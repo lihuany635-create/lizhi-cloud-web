@@ -37,11 +37,12 @@ function scheduleChatAutoSend(text,immediate=false){autoQueueChat(text,immediate
 function openDb(){return new Promise((resolve,reject)=>{const request=indexedDB.open(DB_NAME,DB_VERSION);request.onupgradeneeded=()=>{const db=request.result;if(!db.objectStoreNames.contains("records"))db.createObjectStore("records",{keyPath:"id"});if(!db.objectStoreNames.contains("blobs"))db.createObjectStore("blobs",{keyPath:"id"});};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
 async function store(mode,name="records"){const db=await openDb();return db.transaction(name,mode).objectStore(name);}
 async function allRecords(){return new Promise(async(resolve,reject)=>{const request=(await store("readonly")).getAll();request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
-async function putRecord(record){return new Promise(async(resolve,reject)=>{const request=(await store("readwrite")).put(record);request.onsuccess=()=>resolve(record);request.onerror=()=>reject(request.error);});}
+async function putRecord(record){return new Promise(async(resolve,reject)=>{const request=(await store("readwrite")).put(record);request.onsuccess=()=>{window.LizhiSync?.schedule?.();resolve(record);};request.onerror=()=>reject(request.error);});}
 async function removeRecord(id){return new Promise(async(resolve,reject)=>{const request=(await store("readwrite")).delete(id);request.onsuccess=()=>resolve();request.onerror=()=>reject(request.error);});}
 async function putBlob(id,blob){return new Promise(async(resolve,reject)=>{const request=(await store("readwrite","blobs")).put({id,blob});request.onsuccess=()=>resolve();request.onerror=()=>reject(request.error);});}
 async function getBlob(id){return new Promise(async(resolve,reject)=>{const request=(await store("readonly","blobs")).get(id);request.onsuccess=()=>resolve(request.result?.blob);request.onerror=()=>reject(request.error);});}
 async function removeBlob(id){return new Promise(async(resolve,reject)=>{const request=(await store("readwrite","blobs")).delete(id);request.onsuccess=()=>resolve();request.onerror=()=>reject(request.error);});}
+window.LizhiRecordStore={all:allRecords,put:putRecord};
 
 async function seed(){const rows=await allRecords();if(rows.length)return;const created=now();await putRecord({id:uid(),kind:"folder",title:"我的第一個資料夾",createdAt:created,updatedAt:created});await putRecord({id:uid(),kind:"note",title:"歡迎使用立之雲端庫",body:"這一版只屬於這台電腦。\n\n你可以建立筆記、上傳文件與影音、整理 Podcast 專案，也能從這裡直接進入立之讀書室。",tags:["開始"],createdAt:created,updatedAt:created});}
 async function loadCloudMedia(){if(!IS_CLOUD_SITE)return;const response=await fetch("./media-manifest.json",{cache:"no-store"});if(!response.ok)throw new Error("無法載入雲端影音目錄");const items=await response.json();state.cloudMedia=items.map((item,index)=>({id:`cloud-${index+1}`,kind:"media",mediaType:item.type?.startsWith("video/")?"video":"audio",title:item.title,fileName:item.fileName,type:item.type,size:item.size,remoteUrl:RELEASE_BASE+encodeURIComponent(item.assetName||item.fileName),favorite:false,createdAt:item.createdAt,updatedAt:item.createdAt,cloud:true}));}
@@ -110,6 +111,6 @@ async function boot(){
   KnowledgeEditor.installEvents(app);
   KnowledgeEditor.restore();
   if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").then(registration=>registration.update()).catch(()=>{});
-  seed().then(loadCloudMedia).then(refresh).catch(error=>{app.innerHTML=`<div class="empty">無法開啟資料庫：${escapeHtml(error.message)}</div>`;});
+  seed().then(()=>window.LizhiSync?.sync?.()).then(loadCloudMedia).then(refresh).catch(error=>{app.innerHTML=`<div class="empty">無法開啟資料庫：${escapeHtml(error.message)}</div>`;});
 }
 boot();
