@@ -1,5 +1,5 @@
 (function () {
-  const ALLOWED_EMAIL = "lihuany63@gmail.com";
+  const ALLOWED_EMAIL = "lihuany635@gmail.com";
   const client = window.supabase.createClient(
     window.LIZHI_SUPABASE_URL,
     window.LIZHI_SUPABASE_PUBLISHABLE_KEY,
@@ -48,4 +48,3 @@
 
   window.LizhiAuth = { client, allowedEmail: ALLOWED_EMAIL, requireUser, get user() { return currentUser; } };
 })();
-
