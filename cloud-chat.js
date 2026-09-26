@@ -47,9 +47,11 @@ async function chatRequest(path, body) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
   try {
+    const session = window.LizhiAuth ? (await window.LizhiAuth.client.auth.getSession()).data.session : null;
+    if (!session) throw new Error('請先登入後再使用共用對話');
     const response = await fetch(CHAT_API + path, {
       method: body ? 'POST' : 'GET', cache:'no-store', signal:controller.signal,
-      headers:{apikey:CHAT_PUBLIC_KEY, ...(body ? {'Content-Type':'application/json'} : {})},
+      headers:{apikey:CHAT_PUBLIC_KEY, Authorization:`Bearer ${session.access_token}`, ...(body ? {'Content-Type':'application/json'} : {})},
       ...(body ? {body:JSON.stringify(body)} : {})
     });
     if (!response.ok) {
@@ -83,7 +85,7 @@ async function syncCloudChat() {
     if (!navigator.onLine) throw new Error('目前離線，文字先保存在此裝置');
     // Retry the same ID after timeouts: the database does not duplicate a write.
     for (const message of chat.outbox.slice(0,10)) {
-      const row = await chatRequest('/rpc/lizhi_send_message', {p_id:message.id,p_device_id:message.deviceId,p_device_name:message.deviceName,p_content:message.content});
+      const row = await chatRequest('/rpc/lizhi_web_send_message', {p_id:message.id,p_device_id:message.deviceId,p_device_name:message.deviceName,p_content:message.content});
       const saved = cloudMessage(row);
       if (saved.id !== message.id || saved.content !== message.content) throw new Error('雲端接收確認不符，文字仍保留');
       chat.messages = [...chat.messages.filter(m => m.id !== saved.id), saved].slice(-80);
@@ -92,11 +94,11 @@ async function syncCloudChat() {
       if (!writeLocalJson(chatStoreKey('outbox'), pending)) throw new Error('本機儲存失敗，稍後重試');
       chat.outbox = pending;
     }
-    const latest = await chatRequest('/lizhi_cloud_messages?select=id&order=created_at.desc,id.desc&limit=1');
+    const latest = await chatRequest('/lizhi_web_chat_messages?select=id&order=created_at.desc,id.desc&limit=1');
     if (!Array.isArray(latest)) throw new Error('雲端資料格式異常，稍後重試');
     const latestId = latest[0]?.id || '';
     if (chat.latestCloudId !== latestId) {
-      const rows = await chatRequest('/lizhi_cloud_messages?select=id,device_id,device_name,content,created_at&order=created_at.desc,id.desc&limit=80');
+      const rows = await chatRequest('/lizhi_web_chat_messages?select=id,device_id,device_name,content,created_at&order=created_at.desc,id.desc&limit=80');
       if (!Array.isArray(rows)) throw new Error('雲端資料格式異常，稍後重試');
       chat.messages = rows.map(cloudMessage).reverse();
       chat.latestCloudId = rows[0]?.id || '';
