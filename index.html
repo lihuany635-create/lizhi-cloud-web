@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f3ead9">
+  <title>立之雲端庫</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css?v=15">
+  <link rel="stylesheet" href="./theme.css?v=15">
+  <link rel="stylesheet" href="./study.css?v=15">
+  <link rel="stylesheet" href="./chat.css?v=15">
+  <link rel="stylesheet" href="./knowledge-weaving.css?v=20">
+  <link rel="stylesheet" href="./finance/styles/home.css?v=55">
+  <link rel="stylesheet" href="./knowledge/styles/knowledge.css?v=16">
+</head>
+<body>
+  <div id="app"></div>
+  <input id="knowledge-file-input" type="file" multiple hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.csv,.json,image/*">
+  <input id="media-file-input" type="file" multiple hidden accept="audio/*,video/*">
+  <input id="restore-input" type="file" hidden accept="application/json,.json">
+  <link rel="stylesheet" href="./workspace-ui.css?v=18">
+  <script src="./cloud-chat.js?v=18" defer></script>
+  <script src="./knowledge-weaving-validator.js?v=20" defer></script>
+  <script src="./knowledge-weaving.js?v=20" defer></script>
+  <script src="./finance/domain/finance-domain.js?v=30" defer></script>
+  <script src="./finance/domain/backup.js?v=30" defer></script>
+  <script src="./finance/storage/finance-db.js?v=43" defer></script>
+  <script src="./finance/ui-model.js?v=30" defer></script>
+  <script src="./finance/domain/finance-ai-draft.js?v=50" defer></script>
+  <script src="./finance/ai/ollama-connector.js?v=56" defer></script>
+  <script src="./finance/pages/home.js?v=55" defer></script>
+  <script src="./knowledge/domain/knowledge-model.js?v=16" defer></script>
+  <script src="./knowledge/domain/knowledge-serializer.js?v=17" defer></script>
+  <script src="./knowledge/data/local-knowledge-adapter.js?v=16" defer></script>
+  <script src="./knowledge/data/vault-knowledge-adapter.js?v=16" defer></script>
+  <script src="./knowledge/services/knowledge-service.js?v=16" defer></script>
+  <script src="./knowledge/pages/knowledge-home.js?v=16" defer></script>
+  <script src="./knowledge/pages/knowledge-editor.js?v=17" defer></script>
+  <script src="./workspace-ui.js?v=21" defer></script>
+  <script src="./app.js?v=30" defer></script>
+</body>
+</html>
