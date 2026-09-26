@@ -93,19 +93,23 @@ mediaInput.addEventListener("change",async()=>{for(const file of mediaInput.file
 function exportBackup(){const payload={app:"立之雲端庫・本機版",version:1,exportedAt:now(),records:state.records};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download=`立之雲端庫-資料目錄-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast("已匯出資料目錄");}
 restoreInput.addEventListener("change",async()=>{const file=restoreInput.files[0];if(!file)return;try{const payload=JSON.parse(await file.text());if(!Array.isArray(payload.records))throw new Error("格式不正確");for(const row of payload.records)await putRecord(row);await refresh();toast("資料目錄已匯入");}catch{toast("備份檔格式不正確");}restoreInput.value="";});
 
-initializeChatIdentity();
-initializeDelivery();
-installWorkspaceEvents();
-KnowledgeWeaving.installEvents(app);
-FinanceHome.installEvents(app);
-const knowledgeService=new KnowledgeService({
-  local:new LocalKnowledgeAdapter({records:()=>state.records,put:putRecord,afterSave:refresh}),
-  vault:new VaultKnowledgeAdapter({enabled:!IS_CLOUD_SITE})
-});
-KnowledgeHome.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
-KnowledgeHome.installEvents(app);
-KnowledgeEditor.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
-KnowledgeEditor.installEvents(app);
-KnowledgeEditor.restore();
-if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").then(registration=>registration.update()).catch(()=>{});
-seed().then(loadCloudMedia).then(refresh).catch(error=>{app.innerHTML=`<div class="empty">無法開啟資料庫：${escapeHtml(error.message)}</div>`;});
+async function boot(){
+  if(IS_CLOUD_SITE&&window.LizhiAuth&&!await window.LizhiAuth.requireUser())return;
+  initializeChatIdentity();
+  initializeDelivery();
+  installWorkspaceEvents();
+  KnowledgeWeaving.installEvents(app);
+  FinanceHome.installEvents(app);
+  const knowledgeService=new KnowledgeService({
+    local:new LocalKnowledgeAdapter({records:()=>state.records,put:putRecord,afterSave:refresh}),
+    vault:new VaultKnowledgeAdapter({enabled:!IS_CLOUD_SITE})
+  });
+  KnowledgeHome.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
+  KnowledgeHome.installEvents(app);
+  KnowledgeEditor.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
+  KnowledgeEditor.installEvents(app);
+  KnowledgeEditor.restore();
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").then(registration=>registration.update()).catch(()=>{});
+  seed().then(loadCloudMedia).then(refresh).catch(error=>{app.innerHTML=`<div class="empty">無法開啟資料庫：${escapeHtml(error.message)}</div>`;});
+}
+boot();

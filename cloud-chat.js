@@ -1,7 +1,7 @@
 // Public cloud chat. Only a successful database response means cloud-saved.
-const CHAT_API = 'https://dtgtkrlzufylyvcbgggw.supabase.co/rest/v1';
+const CHAT_API = `${window.LIZHI_SUPABASE_URL}/rest/v1`;
 // Publishable browser key, not a service-role/admin credential.
-const CHAT_PUBLIC_KEY = 'sb_publishable_srv3yVIAjEQne-p0qhw19A_feAFnV6s';
+const CHAT_PUBLIC_KEY = window.LIZHI_SUPABASE_PUBLISHABLE_KEY;
 function chatStoreKey(suffix) { return `lizhi-chat-${suffix}:${chat.roomCode}`; }
 function readLocalJson(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
