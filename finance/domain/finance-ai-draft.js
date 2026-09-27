@@ -1,13 +1,13 @@
 (function(root,factory){
   const isNode=typeof module!=="undefined"&&module.exports;
-  const api=factory(isNode?require("./finance-domain.js"):root.FinanceDomain,isNode?require("../ui-model.js"):root.FinanceUiModel);
+  const api=factory(isNode?require("./finance-domain.js"):root.FinanceDomain,isNode?require("../ui-model.js"):root.FinanceUiModel,isNode?require("./finance-transaction-template.js"):root.FinanceTransactionTemplate);
   if(isNode)module.exports=api;
   root.FinanceDraft=api;
-})(typeof globalThis!=="undefined"?globalThis:this,function(Domain,UiModel){
+})(typeof globalThis!=="undefined"?globalThis:this,function(Domain,UiModel,Template){
   "use strict";
 
-  const VERSION=1;
-  const DRAFT_FIELDS=Object.freeze(["version","type","amount","date","category","account","creditCard","fromAccount","toAccount","note","source","confidence"]);
+  const VERSION=Template.TEMPLATE_VERSION;
+  const DRAFT_FIELDS=Template.FIELDS;
   const REFERENCE_CONFIG=Object.freeze({
     category:{rows:"categories",resolved:"categoryId",label:"分類"},
     account:{rows:"accounts",resolved:"accountId",label:"帳戶"},
@@ -39,8 +39,9 @@
 
   function normalizeFinanceDraft(input={}){
     const source=input&&typeof input==="object"&&!Array.isArray(input)?input:{};
-    return Object.freeze({
-      version:source.version==="1"?1:source.version,
+    return Template.sanitizeFinanceTransactionTemplate({
+      ...source,
+      version:VERSION,
       type:normalizedType(source.type),
       amount:normalizedAmount(source.amount),
       date:text(source.date),
@@ -49,14 +50,14 @@
       creditCard:text(source.creditCard),
       fromAccount:text(source.fromAccount),
       toAccount:text(source.toAccount),
-      note:text(source.note)||"",
-      source:text(source.source)||"unknown",
+      note:text(source.note),
+      source:text(source.source),
       confidence:normalizedConfidence(source.confidence)
     });
   }
 
   function transactionCandidate(draft,resolved={}){
-    const base={type:draft.type,amount:draft.amount,date:draft.date,note:draft.note};
+    const base={type:draft.type,amount:draft.amount,date:draft.date,note:draft.note||""};
     if(draft.type==="income"||draft.type==="expense")return {...base,accountId:resolved.accountId||draft.account,categoryId:resolved.categoryId||draft.category};
     if(draft.type==="transfer")return {...base,fromAccountId:resolved.fromAccountId||draft.fromAccount,toAccountId:resolved.toAccountId||draft.toAccount};
     if(draft.type==="credit_card_purchase")return {...base,creditCardId:resolved.creditCardId||draft.creditCard,categoryId:resolved.categoryId||draft.category};
@@ -66,10 +67,11 @@
 
   function validateFinanceDraft(input){
     const draft=normalizeFinanceDraft(input),errors=[];
-    if(draft.version!==VERSION)errors.push(error("UNSUPPORTED_DRAFT_VERSION","version",`Draft version 必須是 ${VERSION}`));
+    if(input?.version!==undefined&&!([1,"1","1.0"].includes(input.version)))errors.push(error("UNSUPPORTED_DRAFT_VERSION","version",`Draft version 必須是 ${VERSION}`));
+    if(!Template.isFinanceTransactionTemplateShape(draft))errors.push(error("INVALID_DRAFT_SHAPE",null,"Draft 不符合 Canonical Finance Draft 結構"));
     if(!Domain.TRANSACTION_TYPES.includes(draft.type))errors.push(error("UNKNOWN_TRANSACTION_TYPE","type","請指定支援的交易類型"));
     if(draft.confidence!==null&&(draft.confidence<0||draft.confidence>1))errors.push(error("INVALID_CONFIDENCE","confidence","confidence 必須是 0 到 1 或 null"));
-    if(draft.note.length>200)errors.push(error("INVALID_NOTE","note","備註不可超過 200 字"));
+    if((draft.note||"").length>200)errors.push(error("INVALID_NOTE","note","備註不可超過 200 字"));
     const domainResult=Domain.validateTransaction(transactionCandidate(draft));
     for(const item of domainResult.errors){
       if(item.code==="UNKNOWN_TRANSACTION_TYPE"&&errors.some(row=>row.code===item.code))continue;
