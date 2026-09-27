@@ -38,6 +38,7 @@
     var text = value.trim();
     var allowed = allowedForField(field, context);
     if (allowed && allowed.indexOf(text) === -1) return {value: null, issue: "ai_value_not_allowed:" + field};
+    if (field === "category" && normalizeText(context.rawText).indexOf(normalizeText(text)) === -1) return {value: null, issue: "ai_value_not_allowed:category"};
     if (field === "merchant" && normalizeText(context.rawText).indexOf(normalizeText(text)) === -1) return {value: null, issue: "ai_value_not_allowed:merchant"};
     if (field === "note" && text.length > 200) return {value: null, issue: "ai_value_not_allowed:note"};
     return {value: text};

@@ -8,6 +8,8 @@
   const DIGITS=Object.freeze({零:0,"〇":0,一:1,二:2,兩:2,两:2,三:3,四:4,五:5,六:6,七:7,八:8,九:9});
   const SMALL_UNITS=Object.freeze({十:10,百:100,千:1000});
   const AMOUNT_UNITS="元塊块圓圆";
+  const QUANTITY_MEASURE_WORDS=Object.freeze(["筆","份","次","張","個","杯","餐","件","台","組","包","瓶"]);
+  const CHINESE_NUMBER_CHARS="零〇一二兩两三四五六七八九十百千萬万";
   const AMBIGUOUS_PATTERNS=Object.freeze([/[零〇一二兩两三四五六七八九十百千萬万]+多(?:元|塊|块|圓|圆)?/,/快\s*[零〇一二兩两三四五六七八九十百千萬万\d,]+/,/[零〇一二兩两三四五六七八九]\s*[、到至~-]\s*[零〇一二兩两三四五六七八九十百千萬万]+/]);
 
   function parseChineseStandard(value){
@@ -39,7 +41,14 @@
   }
 
   function excludedRanges(text){
-    const ranges=[],patterns=[/\d{4}\s*[\/-]\s*\d{1,2}\s*[\/-]\s*\d{1,2}/g,/\b\d{1,2}\s*[\/-]\s*\d{1,2}\b/g,/(?:末四碼|尾碼|末碼)\s*\d{3,6}/g];
+    const quantityWords=QUANTITY_MEASURE_WORDS.join("|");
+    const ranges=[],patterns=[
+      /\d{4}\s*[\/-]\s*\d{1,2}\s*[\/-]\s*\d{1,2}/g,
+      /\b\d{1,2}\s*[\/-]\s*\d{1,2}\b/g,
+      /(?:\d{4}\s*年\s*)?\d{1,2}\s*月\s*\d{1,2}\s*(?:日|號)/g,
+      new RegExp(`[${CHINESE_NUMBER_CHARS}]+\\s*(?:${quantityWords})`,"g"),
+      /(?:末四碼|尾碼|末碼)\s*\d{3,6}/g
+    ];
     for(const pattern of patterns){let match;while((match=pattern.exec(text)))ranges.push([match.index,match.index+match[0].length]);}
     return ranges;
   }
@@ -70,5 +79,5 @@
     return Object.freeze({amount:valid?candidates[0].value:null,source:valid?candidates[0].source:null,candidates:Object.freeze(candidates),issues:uniqueIssues});
   }
 
-  return Object.freeze({parseChineseAmount,parseFinanceAmount});
+  return Object.freeze({QUANTITY_MEASURE_WORDS,parseChineseAmount,parseFinanceAmount});
 });

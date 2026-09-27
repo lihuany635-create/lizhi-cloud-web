@@ -25,7 +25,7 @@
     return value.normalize("NFKC").replace(/[，、]/g,",").replace(/[。]/g,".").replace(/\s+/g," ").trim();
   }
   const contains=(text,value)=>{const key=matchText(value);return Boolean(key)&&text.includes(key);};
-  const activeRows=rows=>(Array.isArray(rows)?rows:[]).filter(row=>row&&row.archived!==true&&typeof row.name==="string"&&row.name.trim());
+  const activeRows=rows=>(Array.isArray(rows)?rows:[]).filter(row=>row&&row.archived!==true&&row.active!==false&&typeof row.name==="string"&&row.name.trim());
 
   function resolveAlias(text,rows,groups,kind){
     const available=activeRows(rows),normalized=matchText(text);

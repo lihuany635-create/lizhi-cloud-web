@@ -24,6 +24,13 @@
     }).map(function (row) { return row.name; }));
   }
 
+  function evidenceBackedNames(rows, type, rawText) {
+    var normalized = String(rawText == null ? "" : rawText).normalize("NFKC").trim().toLowerCase();
+    return activeNames(rows, type).filter(function (name) {
+      return normalized.indexOf(String(name).normalize("NFKC").trim().toLowerCase()) !== -1;
+    });
+  }
+
   function nonNullKnownFields(draft) {
     var out = {};
     Object.keys(draft || {}).forEach(function (key) {
@@ -65,6 +72,7 @@
     var ruleResult = options.ruleResult || {};
     var draft = options.draft || ruleResult.draft || {};
     var references = options.references || {};
+    var rawText = String(options.rawText == null ? draft.rawText || "" : options.rawText).trim();
     var issues = uniqueStrings(ruleResult.issues || []);
     var lockedFields = uniqueStrings(ruleResult.lockedFields || []);
     var typeHints = uniqueStrings(ruleResult.typeHints || []);
@@ -72,14 +80,14 @@
     var allowedValues = { types: ALLOWED_TYPES.slice() };
     var expectedType = inferredType(draft, typeHints);
     var categoryType = expectedType === "income" ? "income" : (["expense", "credit_card_purchase"].indexOf(expectedType) !== -1 ? "expense" : null);
-    if (missingFields.indexOf("category") !== -1) allowedValues.categories = activeNames(references.categories, categoryType);
+    if (missingFields.indexOf("category") !== -1) allowedValues.categories = evidenceBackedNames(references.categories, categoryType, rawText);
     if (["account", "fromAccount", "toAccount"].some(function (field) { return missingFields.indexOf(field) !== -1; })) {
       allowedValues.accounts = activeNames(references.accounts);
     }
     if (missingFields.indexOf("creditCard") !== -1) allowedValues.creditCards = activeNames(references.creditCards);
     var blocking = hasBlockingIssue(ruleResult, issues);
     return Object.freeze({
-      rawText: String(options.rawText == null ? draft.rawText || "" : options.rawText).trim(),
+      rawText: rawText,
       draft: draft,
       knownFields: nonNullKnownFields(draft),
       lockedFields: lockedFields,
