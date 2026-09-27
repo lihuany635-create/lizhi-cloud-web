@@ -118,7 +118,7 @@
   async function generateConstrainedFinanceDraft(input,references={},settings={},options={}){
     if(!RuleEngine||!SmallModelParser)throw new Error("Finance Phase 2/3 modules are unavailable.");
     const ruleResult=RuleEngine.parseFinanceRulesToDraft(input,{...references,currentDate:options.currentDate});
-    return SmallModelParser.parseFinanceWithSmallModel({rawText:input,draft:ruleResult.draft,ruleResult,references,settings,signal:options.signal,connector:options.connector});
+    return SmallModelParser.parseFinanceWithSmallModel({rawText:input,draft:ruleResult.draft,ruleResult,references,settings,signal:options.signal,connector:options.connector,onStatus:options.onStatus});
   }
 
   return Object.freeze({VERSION,DRAFT_FIELDS,TRANSACTION_TYPES:Domain.TRANSACTION_TYPES,normalizeFinanceDraft,validateFinanceDraft,resolveFinanceDraftReferences,applyFinanceDraftToForm,generateConstrainedFinanceDraft});

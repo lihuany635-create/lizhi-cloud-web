@@ -43,7 +43,7 @@
     var started = Date.now();
     var response;
     try {
-      response = await connector.generateConstrainedFinancePatch(promptPackage, options.settings, {signal: options.signal, context: context});
+      response = await connector.generateConstrainedFinancePatch(promptPackage, options.settings, {signal: options.signal, context: context, onStatus: options.onStatus});
     } catch (error) {
       var issue = errorIssue(error);
       return Object.freeze({
