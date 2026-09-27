@@ -15,8 +15,10 @@
   ]);
   const MUTABLE_FIELDS=Object.freeze(FIELDS.filter(field=>field!=="version"));
   const TEXT_FIELDS=Object.freeze(["category","account","creditCard","fromAccount","toAccount","merchant","note","rawText","source"]);
+  const NORMALIZED_TEXT_FIELDS=Object.freeze(TEXT_FIELDS.filter(field=>field!=="rawText"));
   const own=(value,key)=>Object.prototype.hasOwnProperty.call(value,key);
   const text=value=>typeof value==="string"?(value.normalize("NFKC").trim()||null):null;
+  const rawText=value=>typeof value==="string"?(value.trim()||null):null;
 
   function isCalendarDate(value){
     const match=/^(\d{4})-(\d{2})-(\d{2})$/.exec(value||"");
@@ -43,7 +45,8 @@
     result.action=enumValue(source.action,ACTIONS);
     result.type=enumValue(source.type,TYPES);
     result.amount=amountValue(source.amount);
-    for(const field of TEXT_FIELDS)result[field]=text(source[field]);
+    for(const field of NORMALIZED_TEXT_FIELDS)result[field]=text(source[field]);
+    result.rawText=rawText(source.rawText);
     result.dateToken=enumValue(source.dateToken,DATE_TOKENS);
     const date=text(source.date);result.date=date&&isCalendarDate(date)?date:null;
     result.confidence=confidenceValue(source.confidence);
