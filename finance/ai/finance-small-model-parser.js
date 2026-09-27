@@ -4,17 +4,17 @@
     isNode ? require("./finance-ai-context.js") : root.FinanceAiContext,
     isNode ? require("./finance-ai-prompt.js") : root.FinanceAiPrompt,
     isNode ? require("./finance-ai-output-guard.js") : root.FinanceAiOutputGuard,
-    isNode ? require("./ollama-connector.js") : root.FinanceOllama,
+    isNode ? require("./finance-ai-gateway-connector.js") : root.FinanceAIGatewayConnector,
     isNode ? require("../domain/finance-transaction-template.js") : root.FinanceTransactionTemplate
   );
   if (isNode) module.exports = api;
   root.FinanceSmallModelParser = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (Context, Prompt, OutputGuard, Ollama, Template) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (Context, Prompt, OutputGuard, GatewayConnector, Template) {
   "use strict";
 
   function errorIssue(error) {
     var code = error && error.code;
-    if (code === "TIMEOUT" || code === "ABORTED") return "ai_timeout";
+    if (code === "TIMEOUT" || code === "ABORTED" || code === "OLLAMA_TIMEOUT") return "ai_timeout";
     if (code === "CANCELLED") return "ai_cancelled";
     if (code === "EMPTY_RESPONSE") return "ai_empty_response";
     return "ai_unavailable";
@@ -38,12 +38,12 @@
     var context = Context.buildFinanceAiContext({rawText: options.rawText, draft: draft, ruleResult: ruleResult, references: options.references || {}});
     if (!context.shouldCallAI) return noCallResult(draft, context, ruleResult);
 
-    var connector = options.connector || Ollama;
+    var connector = options.connector || GatewayConnector;
     var promptPackage = Prompt.buildFinanceAiPrompt(context);
     var started = Date.now();
     var response;
     try {
-      response = await connector.generateConstrainedFinancePatch(promptPackage, options.settings, {signal: options.signal});
+      response = await connector.generateConstrainedFinancePatch(promptPackage, options.settings, {signal: options.signal, context: context});
     } catch (error) {
       var issue = errorIssue(error);
       return Object.freeze({

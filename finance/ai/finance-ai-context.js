@@ -80,6 +80,7 @@
     var blocking = hasBlockingIssue(ruleResult, issues);
     return Object.freeze({
       rawText: String(options.rawText == null ? draft.rawText || "" : options.rawText).trim(),
+      draft: draft,
       knownFields: nonNullKnownFields(draft),
       lockedFields: lockedFields,
       missingFields: missingFields,
