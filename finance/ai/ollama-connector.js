@@ -83,5 +83,18 @@
     if(response?.error&&/model/i.test(response.error))throw new OllamaConnectorError("MODEL_NOT_FOUND","找不到指定的 Ollama 模型。");
     return Object.freeze({rawDraft:parseStructuredDraft(response?.response),model:response?.model||config.model,done:response?.done===true,metrics:Object.freeze({totalDuration:response?.total_duration||null,promptTokens:response?.prompt_eval_count||null,outputTokens:response?.eval_count||null})});
   }
-  return Object.freeze({DEFAULT_SETTINGS,DRAFT_KEYS,DRAFT_SCHEMA,TYPES,OllamaConnectorError,normalizeSettings,checkOllamaHealth,getOllamaModels,minimalReferences,buildFinancePrompt,parseStructuredDraft,generateFinanceDraft});
+  async function generateConstrainedFinancePatch(promptPackage,settings=DEFAULT_SETTINGS,{signal}={}){
+    if(!promptPackage||promptPackage.kind!=="finance-small-model-v1"||!promptPackage.prompt){
+      throw new OllamaConnectorError("INVALID_PROMPT","Invalid constrained finance prompt.");
+    }
+    if(!promptPackage.schema||promptPackage.schema.type!=="object"){
+      throw new OllamaConnectorError("INVALID_SCHEMA","Invalid constrained finance schema.");
+    }
+    const config=normalizeSettings(settings);
+    if(!config.model)throw new OllamaConnectorError("MODEL_REQUIRED","請先選擇 Ollama 模型。");
+    const response=await request("/api/generate",{settings:config,method:"POST",signal,body:{model:config.model,prompt:String(promptPackage.prompt),stream:false,format:promptPackage.schema,options:{temperature:0,num_predict:220}}});
+    if(response?.error&&/model/i.test(response.error))throw new OllamaConnectorError("MODEL_NOT_FOUND","找不到指定的 Ollama 模型。");
+    return Object.freeze({rawText:String(response?.response??""),model:response?.model||config.model,metrics:response||null});
+  }
+  return Object.freeze({DEFAULT_SETTINGS,DRAFT_KEYS,DRAFT_SCHEMA,TYPES,OllamaConnectorError,normalizeSettings,checkOllamaHealth,getOllamaModels,minimalReferences,buildFinancePrompt,parseStructuredDraft,generateFinanceDraft,generateConstrainedFinancePatch});
 });

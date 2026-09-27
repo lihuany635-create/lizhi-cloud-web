@@ -1,9 +1,9 @@
 (function(root,factory){
   const isNode=typeof module!=="undefined"&&module.exports;
-  const api=factory(isNode?require("./finance-domain.js"):root.FinanceDomain,isNode?require("../ui-model.js"):root.FinanceUiModel,isNode?require("./finance-transaction-template.js"):root.FinanceTransactionTemplate);
+  const api=factory(isNode?require("./finance-domain.js"):root.FinanceDomain,isNode?require("../ui-model.js"):root.FinanceUiModel,isNode?require("./finance-transaction-template.js"):root.FinanceTransactionTemplate,isNode?require("./finance-rule-engine.js"):root.FinanceRuleEngine,isNode?require("../ai/finance-small-model-parser.js"):root.FinanceSmallModelParser);
   if(isNode)module.exports=api;
   root.FinanceDraft=api;
-})(typeof globalThis!=="undefined"?globalThis:this,function(Domain,UiModel,Template){
+})(typeof globalThis!=="undefined"?globalThis:this,function(Domain,UiModel,Template,RuleEngine,SmallModelParser){
   "use strict";
 
   const VERSION=Template.TEMPLATE_VERSION;
@@ -115,5 +115,11 @@
     return Object.freeze({...parsed.value,amount:String(parsed.value.amount)});
   }
 
-  return Object.freeze({VERSION,DRAFT_FIELDS,TRANSACTION_TYPES:Domain.TRANSACTION_TYPES,normalizeFinanceDraft,validateFinanceDraft,resolveFinanceDraftReferences,applyFinanceDraftToForm});
+  async function generateConstrainedFinanceDraft(input,references={},settings={},options={}){
+    if(!RuleEngine||!SmallModelParser)throw new Error("Finance Phase 2/3 modules are unavailable.");
+    const ruleResult=RuleEngine.parseFinanceRulesToDraft(input,{...references,currentDate:options.currentDate});
+    return SmallModelParser.parseFinanceWithSmallModel({rawText:input,draft:ruleResult.draft,ruleResult,references,settings,signal:options.signal,connector:options.connector});
+  }
+
+  return Object.freeze({VERSION,DRAFT_FIELDS,TRANSACTION_TYPES:Domain.TRANSACTION_TYPES,normalizeFinanceDraft,validateFinanceDraft,resolveFinanceDraftReferences,applyFinanceDraftToForm,generateConstrainedFinanceDraft});
 });

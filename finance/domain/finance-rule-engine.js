@@ -68,12 +68,13 @@
 
   function transactionHints(text){
     const normalized=matchText(text);
+    if(/繳.*卡費|卡費.*繳/.test(normalized))return Object.freeze(["credit_card_payment"]);
     for(const rule of TransactionKeywords.RULES)if(rule.keywords.some(keyword=>contains(normalized,keyword)))return Object.freeze([rule.type]);
     return Object.freeze([TransactionKeywords.DEFAULT_HINT]);
   }
 
   function resolveTransferAccounts(text,accounts){
-    const fromMatch=/從(.+?)轉/.exec(text),toMatch=/(?:到|至)(.+)$/.exec(text);
+    const fromMatch=/(?:從)?(.+?)轉/.exec(text),toMatch=/(?:到|至)(.+)$/.exec(text);
     const from=fromMatch?resolveAlias(fromMatch[1],accounts,AccountAliases.GROUPS,"account"):null;
     const to=toMatch?resolveAlias(toMatch[1],accounts,AccountAliases.GROUPS,"account"):null;
     return {from,to};
