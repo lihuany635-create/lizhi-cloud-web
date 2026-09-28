@@ -8,6 +8,7 @@
 
   const DB_NAME="lizhi-finance",DB_VERSION=1;
   const STORE_NAMES=Object.freeze(["accounts","creditCards","categories","transactions","settings","backgrounds"]);
+  const SYNC_STORE_NAMES=Object.freeze(["accounts","creditCards","categories","transactions"]);
   const DEFAULT_CATEGORIES=Object.freeze([
     {id:"system-salary",name:"薪資",type:"income",icon:"薪",system:true},
     {id:"system-other-income",name:"其他收入",type:"income",icon:"收",system:true},
@@ -66,8 +67,8 @@
   const getRecord=(store,key)=>requestResult(store.get(key));
   async function listStore(storeName,options={}){
     return withStore(storeName,"readonly",async store=>{
-      if(options.index&&options.value!==undefined)return requestResult(store.index(options.index).getAll(options.value));
-      return requestResult(store.getAll());
+      const rows=options.index&&options.value!==undefined?await requestResult(store.index(options.index).getAll(options.value)):await requestResult(store.getAll());
+      return options.includeDeleted?rows:rows.filter(row=>!row.deletedAt);
     });
   }
   async function getFrom(storeName,key){return withStore(storeName,"readonly",store=>getRecord(store,key));}
@@ -106,13 +107,14 @@
   }
   const backgrounds=Object.freeze({...baseBackgrounds,setActive:setActiveBackground,clearActive:()=>setActiveBackground(null),delete:deleteBackground});
 
-  async function saveTransaction(input,existingId=null){
+  async function saveTransaction(input,existingId=null,{upsert=false,preserveTimestamps=false}={}){
     const db=await openFinanceDb();
     try{
       const tx=db.transaction(["transactions","accounts","creditCards","categories"],"readwrite"),store=tx.objectStore("transactions");
       const current=existingId?await getRecord(store,existingId):null;
-      if(existingId&&!current)throw new FinanceStorageError("NOT_FOUND",`找不到 transactions：${existingId}`,{id:existingId});
-      const stamp=now(),record={...(current||{}),...input,id:existingId||input.id||id(),createdAt:current?.createdAt||input.createdAt||stamp,updatedAt:stamp};
+      if(existingId&&!current&&!upsert)throw new FinanceStorageError("NOT_FOUND",`找不到 transactions：${existingId}`,{id:existingId});
+      const stamp=now(),record={...(current||{}),...input,id:existingId||input.id||id(),createdAt:current?.createdAt||input.createdAt||stamp,updatedAt:preserveTimestamps?(input.updatedAt||current?.updatedAt||stamp):stamp};
+      if(record.deletedAt){await requestResult(store.put(record));await transactionDone(tx);return record;}
       const allowed={income:["accountId","categoryId"],expense:["accountId","categoryId"],transfer:["fromAccountId","toAccountId"],credit_card_purchase:["creditCardId","categoryId"],credit_card_payment:["accountId","creditCardId"]}[record.type]||[];
       for(const field of ["accountId","categoryId","fromAccountId","toAccountId","creditCardId"])if(!allowed.includes(field))delete record[field];
       const accountIds=[record.accountId,record.fromAccountId,record.toAccountId].filter(Boolean);
@@ -126,16 +128,31 @@
       if(categoryRow?.archived&&(!current||current.categoryId!==record.categoryId))throw new FinanceStorageError("ARCHIVED_REFERENCE","已封存分類不可用於新交易",{field:"categoryId"});
       if(record.type==="income"&&categoryRow?.type!=="income")throw new FinanceStorageError("INVALID_CATEGORY_REFERENCE","收入必須使用收入分類",{categoryId:record.categoryId});
       if(["expense","credit_card_purchase"].includes(record.type)&&categoryRow?.type!=="expense")throw new FinanceStorageError("INVALID_CATEGORY_REFERENCE","支出必須使用支出分類",{categoryId:record.categoryId});
-      await requestResult(existingId?store.put(record):store.add(record));await transactionDone(tx);return record;
+      await requestResult(existingId||upsert?store.put(record):store.add(record));await transactionDone(tx);return record;
     }catch(error){throw translateError(error,{store:"transactions",id:existingId||input.id});}finally{db.close();}
   }
-  const transactions=Object.freeze({create:input=>saveTransaction(input),get:key=>getFrom("transactions",key),list:options=>listStore("transactions",options),update:(key,changes)=>saveTransaction(changes,key),delete:key=>removeFrom("transactions",key)});
+  async function tombstoneTransaction(key){const current=await getFrom("transactions",key);if(!current)throw new FinanceStorageError("NOT_FOUND",`找不到 transactions：${key}`,{id:key});const stamp=now();return putTo("transactions",{...current,deletedAt:stamp,updatedAt:stamp});}
+  const transactions=Object.freeze({create:input=>saveTransaction(input),get:key=>getFrom("transactions",key),list:options=>listStore("transactions",options),update:(key,changes)=>saveTransaction(changes,key),delete:tombstoneTransaction});
   const settings=Object.freeze({get:key=>getFrom("settings",key),list:()=>listStore("settings"),set:(key,value)=>{requireText(key,"key");return putTo("settings",{key,value,updatedAt:now()});}});
+
+  function syncStoreName(kind){if(!SYNC_STORE_NAMES.includes(kind))throw new FinanceStorageError("INVALID_SYNC_KIND","不支援的 Finance sync 類型",{kind});return kind;}
+  async function putSynced(kind,input){
+    const storeName=syncStoreName(kind),record={...input};requireText(record.id,"id");
+    if(storeName==="transactions")return saveTransaction(record,record.id,{upsert:true,preserveTimestamps:true});
+    const normalized=storeName==="accounts"?normalizeAccount(record):storeName==="creditCards"?normalizeCard(record):normalizeCategory(record);
+    return putTo(storeName,normalized);
+  }
+  async function transactionReferencesPresent(record){
+    if(record.deletedAt)return true;
+    const required={income:[["accounts",record.accountId],["categories",record.categoryId]],expense:[["accounts",record.accountId],["categories",record.categoryId]],transfer:[["accounts",record.fromAccountId],["accounts",record.toAccountId]],credit_card_purchase:[["creditCards",record.creditCardId],["categories",record.categoryId]],credit_card_payment:[["accounts",record.accountId],["creditCards",record.creditCardId]]}[record.type]||[];
+    const rows=await Promise.all(required.map(([store,key])=>key?getFrom(store,key):null));return rows.length===required.length&&rows.every(row=>row&&!row.deletedAt);
+  }
+  const sync=Object.freeze({kinds:SYNC_STORE_NAMES,list:kind=>listStore(syncStoreName(kind),{includeDeleted:true}),get:(kind,key)=>getFrom(syncStoreName(kind),key),put:putSynced,referencesPresent:transactionReferencesPresent});
 
   async function exportBackup(exportedAt){
     if(!Backup)throw new FinanceStorageError("BACKUP_UNAVAILABLE","FinanceBackup 尚未載入");
     const db=await openFinanceDb();
     try{const tx=db.transaction(STORE_NAMES,"readonly"),rows={};await Promise.all(STORE_NAMES.map(async name=>{rows[name]=await requestResult(tx.objectStore(name).getAll());}));await transactionDone(tx);return Backup.createBackupEnvelope(rows,exportedAt);}catch(error){throw translateError(error,{operation:"exportBackup"});}finally{db.close();}
   }
-  return Object.freeze({DB_NAME,DB_VERSION,STORE_NAMES,DEFAULT_CATEGORIES,FinanceStorageError,migrateFinanceDb,openFinanceDb,accounts,creditCards,categories,transactions,settings,backgrounds,exportBackup});
+  return Object.freeze({DB_NAME,DB_VERSION,STORE_NAMES,SYNC_STORE_NAMES,DEFAULT_CATEGORIES,FinanceStorageError,migrateFinanceDb,openFinanceDb,accounts,creditCards,categories,transactions,settings,backgrounds,sync,exportBackup});
 });

@@ -97,7 +97,7 @@ test('P6-FINAL-14 heartbeat continues while Host is busy',async()=>{
 });
 
 test('P6-FINAL-15 production autoEntry remains disabled',()=>{
-  assert.match(read('finance/pages/home.js'),/aiAutoEntryEnabled=location\.hostname!=="lihuany635-create\.github\.io"/);
+  assert.match(read('finance/pages/home.js'),/aiAutoEntryEnabled=false/);
 });
 
 test('P6-FINAL-16 Finance DB_VERSION remains 1',()=>{

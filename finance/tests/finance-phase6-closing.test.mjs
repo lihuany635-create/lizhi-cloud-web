@@ -101,7 +101,7 @@ test('P6-CLOSE-18 AI-required case completes the Job lifecycle',async()=>{
 });
 
 test('P6-CLOSE-19 production autoEntry remains disabled',()=>{
-  assert.match(home(),/aiAutoEntryEnabled=location\.hostname!=="lihuany635-create\.github\.io"/);
+  assert.match(home(),/aiAutoEntryEnabled=false/);
 });
 
 test('P6-CLOSE-20 Finance DB_VERSION remains 1',()=>{
