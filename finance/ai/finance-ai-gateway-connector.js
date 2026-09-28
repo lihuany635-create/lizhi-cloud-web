@@ -6,6 +6,7 @@
   "use strict";
   const DEFAULT_SETTINGS=Object.freeze({provider:"finance-gateway",baseUrl:"http://127.0.0.1:4181",timeout:30000});
   class GatewayConnectorError extends Error{constructor(code,message,details={},cause){super(message,{cause});this.name="GatewayConnectorError";this.code=code;this.details=details;}}
+  function isLoopbackUrl(value){let url;try{url=new URL(String(value));}catch{return false;}return ["127.0.0.1","localhost","[::1]"].includes(url.hostname);}
   function normalizeSettings(input={}){
     let url;try{url=new URL(String(input.baseUrl||DEFAULT_SETTINGS.baseUrl).trim());}catch(cause){throw new GatewayConnectorError("INVALID_BASE_URL","Gateway URL 格式不正確。",{},cause);}
     const local=url.protocol==="http:"&&["127.0.0.1","localhost","[::1]"].includes(url.hostname),secure=url.protocol==="https:";
@@ -25,7 +26,9 @@
     if(signal){if(signal.aborted)relay();else signal.addEventListener("abort",relay,{once:true});}
     try{
       const headers=body?{"content-type":"application/json"}:{};if(authorized)headers.authorization=`Bearer ${await accessToken()}`;
-      const response=await fetch(`${config.baseUrl}${path}`,{method,headers,body:body?JSON.stringify(body):undefined,signal:controller.signal,cache:"no-store"});
+      const requestOptions={method,headers,body:body?JSON.stringify(body):undefined,signal:controller.signal,cache:"no-store"};
+      if(isLoopbackUrl(config.baseUrl))requestOptions.targetAddressSpace="loopback";
+      const response=await fetch(`${config.baseUrl}${path}`,requestOptions);
       let payload={};try{payload=await response.json();}catch{}
       if(!response.ok){const code=payload?.error?.code||"GATEWAY_ERROR";throw new GatewayConnectorError(code,`Finance AI Gateway 回傳 HTTP ${response.status}。`,{status:response.status});}
       return payload;
@@ -41,5 +44,5 @@
     const data=await gatewayRequest("/finance/parse",{settings,method:"POST",authorized:true,signal,body:{task:"finance_parse",requestId:requestId(),rawText:context.rawText,draft:context.draft,lockedFields:context.lockedFields,typeHints:context.typeHints,allowedValues:{types:context.allowedValues.types||[],accounts:context.allowedValues.accounts||[],creditCards:context.allowedValues.creditCards||[],categories:context.allowedValues.categories||[]}}});
     return Object.freeze({rawText:JSON.stringify(data.patch||{}),model:"finance-gateway",metrics:Object.freeze({requestId:data.requestId,elapsedMs:data.elapsedMs,issues:data.issues||[]})});
   }
-  return Object.freeze({DEFAULT_SETTINGS,GatewayConnectorError,normalizeSettings,checkGatewayHealth,generateConstrainedFinancePatch});
+  return Object.freeze({DEFAULT_SETTINGS,GatewayConnectorError,isLoopbackUrl,normalizeSettings,checkGatewayHealth,generateConstrainedFinancePatch});
 });

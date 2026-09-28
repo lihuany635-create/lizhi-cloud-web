@@ -54,12 +54,13 @@ test('P6-T07 connector failure stays safe and never falls back to direct Ollama'
   const originalAuth=globalThis.LizhiAuth;
   const calls=[];
   globalThis.LizhiAuth={client:{auth:{getSession:async()=>({data:{session:{access_token:'phase6-token'}}})}}};
-  globalThis.fetch=async url=>{calls.push(String(url));throw new TypeError('offline');};
+  globalThis.fetch=async(url,options)=>{calls.push({url:String(url),options});throw new TypeError('offline');};
   t.after(()=>{globalThis.fetch=originalFetch;globalThis.LizhiAuth=originalAuth;});
   await assert.rejects(()=>Connector.generateConstrainedFinancePatch({}, {baseUrl:'https://finance-ai.example.com'}, {context:{rawText:'早餐250',draft:{},lockedFields:[],typeHints:['expense'],allowedValues:{types:['expense']}}}),error=>error.code==='CONNECTION_FAILED');
   assert.equal(calls.length,1);
-  assert.match(calls[0],/^https:\/\/finance-ai\.example\.com\/finance\/parse$/);
-  assert.ok(calls.every(url=>!url.includes('11434')));
+  assert.match(calls[0].url,/^https:\/\/finance-ai\.example\.com\/finance\/parse$/);
+  assert.equal(calls[0].options.targetAddressSpace,undefined);
+  assert.ok(calls.every(call=>!call.url.includes('11434')));
 });
 
 test('P6-T08 Phase 6 keeps DB v1 and performs no transaction writes',()=>{

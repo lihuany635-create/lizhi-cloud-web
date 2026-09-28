@@ -12,6 +12,7 @@ import {createGatewayLogger} from "./gateway-logger.mjs";
 const json=(response,status,body,headers={})=>{response.writeHead(status,{"content-type":"application/json; charset=utf-8","cache-control":"no-store",...headers});response.end(JSON.stringify(body));};
 const errorBody=(code)=>({ok:false,error:{code}});
 function cors(config,origin){return origin&&config.allowedOrigins.includes(origin)?{"access-control-allow-origin":origin,"vary":"Origin"}:{};}
+function privateNetworkCors(request){return request.headers["access-control-request-private-network"]==="true"?{"access-control-allow-private-network":"true"}:{};}
 async function readJson(request,limit){
   let size=0,text="";
   for await(const chunk of request){size+=chunk.length;if(size>limit)throw new GatewayRequestError(413,"BODY_TOO_LARGE","Request body is too large");text+=chunk.toString("utf8");}
@@ -28,7 +29,7 @@ export function createFinanceGateway(options={}){
     if(url.pathname!=="/finance/parse")return json(response,404,errorBody("NOT_FOUND"));
     if(!origin||!config.allowedOrigins.includes(origin))return json(response,403,errorBody("ORIGIN_NOT_ALLOWED"));
     const corsHeaders=cors(config,origin);
-    if(request.method==="OPTIONS")return json(response,204,{}, {...corsHeaders,"access-control-allow-methods":"POST, OPTIONS","access-control-allow-headers":"Authorization, Content-Type","access-control-max-age":"600"});
+    if(request.method==="OPTIONS")return json(response,204,{}, {...corsHeaders,...privateNetworkCors(request),"access-control-allow-methods":"POST, OPTIONS","access-control-allow-headers":"Authorization, Content-Type","access-control-max-age":"600"});
     if(request.method!=="POST")return json(response,404,errorBody("NOT_FOUND"),corsHeaders);
     if(!/^application\/json(?:\s*;|$)/i.test(request.headers["content-type"]||""))return json(response,400,errorBody("INVALID_REQUEST"),corsHeaders);
     let requestId=null,release=null;
