@@ -104,5 +104,5 @@ test('P7-VOICE-23 no audio recording or upload API exists in the Phase 7 module'
 });
 
 test('P7-VOICE-24 production assets and safety boundaries remain correct',()=>{
-  const index=read('index.html'),sw=read('sw.js'),home=read('finance/pages/home.js'),db=read('finance/storage/finance-db.js');assert.match(index,/finance\/voice\/finance-voice-input\.js\?v=1[\s\S]*finance\/pages\/home\.js\?v=63/);assert.match(index,/finance\/styles\/home\.css\?v=59/);assert.match(sw,/lizhi-cloud-v71/);assert.match(sw,/finance\/voice\/finance-voice-input\.js\?v=1/);assert.match(db,/DB_VERSION=1/);assert.match(home,/aiAutoEntryEnabled=false/);
+  const index=read('index.html'),sw=read('sw.js'),home=read('finance/pages/home.js'),db=read('finance/storage/finance-db.js');assert.match(index,/finance\/voice\/finance-voice-input\.js\?v=1[\s\S]*finance\/pages\/home\.js\?v=64/);assert.match(index,/finance\/styles\/home\.css\?v=60/);assert.match(sw,/lizhi-cloud-v71/);assert.match(sw,/finance\/voice\/finance-voice-input\.js\?v=1/);assert.match(db,/DB_VERSION=1/);assert.match(home,/aiAutoEntryEnabled=false/);
 });

@@ -44,3 +44,5 @@
 /* Phase 8 — local-first Finance cloud sync and explicit AI confirmation. */
 .finance-rail-status.pending i,.finance-rail-status.syncing i{background:#f0a64a;box-shadow:0 0 0 4px rgba(240,166,74,.16)}.finance-rail-status.synced i{background:#49c997}.finance-rail-status.error i{background:#d8665b}.finance-rail-status button{margin-left:auto;padding:3px 7px;border:1px solid rgba(255,255,255,.3);border-radius:8px;background:transparent;color:inherit;font-size:10px;font-weight:900;cursor:pointer}.finance-ai-result-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:9px;margin-top:14px}
 @media(max-width:600px){.finance-ai-result-actions{display:grid;grid-template-columns:1fr}.finance-ai-result-actions .finance-button{width:100%}}
+.finance-mobile-sync-alert{display:none}
+@media(max-width:800px){.finance-mobile-sync-alert{display:flex;align-items:center}.finance-alert .finance-sync-retry{min-height:36px;margin-left:auto;padding:6px 12px;border:1px solid currentColor;border-radius:10px;background:transparent;color:inherit;font-size:13px;font-weight:900}}
