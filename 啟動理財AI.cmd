@@ -17,5 +17,8 @@ if not "%LIZHI_AI_EXIT%"=="0" (
 
 echo.
 echo 理財 AI 已連線，瀏覽器中的家中 AI 主機頁面已開啟。
-timeout /t 3 /nobreak >nul
+echo Gateway：http://127.0.0.1:4181
+echo.
+echo 這個視窗現在可以安全關閉；按任意鍵結束。
+pause >nul
 exit /b 0
