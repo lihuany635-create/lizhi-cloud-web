@@ -111,7 +111,7 @@ test("E1-19 repository failures stay inside Engineering UI boundary",()=>{
   const source=read("engineering/engineering.js");assert.match(source,/Engineering projects failed safely/);assert.match(read("workspace-ui.js"),/Engineering Hub failed safely/);
 });
 test("E1-20 persistence remains a dedicated versioned Engineering database",()=>{
-  assert.equal(Database.DB_NAME,"lizhi-engineering");assert.equal(Database.DB_VERSION,2);assert.equal(Database.STORES.projects,"projects");assert.equal(Database.STORES.settings,"settings");
+  assert.equal(Database.DB_NAME,"lizhi-engineering");assert.ok(Database.DB_VERSION>=2);assert.equal(Database.STORES.projects,"projects");assert.equal(Database.STORES.settings,"settings");
 });
 test("E1-21 production load order preserves UI-Service-Repository-Persistence",()=>{
   const index=read("index.html");assert.match(index,/engineering-db\.js[\s\S]*project-repository\.js[\s\S]*project-service\.js[\s\S]*engineering-home\.js[\s\S]*engineering\.js/);

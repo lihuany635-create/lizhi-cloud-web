@@ -4,8 +4,8 @@
   else root.EngineeringDatabase=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(root){
   "use strict";
-  const DB_NAME="lizhi-engineering",DB_VERSION=2;
-  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations"});
+  const DB_NAME="lizhi-engineering",DB_VERSION=3;
+  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records"});
 
   class EngineeringStorageError extends Error{
     constructor(code,message,cause){super(message,{cause});this.name="EngineeringStorageError";this.code=code;}
@@ -35,6 +35,16 @@
           calculations.createIndex("formula_id","formula_id");
           calculations.createIndex("created_at","created_at");
         }
+        const createProjectDataStore=(name,indexes=[])=>{
+          if(db.objectStoreNames.contains(name))return;
+          const store=db.createObjectStore(name,{keyPath:"id"});
+          store.createIndex("project_id","project_id");
+          for(const index of indexes)store.createIndex(index,index);
+        };
+        createProjectDataStore(STORES.measurements,["type","updated_at"]);
+        createProjectDataStore(STORES.notes,["updated_at"]);
+        createProjectDataStore(STORES.attachments,["kind","created_at"]);
+        createProjectDataStore(STORES.project_records,["record_type","created_at"]);
       };
       request.onsuccess=()=>resolve(request.result);
       request.onerror=()=>reject(new EngineeringStorageError("DATABASE_OPEN_FAILED","無法開啟工程專案資料庫。",request.error));
@@ -63,6 +73,12 @@
       addCalculation(record){return withStore(STORES.calculations,"readwrite",store=>requestResult(store.add(clone(record))));},
       getCalculation(id){return withStore(STORES.calculations,"readonly",store=>requestResult(store.get(String(id))));},
       listCalculations(projectId){return withStore(STORES.calculations,"readonly",store=>requestResult(store.index("project_id").getAll(String(projectId))));},
+      addData(storeName,record){return withStore(storeName,"readwrite",store=>requestResult(store.add(clone(record))));},
+      putData(storeName,record){return withStore(storeName,"readwrite",store=>requestResult(store.put(clone(record))));},
+      getData(storeName,id){return withStore(storeName,"readonly",store=>requestResult(store.get(String(id))));},
+      deleteData(storeName,id){return withStore(storeName,"readwrite",store=>requestResult(store.delete(String(id))));},
+      listDataByProject(storeName,projectId){return withStore(storeName,"readonly",store=>requestResult(store.index("project_id").getAll(String(projectId))));},
+      listData(storeName){return withStore(storeName,"readonly",store=>requestResult(store.getAll()));},
       getWorkspaceId(){
         return withStore(STORES.settings,"readwrite",async store=>{
           const existing=await requestResult(store.get("workspace_id"));
