@@ -27,4 +27,4 @@ try {
   elseif ($ollama.Connected) { $ollama.EndConnect($pending) }
 } catch { Write-Warning 'Ollama is not reachable on 127.0.0.1:11434. Gateway will start, but parse requests will safely fail.' }
 finally { $ollama.Dispose() }
-& $node.Source (Join-Path $repoRoot 'finance\gateway\finance-ai-gateway.mjs')
+& $node.Source --use-system-ca (Join-Path $repoRoot 'finance\gateway\finance-ai-gateway.mjs')

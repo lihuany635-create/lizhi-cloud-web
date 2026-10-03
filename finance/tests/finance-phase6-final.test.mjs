@@ -111,3 +111,7 @@ test('P6-FINAL-17 launcher supports Windows PowerShell without pwsh',()=>{
 test('P6-FINAL-18 launcher and Gateway remain loopback-only',()=>{
   const launcher=read('scripts/start-finance-ai-host.ps1'),gateway=read('finance/gateway/gateway-config.mjs');assert.match(launcher,/OLLAMA_HOST = '127\.0\.0\.1:11434'/);assert.match(launcher,/127\.0\.0\.1.*4181/s);assert.doesNotMatch(launcher,/cloudflared|tunnel/i);assert.match(gateway,/127\.0\.0\.1/);assert.doesNotMatch(gateway,/host.*0\.0\.0\.0/i);
 });
+
+test('P6-FINAL-19 Gateway uses the Windows system CA store without disabling TLS',()=>{
+  const script=read('scripts/start-finance-ai-gateway.ps1');assert.match(script,/--use-system-ca/);assert.doesNotMatch(script,/NODE_TLS_REJECT_UNAUTHORIZED|--use-openssl-ca/);
+});
