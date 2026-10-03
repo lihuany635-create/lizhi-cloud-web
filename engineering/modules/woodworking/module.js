@@ -16,6 +16,6 @@
     name:"木工",
     version:"1.0.0",
     status:"ready",
-    capabilities:Object.freeze(["woodworking-tools","calculation-history"])
+    capabilities:Object.freeze(["woodworking-tools","calculation-history","parametric-furniture"])
   });
 });

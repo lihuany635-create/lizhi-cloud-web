@@ -49,7 +49,7 @@ test("E0-06 platform adapter fails predictably for unavailable capabilities",asy
 test("E0-07 home renders registered modules through metadata",()=>{
   const html=Home.render({modules:[Woodworking]});
   assert.match(html,/木工/);
-  assert.match(html,/2 項能力/);
+  assert.match(html,/3 項能力/);
   assert.match(html,/data-route="home"/);
 });
 
@@ -65,7 +65,7 @@ test("E0-09 workspace exposes an isolated Engineering renderer",()=>{
 
 test("E0-10 production entry loads Engineering before workspace",()=>{
   const index=read("index.html");
-  assert.match(index,/engineering\/engineering\.js\?v=5[\s\S]*workspace-ui\.js\?v=24/);
+  assert.match(index,/engineering\/engineering\.js\?v=7[\s\S]*workspace-ui\.js\?v=24/);
 });
 
 test("E0-11 Phase 0 does not introduce persistence or AI",()=>{

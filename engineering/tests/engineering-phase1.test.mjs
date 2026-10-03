@@ -105,7 +105,7 @@ test("E1-17 active and archived lists render separately",()=>{
 });
 test("E1-18 workspace preserves basic project data as professional tools evolve",()=>{
   const project=Model.create({id:"p1",workspace_id:"w1",name:"A",module_ids:["woodworking"],created_at:"2026-10-03T00:00:00Z",updated_at:"2026-10-03T00:00:00Z"});
-  const html=Workspace.render({project,modules:[Woodworking]});assert.match(html,/Project ID/);assert.match(html,/2 項能力可用/);assert.doesNotMatch(html,/BOM|報價|材料/);
+  const html=Workspace.render({project,modules:[Woodworking]});assert.match(html,/Project ID/);assert.match(html,/3 項能力可用/);assert.doesNotMatch(html,/BOM|報價|材料/);
 });
 test("E1-19 repository failures stay inside Engineering UI boundary",()=>{
   const source=read("engineering/engineering.js");assert.match(source,/Engineering projects failed safely/);assert.match(read("workspace-ui.js"),/Engineering Hub failed safely/);
