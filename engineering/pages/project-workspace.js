@@ -1,0 +1,36 @@
+(function(root,factory){
+  const api=factory();
+  if(typeof module==="object"&&module.exports)module.exports=api;
+  else root.EngineeringProjectWorkspace=api;
+})(typeof globalThis!=="undefined"?globalThis:this,function(){
+  "use strict";
+  const esc=value=>String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[char]);
+  const time=value=>new Intl.DateTimeFormat("zh-TW",{dateStyle:"long",timeStyle:"medium"}).format(new Date(value));
+  const json=value=>esc(JSON.stringify(value));
+
+  function formulaField(name,rules,value){
+    const label=esc(rules.label||name),current=value??rules.default??"";
+    if(rules.type==="unit"||Array.isArray(rules.enum))return `<label>${label}<select name="${esc(name)}">${(rules.enum||[]).map(option=>`<option value="${esc(option)}" ${String(current)===String(option)?"selected":""}>${esc(option)}</option>`).join("")}</select></label>`;
+    return `<label>${label}<input name="${esc(name)}" type="${rules.type==="number"?"number":"text"}" step="any" value="${esc(current)}"></label>`;
+  }
+  function calculationResult(result){
+    if(!result)return"";
+    if(!result.ok)return `<div class="engineering-calculation-result error" role="alert"><h3>無法計算</h3>${result.errors.map(item=>`<p><b>${esc(item.code)}</b> ${esc(item.message)}${item.field?` · ${esc(item.field)}`:""}</p>`).join("")}</div>`;
+    const rows=Object.entries(result.result).map(([key,value])=>`<div><small>${esc(key)}</small><strong>${esc(value)}</strong></div>`).join("");
+    return `<div class="engineering-calculation-result success" role="status"><h3>計算完成</h3><div class="engineering-result-grid">${rows}</div><p>${result.meta.saved?"已保存至計算歷史。":"結果未保存。"}</p>${result.warnings.map(item=>`<p class="engineering-warning">${esc(item.message||item.code)}</p>`).join("")}</div>`;
+  }
+  function historyList(history){
+    return history.length?`<div class="engineering-history-list">${history.map(record=>`<article><div><b>${esc(record.formula_id)} <small>v${esc(record.formula_version)}</small></b><time>${esc(time(record.created_at))}</time></div><p>Input：<code>${json(record.input)}</code></p><p>Result：<code>${json(record.result)}</code></p>${record.warnings?.map(item=>`<p class="engineering-warning">${esc(item.message||item.code)}</p>`).join("")||""}</article>`).join("")}</div>`:`<div class="engineering-empty"><p>尚無計算紀錄。</p></div>`;
+  }
+  function render({project,modules=[],formulas=[],history=[],error="",formError="",calculationResult:result=null,calculationInput={},historyError=""}={}){
+    if(!project)return `<section class="engineering-hub engineering-unavailable"><h1>找不到工程專案</h1><button class="button" data-engineering-action="back">返回工程中心</button></section>`;
+    const options=modules.map(module=>`<label class="engineering-module-option"><input type="checkbox" name="module_ids" value="${esc(module.id)}" ${project.module_ids.includes(module.id)?"checked":""}><span><b>${esc(module.name)}</b><small>${project.module_ids.includes(module.id)?"已關聯":"尚未關聯"} · ${module.capabilities.length?`${module.capabilities.length} 項能力可用`:"尚無可用工具"}</small></span></label>`).join("");
+    const available=formulas.filter(formula=>(!formula.status||formula.status==="production")&&(formula.module_id==="demo"||project.module_ids.includes(formula.module_id))).sort((a,b)=>(a.module_id==="demo")-(b.module_id==="demo"));
+    const selected=available.find(formula=>formula.id===(calculationInput.formula_id||available[0]?.id))||available[0],selectedModule=modules.find(module=>module.id===selected?.module_id);
+    const groups=[...new Set(available.map(formula=>formula.module_id))].map(moduleId=>{const label=moduleId==="demo"?"Calculation Engine 示範":`${modules.find(module=>module.id===moduleId)?.name||moduleId}工具`;return `<optgroup label="${esc(label)}">${available.filter(formula=>formula.module_id===moduleId).map(formula=>`<option value="${esc(formula.id)}" ${formula.id===selected?.id?"selected":""}>${esc(formula.name)} · v${esc(formula.version)}</option>`).join("")}</optgroup>`;}).join("");
+    const formulaTitle=selected?.module_id==="demo"?"計算引擎示範":`${selectedModule?.name||selected?.module_id||"專業"}工具`;
+    const formulaForm=selected&&project.status==="active"?`<form data-engineering-form="calculate"><label>公式<select name="formula_id" data-engineering-formula>${groups}</select></label><div class="engineering-formula-note"><b>${esc(selected.description)}</b>${selected.applicability?`<span>${esc(selected.applicability)}</span>`:""}</div><div class="engineering-calculation-inputs">${Object.entries(selected.input_schema.fields).map(([name,rules])=>formulaField(name,rules,calculationInput[name])).join("")}</div><button class="button primary">計算並保存</button></form>`:project.status==="archived"?`<p class="engineering-muted">封存專案不可新增計算；歷史紀錄仍可查看。</p>`:`<p class="engineering-muted">目前沒有已註冊公式。</p>`;
+    return `<section class="engineering-hub engineering-workspace" aria-labelledby="engineering-project-title"><header class="engineering-header"><div><div class="eyebrow">ENGINEERING PROJECT</div><h1 id="engineering-project-title">${esc(project.name)}</h1><p>Project ID：<code>${esc(project.id)}</code></p></div><button class="button" data-engineering-action="back">返回工程中心</button></header>${error?`<p class="engineering-form-error" role="alert">${esc(error)}</p>`:""}<div class="engineering-workspace-grid"><section class="engineering-project-details"><div><small>狀態</small><strong>${project.status==="active"?"進行中":"已封存"}</strong></div><div><small>建立時間</small><strong>${esc(time(project.created_at))}</strong></div><div><small>更新時間</small><strong>${esc(time(project.updated_at))}</strong></div><div><small>Workspace ID</small><strong class="engineering-code">${esc(project.workspace_id)}</strong></div></section><section class="engineering-edit"><h2>基本資料與專業模組</h2><form data-engineering-form="update" data-project-id="${esc(project.id)}"><label>專案名稱<input name="name" maxlength="100" required value="${esc(project.name)}" ${project.status==="archived"?"disabled":""}></label><fieldset ${project.status==="archived"?"disabled":""}><legend>已啟用專業模組</legend>${options||`<p class="engineering-muted">目前沒有已註冊模組。</p>`}</fieldset>${formError?`<p class="engineering-form-error" role="alert">${esc(formError)}</p>`:""}<div class="engineering-actions">${project.status==="active"?`<button class="button primary">儲存基本資料</button><button type="button" class="button danger" data-engineering-archive="${esc(project.id)}">封存專案</button>`:`<button type="button" class="button primary" data-engineering-reopen="${esc(project.id)}">重新開啟專案</button>`}</div></form></section></div><section class="engineering-calculation"><div class="engineering-section-head"><div><small>CALCULATION ENGINE · PHASE 3</small><h2>${esc(formulaTitle)}</h2></div><span>${available.length} 個可用公式</span></div>${formulaForm}${calculationResult(result)}</section><section class="engineering-section engineering-history"><div class="engineering-section-head"><h2>最近計算</h2><span>${history.length} 筆</span></div>${historyError?`<p class="engineering-form-error" role="alert">${esc(historyError)}</p>`:historyList(history)}</section></section>`;
+  }
+  return Object.freeze({render});
+});

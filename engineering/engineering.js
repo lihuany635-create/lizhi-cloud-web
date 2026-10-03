@@ -1,0 +1,91 @@
+(function(root){
+  "use strict";
+  const state={view:"list",projects:[],selected:null,loading:true,error:"",formError:"",ready:false,activating:null,history:[],historyError:"",calculationResult:null,calculationInput:{}};
+  let projectService=null,calculationRepository=null,calculationEngine=null,formulaRegistry=null,installed=false;
+  const registry=()=>root.EngineeringModuleRegistry;
+  const message=error=>error?.message||"工程專案發生未知錯誤。";
+
+  function snapshot(){return {modules:registry()?.list?.()||[],failures:registry()?.failures?.()||[],formulas:formulaRegistry?.listFormulas?.()||[]};}
+  function markup(){
+    const common=snapshot();
+    if(state.view==="workspace")return root.EngineeringProjectWorkspace.render({...common,project:state.selected,error:state.error,formError:state.formError,history:state.history,historyError:state.historyError,calculationResult:state.calculationResult,calculationInput:state.calculationInput});
+    return root.EngineeringHome.render({...common,projects:state.projects,loading:state.loading,error:state.error,formError:state.formError});
+  }
+  function render(){
+    try{return markup();}
+    catch(error){console.error("Engineering Hub failed safely",error);return `<section class="engineering-hub engineering-unavailable"><div class="eyebrow">ENGINEERING HUB</div><h1>工程中心暫時無法載入</h1><p>立之雲端庫其他功能不受影響。</p><button class="button" data-route="home">返回立之雲端庫</button></section>`;}
+  }
+  function renderPanel(){const panel=document.querySelector('[data-panel="engineering"]');if(panel&&!panel.hidden)panel.innerHTML=render();}
+  async function runtime(){
+    if(projectService)return projectService;
+    const persistence=root.EngineeringDatabase.createPersistence();
+    const projectRepository=root.EngineeringProjectRepository.create({persistence});
+    calculationRepository=root.EngineeringCalculationRepository.create({persistence});
+    formulaRegistry=root.EngineeringFormulaRegistryApi.createRegistry({moduleRegistry:registry(),neutralNamespaces:["demo"]});
+    formulaRegistry.registerPack(root.EngineeringDemoFormulaPack);
+    try{
+      if(!root.EngineeringWoodworkingFormulaPack)throw new Error("Woodworking Formula Pack is unavailable");
+      formulaRegistry.registerPack(root.EngineeringWoodworkingFormulaPack);
+    }catch(error){registry()?.recordFailure?.(error);console.warn("Woodworking Formula Pack failed safely",error);}
+    calculationEngine=root.EngineeringCalculationEngine.create({formulaRegistry,calculationRepository});
+    projectService=root.EngineeringProjectService.create({repository:projectRepository,registry:registry(),workspaceId:await persistence.getWorkspaceId()});
+    return projectService;
+  }
+  async function refresh(){
+    state.loading=true;state.error="";renderPanel();
+    try{state.projects=await (await runtime()).listProjects();state.ready=true;}
+    catch(error){console.error("Engineering projects failed safely",error);state.error=message(error);}
+    finally{state.loading=false;renderPanel();}
+  }
+  function activate(){if(state.activating)return state.activating;if(state.ready){renderPanel();return Promise.resolve();}state.activating=refresh().finally(()=>{state.activating=null;});return state.activating;}
+  async function loadHistory(projectId){
+    state.historyError="";
+    try{state.history=await calculationRepository.listByProject(projectId);}
+    catch(error){state.history=[];state.historyError=message(error);console.warn("Engineering calculation history failed safely",error);}
+  }
+  async function openProject(project){
+    state.selected=project;state.view="workspace";state.formError="";state.calculationResult=null;state.calculationInput={};state.history=[];renderPanel();
+    await runtime();await loadHistory(project.id);renderPanel();
+  }
+  async function perform(operation,{stay=false}={}){
+    state.formError="";state.error="";
+    try{
+      const result=await operation(await runtime());
+      state.projects=await projectService.listProjects();
+      if(result&&!stay)await openProject(result);
+      else if(state.selected)state.selected=state.projects.find(project=>project.id===state.selected.id)||null;
+    }catch(error){state.formError=message(error);console.warn("Engineering project action rejected safely",error);}
+    renderPanel();
+  }
+  function checkedModules(form){return [...form.querySelectorAll('input[name="module_ids"]:checked')].map(input=>input.value);}
+  async function calculate(form){
+    const data=Object.fromEntries(new FormData(form));state.calculationInput={...data};state.calculationResult=null;renderPanel();
+    try{state.calculationResult=await calculationEngine.calculate({project_id:state.selected.id,formula_id:data.formula_id,input:Object.fromEntries(Object.entries(data).filter(([key])=>key!=="formula_id"))});await loadHistory(state.selected.id);}
+    catch(error){state.calculationResult={ok:false,formula_id:data.formula_id,formula_version:null,result:null,warnings:[],errors:[{code:"FORMULA_EXECUTION_ERROR",message:message(error)}],meta:{}};}
+    renderPanel();
+  }
+  function installEvents(app){
+    if(installed||!app)return;installed=true;
+    app.addEventListener("submit",event=>{
+      const form=event.target.closest("[data-engineering-form]");if(!form)return;
+      event.preventDefault();event.stopImmediatePropagation();
+      if(form.dataset.engineeringForm==="calculate"){void calculate(form);return;}
+      const name=String(new FormData(form).get("name")||"").trim(),module_ids=checkedModules(form);
+      if(form.dataset.engineeringForm==="create")void perform(api=>api.createProject({name,module_ids}));
+      if(form.dataset.engineeringForm==="update")void perform(api=>api.updateProject(form.dataset.projectId,{name,module_ids}));
+    },true);
+    app.addEventListener("change",event=>{
+      if(!event.target.matches("[data-engineering-formula]"))return;
+      state.calculationInput={formula_id:event.target.value};state.calculationResult=null;renderPanel();
+    },true);
+    app.addEventListener("click",event=>{
+      const button=event.target.closest("button");if(!button)return;
+      if(button.dataset.engineeringOpen){const project=state.projects.find(item=>item.id===button.dataset.engineeringOpen);if(project)void openProject(project);}
+      if(button.dataset.engineeringAction==="back"){state.view="list";state.selected=null;state.formError="";state.history=[];state.calculationResult=null;renderPanel();}
+      if(button.dataset.engineeringAction==="retry")void refresh();
+      if(button.dataset.engineeringArchive)void perform(api=>api.archiveProject(button.dataset.engineeringArchive));
+      if(button.dataset.engineeringReopen)void perform(api=>api.reopenProject(button.dataset.engineeringReopen),{stay:state.view==="list"});
+    },true);
+  }
+  root.EngineeringHub=Object.freeze({render,snapshot,activate,refresh,installEvents});
+})(typeof globalThis!=="undefined"?globalThis:this);

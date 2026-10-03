@@ -11,6 +11,16 @@ function prefsFor(row) {
   return mediaPrefs[key] ||= {position:0,rate:1,favorite:false,completed:false};
 }
 function persistMediaPrefs() { writeLocalJson("lizhi-media-preferences", mediaPrefs); }
+function renderEngineeringHub() {
+  try {
+    const markup=window.EngineeringHub?.render?.();
+    if(markup)queueMicrotask(()=>window.EngineeringHub?.activate?.());
+    return markup || '<section class="engineering-hub engineering-unavailable"><div class="eyebrow">ENGINEERING HUB</div><h1>工程中心暫時無法載入</h1><p>立之雲端庫其他功能不受影響。</p><button class="button" data-route="home">返回立之雲端庫</button></section>';
+  } catch(error) {
+    console.error("Engineering Hub failed safely", error);
+    return '<section class="engineering-hub engineering-unavailable"><div class="eyebrow">ENGINEERING HUB</div><h1>工程中心暫時無法載入</h1><p>立之雲端庫其他功能不受影響。</p><button class="button" data-route="home">返回立之雲端庫</button></section>';
+  }
+}
 function setMenuState() {
   const shell = document.querySelector('.shell');
   shell.className = `shell route-${state.route} ${state.sidebar ? "drawer-open" : ""}`;
@@ -52,7 +62,7 @@ function renderWorkspace() {
       }
     }
   } else {
-    const renderers = {home:renderHome,knowledge:KnowledgeHome.render,weave:KnowledgeWeaving.render,finance:FinanceHome.render,trash:renderTrash,settings:renderSettings,uploads:renderUploads};
+    const renderers = {home:renderHome,knowledge:KnowledgeHome.render,weave:KnowledgeWeaving.render,finance:FinanceHome.render,engineering:renderEngineeringHub,trash:renderTrash,settings:renderSettings,uploads:renderUploads};
     const focused = document.activeElement;
     const searchFocused = panel.contains(focused) && focused.matches('[data-search]');
     const selection = searchFocused ? [focused.selectionStart, focused.selectionEnd] : null;

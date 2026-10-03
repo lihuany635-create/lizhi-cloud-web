@@ -1,0 +1,47 @@
+.route-engineering{background:#071016;color:#e8f0ef}
+.route-engineering .main{background:radial-gradient(circle at 82% 10%,#18343f 0,transparent 34%),linear-gradient(145deg,#071016,#0b1820);min-height:calc(100vh - 72px)}
+.engineering-hub{width:min(1120px,100%);margin:0 auto;padding:18px 0 56px}
+.engineering-header{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;margin-bottom:42px}
+.engineering-header h1,.engineering-unavailable h1{margin:8px 0 10px;color:#f2f6f5;font:500 clamp(42px,7vw,82px)/1 Georgia,"Noto Serif TC",serif}
+.engineering-header p,.engineering-unavailable p{max-width:720px;color:#91a6aa;line-height:1.8}
+.engineering-header .button,.engineering-unavailable .button{border-color:#42616a;background:#10252d;color:#dce9e7}
+.engineering-section{border-top:1px solid #29434c;padding-top:25px}
+.engineering-section-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:20px}
+.engineering-section-head h2{margin:0;color:#eef5f3;font:500 28px Georgia,"Noto Serif TC",serif}
+.engineering-section-head span{color:#789095;font:12px ui-monospace,monospace}
+.engineering-module-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px}
+.engineering-module-card{display:grid;grid-template-columns:58px 1fr;gap:18px;min-height:190px;padding:24px;border:1px solid #31515b;border-radius:16px;background:linear-gradient(145deg,#112a34,#0b1c23);box-shadow:0 20px 48px #0004}
+.engineering-module-mark{display:grid;place-items:center;width:56px;height:56px;border:1px solid #66868b;border-radius:14px;color:#cae2df;font:500 25px Georgia,"Noto Serif TC",serif}
+.engineering-module-card h2{margin:4px 0 10px;color:#f0f5f3;font:500 27px Georgia,"Noto Serif TC",serif}
+.engineering-module-card p{margin:7px 0;color:#81989d}
+.engineering-module-status{color:#80c5ae!important;font-weight:700}
+.engineering-module-meta{color:#678087;font:11px ui-monospace,monospace;letter-spacing:.1em}
+.engineering-empty{padding:30px;border:1px dashed #38545d;border-radius:14px;color:#8ba0a4}
+.engineering-warning{color:#f0cf8c}
+.engineering-unavailable{padding-top:12vh}
+.engineering-create{display:grid;grid-template-columns:minmax(190px,.55fr) minmax(280px,1.45fr);gap:28px;margin-bottom:42px;padding:26px;border:1px solid #31515b;border-radius:18px;background:#0b1b22cc}
+.engineering-create h2,.engineering-edit h2{margin:5px 0;color:#eef5f3;font:500 28px Georgia,"Noto Serif TC",serif}
+.engineering-create small{color:#6f8e94;font:11px ui-monospace,monospace;letter-spacing:.12em}
+.engineering-create form,.engineering-edit form{display:grid;gap:18px}
+.engineering-create label,.engineering-edit label{display:grid;gap:8px;color:#b7cacb;font-size:13px}
+.engineering-create input[type="text"],.engineering-create input:not([type]),.engineering-edit input:not([type="checkbox"]),.engineering-calculation input,.engineering-calculation select{width:100%;box-sizing:border-box;border:1px solid #365761;border-radius:10px;background:#07141a;color:#edf5f3;padding:12px 14px;font:inherit}
+.engineering-create fieldset,.engineering-edit fieldset{display:grid;gap:10px;margin:0;padding:0;border:0}
+.engineering-create legend,.engineering-edit legend{margin-bottom:8px;color:#8fa7aa;font-size:12px}
+.engineering-module-option{display:flex!important;grid-template-columns:none!important;align-items:center;gap:12px!important;padding:12px;border:1px solid #2e4b54;border-radius:11px;background:#0d222a;cursor:pointer}
+.engineering-module-option input{width:18px;height:18px;accent-color:#77bca9}
+.engineering-module-option span{display:grid;gap:3px}.engineering-module-option b{color:#e7f0ee}.engineering-module-option small{color:#759096}
+.engineering-project-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.engineering-project-card{display:flex;justify-content:space-between;gap:20px;padding:22px;border:1px solid #2f4e57;border-radius:15px;background:linear-gradient(145deg,#102832,#0a1b22)}
+.engineering-project-card h3{margin:10px 0 7px;color:#eef5f3;font:500 23px Georgia,"Noto Serif TC",serif}.engineering-project-card p{margin:0 0 13px;color:#90a6aa}.engineering-project-card small{color:#6f888d}
+.engineering-card-actions{align-self:flex-end}.engineering-status{display:inline-flex;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:700}.engineering-status.active{background:#163d35;color:#86d1b6}.engineering-status.archived{background:#303b3f;color:#aab7b8}
+.engineering-error,.engineering-form-error{padding:16px;border:1px solid #8b4d49;border-radius:12px;background:#361f20;color:#f0c2bd}.engineering-form-error{margin:0}
+.engineering-workspace-grid{display:grid;grid-template-columns:minmax(250px,.7fr) minmax(340px,1.3fr);gap:22px}
+.engineering-project-details,.engineering-edit{padding:24px;border:1px solid #31515b;border-radius:16px;background:#0b1b22cc}.engineering-project-details{display:grid;align-content:start;gap:18px}.engineering-project-details div{display:grid;gap:5px;padding-bottom:15px;border-bottom:1px solid #223d45}.engineering-project-details small{color:#718b91}.engineering-project-details strong{color:#e7efed;overflow-wrap:anywhere}.engineering-code{font:12px ui-monospace,monospace}
+.engineering-actions{display:flex;flex-wrap:wrap;gap:10px}.engineering-actions .danger{border-color:#7e4a47;color:#f0b3ad}.engineering-muted{color:#81979c}
+.engineering-calculation{margin-top:24px;padding:24px;border:1px solid #31515b;border-radius:16px;background:linear-gradient(145deg,#102832,#0a1b22)}
+.engineering-calculation form{display:grid;gap:16px}.engineering-calculation label{display:grid;gap:8px;color:#b7cacb;font-size:13px}.engineering-calculation-inputs{display:grid;grid-template-columns:repeat(3,minmax(130px,1fr));gap:14px}
+.engineering-formula-note{display:grid;gap:5px;padding:13px 15px;border-left:3px solid #5fa58f;background:#0a1c20;color:#d9e8e4}.engineering-formula-note span{color:#8ea5a7;font-size:13px;line-height:1.6}
+.engineering-calculation-result{margin-top:18px;padding:18px;border-radius:12px}.engineering-calculation-result h3{margin:0 0 12px}.engineering-calculation-result.success{border:1px solid #2f7662;background:#12352d}.engineering-calculation-result.error{border:1px solid #8b4d49;background:#361f20}.engineering-calculation-result p{margin:9px 0;color:#bdd0cc}
+.engineering-result-grid{display:flex;flex-wrap:wrap;gap:12px}.engineering-result-grid div{display:grid;gap:3px;min-width:120px;padding:10px 13px;border-radius:9px;background:#071916}.engineering-result-grid small{color:#72a494}.engineering-result-grid strong{color:#f0faf6;font:600 21px ui-monospace,monospace}
+.engineering-history{margin-top:28px}.engineering-history-list{display:grid;gap:12px}.engineering-history-list article{padding:18px;border:1px solid #29464e;border-radius:12px;background:#0a1a21}.engineering-history-list article>div{display:flex;justify-content:space-between;gap:16px}.engineering-history-list b{color:#e7f0ee}.engineering-history-list time,.engineering-history-list small{color:#748e93}.engineering-history-list p{margin:10px 0 0;color:#8fa5a9;overflow-wrap:anywhere}.engineering-history-list code{color:#c5d9d5}
+@media(max-width:680px){.route-engineering .main{min-height:calc(100vh - 64px)}.engineering-hub{padding-top:8px}.engineering-header{align-items:flex-start;flex-direction:column;margin-bottom:30px}.engineering-header .button{width:100%;justify-content:center}.engineering-module-card{min-height:170px;padding:20px}.engineering-create,.engineering-workspace-grid,.engineering-calculation-inputs{grid-template-columns:1fr}.engineering-project-card{flex-direction:column}.engineering-card-actions{align-self:stretch}.engineering-card-actions .button{width:100%}.engineering-history-list article>div{flex-direction:column}}
