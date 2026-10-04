@@ -4,8 +4,8 @@
   else root.EngineeringDatabase=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(root){
   "use strict";
-  const DB_NAME="lizhi-engineering",DB_VERSION=4;
-  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs"});
+  const DB_NAME="lizhi-engineering",DB_VERSION=5;
+  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes"});
 
   class EngineeringStorageError extends Error{
     constructor(code,message,cause){super(message,{cause});this.name="EngineeringStorageError";this.code=code;}
@@ -46,6 +46,9 @@
         createProjectDataStore(STORES.attachments,["kind","created_at"]);
         createProjectDataStore(STORES.project_records,["record_type","created_at"]);
         createProjectDataStore(STORES.designs,["template_id","status","updated_at"]);
+        createProjectDataStore(STORES.boms,["design_id","created_at"]);
+        createProjectDataStore(STORES.price_entries,["bom_item_id","effective_at"]);
+        createProjectDataStore(STORES.quotes,["bom_id","status","updated_at"]);
       };
       request.onsuccess=()=>resolve(request.result);
       request.onerror=()=>reject(new EngineeringStorageError("DATABASE_OPEN_FAILED","無法開啟工程專案資料庫。",request.error));

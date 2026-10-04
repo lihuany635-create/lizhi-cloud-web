@@ -3,15 +3,16 @@
   const emptyProjectData=()=>({measurements:[],notes:[],attachments:[],records:[]});
   const emptyVisualization=()=>({mode:"2d",view:"front",azimuth:40,zoom:1,svg2d:"",svg3d:"",error2d:"",error3d:"",sourceIdentity:null,snapshotOnly:false});
   const emptyFurniture=()=>({templates:[],designs:[],templateKey:"",name:"",parameters:{},preview:null,error:"",editing:null,compatibilityWarning:"",visualization:emptyVisualization()});
-  const state={view:"list",projects:[],selected:null,loading:true,error:"",formError:"",ready:false,activating:null,history:[],historyError:"",calculationResult:null,calculationInput:{},projectData:emptyProjectData(),projectDataError:"",furniture:emptyFurniture()};
-  let projectService=null,projectDataService=null,furnitureDesignService=null,templateRegistry=null,calculationRepository=null,calculationEngine=null,formulaRegistry=null,installed=false,attachmentUrls=[];
+  const emptyCommercial=()=>({boms:[],quotes:[],prices:[],error:"",notice:""});
+  const state={view:"list",projects:[],selected:null,loading:true,error:"",formError:"",ready:false,activating:null,history:[],historyError:"",calculationResult:null,calculationInput:{},projectData:emptyProjectData(),projectDataError:"",furniture:emptyFurniture(),commercial:emptyCommercial()};
+  let projectService=null,projectDataService=null,furnitureDesignService=null,bomService=null,priceRepository=null,quoteRepository=null,quoteService=null,quotePublisher=null,templateRegistry=null,calculationRepository=null,calculationEngine=null,formulaRegistry=null,installed=false,attachmentUrls=[];
   const registry=()=>root.EngineeringModuleRegistry;
   const message=error=>error?.message||"工程專案發生未知錯誤。";
 
   function snapshot(){return {modules:registry()?.list?.()||[],failures:registry()?.failures?.()||[],formulas:formulaRegistry?.listFormulas?.()||[],templates:templateRegistry?.listTemplates?.()||[]};}
   function markup(){
     const common=snapshot();
-    if(state.view==="workspace")return root.EngineeringProjectWorkspace.render({...common,project:state.selected,error:state.error,formError:state.formError,history:state.history,historyError:state.historyError,calculationResult:state.calculationResult,calculationInput:state.calculationInput,projectData:state.projectData,projectDataError:state.projectDataError,furniture:state.furniture});
+    if(state.view==="workspace")return root.EngineeringProjectWorkspace.render({...common,project:state.selected,error:state.error,formError:state.formError,history:state.history,historyError:state.historyError,calculationResult:state.calculationResult,calculationInput:state.calculationInput,projectData:state.projectData,projectDataError:state.projectDataError,furniture:state.furniture,commercial:state.commercial});
     return root.EngineeringHome.render({...common,projects:state.projects,loading:state.loading,error:state.error,formError:state.formError});
   }
   function render(){
@@ -25,7 +26,8 @@
     const projectRepository=root.EngineeringProjectRepository.create({persistence});
     calculationRepository=root.EngineeringCalculationRepository.create({persistence});
     const measurementRepository=root.EngineeringMeasurementRepository.create({persistence}),noteRepository=root.EngineeringNoteRepository.create({persistence}),attachmentRepository=root.EngineeringAttachmentRepository.create({persistence}),projectRecordRepository=root.EngineeringProjectRecordRepository.create({persistence});
-    const designRepository=root.EngineeringDesignRepository.create({persistence});
+    const designRepository=root.EngineeringDesignRepository.create({persistence}),bomRepository=root.EngineeringBomRepository.create({persistence});
+    priceRepository=root.EngineeringPriceRepository.create({persistence});quoteRepository=root.EngineeringQuoteRepository.create({persistence});
     templateRegistry=root.EngineeringParametricTemplateRegistryApi.createRegistry();
     for(const definition of[root.EngineeringOpenBoxCabinetTemplate,root.EngineeringOpenBoxCabinetTemplateV11])try{templateRegistry.registerTemplate(definition);}catch(error){templateRegistry.recordFailure(error);registry()?.recordFailure?.(error);console.warn("Furniture Template failed safely",error);}
     formulaRegistry=root.EngineeringFormulaRegistryApi.createRegistry({moduleRegistry:registry(),neutralNamespaces:["demo"]});
@@ -38,6 +40,9 @@
     projectService=root.EngineeringProjectService.create({repository:projectRepository,registry:registry(),workspaceId:await persistence.getWorkspaceId()});
     projectDataService=root.EngineeringProjectDataService.create({projectService,measurementRepository,noteRepository,attachmentRepository,projectRecordRepository,attachmentStorage:root.EngineeringAttachmentStorage.create()});
     furnitureDesignService=root.EngineeringFurnitureDesignService.create({templateRegistry,designRepository,projectService});
+    bomService=root.EngineeringBomService.create({repository:bomRepository,adapter:root.EngineeringWoodworkingBomAdapter});
+    quoteService=root.EngineeringQuoteService.create({repository:quoteRepository});
+    quotePublisher=root.EngineeringQuotePublisher.create({repository:quoteRepository,quoteService});
     return projectService;
   }
   async function refresh(){
@@ -66,9 +71,10 @@
     try{const templates=templateRegistry.listTemplates().sort((a,b)=>b.version.localeCompare(a.version,undefined,{numeric:true})),designs=await furnitureDesignService.listByProject(projectId),templateKey=state.furniture.templateKey||`${templates[0]?.id||""}@${templates[0]?.version||""}`;state.furniture={...state.furniture,templates,designs,templateKey};}
     catch(error){state.furniture={...emptyFurniture(),error:message(error)};console.warn("Furniture designs failed safely",error);}
   }
+  async function loadCommercial(projectId){state.commercial.error="";try{const[boms,quotes,prices]=await Promise.all([bomService.listByProject(projectId),quoteService.listByProject(projectId),priceRepository.listByProject(projectId)]);state.commercial={...state.commercial,boms,quotes,prices};}catch(error){state.commercial={...emptyCommercial(),error:message(error)};console.warn("BOM and Quote data failed safely",error);}}
   async function openProject(project){
-    state.selected=project;state.view="workspace";state.formError="";state.calculationResult=null;state.calculationInput={};state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();renderPanel();
-    await runtime();await Promise.all([loadHistory(project.id),loadProjectData(project.id),loadFurniture(project.id)]);renderPanel();
+    state.selected=project;state.view="workspace";state.formError="";state.calculationResult=null;state.calculationInput={};state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();renderPanel();
+    await runtime();await Promise.all([loadHistory(project.id),loadProjectData(project.id),loadFurniture(project.id),loadCommercial(project.id)]);renderPanel();
   }
   async function perform(operation,{stay=false}={}){
     state.formError="";state.error="";
@@ -103,6 +109,13 @@
   async function furnitureAction(form,action){state.furniture.error="";const data=Object.fromEntries(new FormData(form)),identity=templateIdentity(data.template_key),template=templateRegistry.getTemplate(identity.template_id,identity.template_version),parameters={};for(const name of Object.keys(template?.parameter_schema?.fields||{}))parameters[name]=data[name];state.furniture={...state.furniture,templateKey:data.template_key,name:String(data.name||""),parameters};try{if(action==="preview"){state.furniture.preview=await furnitureDesignService.preview({project_id:state.selected.id,...identity,parameters});state.furniture.compatibilityWarning="";}if(action==="save"){const request={name:data.name,parameters};const design=state.furniture.editing?await furnitureDesignService.updateDraft(state.selected.id,state.furniture.editing,request):await furnitureDesignService.saveDraft({project_id:state.selected.id,...identity,...request});await loadFurniture(state.selected.id);state.furniture.editing=design.id;state.furniture.name=design.name;state.furniture.parameters={...design.parameters};state.furniture.preview={template:templateRegistry.getTemplate(design.template_id,design.template_version),parameters:design.parameters,derived_snapshot:design.derived_snapshot,warnings:design.derived_snapshot.warnings||[]};refreshVisualization(design);}}catch(error){state.furniture.error=message(error);if(error?.details?.issues?.length)state.furniture.error+=` ${error.details.issues.map(item=>item.message).join(" ")}`;if(error?.details?.preview)state.furniture.preview=error.details.preview;if(error?.code!=="VALIDATION_ERROR")console.warn("Furniture design action rejected safely",error);}renderPanel();}
   async function editFurniture(designId){try{const result=await furnitureDesignService.getDesign(state.selected.id,designId),design=result.design;state.furniture={...state.furniture,editing:design.id,templateKey:`${design.template_id}@${design.template_version}`,name:design.name,parameters:{...design.parameters},preview:{template:templateRegistry.getTemplate(design.template_id,design.template_version),parameters:design.parameters,derived_snapshot:design.derived_snapshot,warnings:design.derived_snapshot.warnings||[]},compatibilityWarning:result.compatibility_warning||"",error:"",visualization:emptyVisualization()};refreshVisualization(design);}catch(error){state.furniture.error=message(error);}renderPanel();}
   function updateVisualization(action,value){const design=state.furniture.designs.find(item=>item.id===state.furniture.editing);if(!design)return;if(action==="mode")state.furniture.visualization.mode=value;if(action==="view")state.furniture.visualization.view=value;if(action==="rotate")state.furniture.visualization.azimuth+=Number(value);if(action==="zoom")state.furniture.visualization.zoom=Math.min(2,Math.max(.5,state.furniture.visualization.zoom+Number(value)));if(action==="reset")state.furniture.visualization={...emptyVisualization(),mode:"3d"};refreshVisualization(design);renderPanel();}
+  async function commercialAction(operation,notice){state.commercial.error="";state.commercial.notice="";try{await operation();await loadCommercial(state.selected.id);state.commercial.notice=notice;}catch(error){state.commercial.error=message(error);if(error?.details?.issues?.length)state.commercial.error+=` ${error.details.issues.map(item=>item.message).join(" ")}`;console.warn("BOM or Quote action rejected safely",error);}renderPanel();}
+  async function generateBom(designId){const design=state.furniture.designs.find(item=>item.id===designId);return commercialAction(()=>bomService.generate(state.selected.id,design),"BOM Snapshot 已保存。");}
+  async function createQuote(bomId){return commercialAction(async()=>{const bom=await bomService.get(state.selected.id,bomId),prices=await priceRepository.listByBomItems(state.selected.id,bom.items.map(item=>item.id));await quoteService.createDraft(state.selected.id,bom,prices);},"Quote Draft 已建立；缺少的價格維持未解決。");}
+  async function saveQuotePrices(form){const quoteId=form.dataset.quoteId;return commercialAction(async()=>{const quote=await quoteService.get(state.selected.id,quoteId),bom=await bomService.get(state.selected.id,quote.bom_id),data=new FormData(form),existing=await priceRepository.listByBomItems(state.selected.id,bom.items.map(item=>item.id));for(const item of bom.items){const raw=String(data.get(`price:${item.id}`)??"").trim();if(!raw)continue;const prior=existing.filter(row=>row.bom_item_id===item.id),unitPrice=Number(raw),same=prior.find(row=>row.unit_price===unitPrice);if(!same)await priceRepository.create(root.EngineeringPriceModel.create({id:root.crypto?.randomUUID?.()||`price-${Date.now()}-${Math.random().toString(16).slice(2)}`,project_id:state.selected.id,bom_item_id:item.id,description:item.description,pricing_basis:"per_piece",unit_price:unitPrice,currency:"TWD",effective_at:new Date().toISOString(),version:Math.max(0,...prior.map(row=>row.version))+1,source:"manual",metadata:{}}));}const prices=await priceRepository.listByBomItems(state.selected.id,bom.items.map(item=>item.id));await quoteService.repriceDraft(state.selected.id,quoteId,bom,prices);},"人工價格與 Quote Draft 已保存。");}
+  async function publishQuote(quoteId){return commercialAction(()=>quotePublisher.publish(state.selected.id,quoteId),"Quote 已由人工確認並發布為不可變 Snapshot。");}
+  async function reviseQuote(quoteId){return commercialAction(async()=>{const published=await quoteService.get(state.selected.id,quoteId),bom=await bomService.get(state.selected.id,published.bom_id),prices=await priceRepository.listByBomItems(state.selected.id,bom.items.map(item=>item.id));await quoteService.newRevision(state.selected.id,published,bom,prices);},"已建立新的 Quote Draft Revision。");}
+  async function exportQuotePdf(quoteId){state.commercial.error="";try{const quote=await quoteService.get(state.selected.id,quoteId),blob=await root.EngineeringQuotePdfRenderer.renderBlob(quote,{projectName:state.selected.name}),url=root.URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=`${quote.quote_number}-${quote.status}.pdf`;link.click();setTimeout(()=>root.URL.revokeObjectURL(url),1500);state.commercial.notice="PDF 已由 Quote Snapshot 匯出。";}catch(error){state.commercial.error=message(error);console.warn("Quote PDF export failed safely",error);}renderPanel();}
   function installEvents(app){
     if(installed||!app)return;installed=true;
     app.addEventListener("submit",event=>{
@@ -110,6 +123,7 @@
       event.preventDefault();event.stopImmediatePropagation();
       if(form.dataset.engineeringForm==="calculate"){void calculate(form);return;}
       if(form.dataset.engineeringForm==="furniture-design"){void furnitureAction(form,event.submitter?.dataset.furnitureAction||"preview");return;}
+      if(form.dataset.engineeringForm==="quote-prices"){void saveQuotePrices(form);return;}
       if(["measurement-create","measurement-update","note-create","note-update","record-create","attachment-create"].includes(form.dataset.engineeringForm)){void submitProjectData(form);return;}
       const name=String(new FormData(form).get("name")||"").trim(),module_ids=checkedModules(form);
       if(form.dataset.engineeringForm==="create")void perform(api=>api.createProject({name,module_ids}));
@@ -122,7 +136,7 @@
     app.addEventListener("click",event=>{
       const button=event.target.closest("button");if(!button)return;
       if(button.dataset.engineeringOpen){const project=state.projects.find(item=>item.id===button.dataset.engineeringOpen);if(project)void openProject(project);}
-      if(button.dataset.engineeringAction==="back"){revokeAttachmentUrls();state.view="list";state.selected=null;state.formError="";state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.calculationResult=null;renderPanel();}
+      if(button.dataset.engineeringAction==="back"){revokeAttachmentUrls();state.view="list";state.selected=null;state.formError="";state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.calculationResult=null;renderPanel();}
       if(button.dataset.engineeringAction==="retry")void refresh();
       if(button.dataset.engineeringArchive)void perform(api=>api.archiveProject(button.dataset.engineeringArchive));
       if(button.dataset.engineeringReopen)void perform(api=>api.reopenProject(button.dataset.engineeringReopen),{stay:state.view==="list"});
@@ -135,6 +149,11 @@
       if(button.dataset.sceneRotate)updateVisualization("rotate",button.dataset.sceneRotate);
       if(button.dataset.sceneZoom)updateVisualization("zoom",button.dataset.sceneZoom);
       if(button.dataset.sceneReset)updateVisualization("reset",0);
+      if(button.dataset.bomGenerate)void generateBom(button.dataset.bomGenerate);
+      if(button.dataset.quoteCreate)void createQuote(button.dataset.quoteCreate);
+      if(button.dataset.quotePublish)void publishQuote(button.dataset.quotePublish);
+      if(button.dataset.quoteRevise)void reviseQuote(button.dataset.quoteRevise);
+      if(button.dataset.quotePdf)void exportQuotePdf(button.dataset.quotePdf);
     },true);
   }
   root.EngineeringHub=Object.freeze({render,snapshot,activate,refresh,installEvents});
