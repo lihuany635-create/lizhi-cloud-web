@@ -65,7 +65,7 @@ test("E0-09 workspace exposes an isolated Engineering renderer",()=>{
 
 test("E0-10 production entry loads Engineering before workspace",()=>{
   const index=read("index.html");
-  assert.match(index,/engineering\/engineering\.js\?v=10[\s\S]*workspace-ui\.js\?v=24/);
+  assert.match(index,/engineering\/engineering\.js\?v=11[\s\S]*workspace-ui\.js\?v=24/);
 });
 
 test("E0-11 Phase 0 does not introduce persistence or AI",()=>{

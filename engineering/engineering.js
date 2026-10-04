@@ -5,15 +5,16 @@
   const emptyFurniture=()=>({templates:[],designs:[],templateKey:"",name:"",parameters:{},preview:null,error:"",editing:null,compatibilityWarning:"",visualization:emptyVisualization()});
   const emptyCommercial=()=>({boms:[],quotes:[],prices:[],error:"",notice:""});
   const emptyWorkflow=()=>({members:[],tasks:[],reviews:[],events:[],timeline:[],actorId:"",filter:"all",error:"",notice:""});
-  const state={view:"list",projects:[],selected:null,loading:true,error:"",formError:"",ready:false,activating:null,history:[],historyError:"",calculationResult:null,calculationInput:{},projectData:emptyProjectData(),projectDataError:"",furniture:emptyFurniture(),commercial:emptyCommercial(),workflow:emptyWorkflow()};
-  let projectService=null,projectDataService=null,furnitureDesignService=null,bomService=null,priceRepository=null,quoteRepository=null,quoteService=null,quotePublisher=null,workflowService=null,templateRegistry=null,calculationRepository=null,calculationEngine=null,formulaRegistry=null,installed=false,attachmentUrls=[];
+  const emptyAI=()=>({drafts:[],events:[],capabilityId:"project_summary",error:"",notice:"",loading:false});
+  const state={view:"list",projects:[],selected:null,loading:true,error:"",formError:"",ready:false,activating:null,history:[],historyError:"",calculationResult:null,calculationInput:{},projectData:emptyProjectData(),projectDataError:"",furniture:emptyFurniture(),commercial:emptyCommercial(),workflow:emptyWorkflow(),ai:emptyAI()};
+  let projectService=null,projectDataService=null,furnitureDesignService=null,bomService=null,priceRepository=null,quoteRepository=null,quoteService=null,quotePublisher=null,workflowService=null,aiService=null,templateRegistry=null,calculationRepository=null,calculationEngine=null,formulaRegistry=null,installed=false,attachmentUrls=[];
   const registry=()=>root.EngineeringModuleRegistry;
   const message=error=>error?.message||"工程專案發生未知錯誤。";
 
   function snapshot(){return {modules:registry()?.list?.()||[],failures:registry()?.failures?.()||[],formulas:formulaRegistry?.listFormulas?.()||[],templates:templateRegistry?.listTemplates?.()||[]};}
   function markup(){
     const common=snapshot();
-    if(state.view==="workspace")return root.EngineeringProjectWorkspace.render({...common,project:state.selected,error:state.error,formError:state.formError,history:state.history,historyError:state.historyError,calculationResult:state.calculationResult,calculationInput:state.calculationInput,projectData:state.projectData,projectDataError:state.projectDataError,furniture:state.furniture,commercial:state.commercial,workflow:state.workflow});
+    if(state.view==="workspace")return root.EngineeringProjectWorkspace.render({...common,project:state.selected,error:state.error,formError:state.formError,history:state.history,historyError:state.historyError,calculationResult:state.calculationResult,calculationInput:state.calculationInput,projectData:state.projectData,projectDataError:state.projectDataError,furniture:state.furniture,commercial:state.commercial,workflow:state.workflow,ai:state.ai});
     return root.EngineeringHome.render({...common,projects:state.projects,loading:state.loading,error:state.error,formError:state.formError});
   }
   function render(){
@@ -30,6 +31,7 @@
     const designRepository=root.EngineeringDesignRepository.create({persistence}),bomRepository=root.EngineeringBomRepository.create({persistence});
     priceRepository=root.EngineeringPriceRepository.create({persistence});quoteRepository=root.EngineeringQuoteRepository.create({persistence});
     const memberRepository=root.EngineeringProjectMemberRepository.create({persistence}),taskRepository=root.EngineeringTaskRepository.create({persistence}),reviewRepository=root.EngineeringTaskReviewRepository.create({persistence}),eventRepository=root.EngineeringWorkflowEventRepository.create({persistence});
+    const aiDraftRepository=root.EngineeringAIDraftRepository.create({persistence}),aiActionRepository=root.EngineeringAIActionRepository.create({persistence}),aiEventRepository=root.EngineeringAIEventRepository.create({persistence});
     templateRegistry=root.EngineeringParametricTemplateRegistryApi.createRegistry();
     for(const definition of[root.EngineeringOpenBoxCabinetTemplate,root.EngineeringOpenBoxCabinetTemplateV11])try{templateRegistry.registerTemplate(definition);}catch(error){templateRegistry.recordFailure(error);registry()?.recordFailure?.(error);console.warn("Furniture Template failed safely",error);}
     formulaRegistry=root.EngineeringFormulaRegistryApi.createRegistry({moduleRegistry:registry(),neutralNamespaces:["demo"]});
@@ -46,6 +48,8 @@
     quoteService=root.EngineeringQuoteService.create({repository:quoteRepository});
     quotePublisher=root.EngineeringQuotePublisher.create({repository:quoteRepository,quoteService});
     workflowService=root.EngineeringWorkflowService.create({projectService,memberRepository,taskRepository,reviewRepository,eventRepository,relationResolvers:{project_record:id=>projectRecordRepository.getById(id),attachment:id=>attachmentRepository.getById(id),measurement:id=>measurementRepository.getById(id),note:id=>noteRepository.getById(id),calculation:id=>calculationRepository.getById(id),design:id=>designRepository.getById(id),bom:id=>bomRepository.getById(id),quote:id=>quoteRepository.getById(id)}});
+    const aiActionRegistry=root.EngineeringAIActionRegistry.create(),aiContext=root.EngineeringAIContext.create({projectService,projectDataService,workflowService,designRepository,bomRepository,quoteRepository,calculationRepository,entityLoaders:{measurement:id=>measurementRepository.getById(id),note:id=>noteRepository.getById(id),project_record:id=>projectRecordRepository.getById(id),task:id=>taskRepository.getById(id)}}),aiDomainValidator=root.EngineeringAIDomainValidator.create({projectService,workflowService}),aiProvider=root.EngineeringAIProviderAdapter.create(),aiExecution=root.EngineeringAIExecutionAdapter.create({actionRepository:aiActionRepository,actionRegistry:aiActionRegistry,workflowService,projectDataService,taskRepository,projectRecordRepository});
+    aiService=root.EngineeringAIService.create({contextBuilder:aiContext,providerAdapter:aiProvider,schemaValidator:root.EngineeringAISchemaValidator,domainValidator:aiDomainValidator,actionRegistry:aiActionRegistry,executionAdapter:aiExecution,draftRepository:aiDraftRepository,eventRepository:aiEventRepository});
     return projectService;
   }
   async function refresh(){
@@ -77,9 +81,10 @@
   async function loadCommercial(projectId){state.commercial.error="";try{const[boms,quotes,prices]=await Promise.all([bomService.listByProject(projectId),quoteService.listByProject(projectId),priceRepository.listByProject(projectId)]);state.commercial={...state.commercial,boms,quotes,prices};}catch(error){state.commercial={...emptyCommercial(),error:message(error)};console.warn("BOM and Quote data failed safely",error);}}
   function refreshWorkflowTimeline(){state.workflow.timeline=workflowService.projectTimeline({events:state.workflow.events,projectRecords:state.projectData.records,quotes:state.commercial.quotes});}
   async function loadWorkflow(projectId){state.workflow.error="";try{const loaded=await workflowService.listProjectWorkflow(projectId),actorId=state.workflow.actorId&&loaded.members.some(item=>item.id===state.workflow.actorId&&item.status==="active")?state.workflow.actorId:loaded.members.find(item=>item.status==="active")?.id||"";state.workflow={...state.workflow,...loaded,actorId};}catch(error){state.workflow={...emptyWorkflow(),error:message(error)};console.warn("Engineering workflow failed safely",error);}}
+  async function loadAI(projectId){state.ai.error="";try{const loaded=await aiService.listProjectAI(projectId);state.ai={...state.ai,...loaded};}catch(error){state.ai={...emptyAI(),error:message(error)};console.warn("Engineering AI history failed safely",error);}}
   async function openProject(project){
-    state.selected=project;state.view="workspace";state.formError="";state.calculationResult=null;state.calculationInput={};state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();renderPanel();
-    await runtime();await Promise.all([loadHistory(project.id),loadProjectData(project.id),loadFurniture(project.id),loadCommercial(project.id),loadWorkflow(project.id)]);refreshWorkflowTimeline();renderPanel();
+    state.selected=project;state.view="workspace";state.formError="";state.calculationResult=null;state.calculationInput={};state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();state.ai=emptyAI();renderPanel();
+    await runtime();await Promise.all([loadHistory(project.id),loadProjectData(project.id),loadFurniture(project.id),loadCommercial(project.id),loadWorkflow(project.id),loadAI(project.id)]);refreshWorkflowTimeline();renderPanel();
   }
   async function perform(operation,{stay=false}={}){
     state.formError="";state.error="";
@@ -123,6 +128,8 @@
   async function exportQuotePdf(quoteId){state.commercial.error="";try{const quote=await quoteService.get(state.selected.id,quoteId),blob=await root.EngineeringQuotePdfRenderer.renderBlob(quote,{projectName:state.selected.name}),url=root.URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=`${quote.quote_number}-${quote.status}.pdf`;link.click();setTimeout(()=>root.URL.revokeObjectURL(url),1500);state.commercial.notice="PDF 已由 Quote Snapshot 匯出。";}catch(error){state.commercial.error=message(error);console.warn("Quote PDF export failed safely",error);}renderPanel();}
   async function workflowAction(operation,notice){state.workflow.error="";state.workflow.notice="";try{await operation();await loadWorkflow(state.selected.id);refreshWorkflowTimeline();state.workflow.notice=notice;}catch(error){state.workflow.error=message(error);console.warn("Engineering workflow action rejected safely",error);}renderPanel();}
   async function submitWorkflow(form){const data=Object.fromEntries(new FormData(form)),projectId=state.selected.id,actorId=state.workflow.actorId;if(form.dataset.engineeringForm==="workflow-member-create")return workflowAction(()=>workflowService.createMember(projectId,{display_name:data.display_name,role:data.role}),"本機 Member 已建立。");if(form.dataset.engineeringForm==="workflow-task-create"){const [related_entity_type,related_entity_id]=String(data.related_key||"").split("|");return workflowAction(()=>workflowService.createTask(projectId,{title:data.title,description:data.description,priority:data.priority,assignee_id:data.assignee_id||null,due_at:data.due_at?`${data.due_at}T23:59:59.000Z`:null,related_entity_type:related_entity_type||null,related_entity_id:related_entity_id||null,requires_review:data.requires_review==="1"},actorId),"Task 已建立並加入 Audit Timeline。");}}
+  async function aiAction(operation,notice){state.ai.error="";state.ai.notice="";state.ai.loading=true;renderPanel();try{await operation();await Promise.all([loadAI(state.selected.id),loadWorkflow(state.selected.id),loadProjectData(state.selected.id)]);refreshWorkflowTimeline();state.ai.notice=notice;}catch(error){state.ai.error=message(error);console.warn("Engineering AI rejected safely",error);}finally{state.ai.loading=false;renderPanel();}}
+  async function submitAI(form){const data=Object.fromEntries(new FormData(form)),projectId=state.selected.id;if(form.dataset.engineeringForm==="engineering-ai-generate"){const [type,id]=String(data.selection||"").split("|");return aiAction(()=>aiService.request({projectId,capabilityId:data.capability_id,userIntent:data.user_intent||"",selections:type&&id?[{type,id}]:[]}),data.capability_id==="project_summary"?"Project Summary 已產生；未寫入正式資料。":"AI Draft 已產生，尚未套用。");}if(form.dataset.engineeringForm==="engineering-ai-approve"){const draft=state.ai.drafts.find(item=>item.id===form.dataset.draftId);if(!draft)return;let payload;if(draft.capability_id==="draft_task"){const [related_entity_type,related_entity_id]=String(data.related_key||"").split("|");payload={title:data.title,description:data.description||"",priority:data.priority,assignee_id:data.assignee_id||null,related_entity_type:related_entity_type||null,related_entity_id:related_entity_id||null,requires_review:data.requires_review==="1"};}else{const [related_entity_type,related_entity_id]=String(data.related_key||"").split("|");payload={record_type:data.record_type,title:data.title,content:data.content,related_entity_type:related_entity_type||null,related_entity_id:related_entity_id||null};}return aiAction(()=>aiService.approve({projectId,draftId:draft.id,approvedPayload:payload,actorId:state.workflow.actorId}),"已經人工確認，並透過既有 Domain Service 套用。");}}
   function installEvents(app){
     if(installed||!app)return;installed=true;
     app.addEventListener("submit",event=>{
@@ -131,6 +138,7 @@
       if(form.dataset.engineeringForm==="calculate"){void calculate(form);return;}
       if(form.dataset.engineeringForm==="furniture-design"){void furnitureAction(form,event.submitter?.dataset.furnitureAction||"preview");return;}
       if(form.dataset.engineeringForm==="quote-prices"){void saveQuotePrices(form);return;}
+      if(["engineering-ai-generate","engineering-ai-approve"].includes(form.dataset.engineeringForm)){void submitAI(form);return;}
       if(["workflow-member-create","workflow-task-create"].includes(form.dataset.engineeringForm)){void submitWorkflow(form);return;}
       if(["measurement-create","measurement-update","note-create","note-update","record-create","attachment-create"].includes(form.dataset.engineeringForm)){void submitProjectData(form);return;}
       const name=String(new FormData(form).get("name")||"").trim(),module_ids=checkedModules(form);
@@ -142,11 +150,12 @@
       if(event.target.matches("[data-furniture-template]")){state.furniture={...state.furniture,templateKey:event.target.value,parameters:{},preview:null,editing:null,compatibilityWarning:"",error:""};renderPanel();}
       if(event.target.matches("[data-workflow-actor]")){state.workflow.actorId=event.target.value;renderPanel();return;}
       if(event.target.matches("[data-workflow-filter]")){state.workflow.filter=event.target.value;renderPanel();return;}
+      if(event.target.matches("[data-engineering-ai-capability]")){state.ai.capabilityId=event.target.value;renderPanel();return;}
     },true);
     app.addEventListener("click",event=>{
       const button=event.target.closest("button");if(!button)return;
       if(button.dataset.engineeringOpen){const project=state.projects.find(item=>item.id===button.dataset.engineeringOpen);if(project)void openProject(project);}
-      if(button.dataset.engineeringAction==="back"){revokeAttachmentUrls();state.view="list";state.selected=null;state.formError="";state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();state.calculationResult=null;renderPanel();}
+      if(button.dataset.engineeringAction==="back"){revokeAttachmentUrls();state.view="list";state.selected=null;state.formError="";state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();state.ai=emptyAI();state.calculationResult=null;renderPanel();}
       if(button.dataset.engineeringAction==="retry")void refresh();
       if(button.dataset.engineeringArchive)void perform(api=>api.archiveProject(button.dataset.engineeringArchive));
       if(button.dataset.engineeringReopen)void perform(api=>api.reopenProject(button.dataset.engineeringReopen),{stay:state.view==="list"});
@@ -169,6 +178,7 @@
       if(button.dataset.workflowAssign&&taskId){const assigneeId=taskCard.querySelector('select[name="assignee_id"]')?.value;void workflowAction(()=>workflowService.assignTask(state.selected.id,taskId,assigneeId,actorId),"Task Assignment 已更新。");}
       if(button.dataset.workflowTransition&&taskId)void workflowAction(()=>workflowService.transition(state.selected.id,taskId,button.dataset.workflowTransition,actorId),"Task 狀態已由 State Machine 更新。");
       if(button.dataset.workflowReview&&taskId){const comment=taskCard.querySelector('input[name="review_comment"]')?.value||"";void workflowAction(()=>workflowService.reviewTask(state.selected.id,taskId,button.dataset.workflowReview,comment,actorId),button.dataset.workflowReview==="approved"?"Review 已核准，Task 完成。":"Review 已退回修改。");}
+      if(button.dataset.engineeringAiReject)void aiAction(()=>aiService.reject(state.selected.id,button.dataset.engineeringAiReject),"AI Draft 已由人工拒絕，未套用正式資料。");
     },true);
   }
   root.EngineeringHub=Object.freeze({render,snapshot,activate,refresh,installEvents});

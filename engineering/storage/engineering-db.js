@@ -4,8 +4,8 @@
   else root.EngineeringDatabase=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(root){
   "use strict";
-  const DB_NAME="lizhi-engineering",DB_VERSION=6;
-  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events"});
+  const DB_NAME="lizhi-engineering",DB_VERSION=7;
+  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events",ai_drafts:"ai_drafts",ai_actions:"ai_actions",ai_events:"ai_events"});
 
   class EngineeringStorageError extends Error{
     constructor(code,message,cause){super(message,{cause});this.name="EngineeringStorageError";this.code=code;}
@@ -59,6 +59,9 @@
         }
         createProjectDataStore(STORES.task_reviews,["task_id","reviewer_id","created_at"]);
         createProjectDataStore(STORES.workflow_events,["entity_id","event_type","created_at"]);
+        createProjectDataStore(STORES.ai_drafts,["capability_id","status","created_at","updated_at"]);
+        createProjectDataStore(STORES.ai_actions,["draft_id","action_type","status","updated_at"]);
+        createProjectDataStore(STORES.ai_events,["draft_id","action_id","event_type","created_at"]);
       };
       request.onsuccess=()=>resolve(request.result);
       request.onerror=()=>reject(new EngineeringStorageError("DATABASE_OPEN_FAILED","無法開啟工程專案資料庫。",request.error));
