@@ -13,7 +13,7 @@
     if(!persistence)throw new TypeError("Project repository persistence is required");
     const repository={
       async create(project){
-        try{await persistence.addProject(Model.toRecord(project));return Model.create(project);}
+        try{const record=Model.toRecord(project);if(persistence.commitEntityChange)await persistence.commitEntityChange({storeName:"projects",operation:"create",record,entityId:record.id,projectId:record.id,workspaceId:record.workspace_id});else await persistence.addProject(record);return Model.create(project);}
         catch(error){
           if(error?.name==="ConstraintError"||error?.cause?.name==="ConstraintError")throw new ProjectRepositoryError("PROJECT_ALREADY_EXISTS","工程專案 ID 已存在。",error);
           throw mapError(error,"PROJECT_CREATE_FAILED","無法建立工程專案。");
@@ -30,7 +30,7 @@
       async update(project){
         try{
           if(!await persistence.getProject(project.id))throw new ProjectRepositoryError("PROJECT_NOT_FOUND","找不到工程專案。");
-          await persistence.putProject(Model.toRecord(project));
+          const record=Model.toRecord(project);if(persistence.commitEntityChange)await persistence.commitEntityChange({storeName:"projects",operation:project.status==="archived"?"archive":"update",record,entityId:record.id,projectId:record.id,workspaceId:record.workspace_id});else await persistence.putProject(record);
           return Model.create(project);
         }catch(error){throw mapError(error,"PROJECT_UPDATE_FAILED","無法更新工程專案。");}
       },

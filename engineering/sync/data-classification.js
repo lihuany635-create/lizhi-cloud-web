@@ -1,0 +1,29 @@
+(function(root,factory){const api=factory();if(typeof module==="object"&&module.exports)module.exports=api;else root.EngineeringSyncDataClassification=api;})(typeof globalThis!=="undefined"?globalThis:this,function(){
+  "use strict";
+  const DEFINITIONS=Object.freeze({
+    projects:{classification:"mutable",wave:1,source:"local-domain",direction:"bidirectional",delete_policy:"tombstone",conflict_policy:"manual",idempotency:"change-id",ordering:"logical-version",cloud_retention:"until-workspace-purge"},
+    measurements:{classification:"mutable",wave:1,source:"local-domain",direction:"bidirectional",delete_policy:"tombstone",conflict_policy:"manual",idempotency:"change-id",ordering:"logical-version",cloud_retention:"until-project-purge"},
+    notes:{classification:"mutable",wave:1,source:"local-domain",direction:"bidirectional",delete_policy:"tombstone",conflict_policy:"manual",idempotency:"change-id",ordering:"logical-version",cloud_retention:"until-project-purge"},
+    project_records:{classification:"mutable",wave:1,source:"local-domain",direction:"bidirectional",delete_policy:"tombstone",conflict_policy:"manual",idempotency:"change-id",ordering:"logical-version",cloud_retention:"until-project-purge"},
+    calculations:{classification:"versioned_immutable",wave:2,source:"local-domain",direction:"deferred",delete_policy:"archive",conflict_policy:"version_fork",idempotency:"stable-id",ordering:"revision",cloud_retention:"project-policy"},
+    designs:{classification:"versioned_immutable",wave:2,source:"saved-snapshot",direction:"deferred",delete_policy:"archive",conflict_policy:"version_fork",idempotency:"stable-id-revision",ordering:"revision",cloud_retention:"project-policy"},
+    boms:{classification:"versioned_immutable",wave:2,source:"design-snapshot",direction:"deferred",delete_policy:"archive",conflict_policy:"immutable_reject",idempotency:"stable-id-version",ordering:"version",cloud_retention:"project-policy"},
+    price_entries:{classification:"versioned_immutable",wave:2,source:"local-domain",direction:"deferred",delete_policy:"archive",conflict_policy:"version_fork",idempotency:"stable-id",ordering:"effective-at-plus-id",cloud_retention:"project-policy"},
+    quote_drafts:{classification:"mutable",wave:2,source:"quote-domain",direction:"deferred",delete_policy:"tombstone",conflict_policy:"manual",idempotency:"stable-id",ordering:"logical-version",cloud_retention:"project-policy"},
+    published_quotes:{classification:"immutable",wave:2,source:"published-snapshot",direction:"deferred",delete_policy:"archive",conflict_policy:"immutable_reject",idempotency:"stable-id-version",ordering:"version",cloud_retention:"permanent-audit"},
+    project_members:{classification:"mutable",wave:3,source:"workflow-domain",direction:"deferred",delete_policy:"archive",conflict_policy:"manual",idempotency:"stable-id",ordering:"logical-version",cloud_retention:"workflow-history"},
+    tasks:{classification:"mutable_state_machine",wave:3,source:"workflow-domain",direction:"deferred",delete_policy:"archive",conflict_policy:"manual_state_transition",idempotency:"stable-id",ordering:"logical-version",cloud_retention:"workflow-history"},
+    task_reviews:{classification:"append_only",wave:3,source:"workflow-domain",direction:"deferred",delete_policy:"none",conflict_policy:"append_only_union",idempotency:"stable-id",ordering:"server-sequence",cloud_retention:"workflow-history"},
+    workflow_events:{classification:"append_only",wave:3,source:"workflow-domain",direction:"deferred",delete_policy:"none",conflict_policy:"append_only_union",idempotency:"stable-id",ordering:"server-sequence",cloud_retention:"workflow-history"},
+    ai_drafts:{classification:"local_only",wave:4,source:"ai-domain",direction:"none",delete_policy:"retention",conflict_policy:"local_authoritative",idempotency:"stable-id",ordering:"created-at",cloud_retention:"90-days-local"},
+    ai_actions:{classification:"local_only",wave:4,source:"ai-domain",direction:"none",delete_policy:"none",conflict_policy:"executed_action_reject",idempotency:"action-id",ordering:"created-at",cloud_retention:"audit-local"},
+    ai_events:{classification:"append_only_local",wave:4,source:"ai-domain",direction:"none",delete_policy:"none",conflict_policy:"append_only_union",idempotency:"event-id",ordering:"created-at-plus-id",cloud_retention:"audit-local"},
+    attachment_metadata:{classification:"binary_metadata",wave:5,source:"project-data-domain",direction:"deferred",delete_policy:"tombstone",conflict_policy:"manual",idempotency:"stable-id-checksum",ordering:"logical-version",cloud_retention:"project-policy"},
+    attachment_binary:{classification:"binary",wave:5,source:"attachment-storage",direction:"deferred",delete_policy:"tombstone_then_purge",conflict_policy:"checksum_reject",idempotency:"object-key-checksum",ordering:"metadata-first",cloud_retention:"project-policy"},
+    render_cache:{classification:"derived_cache",wave:0,source:"saved-design-snapshot",direction:"none",delete_policy:"local-purge",conflict_policy:"local_authoritative",idempotency:"not-applicable",ordering:"not-applicable",cloud_retention:"none"}
+  });
+  const ACTIVE_WAVE=1,active=type=>Number(DEFINITIONS[type]?.wave)===ACTIVE_WAVE&&DEFINITIONS[type].direction==="bidirectional";
+  function get(type){return DEFINITIONS[String(type)]||null;}
+  function assertRemoteAllowed(type){const policy=get(type);if(!policy)throw Object.assign(new Error("未知同步資料類型。"),{code:"SYNC_ENTITY_TYPE_UNKNOWN"});if(!active(type))throw Object.assign(new Error("此資料類型尚未進入正式同步波次。"),{code:"SYNC_WAVE_DEFERRED",policy});return policy;}
+  return Object.freeze({ACTIVE_WAVE,DEFINITIONS,get,active,assertRemoteAllowed});
+});

@@ -4,8 +4,8 @@
   else root.EngineeringDatabase=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(root){
   "use strict";
-  const DB_NAME="lizhi-engineering",DB_VERSION=7;
-  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events",ai_drafts:"ai_drafts",ai_actions:"ai_actions",ai_events:"ai_events"});
+  const DB_NAME="lizhi-engineering",DB_VERSION=8;
+  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events",ai_drafts:"ai_drafts",ai_actions:"ai_actions",ai_events:"ai_events",sync_outbox:"sync_outbox",sync_state:"sync_state",sync_conflicts:"sync_conflicts",sync_receipts:"sync_receipts",sync_audit:"sync_audit"});
 
   class EngineeringStorageError extends Error{
     constructor(code,message,cause){super(message,{cause});this.name="EngineeringStorageError";this.code=code;}
@@ -62,6 +62,27 @@
         createProjectDataStore(STORES.ai_drafts,["capability_id","status","created_at","updated_at"]);
         createProjectDataStore(STORES.ai_actions,["draft_id","action_type","status","updated_at"]);
         createProjectDataStore(STORES.ai_events,["draft_id","action_id","event_type","created_at"]);
+        if(!db.objectStoreNames.contains(STORES.sync_outbox)){
+          const outbox=db.createObjectStore(STORES.sync_outbox,{keyPath:"id"});
+          for(const index of["entity_type","entity_id","project_id","status","next_attempt_at","created_at"])outbox.createIndex(index,index);
+          outbox.createIndex("idempotency_key","idempotency_key",{unique:true});
+        }
+        if(!db.objectStoreNames.contains(STORES.sync_state)){
+          const state=db.createObjectStore(STORES.sync_state,{keyPath:"scope_id"});
+          state.createIndex("workspace_id","workspace_id");state.createIndex("status","status");
+        }
+        if(!db.objectStoreNames.contains(STORES.sync_conflicts)){
+          const conflicts=db.createObjectStore(STORES.sync_conflicts,{keyPath:"id"});
+          for(const index of["entity_type","entity_id","project_id","status","detected_at"])conflicts.createIndex(index,index);
+        }
+        if(!db.objectStoreNames.contains(STORES.sync_receipts)){
+          const receipts=db.createObjectStore(STORES.sync_receipts,{keyPath:"id"});
+          for(const index of["entity_type","entity_id","project_id","last_change_id"])receipts.createIndex(index,index);
+        }
+        if(!db.objectStoreNames.contains(STORES.sync_audit)){
+          const audit=db.createObjectStore(STORES.sync_audit,{keyPath:"id"});
+          for(const index of["project_id","event_type","created_at"])audit.createIndex(index,index);
+        }
       };
       request.onsuccess=()=>resolve(request.result);
       request.onerror=()=>reject(new EngineeringStorageError("DATABASE_OPEN_FAILED","無法開啟工程專案資料庫。",request.error));
@@ -96,6 +117,20 @@
       deleteData(storeName,id){return withStore(storeName,"readwrite",store=>requestResult(store.delete(String(id))));},
       listDataByProject(storeName,projectId){return withStore(storeName,"readonly",store=>requestResult(store.index("project_id").getAll(String(projectId))));},
       listData(storeName){return withStore(storeName,"readonly",store=>requestResult(store.getAll()));},
+      async commitEntityChange({storeName,operation,record=null,entityId,projectId=null,workspaceId=null,now=()=>new Date().toISOString(),idGenerator=randomId}){
+        if(!["create","update","delete","archive","reopen"].includes(operation))throw new EngineeringStorageError("SYNC_OPERATION_INVALID","不支援的本機同步操作。");
+        const id=String(entityId||record?.id||"").trim();if(!id)throw new EngineeringStorageError("SYNC_ENTITY_ID_REQUIRED","同步資料必須有 stable id。");
+        const db=await openDatabase(indexedDBImpl);
+        try{
+          const tx=db.transaction([storeName,STORES.settings,STORES.sync_outbox,STORES.sync_receipts],"readwrite"),entityStore=tx.objectStore(storeName),settings=tx.objectStore(STORES.settings),outbox=tx.objectStore(STORES.sync_outbox),receipts=tx.objectStore(STORES.sync_receipts),receiptId=`${storeName}:${id}`;
+          const previous=await requestResult(receipts.get(receiptId)),workspaceSetting=await requestResult(settings.get("workspace_id")),localVersion=Number(previous?.local_version||0)+1,timestamp=now(),changeId=idGenerator(),project_id=String(projectId||record?.project_id||record?.id||"").trim()||null,workspace_id=String(workspaceId||record?.workspace_id||workspaceSetting?.value||"").trim()||null;
+          if(operation==="delete")await requestResult(entityStore.delete(id));else await requestResult(operation==="create"?entityStore.add(clone(record)):entityStore.put(clone(record)));
+          const item={id:changeId,entity_type:storeName,entity_id:id,project_id,workspace_id,operation,local_version:localVersion,payload:operation==="delete"?null:clone(record),created_at:timestamp,attempt_count:0,next_attempt_at:timestamp,status:"pending",last_error:null,idempotency_key:`${workspace_id||"local"}:${storeName}:${id}:${localVersion}:${operation}`};
+          await requestResult(outbox.add(item));
+          await requestResult(receipts.put({id:receiptId,entity_type:storeName,entity_id:id,project_id,workspace_id,local_version:localVersion,remote_version:Number(previous?.remote_version||0),deleted:operation==="delete",last_change_id:changeId,last_idempotency_key:item.idempotency_key,updated_at:timestamp}));
+          await transactionDone(tx);return clone({record,change:item});
+        }catch(error){if(error instanceof EngineeringStorageError)throw error;throw new EngineeringStorageError("SYNC_ATOMIC_COMMIT_FAILED","本機資料與同步佇列無法原子寫入。",error);}finally{db.close();}
+      },
       getWorkspaceId(){
         return withStore(STORES.settings,"readwrite",async store=>{
           const existing=await requestResult(store.get("workspace_id"));
