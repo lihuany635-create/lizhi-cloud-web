@@ -4,15 +4,16 @@
   const emptyVisualization=()=>({mode:"2d",view:"front",azimuth:40,zoom:1,svg2d:"",svg3d:"",error2d:"",error3d:"",sourceIdentity:null,snapshotOnly:false});
   const emptyFurniture=()=>({templates:[],designs:[],templateKey:"",name:"",parameters:{},preview:null,error:"",editing:null,compatibilityWarning:"",visualization:emptyVisualization()});
   const emptyCommercial=()=>({boms:[],quotes:[],prices:[],error:"",notice:""});
-  const state={view:"list",projects:[],selected:null,loading:true,error:"",formError:"",ready:false,activating:null,history:[],historyError:"",calculationResult:null,calculationInput:{},projectData:emptyProjectData(),projectDataError:"",furniture:emptyFurniture(),commercial:emptyCommercial()};
-  let projectService=null,projectDataService=null,furnitureDesignService=null,bomService=null,priceRepository=null,quoteRepository=null,quoteService=null,quotePublisher=null,templateRegistry=null,calculationRepository=null,calculationEngine=null,formulaRegistry=null,installed=false,attachmentUrls=[];
+  const emptyWorkflow=()=>({members:[],tasks:[],reviews:[],events:[],timeline:[],actorId:"",filter:"all",error:"",notice:""});
+  const state={view:"list",projects:[],selected:null,loading:true,error:"",formError:"",ready:false,activating:null,history:[],historyError:"",calculationResult:null,calculationInput:{},projectData:emptyProjectData(),projectDataError:"",furniture:emptyFurniture(),commercial:emptyCommercial(),workflow:emptyWorkflow()};
+  let projectService=null,projectDataService=null,furnitureDesignService=null,bomService=null,priceRepository=null,quoteRepository=null,quoteService=null,quotePublisher=null,workflowService=null,templateRegistry=null,calculationRepository=null,calculationEngine=null,formulaRegistry=null,installed=false,attachmentUrls=[];
   const registry=()=>root.EngineeringModuleRegistry;
   const message=error=>error?.message||"工程專案發生未知錯誤。";
 
   function snapshot(){return {modules:registry()?.list?.()||[],failures:registry()?.failures?.()||[],formulas:formulaRegistry?.listFormulas?.()||[],templates:templateRegistry?.listTemplates?.()||[]};}
   function markup(){
     const common=snapshot();
-    if(state.view==="workspace")return root.EngineeringProjectWorkspace.render({...common,project:state.selected,error:state.error,formError:state.formError,history:state.history,historyError:state.historyError,calculationResult:state.calculationResult,calculationInput:state.calculationInput,projectData:state.projectData,projectDataError:state.projectDataError,furniture:state.furniture,commercial:state.commercial});
+    if(state.view==="workspace")return root.EngineeringProjectWorkspace.render({...common,project:state.selected,error:state.error,formError:state.formError,history:state.history,historyError:state.historyError,calculationResult:state.calculationResult,calculationInput:state.calculationInput,projectData:state.projectData,projectDataError:state.projectDataError,furniture:state.furniture,commercial:state.commercial,workflow:state.workflow});
     return root.EngineeringHome.render({...common,projects:state.projects,loading:state.loading,error:state.error,formError:state.formError});
   }
   function render(){
@@ -28,6 +29,7 @@
     const measurementRepository=root.EngineeringMeasurementRepository.create({persistence}),noteRepository=root.EngineeringNoteRepository.create({persistence}),attachmentRepository=root.EngineeringAttachmentRepository.create({persistence}),projectRecordRepository=root.EngineeringProjectRecordRepository.create({persistence});
     const designRepository=root.EngineeringDesignRepository.create({persistence}),bomRepository=root.EngineeringBomRepository.create({persistence});
     priceRepository=root.EngineeringPriceRepository.create({persistence});quoteRepository=root.EngineeringQuoteRepository.create({persistence});
+    const memberRepository=root.EngineeringProjectMemberRepository.create({persistence}),taskRepository=root.EngineeringTaskRepository.create({persistence}),reviewRepository=root.EngineeringTaskReviewRepository.create({persistence}),eventRepository=root.EngineeringWorkflowEventRepository.create({persistence});
     templateRegistry=root.EngineeringParametricTemplateRegistryApi.createRegistry();
     for(const definition of[root.EngineeringOpenBoxCabinetTemplate,root.EngineeringOpenBoxCabinetTemplateV11])try{templateRegistry.registerTemplate(definition);}catch(error){templateRegistry.recordFailure(error);registry()?.recordFailure?.(error);console.warn("Furniture Template failed safely",error);}
     formulaRegistry=root.EngineeringFormulaRegistryApi.createRegistry({moduleRegistry:registry(),neutralNamespaces:["demo"]});
@@ -43,6 +45,7 @@
     bomService=root.EngineeringBomService.create({repository:bomRepository,adapter:root.EngineeringWoodworkingBomAdapter});
     quoteService=root.EngineeringQuoteService.create({repository:quoteRepository});
     quotePublisher=root.EngineeringQuotePublisher.create({repository:quoteRepository,quoteService});
+    workflowService=root.EngineeringWorkflowService.create({projectService,memberRepository,taskRepository,reviewRepository,eventRepository,relationResolvers:{project_record:id=>projectRecordRepository.getById(id),attachment:id=>attachmentRepository.getById(id),measurement:id=>measurementRepository.getById(id),note:id=>noteRepository.getById(id),calculation:id=>calculationRepository.getById(id),design:id=>designRepository.getById(id),bom:id=>bomRepository.getById(id),quote:id=>quoteRepository.getById(id)}});
     return projectService;
   }
   async function refresh(){
@@ -72,9 +75,11 @@
     catch(error){state.furniture={...emptyFurniture(),error:message(error)};console.warn("Furniture designs failed safely",error);}
   }
   async function loadCommercial(projectId){state.commercial.error="";try{const[boms,quotes,prices]=await Promise.all([bomService.listByProject(projectId),quoteService.listByProject(projectId),priceRepository.listByProject(projectId)]);state.commercial={...state.commercial,boms,quotes,prices};}catch(error){state.commercial={...emptyCommercial(),error:message(error)};console.warn("BOM and Quote data failed safely",error);}}
+  function refreshWorkflowTimeline(){state.workflow.timeline=workflowService.projectTimeline({events:state.workflow.events,projectRecords:state.projectData.records,quotes:state.commercial.quotes});}
+  async function loadWorkflow(projectId){state.workflow.error="";try{const loaded=await workflowService.listProjectWorkflow(projectId),actorId=state.workflow.actorId&&loaded.members.some(item=>item.id===state.workflow.actorId&&item.status==="active")?state.workflow.actorId:loaded.members.find(item=>item.status==="active")?.id||"";state.workflow={...state.workflow,...loaded,actorId};}catch(error){state.workflow={...emptyWorkflow(),error:message(error)};console.warn("Engineering workflow failed safely",error);}}
   async function openProject(project){
-    state.selected=project;state.view="workspace";state.formError="";state.calculationResult=null;state.calculationInput={};state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();renderPanel();
-    await runtime();await Promise.all([loadHistory(project.id),loadProjectData(project.id),loadFurniture(project.id),loadCommercial(project.id)]);renderPanel();
+    state.selected=project;state.view="workspace";state.formError="";state.calculationResult=null;state.calculationInput={};state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();renderPanel();
+    await runtime();await Promise.all([loadHistory(project.id),loadProjectData(project.id),loadFurniture(project.id),loadCommercial(project.id),loadWorkflow(project.id)]);refreshWorkflowTimeline();renderPanel();
   }
   async function perform(operation,{stay=false}={}){
     state.formError="";state.error="";
@@ -93,7 +98,7 @@
     catch(error){state.calculationResult={ok:false,formula_id:data.formula_id,formula_version:null,result:null,warnings:[],errors:[{code:"FORMULA_EXECUTION_ERROR",message:message(error)}],meta:{}};}
     renderPanel();
   }
-  async function projectDataAction(operation){state.projectDataError="";try{await operation();await loadProjectData(state.selected.id);}catch(error){state.projectDataError=message(error);console.warn("Engineering project data action rejected safely",error);}renderPanel();}
+  async function projectDataAction(operation){state.projectDataError="";try{await operation();await loadProjectData(state.selected.id);if(workflowService)refreshWorkflowTimeline();}catch(error){state.projectDataError=message(error);console.warn("Engineering project data action rejected safely",error);}renderPanel();}
   function measurementData(form){const data=Object.fromEntries(new FormData(form));return{type:data.type,label:data.label,values:{value:Number(data.value)},units:{value:data.unit},notes:data.notes||"",source:"manual"};}
   async function submitProjectData(form){
     const kind=form.dataset.engineeringForm,data=Object.fromEntries(new FormData(form)),projectId=state.selected.id;
@@ -109,13 +114,15 @@
   async function furnitureAction(form,action){state.furniture.error="";const data=Object.fromEntries(new FormData(form)),identity=templateIdentity(data.template_key),template=templateRegistry.getTemplate(identity.template_id,identity.template_version),parameters={};for(const name of Object.keys(template?.parameter_schema?.fields||{}))parameters[name]=data[name];state.furniture={...state.furniture,templateKey:data.template_key,name:String(data.name||""),parameters};try{if(action==="preview"){state.furniture.preview=await furnitureDesignService.preview({project_id:state.selected.id,...identity,parameters});state.furniture.compatibilityWarning="";}if(action==="save"){const request={name:data.name,parameters};const design=state.furniture.editing?await furnitureDesignService.updateDraft(state.selected.id,state.furniture.editing,request):await furnitureDesignService.saveDraft({project_id:state.selected.id,...identity,...request});await loadFurniture(state.selected.id);state.furniture.editing=design.id;state.furniture.name=design.name;state.furniture.parameters={...design.parameters};state.furniture.preview={template:templateRegistry.getTemplate(design.template_id,design.template_version),parameters:design.parameters,derived_snapshot:design.derived_snapshot,warnings:design.derived_snapshot.warnings||[]};refreshVisualization(design);}}catch(error){state.furniture.error=message(error);if(error?.details?.issues?.length)state.furniture.error+=` ${error.details.issues.map(item=>item.message).join(" ")}`;if(error?.details?.preview)state.furniture.preview=error.details.preview;if(error?.code!=="VALIDATION_ERROR")console.warn("Furniture design action rejected safely",error);}renderPanel();}
   async function editFurniture(designId){try{const result=await furnitureDesignService.getDesign(state.selected.id,designId),design=result.design;state.furniture={...state.furniture,editing:design.id,templateKey:`${design.template_id}@${design.template_version}`,name:design.name,parameters:{...design.parameters},preview:{template:templateRegistry.getTemplate(design.template_id,design.template_version),parameters:design.parameters,derived_snapshot:design.derived_snapshot,warnings:design.derived_snapshot.warnings||[]},compatibilityWarning:result.compatibility_warning||"",error:"",visualization:emptyVisualization()};refreshVisualization(design);}catch(error){state.furniture.error=message(error);}renderPanel();}
   function updateVisualization(action,value){const design=state.furniture.designs.find(item=>item.id===state.furniture.editing);if(!design)return;if(action==="mode")state.furniture.visualization.mode=value;if(action==="view")state.furniture.visualization.view=value;if(action==="rotate")state.furniture.visualization.azimuth+=Number(value);if(action==="zoom")state.furniture.visualization.zoom=Math.min(2,Math.max(.5,state.furniture.visualization.zoom+Number(value)));if(action==="reset")state.furniture.visualization={...emptyVisualization(),mode:"3d"};refreshVisualization(design);renderPanel();}
-  async function commercialAction(operation,notice){state.commercial.error="";state.commercial.notice="";try{await operation();await loadCommercial(state.selected.id);state.commercial.notice=notice;}catch(error){state.commercial.error=message(error);if(error?.details?.issues?.length)state.commercial.error+=` ${error.details.issues.map(item=>item.message).join(" ")}`;console.warn("BOM or Quote action rejected safely",error);}renderPanel();}
+  async function commercialAction(operation,notice){state.commercial.error="";state.commercial.notice="";try{await operation();await loadCommercial(state.selected.id);if(workflowService)refreshWorkflowTimeline();state.commercial.notice=notice;}catch(error){state.commercial.error=message(error);if(error?.details?.issues?.length)state.commercial.error+=` ${error.details.issues.map(item=>item.message).join(" ")}`;console.warn("BOM or Quote action rejected safely",error);}renderPanel();}
   async function generateBom(designId){const design=state.furniture.designs.find(item=>item.id===designId);return commercialAction(()=>bomService.generate(state.selected.id,design),"BOM Snapshot 已保存。");}
   async function createQuote(bomId){return commercialAction(async()=>{const bom=await bomService.get(state.selected.id,bomId),prices=await priceRepository.listByBomItems(state.selected.id,bom.items.map(item=>item.id));await quoteService.createDraft(state.selected.id,bom,prices);},"Quote Draft 已建立；缺少的價格維持未解決。");}
   async function saveQuotePrices(form){const quoteId=form.dataset.quoteId;return commercialAction(async()=>{const quote=await quoteService.get(state.selected.id,quoteId),bom=await bomService.get(state.selected.id,quote.bom_id),data=new FormData(form),existing=await priceRepository.listByBomItems(state.selected.id,bom.items.map(item=>item.id));for(const item of bom.items){const raw=String(data.get(`price:${item.id}`)??"").trim();if(!raw)continue;const prior=existing.filter(row=>row.bom_item_id===item.id),unitPrice=Number(raw),same=prior.find(row=>row.unit_price===unitPrice);if(!same)await priceRepository.create(root.EngineeringPriceModel.create({id:root.crypto?.randomUUID?.()||`price-${Date.now()}-${Math.random().toString(16).slice(2)}`,project_id:state.selected.id,bom_item_id:item.id,description:item.description,pricing_basis:"per_piece",unit_price:unitPrice,currency:"TWD",effective_at:new Date().toISOString(),version:Math.max(0,...prior.map(row=>row.version))+1,source:"manual",metadata:{}}));}const prices=await priceRepository.listByBomItems(state.selected.id,bom.items.map(item=>item.id));await quoteService.repriceDraft(state.selected.id,quoteId,bom,prices);},"人工價格與 Quote Draft 已保存。");}
   async function publishQuote(quoteId){return commercialAction(()=>quotePublisher.publish(state.selected.id,quoteId),"Quote 已由人工確認並發布為不可變 Snapshot。");}
   async function reviseQuote(quoteId){return commercialAction(async()=>{const published=await quoteService.get(state.selected.id,quoteId),bom=await bomService.get(state.selected.id,published.bom_id),prices=await priceRepository.listByBomItems(state.selected.id,bom.items.map(item=>item.id));await quoteService.newRevision(state.selected.id,published,bom,prices);},"已建立新的 Quote Draft Revision。");}
   async function exportQuotePdf(quoteId){state.commercial.error="";try{const quote=await quoteService.get(state.selected.id,quoteId),blob=await root.EngineeringQuotePdfRenderer.renderBlob(quote,{projectName:state.selected.name}),url=root.URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=`${quote.quote_number}-${quote.status}.pdf`;link.click();setTimeout(()=>root.URL.revokeObjectURL(url),1500);state.commercial.notice="PDF 已由 Quote Snapshot 匯出。";}catch(error){state.commercial.error=message(error);console.warn("Quote PDF export failed safely",error);}renderPanel();}
+  async function workflowAction(operation,notice){state.workflow.error="";state.workflow.notice="";try{await operation();await loadWorkflow(state.selected.id);refreshWorkflowTimeline();state.workflow.notice=notice;}catch(error){state.workflow.error=message(error);console.warn("Engineering workflow action rejected safely",error);}renderPanel();}
+  async function submitWorkflow(form){const data=Object.fromEntries(new FormData(form)),projectId=state.selected.id,actorId=state.workflow.actorId;if(form.dataset.engineeringForm==="workflow-member-create")return workflowAction(()=>workflowService.createMember(projectId,{display_name:data.display_name,role:data.role}),"本機 Member 已建立。");if(form.dataset.engineeringForm==="workflow-task-create"){const [related_entity_type,related_entity_id]=String(data.related_key||"").split("|");return workflowAction(()=>workflowService.createTask(projectId,{title:data.title,description:data.description,priority:data.priority,assignee_id:data.assignee_id||null,due_at:data.due_at?`${data.due_at}T23:59:59.000Z`:null,related_entity_type:related_entity_type||null,related_entity_id:related_entity_id||null,requires_review:data.requires_review==="1"},actorId),"Task 已建立並加入 Audit Timeline。");}}
   function installEvents(app){
     if(installed||!app)return;installed=true;
     app.addEventListener("submit",event=>{
@@ -124,6 +131,7 @@
       if(form.dataset.engineeringForm==="calculate"){void calculate(form);return;}
       if(form.dataset.engineeringForm==="furniture-design"){void furnitureAction(form,event.submitter?.dataset.furnitureAction||"preview");return;}
       if(form.dataset.engineeringForm==="quote-prices"){void saveQuotePrices(form);return;}
+      if(["workflow-member-create","workflow-task-create"].includes(form.dataset.engineeringForm)){void submitWorkflow(form);return;}
       if(["measurement-create","measurement-update","note-create","note-update","record-create","attachment-create"].includes(form.dataset.engineeringForm)){void submitProjectData(form);return;}
       const name=String(new FormData(form).get("name")||"").trim(),module_ids=checkedModules(form);
       if(form.dataset.engineeringForm==="create")void perform(api=>api.createProject({name,module_ids}));
@@ -132,11 +140,13 @@
     app.addEventListener("change",event=>{
       if(event.target.matches("[data-engineering-formula]")){state.calculationInput={formula_id:event.target.value};state.calculationResult=null;renderPanel();return;}
       if(event.target.matches("[data-furniture-template]")){state.furniture={...state.furniture,templateKey:event.target.value,parameters:{},preview:null,editing:null,compatibilityWarning:"",error:""};renderPanel();}
+      if(event.target.matches("[data-workflow-actor]")){state.workflow.actorId=event.target.value;renderPanel();return;}
+      if(event.target.matches("[data-workflow-filter]")){state.workflow.filter=event.target.value;renderPanel();return;}
     },true);
     app.addEventListener("click",event=>{
       const button=event.target.closest("button");if(!button)return;
       if(button.dataset.engineeringOpen){const project=state.projects.find(item=>item.id===button.dataset.engineeringOpen);if(project)void openProject(project);}
-      if(button.dataset.engineeringAction==="back"){revokeAttachmentUrls();state.view="list";state.selected=null;state.formError="";state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.calculationResult=null;renderPanel();}
+      if(button.dataset.engineeringAction==="back"){revokeAttachmentUrls();state.view="list";state.selected=null;state.formError="";state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();state.calculationResult=null;renderPanel();}
       if(button.dataset.engineeringAction==="retry")void refresh();
       if(button.dataset.engineeringArchive)void perform(api=>api.archiveProject(button.dataset.engineeringArchive));
       if(button.dataset.engineeringReopen)void perform(api=>api.reopenProject(button.dataset.engineeringReopen),{stay:state.view==="list"});
@@ -154,6 +164,11 @@
       if(button.dataset.quotePublish)void publishQuote(button.dataset.quotePublish);
       if(button.dataset.quoteRevise)void reviseQuote(button.dataset.quoteRevise);
       if(button.dataset.quotePdf)void exportQuotePdf(button.dataset.quotePdf);
+      if(button.dataset.workflowMemberArchive)void workflowAction(()=>workflowService.archiveMember(state.selected.id,button.dataset.workflowMemberArchive),"Member 已封存；歷史 Assignment 保留。");
+      const taskCard=button.closest("[data-task-id]"),taskId=taskCard?.dataset.taskId,actorId=state.workflow.actorId;
+      if(button.dataset.workflowAssign&&taskId){const assigneeId=taskCard.querySelector('select[name="assignee_id"]')?.value;void workflowAction(()=>workflowService.assignTask(state.selected.id,taskId,assigneeId,actorId),"Task Assignment 已更新。");}
+      if(button.dataset.workflowTransition&&taskId)void workflowAction(()=>workflowService.transition(state.selected.id,taskId,button.dataset.workflowTransition,actorId),"Task 狀態已由 State Machine 更新。");
+      if(button.dataset.workflowReview&&taskId){const comment=taskCard.querySelector('input[name="review_comment"]')?.value||"";void workflowAction(()=>workflowService.reviewTask(state.selected.id,taskId,button.dataset.workflowReview,comment,actorId),button.dataset.workflowReview==="approved"?"Review 已核准，Task 完成。":"Review 已退回修改。");}
     },true);
   }
   root.EngineeringHub=Object.freeze({render,snapshot,activate,refresh,installEvents});

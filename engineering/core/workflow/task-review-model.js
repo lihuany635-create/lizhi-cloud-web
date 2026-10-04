@@ -1,0 +1,6 @@
+(function(root,factory){const api=factory();if(typeof module==="object"&&module.exports)module.exports=api;else root.EngineeringTaskReviewModel=api;})(typeof globalThis!=="undefined"?globalThis:this,function(){
+  "use strict";const DECISIONS=Object.freeze(["approved","changes_requested"]),clone=value=>JSON.parse(JSON.stringify(value));class TaskReviewError extends Error{constructor(code,message){super(message);this.name="TaskReviewError";this.code=code;}}
+  const required=(value,name)=>{const result=String(value??"").trim();if(!result)throw new TaskReviewError("REVIEW_INVALID",`${name} 不可空白。`);return result;};
+  function create(input={}){const decision=String(input.decision||"");if(!DECISIONS.includes(decision))throw new TaskReviewError("REVIEW_INVALID","Review decision 不合法。");return Object.freeze(clone({id:required(input.id,"Review ID"),project_id:required(input.project_id,"Project ID"),task_id:required(input.task_id,"Task ID"),reviewer_id:required(input.reviewer_id,"Reviewer ID"),decision,comment:String(input.comment||"").trim(),created_at:required(input.created_at,"建立時間"),metadata:input.metadata&&typeof input.metadata==="object"?input.metadata:{}}));}
+  return Object.freeze({DECISIONS,TaskReviewError,create,toRecord:create});
+});

@@ -4,8 +4,8 @@
   else root.EngineeringDatabase=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(root){
   "use strict";
-  const DB_NAME="lizhi-engineering",DB_VERSION=5;
-  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes"});
+  const DB_NAME="lizhi-engineering",DB_VERSION=6;
+  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events"});
 
   class EngineeringStorageError extends Error{
     constructor(code,message,cause){super(message,{cause});this.name="EngineeringStorageError";this.code=code;}
@@ -49,6 +49,16 @@
         createProjectDataStore(STORES.boms,["design_id","created_at"]);
         createProjectDataStore(STORES.price_entries,["bom_item_id","effective_at"]);
         createProjectDataStore(STORES.quotes,["bom_id","status","updated_at"]);
+        createProjectDataStore(STORES.project_members,["role","status","updated_at"]);
+        if(!db.objectStoreNames.contains(STORES.tasks)){
+          const tasks=db.createObjectStore(STORES.tasks,{keyPath:"id"});
+          tasks.createIndex("project_id","project_id");
+          tasks.createIndex("status","status");
+          tasks.createIndex("assignee_ids","assignee_ids",{multiEntry:true});
+          tasks.createIndex("updated_at","updated_at");
+        }
+        createProjectDataStore(STORES.task_reviews,["task_id","reviewer_id","created_at"]);
+        createProjectDataStore(STORES.workflow_events,["entity_id","event_type","created_at"]);
       };
       request.onsuccess=()=>resolve(request.result);
       request.onerror=()=>reject(new EngineeringStorageError("DATABASE_OPEN_FAILED","無法開啟工程專案資料庫。",request.error));
