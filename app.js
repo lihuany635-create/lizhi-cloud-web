@@ -1,7 +1,7 @@
 const DB_NAME="lizhi-local-cloud";
 const DB_VERSION=1;
 const IS_CLOUD_SITE=location.hostname.endsWith("github.io")||new URLSearchParams(location.search).has("cloud");
-const CLOUD_APP_URL="https://lihuany635-create.github.io/lizhi-cloud-laptop-6s8a4kuk/";
+const CLOUD_APP_URL="https://lihuany635-create.github.io/lizhi-cloud-web/";
 const RELEASE_BASE="https://github.com/lihuany635-create/lizhi-cloud-laptop-6s8a4kuk/releases/download/media-2026-08-23/";
 const queryParams=new URLSearchParams(location.search);
 const OPEN_ROUTES=["home","knowledge","weave","finance","engineering","media","chat","study","a4","trash","settings","uploads"];

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://lihuany635-create.github.io/lizhi-cloud-laptop-6s8a4kuk/schemas/weaving-proposal.schema.json",
+  "$id": "https://lihuany635-create.github.io/lizhi-cloud-web/schemas/weaving-proposal.schema.json",
   "title": "Knowledge Weaving Proposal Schema Version 1",
   "description": "AI/nanobot 只能提出此 Proposal；approved 僅表示使用者完成人工審核，不表示已寫入 Obsidian。",
   "type": "object",
