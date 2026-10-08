@@ -4,8 +4,8 @@
   else root.EngineeringDatabase=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(root){
   "use strict";
-  const DB_NAME="lizhi-engineering",DB_VERSION=8;
-  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events",ai_drafts:"ai_drafts",ai_actions:"ai_actions",ai_events:"ai_events",sync_outbox:"sync_outbox",sync_state:"sync_state",sync_conflicts:"sync_conflicts",sync_receipts:"sync_receipts",sync_audit:"sync_audit"});
+  const DB_NAME="lizhi-engineering",DB_VERSION=9;
+  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events",ai_drafts:"ai_drafts",ai_actions:"ai_actions",ai_events:"ai_events",sync_outbox:"sync_outbox",sync_state:"sync_state",sync_conflicts:"sync_conflicts",sync_receipts:"sync_receipts",sync_audit:"sync_audit",supervision_inspections:"supervision_inspections",supervision_defects:"supervision_defects"});
 
   class EngineeringStorageError extends Error{
     constructor(code,message,cause){super(message,{cause});this.name="EngineeringStorageError";this.code=code;}
@@ -62,6 +62,8 @@
         createProjectDataStore(STORES.ai_drafts,["capability_id","status","created_at","updated_at"]);
         createProjectDataStore(STORES.ai_actions,["draft_id","action_type","status","updated_at"]);
         createProjectDataStore(STORES.ai_events,["draft_id","action_id","event_type","created_at"]);
+        createProjectDataStore(STORES.supervision_inspections,["module_id","status","updated_at"]);
+        createProjectDataStore(STORES.supervision_defects,["module_id","inspection_id","status","updated_at"]);
         if(!db.objectStoreNames.contains(STORES.sync_outbox)){
           const outbox=db.createObjectStore(STORES.sync_outbox,{keyPath:"id"});
           for(const index of["entity_type","entity_id","project_id","status","next_attempt_at","created_at"])outbox.createIndex(index,index);

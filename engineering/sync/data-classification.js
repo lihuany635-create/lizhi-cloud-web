@@ -20,6 +20,8 @@
     ai_events:{classification:"append_only_local",wave:4,source:"ai-domain",direction:"none",delete_policy:"none",conflict_policy:"append_only_union",idempotency:"event-id",ordering:"created-at-plus-id",cloud_retention:"audit-local"},
     attachment_metadata:{classification:"binary_metadata",wave:5,source:"project-data-domain",direction:"deferred",delete_policy:"tombstone",conflict_policy:"manual",idempotency:"stable-id-checksum",ordering:"logical-version",cloud_retention:"project-policy"},
     attachment_binary:{classification:"binary",wave:5,source:"attachment-storage",direction:"deferred",delete_policy:"tombstone_then_purge",conflict_policy:"checksum_reject",idempotency:"object-key-checksum",ordering:"metadata-first",cloud_retention:"project-policy"},
+    supervision_inspections:{classification:"local_only_module",wave:0,source:"supervision-domain",direction:"none",delete_policy:"archive",conflict_policy:"local_authoritative",idempotency:"stable-id",ordering:"updated-at-plus-id",cloud_retention:"none"},
+    supervision_defects:{classification:"local_only_module",wave:0,source:"supervision-domain",direction:"none",delete_policy:"archive",conflict_policy:"local_authoritative",idempotency:"stable-id",ordering:"updated-at-plus-id",cloud_retention:"none"},
     render_cache:{classification:"derived_cache",wave:0,source:"saved-design-snapshot",direction:"none",delete_policy:"local-purge",conflict_policy:"local_authoritative",idempotency:"not-applicable",ordering:"not-applicable",cloud_retention:"none"}
   });
   const ACTIVE_WAVE=1,active=type=>Number(DEFINITIONS[type]?.wave)===ACTIVE_WAVE&&DEFINITIONS[type].direction==="bidirectional";

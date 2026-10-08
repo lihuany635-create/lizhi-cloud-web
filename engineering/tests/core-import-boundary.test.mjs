@@ -1,0 +1,14 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import {fileURLToPath} from "node:url";
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../.."),core=path.join(root,"engineering/core"),files=fs.readdirSync(core,{recursive:true}).filter(file=>String(file).endsWith(".js")),source=files.map(file=>fs.readFileSync(path.join(core,file),"utf8")).join("\n");
+test("CB-01 core never imports woodworking",()=>assert.doesNotMatch(source,/require\([^)]*modules[\\/]woodworking|from\s+["'][^"']*modules[\\/]woodworking/));
+test("CB-02 core never imports supervision",()=>assert.doesNotMatch(source,/require\([^)]*modules[\\/]supervision|from\s+["'][^"']*modules[\\/]supervision/));
+test("CB-03 core has no woodworking branch",()=>assert.doesNotMatch(source,/if\s*\([^)]*woodworking/i));
+test("CB-04 core has no supervision branch",()=>assert.doesNotMatch(source,/if\s*\([^)]*supervision/i));
+test("CB-05 project model has no inspection field",()=>assert.doesNotMatch(fs.readFileSync(path.join(core,"project-model.js"),"utf8"),/inspection_result|defect_severity|supervision_checklist/));
+test("CB-06 task model has no supervision severity",()=>assert.doesNotMatch(fs.readFileSync(path.join(core,"workflow/task-model.js"),"utf8"),/supervision_defect_severity|inspection_result/));
+test("CB-07 generic module relation is profession neutral",()=>assert.match(fs.readFileSync(path.join(core,"workflow/task-model.js"),"utf8"),/module_entity/));
+test("CB-08 module entity registry contains no professional names",()=>assert.doesNotMatch(fs.readFileSync(path.join(core,"module-entity-registry.js"),"utf8"),/woodworking|supervision/i));

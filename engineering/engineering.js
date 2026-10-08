@@ -7,15 +7,16 @@
   const emptyWorkflow=()=>({members:[],tasks:[],reviews:[],events:[],timeline:[],actorId:"",filter:"all",error:"",notice:""});
   const emptyAI=()=>({drafts:[],events:[],capabilityId:"project_summary",error:"",notice:"",loading:false});
   const emptySync=()=>({online:typeof navigator==="undefined"?true:navigator.onLine,cloud_enabled:false,adapter_kind:"local-simulation",pending_count:0,failed_count:0,conflicts:[],last_sync_at:null,last_error:null,status:"never",notice:"",error:""});
-  const state={view:"list",projects:[],selected:null,loading:true,error:"",formError:"",ready:false,activating:null,history:[],historyError:"",calculationResult:null,calculationInput:{},projectData:emptyProjectData(),projectDataError:"",furniture:emptyFurniture(),commercial:emptyCommercial(),workflow:emptyWorkflow(),ai:emptyAI(),sync:emptySync()};
-  let projectService=null,projectDataService=null,furnitureDesignService=null,bomService=null,priceRepository=null,quoteRepository=null,quoteService=null,quotePublisher=null,workflowService=null,aiService=null,syncService=null,syncConflictService=null,templateRegistry=null,calculationRepository=null,calculationEngine=null,formulaRegistry=null,installed=false,attachmentUrls=[];
+  const emptySupervision=()=>({inspections:[],defects:[],checklist:null,error:"",notice:""});
+  const state={view:"list",projects:[],selected:null,loading:true,error:"",formError:"",ready:false,activating:null,history:[],historyError:"",calculationResult:null,calculationInput:{},projectData:emptyProjectData(),projectDataError:"",furniture:emptyFurniture(),commercial:emptyCommercial(),workflow:emptyWorkflow(),ai:emptyAI(),sync:emptySync(),supervision:emptySupervision()};
+  let projectService=null,projectDataService=null,furnitureDesignService=null,bomService=null,priceRepository=null,quoteRepository=null,quoteService=null,quotePublisher=null,workflowService=null,aiService=null,syncService=null,syncConflictService=null,supervisionService=null,moduleEntityRegistry=null,templateRegistry=null,calculationRepository=null,calculationEngine=null,formulaRegistry=null,installed=false,attachmentUrls=[];
   const registry=()=>root.EngineeringModuleRegistry;
   const message=error=>error?.message||"工程專案發生未知錯誤。";
 
   function snapshot(){return {modules:registry()?.list?.()||[],failures:registry()?.failures?.()||[],formulas:formulaRegistry?.listFormulas?.()||[],templates:templateRegistry?.listTemplates?.()||[]};}
   function markup(){
     const common=snapshot();
-    if(state.view==="workspace")return root.EngineeringProjectWorkspace.render({...common,project:state.selected,error:state.error,formError:state.formError,history:state.history,historyError:state.historyError,calculationResult:state.calculationResult,calculationInput:state.calculationInput,projectData:state.projectData,projectDataError:state.projectDataError,furniture:state.furniture,commercial:state.commercial,workflow:state.workflow,ai:state.ai,sync:state.sync});
+    if(state.view==="workspace")return root.EngineeringProjectWorkspace.render({...common,project:state.selected,error:state.error,formError:state.formError,history:state.history,historyError:state.historyError,calculationResult:state.calculationResult,calculationInput:state.calculationInput,projectData:state.projectData,projectDataError:state.projectDataError,furniture:state.furniture,commercial:state.commercial,workflow:state.workflow,ai:state.ai,sync:state.sync,supervision:state.supervision});
     return root.EngineeringHome.render({...common,projects:state.projects,loading:state.loading,error:state.error,formError:state.formError});
   }
   function render(){
@@ -41,6 +42,10 @@
       if(!root.EngineeringWoodworkingFormulaPack)throw new Error("Woodworking Formula Pack is unavailable");
       formulaRegistry.registerPack(root.EngineeringWoodworkingFormulaPack);
     }catch(error){registry()?.recordFailure?.(error);console.warn("Woodworking Formula Pack failed safely",error);}
+    try{
+      if(!root.EngineeringSupervisionFormulaPack)throw new Error("Supervision Formula Pack is unavailable");
+      formulaRegistry.registerPack(root.EngineeringSupervisionFormulaPack);
+    }catch(error){registry()?.recordFailure?.(error);console.warn("Supervision Formula Pack failed safely",error);}
     calculationEngine=root.EngineeringCalculationEngine.create({formulaRegistry,calculationRepository});
     const workspaceId=await persistence.getWorkspaceId();
     projectService=root.EngineeringProjectService.create({repository:projectRepository,registry:registry(),workspaceId});
@@ -49,8 +54,13 @@
     bomService=root.EngineeringBomService.create({repository:bomRepository,adapter:root.EngineeringWoodworkingBomAdapter});
     quoteService=root.EngineeringQuoteService.create({repository:quoteRepository});
     quotePublisher=root.EngineeringQuotePublisher.create({repository:quoteRepository,quoteService});
-    workflowService=root.EngineeringWorkflowService.create({projectService,memberRepository,taskRepository,reviewRepository,eventRepository,relationResolvers:{project_record:id=>projectRecordRepository.getById(id),attachment:id=>attachmentRepository.getById(id),measurement:id=>measurementRepository.getById(id),note:id=>noteRepository.getById(id),calculation:id=>calculationRepository.getById(id),design:id=>designRepository.getById(id),bom:id=>bomRepository.getById(id),quote:id=>quoteRepository.getById(id)}});
-    const aiActionRegistry=root.EngineeringAIActionRegistry.create(),aiContext=root.EngineeringAIContext.create({projectService,projectDataService,workflowService,designRepository,bomRepository,quoteRepository,calculationRepository,entityLoaders:{measurement:id=>measurementRepository.getById(id),note:id=>noteRepository.getById(id),project_record:id=>projectRecordRepository.getById(id),task:id=>taskRepository.getById(id)}}),aiDomainValidator=root.EngineeringAIDomainValidator.create({projectService,workflowService}),aiProvider=root.EngineeringAIProviderAdapter.create(),aiExecution=root.EngineeringAIExecutionAdapter.create({actionRepository:aiActionRepository,actionRegistry:aiActionRegistry,workflowService,projectDataService,taskRepository,projectRecordRepository});
+    const inspectionRepository=root.EngineeringSupervisionRepository.create({persistence,storeName:"supervision_inspections",model:root.EngineeringSupervisionInspectionModel}),defectRepository=root.EngineeringSupervisionRepository.create({persistence,storeName:"supervision_defects",model:root.EngineeringSupervisionDefectModel});
+    moduleEntityRegistry=root.EngineeringModuleEntityRegistry.createRegistry();
+    moduleEntityRegistry.register({module_id:"supervision",entity_type:"inspection",resolve:id=>inspectionRepository.getById(id)});
+    moduleEntityRegistry.register({module_id:"supervision",entity_type:"defect",resolve:id=>defectRepository.getById(id)});
+    workflowService=root.EngineeringWorkflowService.create({projectService,memberRepository,taskRepository,reviewRepository,eventRepository,relationResolvers:{project_record:id=>projectRecordRepository.getById(id),attachment:id=>attachmentRepository.getById(id),measurement:id=>measurementRepository.getById(id),note:id=>noteRepository.getById(id),calculation:id=>calculationRepository.getById(id),design:id=>designRepository.getById(id),bom:id=>bomRepository.getById(id),quote:id=>quoteRepository.getById(id),module_entity:id=>moduleEntityRegistry.resolve(id)}});
+    supervisionService=root.EngineeringSupervisionService.create({projectService,inspectionRepository,defectRepository,attachmentRepository,workflowService});
+    const aiActionRegistry=root.EngineeringAIActionRegistry.create(),aiContext=root.EngineeringAIContext.create({projectService,projectDataService,workflowService,designRepository,bomRepository,quoteRepository,calculationRepository,entityLoaders:{measurement:id=>measurementRepository.getById(id),note:id=>noteRepository.getById(id),project_record:id=>projectRecordRepository.getById(id),task:id=>taskRepository.getById(id),module_entity:id=>moduleEntityRegistry.resolve(id)}}),aiDomainValidator=root.EngineeringAIDomainValidator.create({projectService,workflowService}),aiProvider=root.EngineeringAIProviderAdapter.create(),aiExecution=root.EngineeringAIExecutionAdapter.create({actionRepository:aiActionRepository,actionRegistry:aiActionRegistry,workflowService,projectDataService,taskRepository,projectRecordRepository});
     aiService=root.EngineeringAIService.create({contextBuilder:aiContext,providerAdapter:aiProvider,schemaValidator:root.EngineeringAISchemaValidator,domainValidator:aiDomainValidator,actionRegistry:aiActionRegistry,executionAdapter:aiExecution,draftRepository:aiDraftRepository,eventRepository:aiEventRepository});
     const syncOutboxRepository=root.EngineeringSyncOutboxRepository.create({persistence}),syncStateRepository=root.EngineeringSyncStateRepository.create({persistence}),syncConflictRepository=root.EngineeringSyncConflictRepository.create({persistence}),syncReceiptRepository=root.EngineeringSyncReceiptRepository.create({persistence}),syncAuditRepository=root.EngineeringSyncAuditRepository.create({persistence}),syncAudit=root.EngineeringSyncAudit.create({repository:syncAuditRepository}),syncCheckpoint=root.EngineeringSyncCheckpoint.create({repository:syncStateRepository,audit:syncAudit}),syncAdapter=root.EngineeringLocalSyncAdapter.create(),domainApply=root.EngineeringSyncDomainApplyAdapter.create({persistence,registry:registry(),workspaceId});
     syncConflictService=root.EngineeringSyncConflictService.create({repository:syncConflictRepository,audit:syncAudit});
@@ -90,9 +100,10 @@
   async function loadWorkflow(projectId){state.workflow.error="";try{const loaded=await workflowService.listProjectWorkflow(projectId),actorId=state.workflow.actorId&&loaded.members.some(item=>item.id===state.workflow.actorId&&item.status==="active")?state.workflow.actorId:loaded.members.find(item=>item.status==="active")?.id||"";state.workflow={...state.workflow,...loaded,actorId};}catch(error){state.workflow={...emptyWorkflow(),error:message(error)};console.warn("Engineering workflow failed safely",error);}}
   async function loadAI(projectId){state.ai.error="";try{const loaded=await aiService.listProjectAI(projectId);state.ai={...state.ai,...loaded};}catch(error){state.ai={...emptyAI(),error:message(error)};console.warn("Engineering AI history failed safely",error);}}
   async function loadSync(projectId){try{state.sync={...emptySync(),...await syncService.status(projectId),notice:state.sync.notice||"",error:""};}catch(error){state.sync={...emptySync(),error:message(error)};console.warn("Engineering sync diagnostics failed safely",error);}}
+  async function loadSupervision(projectId){if(!state.selected?.module_ids?.includes("supervision")){state.supervision=emptySupervision();return;}try{state.supervision={...emptySupervision(),...await supervisionService.listProjectData(projectId)};}catch(error){state.supervision={...emptySupervision(),error:message(error)};console.warn("Supervision data failed safely",error);}}
   async function openProject(project){
-    state.selected=project;state.view="workspace";state.formError="";state.calculationResult=null;state.calculationInput={};state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();state.ai=emptyAI();state.sync=emptySync();renderPanel();
-    await runtime();await Promise.all([loadHistory(project.id),loadProjectData(project.id),loadFurniture(project.id),loadCommercial(project.id),loadWorkflow(project.id),loadAI(project.id),loadSync(project.id)]);refreshWorkflowTimeline();renderPanel();
+    state.selected=project;state.view="workspace";state.formError="";state.calculationResult=null;state.calculationInput={};state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();state.ai=emptyAI();state.sync=emptySync();state.supervision=emptySupervision();renderPanel();
+    await runtime();await Promise.all([loadHistory(project.id),loadProjectData(project.id),loadFurniture(project.id),loadCommercial(project.id),loadWorkflow(project.id),loadAI(project.id),loadSync(project.id),loadSupervision(project.id)]);refreshWorkflowTimeline();renderPanel();
   }
   async function perform(operation,{stay=false}={}){
     state.formError="";state.error="";
@@ -112,6 +123,9 @@
     renderPanel();
   }
   async function projectDataAction(operation){state.projectDataError="";try{await operation();await Promise.all([loadProjectData(state.selected.id),loadSync(state.selected.id)]);if(workflowService)refreshWorkflowTimeline();}catch(error){state.projectDataError=message(error);console.warn("Engineering project data action rejected safely",error);}renderPanel();}
+  async function supervisionAction(operation,notice){state.supervision.error="";state.supervision.notice="";try{await operation();await Promise.all([loadSupervision(state.selected.id),loadWorkflow(state.selected.id)]);refreshWorkflowTimeline();state.supervision.notice=notice;}catch(error){state.supervision.error=message(error);console.warn("Supervision action rejected safely",error);}renderPanel();}
+  function checklistResults(form){return (state.supervision.checklist?.items||[]).map(item=>({item_key:item.key,result:String(new FormData(form).get(`checklist:${item.key}`)||""),note:String(new FormData(form).get(`checklist-note:${item.key}`)||""),attachment_ids:[]}));}
+  async function submitSupervision(form){const data=Object.fromEntries(new FormData(form)),formData=new FormData(form),projectId=state.selected.id;if(form.dataset.engineeringForm==="supervision-inspection-create")return supervisionAction(()=>supervisionService.createInspection(projectId,{inspection_type:data.inspection_type,title:data.title,location:data.location,inspected_at:new Date(data.inspected_at).toISOString(),inspector_ref:data.inspector_ref||null,result:data.result,findings:String(data.findings||"").split("\n").map(item=>item.trim()).filter(Boolean),attachment_ids:formData.getAll("attachment_ids"),checklist_results:checklistResults(form)}),"Inspection 已保存為版本化 Checklist Snapshot。");if(form.dataset.engineeringForm==="supervision-defect-create")return supervisionAction(()=>supervisionService.createDefect(projectId,{inspection_id:data.inspection_id,title:data.title,description:data.description,severity:data.severity,location:data.location,responsible_member_ref:data.responsible_member_ref||null,due_at:data.due_at?`${data.due_at}T23:59:59.000Z`:null,attachment_ids:formData.getAll("attachment_ids")}),"Defect 已建立。");}
   function measurementData(form){const data=Object.fromEntries(new FormData(form));return{type:data.type,label:data.label,values:{value:Number(data.value)},units:{value:data.unit},notes:data.notes||"",source:"manual"};}
   async function submitProjectData(form){
     const kind=form.dataset.engineeringForm,data=Object.fromEntries(new FormData(form)),projectId=state.selected.id;
@@ -148,6 +162,7 @@
       if(form.dataset.engineeringForm==="quote-prices"){void saveQuotePrices(form);return;}
       if(["engineering-ai-generate","engineering-ai-approve"].includes(form.dataset.engineeringForm)){void submitAI(form);return;}
       if(["workflow-member-create","workflow-task-create"].includes(form.dataset.engineeringForm)){void submitWorkflow(form);return;}
+      if(["supervision-inspection-create","supervision-defect-create"].includes(form.dataset.engineeringForm)){void submitSupervision(form);return;}
       if(["measurement-create","measurement-update","note-create","note-update","record-create","attachment-create"].includes(form.dataset.engineeringForm)){void submitProjectData(form);return;}
       const name=String(new FormData(form).get("name")||"").trim(),module_ids=checkedModules(form);
       if(form.dataset.engineeringForm==="create")void perform(api=>api.createProject({name,module_ids}));
@@ -163,7 +178,7 @@
     app.addEventListener("click",event=>{
       const button=event.target.closest("button");if(!button)return;
       if(button.dataset.engineeringOpen){const project=state.projects.find(item=>item.id===button.dataset.engineeringOpen);if(project)void openProject(project);}
-      if(button.dataset.engineeringAction==="back"){revokeAttachmentUrls();state.view="list";state.selected=null;state.formError="";state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();state.ai=emptyAI();state.sync=emptySync();state.calculationResult=null;renderPanel();}
+      if(button.dataset.engineeringAction==="back"){revokeAttachmentUrls();state.view="list";state.selected=null;state.formError="";state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();state.ai=emptyAI();state.sync=emptySync();state.supervision=emptySupervision();state.calculationResult=null;renderPanel();}
       if(button.dataset.engineeringAction==="retry")void refresh();
       if(button.dataset.engineeringArchive)void perform(api=>api.archiveProject(button.dataset.engineeringArchive));
       if(button.dataset.engineeringReopen)void perform(api=>api.reopenProject(button.dataset.engineeringReopen),{stay:state.view==="list"});
@@ -182,6 +197,9 @@
       if(button.dataset.quoteRevise)void reviseQuote(button.dataset.quoteRevise);
       if(button.dataset.quotePdf)void exportQuotePdf(button.dataset.quotePdf);
       if(button.dataset.workflowMemberArchive)void workflowAction(()=>workflowService.archiveMember(state.selected.id,button.dataset.workflowMemberArchive),"Member 已封存；歷史 Assignment 保留。");
+      if(button.dataset.supervisionInspectionArchive)void supervisionAction(()=>supervisionService.archiveInspection(state.selected.id,button.dataset.supervisionInspectionArchive),"Inspection 已封存，歷史 Snapshot 保留。");
+      if(button.dataset.supervisionDefectTransition)void supervisionAction(()=>supervisionService.transitionDefect(state.selected.id,button.dataset.supervisionDefectTransition,button.dataset.targetStatus),"Defect 狀態已由監造 Domain 更新。");
+      if(button.dataset.supervisionDefectTask){const defect=state.supervision.defects.find(item=>item.id===button.dataset.supervisionDefectTask);void supervisionAction(()=>supervisionService.createTaskForDefect(state.selected.id,defect.id,{title:`改善：${defect.title}`,description:defect.description,priority:["critical","high"].includes(defect.severity)?"high":"normal",assignee_id:defect.responsible_member_ref||null,due_at:defect.due_at,requires_review:true},state.workflow.actorId),"Defect 已透過既有 Workflow Service 建立 Task。");}
       const taskCard=button.closest("[data-task-id]"),taskId=taskCard?.dataset.taskId,actorId=state.workflow.actorId;
       if(button.dataset.workflowAssign&&taskId){const assigneeId=taskCard.querySelector('select[name="assignee_id"]')?.value;void workflowAction(()=>workflowService.assignTask(state.selected.id,taskId,assigneeId,actorId),"Task Assignment 已更新。");}
       if(button.dataset.workflowTransition&&taskId)void workflowAction(()=>workflowService.transition(state.selected.id,taskId,button.dataset.workflowTransition,actorId),"Task 狀態已由 State Machine 更新。");

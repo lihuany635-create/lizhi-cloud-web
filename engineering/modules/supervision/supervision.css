@@ -1,0 +1,10 @@
+.engineering-supervision{margin-top:1rem;padding:1rem;border:1px solid color-mix(in srgb,var(--accent,#4f766f) 35%,transparent);border-radius:1rem;background:color-mix(in srgb,var(--surface,#fff) 94%,#d9ece7)}
+.engineering-supervision details{margin-top:.8rem}.engineering-supervision summary{cursor:pointer;font-weight:700}
+.engineering-supervision-form{display:grid;gap:.65rem;margin:.8rem 0;padding:.85rem;border-radius:.8rem;background:var(--surface,#fff)}
+.engineering-supervision-form input,.engineering-supervision-form select,.engineering-supervision-form textarea{box-sizing:border-box;width:100%;padding:.6rem}
+.engineering-supervision-checklist,.engineering-supervision-attachments{display:grid;gap:.45rem;padding:.7rem;border:1px solid color-mix(in srgb,currentColor 14%,transparent);border-radius:.65rem}
+.engineering-supervision-checklist fieldset{display:grid;grid-template-columns:minmax(9rem,1fr) minmax(12rem,2fr);gap:.5rem;border:0;padding:0}
+.engineering-supervision-attachments label{display:flex;align-items:center;gap:.45rem}.engineering-supervision-attachments input{width:auto}
+.engineering-supervision-list{display:grid;gap:.7rem}.engineering-supervision-card{padding:.8rem;border:1px solid color-mix(in srgb,currentColor 14%,transparent);border-radius:.75rem;background:var(--surface,#fff)}
+.engineering-supervision-card header{display:flex;justify-content:space-between;gap:.7rem}.engineering-supervision-card header div{display:grid;gap:.2rem}
+@media(max-width:650px){.engineering-supervision-checklist fieldset{grid-template-columns:1fr}.engineering-supervision-card header{display:grid}}
