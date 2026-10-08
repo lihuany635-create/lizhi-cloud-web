@@ -4,8 +4,8 @@
   else root.EngineeringDatabase=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(root){
   "use strict";
-  const DB_NAME="lizhi-engineering",DB_VERSION=10;
-  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events",ai_drafts:"ai_drafts",ai_actions:"ai_actions",ai_events:"ai_events",sync_outbox:"sync_outbox",sync_state:"sync_state",sync_conflicts:"sync_conflicts",sync_receipts:"sync_receipts",sync_audit:"sync_audit",supervision_inspections:"supervision_inspections",supervision_defects:"supervision_defects",supervision_profiles:"supervision_profiles",supervision_parties:"supervision_parties",supervision_work_items:"supervision_work_items",supervision_locations:"supervision_locations",supervision_relations:"supervision_relations"});
+  const DB_NAME="lizhi-engineering",DB_VERSION=11;
+  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events",ai_drafts:"ai_drafts",ai_actions:"ai_actions",ai_events:"ai_events",sync_outbox:"sync_outbox",sync_state:"sync_state",sync_conflicts:"sync_conflicts",sync_receipts:"sync_receipts",sync_audit:"sync_audit",supervision_inspections:"supervision_inspections",supervision_defects:"supervision_defects",supervision_profiles:"supervision_profiles",supervision_parties:"supervision_parties",supervision_work_items:"supervision_work_items",supervision_locations:"supervision_locations",supervision_relations:"supervision_relations",supervision_inspection_revisions:"supervision_inspection_revisions",supervision_inspection_reviews:"supervision_inspection_reviews",supervision_inspection_events:"supervision_inspection_events"});
 
   class EngineeringStorageError extends Error{
     constructor(code,message,cause){super(message,{cause});this.name="EngineeringStorageError";this.code=code;}
@@ -74,6 +74,9 @@
         createIndexedStore(STORES.supervision_work_items,["project_id","parent_id","status","updated_at",{name:"project_code",keyPath:["project_id","code"],options:{unique:true}}]);
         createIndexedStore(STORES.supervision_locations,["project_id","parent_id","status","updated_at",{name:"project_code",keyPath:["project_id","code"],options:{unique:true}}]);
         createIndexedStore(STORES.supervision_relations,["project_id","source_id","target_id","relation_type","status","updated_at",{name:"relation_identity",keyPath:["project_id","source_type","source_id","target_type","target_id","relation_type"],options:{unique:true}}]);
+        createIndexedStore(STORES.supervision_inspection_revisions,["project_id","inspection_id","created_at",{name:"inspection_revision",keyPath:["inspection_id","revision"],options:{unique:true}}]);
+        createIndexedStore(STORES.supervision_inspection_reviews,["project_id","inspection_id","inspection_revision_id","reviewer_ref","reviewed_at",{name:"action_id",keyPath:"action_id",options:{unique:true}}]);
+        createIndexedStore(STORES.supervision_inspection_events,["project_id","inspection_id","event_type","created_at",{name:"action_id",keyPath:"action_id",options:{unique:true}}]);
         if(!db.objectStoreNames.contains(STORES.sync_outbox)){
           const outbox=db.createObjectStore(STORES.sync_outbox,{keyPath:"id"});
           for(const index of["entity_type","entity_id","project_id","status","next_attempt_at","created_at"])outbox.createIndex(index,index);

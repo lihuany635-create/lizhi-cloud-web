@@ -27,6 +27,9 @@
     supervision_work_items:{classification:"local_only_module",wave:0,source:"supervision-domain",direction:"none",delete_policy:"archive",conflict_policy:"local_authoritative",idempotency:"stable-id",ordering:"updated-at-plus-id",cloud_retention:"none"},
     supervision_locations:{classification:"local_only_module",wave:0,source:"supervision-domain",direction:"none",delete_policy:"archive",conflict_policy:"local_authoritative",idempotency:"stable-id",ordering:"updated-at-plus-id",cloud_retention:"none"},
     supervision_relations:{classification:"local_only_module",wave:0,source:"supervision-domain",direction:"none",delete_policy:"revoke",conflict_policy:"local_authoritative",idempotency:"relation-identity",ordering:"updated-at-plus-id",cloud_retention:"none"},
+    supervision_inspection_revisions:{classification:"versioned_immutable_local",wave:0,source:"supervision-domain",direction:"none",delete_policy:"none",conflict_policy:"immutable_reject",idempotency:"inspection-revision",ordering:"revision",cloud_retention:"none"},
+    supervision_inspection_reviews:{classification:"append_only_local",wave:0,source:"supervision-domain",direction:"none",delete_policy:"none",conflict_policy:"append_only_union",idempotency:"action-id",ordering:"reviewed-at-plus-id",cloud_retention:"none"},
+    supervision_inspection_events:{classification:"append_only_local",wave:0,source:"supervision-domain",direction:"none",delete_policy:"none",conflict_policy:"append_only_union",idempotency:"action-id",ordering:"created-at-plus-id",cloud_retention:"none"},
     render_cache:{classification:"derived_cache",wave:0,source:"saved-design-snapshot",direction:"none",delete_policy:"local-purge",conflict_policy:"local_authoritative",idempotency:"not-applicable",ordering:"not-applicable",cloud_retention:"none"}
   });
   const ACTIVE_WAVE=1,active=type=>Number(DEFINITIONS[type]?.wave)===ACTIVE_WAVE&&DEFINITIONS[type].direction==="bidirectional";
