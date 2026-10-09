@@ -1,9 +1,9 @@
 (function(root,factory){
   const isNode=typeof module!=="undefined"&&module.exports;
-  const api=factory(isNode?require("./finance-domain.js"):root.FinanceDomain,isNode?require("../ui-model.js"):root.FinanceUiModel,isNode?require("./finance-transaction-template.js"):root.FinanceTransactionTemplate,isNode?require("./finance-rule-engine.js"):root.FinanceRuleEngine,isNode?require("../ai/finance-small-model-parser.js"):root.FinanceSmallModelParser);
+  const api=factory(isNode?require("./finance-domain.js"):root.FinanceDomain,isNode?require("../ui-model.js"):root.FinanceUiModel,isNode?require("./finance-transaction-template.js"):root.FinanceTransactionTemplate,isNode?require("./finance-rule-engine.js"):root.FinanceRuleEngine,isNode?require("../ai/finance-small-model-parser.js"):root.FinanceSmallModelParser,isNode?require("../rule-memory/finance-rule-memory.js"):root.FinanceRuleMemory);
   if(isNode)module.exports=api;
   root.FinanceDraft=api;
-})(typeof globalThis!=="undefined"?globalThis:this,function(Domain,UiModel,Template,RuleEngine,SmallModelParser){
+})(typeof globalThis!=="undefined"?globalThis:this,function(Domain,UiModel,Template,RuleEngine,SmallModelParser,RuleMemory){
   "use strict";
 
   const VERSION=Template.TEMPLATE_VERSION;
@@ -81,8 +81,9 @@
     return {valid:errors.length===0,draft,errors};
   }
 
-  function resolveOne(field,value,references){
+  function resolveOne(field,value,references,preferredId=null){
     const config=REFERENCE_CONFIG[field],rows=Array.isArray(references?.[config.rows])?references[config.rows]:[],key=matchKey(value);
+    if(preferredId!=null){const preferred=rows.find(row=>String(row?.id||"")===String(preferredId));if(preferred&&preferred.archived!==true&&preferred.active!==false)return {status:"resolved",id:preferred.id};if(preferred)return {status:"unresolved",item:{field,value,reason:"archived",message:`${config.label}已封存，請手動選擇可用項目`}};return {status:"unresolved",item:{field,value,reason:"not_found",message:`找不到對應${config.label}，請手動選擇`}};}
     if(!key)return {status:"unresolved",item:{field,value:value??null,reason:"missing",message:`${config.label}不可為空`}};
     const exact=rows.filter(row=>matchKey(row?.name)===key),active=exact.filter(row=>row.archived!==true);
     if(active.length===1)return {status:"resolved",id:active[0].id};
@@ -91,11 +92,11 @@
     return {status:"unresolved",item:{field,value,reason:"not_found",message:`找不到對應${config.label}，請手動選擇`}};
   }
 
-  function resolveFinanceDraftReferences(input,references={}){
+  function resolveFinanceDraftReferences(input,references={},options={}){
     const validation=validateFinanceDraft(input),draft=validation.draft,resolved={},unresolved=[],ambiguous=[],warnings=[],errors=[...validation.errors];
     const fields=REQUIRED_REFERENCES[draft.type]||[];
     for(const field of fields){
-      const outcome=resolveOne(field,draft[field],references);
+      const outcome=resolveOne(field,draft[field],references,options.preferredEntityIds?.[field]);
       if(outcome.status==="resolved")resolved[REFERENCE_CONFIG[field].resolved]=outcome.id;
       else if(outcome.status==="ambiguous")ambiguous.push(outcome.item);
       else unresolved.push(outcome.item);
@@ -117,7 +118,8 @@
 
   async function generateConstrainedFinanceDraft(input,references={},settings={},options={}){
     if(!RuleEngine||!SmallModelParser)throw new Error("Finance Phase 2/3 modules are unavailable.");
-    const ruleResult=RuleEngine.parseFinanceRulesToDraft(input,{...references,currentDate:options.currentDate});
+    const deterministic=RuleEngine.parseFinanceRulesToDraft(input,{...references,currentDate:options.currentDate});
+    const ruleResult=RuleMemory&&Array.isArray(options.memoryRules)?RuleMemory.applyRuleMemory({draft:deterministic.draft,ruleResult:deterministic,rules:options.memoryRules,references,rawText:input}):deterministic;
     return SmallModelParser.parseFinanceWithSmallModel({rawText:input,draft:ruleResult.draft,ruleResult,references,settings,signal:options.signal,connector:options.connector,onStatus:options.onStatus});
   }
 

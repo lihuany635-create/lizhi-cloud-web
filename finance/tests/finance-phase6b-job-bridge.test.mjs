@@ -147,7 +147,7 @@ test('P6B-T20 production assets load Job Bridge before SmallModelParser',()=>{
 });
 
 test('P6B-T21 Service Worker cache is bumped and includes every bridge module',()=>{
-  const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');assert.match(sw,/lizhi-cloud-v77/);for(const file of ['finance-ai-job-store.js','finance-ai-job-connector.js','finance-ai-host.js','finance-ai-host-id.js'])assert.match(sw,new RegExp(file.replaceAll('.','\\.')));
+  const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');assert.match(sw,/lizhi-cloud-v78/);for(const file of ['finance-ai-job-store.js','finance-ai-job-connector.js','finance-ai-host.js','finance-ai-host-id.js'])assert.match(sw,new RegExp(file.replaceAll('.','\\.')));
 });
 
 test('P6B-T22 production UI selects the Job Connector and local host keeps loopback',()=>{

@@ -7,7 +7,7 @@
 
   var AI_ALLOWED_FIELDS = Object.freeze(["type", "category", "account", "creditCard", "fromAccount", "toAccount", "merchant", "note"]);
   var ALLOWED_TYPES = Object.freeze(["expense", "income", "transfer", "credit_card_purchase", "credit_card_payment"]);
-  var BLOCKING_ISSUES = Object.freeze(["multiple_transactions_not_supported", "amount_conflict", "date_conflict", "preprocessing_failed", "invalid_input"]);
+  var BLOCKING_ISSUES = Object.freeze(["multiple_transactions_not_supported", "amount_conflict", "date_conflict", "preprocessing_failed", "invalid_input", "memory_conflict", "memory_target_unavailable"]);
 
   function uniqueStrings(values) {
     var seen = Object.create(null);

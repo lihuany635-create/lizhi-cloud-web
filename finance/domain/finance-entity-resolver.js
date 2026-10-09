@@ -15,10 +15,11 @@
   const key=value=>String(value??"").normalize("NFKC").trim().toLocaleLowerCase("zh-TW");
   const active=row=>row&&row.archived!==true&&row.active!==false;
 
-  function resolveFinanceEntity(field,value,references={}){
+  function resolveFinanceEntity(field,value,references={},preferredId=null){
     const config=FIELD_CONFIG[field];
     if(!config)throw new TypeError(`不支援的 Finance 實體欄位：${field}`);
     const lookup=key(value),rows=Array.isArray(references[config.collection])?references[config.collection]:[];
+    if(preferredId!=null){const preferred=rows.find(row=>String(row?.id||"")===String(preferredId));if(preferred&&active(preferred))return Object.freeze({status:"resolved",field,value:String(value??preferred.name).trim(),entity:Object.freeze({...preferred}),candidates:Object.freeze([]),message:""});if(preferred)return Object.freeze({status:"archived",field,value:String(value??preferred.name).trim(),entity:null,candidates:Object.freeze([{id:preferred.id,name:preferred.name}]),message:`${config.label}已封存或不可用`});return Object.freeze({status:"not_found",field,value:String(value??"").trim(),entity:null,candidates:Object.freeze([]),message:`找不到對應${config.label}`});}
     if(!lookup)return Object.freeze({status:"missing",field,value:null,entity:null,candidates:Object.freeze([]),message:`${config.label}不可為空`});
     const exact=rows.filter(row=>key(row?.name)===lookup),available=exact.filter(active);
     if(available.length===1)return Object.freeze({status:"resolved",field,value:String(value).trim(),entity:Object.freeze({...available[0]}),candidates:Object.freeze([]),message:""});
@@ -27,10 +28,10 @@
     return Object.freeze({status:"not_found",field,value:String(value).trim(),entity:null,candidates:Object.freeze([]),message:`找不到對應${config.label}`});
   }
 
-  function resolveFinanceEntities(draft,fields,references={}){
+  function resolveFinanceEntities(draft,fields,references={},preferredIds={}){
     const resolved={},outcomes={};
     for(const field of fields||[]){
-      const outcome=resolveFinanceEntity(field,draft?.[field],references);
+      const outcome=resolveFinanceEntity(field,draft?.[field],references,preferredIds?.[field]);
       outcomes[field]=outcome;
       if(outcome.status==="resolved")resolved[field]=outcome.entity;
     }

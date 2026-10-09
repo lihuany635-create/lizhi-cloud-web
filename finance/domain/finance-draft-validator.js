@@ -76,7 +76,7 @@
     if(rawDate==null||rawDate==="")missingFields.push("date");
     else if(!Domain.isValidDate(rawDate))pushUnique(invalidFields,issue("invalid_date","date","日期必須是有效的 YYYY-MM-DD",rawDate));
 
-    const required=REQUIRED_REFERENCES[rawType]||[],entityResult=EntityResolver.resolveFinanceEntities(input,required,references);
+    const required=REQUIRED_REFERENCES[rawType]||[],entityResult=EntityResolver.resolveFinanceEntities(input,required,references,options.preferredEntityIds||{});
     for(const field of required){
       const outcome=entityResult.outcomes[field];
       if(outcome.status==="resolved")continue;
