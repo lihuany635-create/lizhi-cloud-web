@@ -4,8 +4,8 @@
   else root.EngineeringDatabase=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(root){
   "use strict";
-  const DB_NAME="lizhi-engineering",DB_VERSION=11;
-  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events",ai_drafts:"ai_drafts",ai_actions:"ai_actions",ai_events:"ai_events",sync_outbox:"sync_outbox",sync_state:"sync_state",sync_conflicts:"sync_conflicts",sync_receipts:"sync_receipts",sync_audit:"sync_audit",supervision_inspections:"supervision_inspections",supervision_defects:"supervision_defects",supervision_profiles:"supervision_profiles",supervision_parties:"supervision_parties",supervision_work_items:"supervision_work_items",supervision_locations:"supervision_locations",supervision_relations:"supervision_relations",supervision_inspection_revisions:"supervision_inspection_revisions",supervision_inspection_reviews:"supervision_inspection_reviews",supervision_inspection_events:"supervision_inspection_events"});
+  const DB_NAME="lizhi-engineering",DB_VERSION=12;
+  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events",ai_drafts:"ai_drafts",ai_actions:"ai_actions",ai_events:"ai_events",sync_outbox:"sync_outbox",sync_state:"sync_state",sync_conflicts:"sync_conflicts",sync_receipts:"sync_receipts",sync_audit:"sync_audit",supervision_inspections:"supervision_inspections",supervision_defects:"supervision_defects",supervision_profiles:"supervision_profiles",supervision_parties:"supervision_parties",supervision_work_items:"supervision_work_items",supervision_locations:"supervision_locations",supervision_relations:"supervision_relations",supervision_inspection_revisions:"supervision_inspection_revisions",supervision_inspection_reviews:"supervision_inspection_reviews",supervision_inspection_events:"supervision_inspection_events",supervision_corrective_rounds:"supervision_corrective_rounds",supervision_defect_reviews:"supervision_defect_reviews",supervision_defect_events:"supervision_defect_events"});
 
   class EngineeringStorageError extends Error{
     constructor(code,message,cause){super(message,{cause});this.name="EngineeringStorageError";this.code=code;}
@@ -77,6 +77,15 @@
         createIndexedStore(STORES.supervision_inspection_revisions,["project_id","inspection_id","created_at",{name:"inspection_revision",keyPath:["inspection_id","revision"],options:{unique:true}}]);
         createIndexedStore(STORES.supervision_inspection_reviews,["project_id","inspection_id","inspection_revision_id","reviewer_ref","reviewed_at",{name:"action_id",keyPath:"action_id",options:{unique:true}}]);
         createIndexedStore(STORES.supervision_inspection_events,["project_id","inspection_id","event_type","created_at",{name:"action_id",keyPath:"action_id",options:{unique:true}}]);
+        createIndexedStore(STORES.supervision_corrective_rounds,["workspace_id","project_id","defect_id","submitted_by","submitted_at",{name:"defect_round",keyPath:["defect_id","round_number"],options:{unique:true}},{name:"action_id",keyPath:"action_id",options:{unique:true}},{name:"evidence_attachment_ids",keyPath:"evidence_attachment_ids",options:{multiEntry:true}}]);
+        createIndexedStore(STORES.supervision_defect_reviews,["workspace_id","project_id","defect_id","round_id","reviewer_member_id","reviewed_at",{name:"round_unique",keyPath:"round_id",options:{unique:true}},{name:"action_id",keyPath:"action_id",options:{unique:true}},{name:"evidence_attachment_ids",keyPath:"evidence_attachment_ids",options:{multiEntry:true}}]);
+        createIndexedStore(STORES.supervision_defect_events,["workspace_id","project_id","defect_id","round_id","review_id","event_type","created_at",{name:"action_id",keyPath:"action_id",options:{unique:true}},{name:"defect_revision",keyPath:["defect_id","defect_revision"],options:{unique:true}}]);
+        const upgradeTransaction=request.transaction;
+        const ensureIndex=(storeName,name,keyPath=name,options={})=>{if(!upgradeTransaction||!db.objectStoreNames.contains(storeName))return;const store=upgradeTransaction.objectStore(storeName);if(!store.indexNames.contains(name))store.createIndex(name,keyPath,options);};
+        ensureIndex(STORES.supervision_defects,"attachment_ids","attachment_ids",{multiEntry:true});
+        ensureIndex(STORES.supervision_defects,"due_at");
+        ensureIndex(STORES.supervision_defects,"revision");
+        ensureIndex(STORES.tasks,"idempotency_key","idempotency_key",{unique:true});
         if(!db.objectStoreNames.contains(STORES.sync_outbox)){
           const outbox=db.createObjectStore(STORES.sync_outbox,{keyPath:"id"});
           for(const index of["entity_type","entity_id","project_id","status","next_attempt_at","created_at"])outbox.createIndex(index,index);
@@ -132,6 +141,35 @@
       deleteData(storeName,id){return withStore(storeName,"readwrite",store=>requestResult(store.delete(String(id))));},
       listDataByProject(storeName,projectId){return withStore(storeName,"readonly",store=>requestResult(store.index("project_id").getAll(String(projectId))));},
       listData(storeName){return withStore(storeName,"readonly",store=>requestResult(store.getAll()));},
+      async commitDefectWorkflow({operation,defect,expectedRevision=0,round=null,review=null,event,attachmentIds=[]}){
+        if(!["create","update"].includes(operation))throw new EngineeringStorageError("SUPERVISION_WORKFLOW_OPERATION_INVALID","不支援的 Defect 原子操作。");
+        const db=await openDatabase(indexedDBImpl);
+        let tx;
+        try{
+          const storeNames=[STORES.supervision_defects,STORES.supervision_defect_events,STORES.attachments];
+          if(round)storeNames.push(STORES.supervision_corrective_rounds);
+          if(review)storeNames.push(STORES.supervision_defect_reviews);
+          tx=db.transaction(storeNames,"readwrite");
+          const defects=tx.objectStore(STORES.supervision_defects),events=tx.objectStore(STORES.supervision_defect_events),existingEvent=await requestResult(events.index("action_id").get(String(event.action_id)));
+          if(existingEvent){
+            if(existingEvent.defect_id!==event.defect_id||existingEvent.event_type!==event.event_type||existingEvent.request_fingerprint!==event.request_fingerprint)throw new EngineeringStorageError("SUPERVISION_ACTION_ID_REUSED","相同 Action ID 的原始請求內容不一致。");
+            await transactionDone(tx);return clone({duplicate:true,defect:await this.getData(STORES.supervision_defects,event.defect_id),event:existingEvent});
+          }
+          const current=await requestResult(defects.get(String(defect.id))),actualRevision=Number(current?.revision||0);
+          if(operation==="create"&&current)throw new EngineeringStorageError("SUPERVISION_DEFECT_ALREADY_EXISTS","Defect 已存在。");
+          if(operation==="update"&&!current)throw new EngineeringStorageError("SUPERVISION_DEFECT_NOT_FOUND","找不到 Defect。");
+          if(actualRevision!==Number(expectedRevision))throw new EngineeringStorageError("SUPERVISION_DEFECT_VERSION_CONFLICT","Defect 已被其他操作更新，請重新載入。");
+          const projectId=String(defect.project_id),workspaceId=String(defect.workspace_id||"");
+          for(const record of [current,round,review,event].filter(Boolean)){if(String(record.project_id)!==projectId||String(record.workspace_id||"")!==workspaceId)throw new EngineeringStorageError("SUPERVISION_PROJECT_BOUNDARY_VIOLATION","Defect 工作流資料不屬於同一專案或 Workspace。");}
+          const attachmentStore=tx.objectStore(STORES.attachments);
+          for(const id of [...new Set((attachmentIds||[]).map(String).filter(Boolean))]){const item=await requestResult(attachmentStore.get(id));if(!item||String(item.project_id)!==projectId)throw new EngineeringStorageError("SUPERVISION_ATTACHMENT_NOT_FOUND","改善證據附件不存在或不屬於此專案。");}
+          if(round)await requestResult(tx.objectStore(STORES.supervision_corrective_rounds).add(clone(round)));
+          if(review)await requestResult(tx.objectStore(STORES.supervision_defect_reviews).add(clone(review)));
+          await requestResult(events.add(clone(event)));
+          await requestResult(operation==="create"?defects.add(clone(defect)):defects.put(clone(defect)));
+          await transactionDone(tx);return clone({duplicate:false,defect,round,review,event});
+        }catch(error){try{if(tx&&tx.readyState!=="done")tx.abort();}catch{}if(error instanceof EngineeringStorageError)throw error;throw new EngineeringStorageError("SUPERVISION_ATOMIC_COMMIT_FAILED","Defect、改善輪次、複查與稽核事件無法原子寫入。",error);}finally{db.close();}
+      },
       async commitEntityChange({storeName,operation,record=null,entityId,projectId=null,workspaceId=null,now=()=>new Date().toISOString(),idGenerator=randomId}){
         if(!["create","update","delete","archive","reopen"].includes(operation))throw new EngineeringStorageError("SYNC_OPERATION_INVALID","不支援的本機同步操作。");
         const id=String(entityId||record?.id||"").trim();if(!id)throw new EngineeringStorageError("SYNC_ENTITY_ID_REQUIRED","同步資料必須有 stable id。");
