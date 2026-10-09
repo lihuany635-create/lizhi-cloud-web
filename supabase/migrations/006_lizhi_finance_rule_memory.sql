@@ -10,9 +10,22 @@ create table if not exists public.lizhi_finance_rule_memories (
   primary key (user_id, id),
   constraint lizhi_finance_rule_memories_payload_object check (jsonb_typeof(payload) = 'object'),
   constraint lizhi_finance_rule_memories_payload_size check (octet_length(payload::text) <= 8192),
+  constraint lizhi_finance_rule_memories_payload_allowlist check (
+    payload - array[
+      'id','version','matchKind','matchValue','normalizedMatch','scopeType',
+      'targetField','targetEntityId','targetLabelSnapshot','enabled','source',
+      'createdAt','updatedAt','deletedAt','lastUsedAt'
+    ]::text[] = '{}'::jsonb
+  ),
+  constraint lizhi_finance_rule_memories_payload_id check (payload->>'id' = id),
   constraint lizhi_finance_rule_memories_source check (payload->>'source' = 'user_confirmed'),
   constraint lizhi_finance_rule_memories_version check ((payload->>'version')::integer = 1),
   constraint lizhi_finance_rule_memories_target check (payload->>'targetField' in ('category','account','creditCard','merchant')),
+  constraint lizhi_finance_rule_memories_target_stable_id check (
+    ((payload->>'targetField') = 'merchant' and nullif(payload->>'targetEntityId','') is null)
+    or
+    ((payload->>'targetField') in ('category','account','creditCard') and nullif(payload->>'targetEntityId','') is not null)
+  ),
   constraint lizhi_finance_rule_memories_match check (payload->>'matchKind' in ('merchant','keyword','phrase')),
   constraint lizhi_finance_rule_memories_timestamp_order check (updated_at >= created_at)
 );
@@ -21,7 +34,7 @@ create index if not exists lizhi_finance_rule_memories_user_updated_idx
   on public.lizhi_finance_rule_memories (user_id, updated_at desc);
 
 alter table public.lizhi_finance_rule_memories enable row level security;
-revoke all on table public.lizhi_finance_rule_memories from anon;
+revoke all on table public.lizhi_finance_rule_memories from public, anon;
 grant select, insert, update, delete on table public.lizhi_finance_rule_memories to authenticated;
 
 drop policy if exists lizhi_finance_rule_memories_select_own on public.lizhi_finance_rule_memories;
