@@ -113,7 +113,7 @@ test("P10-71 UI distinguishes local save from cloud sync",()=>{const html=Worksp
 test("P10-72 UI displays offline explicitly",()=>assert.match(Workspace.render({project,sync:{online:false,conflicts:[]}}),/>Offline</));
 test("P10-73 UI exposes conflict choices",()=>{const html=Workspace.render({project,sync:{online:true,conflicts:[{id:"c",entity_type:"notes",entity_id:"n",reason:"CONCURRENT_UPDATE",local_version:{},remote_version:{}}]}});for(const label of["Keep Local","Keep Remote","Create New Revision","Later"])assert.match(html,new RegExp(label));});
 test("P10-74 production loads sync contracts before runtime",()=>{const html=read("index.html");assert.match(html,/data-classification\.js[\s\S]*sync-contracts\.js[\s\S]*inbox-service\.js[\s\S]*project-workspace\.js\?v=17[\s\S]*engineering\.js\?v=16/);});
-test("P10-75 service worker caches Phase 10 surface",()=>{const source=read("sw.js");assert.match(source,/lizhi-cloud-v78/);assert.match(source,/sync-service\.js\?v=1/);});
+test("P10-75 service worker caches Phase 10 surface",()=>{const source=read("sw.js");assert.match(source,/lizhi-cloud-v79/);assert.match(source,/sync-service\.js\?v=1/);});
 test("P10-76 architecture explicitly says no production cloud",()=>assert.match(read("engineering/phase10-offline-sync-architecture.md"),/not production cloud sync/i));
 test("P10-77 architecture defines clock-skew defense",()=>assert.match(read("engineering/phase10-offline-sync-architecture.md"),/Client timestamps are diagnostic only/i));
 test("P10-78 architecture defines Cloud RLS gate",()=>assert.match(read("engineering/phase10-offline-sync-architecture.md"),/RLS for SELECT\/INSERT\/UPDATE\/DELETE/));

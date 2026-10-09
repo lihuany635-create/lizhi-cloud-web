@@ -35,7 +35,7 @@ test('HOST-LAUNCH-03 installer registers only a custom protocol and current-user
 
 test('HOST-LAUNCH-04 production loads launcher before Finance home',()=>{
   const index=read('index.html');
-  assert.ok(index.indexOf('finance-ai-host-launcher.js?v=1')<index.indexOf('finance/pages/home.js?v=67'));
+  assert.ok(index.indexOf('finance-ai-host-launcher.js?v=1')<index.indexOf('finance/pages/home.js?v=68'));
   assert.match(read('sw.js'),/finance\/remote\/finance-ai-host-launcher\.js\?v=1/);
 });
 
