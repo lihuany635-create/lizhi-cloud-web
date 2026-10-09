@@ -47,7 +47,8 @@
       /\b\d{1,2}\s*[\/-]\s*\d{1,2}\b/g,
       /(?:\d{4}\s*年\s*)?\d{1,2}\s*月\s*\d{1,2}\s*(?:日|號)/g,
       new RegExp(`[${CHINESE_NUMBER_CHARS}]+\\s*(?:${quantityWords})`,"g"),
-      /(?:末四碼|尾碼|末碼)\s*\d{3,6}/g
+      /(?:末四碼|尾碼|末碼)\s*\d{3,6}/g,
+      /\b(?=[A-Za-z0-9_-]*[A-Za-z])(?=[A-Za-z0-9_-]*\d)[A-Za-z0-9_-]+\b/g
     ];
     for(const pattern of patterns){let match;while((match=pattern.exec(text)))ranges.push([match.index,match.index+match[0].length]);}
     return ranges;

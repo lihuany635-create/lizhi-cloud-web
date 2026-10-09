@@ -6,7 +6,7 @@ const FILES=[
   "knowledge-weaving-validator.js?v=20","knowledge-weaving.js?v=20",
   "finance/domain/finance-domain.js?v=30","finance/domain/backup.js?v=30",
   "finance/storage/finance-db.js?v=44","finance/ui-model.js?v=30",
-  "finance/domain/finance-transaction-template.js?v=1","finance/parsers/finance-amount-parser.js?v=1",
+  "finance/domain/finance-transaction-template.js?v=1","finance/parsers/finance-amount-parser.js?v=2",
   "finance/parsers/finance-date-parser.js?v=1","finance/rules/account-aliases.js?v=1",
   "finance/rules/card-aliases.js?v=1","finance/rules/merchant-rules.js?v=1",
   "finance/rules/category-rules.js?v=1","finance/rules/transaction-keywords.js?v=1",

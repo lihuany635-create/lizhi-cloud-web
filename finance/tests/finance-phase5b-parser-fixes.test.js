@@ -142,3 +142,20 @@ test("T-FIX-13 required existing parser capabilities do not regress",()=>{
     for(const [field,value] of Object.entries(expected))assert.equal(draft[field],value,`${input} ${field}`);
   }
 });
+
+test("T-FIX-14 digits inside alphanumeric identifiers are not amounts",()=>{
+  const tagged=rule("P9-TEST通勤花了850，錢包",{
+    ...references,
+    accounts:Object.freeze([...references.accounts,Object.freeze({id:"wallet",name:"錢包",type:"cash",archived:false})])
+  });
+  assert.equal(tagged.draft.amount,850);
+  assert.equal(tagged.issues.includes("amount_conflict"),false);
+
+  const model=AmountParser.parseFinanceAmount("iPhone15花了30000");
+  assert.equal(model.amount,30000);
+  assert.equal(model.issues.includes("amount_conflict"),false);
+
+  const identifierOnly=AmountParser.parseFinanceAmount("版本A9");
+  assert.equal(identifierOnly.amount,null);
+  assert.equal(identifierOnly.candidates.length,0);
+});
