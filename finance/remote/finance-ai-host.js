@@ -34,11 +34,12 @@
     }
     async function start(){if(active)return snapshot();active=true;paused=false;await gateway.checkGatewayHealth(gatewaySettings);await beat("online");heartbeatTimer=setInterval(()=>void beat(),heartbeatMs);void poll();notify();return snapshot();}
     async function stop(){active=false;paused=false;if(timer)clearTimeout(timer);if(heartbeatTimer)clearInterval(heartbeatTimer);timer=heartbeatTimer=null;await store.heartbeat(hostId,"offline",{client,version:VERSION}).catch(()=>{});notify();}
+    async function wake(){if(active&&!paused)await beat(busy?"busy":"online");return snapshot();}
     function pause(){paused=true;if(timer)clearTimeout(timer);timer=null;notify();}
     function resume(){if(!active)return;paused=false;notify();void poll();}
     async function health(){const result=await gateway.checkGatewayHealth(gatewaySettings);lastError=null;notify();return result;}
     function subscribe(listener){listeners.add(listener);listener(snapshot());return()=>listeners.delete(listener);}
-    return Object.freeze({hostId,start,stop,pause,resume,health,subscribe,snapshot,processJob:process});
+    return Object.freeze({hostId,start,stop,wake,pause,resume,health,subscribe,snapshot,processJob:process});
   }
   return Object.freeze({VERSION,safeErrorCode,parseGatewayResult,createFinanceAIHost});
 });

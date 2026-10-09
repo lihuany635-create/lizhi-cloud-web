@@ -158,6 +158,16 @@ test('P6B-T23 one-click Host script never starts a Tunnel and checks both loopba
   const script=fs.readFileSync(path.join(root,'scripts/start-finance-ai-host.ps1'),'utf8');assert.match(script,/11434/);assert.match(script,/4181/);assert.match(script,/aiHost=1/);assert.doesNotMatch(script,/cloudflared.*tunnel/i);
 });
 
+test('P6B-T23B dedicated Host resists browser sleeping and wakes its heartbeat',async()=>{
+  const script=fs.readFileSync(path.join(root,'scripts/start-finance-ai-host.ps1'),'utf8');
+  assert.match(script,/--app=\$hostUrl/);assert.match(script,/--disable-background-timer-throttling/);assert.match(script,/--disable-renderer-backgrounding/);
+  const calls=[],store={heartbeat:async(id,status)=>calls.push([id,status]),claim:async()=>null};
+  const gateway={DEFAULT_SETTINGS:{},checkGatewayHealth:async()=>({connected:true})};
+  const host=Host.createFinanceAIHost({store,gateway,hostId:'wake-host',heartbeatMs:60000,pollMs:60000});
+  await host.start();await host.wake();await host.stop();
+  assert.deepEqual(calls.map(item=>item[1]),['online','online','offline']);
+});
+
 test('P6B-T24 Phase 6B keeps Finance IndexedDB v1 and remote modules cannot write transactions',()=>{
   const db=fs.readFileSync(path.join(root,'finance/storage/finance-db.js'),'utf8');assert.match(db,/DB_VERSION=1/);
   for(const file of ['finance-ai-job-store.js','finance-ai-job-connector.js','finance-ai-host.js'])assert.doesNotMatch(fs.readFileSync(path.join(root,'finance/remote',file),'utf8'),/FinanceStorage\.transactions|transactions\.(?:create|update|delete)/);

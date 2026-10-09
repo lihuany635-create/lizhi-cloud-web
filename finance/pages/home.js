@@ -145,6 +145,9 @@ const FinanceHome=(()=>{
       ui.host.instance=host;
       host.subscribe(state=>{ui.host.state=state;ui.host.error=state.lastError?ollamaMessage(state.lastError):"";update();});
       await host.start();ui.ai.status="connected";ui.ai.error="";
+      const wakeHost=()=>void host.wake();
+      document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")wakeHost();});
+      addEventListener("focus",wakeHost);addEventListener("online",wakeHost);addEventListener("pageshow",wakeHost);
       addEventListener("beforeunload",()=>void host.stop(),{once:true});
     }catch(error){ui.host.error=ollamaMessage(error);ui.ai.status="disconnected";ui.ai.error=ui.host.error;}
     update();

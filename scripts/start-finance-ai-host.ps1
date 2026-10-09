@@ -1,8 +1,18 @@
 ﻿$ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $gatewayScript = Join-Path $PSScriptRoot 'start-finance-ai-gateway.ps1'
-$hostUrl = 'https://lihuany635-create.github.io/lizhi-cloud-web/?open=finance&aiHost=1&autoEntry=0'
+$launchNonce = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+$hostUrl = "https://lihuany635-create.github.io/lizhi-cloud-web/?open=finance&aiHost=1&autoEntry=0&launch=$launchNonce"
 $allowedLoopback = @('127.0.0.1', '::1')
+
+function Get-HostBrowserPath {
+  $candidates = @(
+    (Join-Path ${env:ProgramFiles(x86)} 'Microsoft\Edge\Application\msedge.exe'),
+    (Join-Path $env:ProgramFiles 'Google\Chrome\Application\chrome.exe'),
+    (Join-Path ${env:ProgramFiles(x86)} 'Google\Chrome\Application\chrome.exe')
+  )
+  return $candidates | Where-Object { $_ -and (Test-Path -LiteralPath $_) } | Select-Object -First 1
+}
 
 function Get-Listeners([int]$Port) {
   return @(Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
@@ -57,5 +67,15 @@ if ($health.status -ne 'ok' -or $health.service -ne 'finance-ai-gateway') {
 
 Write-Host 'Ollama ready'
 Write-Host 'Finance AI Gateway ready'
-Start-Process $hostUrl
-Write-Host 'Browser AI Host opened'
+$hostBrowser = Get-HostBrowserPath
+if (-not $hostBrowser) { throw 'Microsoft Edge or Google Chrome is required for the Finance AI Host.' }
+$hostArguments = @(
+  "--app=$hostUrl",
+  '--disable-background-timer-throttling',
+  '--disable-backgrounding-occluded-windows',
+  '--disable-renderer-backgrounding',
+  '--disable-features=CalculateNativeWinOcclusion,IntensiveWakeUpThrottling',
+  '--no-first-run'
+)
+Start-Process -FilePath $hostBrowser -ArgumentList $hostArguments -WorkingDirectory $repoRoot
+Write-Host 'Dedicated Browser AI Host opened'
