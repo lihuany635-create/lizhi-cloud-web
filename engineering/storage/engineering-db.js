@@ -4,8 +4,8 @@
   else root.EngineeringDatabase=api;
 })(typeof globalThis!=="undefined"?globalThis:this,function(root){
   "use strict";
-  const DB_NAME="lizhi-engineering",DB_VERSION=13;
-  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events",ai_drafts:"ai_drafts",ai_actions:"ai_actions",ai_events:"ai_events",sync_outbox:"sync_outbox",sync_state:"sync_state",sync_conflicts:"sync_conflicts",sync_receipts:"sync_receipts",sync_audit:"sync_audit",supervision_inspections:"supervision_inspections",supervision_defects:"supervision_defects",supervision_profiles:"supervision_profiles",supervision_parties:"supervision_parties",supervision_work_items:"supervision_work_items",supervision_locations:"supervision_locations",supervision_relations:"supervision_relations",supervision_inspection_revisions:"supervision_inspection_revisions",supervision_inspection_reviews:"supervision_inspection_reviews",supervision_inspection_events:"supervision_inspection_events",supervision_corrective_rounds:"supervision_corrective_rounds",supervision_defect_reviews:"supervision_defect_reviews",supervision_defect_events:"supervision_defect_events",supervision_daily_records:"supervision_daily_records",supervision_daily_record_revisions:"supervision_daily_record_revisions",supervision_daily_record_reviews:"supervision_daily_record_reviews",supervision_daily_record_events:"supervision_daily_record_events"});
+  const DB_NAME="lizhi-engineering",DB_VERSION=14;
+  const STORES=Object.freeze({projects:"projects",settings:"settings",calculations:"calculations",measurements:"measurements",notes:"notes",attachments:"attachments",project_records:"project_records",designs:"designs",boms:"boms",price_entries:"price_entries",quotes:"quotes",project_members:"project_members",tasks:"tasks",task_reviews:"task_reviews",workflow_events:"workflow_events",ai_drafts:"ai_drafts",ai_actions:"ai_actions",ai_events:"ai_events",sync_outbox:"sync_outbox",sync_state:"sync_state",sync_conflicts:"sync_conflicts",sync_receipts:"sync_receipts",sync_audit:"sync_audit",supervision_inspections:"supervision_inspections",supervision_defects:"supervision_defects",supervision_profiles:"supervision_profiles",supervision_parties:"supervision_parties",supervision_work_items:"supervision_work_items",supervision_locations:"supervision_locations",supervision_relations:"supervision_relations",supervision_inspection_revisions:"supervision_inspection_revisions",supervision_inspection_reviews:"supervision_inspection_reviews",supervision_inspection_events:"supervision_inspection_events",supervision_corrective_rounds:"supervision_corrective_rounds",supervision_defect_reviews:"supervision_defect_reviews",supervision_defect_events:"supervision_defect_events",supervision_daily_records:"supervision_daily_records",supervision_daily_record_revisions:"supervision_daily_record_revisions",supervision_daily_record_reviews:"supervision_daily_record_reviews",supervision_daily_record_events:"supervision_daily_record_events",engineering_documents:"engineering_documents",engineering_document_revisions:"engineering_document_revisions",engineering_document_submissions:"engineering_document_submissions",engineering_document_reviews:"engineering_document_reviews",engineering_document_events:"engineering_document_events"});
 
   class EngineeringStorageError extends Error{
     constructor(code,message,cause){super(message,{cause});this.name="EngineeringStorageError";this.code=code;}
@@ -84,6 +84,11 @@
         createIndexedStore(STORES.supervision_daily_record_revisions,["workspace_id","project_id","record_id","record_type","record_date","created_at",{name:"record_revision",keyPath:["record_id","revision"],options:{unique:true}},{name:"action_id",keyPath:"action_id",options:{unique:true}},{name:"attachment_ids",keyPath:"attachment_ids",options:{multiEntry:true}}]);
         createIndexedStore(STORES.supervision_daily_record_reviews,["workspace_id","project_id","record_id","revision_id","reviewer_member_id","decision","reviewed_at",{name:"revision_unique",keyPath:"revision_id",options:{unique:true}},{name:"action_id",keyPath:"action_id",options:{unique:true}}]);
         createIndexedStore(STORES.supervision_daily_record_events,["workspace_id","project_id","record_id","revision_id","review_id","event_type","occurred_at",{name:"action_id",keyPath:"action_id",options:{unique:true}},{name:"record_version",keyPath:["record_id","record_version"],options:{unique:true}}]);
+        createIndexedStore(STORES.engineering_documents,["workspace_id","project_id","document_type","issuer_party_id","status","updated_at",{name:"identity_key",keyPath:"identity_key",options:{unique:true}}]);
+        createIndexedStore(STORES.engineering_document_revisions,["workspace_id","project_id","document_id","created_at",{name:"document_revision",keyPath:["document_id","revision"],options:{unique:true}},{name:"action_id",keyPath:"action_id",options:{unique:true}},{name:"attachment_ids",keyPath:"attachment_ids",options:{multiEntry:true}}]);
+        createIndexedStore(STORES.engineering_document_submissions,["workspace_id","project_id","document_id","revision_id","status","submitted_at",{name:"document_submission",keyPath:["document_id","submission_number"],options:{unique:true}},{name:"action_id",keyPath:"action_id",options:{unique:true}}]);
+        createIndexedStore(STORES.engineering_document_reviews,["workspace_id","project_id","document_id","revision_id","submission_id","reviewer_member_id","decision","reviewed_at",{name:"submission_review",keyPath:"submission_id",options:{unique:true}},{name:"action_id",keyPath:"action_id",options:{unique:true}}]);
+        createIndexedStore(STORES.engineering_document_events,["workspace_id","project_id","document_id","revision_id","submission_id","review_id","event_type","occurred_at",{name:"action_id",keyPath:"action_id",options:{unique:true}},{name:"document_version",keyPath:["document_id","document_version"],options:{unique:true}}]);
         const upgradeTransaction=request.transaction;
         const ensureIndex=(storeName,name,keyPath=name,options={})=>{if(!upgradeTransaction||!db.objectStoreNames.contains(storeName))return;const store=upgradeTransaction.objectStore(storeName);if(!store.indexNames.contains(name))store.createIndex(name,keyPath,options);};
         ensureIndex(STORES.supervision_defects,"attachment_ids","attachment_ids",{multiEntry:true});
@@ -202,6 +207,36 @@
           await requestResult(operation==="create"?records.add(clone(record)):records.put(clone(record)));
           await transactionDone(tx);return clone({duplicate:false,record,revision,review,event});
         }catch(error){try{if(tx&&tx.readyState!=="done")tx.abort();}catch{}if(error instanceof EngineeringStorageError)throw error;throw new EngineeringStorageError("DAILY_RECORD_ATOMIC_COMMIT_FAILED","DailyRecord、Revision、Review 與 Event 無法原子寫入。",error);}finally{db.close();}
+      },
+      async commitDocumentWorkflow({operation,document,expectedVersion=0,revision=null,submission=null,review=null,event,attachmentIds=[]}){
+        if(!["create","update"].includes(operation))throw new EngineeringStorageError("DOCUMENT_OPERATION_INVALID","不支援的文件管制原子操作。");
+        const db=await openDatabase(indexedDBImpl);let tx;
+        try{
+          const storeNames=[STORES.engineering_documents,STORES.engineering_document_events,STORES.attachments];
+          if(revision)storeNames.push(STORES.engineering_document_revisions);
+          if(submission)storeNames.push(STORES.engineering_document_submissions);
+          if(review)storeNames.push(STORES.engineering_document_reviews);
+          tx=db.transaction([...new Set(storeNames)],"readwrite");
+          const documents=tx.objectStore(STORES.engineering_documents),events=tx.objectStore(STORES.engineering_document_events),existingEvent=await requestResult(events.index("action_id").get(String(event.action_id)));
+          if(existingEvent){
+            if(existingEvent.document_id!==event.document_id||existingEvent.event_type!==event.event_type||existingEvent.request_fingerprint!==event.request_fingerprint)throw new EngineeringStorageError("DOCUMENT_ACTION_ID_REUSED","相同 Action ID 的原始請求內容不一致。");
+            await transactionDone(tx);return clone({duplicate:true,document:await this.getData(STORES.engineering_documents,event.document_id),event:existingEvent});
+          }
+          const current=await requestResult(documents.get(String(document.id))),actualVersion=Number(current?.version||0);
+          if(operation==="create"&&current)throw new EngineeringStorageError("DOCUMENT_ALREADY_EXISTS","工程文件已存在。");
+          if(operation==="update"&&!current)throw new EngineeringStorageError("DOCUMENT_NOT_FOUND","找不到工程文件。");
+          if(actualVersion!==Number(expectedVersion))throw new EngineeringStorageError("DOCUMENT_VERSION_CONFLICT","工程文件已被其他操作更新，請重新載入。");
+          const projectId=String(document.project_id),workspaceId=String(document.workspace_id);
+          for(const value of[current,revision,submission,review,event].filter(Boolean))if(String(value.project_id)!==projectId||String(value.workspace_id)!==workspaceId)throw new EngineeringStorageError("DOCUMENT_PROJECT_BOUNDARY_VIOLATION","文件管制資料不屬於同一專案或 Workspace。");
+          const attachments=tx.objectStore(STORES.attachments);
+          for(const id of [...new Set((attachmentIds||[]).map(String).filter(Boolean))]){const item=await requestResult(attachments.get(id));if(!item||String(item.project_id)!==projectId)throw new EngineeringStorageError("DOCUMENT_ATTACHMENT_INVALID","文件附件不存在或不屬於此專案。");}
+          if(revision)await requestResult(tx.objectStore(STORES.engineering_document_revisions).add(clone(revision)));
+          if(submission)await requestResult(tx.objectStore(STORES.engineering_document_submissions).add(clone(submission)));
+          if(review)await requestResult(tx.objectStore(STORES.engineering_document_reviews).add(clone(review)));
+          await requestResult(events.add(clone(event)));
+          await requestResult(operation==="create"?documents.add(clone(document)):documents.put(clone(document)));
+          await transactionDone(tx);return clone({duplicate:false,document,revision,submission,review,event});
+        }catch(error){try{if(tx&&tx.readyState!=="done")tx.abort();}catch{}if(error instanceof EngineeringStorageError)throw error;throw new EngineeringStorageError("DOCUMENT_ATOMIC_COMMIT_FAILED","文件主檔、Revision、Submission、Review 與 Event 無法原子寫入。",error);}finally{db.close();}
       },
       async commitEntityChange({storeName,operation,record=null,entityId,projectId=null,workspaceId=null,now=()=>new Date().toISOString(),idGenerator=randomId}){
         if(!["create","update","delete","archive","reopen"].includes(operation))throw new EngineeringStorageError("SYNC_OPERATION_INVALID","不支援的本機同步操作。");
