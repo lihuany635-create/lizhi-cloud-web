@@ -22,10 +22,10 @@ test("T01 中油加油 850 台新卡",()=>{
   assert.equal(result.draft.dateToken,"today");
   assert.equal(result.draft.date,"2026-09-27");
   assert.equal(result.draft.rawText,"中油加油 850，台新卡。");
-  assert.equal(result.draft.type,null);
+  assert.equal(result.draft.type,"credit_card_purchase");
   assert.deepEqual(result.typeHints,["credit_card_purchase"]);
   assert.equal(result.issues.length,0);
-  for(const field of ["amount","merchant","category","creditCard","dateToken","date"])assert.equal(result.lockedFields.includes(field),true);
+  for(const field of ["type","amount","merchant","category","creditCard","dateToken","date"])assert.equal(result.lockedFields.includes(field),true);
 });
 
 test("T02 早餐 80 現金",()=>{
@@ -88,8 +88,8 @@ test("T17 空字串與 null 安全回傳 issues",()=>{
   for(const value of ["",null]){const result=Engine.parseFinanceRules(value,context);assert.equal(result.issues.includes("invalid_input"),true);assert.deepEqual(result.patch,{});}
 });
 
-test("T18 Phase 2 不填 type 或 action 且保持 Canonical shape",()=>{
-  const result=Engine.parseFinanceRulesToDraft("中油加油 850，台新卡。",context);assert.equal(result.draft.type,null);assert.equal(result.draft.action,null);assert.equal(Template.isFinanceTransactionTemplateShape(result.draft),true);
+test("T18 Phase 2 鎖定有明確依據的刷卡消費類型且保持 Canonical shape",()=>{
+  const result=Engine.parseFinanceRulesToDraft("中油加油 850，台新卡。",context);assert.equal(result.draft.type,"credit_card_purchase");assert.equal(result.draft.action,null);assert.equal(result.lockedFields.includes("type"),true);assert.equal(Template.isFinanceTransactionTemplateShape(result.draft),true);
 });
 
 test("轉帳方向可確定時填入 fromAccount 與 toAccount",()=>{

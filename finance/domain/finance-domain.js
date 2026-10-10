@@ -42,7 +42,7 @@
     if(transaction.type==="expense")required.push(["accountId","帳戶"],["categoryId","分類"]);
     if(transaction.type==="transfer")required.push(["fromAccountId","轉出帳戶"],["toAccountId","轉入帳戶"]);
     if(transaction.type==="credit_card_purchase")required.push(["creditCardId","信用卡"],["categoryId","分類"]);
-    if(transaction.type==="credit_card_payment")required.push(["accountId","付款帳戶"],["creditCardId","信用卡"]);
+    if(transaction.type==="credit_card_payment"){if(!isText(transaction.fromAccountId)&&!isText(transaction.accountId))errors.push(error("MISSING_REFERENCE","fromAccountId","付款帳戶不可為空"));required.push(["creditCardId","信用卡"]);}
     for(const [field,label] of required)if(!isText(transaction[field]))errors.push(error("MISSING_REFERENCE",field,`${label}不可為空`));
     if(transaction.type==="transfer"&&isText(transaction.fromAccountId)&&transaction.fromAccountId===transaction.toAccountId)errors.push(error("SAME_TRANSFER_ACCOUNT","toAccountId","轉出與轉入帳戶不可相同"));
 
@@ -64,7 +64,7 @@
       if(tx.type==="expense"&&tx.accountId===account.id)return balance-amount;
       if(tx.type==="transfer"&&tx.fromAccountId===account.id)return balance-amount;
       if(tx.type==="transfer"&&tx.toAccountId===account.id)return balance+amount;
-      if(tx.type==="credit_card_payment"&&tx.accountId===account.id)return balance-amount;
+      if(tx.type==="credit_card_payment"&&(tx.fromAccountId===account.id||tx.accountId===account.id))return balance-amount;
       return balance;
     },account.initialBalance);
   }
@@ -72,6 +72,8 @@
   function inMonth(transaction,month){return typeof month==="string"&&/^\d{4}-\d{2}$/.test(month)&&transaction.date?.slice(0,7)===month;}
   function calculateMonthlyIncome(transactions,month){return transactions.filter(tx=>tx.type==="income"&&inMonth(tx,month)).reduce((sum,tx)=>sum+tx.amount,0);}
   function calculateMonthlyExpense(transactions,month){return transactions.filter(tx=>(tx.type==="expense"||tx.type==="credit_card_purchase")&&inMonth(tx,month)).reduce((sum,tx)=>sum+tx.amount,0);}
+  function calculateMonthlyCreditCardPurchases(transactions,month,creditCardId=null){return transactions.filter(tx=>tx.type==="credit_card_purchase"&&inMonth(tx,month)&&(!creditCardId||tx.creditCardId===creditCardId)).reduce((sum,tx)=>sum+tx.amount,0);}
+  function calculateMonthlyCreditCardPayments(transactions,month,creditCardId=null){return transactions.filter(tx=>tx.type==="credit_card_payment"&&inMonth(tx,month)&&(!creditCardId||tx.creditCardId===creditCardId)).reduce((sum,tx)=>sum+tx.amount,0);}
   function calculateMonthlyBalance(transactions,month){return calculateMonthlyIncome(transactions,month)-calculateMonthlyExpense(transactions,month);}
   function calculateCreditCardOutstanding(creditCardId,transactions=[]){
     if(!isText(creditCardId))throw new TypeError("creditCardId 不可為空");
@@ -80,6 +82,15 @@
   }
   function calculateTotalAssets(accounts=[],transactions=[]){
     return accounts.filter(account=>account.includeInAssets!==false).reduce((sum,account)=>sum+calculateAccountBalance(account,transactions),0);
+  }
+  function calculateTotalCreditCardLiabilities(cards=[],transactions=[]){return cards.reduce((sum,card)=>sum+calculateCreditCardOutstanding(card.id,transactions),0);}
+  function calculateNetWorth(accounts=[],cards=[],transactions=[]){return calculateTotalAssets(accounts,transactions)-calculateTotalCreditCardLiabilities(cards,transactions);}
+  function calculateCreditCardCycle(card,transactions=[],currentDate){
+    const today=currentDate||new Date().toISOString().slice(0,10),month=today.slice(0,7),closingDay=Number(card?.closingDay),outstanding=calculateCreditCardOutstanding(card?.id,transactions),purchases=calculateMonthlyCreditCardPurchases(transactions,month,card?.id),payments=calculateMonthlyCreditCardPayments(transactions,month,card?.id);
+    if(!Number.isSafeInteger(closingDay)||closingDay<1||closingDay>31)return Object.freeze({available:false,month,purchases,payments,outstanding,unbilled:null,billedUnpaid:null,paymentStatus:payments>0?(outstanding>0?"partial":"paid"):"unpaid"});
+    const [yearValue,monthValue,dayValue]=today.split("-").map(Number),monthEnd=new Date(Date.UTC(yearValue,monthValue,0)).getUTCDate(),safeClosing=Math.min(closingDay,monthEnd),closingDate=`${month}-${String(safeClosing).padStart(2,"0")}`;
+    const unbilled=transactions.filter(tx=>tx.type==="credit_card_purchase"&&tx.creditCardId===card.id&&tx.date>closingDate&&tx.date<=today).reduce((sum,tx)=>sum+tx.amount,0),billedUnpaid=Math.max(0,outstanding-unbilled);
+    return Object.freeze({available:true,month,closingDate,purchases,payments,outstanding,unbilled,billedUnpaid,paymentStatus:payments>0?(outstanding>0?"partial":"paid"):"unpaid"});
   }
   function filterTransactionsByDateRange(transactions=[],startDate,endDate){
     if(startDate&&!isValidDate(startDate))throw new TypeError("startDate 必須是有效的 YYYY-MM-DD");
@@ -96,5 +107,5 @@
     return months.map(month=>({month,income:calculateMonthlyIncome(transactions,month),expense:calculateMonthlyExpense(transactions,month),balance:calculateMonthlyBalance(transactions,month)}));
   }
 
-  return Object.freeze({TRANSACTION_TYPES,ACCOUNT_TYPES,CATEGORY_TYPES,isValidDate,validateTransaction,calculateAccountBalance,calculateMonthlyIncome,calculateMonthlyExpense,calculateMonthlyBalance,calculateCreditCardOutstanding,calculateTotalAssets,filterTransactionsByDateRange,summarizeExpensesByCategory,summarizeMonthlyTrend});
+  return Object.freeze({TRANSACTION_TYPES,ACCOUNT_TYPES,CATEGORY_TYPES,isValidDate,validateTransaction,calculateAccountBalance,calculateMonthlyIncome,calculateMonthlyExpense,calculateMonthlyCreditCardPurchases,calculateMonthlyCreditCardPayments,calculateMonthlyBalance,calculateCreditCardOutstanding,calculateTotalAssets,calculateTotalCreditCardLiabilities,calculateNetWorth,calculateCreditCardCycle,filterTransactionsByDateRange,summarizeExpensesByCategory,summarizeMonthlyTrend});
 });

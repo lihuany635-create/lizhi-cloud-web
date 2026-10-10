@@ -16,7 +16,8 @@
   "use strict";
 
   const TRANSACTION_ANCHORS=Object.freeze(["早餐","午餐","中午","晚餐","晚上","宵夜","中油","加油","全聯","麥當勞","薪水","薪資","繳卡費","轉帳"]);
-  const LOCK_ORDER=Object.freeze(["amount","merchant","category","account","creditCard","fromAccount","toAccount","dateToken","date"]);
+  const LOCK_ORDER=Object.freeze(["type","amount","merchant","category","account","creditCard","fromAccount","toAccount","dateToken","date"]);
+  const PAYMENT_LANGUAGE=/(?:繳|付|支付|還|扣繳).{0,16}(?:卡費|信用卡|卡)|(?:卡費|信用卡).{0,12}(?:繳款|繳|付款|付|扣繳)/;
   const own=(value,key)=>Object.prototype.hasOwnProperty.call(value,key);
   const matchText=value=>String(value??"").normalize("NFKC").trim().toLocaleLowerCase("zh-TW");
 
@@ -68,9 +69,19 @@
 
   function transactionHints(text){
     const normalized=matchText(text);
-    if(/繳.*卡費|卡費.*繳/.test(normalized))return Object.freeze(["credit_card_payment"]);
+    if(PAYMENT_LANGUAGE.test(normalized))return Object.freeze(["credit_card_payment"]);
+    if(/卡費/.test(normalized))return Object.freeze([]);
     for(const rule of TransactionKeywords.RULES)if(rule.keywords.some(keyword=>contains(normalized,keyword)))return Object.freeze([rule.type]);
     return Object.freeze([TransactionKeywords.DEFAULT_HINT]);
+  }
+
+  function explicitTransactionType(text){
+    const normalized=matchText(text);
+    if(PAYMENT_LANGUAGE.test(normalized))return "credit_card_payment";
+    if(/刷卡|(?:信用卡|[^\s，,。]+卡)(?:消費|買)|(?:信用卡|[^\s，,。]+卡)刷|刷[^\s，,。]*卡/.test(normalized))return "credit_card_purchase";
+    if(/轉帳|轉到|轉入|轉出|從.+轉.+到/.test(normalized))return "transfer";
+    if(/薪水|薪資|收入|入帳/.test(normalized))return "income";
+    return null;
   }
 
   function resolveTransferAccounts(text,accounts){
@@ -105,14 +116,17 @@
     issues.push(...date.issues);
     if(date.dateToken){patch.dateToken=date.dateToken;patch.date=date.date;sourceTrace.dateToken=date.source;sourceTrace.date=date.source;}
 
-    const typeHints=transactionHints(normalizedText),isTransfer=typeHints.includes("transfer");
+    const typeHints=transactionHints(normalizedText),explicitType=explicitTransactionType(normalizedText),isTransfer=typeHints.includes("transfer"),isCardPayment=explicitType==="credit_card_payment";
+    if(explicitType){patch.type=explicitType;sourceTrace.type=`type:explicit:${explicitType}`;}
+    if(/卡費/.test(normalizedText)&&!explicitType)issues.push("payment_intent_unclear");
     const transfer=isTransfer?resolveTransferAccounts(normalizedText,context.accounts):{from:null,to:null};
     const account=isTransfer?Object.freeze({value:null,source:null,issue:null}):resolveAlias(normalizedText,context.accounts,AccountAliases.GROUPS,"account");
     const card=resolveAlias(normalizedText,context.creditCards,CardAliases.GROUPS,"card");
-    if(account.issue)issues.push(account.issue);else if(account.value){patch.account=account.value;sourceTrace.account=account.source;}
+    if(account.issue)issues.push(account.issue);else if(account.value){const field=isCardPayment?"fromAccount":"account";patch[field]=account.value;sourceTrace[field]=account.source;}
     if(transfer.from?.issue)issues.push(transfer.from.issue);else if(transfer.from?.value){patch.fromAccount=transfer.from.value;sourceTrace.fromAccount=transfer.from.source;}
     if(transfer.to?.issue)issues.push(transfer.to.issue);else if(transfer.to?.value){patch.toAccount=transfer.to.value;sourceTrace.toAccount=transfer.to.source;}
     if(card.issue)issues.push(card.issue);else if(card.value){patch.creditCard=card.value;sourceTrace.creditCard=card.source;}
+    if(!explicitType&&typeHints.includes("credit_card_purchase")&&card.value){patch.type="credit_card_purchase";sourceTrace.type="type:card-reference";}
 
     const merchant=resolveMerchant(normalizedText),category=resolveCategory(normalizedText,context.categories);
     if(merchant.issue)issues.push(merchant.issue);else if(merchant.value){patch.merchant=merchant.value;sourceTrace.merchant=merchant.source;}

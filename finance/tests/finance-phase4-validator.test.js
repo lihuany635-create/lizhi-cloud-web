@@ -61,10 +61,10 @@ test("T04 complete credit card purchase is READY",()=>{
   assert.deepEqual(Payload.buildFinanceCommitPayload(result),{type:"credit_card_purchase",amount:850,date:"2026-09-27",note:"中油",creditCardId:"taishin",categoryId:"transport"});
 });
 
-test("T05 complete credit card payment follows the existing accountId contract",()=>{
+test("T05 complete credit card payment uses the explicit fromAccount contract",()=>{
   const result=validate(draft("credit_card_payment"));
   assert.equal(result.status,"ready");
-  assert.deepEqual(Payload.buildFinanceCommitPayload(result),{type:"credit_card_payment",amount:850,date:"2026-09-27",note:"",accountId:"cathay",creditCardId:"taishin"});
+  assert.deepEqual(Payload.buildFinanceCommitPayload(result),{type:"credit_card_payment",amount:850,date:"2026-09-27",note:"",fromAccountId:"cathay",creditCardId:"taishin"});
 });
 
 test("T06 amount zero is BLOCKED",()=>{

@@ -115,7 +115,7 @@
       if(existingId&&!current&&!upsert)throw new FinanceStorageError("NOT_FOUND",`找不到 transactions：${existingId}`,{id:existingId});
       const stamp=now(),record={...(current||{}),...input,id:existingId||input.id||id(),createdAt:current?.createdAt||input.createdAt||stamp,updatedAt:preserveTimestamps?(input.updatedAt||current?.updatedAt||stamp):stamp};
       if(record.deletedAt){await requestResult(store.put(record));await transactionDone(tx);return record;}
-      const allowed={income:["accountId","categoryId"],expense:["accountId","categoryId"],transfer:["fromAccountId","toAccountId"],credit_card_purchase:["creditCardId","categoryId"],credit_card_payment:["accountId","creditCardId"]}[record.type]||[];
+      const allowed={income:["accountId","categoryId"],expense:["accountId","categoryId"],transfer:["fromAccountId","toAccountId"],credit_card_purchase:["creditCardId","categoryId"],credit_card_payment:["fromAccountId","accountId","creditCardId"]}[record.type]||[];
       for(const field of ["accountId","categoryId","fromAccountId","toAccountId","creditCardId"])if(!allowed.includes(field))delete record[field];
       const accountIds=[record.accountId,record.fromAccountId,record.toAccountId].filter(Boolean);
       const accountRows=await Promise.all(accountIds.map(key=>getRecord(tx.objectStore("accounts"),key)));
@@ -144,7 +144,7 @@
   }
   async function transactionReferencesPresent(record){
     if(record.deletedAt)return true;
-    const required={income:[["accounts",record.accountId],["categories",record.categoryId]],expense:[["accounts",record.accountId],["categories",record.categoryId]],transfer:[["accounts",record.fromAccountId],["accounts",record.toAccountId]],credit_card_purchase:[["creditCards",record.creditCardId],["categories",record.categoryId]],credit_card_payment:[["accounts",record.accountId],["creditCards",record.creditCardId]]}[record.type]||[];
+    const required={income:[["accounts",record.accountId],["categories",record.categoryId]],expense:[["accounts",record.accountId],["categories",record.categoryId]],transfer:[["accounts",record.fromAccountId],["accounts",record.toAccountId]],credit_card_purchase:[["creditCards",record.creditCardId],["categories",record.categoryId]],credit_card_payment:[["accounts",record.fromAccountId||record.accountId],["creditCards",record.creditCardId]]}[record.type]||[];
     const rows=await Promise.all(required.map(([store,key])=>key?getFrom(store,key):null));return rows.length===required.length&&rows.every(row=>row&&!row.deletedAt);
   }
   const sync=Object.freeze({kinds:SYNC_STORE_NAMES,list:kind=>listStore(syncStoreName(kind),{includeDeleted:true}),get:(kind,key)=>getFrom(syncStoreName(kind),key),put:putSynced,referencesPresent:transactionReferencesPresent});

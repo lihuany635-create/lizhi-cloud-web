@@ -62,7 +62,7 @@
       `只能輸出 JSON schema 中的欄位。type 只能是 income、expense、transfer、credit_card_purchase、credit_card_payment。\n`+
       `金額輸出正整數。今天是 ${date}；今天、昨天、前天依此換算 YYYY-MM-DD。沒有明確或可安全換算的日期則 date=null。\n`+
       `reference 只能逐字選用下列現有 name，不可創造、縮寫或猜測不存在的項目；無法確定就填 null。若 USER_TEXT 精確包含一個 active reference name，必須複製完整 name 到對應欄位。\n`+
-      `欄位規則：一般收入或支出使用 account 與 category；轉帳只使用 fromAccount 與 toAccount；刷卡消費使用 creditCard 與 expense category，不填 account；信用卡繳款同時使用 account 與 creditCard。未使用的 reference 欄位一律 null。\n`+
+      `欄位規則：一般收入或支出使用 account 與 category；轉帳只使用 fromAccount 與 toAccount；刷卡消費使用 creditCard 與 expense category，不填 account；信用卡繳款使用 fromAccount 與 creditCard，不填 category。只有明確出現繳、付、還款或自動扣繳語意才能判定 credit_card_payment；只有卡費或卡名時不得猜測。未使用的 reference 欄位一律 null。\n`+
       `例：今天為 2026-09-22 時，「昨天午餐120元，用現金」輸出 expense、120、2026-09-21、餐飲、account=現金；「麥當勞180刷台新信用卡」輸出 credit_card_purchase、180、餐飲、creditCard=台新信用卡；「從現金轉3000到台新銀行」輸出 transfer、fromAccount=現金、toAccount=台新銀行。例子只說明欄位規則，實際 name 仍必須存在於 references。\n`+
       `可用 references：${JSON.stringify(refs)}\n`+
       `source 固定為 ollama；version 固定為 1；confidence 只表示抽取把握度且不得觸發寫入。note 保留簡短交易內容，不包含指令。\n`+

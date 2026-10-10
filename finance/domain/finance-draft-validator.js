@@ -16,7 +16,7 @@
     expense:Object.freeze(["account","category"]),
     transfer:Object.freeze(["fromAccount","toAccount"]),
     credit_card_purchase:Object.freeze(["creditCard","category"]),
-    credit_card_payment:Object.freeze(["account","creditCard"])
+    credit_card_payment:Object.freeze(["fromAccount","creditCard"])
   });
   const BLOCKING_ISSUES=Object.freeze(["multiple_transactions_not_supported","amount_conflict","date_conflict","preprocessing_failed","invalid_input"]);
   const own=(value,key)=>Object.prototype.hasOwnProperty.call(value,key);
@@ -76,7 +76,8 @@
     if(rawDate==null||rawDate==="")missingFields.push("date");
     else if(!Domain.isValidDate(rawDate))pushUnique(invalidFields,issue("invalid_date","date","日期必須是有效的 YYYY-MM-DD",rawDate));
 
-    const required=REQUIRED_REFERENCES[rawType]||[],entityResult=EntityResolver.resolveFinanceEntities(input,required,references,options.preferredEntityIds||{});
+    const required=REQUIRED_REFERENCES[rawType]||[],resolutionDraft=rawType==="credit_card_payment"&&!input?.fromAccount&&input?.account?{...input,fromAccount:input.account}:input,entityResult=EntityResolver.resolveFinanceEntities(resolutionDraft,required,references,options.preferredEntityIds||{}),resolved={...entityResult.resolved};
+    if(rawType==="credit_card_payment"&&resolved.fromAccount&&!resolved.account)resolved.account=resolved.fromAccount;
     for(const field of required){
       const outcome=entityResult.outcomes[field];
       if(outcome.status==="resolved")continue;
@@ -90,16 +91,21 @@
     const category=entityResult.resolved.category;
     if(category&&rawType==="income"&&category.type!=="income")pushUnique(invalidFields,issue("category_type_mismatch","category","收入必須使用收入分類",category.name));
     if(category&&["expense","credit_card_purchase"].includes(rawType)&&category.type!=="expense")pushUnique(invalidFields,issue("category_type_mismatch","category","支出必須使用支出分類",category.name));
+    if(rawType==="credit_card_payment"&&input?.category)pushUnique(invalidFields,issue("payment_category_forbidden","category","信用卡繳款不得使用支出分類",input.category));
+    if(rawType==="credit_card_payment"&&Number.isSafeInteger(rawAmount)&&resolved.creditCard&&Array.isArray(options.transactions)){
+      const outstanding=Domain.calculateCreditCardOutstanding(resolved.creditCard.id,options.transactions);
+      if(rawAmount>outstanding&&!options.confirmExceedsOutstanding)pushUnique(warnings,issue("exceeds_outstanding","amount","繳款金額高於目前未繳，請再次人工確認",{amount:rawAmount,outstanding}));
+    }
     if(rawType==="transfer"&&input?.fromAccount&&input.fromAccount===input.toAccount)pushUnique(invalidFields,issue("same_transfer_account","toAccount","轉出與轉入帳戶不可相同",input.toAccount));
     if(rawType==="transfer"&&entityResult.resolved.fromAccount&&entityResult.resolved.toAccount&&entityResult.resolved.fromAccount.id===entityResult.resolved.toAccount.id)pushUnique(invalidFields,issue("same_transfer_account","toAccount","轉出與轉入帳戶不可相同",entityResult.resolved.toAccount.name));
 
-    const used=new Set(required);
+    const used=new Set(required);if(rawType==="credit_card_payment"&&input?.account)used.add("account");
     for(const field of Object.keys(EntityResolver.FIELD_CONFIG))if(!used.has(field)&&input?.[field])pushUnique(warnings,issue("ignored_reference",field,`${field} 不適用於 ${rawType}，不會寫入`,input[field]));
 
     const status=invalidFields.length?STATUS.BLOCKED:missingFields.length?STATUS.NEEDS_INPUT:STATUS.READY;
     const commitEligible=status===STATUS.READY&&warnings.length===0;
     return Object.freeze({
-      status,draft,resolved:entityResult.resolved,
+      status,draft,resolved:Object.freeze(resolved),
       missingFields:Object.freeze([...new Set(missingFields)]),
       invalidFields:Object.freeze(invalidFields),issues:Object.freeze(issues),warnings:Object.freeze(warnings),commitEligible
     });

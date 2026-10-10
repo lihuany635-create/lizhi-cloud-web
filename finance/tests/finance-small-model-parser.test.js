@@ -39,7 +39,7 @@ function run(input, output, refs = references, capture) {
   });
 }
 
-test("T01 core card purchase only lets AI fill the missing type", async () => {
+test("T01 core card purchase locks deterministic type and skips AI", async () => {
   let prompt;
   const result = await run("中油加油 850，台新卡。", {type: "credit_card_purchase"}, references, value => { prompt = value; });
   assert.equal(result.draft.type, "credit_card_purchase");
@@ -47,10 +47,11 @@ test("T01 core card purchase only lets AI fill the missing type", async () => {
   assert.equal(result.draft.merchant, "中油");
   assert.equal(result.draft.category, "交通");
   assert.equal(result.draft.creditCard, "台新卡");
-  assert.deepEqual(result.context.missingFields, ["type"]);
+  assert.deepEqual(result.context.missingFields, []);
+  assert.equal(result.context.shouldCallAI, false);
   assert.equal(result.context.allowedValues.accounts, undefined);
   assert.equal(result.context.allowedValues.creditCards, undefined);
-  assert.deepEqual(Object.keys(prompt.schema.properties), ["type"]);
+  assert.equal(prompt, undefined);
 });
 
 test("T02 breakfast keeps deterministic cash, category and amount", async () => {
@@ -78,10 +79,10 @@ test("T04 transfer can fill only a missing allowed transfer endpoint", async () 
 });
 
 test("T05 card payment language is classified as payment", async () => {
-  const result = await run("國泰繳台新卡費12850", {type: "credit_card_payment", account: "國泰銀行"});
+  const result = await run("國泰繳台新卡費12850", {type: "credit_card_payment", fromAccount: "國泰銀行"});
   assert.equal(result.draft.type, "credit_card_payment");
   assert.equal(result.draft.amount, 12850);
-  assert.equal(result.draft.account, "國泰銀行");
+  assert.equal(result.draft.fromAccount, "國泰銀行");
   assert.equal(result.draft.creditCard, "台新卡");
 });
 
@@ -106,7 +107,7 @@ test("T08 a nonexistent credit card is rejected", async () => {
 });
 
 test("T09 a model cannot overwrite locked amount", async () => {
-  const result = await run("中油加油 850，台新卡。", {type: "credit_card_purchase", amount: 8500});
+  const result = await run("買汽油 850", {type: "expense", amount: 8500});
   assert.equal(result.draft.amount, 850);
   assert.ok(result.aiResult.issues.includes("ai_attempted_locked_field:amount"));
 });

@@ -17,7 +17,7 @@
   });
   const REQUIRED_REFERENCES=Object.freeze({
     income:["category","account"],expense:["category","account"],transfer:["fromAccount","toAccount"],
-    credit_card_purchase:["category","creditCard"],credit_card_payment:["account","creditCard"]
+    credit_card_purchase:["category","creditCard"],credit_card_payment:["fromAccount","creditCard"]
   });
   const TYPE_ALIASES=new Map([
     ["income","income"],["收入","income"],
@@ -61,7 +61,7 @@
     if(draft.type==="income"||draft.type==="expense")return {...base,accountId:resolved.accountId||draft.account,categoryId:resolved.categoryId||draft.category};
     if(draft.type==="transfer")return {...base,fromAccountId:resolved.fromAccountId||draft.fromAccount,toAccountId:resolved.toAccountId||draft.toAccount};
     if(draft.type==="credit_card_purchase")return {...base,creditCardId:resolved.creditCardId||draft.creditCard,categoryId:resolved.categoryId||draft.category};
-    if(draft.type==="credit_card_payment")return {...base,accountId:resolved.accountId||draft.account,creditCardId:resolved.creditCardId||draft.creditCard};
+    if(draft.type==="credit_card_payment")return {...base,fromAccountId:resolved.fromAccountId||resolved.accountId||draft.fromAccount||draft.account,creditCardId:resolved.creditCardId||draft.creditCard};
     return base;
   }
 
@@ -96,7 +96,7 @@
     const validation=validateFinanceDraft(input),draft=validation.draft,resolved={},unresolved=[],ambiguous=[],warnings=[],errors=[...validation.errors];
     const fields=REQUIRED_REFERENCES[draft.type]||[];
     for(const field of fields){
-      const outcome=resolveOne(field,draft[field],references,options.preferredEntityIds?.[field]);
+      const value=draft.type==="credit_card_payment"&&field==="fromAccount"?(draft.fromAccount||draft.account):draft[field],outcome=resolveOne(field,value,references,options.preferredEntityIds?.[field]);
       if(outcome.status==="resolved")resolved[REFERENCE_CONFIG[field].resolved]=outcome.id;
       else if(outcome.status==="ambiguous")ambiguous.push(outcome.item);
       else unresolved.push(outcome.item);
