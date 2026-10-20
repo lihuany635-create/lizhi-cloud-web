@@ -130,3 +130,9 @@
   - 可排批次佇列
   - 沒有 WebCodecs 的瀏覽器會改用 MediaRecorder
 - 純音訊：WAV（無損）或 M4A，離線混音，比即時快
+
+遮罩轉場：
+
+- `mask.shape` 多了 `linear`（線性遮罩，`angle` 為角度）
+- 關鍵影格 `prop` 多了 `maskX`、`maskY`、`maskAngle`
+- `make_mask_transition {clipId, duration?, direction?: left | right}`：把前一段的結尾移到子母畫面，用線性遮罩帶出這一段（物體帶過去的無縫轉場）
