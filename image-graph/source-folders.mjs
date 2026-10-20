@@ -7,12 +7,14 @@ const validPart=name=>typeof name==='string'&&name.length>0&&name.length<=255&&!
 export function sourcePath(path){if(!Array.isArray(path)||path.length>250||path.some(name=>!validPart(name)))throw Error('來源路徑無效');return [...path]}
 export function sourceReference(ref){if(!ref||!UUID.test(ref.root_id||'')||typeof ref.root_name!=='string')throw Error('圖片來源無效');const path=sourcePath(ref.path);if(!path.length)throw Error('來源圖片路徑遺失');return {root_id:ref.root_id,root_name:ref.root_name,path}}
 const problem=(message,code)=>Object.assign(Error(message),{code});
-export function createSourceFolders({getStore,scope=window,readTimeoutMs=8000,scanTimeoutMs=30000}){
+// Android 的資料夾提供者第一次列出大資料夾可能要幾十秒：列檔案給較長的等待，其他小動作 15 秒
+export function createSourceFolders({getStore,scope=window,readTimeoutMs=15000,listTimeoutMs=90000,scanTimeoutMs=120000}){
  let current=null;const roots=new Map();
  function store(){const value=getStore();if(!value)throw problem('專案仍在載入，請稍候再連接資料夾','storage_loading');return value}
  const supported=()=>scope.isSecureContext&&typeof scope.showDirectoryPicker==='function';
  async function root(id){if(!UUID.test(id||''))throw Error('資料夾來源無效');if(!roots.has(id)){const value=await store().getSetting('sourceRoot:'+id);if(value?.kind==='directory')roots.set(id,value)}const value=roots.get(id);if(!value)throw problem('請連接原圖所在的資料夾','source_permission');return value}
  const read=(run,label,signal)=>sourceRead(run,label,{signal,timeoutMs:readTimeoutMs});
+ const readList=(run,label,signal)=>sourceRead(run,label,{signal,timeoutMs:listTimeoutMs});
  async function permission(handle,mode='read',signal){if(await read(()=>handle.queryPermission({mode}),'確認資料夾授權',signal)!=='granted')throw problem('圖片來源需要授權，請按「連接資料夾」選回原圖所在位置','source_permission')}
  async function at(handle,path,signal){let directory=handle;for(const name of sourcePath(path))directory=await read(()=>directory.getDirectoryHandle(name),'開啟資料夾 '+name,signal);return directory}
  async function restore(){const saved=await store().getSetting('sourceBrowserCurrent');if(saved&&UUID.test(saved.root_id||'')){const handle=await root(saved.root_id);current={root_id:saved.root_id,root_name:handle.name,path:sourcePath(saved.path||[])};return current}return null}
@@ -23,7 +25,7 @@ export function createSourceFolders({getStore,scope=window,readTimeoutMs=8000,sc
   const handle=await scope.showDirectoryPicker({mode:'readwrite'});await permission(handle);
   // Confirm the selected directory can really be enumerated before changing source.
   if(typeof handle.entries!=='function')throw Error('這個資料夾無法列出內容，請選擇裝置內實際存在的位置');
-  const probe=handle.entries();try{await read(()=>probe.next(),'確認所選資料夾內容')}finally{probe.return?.().catch?.(()=>{})}
+  const probe=handle.entries();try{await readList(()=>probe.next(),'確認所選資料夾內容')}finally{probe.return?.().catch?.(()=>{})}
   const ids=await store().getSetting('sourceRootIds')||[];let id;
   for(const previous of ids){try{const old=await root(previous);if(old===handle||await old.isSameEntry?.(handle)){id=previous;break}}catch{}}
   id??=uid();await store().setSetting('sourceRoot:'+id,handle);roots.set(id,handle);
@@ -46,14 +48,14 @@ export function createSourceFolders({getStore,scope=window,readTimeoutMs=8000,sc
   let foldersScanned=0,filesScanned=0,otherFiles=0,unsupportedImages=0,truncated=false,entries=0;
   const snapshotResult=()=>({folders:[...folders],images:[...images],location:snapshot,recursive,foldersScanned,filesScanned,otherFiles,unsupportedImages,unreadable:[...unreadable],truncated});
   let lastProgress=0;
-  function progress(force=false){if(force||Date.now()-lastProgress>40){lastProgress=Date.now();onProgress(snapshotResult())}}
+  function progress(force=false){if(force||Date.now()-lastProgress>400){lastProgress=Date.now();onProgress(snapshotResult())}}
   for(let index=0;index<queue.length;index++){
    if(signal?.aborted)throw new DOMException('已停止讀取','AbortError');
    if(foldersScanned>=500||Date.now()-started>scanTimeoutMs){truncated=true;break}
    const item=queue[index];foldersScanned++;
    const iterator=item.directory.entries();
    try{while(true){
-    const next=await read(()=>iterator.next(),'列出 '+[snapshot.root_name,...item.path].join(' / '),signal);if(next.done)break;const [name,entry]=next.value;
+    const next=await readList(()=>iterator.next(),'列出 '+[snapshot.root_name,...item.path].join(' / '),signal);if(next.done)break;const [name,entry]=next.value;
     if(++entries>20000){truncated=true;break}if(!validPart(name))continue;
     const path=[...item.path,name];
     if(entry.kind==='directory'){

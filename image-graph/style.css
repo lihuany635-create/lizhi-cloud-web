@@ -93,3 +93,4 @@ summary:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}.settings
  .canvas-heading .eyebrow,.canvas-heading p{display:none}
  .canvas-heading h1{font-size:18px!important;margin:0!important}
 }
+.source-image-missing .source-preview-retry{display:inline-block;margin-top:6px;min-height:32px;padding:4px 10px;font-size:11px}

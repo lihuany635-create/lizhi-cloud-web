@@ -117,11 +117,11 @@
     },
     {
       "name": "source-folder-ui.mjs",
-      "sha256": "a70b80d5d631a1ec8600c7ef05a8659da774cd7e61e6b65b9039b38866290504"
+      "sha256": "0a765c4eac4efedeca1d7bb29896afecda10acad678dfbee9fe01edcaac495a4"
     },
     {
       "name": "source-folders.mjs",
-      "sha256": "985e929a5c8e20f0e35246c1c845bbe0c49b5eb352ee69af2099d6fb375dab65"
+      "sha256": "50f15055fc614a9f816c1f4b3b5ccd615fd372f207248eff953a28bd6d94ddd1"
     },
     {
       "name": "source-read.mjs",
@@ -129,11 +129,11 @@
     },
     {
       "name": "source-thumbs.mjs",
-      "sha256": "c0dadceccb3b995cce1be7d47c4d8053b7ed8161b0f9ec2d278e004f6072b60e"
+      "sha256": "d085a24b5056e89ea027351e8521fc1c014805890069bd36f802b369de7a204f"
     },
     {
       "name": "style.css",
-      "sha256": "270080d12ebe577a17970285c81a9a2c7986e5e737c153398e62988968782089"
+      "sha256": "bd8c6aa9fb7b2096fd89829a3007afcb63471967cafeee6e8ef39fd89836ce9f"
     },
     {
       "name": "task-actions.mjs",

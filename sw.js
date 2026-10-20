@@ -1,4 +1,4 @@
-const CACHE="lizhi-cloud-v93";
+const CACHE="lizhi-cloud-v94";
 const FILES=[
   // BEGIN IMAGE GRAPH ASSETS
   "image-graph/?v=30",
@@ -34,7 +34,7 @@ const FILES=[
   "image-graph/source-read.mjs?v=28",
   "image-graph/style.css?v=30",
   "image-graph/settings-status.mjs?v=30",
-  "image-graph/source-thumbs.mjs?v=31",
+  "image-graph/source-thumbs.mjs?v=32",
   "image-graph/task-actions.mjs",
   "image-graph/task-ui.mjs?v=28",
   "image-graph/workspace-ui.mjs?v=28",
