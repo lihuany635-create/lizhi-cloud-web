@@ -1,14 +1,16 @@
 import {dataBytes,hash,stable,uid} from './core.mjs';
-import {projectVersions,importedProject} from './project-store.mjs?v=26';
+import {projectVersions,importedProject} from './project-store.mjs?v=28';
 import {validateAssetFolders} from './asset-folders.mjs';
 import {allProjectRuns,validateTaskCollections} from './task-actions.mjs';
-import {readReturnedImage} from './returned-images.mjs?v=25';
+import {readReturnedImage} from './returned-images.mjs?v=28';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 const EXT={'image/png':'png','image/jpeg':'jpg','image/webp':'webp'};
 export const directoryProject=p=>p?.image_storage?.mode==='directory';
 export const imagePreview=v=>v?.thumbnail||v?.data||'';
-export const projectImageLimit=(p,fallback)=>directoryProject(p)||p?.versions?.some(v=>v.fs_ref)||(p?.runs||[]).some(r=>(r.outputs||[]).some(o=>o.version?.fs_ref))?Infinity:fallback;
+// Capacity applies only to full originals stored in this browser. External refs do not consume it.
+export const projectImageLimit=(p,fallback)=>fallback;
+export const browserImageBytes=p=>projectVersions(p).reduce((sum,v)=>sum+(v.data?v.byte_size:0),0);
 const fail=(message,code='original_storage')=>Object.assign(new Error(message),{code});
 export function originalPath(v){
  if(!v||!EXT[v.mime]||!/^[a-f0-9]{64}$/.test(v.sha256)||!Number.isSafeInteger(v.byte_size)||v.byte_size<1||v.byte_size>10*1024*1024)throw fail('原圖索引無效');
@@ -78,6 +80,7 @@ export function createOriginalStore({getStore,makeThumbnail,sourceFolders=null,r
   originalPath(v);
   if(v.fs_ref){try{if(!sourceFolders)throw fail('請連接來源圖片所在的資料夾','source_permission');const file=await sourceFolders.file(v.fs_ref);return await verified(await file.arrayBuffer(),v)}catch(e){if(!v.returned_ref||!['source_permission','source_missing','source_timeout'].includes(e.code)&&!['NotAllowedError','NotFoundError','SecurityError'].includes(e.name))throw e;return verified(await readReturned(v),v)}}
   if(v.data)return verified(dataBytes(v.data),v);
+  if(v.retained_ref)return verified(await readReturned(v),v);
   if(v.returned_ref&&!v.disk_ref)return verified(await readReturned(v),v);
   originalLocation(v);
   const explicitRoot=root;
@@ -99,7 +102,7 @@ export function createOriginalStore({getStore,makeThumbnail,sourceFolders=null,r
  }
  async function saveIndex(project,root=null){
   if(!directoryProject(project)||projectVersions(project).some(v=>v.fs_ref||v.returned_ref))return null;root??=await rootFor(project);await permission(root);
-  const copy=structuredClone(project);
+  const copy=structuredClone(project);delete copy.storage_token;
   for(const v of projectVersions(copy)){if(v.data)throw fail('專案仍有未保存的原圖，已停止索引保存');originalLocation(v);delete v.thumbnail}
   const bytes=new TextEncoder().encode(stable({format:'yinggou-directory-project-v1',project:copy})),sha=await hash(bytes);
   const path='映構索引/'+project.id+'/專案-'+String(project.revision).padStart(8,'0')+'-'+sha+'.json';

@@ -1,7 +1,7 @@
 import {uid,hash,stable} from './core.mjs';
 import {allProjectRuns,assertTaskActive} from './task-actions.mjs';
 import {appendCloudCandidate,candidateReceived} from './cloud-candidates.mjs';
-import {apiFetch} from './api-transport.mjs?v=26';
+import {apiFetch} from './api-transport.mjs?v=28';
 
 export const HANDOFF_LIMITS={imageBytes:10*1024*1024,totalBytes:24*1024*1024,references:8};
 export async function handoffRequest(path,options={}){
@@ -43,8 +43,20 @@ export async function syncHandoffControl({project,run,save,request=handoffReques
   }catch(e){h.control_error=e.message;await save();throw e}
  }
 }
+export function handoffPreflight(project,spec){
+ const refs=spec.references;if(!refs.length||refs.length>HANDOFF_LIMITS.references)throw Error('直接傳送需 1～8 張參考圖；請停用多餘連線，或使用 ZIP 備用包');
+ const unique=new Map();for(const ref of refs){const v=project.versions.find(v=>v.id===ref.asset_version_id);if(!v||v.sha256!==ref.sha256||v.mime!==ref.mime)throw Error('固定參考版本遺失或不符');if(!Number.isSafeInteger(v.byte_size)||v.byte_size<1||v.byte_size>HANDOFF_LIMITS.imageBytes)throw Error('交接參考圖每張最多 10 MiB');unique.set(v.sha256,v.byte_size)}
+ if([...unique.values()].reduce((a,b)=>a+b,0)>HANDOFF_LIMITS.totalBytes)throw Error('每個交接任務的參考圖合計最多 24 MiB，請減少參考圖');
+}
+export async function copyHistoricalRun(project,run){
+ if(run.spec.project_id===project.id)return run;
+ const spec={...structuredClone(run.spec),project_id:project.id,project_revision:project.revision??0};
+ return {id:uid(),created_at:new Date().toISOString(),spec,spec_hash:await hash(stable(spec)),status:'awaiting_import',outputs:[],copied_from:{project_id:run.spec.project_id,run_id:run.id,spec_hash:run.spec_hash}};
+}
 export async function sendHandoffTask({project,run,readOriginal,save,request=handoffRequest}){
  assertTaskActive(project,run.id);
+ if(run.spec.project_id!==project.id)throw Error('這是原專案的歷史快照，請建立本專案的新任務後傳送');
+ handoffPreflight(project,run.spec);
  if(await hash(stable(run.spec))!==run.spec_hash)throw Error('固定規格校驗失敗');
  const refs=run.spec.references;
  if(!refs.length||refs.length>HANDOFF_LIMITS.references)throw Error('每個交接任務需包含 1～8 張參考圖');
@@ -78,11 +90,13 @@ export async function sendHandoffTask({project,run,readOriginal,save,request=han
  }catch(e){h.error=e.message;await save();throw e}
 }
 
-export async function receiveHandoffTasks({project,readCandidate,save,totalBytes,maxBytes,request=handoffRequest}){
- let added=0;
- for(const run of allProjectRuns(project))if(ownsHandoff(project,run))await syncHandoffControl({project,run,save,request});
+export async function receiveHandoffTasks({project,readCandidate,save,totalBytes,maxBytes,request=handoffRequest,onError=null}){
+ let added=0;const failures=[],failed=new Set();
+ const report=(run,error)=>{failed.add(run.id);run.handoff.error=error.message;const issue={run_id:run.id,shot:run.spec.shot_id||run.spec.shot||run.id,message:error.message};failures.push(issue);onError?.(issue)};
+ for(const run of allProjectRuns(project))if(ownsHandoff(project,run))try{await syncHandoffControl({project,run,save,request})}catch(e){report(run,e)}
  for(const run of project.runs){
-  if(run.status==='cancelled'||!ownsHandoff(project,run))continue;
+  if(run.status==='cancelled'||!ownsHandoff(project,run)||failed.has(run.id))continue;
+  try{
   const h=run.handoff,task=await reconcileHandoff({project,run,save,request});
   if(!task){if(h.status==='received')throw Error('先前交接的任務目前找不到，請重試交接');continue}
   const {candidates}=await request('tasks/'+h.task_id+'/candidates');
@@ -113,6 +127,8 @@ export async function receiveHandoffTasks({project,readCandidate,save,totalBytes
     added++;
    }
   }
+  }catch(e){report(run,e)}
  }
+ if(failures.length){await saved(save);if(!onError)throw Object.assign(Error('部分任務更新失敗：'+failures.map(x=>x.shot+'：'+x.message).join('；')),{failures,added})}
  return added;
 }

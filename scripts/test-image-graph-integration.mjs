@@ -17,7 +17,7 @@ test('完整前端清單均可用且雜湊一致，模組相對引用沒有遺�
 test('離線快取包含新模組，既有模組來源與新增 iframe 同源，不導向第三方原圖來源',async()=>{
  const handlers={},context={URL,Response,self:{location:{origin:'https://lihuany635-create.github.io'},registration:{scope:'https://lihuany635-create.github.io/lizhi-cloud-web/'},addEventListener:(event,fn)=>handlers[event]=fn}};
  const source=await read('sw.js');vm.runInNewContext(source+';globalThis.assets=FILES;',context);for(const url of context.assets){const path=new URL(url).pathname.replace('/lizhi-cloud-web/','');await access(resolve(root,path||'index.html'));}
- assert.ok(context.assets.some(url=>url.includes('image-graph/runtime-config.mjs?v=26')));assert.ok(context.assets.some(url=>url.includes('engineering/engineering.js')));assert.ok(context.assets.some(url=>url.includes('finance/pages/home.js')));
+ assert.ok(context.assets.some(url=>url.includes('/image-graph/runtime-config.mjs?v=')));assert.ok(context.assets.some(url=>url.includes('engineering/engineering.js')));assert.ok(context.assets.some(url=>url.includes('finance/pages/home.js')));
  const app=await read('app.js'),render=app.slice(app.indexOf('function renderImageGraph()'),app.indexOf('function renderLicut()'));
  const markup=vm.runInNewContext(render+';renderImageGraph()',{});const src=markup.match(/<iframe[^>]+src="([^"]+)"/)[1];assert.equal(new URL(src,context.self.registration.scope).origin,context.self.location.origin);assert.doesNotMatch(markup,/sandbox|chatgpt.site/);
 });

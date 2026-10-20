@@ -1,4 +1,4 @@
-import {sourceRead} from './source-read.mjs?v=23';
+import {sourceRead} from './source-read.mjs?v=28';
 const PAGE_SIZE=40;
 const errorMessage=error=>({NotFoundError:'目前位置已移動或刪除，請重新連接資料夾',NotAllowedError:'資料夾需要重新授權，請按「重新連接」',SecurityError:'瀏覽器未允許存取，請直接開啟網站後重新連接',TypeMismatchError:'同名檔案或資料夾已存在，請使用另一個名稱',QuotaExceededError:'裝置空間不足，請釋放空間後重試'}[error.name]||error.message);
 export function createSourceFolderUI({repository,getStore,isBusy,onAdd,toast,modal,esc,scope=window,doc=document}){

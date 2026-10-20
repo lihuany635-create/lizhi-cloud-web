@@ -1,6 +1,6 @@
 {
   "source": "映構圖片關係生成工作台",
-  "source_commit": "9ce006eb837d158632219e226427630d5a6fae88",
+  "source_commit": "8ac71c4b135e3eace89b5d99be79cfffa740e149",
   "backend": "https://lizhi-image-graph.lihuany635.chatgpt.site",
   "files": [
     {
@@ -9,11 +9,11 @@
     },
     {
       "name": "api-transport.mjs",
-      "sha256": "74058fc85ff7e1de95b1bfebe2d08774548e7e78452ed890d9bba4e3675452a2"
+      "sha256": "2aa7ff50a6ba6f58b5ca032f497a7c6a0b51bbe140638e8b6ab711b68820c36a"
     },
     {
       "name": "app.mjs",
-      "sha256": "cd414d44d8653bf1095eb13baf681a4e01b3a54368d3fb74c21f54fd9579646a"
+      "sha256": "0212667704c6c2af7b90852a4d6e323091e60cc95a35e153452b896863a610ed"
     },
     {
       "name": "asset-actions.mjs",
@@ -29,11 +29,15 @@
     },
     {
       "name": "bridge-client.mjs",
-      "sha256": "16bf3fb8cf8b57bc80c40bd33e8e8dd6d47e2a46d02de74e856d2bb4583be67f"
+      "sha256": "03030e86080a8d671b147103ff3737e4069a2808d8d702f29f50724b5f146903"
+    },
+    {
+      "name": "bridge-navigation.mjs",
+      "sha256": "6e3ae0d28629749816542ede37ba0d0aea0e63f1ee656262cc7c7a56f0cdb357"
     },
     {
       "name": "bridge-protocol.mjs",
-      "sha256": "94e16aaa6655a10042f40bd955214959cbc0a5095faa6a255da8067b1963cf56"
+      "sha256": "26a70a78f3152274f7c8a0983bc2cc2ee8d533b2f00f49272655025a83288aa4"
     },
     {
       "name": "cloud-candidates.mjs",
@@ -49,7 +53,7 @@
     },
     {
       "name": "device-folder-ui.mjs",
-      "sha256": "96bb6eddaf42fc19ce7659931bf988516e1a2507af552091a5e2b97465718247"
+      "sha256": "163804bd3860149a5e692a9e00e3eb6a747749ec0c97d31df742d58fb2474b27"
     },
     {
       "name": "device-folder.mjs",
@@ -61,7 +65,7 @@
     },
     {
       "name": "handoff.mjs",
-      "sha256": "5f42eefed5338b979f2ad6339cafb5a0288f00714d3f78c1542b66ef9560aaa7"
+      "sha256": "836875bd0dc0ef8d4a68e453ff50a5ffbb0d683c0c43cfcda4fcea8e6ff81709"
     },
     {
       "name": "image-input.mjs",
@@ -69,15 +73,15 @@
     },
     {
       "name": "index.html",
-      "sha256": "795d377c31832a47230101ba430822be6fe00357a2bac124972a23be554c6873"
+      "sha256": "78c9bebb97296b339fe6609f7c7c86619f2b1d0f789c95ddb99be09814619d17"
     },
     {
       "name": "integration-projects.mjs",
-      "sha256": "d88b92cacb0846997213c0782e401a48c3a4403d6fb96a58320526b262335aec"
+      "sha256": "f7a5aa5d98a1117bce9a066e6d7b5fbfd59a5a2365c991e0db63005679b0db2c"
     },
     {
       "name": "integration-ui.mjs",
-      "sha256": "063b124fb7c065b9efca2ff18208329fffb6bd5bdb2706752b20a5f3cc4263d8"
+      "sha256": "235626d8e4e69b240344d45caa46b9abb953d1be1148a8274a473e0ea07be101"
     },
     {
       "name": "limits.mjs",
@@ -85,19 +89,23 @@
     },
     {
       "name": "original-storage-ui.mjs",
-      "sha256": "46a41b4bc210288af8c8a6f8c75149cf05ca7f518efeaedcc5e546cd5e102581"
+      "sha256": "2519d04413b4473c32ce6adc3ee8a9872b94bd7b0b301f82dc484ece7bb4596b"
     },
     {
       "name": "original-store.mjs",
-      "sha256": "8c0d33744020b5410cf33d7ecbe92032614d05a6865fa53b60dba00fa4bd628b"
+      "sha256": "3b5789ffdd24b84b6bbe750b2c142b62c227844c81525e5388349008a51bd692"
+    },
+    {
+      "name": "project-backup.mjs",
+      "sha256": "46eb0917b2aab1ba69a1fd9c997f08e627d684d9fd63345b9d39f6a09e507e3d"
     },
     {
       "name": "project-store.mjs",
-      "sha256": "a81d22b4b630fec3c2e96421b4aac12cb3fc95b219d993731ee628f9521574cc"
+      "sha256": "35c035ef97d50b261b3bd6af2db2c1ba320d6f2fb3303d9e6e806f2aeb614913"
     },
     {
       "name": "returned-images.mjs",
-      "sha256": "4c607737a9747d390ce7a5eeeb104b1c18439b9136c2399021b07d99566573a9"
+      "sha256": "4f7f5eb0155ef9a98a13ff8ada5208981033fde5e0ab0588ebd9adf752f15b32"
     },
     {
       "name": "runtime-config.mjs",
@@ -105,11 +113,11 @@
     },
     {
       "name": "source-folder-ui.mjs",
-      "sha256": "e862da2ee04bfde42a00850bb9819ca300016e8b5016d5a821d83d038f71e068"
+      "sha256": "ad77529cc6239b1487cf8dd5e1fa75c048a09259fce4b31ba234fddeea51d1f7"
     },
     {
       "name": "source-folders.mjs",
-      "sha256": "59184629a82de32c8f16c22e8e2c2ce3d85c3fade5dd199c8e07f26c5138a3de"
+      "sha256": "2c7e1baf1e0870e4df8d137811a88b93c50db561858876bbaa1e3b93bf02e80a"
     },
     {
       "name": "source-read.mjs",
@@ -125,7 +133,7 @@
     },
     {
       "name": "task-ui.mjs",
-      "sha256": "94103b20f36cbb21ba5348113267793f24c6a64ccdf65520c28fce760b801a50"
+      "sha256": "dc6a45578ad9bd3f53e8a9e43994473ac538524d3a45d107e2b6a984d5192bf2"
     },
     {
       "name": "workspace-ui.mjs",

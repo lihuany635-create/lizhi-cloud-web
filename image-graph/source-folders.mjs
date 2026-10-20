@@ -1,6 +1,6 @@
 import {uid,hash} from './core.mjs';
 import {rasterMime} from './image-input.mjs';
-import {sourceRead} from './source-read.mjs?v=23';
+import {sourceRead} from './source-read.mjs?v=28';
 
 const UUID=/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i;
 const validPart=name=>typeof name==='string'&&name.length>0&&name.length<=255&&!['.','..'].includes(name)&&!/[\/\\\u0000]/.test(name);
@@ -80,7 +80,7 @@ export function createSourceFolders({getStore,scope=window,readTimeoutMs=8000,sc
  async function file(ref,{signal}={}){
   ref=sourceReference(ref);let handle=await read(()=>root(ref.root_id),'讀取圖片來源設定',signal),path=ref.path;
   // A freshly selected ancestor/child may cover a previously remembered root.
-  if(await read(()=>handle.queryPermission({mode:'read'}),'確認原圖授權',signal)!=='granted'&&current){const active=await read(()=>root(current.root_id),'讀取目前來源設定',signal);await permission(active,'read',signal);const prefix=await read(()=>active.resolve?.(handle),'核對圖片位置',signal);if(prefix!==null&&prefix!==undefined){handle=active;path=[...prefix,...path]}}
+  if(await read(()=>handle.queryPermission({mode:'read'}),'確認原圖授權',signal)!=='granted'&&current){const active=await read(()=>root(current.root_id),'讀取目前來源設定',signal);await permission(active,'read',signal);const prefix=await read(()=>active.resolve?.(handle),'核對圖片位置',signal);if(prefix!==null&&prefix!==undefined){handle=active;path=[...prefix,...path]}else {const child=await read(()=>handle.resolve?.(active),'核對子資料夾位置',signal);if(Array.isArray(child)&&child.length<path.length&&child.every((part,i)=>part===path[i])){handle=active;path=path.slice(child.length)}}}
   await permission(handle,'read',signal);
   try{const directory=await at(handle,path.slice(0,-1),signal),file=await read(()=>directory.getFileHandle(path.at(-1)),'開啟圖片 '+path.at(-1),signal);return await read(()=>file.getFile(),'讀取圖片 '+path.at(-1),signal)}catch(e){if(e.name==='NotFoundError')throw problem('來源圖片已移動或刪除：'+path.at(-1)+'；請重新選圖，歷史任務不會自動換成其他圖片','source_missing');throw e}
  }

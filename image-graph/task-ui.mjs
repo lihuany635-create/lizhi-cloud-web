@@ -1,5 +1,5 @@
-import {ownsHandoff} from './handoff.mjs?v=26';
-import {imagePreview} from './original-store.mjs?v=17';
+import {ownsHandoff} from './handoff.mjs?v=28';
+import {imagePreview} from './original-store.mjs?v=28';
 import {deletedTasks,taskStatusLabel} from './task-actions.mjs';
 
 export function taskListHTML(project,esc,outputInLibrary){

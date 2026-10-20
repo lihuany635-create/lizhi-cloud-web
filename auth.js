@@ -7,6 +7,15 @@
   );
 
   let currentUser = null;
+  const allowedRoutes = new Set(["home","knowledge","weave","finance","engineering","media","chat","study","a4","licut","imagegraph","trash","settings","uploads","library","ai"]);
+  function returnURL() {
+    const target = new URL(location.origin + location.pathname), requested = new URLSearchParams(location.search).get("open");
+    if (allowedRoutes.has(requested)) target.searchParams.set("open", requested);
+    return target.href;
+  }
+  function disconnectWorkbenches() {
+    document.querySelectorAll('iframe').forEach(frame => frame.contentWindow?.postMessage({type:"lizhi-account-logout"}, location.origin));
+  }
 
   function renderGate(message = "請使用核准的 Google 帳號登入。") {
     document.body.innerHTML = `<main style="min-height:100vh;display:grid;place-items:center;background:#f3ead9;color:#2d2925;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;padding:24px"><section style="width:min(440px,100%);background:#fffaf0;border:1px solid #d8c9b3;border-radius:20px;padding:32px;box-shadow:0 18px 60px #6b513522;text-align:center"><div style="font-size:14px;letter-spacing:.16em;color:#8f6d4c">PRIVATE CLOUD ARCHIVE</div><h1 style="margin:12px 0 8px">立之雲端庫</h1><p style="line-height:1.7;color:#65594e">${message}</p><button id="lizhi-google-login" style="border:0;border-radius:999px;padding:12px 20px;background:#2d2925;color:#fffaf0;font-size:16px;cursor:pointer">使用 Google 登入</button><p style="font-size:12px;color:#887a6c;margin-top:18px">只允許核准帳號存取個人資料</p></section></main>`;
@@ -16,7 +25,7 @@
       button.textContent = "正在前往 Google…";
       const { error } = await client.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: `${location.origin}${location.pathname}` }
+        options: { redirectTo: returnURL() }
       });
       if (error) renderGate(`登入設定尚未完成：${error.message}`);
     });
@@ -28,7 +37,7 @@
     el.id = "lizhi-account-control";
     el.style.cssText = "position:fixed;right:16px;top:14px;z-index:30;display:flex;align-items:center;gap:8px;background:#fffaf0ee;border:1px solid #d8c9b3;border-radius:999px;padding:6px 8px 6px 12px;font:12px system-ui;color:#51473f;box-shadow:0 6px 20px #6b513522";
     el.innerHTML = `<span>${user.email}</span><button type="button" style="border:0;border-radius:999px;padding:6px 10px;background:#2d2925;color:#fffaf0;cursor:pointer">登出</button>`;
-    el.querySelector("button").addEventListener("click", () => client.auth.signOut().then(() => location.reload()));
+    el.querySelector("button").addEventListener("click", () => { disconnectWorkbenches(); client.auth.signOut().then(() => location.reload()); });
     document.body.append(el);
   }
 

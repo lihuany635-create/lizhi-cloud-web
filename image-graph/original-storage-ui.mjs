@@ -1,4 +1,4 @@
-import {directoryProject} from './original-store.mjs?v=17';
+import {directoryProject} from './original-store.mjs?v=28';
 
 // Do not reuse the old remembered picker ID: its previous directory may no
 // longer exist. A user can explicitly start again from the documents location.

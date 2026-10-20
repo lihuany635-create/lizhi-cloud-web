@@ -1,4 +1,4 @@
-import {deviceFolderSupported,deviceProjectDirectory,deviceFolderContentKey,deviceSyncError,deviceSyncFailureKind,syncDeviceFolder} from './device-folder.mjs?v=25';
+import {deviceFolderSupported,deviceProjectDirectory,deviceFolderContentKey,deviceSyncError,deviceSyncFailureKind,syncDeviceFolder} from './device-folder.mjs?v=28';
 
 const RETRY_DELAYS=[2000,5000,10000,30000];
 export function createDeviceFolderUI({getProject,getStore,isBusy,toast,modal,esc,scope=window,readOriginal=null}){

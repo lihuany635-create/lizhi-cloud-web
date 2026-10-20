@@ -14,7 +14,7 @@ export function validateBridgeRequest(value){
  }
  if(value.action!=='api'||typeof value.path!=='string')throw Error('不支援此交接操作');
  const method=value.method||'GET',p=value.path;
- const allowed=method==='GET'&&(p==='/api/session'||p==='/api/handoff/status'||new RegExp('^/api/handoff/tasks/'+ID+'(?:/candidates(?:/'+ID+'/image)?)?$','i').test(p))||method==='POST'&&p==='/api/handoff/tasks'||method==='PUT'&&(new RegExp('^/api/handoff/images/[a-f0-9]{64}$','i').test(p)||new RegExp('^/api/handoff/tasks/'+ID+'/control$','i').test(p));
+ const allowed=method==='GET'&&(p==='/api/session'||p==='/api/handoff/status'||new RegExp('^/api/handoff/retained/'+ID+'/'+ID+'$','i').test(p)||new RegExp('^/api/handoff/tasks/'+ID+'(?:/candidates(?:/'+ID+'/image)?)?$','i').test(p))||method==='POST'&&p==='/api/handoff/tasks'||method==='PUT'&&(new RegExp('^/api/handoff/images/[a-f0-9]{64}$','i').test(p)||new RegExp('^/api/handoff/tasks/'+ID+'/control$','i').test(p)||new RegExp('^/api/handoff/tasks/'+ID+'/candidates/'+ID+'/retain$','i').test(p));
  if(!allowed)throw Error('此路徑或操作不允許經由交接通道');
  const size=typeof value.body==='string'?new TextEncoder().encode(value.body).length:value.body?.byteLength??0;
  if(size>11*1024*1024||value.body!=null&&typeof value.body!=='string'&&!(value.body instanceof ArrayBuffer)&&!ArrayBuffer.isView(value.body))throw Error('交接內容過大或格式無效');
