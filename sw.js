@@ -44,7 +44,7 @@ const FILES=[
   // END IMAGE GRAPH ASSETS
   "","index.html","styles.css?v=15","theme.css?v=15","study.css?v=16","chat.css?v=15",
   "knowledge-weaving.css?v=20","finance/styles/home.css?v=61","workspace-ui.css?v=27","engineering/engineering.css?v=10","engineering/sync/sync.css?v=1","engineering/modules/supervision/supervision.css?v=1",
-  "supabase-config.js?v=2","auth.js?v=3","sync.js?v=1","cloud-chat.js?v=18",
+  "supabase-config.js?v=2","auth.js?v=4","sync.js?v=1","cloud-chat.js?v=18",
   "knowledge-weaving-validator.js?v=20","knowledge-weaving.js?v=20",
   "finance/domain/finance-domain.js?v=30","finance/domain/backup.js?v=30",
   "finance/storage/finance-db.js?v=44","finance/ui-model.js?v=30",
