@@ -1,16 +1,17 @@
 import {sourceRead} from './source-read.mjs?v=28';
+import {sourceThumbnail} from './source-thumbs.mjs?v=31';
 const PAGE_SIZE=40;
 const errorMessage=error=>({NotFoundError:'目前位置已移動或刪除，請重新連接資料夾',NotAllowedError:'資料夾需要重新授權，請按「重新連接」',SecurityError:'瀏覽器未允許存取，請直接開啟網站後重新連接',TypeMismatchError:'同名檔案或資料夾已存在，請使用另一個名稱',QuotaExceededError:'裝置空間不足，請釋放空間後重試'}[error.name]||error.message);
 export function createSourceFolderUI({repository,getStore,isBusy,onAdd,toast,modal,esc,scope=window,doc=document}){
- const $=selector=>doc.querySelector(selector);let generation=0,working=false,page=0,items={folders:[],images:[]},urls=[],error='',mode='source',readController=null,previewsRemaining=0,previewFailures=0,selecting=false,notice='';
+ const $=selector=>doc.querySelector(selector);let generation=0,working=false,page=0,items={folders:[],images:[]},urls=[],error='',mode='source',readController=null,previewsRemaining=0,previewFailures=0,selecting=false,notice='',permissionLost=false,lastRefresh=0;
  const pathLabel=value=>value?[value.root_name,...value.path].join(' / '):'尚未連接資料夾';
  function clearURLs(){for(const url of urls)URL.revokeObjectURL(url);urls=[]}
  function controls(){
   const location=repository.current(),ready=!!getStore()&&!isBusy();
-  $('#sourceConnectBtn').textContent=error?'重新連接':location?'更換位置':'連接資料夾';$('#sourceConnectBtn').disabled=working||!ready;
+  $('#sourceConnectBtn').textContent=permissionLost&&location?'恢復存取':error?'重新連接':location?'更換位置':'連接資料夾';$('#sourceConnectBtn').disabled=working||!ready;
   $('#sourceRefreshBtn').disabled=working||!ready||!location;$('#sourceNewFolderBtn').disabled=working||!ready||!location||!!error;$('#sourceIncludeChildren').disabled=working||!ready||!location;
   $('#sourceStopBtn').hidden=selecting||!(working||previewsRemaining);$('#sourceLocation').textContent=pathLabel(location);
-  $('#sourceStatus').textContent=error||(!ready?'專案仍在載入，請稍候…':selecting?'正在確認所選位置…':working?'正在列出實際檔案，已找到 '+items.images.length+' 張圖片…':previewsRemaining?'檔名已列出，正在載入 '+previewsRemaining+' 張預覽…':notice||!repository.supported()&&'此瀏覽器無法連接裝置資料夾，請使用支援此功能的瀏覽器'||!location&&'請連接圖片所在的資料夾'||previewFailures&&('已列出圖片；'+previewFailures+' 張預覽未能讀取，可重試或重新連接')||items.unreadable?.length&&('部分位置未讀取成功：'+items.unreadable[0].message)||'已完成讀取；圖片保持在裝置原位置');
+  $('#sourceStatus').textContent=(permissionLost&&location?'要繼續使用「'+location.root_name+'」，點「恢復存取」允許就好，不用重新選資料夾':'')||error||(!ready?'專案仍在載入，請稍候…':selecting?'正在確認所選位置…':working?'正在列出實際檔案，已找到 '+items.images.length+' 張圖片…':previewsRemaining?'檔名已列出，正在載入 '+previewsRemaining+' 張預覽…':notice||!repository.supported()&&'此瀏覽器無法連接裝置資料夾，請使用支援此功能的瀏覽器'||!location&&'請連接圖片所在的資料夾'||previewFailures&&('已列出圖片；'+previewFailures+' 張預覽未能讀取，可重試或重新連接')||items.unreadable?.length&&('部分位置未讀取成功：'+items.unreadable[0].message)||'已完成讀取；圖片保持在裝置原位置');
   $('#sourceStatus').classList.toggle('source-error',!!error||!!items.unreadable?.length||!!previewFailures);
  }
  function pathAndFolders(location=repository.current()){
@@ -44,7 +45,7 @@ export function createSourceFolderUI({repository,getStore,isBusy,onAdd,toast,mod
    try{
     const file=await sourceRead(()=>repository.file(item.ref,{signal:previewController.signal}),'預覽 '+item.name,{signal:previewController.signal});if(token!==generation||signal.aborted)return;
     if(!file.size||file.size>10*1024*1024){$('#sourceAdd_'+token+'_'+index).disabled=true;$('#sourceCard_'+token+'_'+index).draggable=false;throw Error(!file.size?'檔案為空':'超過單張 10 MiB')}
-    const url=URL.createObjectURL(file);urls.push(url);const img=$('#sourcePreview_'+token+'_'+index);
+    const {url}=await sourceThumbnail(item.ref,file);if(token!==generation||signal.aborted){URL.revokeObjectURL(url);return}urls.push(url);const img=$('#sourcePreview_'+token+'_'+index);
     img.onerror=()=>{if(token!==generation||signal.aborted)return;img.hidden=true;message.hidden=false;message.textContent='圖片預覽無法開啟，請確認原檔能在手機上開啟後重試';message.classList.add('source-error');previewFailures++;controls()};
     img.src=url;img.hidden=false;message.hidden=true;
    }catch(e){previewController.abort();if(token!==generation||signal.aborted)return;previewFailures++;message.textContent=errorMessage(e);message.classList.add('source-error')}
@@ -57,11 +58,16 @@ export function createSourceFolderUI({repository,getStore,isBusy,onAdd,toast,mod
   try{
    if(!repository.current()){$('#sourceImages').innerHTML='<div class="empty">先按「連接資料夾」，選擇你今天想使用的圖片位置。</div>';$('#sourceCounts').textContent='';return}
    const next=await sourceRead(()=>repository.listing({recursive:!!$('#sourceIncludeChildren').checked,signal,onProgress:partial=>{if(token!==generation||signal.aborted)return;items=partial;page=0;pathAndFolders(partial.location);showImages(token,{previews:false,partial:true});controls()}}),'讀取資料夾清單',{signal,timeoutMs:45000});
-   if(token!==generation||signal.aborted)return;items=next;page=Math.min(page,Math.max(0,Math.ceil(items.images.length/PAGE_SIZE)-1));pathAndFolders(next.location);working=false;showImages(token);
-  }catch(e){if(token===generation&&!signal.aborted){readController.abort();error=errorMessage(e);if(!items.images.length)$('#sourceImages').innerHTML='<div class="empty">讀取未完成，尚不能判定這個資料夾沒有圖片。請重新整理或更換位置。</div>';$('#sourceCounts').textContent='讀取未完成 · 目前找到 '+items.images.length+' 張圖片';$('#sourcePagination').hidden=true}}
+   if(token!==generation||signal.aborted)return;items=next;permissionLost=false;lastRefresh=Date.now();page=Math.min(page,Math.max(0,Math.ceil(items.images.length/PAGE_SIZE)-1));pathAndFolders(next.location);working=false;showImages(token);
+  }catch(e){if(token===generation&&!signal.aborted){readController.abort();permissionLost=e.code==='source_permission'||e.name==='NotAllowedError';error=permissionLost?'':errorMessage(e);if(!items.images.length)$('#sourceImages').innerHTML='<div class="empty">讀取未完成，尚不能判定這個資料夾沒有圖片。請重新整理或更換位置。</div>';$('#sourceCounts').textContent='讀取未完成 · 目前找到 '+items.images.length+' 張圖片';$('#sourcePagination').hidden=true}}
   finally{if(token===generation){working=false;controls()}}
  }
- async function choose(){if(working||!getStore()||isBusy())return false;beginRead();working=true;selecting=true;controls();let failed=false;try{await repository.choose();page=0;showMode('source');return true}catch(e){if(e.name!=='AbortError'){failed=true;error=errorMessage(e);toast(errorMessage(e),true)}return false}finally{working=false;selecting=false;controls();if(!failed)await refresh()}}
+ async function regrant(){
+  // 授權過期時先直接要求授權；使用者拒絕或資料夾已不存在，才改走系統選擇器
+  try{if(await repository.regrant()){permissionLost=false;error='';notice='已恢復存取';await refresh();return true}}catch{}
+  return false;
+ }
+ async function choose(){if(working||!getStore()||isBusy())return false;if(permissionLost&&repository.current()){if(await regrant())return true;permissionLost=false;error='沒有恢復存取；可以按「重新連接」改選資料夾';controls();return false}beginRead();working=true;selecting=true;controls();let failed=false;try{await repository.choose();page=0;showMode('source');return true}catch(e){if(e.name!=='AbortError'){failed=true;error=errorMessage(e);toast(errorMessage(e),true)}return false}finally{working=false;selecting=false;controls();if(!failed)await refresh()}}
  async function navigate(path){if(working||isBusy()||!path)return;beginRead();working=true;selecting=true;controls();let failed=false;try{await repository.navigate(path);page=0}catch(e){failed=true;error=errorMessage(e);toast(errorMessage(e),true)}finally{working=false;selecting=false;controls();if(!failed)await refresh()}}
 
  async function add(ref){if(selecting||isBusy()||!ref)return;if(working)stopRead();try{if(ref.root_id!==repository.current()?.root_id)throw Error('來源已切換，請重新選取圖片');await onAdd(ref)}catch(e){toast(errorMessage(e),true)}}
@@ -76,11 +82,13 @@ export function createSourceFolderUI({repository,getStore,isBusy,onAdd,toast,mod
    finally{working=false;selecting=false;controls()}
   };
  }
- async function restore(){if(!getStore())return;try{await sourceRead(()=>repository.restore(),'恢復圖片來源');await refresh()}catch(e){error=errorMessage(e);controls()}}
+ async function restore(){if(!getStore())return;try{await sourceRead(()=>repository.restore(),'恢復圖片來源');if(repository.current()&&await repository.permissionState()==='prompt'){permissionLost=true;$('#sourceImages').innerHTML='<div class="empty">點上方「恢復存取」，允許後就會列出圖片。</div>';controls();return}await refresh()}catch(e){permissionLost=e.code==='source_permission';error=permissionLost?'':errorMessage(e);controls()}}
  controls();
  $('#sourceConnectBtn').onclick=choose;$('#sourceRefreshBtn').onclick=refresh;$('#sourceStopBtn').onclick=stopRead;$('#sourceIncludeChildren').onchange=()=>{page=0;return refresh()};$('#sourceNewFolderBtn').onclick=newFolder;$('#showSourceBtn').onclick=()=>showMode('source');$('#showProjectRefsBtn').onclick=()=>showMode('project');
  function pageImages(delta){if(working||isBusy())return;page=Math.max(0,page+delta);const token=beginRead();showImages(token);controls()}
  $('#sourcePrevBtn').onclick=()=>pageImages(-1);$('#sourceNextBtn').onclick=()=>pageImages(1);
- doc.addEventListener('visibilitychange',()=>{if(!doc.hidden&&mode==='source')refresh()});scope.addEventListener?.('focus',()=>{if(mode==='source')refresh()});
+ // 切回映構時不必每次重掃：超過 2 分鐘才自動重新整理，要立刻更新可按「重新整理」
+ const stale=()=>mode==='source'&&!permissionLost&&Date.now()-lastRefresh>120000;
+ doc.addEventListener('visibilitychange',()=>{if(!doc.hidden&&stale())refresh()});scope.addEventListener?.('focus',()=>{if(stale())refresh()});
  return {choose,refresh,restore,addDragged:ref=>add(ref),showProject:()=>showMode('project'),showSource:()=>showMode('source'),update:controls};
 }

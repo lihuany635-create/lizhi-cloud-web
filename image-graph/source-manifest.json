@@ -117,15 +117,19 @@
     },
     {
       "name": "source-folder-ui.mjs",
-      "sha256": "ad77529cc6239b1487cf8dd5e1fa75c048a09259fce4b31ba234fddeea51d1f7"
+      "sha256": "a70b80d5d631a1ec8600c7ef05a8659da774cd7e61e6b65b9039b38866290504"
     },
     {
       "name": "source-folders.mjs",
-      "sha256": "2c7e1baf1e0870e4df8d137811a88b93c50db561858876bbaa1e3b93bf02e80a"
+      "sha256": "985e929a5c8e20f0e35246c1c845bbe0c49b5eb352ee69af2099d6fb375dab65"
     },
     {
       "name": "source-read.mjs",
       "sha256": "1e218738355070c0e470741ddb40b18cbf52bb4cf4247a13d84e69778c8332ca"
+    },
+    {
+      "name": "source-thumbs.mjs",
+      "sha256": "c0dadceccb3b995cce1be7d47c4d8053b7ed8161b0f9ec2d278e004f6072b60e"
     },
     {
       "name": "style.css",

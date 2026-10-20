@@ -84,6 +84,9 @@ export function createSourceFolders({getStore,scope=window,readTimeoutMs=8000,sc
   await permission(handle,'read',signal);
   try{const directory=await at(handle,path.slice(0,-1),signal),file=await read(()=>directory.getFileHandle(path.at(-1)),'開啟圖片 '+path.at(-1),signal);return await read(()=>file.getFile(),'讀取圖片 '+path.at(-1),signal)}catch(e){if(e.name==='NotFoundError')throw problem('來源圖片已移動或刪除：'+path.at(-1)+'；請重新選圖，歷史任務不會自動換成其他圖片','source_missing');throw e}
  }
+ // 重新打開網站後授權常會回到「需要詢問」：直接對記住的資料夾要求授權，不必再走系統選擇器。必須在點擊事件中呼叫。
+ async function permissionState(){if(!current)return 'none';try{const handle=await root(current.root_id);return await handle.queryPermission({mode:'read'})}catch{return 'none'}}
+ async function regrant(){if(!current)return false;const handle=await root(current.root_id);return await handle.requestPermission({mode:'read'})==='granted'}
  async function currentFile(path){if(!current)throw Error('請先連接資料夾');return file({...current,path:sourcePath(path)})}
  async function createFolder(name){
   if(!current)throw Error('請先連接資料夾');name=String(name||'').trim();if(!validPart(name)||name.length>80)throw Error('資料夾名稱不可空白、包含斜線，或超過 80 字');
@@ -120,5 +123,5 @@ export function createSourceFolders({getStore,scope=window,readTimeoutMs=8000,sc
   const saved=await (await directory.getFileHandle(name)).getFile();if(saved.size!==bytes.length||await hash(await saved.arrayBuffer())!==candidate.sha256)throw Error('回傳原圖寫入後校驗失敗');
   return {root_id:location.root_id,root_name:location.root_name,path:[...location.path,name]};
  }
- return {supported,restore,choose,bindRoot,navigate,listing,file,currentFile,createFolder,legacyFile,saveCandidate,current:()=>current?{...current,path:[...current.path]}:null};
+ return {supported,restore,choose,bindRoot,navigate,listing,file,currentFile,createFolder,legacyFile,saveCandidate,permissionState,regrant,current:()=>current?{...current,path:[...current.path]}:null};
 }
