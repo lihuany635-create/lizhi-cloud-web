@@ -39,11 +39,14 @@
     const local=service.filter(snapshot.local,query),vault=service.filter(snapshot.vault,query);
     const folders=local.filter(item=>item.kind==="folder"),notes=local.filter(item=>item.kind==="note"),documents=local.filter(item=>item.kind==="document");
     const vaultNotes=vault.filter(item=>item.kind==="note"),workflows=vault.filter(item=>item.kind==="workflow");
-    const actions=`<button class="button" data-action="refresh-vault">重新連線</button><button class="button" data-action="upload-knowledge">↑ 上傳文件</button><button class="button" data-action="new-folder">＋ 資料夾</button><button class="button" data-action="new-local-note">＋ 本機筆記</button><button class="button primary" data-action="new-knowledge">＋ 新增知識</button>`;
-    return `${head("KNOWLEDGE WORKSPACE","知識工作區","同一個入口整合本機收藏與 Obsidian Vault；Vault 寫入須經安全請求與同步代理。",actions)}
+    const cloudLibrary=!!global.LibraryStore?.available();
+    const actions=`${cloudLibrary?`<button class="button primary" data-action="upload-library">↑ 上傳到圖書館</button>`:`<button class="button" data-action="upload-knowledge">↑ 上傳文件</button>`}<button class="button" data-action="refresh-vault">重新連線</button><button class="button" data-action="new-folder">＋ 資料夾</button><button class="button" data-action="new-local-note">＋ 本機筆記</button><button class="button ${cloudLibrary?"":"primary"}" data-action="new-knowledge">＋ 新增知識</button>`;
+    return `${head("LIZHI LIBRARY","圖書館","把檔案放進來，Claude 會幫你讀過、取書名、寫摘要、貼標籤並排上書架。下方仍保留本機收藏與 Obsidian Vault。",actions)}
+      ${global.LibraryHome?LibraryHome.render():""}
+      <h2 class="library-divider">其他收藏</h2>
       <div class="knowledge-connection">${status(snapshot)}${snapshot.vaultError?`<small>${esc(snapshot.vaultError)}</small>`:""}</div>
       <div class="stats"><div class="stat"><b>${folders.length}</b><small>本機資料夾</small></div><div class="stat"><b>${notes.length+documents.length}</b><small>本機內容</small></div><div class="stat"><b>${vaultNotes.length}</b><small>Vault Markdown</small></div><div class="stat"><b>${workflows.length}</b><small>Vault Workflow</small></div></div>
-      <div class="toolbar"><input class="field search" data-search placeholder="搜尋本機與 Vault 知識" value="${esc(query)}"><button class="button" data-action="clear-search">清除</button></div>
+      <div class="toolbar"><input class="field search" data-search placeholder="搜尋圖書館、本機與 Vault" value="${esc(query)}"><button class="button" data-action="clear-search">清除</button></div>
       <section class="section"><div class="section-head"><h2>本機收藏</h2><span class="count">${local.length} 項</span></div><div class="grid">${local.length?local.map(localCard).join(""):empty("沒有符合條件的本機內容")}</div></section>
       <section class="section vault-section"><div class="section-head"><h2>Obsidian Markdown</h2><span class="count">${vaultNotes.length} 份</span></div><div class="grid">${vaultNotes.length?vaultNotes.map(vaultCard).join(""):empty(snapshot.vaultStatus==="online"?"沒有符合條件的 Markdown":"連線後會在這裡顯示 Vault 筆記")}</div></section>
       <section class="section vault-section"><div class="section-head"><h2>Obsidian Workflow</h2><span class="count">${workflows.length} 份</span></div><div class="grid">${workflows.length?workflows.map(vaultCard).join(""):empty(snapshot.vaultStatus==="online"?"沒有符合條件的 Workflow":"連線後會在這裡顯示 Mermaid 工作流程")}</div></section>${KnowledgeEditor.render()}`;

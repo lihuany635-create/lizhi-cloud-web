@@ -5,7 +5,7 @@ const CLOUD_APP_URL="https://lihuany635-create.github.io/lizhi-cloud-web/";
 const RELEASE_BASE="https://github.com/lihuany635-create/lizhi-cloud-laptop-6s8a4kuk/releases/download/media-2026-08-23/";
 const queryParams=new URLSearchParams(location.search);
 const OPEN_ROUTES=["home","knowledge","weave","finance","engineering","media","chat","study","a4","licut","imagegraph","trash","settings","uploads"];
-const requestedRoute=queryParams.get("open");
+const requestedRoute=queryParams.get("open")==="library"?"knowledge":queryParams.get("open");
 const state={route:OPEN_ROUTES.includes(requestedRoute)?requestedRoute:"home",records:[],cloudMedia:[],query:"",mediaType:"all",modal:null,sidebar:!requestedRoute||requestedRoute==="home",urls:[]};
 const app=document.querySelector("#app");
 const knowledgeInput=document.querySelector("#knowledge-file-input");
@@ -52,9 +52,9 @@ const trashed=()=>state.records.filter(row=>row.deletedAt);
 function toast(message){document.querySelector(".toast")?.remove();const el=document.createElement("div");el.className="toast";el.textContent=message;document.body.append(el);setTimeout(()=>el.remove(),2600);}
 
 const navItems=[
-  ["home","⌂","封面"],["knowledge","知","知識庫"],["weave","織","知識編織室"],["finance","財","理財管家"],["engineering","工","工程中心"],["media","影","影音庫"],["chat","↔","即時對話"],["study","✎","立之讀書室"],["a4","頁","A4 文件編輯器"],["licut","剪","立剪"],["imagegraph","構","映構圖片工作台"],["uploads","↑","上傳狀態"],["trash","♲","回收桶"],["settings","⚙","本機設定"]
+  ["home","⌂","封面"],["knowledge","書","圖書館"],["weave","織","知識編織室"],["finance","財","理財管家"],["engineering","工","工程中心"],["media","影","影音庫"],["chat","↔","即時對話"],["study","✎","立之讀書室"],["a4","頁","A4 文件編輯器"],["licut","剪","立剪"],["imagegraph","構","映構圖片工作台"],["uploads","↑","上傳狀態"],["trash","♲","回收桶"],["settings","⚙","本機設定"]
 ];
-function navDescription(route){return route==="knowledge"?"文件、筆記與搜尋":route==="weave"?"Proposal 與人工審核":route==="finance"?"離線記帳與財務整理":route==="engineering"?"專業工程模組入口":route==="media"?"影片、音訊與已生成 Podcast":route==="chat"?"手機與電腦即時傳字":route==="study"?"畫布提問與教學模式":route==="a4"?"固定格子、模板與 Word／PDF":route==="licut"?"手機剪片、轉場、字幕與匯出":route==="imagegraph"?"圖片關係、裝置資料夾、任務與驗收":route==="trash"?"復原已刪除內容":route==="uploads"?"最近回報、待上傳與失敗原因":route==="settings"?"備份與裝置資料":"返回收藏入口";}
+function navDescription(route){return route==="knowledge"?"上傳檔案，Claude 幫你整理上架":route==="weave"?"Proposal 與人工審核":route==="finance"?"離線記帳與財務整理":route==="engineering"?"專業工程模組入口":route==="media"?"影片、音訊與已生成 Podcast":route==="chat"?"手機與電腦即時傳字":route==="study"?"畫布提問與教學模式":route==="a4"?"固定格子、模板與 Word／PDF":route==="licut"?"手機剪片、轉場、字幕與匯出":route==="imagegraph"?"圖片關係、裝置資料夾、任務與驗收":route==="trash"?"復原已刪除內容":route==="uploads"?"最近回報、待上傳與失敗原因":route==="settings"?"備份與裝置資料":"返回收藏入口";}
 function layout(content){return `<div class="shell route-${state.route} ${state.sidebar?"drawer-open":""}"><header class="topbar"><a class="brand" href="#" data-route="home"><span class="brand-mark">立</span><span><b>立之雲端庫</b><small>${IS_CLOUD_SITE?"THIS LAPTOP CLOUD ARCHIVE":"LOCAL PRIVATE ARCHIVE"}</small></span></a><span class="local-pill">● ${IS_CLOUD_SITE?"21 集雲端同步":"本機資料庫"}</span><button class="button library-menu-button" data-action="toggle-menu">選擇收藏庫</button></header><button class="drawer-handle" data-action="toggle-menu" aria-label="${state.sidebar?"關閉收藏庫選單":"拉出收藏庫選單"}">${state.sidebar?"›":"‹"}</button><aside class="sidebar ${state.sidebar?"open":""}" aria-label="雲端庫入口"><div class="drawer-head"><div><div class="nav-title">LIBRARY MENU</div><h2>選擇收藏庫</h2></div><button class="drawer-close" data-action="toggle-menu" aria-label="關閉選單">×</button></div><nav class="nav-list">${navItems.map(([route,icon,label],index)=>`<button class="nav-link ${state.route===route?"active":""}" data-route="${route}"><span>${icon}</span><b><small>${String(index+1).padStart(2,"0")}</small>${label}<em>${navDescription(route)}</em></b><i>進入 →</i></button>`).join("")}</nav><div class="side-note">KNOWLEDGE · FINANCE · ENGINEERING · MEDIA · CHAT · STUDY · A4 · VIDEO<br>${IS_CLOUD_SITE?"AVAILABLE ON EVERY DEVICE":"PRIVATE BY DESIGN"}</div></aside><main class="main">${content}</main></div>${renderModal()}`;}
 function head(eyebrow,title,description,actions=""){return `<div class="page-head"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1><p>${description}</p></div><div class="actions">${actions}</div></div>`;}
 
@@ -108,6 +108,8 @@ async function boot(){
     vault:new VaultKnowledgeAdapter({enabled:!IS_CLOUD_SITE})
   });
   KnowledgeHome.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
+  if(window.LibraryHome){LibraryHome.configure({rerender:()=>{if(state.route==="knowledge")render();}});LibraryHome.installEvents(app);}
+
   KnowledgeHome.installEvents(app);
   KnowledgeEditor.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
   KnowledgeEditor.installEvents(app);
