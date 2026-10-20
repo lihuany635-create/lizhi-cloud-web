@@ -1,6 +1,6 @@
 {
   "source": "映構圖片關係生成工作台",
-  "source_commit": "8ac71c4b135e3eace89b5d99be79cfffa740e149",
+  "source_commit": "8a88676a0a3e9fb3a60b269f32a02a27c62dde35",
   "backend": "https://lizhi-image-graph.lihuany635.chatgpt.site",
   "files": [
     {
@@ -73,7 +73,7 @@
     },
     {
       "name": "index.html",
-      "sha256": "78c9bebb97296b339fe6609f7c7c86619f2b1d0f789c95ddb99be09814619d17"
+      "sha256": "15bf782727da39af810a84333189db01ea56c581fcc56c6c3cb88bc858b60fa5"
     },
     {
       "name": "integration-projects.mjs",
@@ -112,6 +112,10 @@
       "sha256": "33062029d21e12cae86d1d2003f8de73afebb942ce1171ec45f897d3aabea095"
     },
     {
+      "name": "settings-status.mjs",
+      "sha256": "5123ff01d609eff7dfae2f4fa35608d15e84e03d1362452efbe3e6961570752d"
+    },
+    {
       "name": "source-folder-ui.mjs",
       "sha256": "ad77529cc6239b1487cf8dd5e1fa75c048a09259fce4b31ba234fddeea51d1f7"
     },
@@ -125,7 +129,7 @@
     },
     {
       "name": "style.css",
-      "sha256": "6e117a27112d4c6d2921310b5f92c549bd4423acf45239891fcb8435fef53207"
+      "sha256": "9216854cb5c7e478b60c3662f1d316312de2da59a46487caeecbc0915ba6d3db"
     },
     {
       "name": "task-actions.mjs",
