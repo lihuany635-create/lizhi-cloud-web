@@ -49,12 +49,12 @@ test("E0-06 platform adapter fails predictably for unavailable capabilities",asy
 test("E0-07 home renders registered modules through metadata",()=>{
   const html=Home.render({modules:[Woodworking]});
   assert.match(html,/木工/);
-  assert.match(html,/3 項能力/);
+  assert.match(html,/3 項功能/);
   assert.match(html,/data-route="home"/);
 });
 
 test("E0-08 empty registry degrades safely",()=>{
-  assert.match(Home.render(),/尚無可用專業模組/);
+  assert.match(Home.render(),/目前沒有可用的專業模組/);
 });
 
 test("E0-09 workspace exposes an isolated Engineering renderer",()=>{

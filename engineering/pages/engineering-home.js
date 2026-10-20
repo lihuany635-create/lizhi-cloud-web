@@ -8,20 +8,33 @@
   const time=value=>value?new Intl.DateTimeFormat("zh-TW",{dateStyle:"medium",timeStyle:"short"}).format(new Date(value)):"—";
 
   function moduleOptions(modules){
-    return modules.length?modules.map(module=>`<label class="engineering-module-option"><input type="checkbox" name="module_ids" value="${esc(module.id)}"><span><b>${esc(module.name)}</b><small>${module.capabilities.length?`${module.capabilities.length} 項能力`:`已註冊 · 功能尚未建立`}</small></span></label>`).join(""):`<p class="engineering-muted">尚無可用專業模組。</p>`;
+    return modules.length?modules.map(module=>`<label class="engineering-module-option"><input type="checkbox" name="module_ids" value="${esc(module.id)}"><span><b>${esc(module.name)}</b><small>${esc([module.id==="woodworking"?"櫃子設計、材料表、報價":module.id==="supervision"?"施工日誌、查驗、缺失、工程文件":"",module.capabilities.length?`${module.capabilities.length} 項功能`:"功能準備中"].filter(Boolean).join(" · "))}</small></span></label>`).join(""):`<p class="engineering-muted">目前沒有可用的專業模組。</p>`;
   }
+  const chevron=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
   function projectCard(project,modules){
     const names=project.module_ids.map(id=>modules.find(module=>module.id===id)?.name||id);
-    return `<article class="engineering-project-card" data-engineering-project="${esc(project.id)}"><div><span class="engineering-status ${esc(project.status)}">${project.status==="active"?"進行中":"已封存"}</span><h3>${esc(project.name)}</h3><p>${names.length?esc(names.join("、")):"尚未關聯專業模組"}</p><small>更新：${esc(time(project.updated_at))}</small></div><div class="engineering-card-actions">${project.status==="active"?`<button class="button primary" data-engineering-open="${esc(project.id)}">開啟</button>`:`<button class="button" data-engineering-reopen="${esc(project.id)}">重新開啟</button>`}</div></article>`;
-  }
-  function section(title,projects,modules,empty){
-    return `<section class="engineering-section"><div class="engineering-section-head"><h2>${title}</h2><span>${projects.length} 個</span></div>${projects.length?`<div class="engineering-project-grid">${projects.map(project=>projectCard(project,modules)).join("")}</div>`:`<div class="engineering-empty"><p>${empty}</p></div>`}</section>`;
+    const action=project.status==="active"?`data-engineering-open="${esc(project.id)}"`:`data-engineering-reopen="${esc(project.id)}"`;
+    return `<button type="button" class="eng2-project" data-engineering-project="${esc(project.id)}" ${action}><span class="eng2-project-main"><b>${esc(project.name)}</b><span class="eng2-chips light">${names.length?names.map(name=>`<span>${esc(name)}</span>`).join(""):`<span>一般專案</span>`}</span><small>${project.status==="active"?`更新於 ${esc(time(project.updated_at))}`:"已封存 · 點一下重新開啟"}</small></span><span class="eng2-project-chev">${chevron}</span></button>`;
   }
   function render({modules=[],projects=[],failures=[],loading=false,error="",formError=""}={}){
     const active=projects.filter(project=>project.status==="active"),archived=projects.filter(project=>project.status==="archived");
     const warning=failures.length?`<p class="engineering-warning" role="status">部分專業模組載入失敗，其他功能仍可使用。</p>`:"";
-    const body=loading?`<div class="engineering-empty"><p>正在讀取工程專案……</p></div>`:error?`<div class="engineering-error" role="alert"><h2>工程專案暫時無法讀取</h2><p>${esc(error)}</p><button class="button" data-engineering-action="retry">重試</button></div>`:`${section("進行中",active,modules,"尚未建立工程專案。")}${section("已封存",archived,modules,"目前沒有封存專案。")}`;
-    return `<section class="engineering-hub" aria-labelledby="engineering-title"><header class="engineering-header"><div><div class="eyebrow">ENGINEERING CENTER · PHASE 15</div><h1 id="engineering-title">工程中心</h1><p>支援離線本機工作、可恢復 Outbox、衝突偵測，以及施工日誌／每日監造紀錄的版本化審查。</p></div><button class="button" data-route="home">返回立之雲端庫</button></header>${warning}<section class="engineering-create"><div><small>NEW PROJECT</small><h2>建立工程專案</h2></div><form data-engineering-form="create"><label>專案名稱<input name="name" maxlength="100" required placeholder="例如：客廳收納工程"></label><fieldset><legend>專業模組（可選）</legend>${moduleOptions(modules)}</fieldset>${formError?`<p class="engineering-form-error" role="alert">${esc(formError)}</p>`:""}<button class="button primary">建立並開啟</button></form></section>${body}</section>`;
+    const openForm=!!formError||(!loading&&!error&&!projects.length);
+    const body=loading?`<div class="engineering-empty"><p>正在讀取工程專案…</p></div>`
+      :error?`<div class="engineering-error" role="alert"><h2>工程專案暫時讀不到</h2><p>${esc(error)}</p><button class="button" data-engineering-action="retry">重試</button></div>`
+      :`<section class="eng2-list"><div class="eng2-card-head"><h2>進行中</h2><span>${active.length} 個專案</span></div>${active.length?active.map(project=>projectCard(project,modules)).join(""):`<div class="eng2-empty">還沒有工程專案，按上面的「新增工程專案」開始。</div>`}</section>${archived.length?`<details class="eng2-archived"><summary>已封存（${archived.length}）</summary>${archived.map(project=>projectCard(project,modules)).join("")}</details>`:""}`;
+    return `<section class="eng2 eng2-home" aria-labelledby="engineering-title">
+      <header class="eng2-top">
+        <div class="eng2-top-row"><span class="eng2-kicker">立之雲端庫</span><button type="button" class="eng2-back light" data-route="home">回封面</button></div>
+        <h1 id="engineering-title">工程中心</h1>
+        <p>每個工程一個專案：現場紀錄、設計報價、文件都在裡面。</p>
+        <details class="eng2-create" ${openForm?"open":""}><summary class="eng2-create-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新增工程專案</summary>
+          <form data-engineering-form="create"><label>專案名稱<input name="name" maxlength="100" required placeholder="例如：客廳收納工程"></label><fieldset><legend>需要哪些功能？（可複選，之後也能改）</legend>${moduleOptions(modules)}</fieldset>${formError?`<p class="engineering-form-error" role="alert">${esc(formError)}</p>`:""}<button class="button primary">建立並開啟</button></form>
+        </details>
+      </header>
+      ${warning}
+      <div class="eng2-body">${body}</div>
+    </section>`;
   }
   return Object.freeze({render});
 });
