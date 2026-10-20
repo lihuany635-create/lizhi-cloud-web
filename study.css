@@ -4,14 +4,24 @@
   overflow: hidden;
 }
 
-.route-a4 .main {
+.route-a4 .main,
+.route-licut .main {
   height: 100vh;
   padding: 0;
   overflow: hidden;
 }
 
-.route-a4 .topbar {
+.route-a4 .topbar,
+.route-licut .topbar {
   display: none;
+}
+
+.licut-embedded {
+  background: #15181d;
+}
+
+.licut-embedded .study-frame-wrap {
+  height: 100%;
 }
 
 .a4-embedded {
@@ -74,12 +84,14 @@
 
 @media (max-width: 680px) {
   .route-study .main,
-  .route-a4 .main {
+  .route-a4 .main,
+  .route-licut .main {
     height: calc(100dvh - 68px);
     padding: 0;
   }
 
-  .route-a4 .main {
+  .route-a4 .main,
+  .route-licut .main {
     height: 100dvh;
   }
 

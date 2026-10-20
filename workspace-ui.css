@@ -1,6 +1,6 @@
 [hidden]{display:none!important}
 .workspace-panel{min-width:0}
-.route-study .workspace-panel,.route-a4 .workspace-panel{height:100%}
+.route-study .workspace-panel,.route-a4 .workspace-panel,.route-licut .workspace-panel{height:100%}
 .main{padding-bottom:90px}
 .page-head{margin-bottom:14px}
 .page-head h1{font-size:clamp(26px,3vw,38px)}
