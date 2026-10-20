@@ -55,3 +55,23 @@
 - `add_music {mediaId, start?, in?, out?, volume?, fadeIn?, fadeOut?}`、`update_music {musicId, ...}`、`remove_music {musicId}`
 - `set_captions {items:[{start,end,text}]}`、`add_caption`、`update_caption {captionId, ...}`、`remove_caption`、`clear_captions`、`set_caption_style {size?, color?, y?, box?, boxOpacity?}`
 - `set_project {name?, width?, height?, fps?}`
+
+進階工具（參考 Premiere）：
+
+- 片段與子母畫面共用參數（`add_clip`／`update_clip`／`add_overlay`／`update_overlay`）：
+  - `speed` 0.1~8（變速，長度跟著變）、`reverse`（倒轉，不播聲音）、`freeze` 秒數（定格）
+  - `transform {scale, x, y, rotate, opacity, fit}`：`scale` 1 = 原大小；`x`/`y` 是畫面寬高的比例位移；`rotate` 角度；`fit` 為 `contain`（完整顯示）或 `cover`（填滿畫面）
+  - `crop {l, t, r, b}`（0~0.45）
+  - `filters` 另有 `temperature` -1~1、`tint` -1~1、`vignette` 0~1、`blur` 0~1、`sharpen` 0~1
+  - `muted`、`fadeIn`、`fadeOut`（片段本身聲音的淡入淡出）
+- `freeze_frame {time, duration?, clipId?}`：在時間點插入定格畫面
+- `ripple_delete {clipId}`：刪除片段，後面的文字、字幕、音樂、子母畫面、標記一起往前移
+- `duplicate {clipId | textId | captionId | musicId | overlayId}`
+- 關鍵影格：`set_keyframe {clipId | overlayId, prop, time, value}`、`remove_keyframe {..., prop, time}`、`clear_keyframes {..., prop?}`
+  - `prop`：scale x y rotate opacity volume
+  - `time` 是片段內的秒數（0 = 片段開頭），中間會平滑內插
+- 子母畫面（疊在主軌上、可自由擺放時間）：`add_overlay {mediaId, start, in?, out?, ...}`、`update_overlay {overlayId, ...}`、`remove_overlay {overlayId}`
+- 標記：`add_marker {time, label?, color?}`、`update_marker {markerId, ...}`、`remove_marker {markerId}`
+- 自動壓低配樂：`set_ducking {enabled?, source?, level?, fade?, segments?}`
+  - `source: captions` 表示有字幕的地方就壓低；`segments` 用 `[[start, end]]` 指定說話段落
+  - `level` 是壓低後的音量倍數
