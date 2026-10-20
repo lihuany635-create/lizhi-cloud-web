@@ -118,3 +118,15 @@
   - `in`：none、fade、pop、slideup、slideleft、zoom、typewriter
   - `out`：none、fade、slidedown、shrink
 - SRT／VTT 匯入匯出在立剪的字幕面板
+
+預覽與輸出（只在手機上操作，沒有遠端指令）：
+
+- 代理檔：540p、每 0.5 秒一個關鍵格；存在手機的 IndexedDB，預覽用代理檔，匯出一律用原始檔
+- 預覽解析度：流暢、標準、清晰三段
+- 匯出用 WebCodecs，即時算出、直接編碼：
+  - 編碼：H.264、H.265、VP9，依裝置支援自動停用不能用的
+  - 解析度：原始、4K、1080p、720p、480p；幀率 24～60
+  - 範圍：整支、自訂、依標記切段
+  - 可排批次佇列
+  - 沒有 WebCodecs 的瀏覽器會改用 MediaRecorder
+- 純音訊：WAV（無損）或 M4A，離線混音，比即時快
