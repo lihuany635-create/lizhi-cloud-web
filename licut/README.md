@@ -143,3 +143,9 @@
   - `track`：`text`、`overlay`、`video`、`caption`、`music`，或語言字幕軌 `ct:<id>`
 - 鎖定的軌道不能選取或拖曳，波紋刪除、波紋修剪、全軌切割也不會動到它
 - 隱藏的軌道不顯示、也不匯出；音樂軌隱藏就是靜音
+
+其他：
+
+- 片段 `bgFill: none | blur`：橫轉直的模糊背景填滿
+- `update_clip`／`update_overlay` 可直接給 `keys {prop: [[time, value, ease?], …]}`
+- `cut_ranges {ranges: [[start, end], …]}`：剪掉這幾段時間，後面的東西一起往前補（例如去靜音）
