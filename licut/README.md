@@ -75,3 +75,18 @@
 - 自動壓低配樂：`set_ducking {enabled?, source?, level?, fade?, segments?}`
   - `source: captions` 表示有字幕的地方就壓低；`segments` 用 `[[start, end]]` 指定說話段落
   - `level` 是壓低後的音量倍數
+
+精確剪輯與批次操作：
+
+- `ripple_trim {clipId, in?, out?, ...}`：修剪主軌片段，後面其他軌一起前後移
+- `slip_clip {clipId | overlayId, delta}`：滑移（長度不變，換用素材的另一段，delta 為素材秒數）
+- `split_all {time}`：所有軌一起切開
+- `shift_items {items: [{kind, id}], delta}`：批次移動文字／字幕／音樂／子母畫面／標記
+- `remove_items {items: [{kind, id}]}`：批次刪除（kind 可含 clip）
+- `tag_media {mediaId, name?, tags?, scene?, note?, rating?}`：素材整理
+
+### 其他控制方式
+
+- 頁面內：`window.licut`（`run(ops, label)`、`op`、`project()`、`summary()`、`seek`、`play`、`pause`、`undo`、`redo`、`history()`、`on(fn)`）
+- 同網站外層頁面：`iframe.contentWindow.postMessage({licut: 'run', id, ops, label}, origin)`，回覆 `{licutReply: id, ok, result | error}`；指令另有 `summary`、`project`、`undo`、`redo`、`seek`、`play`、`pause`、`script`
+- 立剪裡的「腳本」面板：貼 JSON 操作陣列或 JavaScript
