@@ -1,0 +1,135 @@
+{
+  "source": "映構圖片關係生成工作台",
+  "source_commit": "9ce006eb837d158632219e226427630d5a6fae88",
+  "backend": "https://lizhi-image-graph.lihuany635.chatgpt.site",
+  "files": [
+    {
+      "name": "account-ui.mjs",
+      "sha256": "90b5b696b354f1761e8b0e1e8de83e2d46b6dedbef24c308d409cb3b90c5d029"
+    },
+    {
+      "name": "api-transport.mjs",
+      "sha256": "74058fc85ff7e1de95b1bfebe2d08774548e7e78452ed890d9bba4e3675452a2"
+    },
+    {
+      "name": "app.mjs",
+      "sha256": "cd414d44d8653bf1095eb13baf681a4e01b3a54368d3fb74c21f54fd9579646a"
+    },
+    {
+      "name": "asset-actions.mjs",
+      "sha256": "d389217090de389ea9bfb936dc343dc4c819f03f406c295b6353e1cae70979e4"
+    },
+    {
+      "name": "asset-folders.mjs",
+      "sha256": "06db373f69a667f5e105d2a2432cca2d5ea295944bee95a7387261c7cb6cad4e"
+    },
+    {
+      "name": "asset-kinds.mjs",
+      "sha256": "a44582b28fdef6f122b9157467f799632c7d3ddff6155b4310a22061c81c055a"
+    },
+    {
+      "name": "bridge-client.mjs",
+      "sha256": "16bf3fb8cf8b57bc80c40bd33e8e8dd6d47e2a46d02de74e856d2bb4583be67f"
+    },
+    {
+      "name": "bridge-protocol.mjs",
+      "sha256": "94e16aaa6655a10042f40bd955214959cbc0a5095faa6a255da8067b1963cf56"
+    },
+    {
+      "name": "cloud-candidates.mjs",
+      "sha256": "0927157a9ec0a2b178440b741b5b8a42e0195e70cf63f50cd9c9be5c045cd893"
+    },
+    {
+      "name": "cloud.mjs",
+      "sha256": "1f250d7287abf088c41fb6fbedd3ee33c66ed2208d52e823563eb697038c2884"
+    },
+    {
+      "name": "core.mjs",
+      "sha256": "e0149b3a9ade486a1b4064e236c56535dfa7e7db983ada847783e776a4bd02cb"
+    },
+    {
+      "name": "device-folder-ui.mjs",
+      "sha256": "96bb6eddaf42fc19ce7659931bf988516e1a2507af552091a5e2b97465718247"
+    },
+    {
+      "name": "device-folder.mjs",
+      "sha256": "d8ad75ab9ff768cddd83c55f7ae1cc5dc51960d9d57cff46e0f697d6310a3bbf"
+    },
+    {
+      "name": "google-drive.mjs",
+      "sha256": "f9afff954b16f5e5be69d763eccc1e15cda495ffda06ce7425d2a07f3f7d0cec"
+    },
+    {
+      "name": "handoff.mjs",
+      "sha256": "5f42eefed5338b979f2ad6339cafb5a0288f00714d3f78c1542b66ef9560aaa7"
+    },
+    {
+      "name": "image-input.mjs",
+      "sha256": "227ca348ce0c81468016a3c9be95e8cbd279006df8f5ff4bd623347e78f30f64"
+    },
+    {
+      "name": "index.html",
+      "sha256": "795d377c31832a47230101ba430822be6fe00357a2bac124972a23be554c6873"
+    },
+    {
+      "name": "integration-projects.mjs",
+      "sha256": "d88b92cacb0846997213c0782e401a48c3a4403d6fb96a58320526b262335aec"
+    },
+    {
+      "name": "integration-ui.mjs",
+      "sha256": "063b124fb7c065b9efca2ff18208329fffb6bd5bdb2706752b20a5f3cc4263d8"
+    },
+    {
+      "name": "limits.mjs",
+      "sha256": "0632e77d906d146aa5849be5616ea1bc2be3ea12e8e2761f4cbd0171fb6dffa9"
+    },
+    {
+      "name": "original-storage-ui.mjs",
+      "sha256": "46a41b4bc210288af8c8a6f8c75149cf05ca7f518efeaedcc5e546cd5e102581"
+    },
+    {
+      "name": "original-store.mjs",
+      "sha256": "8c0d33744020b5410cf33d7ecbe92032614d05a6865fa53b60dba00fa4bd628b"
+    },
+    {
+      "name": "project-store.mjs",
+      "sha256": "a81d22b4b630fec3c2e96421b4aac12cb3fc95b219d993731ee628f9521574cc"
+    },
+    {
+      "name": "returned-images.mjs",
+      "sha256": "4c607737a9747d390ce7a5eeeb104b1c18439b9136c2399021b07d99566573a9"
+    },
+    {
+      "name": "runtime-config.mjs",
+      "sha256": "33062029d21e12cae86d1d2003f8de73afebb942ce1171ec45f897d3aabea095"
+    },
+    {
+      "name": "source-folder-ui.mjs",
+      "sha256": "e862da2ee04bfde42a00850bb9819ca300016e8b5016d5a821d83d038f71e068"
+    },
+    {
+      "name": "source-folders.mjs",
+      "sha256": "59184629a82de32c8f16c22e8e2c2ce3d85c3fade5dd199c8e07f26c5138a3de"
+    },
+    {
+      "name": "source-read.mjs",
+      "sha256": "1e218738355070c0e470741ddb40b18cbf52bb4cf4247a13d84e69778c8332ca"
+    },
+    {
+      "name": "style.css",
+      "sha256": "6e117a27112d4c6d2921310b5f92c549bd4423acf45239891fcb8435fef53207"
+    },
+    {
+      "name": "task-actions.mjs",
+      "sha256": "df75c8eab075f44e0c1acf56833a8cee662839c92d9b125f9ba1e53fdd9f1e09"
+    },
+    {
+      "name": "task-ui.mjs",
+      "sha256": "94103b20f36cbb21ba5348113267793f24c6a64ccdf65520c28fce760b801a50"
+    },
+    {
+      "name": "workspace-ui.mjs",
+      "sha256": "20a37648e0e667e6fb656a94e1c6b7da4cee418326e89fea189a961303d6ee8a"
+    }
+  ]
+}

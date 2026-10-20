@@ -6,7 +6,7 @@ import { createProposalInbox } from "./proposal-inbox-store.mjs";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 4180);
-const mime = {".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".json":"application/json; charset=utf-8",".webmanifest":"application/manifest+json",".svg":"image/svg+xml",".png":"image/png",".ico":"image/x-icon"};
+const mime = {".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".mjs":"text/javascript; charset=utf-8",".json":"application/json; charset=utf-8",".webmanifest":"application/manifest+json",".svg":"image/svg+xml",".png":"image/png",".ico":"image/x-icon"};
 const proposalInbox=createProposalInbox({dataDir:process.env.WEAVING_DATA_DIR||path.join(root,".local-data","knowledge-weaving")});
 
 const server = http.createServer(async (req,res)=>{
