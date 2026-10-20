@@ -136,3 +136,10 @@
 - `mask.shape` 多了 `linear`（線性遮罩，`angle` 為角度）
 - 關鍵影格 `prop` 多了 `maskX`、`maskY`、`maskAngle`
 - `make_mask_transition {clipId, duration?, direction?: left | right}`：把前一段的結尾移到子母畫面，用線性遮罩帶出這一段（物體帶過去的無縫轉場）
+
+軌道鎖定與隱藏：
+
+- `set_track {track, locked?, hidden?}`
+  - `track`：`text`、`overlay`、`video`、`caption`、`music`，或語言字幕軌 `ct:<id>`
+- 鎖定的軌道不能選取或拖曳，波紋刪除、波紋修剪、全軌切割也不會動到它
+- 隱藏的軌道不顯示、也不匯出；音樂軌隱藏就是靜音
