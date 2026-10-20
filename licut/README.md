@@ -103,3 +103,8 @@
 - `blend`（子母畫面）：`normal`、`screen`、`multiply`、`add`、`lighten`、`darken`
 - 關鍵影格：`prop` 多了 `speed`（速度曲線）；`set_keyframe` 可加 `ease`（`ease`、`linear`、`in`、`out`、`hold`）
 - 轉場另有：`whipleft`、`whipright`、`spin`、`zoomblur`、`glitch`、`flash`、`blurfade`、`wipeup`、`doorway`
+
+音訊工作台：
+
+- 片段、子母畫面、音樂都能加：`eq {low, mid, high}`（dB，-15~15）、`denoise`（0~1，頻譜降噪）、`norm`（標準化補償 dB）、`muted`
+- `set_mix {main?, overlay?, music?, master?, muted?: {main?, overlay?, music?}, limiter?}`：混音台（各軌與總音量 0~4、靜音、限制器）
