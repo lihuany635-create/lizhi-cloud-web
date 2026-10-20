@@ -108,7 +108,7 @@
     const inbox=item.status==="inbox",snippet=contentHits.get(item.id);
     return `<article class="card library-card ${inbox?"is-inbox":""}" data-library-read="${esc(item.id)}" tabindex="0" role="button" aria-label="開啟 ${esc(titleOf(item))}">
       ${item.thumb?`<img class="library-thumb" src="${esc(item.thumb)}" alt="" loading="lazy">`:""}
-      <div class="card-top"><span class="library-icon">${icon(item)}</span>${inbox?`<span class="chip library-wait">待整理</span>`:`<span class="chip library-shelf-chip">${esc(item.shelf||"未分類")}</span>`}</div>
+      <div class="card-top"><span class="library-icon">${icon(item)}</span>${inbox?`<span class="chip library-wait">待整理</span>`:item.status==="skipped"?`<span class="chip library-wait">需補備註</span>`:`<span class="chip library-shelf-chip">${esc(item.shelf||"未分類")}</span>`}</div>
       <h3>${highlight(titleOf(item))}</h3>
       ${item.title&&item.title!==item.file_name?`<p class="library-file">${highlight(item.file_name)}</p>`:""}
       ${item.summary?`<p class="library-summary">${highlight(item.summary)}</p>`:inbox?`<p class="library-hint">${esc(item.extract_note||"等整理後會寫上摘要與重點")}</p>`:""}
