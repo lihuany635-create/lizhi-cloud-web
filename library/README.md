@@ -81,7 +81,8 @@ Supabase 專案 `hrdzywkihfqggiwjgavi`。`text_excerpt`、`user_note`、檔名�
      `update lizhi_library_items set related_ids = array_append(related_ids, '<這本 id>'::uuid) where id = '<對方 id>' and not ('<這本 id>'::uuid = any(related_ids));`
    - 讀不出內容又判斷不了的：`status = 'skipped'`，在 `summary` 說明原因，請使用者補備註。
 
-4. 回報：幾本放上哪些書架、拆了哪些書架、哪些略過與原因。沒有待整理的書就說沒有。
+4. 寫一筆處理紀錄到 `lizhi_ai_runs`，讓 AI 處理中心看得到（做法見 `ai-center/README.md`；`source` = `library`，排程跑的 `kind` = `daily`、對話中手動的 = `manual`，有略過的書 `status` = `warning`）。
+5. 回報：幾本放上哪些書架、拆了哪些書架、哪些略過與原因。沒有待整理的書就說沒有，也不用寫紀錄。
 
 使用者要求重新整理某些書時，把它們的 `status` 改回 `inbox` 再照上面做。
 

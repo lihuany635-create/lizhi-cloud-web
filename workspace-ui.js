@@ -62,7 +62,7 @@ function renderWorkspace() {
       }
     }
   } else {
-    const renderers = {home:renderHome,knowledge:KnowledgeHome.render,weave:KnowledgeWeaving.render,finance:FinanceHome.render,engineering:renderEngineeringHub,trash:renderTrash,settings:renderSettings,uploads:renderUploads};
+    const renderers = {home:renderHome,knowledge:KnowledgeHome.render,weave:(window.AiCenter?AiCenter.render:KnowledgeWeaving.render),finance:FinanceHome.render,engineering:renderEngineeringHub,trash:renderTrash,settings:renderSettings,uploads:renderUploads};
     const focused = document.activeElement;
     const searchFocused = panel.contains(focused) && focused.matches('[data-search]');
     const selection = searchFocused ? [focused.selectionStart, focused.selectionEnd] : null;
