@@ -149,3 +149,10 @@
 - 片段 `bgFill: none | blur`：橫轉直的模糊背景填滿
 - `update_clip`／`update_overlay` 可直接給 `keys {prop: [[time, value, ease?], …]}`
 - `cut_ranges {ranges: [[start, end], …]}`：剪掉這幾段時間，後面的東西一起往前補（例如去靜音）
+
+### 音效、旁白、節拍、文字樣式、貼圖
+- `add_music {..., track: 'sfx'}`：放到「音效」軌（內建音效、錄的旁白都在這軌，不會被自動壓低）；`update_music {musicId, track: 'music' | 'sfx'}` 可換軌；`set_mix` 多了 `sfx`
+- `set_track {track: 'sfx', hidden?, locked?}`：音效軌整軌靜音／鎖定
+- 文字：`font`（`sans` 黑體、`serif` 明體、`kai` 文楷、`round` 粉圓、`hei` 港式黑體）、`glow` 0~1、`glowColor`、`rotate`（度）
+- 形狀貼圖：`add_text {shape: rect | circle | arrow | line | bubble | star | heart, w, h, color（外框）, stroke（粗細）, fill, fillOpacity, ...}`；表情貼圖就是 `text` 放 emoji
+- 節拍偵測在音樂的屬性面板：每拍／每小節加標記（標籤 `♪`）、依小節切開主軌
