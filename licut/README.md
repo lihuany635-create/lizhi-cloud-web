@@ -90,3 +90,16 @@
 - 頁面內：`window.licut`（`run(ops, label)`、`op`、`project()`、`summary()`、`seek`、`play`、`pause`、`undo`、`redo`、`history()`、`on(fn)`）
 - 同網站外層頁面：`iframe.contentWindow.postMessage({licut: 'run', id, ops, label}, origin)`，回覆 `{licutReply: id, ok, result | error}`；指令另有 `summary`、`project`、`undo`、`redo`、`seek`、`play`、`pause`、`script`
 - 立剪裡的「腳本」面板：貼 JSON 操作陣列或 JavaScript
+
+畫面與調色（片段與子母畫面共用）：
+
+- `filters` 另有 `exposure` -3~3（檔）、`highlights`／`shadows` -1~1
+- `curves {master | r | g | b: [[x, y], …]}`：曲線，0~1，`null` 代表重設
+- `lut {id, intensity}`
+  - 內建 id：`bi:tealorange`、`bi:fade`、`bi:noir`、`bi:golden`、`bi:night`、`bi:film`、`bi:vivid`
+  - 匯入的 .cube 存在手機上，專案的 `luts` 只記名稱
+- `mask {shape: none | rect | ellipse, x, y, w, h, feather, invert}`：遮罩，座標以片段畫面為準（0~1）
+- `chroma {enabled, color, similarity, smooth, spill}`：色鍵去背
+- `blend`（子母畫面）：`normal`、`screen`、`multiply`、`add`、`lighten`、`darken`
+- 關鍵影格：`prop` 多了 `speed`（速度曲線）；`set_keyframe` 可加 `ease`（`ease`、`linear`、`in`、`out`、`hold`）
+- 轉場另有：`whipleft`、`whipright`、`spin`、`zoomblur`、`glitch`、`flash`、`blurfade`、`wipeup`、`doorway`
