@@ -1,8 +1,8 @@
 import {projectBackupFiles,validateExternalVersion} from './project-backup.mjs?v=28';
 import {prepareReturnedImage,saveReturnedImage,retainReturnedImage} from './returned-images.mjs?v=28';
 import {createIntegrationUI} from './integration-ui.mjs?v=28';
-import {createSourceFolders,sourceReference} from './source-folders.mjs?v=33';
-import {createSourceFolderUI} from './source-folder-ui.mjs?v=33';
+import {createSourceFolders,sourceReference} from './source-folders.mjs?v=34';
+import {createSourceFolderUI} from './source-folder-ui.mjs?v=34';
 import {createWorkspaceUI} from './workspace-ui.mjs?v=28';import {integrated,privateBridge} from './api-transport.mjs?v=28';
 import {createAccountUI} from './account-ui.mjs?v=28';
 import {createOriginalStore,directoryProject,imagePreview,projectImageLimit,browserImageBytes,validateDirectoryIndex} from './original-store.mjs?v=28';
@@ -186,15 +186,24 @@ async function previewExport(){
   if($('#previewConnect'))$('#previewConnect').onclick=()=>{try{privateBridge().connect();toast('請在新開的映構分頁允許連接，完成後切回這裡再按「傳送給助手」')}catch(e){toast(e.message,true)}};
   $('#confirmSendTask').onclick=()=>exclusiveHandoff(async()=>{
    if(p.id!==projectId)throw Error('專案已切換，請重新確認規格');
+   if(!(integrated()&&!privateBridge().connected()))await grantRunSources({spec:snapshot.spec});
    handoffPreflight(p,snapshot.spec);const run=makeRun();p.runs.unshift(run);changed();
    if(!await persist())throw Error('任務尚未保存，已停止傳送');
    $('#modal').close();showView('runs');
    if(integrated()&&!privateBridge().connected()){renderAll();toast('任務已建立；連接任務交接後，在這裡按「重試傳送」');return}
-   await sendRun(run);
+   toast('正在讀取原圖並傳送…');await sendRun(run);
    toast('已傳送給助手，尚待讀取；回到對話請助手處理此任務');
   });
   $('#confirmExport').onclick=async()=>{if(busy||p.id!==projectId)return;busy=true;$('#confirmExport').disabled=true;try{const run=makeRun();await exportRun(run,true);p.runs.unshift(run);changed();await persist();$('#modal').close();renderAll();toast('ZIP 備用包已下載')}catch(e){toast(e.message,true);$('#confirmExport').disabled=false}finally{busy=false;syncAssetToolbar()}};
  }catch(e){toast(e.message,true);if(validate(p).errors.length)checkSpec()}
+}
+function runSourceRoots(run){const versions=projectVersions(p);return (run?.spec?.references||[]).map(ref=>versions.find(v=>v.id===ref.asset_version_id)?.fs_ref?.root_id).filter(Boolean)}
+async function grantRunSources(run){
+ // 必須是點擊後的第一個等待：瀏覽器只在使用者操作當下允許跳出授權詢問
+ const ids=runSourceRoots(run);if(!ids.length||!sourceFolders.ensureAccess)return;
+ const {denied,missing}=await sourceFolders.ensureAccess(ids);
+ if(missing.length)throw Error('找不到原圖所在的資料夾記錄，請按「連接圖片資料夾」選回原圖位置');
+ if(denied.length)throw Error('沒有取得圖片資料夾的讀取權限；請再按一次並選「允許」，或按「連接圖片資料夾」重新選擇');
 }
 async function exclusiveHandoff(action){
  if(busy)return;workspaceUI.closePanels({restoreFocus:false});busy=true;blockProjectTransition(true);$('#runsView').inert=true;
@@ -215,8 +224,8 @@ function renderRuns(){
  $('#runCount').textContent=p.runs.length;
  $('#deletedTasksBtn').textContent='已刪除任務（'+deletedTasks(p).length+'）';
  $('#runList').innerHTML=taskListHTML(p,esc,outputInLibrary);
- document.querySelectorAll('[data-connect-source]').forEach(button=>button.onclick=()=>sourceFolderUI.choose());
- document.querySelectorAll('[data-send-task]').forEach(button=>button.onclick=()=>exclusiveHandoff(async()=>{await sendRun(assertTaskActive(p,button.dataset.sendTask));toast('任務已交接，請回到對話請助手處理')}));
+ document.querySelectorAll('[data-connect-source]').forEach(button=>button.onclick=async()=>{const run=allProjectRuns(p).find(r=>r.id===button.dataset.connectSource)||p.runs.find(r=>r.id===button.dataset.connectSource),ids=runSourceRoots(run);if(ids.length&&!busy){let result;try{result=await sourceFolders.ensureAccess(ids)}catch{result=null}if(result&&!result.missing.length){if(!result.denied.length){toast('已恢復圖片資料夾存取，請按「重試傳送」');return}toast('沒有恢復存取；再按一次並選「允許」，或到「圖片來源」按「重新連接」改選資料夾',true);return}}sourceFolderUI.choose()});
+ document.querySelectorAll('[data-send-task]').forEach(button=>button.onclick=()=>exclusiveHandoff(async()=>{const run=assertTaskActive(p,button.dataset.sendTask);await grantRunSources(run);toast('正在讀取原圖並傳送…');await sendRun(run);toast('任務已交接，請回到對話請助手處理')}));
  document.querySelectorAll('[data-import]').forEach(button=>button.onclick=()=>{try{assertTaskActive(p,button.dataset.import);outputRun=button.dataset.import;$('#outputInput').click()}catch(e){toast(e.message,true)}});
  document.querySelectorAll('[data-redownload]').forEach(button=>button.onclick=()=>exportRun(p.runs.find(run=>run.id===button.dataset.redownload)).catch(e=>toast(e.message,true)));
  document.querySelectorAll('[data-details]').forEach(button=>button.onclick=()=>{const run=p.runs.find(run=>run.id===button.dataset.details);modal('固定任務規格',`<p>後續修改畫布不會改變此規格。</p><p class="run-meta">任務：${esc(run.id)}${ownsHandoff(p,run)?`<br>交接編號：${esc(run.handoff.task_id)}`:''}<br>原始版本：${esc(run.spec.project_revision)}</p><pre>${esc(instructions(run.spec))}</pre><p>規格雜湊：${esc(run.spec_hash)}</p>`)});

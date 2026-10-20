@@ -15,7 +15,7 @@ export function createSourceFolders({getStore,scope=window,readTimeoutMs=15000,l
  async function root(id){if(!UUID.test(id||''))throw Error('資料夾來源無效');if(!roots.has(id)){const value=await store().getSetting('sourceRoot:'+id);if(value?.kind==='directory')roots.set(id,value)}const value=roots.get(id);if(!value)throw problem('請連接原圖所在的資料夾','source_permission');return value}
  const read=(run,label,signal)=>sourceRead(run,label,{signal,timeoutMs:readTimeoutMs});
  const readList=(run,label,signal)=>sourceRead(run,label,{signal,timeoutMs:listTimeoutMs});
- async function permission(handle,mode='read',signal){if(await read(()=>handle.queryPermission({mode}),'確認資料夾授權',signal)!=='granted')throw problem('圖片來源需要授權，請按「連接資料夾」選回原圖所在位置','source_permission')}
+ async function permission(handle,mode='read',signal){if(await read(()=>handle.queryPermission({mode}),'確認資料夾授權',signal)!=='granted')throw problem('圖片資料夾的授權已過期：再按一次「重試傳送」並選「允許」，或按「連接圖片資料夾」','source_permission')}
  async function at(handle,path,signal){let directory=handle;for(const name of sourcePath(path))directory=await read(()=>directory.getDirectoryHandle(name),'開啟資料夾 '+name,signal);return directory}
  async function restore(){const saved=await store().getSetting('sourceBrowserCurrent');if(saved&&UUID.test(saved.root_id||'')){const handle=await root(saved.root_id);current={root_id:saved.root_id,root_name:handle.name,path:sourcePath(saved.path||[])};return current}return null}
  async function choose(){
@@ -89,6 +89,8 @@ export function createSourceFolders({getStore,scope=window,readTimeoutMs=15000,l
  // 重新打開網站後授權常會回到「需要詢問」：直接對記住的資料夾要求授權，不必再走系統選擇器。必須在點擊事件中呼叫。
  async function permissionState(){if(!current)return 'none';try{const handle=await root(current.root_id);return await handle.queryPermission({mode:'read'})}catch{return 'none'}}
  async function regrant(){if(!current)return false;const handle=await root(current.root_id);return await handle.requestPermission({mode:'read'})==='granted'}
+ // 在按鈕點擊中呼叫：對任務用到的每個資料夾，授權過期就直接請使用者「允許」，不必重新選資料夾
+ async function ensureAccess(ids){const denied=[],missing=[];for(const id of [...new Set(ids)].filter(Boolean)){let handle;try{handle=await root(id)}catch{missing.push(id);continue}let state='prompt';try{state=await handle.queryPermission({mode:'read'})}catch{}if(state==='granted')continue;try{state=await handle.requestPermission({mode:'read'})}catch{state='denied'}if(state!=='granted')denied.push(id)}return {denied,missing}}
  async function currentFile(path){if(!current)throw Error('請先連接資料夾');return file({...current,path:sourcePath(path)})}
  async function createFolder(name){
   if(!current)throw Error('請先連接資料夾');name=String(name||'').trim();if(!validPart(name)||name.length>80)throw Error('資料夾名稱不可空白、包含斜線，或超過 80 字');
@@ -125,5 +127,5 @@ export function createSourceFolders({getStore,scope=window,readTimeoutMs=15000,l
   const saved=await (await directory.getFileHandle(name)).getFile();if(saved.size!==bytes.length||await hash(await saved.arrayBuffer())!==candidate.sha256)throw Error('回傳原圖寫入後校驗失敗');
   return {root_id:location.root_id,root_name:location.root_name,path:[...location.path,name]};
  }
- return {supported,restore,choose,bindRoot,navigate,listing,file,currentFile,createFolder,legacyFile,saveCandidate,permissionState,regrant,current:()=>current?{...current,path:[...current.path]}:null};
+ return {supported,restore,choose,bindRoot,navigate,listing,file,currentFile,createFolder,legacyFile,saveCandidate,permissionState,regrant,ensureAccess,current:()=>current?{...current,path:[...current.path]}:null};
 }
