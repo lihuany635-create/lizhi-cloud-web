@@ -156,3 +156,8 @@
 - 文字：`font`（`sans` 黑體、`serif` 明體、`kai` 文楷、`round` 粉圓、`hei` 港式黑體）、`glow` 0~1、`glowColor`、`rotate`（度）
 - 形狀貼圖：`add_text {shape: rect | circle | arrow | line | bubble | star | heart, w, h, color（外框）, stroke（粗細）, fill, fillOpacity, ...}`；表情貼圖就是 `text` 放 emoji
 - 節拍偵測在音樂的屬性面板：每拍／每小節加標記（標籤 `♪`）、依小節切開主軌
+
+### 特效與轉場（一鍵）
+- 轉場另有：`wipedown`、`slideup`、`slidedown`、`whipup`、`whipdown`、`zoomout`、`diamond`、`heart`、`blinds`、`squeeze`、`rgbsplit`、`lightleak`、`ripple`、`shake`、`blocks`、`dreamy`、`crosszoom`、`dipblack`、`pageturn`
+- `vfx {type, amount}`（片段、子母畫面）：動態特效，`null` 關閉。type：`shake` `glitch` `rgbsplit` `vhs` `oldfilm` `grain` `leak` `strobe` `soul` `breathe` `fisheye` `mirror` `kaleido` `split3` `pixelate` `rainbow` `posterize` `invert` `sketch` `cctv`
+- 「特效」分頁的一鍵動畫（入場／出場／強調／運鏡）、一鍵風格、轉場面板的無縫轉場，都是用 `set_keyframe`、`filters`、`lut`、`vfx`、`set_transition` 組合出來的
