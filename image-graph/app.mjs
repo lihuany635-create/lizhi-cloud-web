@@ -1,8 +1,8 @@
 import {projectBackupFiles,validateExternalVersion} from './project-backup.mjs?v=28';
 import {prepareReturnedImage,saveReturnedImage,retainReturnedImage} from './returned-images.mjs?v=28';
 import {createIntegrationUI} from './integration-ui.mjs?v=28';
-import {createSourceFolders,sourceReference} from './source-folders.mjs?v=28';
-import {createSourceFolderUI} from './source-folder-ui.mjs?v=28';
+import {createSourceFolders,sourceReference} from './source-folders.mjs?v=33';
+import {createSourceFolderUI} from './source-folder-ui.mjs?v=33';
 import {createWorkspaceUI} from './workspace-ui.mjs?v=28';import {integrated,privateBridge} from './api-transport.mjs?v=28';
 import {createAccountUI} from './account-ui.mjs?v=28';
 import {createOriginalStore,directoryProject,imagePreview,projectImageLimit,browserImageBytes,validateDirectoryIndex} from './original-store.mjs?v=28';
