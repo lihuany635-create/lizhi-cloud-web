@@ -32,3 +32,16 @@ document.querySelector('#workspaceSettings')?.addEventListener('toggle',watch);
 // 手機版的設定是底部面板，點面板外的暗色背景就關閉
 const menu=document.querySelector('#workspaceSettings');
 menu?.addEventListener('pointerdown',event=>{if(event.target===menu&&menu.open){event.preventDefault();menu.open=false}});
+
+// 嵌在立之雲端庫裡時標記，樣式會收起重複的「返回雲端庫」連結
+try{if(window.top!==window)document.documentElement.classList.add('ig-embedded')}catch{document.documentElement.classList.add('ig-embedded')}
+// 手機版交接列只留狀態與連接；「接續原入口專案」「連回原圖資料夾」改從設定進入
+function wireIntegrationShortcuts(){
+ for(const [proxy,target] of [['#settingsImportBtn','#integrationImport'],['#settingsRootsBtn','#integrationRoots']]){
+  const button=document.querySelector(proxy),real=document.querySelector(target);
+  if(!button||!real)continue;
+  button.hidden=false;button.onclick=()=>real.click();
+ }
+}
+wireIntegrationShortcuts();
+new MutationObserver((_,observer)=>{if(document.querySelector('#integrationImport')){wireIntegrationShortcuts();observer.disconnect()}}).observe(document.body,{childList:true,subtree:true});

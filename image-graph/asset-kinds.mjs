@@ -2,7 +2,8 @@ import {folderPath} from './asset-folders.mjs';
 
 // Explicit labels only; this is not visual recognition.
 export function inferredAssetKind(project,name,folderId=null){
- return /場景/.test(name)||folderPath(project,folderId).some(f=>/場景/.test(f.name))?'scene':'identity';
+ const labels=[name,...folderPath(project,folderId).map(f=>f.name)].join('/');
+ return /場景/.test(labels)?'scene':/動作|姿勢|姿態/.test(labels)?'pose':'identity';
 }
 
 export function setSceneDefaults(edge){

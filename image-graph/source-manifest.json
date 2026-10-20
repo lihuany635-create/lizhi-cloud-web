@@ -13,7 +13,7 @@
     },
     {
       "name": "app.mjs",
-      "sha256": "0212667704c6c2af7b90852a4d6e323091e60cc95a35e153452b896863a610ed"
+      "sha256": "ba15e7de06a549c3d98a4df88f4c1ac7fffb49175bc4c4fb1e8f1709a4a08e22"
     },
     {
       "name": "asset-actions.mjs",
@@ -25,7 +25,7 @@
     },
     {
       "name": "asset-kinds.mjs",
-      "sha256": "a44582b28fdef6f122b9157467f799632c7d3ddff6155b4310a22061c81c055a"
+      "sha256": "e8cf83db815a60487685a9d6faae3e39f8b23f8c7695f75f47d8ee599966da14"
     },
     {
       "name": "bridge-client.mjs",
@@ -49,7 +49,7 @@
     },
     {
       "name": "core.mjs",
-      "sha256": "e0149b3a9ade486a1b4064e236c56535dfa7e7db983ada847783e776a4bd02cb"
+      "sha256": "75a32ef17ea1288ba4fe1d5cd1bf27de5a6ef98c140da91874e67c34f736e413"
     },
     {
       "name": "device-folder-ui.mjs",
@@ -73,7 +73,7 @@
     },
     {
       "name": "index.html",
-      "sha256": "15bf782727da39af810a84333189db01ea56c581fcc56c6c3cb88bc858b60fa5"
+      "sha256": "f19ba42aba49a27753630d2adec96b9a910b67b80f4445bb235a3aeb51360f67"
     },
     {
       "name": "integration-projects.mjs",
@@ -113,7 +113,7 @@
     },
     {
       "name": "settings-status.mjs",
-      "sha256": "5123ff01d609eff7dfae2f4fa35608d15e84e03d1362452efbe3e6961570752d"
+      "sha256": "9cdd9ec0e8a8144d210caf352b890f99a987ca1b85a694860470aaff90b0d938"
     },
     {
       "name": "source-folder-ui.mjs",
@@ -129,7 +129,7 @@
     },
     {
       "name": "style.css",
-      "sha256": "9216854cb5c7e478b60c3662f1d316312de2da59a46487caeecbc0915ba6d3db"
+      "sha256": "270080d12ebe577a17970285c81a9a2c7986e5e737c153398e62988968782089"
     },
     {
       "name": "task-actions.mjs",

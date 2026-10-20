@@ -80,3 +80,16 @@ summary:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}.settings
  .settings-section>button,.settings-advanced>button{min-height:52px}
 }
 .settings-panel .settings-section>button#accountBtn,.settings-panel .settings-section>button#helpBtn{padding:10px 8px;font-size:inherit}
+
+/* ── v30：手機畫布空間與嵌入雲端庫 ── */
+.ig-embedded .integration-bar a[target="_top"]{display:none}
+@media(max-width:600px){
+ .integration-bar{flex-wrap:nowrap;gap:8px;padding:6px 12px}
+ .integration-bar>span:first-child{display:none}
+ .integration-bar #integrationStatus{flex:1;min-width:0;flex-basis:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+ .integration-bar #integrationImport,.integration-bar #integrationRoots{display:none}
+ .integration-bar #integrationConnect{flex:none;min-height:36px;padding:6px 10px;font-size:12px}
+ .canvas-heading{padding-top:8px!important;padding-bottom:8px!important;align-items:center}
+ .canvas-heading .eyebrow,.canvas-heading p{display:none}
+ .canvas-heading h1{font-size:18px!important;margin:0!important}
+}
