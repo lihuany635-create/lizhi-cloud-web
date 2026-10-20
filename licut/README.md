@@ -108,3 +108,13 @@
 
 - 片段、子母畫面、音樂都能加：`eq {low, mid, high}`（dB，-15~15）、`denoise`（0~1，頻譜降噪）、`norm`（標準化補償 dB）、`muted`
 - `set_mix {main?, overlay?, music?, master?, muted?: {main?, overlay?, music?}, limiter?}`：混音台（各軌與總音量 0~4、靜音、限制器）
+
+字幕系統：
+
+- 多語字幕軌：`add_caption_track {name, lang, copyFrom?, keepText?}` → `{track}`、`update_caption_track {track, name?, lang?, visible?}`、`remove_caption_track {track}`
+- `set_captions`、`add_caption`、`clear_captions`、`set_caption_style` 可加 `track`（主字幕是 `main`）；`update_caption`／`remove_caption` 會在所有軌找
+- 逐字字幕：字幕可帶 `words: [[start, end, 字], …]`；`set_caption_style {mode: normal | karaoke | typewriter, hiColor, anim: none | fade | pop | slideup}`
+- 文字動畫：`add_text`／`update_text` 的 `anim {in, out, dur}`
+  - `in`：none、fade、pop、slideup、slideleft、zoom、typewriter
+  - `out`：none、fade、slidedown、shrink
+- SRT／VTT 匯入匯出在立剪的字幕面板
