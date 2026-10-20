@@ -1,4 +1,4 @@
-const CACHE="lizhi-cloud-v97";
+const CACHE="lizhi-cloud-v98";
 const FILES=[
   // BEGIN IMAGE GRAPH ASSETS
   "image-graph/?v=35",

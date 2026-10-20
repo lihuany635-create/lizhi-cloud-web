@@ -51,9 +51,10 @@
       return null;
     }
     currentUser = user;
-    mountAccountControl(user);
     return user;
   }
 
-  window.LizhiAuth = { client, allowedEmail: ALLOWED_EMAIL, requireUser, get user() { return currentUser; } };
+  // 右上角的帳號／登出按鈕已拿掉（會擋到畫面）；需要登出時可呼叫 LizhiAuth.signOut()
+  const signOut = () => { disconnectWorkbenches(); return client.auth.signOut().then(() => location.reload()); };
+  window.LizhiAuth = { client, allowedEmail: ALLOWED_EMAIL, requireUser, signOut, get user() { return currentUser; } };
 })();
