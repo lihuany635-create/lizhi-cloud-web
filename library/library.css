@@ -82,3 +82,11 @@ body.library-reading{overflow:hidden}
   .lib-viewer{padding:.6rem}
   .lib-reader-bar .button{padding:.4rem .6rem;font-size:.85rem}
 }
+.library-storage{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .7rem;padding:.75rem .9rem;border:1px solid var(--line,#d8d3c8);border-radius:12px;background:rgba(255,255,255,.6)}
+.library-storage>span{font-weight:700}
+.library-storage small{flex-basis:100%;color:var(--muted,#6f6a60);line-height:1.6}
+.library-storage.ok{border-color:#9cc3a9;background:#eef6f0}
+.library-storage.warn{border-color:#e0c27a;background:#fbf3df}
+.library-storage-actions{display:flex;flex-wrap:wrap;gap:.45rem;flex-basis:100%}
+.library-storage .button{padding:.45rem .75rem;font-size:.88rem}
+.library-uploads li.moving span{color:#8a6a28}.library-uploads li.moved span{color:#26734d}

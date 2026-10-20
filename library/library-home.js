@@ -2,7 +2,7 @@
 (function(global){
   "use strict";
 
-  const STAGE={extract:"讀取內容",upload:"上傳中",save:"登記中",done:"已放進待整理",error:"失敗"};
+  const STAGE={extract:"讀取內容",upload:"存檔中",save:"登記中",done:"已放進待整理",moving:"搬到手機中",moved:"已搬到手機",error:"失敗"};
   const TIME_RANGES=[["","全部時間"],["7","最近 7 天"],["30","最近 30 天"],["365","最近一年"]];
   const SORTS=[["new","最新上傳"],["organized","最近整理"],["title","書名"]];
   const TEXT_EXT=/\.(txt|md|markdown|csv|tsv|json|html?|xml|ya?ml|log|js|ts|py|css|sql)$/i;
@@ -27,6 +27,9 @@
   const isText=item=>(item.mime||"").startsWith("text/")||TEXT_EXT.test(item.file_name);
   const icon=item=>isImage(item)?"▧":isPdf(item)?"▤":/\.(xlsx?|ods|csv|tsv)$/i.test(item.file_name)?"▦":/\.pptx?$/i.test(item.file_name)?"▭":"▤";
   const find=id=>items.find(item=>item.id===id);
+  const dev=()=>global.LibraryDevice;
+  const deviceReady=()=>dev()?.status==="ready";
+  const onDevice=item=>item.location==="device";
   const toast=message=>typeof global.toast==="function"?global.toast(message):typeof window.toast==="function"?window.toast(message):alert(message);
 
   function highlight(text){
@@ -90,18 +93,64 @@
   }
 
   async function uploadFiles(files){
-    const batchNote=note;
+    const batchNote=note,target=deviceReady()?"device":"cloud";
     const jobs=[...files].map(file=>({name:file.name,stage:"extract",error:"",file}));
     uploads=[...jobs,...uploads].slice(0,30);rerender();
     for(const job of jobs){
       try{
-        const row=await global.LibraryStore.upload(job.file,{note:batchNote,onStage:stage=>{job.stage=stage;rerender();}});
+        const row=await global.LibraryStore.upload(job.file,{note:batchNote,target,onStage:stage=>{job.stage=stage;rerender();}});
         items=[row,...items];job.stage="done";
       }catch(err){job.stage="error";job.error=err.message;}
       delete job.file;rerender();
     }
     note="";schedulePoll();rerender();
-    setTimeout(()=>{uploads=uploads.filter(job=>job.stage!=="done");rerender();},8000);
+    clearDoneLater();
+  }
+
+  function clearDoneLater(){setTimeout(()=>{uploads=uploads.filter(job=>!["done","moved"].includes(job.stage));rerender();},8000);}
+
+  async function runJobs(jobs,work){
+    uploads=[...jobs,...uploads].slice(0,40);rerender();
+    for(const job of jobs){
+      try{await work(job);}catch(err){job.stage="error";job.error=err.message;}
+      rerender();
+    }
+    schedulePoll();clearDoneLater();rerender();
+  }
+
+  // 手機資料夾裡有、圖書館還沒登記的檔案加進來（例如用檔案管理員直接丟進資料夾的）
+  async function syncFolder(){
+    let names;
+    try{names=await dev().list();}catch(err){alert(err.message);rerender();return;}
+    const known=new Set(items.filter(onDevice).map(item=>item.device_path));
+    const fresh=names.filter(name=>!known.has(name));
+    if(!fresh.length){toast("資料夾裡沒有新的檔案");rerender();return;}
+    await runJobs(fresh.map(name=>({name,stage:"extract",error:""})),async job=>{
+      const row=await global.LibraryStore.register(job.name,{onStage:stage=>{job.stage=stage;rerender();}});
+      items=[row,...items];job.stage="done";
+    });
+  }
+
+  async function moveAllToDevice(){
+    const cloud=items.filter(item=>!onDevice(item));
+    if(!cloud.length)return;
+    if(!confirm(`把雲端的 ${cloud.length} 本搬到手機資料夾「${dev().name}」？搬完後雲端只留文字與摘要，原檔只在這支手機上。`))return;
+    await runJobs(cloud.map(item=>({name:item.file_name,stage:"moving",error:"",id:item.id})),async job=>{
+      const row=await global.LibraryStore.moveToDevice(find(job.id));
+      items=items.map(entry=>entry.id===row.id?row:entry);job.stage="moved";
+    });
+  }
+
+  function storagePanel(){
+    const d=dev();
+    if(!d||d.status==="loading")return "";
+    const cloudCount=items.filter(item=>!onDevice(item)).length;
+    if(d.status==="unsupported")return `<div class="library-storage"><span>☁ 檔案存在雲端</span><small>這個瀏覽器不能存到手機資料夾；Android 請用 Chrome 132 以上。</small></div>`;
+    if(d.status==="none")return `<div class="library-storage"><span>☁ 檔案目前存在雲端</span><button class="button" data-library-link>改存到手機資料夾</button><small>選一個手機資料夾（例如「文件／立之圖書館」），之後上傳的檔案都放那裡，雲端只留文字與摘要。</small></div>`;
+    if(d.status==="needs-permission")return `<div class="library-storage warn"><span>📱 手機資料夾「${esc(d.name)}」</span><button class="button primary" data-library-grant>允許存取</button><small>重新打開網站後，要點一下允許才能讀寫資料夾。</small></div>`;
+    return `<div class="library-storage ok"><span>📱 檔案存在手機資料夾「${esc(d.name)}」</span>
+      <div class="library-storage-actions"><button class="button" data-library-sync>同步資料夾</button>${cloudCount?`<button class="button" data-library-move>把雲端的 ${cloudCount} 本搬到手機</button>`:""}<button class="button" data-library-link>更換資料夾</button></div>
+      <small>也可以用檔案管理員把檔案直接放進這個資料夾，再按「同步資料夾」。</small></div>`;
   }
 
   function card(item){
@@ -114,7 +163,7 @@
       ${item.summary?`<p class="library-summary">${highlight(item.summary)}</p>`:inbox?`<p class="library-hint">${esc(item.extract_note||"等整理後會寫上摘要與重點")}</p>`:""}
       ${snippet&&query()?`<p class="library-snippet">…${highlight(snippet)}…</p>`:""}
       ${item.tags?.length?`<div class="meta">${item.tags.map(tag=>`<span class="chip">${highlight(tag)}</span>`).join("")}</div>`:""}
-      <p class="library-meta">${bytes(item.size||0)} · ${day(item.created_at)}${item.key_points?.length?` · ${item.key_points.length} 個重點`:""}</p>
+      <p class="library-meta">${onDevice(item)?"📱":"☁"} ${bytes(item.size||0)} · ${day(item.created_at)}${item.key_points?.length?` · ${item.key_points.length} 個重點`:""}</p>
     </article>`;
   }
 
@@ -169,9 +218,10 @@
 
     return `${header}<section class="section library-section">
       <div class="library-intake">
+        ${storagePanel()}
         <div class="dropzone library-drop" data-library-drop role="button" tabindex="0">
           <strong>${busy?"正在上傳…":"把檔案放進圖書館"}</strong>
-          <small>點這裡選檔案或拖曳進來 · PDF、Word、Excel、PowerPoint、文字檔、圖片 · 單檔 50 MB</small>
+          <small>點這裡選檔案或拖曳進來 · PDF、Word、Excel、PowerPoint、文字檔、圖片${deviceReady()?" · 存到手機資料夾":" · 雲端單檔 50 MB"}</small>
         </div>
         <label class="library-note-field"><span>給 Claude 的備註（選填，套用到這批檔案）</span><input data-library-batch-note maxlength="500" placeholder="例如：這些是土木施工課的講義" value="${esc(note)}"></label>
         ${uploadList()}
@@ -204,7 +254,7 @@
         ${item.tags?.length?`<h3>標籤</h3><div class="meta">${item.tags.map(tag=>`<button class="chip" data-library-tag-jump="${esc(tag)}">${esc(tag)}</button>`).join("")}</div>`:""}
         ${related.length?`<h3>相關的書</h3><ul class="lib-related">${related.map(book=>`<li><button data-library-read="${esc(book.id)}"><span>${icon(book)}</span>${esc(titleOf(book))}</button></li>`).join("")}</ul>`:""}
         <h3>檔案</h3>
-        <p class="lib-file-meta">${esc(item.file_name)}<br>${bytes(item.size||0)} · ${day(item.created_at)} 上傳${item.organized_at?` · ${day(item.organized_at)} 整理`:""}</p>
+        <p class="lib-file-meta">${onDevice(item)?`📱 手機資料夾裡的「${esc(item.device_path)}」`:`☁ 雲端：${esc(item.file_name)}`}<br>${bytes(item.size||0)} · ${day(item.created_at)} 上傳${item.organized_at?` · ${day(item.organized_at)} 整理`:""}</p>
         <p class="lib-note">${item.user_note?`備註：${esc(item.user_note)}`:"還沒有備註"}</p>
         <div class="lib-info-actions">
           <button class="button" data-library-note="${esc(item.id)}">${item.user_note?"改備註":"加備註"}</button>
@@ -218,7 +268,7 @@
           <button class="icon-button" data-reader-close aria-label="返回圖書館">‹</button>
           <h2>${esc(titleOf(item))}</h2>
           <button class="button" data-reader-ask title="複製問句，貼給 Claude">問這本書</button>
-          <button class="button" data-reader-download>下載</button>
+          ${onDevice(item)?"":`<button class="button" data-reader-download>下載</button>`}
         </header>
         <nav class="lib-reader-tabs"><button data-reader-tab="content" class="${tab==="content"?"active":""}">內容</button><button data-reader-tab="info" class="${tab==="info"?"active":""}">摘要與重點</button></nav>
         <div class="lib-reader-body">
@@ -236,7 +286,27 @@
       document.body.append(root);document.body.classList.add("library-reading");
       root.querySelector("[data-reader-close]").focus();
       const mine=++version;
-      const viewer=root.querySelector("[data-reader-viewer]");
+      await renderContent(item,root.querySelector("[data-reader-viewer]"),mine);
+    }
+
+    async function showExcerpt(item,viewer,mine,lead){
+      const data=await global.LibraryStore.detail(item.id);if(mine!==version)return;
+      viewer.innerHTML=data.text_excerpt
+        ?`<p class="lib-viewer-note">${lead}</p><pre class="lib-text">${esc(data.text_excerpt)}</pre>`
+        :`<div class="lib-viewer-status">${lead}<br>這個檔案沒有可顯示的文字${data.extract_note?`（${esc(data.extract_note)}）`:""}。</div>`;
+    }
+
+    async function renderContent(item,viewer,mine){
+      if(onDevice(item)&&!deviceReady()){
+        const d=dev();
+        if(d?.status==="needs-permission"){
+          viewer.innerHTML=`<div class="lib-viewer-status">這本書存在手機資料夾「${esc(d.name)}」。<br><button class="button primary" data-reader-grant>允許讀取資料夾</button></div>`;
+          return;
+        }
+        try{await showExcerpt(item,viewer,mine,"原檔存在手機資料夾裡，這台裝置看不到；下面是抽出的文字。");}
+        catch(err){if(mine===version)viewer.innerHTML=`<div class="lib-viewer-status">打不開：${esc(err.message)}</div>`;}
+        return;
+      }
       try{
         if(isImage(item)){
           const url=await global.LibraryStore.openUrl(item);if(mine!==version)return;
@@ -248,13 +318,10 @@
           const text=await (await fetch(url)).text();if(mine!==version)return;
           viewer.innerHTML=`<pre class="lib-text">${esc(text.slice(0,500000))}</pre>`;
         }else{
-          const data=await global.LibraryStore.detail(item.id);if(mine!==version)return;
-          viewer.innerHTML=data.text_excerpt
-            ?`<p class="lib-viewer-note">這是從檔案抽出的文字，原本的排版請按「下載」查看。</p><pre class="lib-text">${esc(data.text_excerpt)}</pre>`
-            :`<div class="lib-viewer-status">這個檔案沒有可顯示的文字${data.extract_note?`（${esc(data.extract_note)}）`:""}，請按「下載」打開。</div>`;
+          await showExcerpt(item,viewer,mine,onDevice(item)?"這是從檔案抽出的文字；原本的排版請用檔案管理員打開手機資料夾裡的原檔。":"這是從檔案抽出的文字，原本的排版請按「下載」查看。");
         }
       }catch(err){
-        if(mine===version)viewer.innerHTML=`<div class="lib-viewer-status">打不開：${esc(err.message)}<br>可以按「下載」改用其他 App 開啟。</div>`;
+        if(mine===version)viewer.innerHTML=`<div class="lib-viewer-status">打不開：${esc(err.message)}${onDevice(item)?"":"<br>可以按「下載」改用其他 App 開啟。"}</div>`;
       }
     }
 
@@ -283,6 +350,11 @@
       viewer.querySelectorAll(".lib-page").forEach(box=>observer.observe(box));
     }
 
+    async function grantAndReload(){
+      try{if(await dev().grant()){rerender();const item=find(currentId);if(item&&root)await renderContent(item,root.querySelector("[data-reader-viewer]"),++version);}}
+      catch(err){alert(err.message);}
+    }
+
     function refreshInfo(){
       if(!root)return;
       const item=find(currentId);
@@ -305,7 +377,7 @@
 
     function setTab(next){tab=next;if(!root)return;root.className=`lib-reader tab-${tab}`;root.querySelectorAll("[data-reader-tab]").forEach(el=>el.classList.toggle("active",el.dataset.readerTab===tab));}
 
-    return {open,close,refreshInfo,ask,download,setTab,get id(){return currentId;},get element(){return root;}};
+    return {open,close,refreshInfo,ask,download,setTab,grantAndReload,get id(){return currentId;},get element(){return root;}};
   })();
 
   async function editNote(id){
@@ -318,7 +390,8 @@
 
   async function deleteItem(id){
     const item=find(id);if(!item)return;
-    if(!confirm(`確定要從圖書館刪除「${titleOf(item)}」？檔案會一起刪除。`))return;
+    if(!confirm(`確定要從圖書館刪除「${titleOf(item)}」？${onDevice(item)?"手機資料夾裡的原檔也會一起刪除。":"雲端的檔案會一起刪除。"}`))return;
+    if(onDevice(item)&&!deviceReady()&&dev()?.status==="needs-permission"&&!(await dev().grant().catch(()=>false))){alert("需要允許存取手機資料夾才能刪除原檔");return;}
     try{await global.LibraryStore.remove(item);items=items.filter(entry=>entry.id!==item.id);if(Reader.id===item.id)Reader.close();rerender();}
     catch(err){alert(err.message);}
   }
@@ -326,7 +399,7 @@
   function onClick(event){
     const el=event.target.closest("[data-library-drop],[data-library-read],button");if(!el)return;
     const stop=()=>{event.preventDefault();event.stopImmediatePropagation();};
-    if(el.matches("[data-library-drop]")||el.dataset.action==="upload-library"){stop();fileInput.click();return;}
+    if(el.matches("[data-library-drop]")||el.dataset.action==="upload-library"){stop();if(dev()?.status==="needs-permission"){dev().grant().then(ok=>{rerender();if(ok)toast("已允許，再點一次選檔案");}).catch(err=>alert(err.message));return;}fileInput.click();return;}
     if(el.hasAttribute("data-library-refresh")){stop();load({force:true});return;}
     if(el.dataset.libraryRead){stop();Reader.open(el.dataset.libraryRead);return;}
     if(el.dataset.libraryShelf!==undefined){stop();shelfFilter=el.dataset.libraryShelf;rerender();return;}
@@ -334,6 +407,11 @@
     if(el.dataset.libraryNote){stop();editNote(el.dataset.libraryNote);return;}
     if(el.dataset.libraryDelete){stop();deleteItem(el.dataset.libraryDelete);return;}
     if(el.hasAttribute("data-reader-close")){stop();Reader.close();return;}
+    if(el.hasAttribute("data-reader-grant")){stop();Reader.grantAndReload();return;}
+    if(el.hasAttribute("data-library-link")){stop();dev().link().then(name=>{toast(`之後的檔案會存到「${name}」`);rerender();}).catch(err=>{if(err?.name!=="AbortError")alert(err.message);});return;}
+    if(el.hasAttribute("data-library-grant")){stop();dev().grant().then(()=>rerender()).catch(err=>alert(err.message));return;}
+    if(el.hasAttribute("data-library-sync")){stop();syncFolder();return;}
+    if(el.hasAttribute("data-library-move")){stop();moveAllToDevice();return;}
     if(el.hasAttribute("data-reader-ask")){stop();Reader.ask();return;}
     if(el.hasAttribute("data-reader-download")){stop();Reader.download();return;}
     if(el.dataset.readerTab){stop();Reader.setTab(el.dataset.readerTab);}
@@ -341,6 +419,7 @@
 
   function installEvents(root){
     document.body.append(fileInput);
+    global.LibraryDevice?.init().then(()=>rerender());
     fileInput.addEventListener("change",()=>{if(fileInput.files.length)uploadFiles(fileInput.files);fileInput.value="";});
 
     root.addEventListener("click",onClick,true);

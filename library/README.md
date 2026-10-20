@@ -8,10 +8,22 @@ Claude 每天自動讀過，取書名、寫摘要與重點、貼標籤、排上�
 | Storage bucket `lizhi-library`（私有） | 網頁 | 檔案本體，路徑 `<user_id>/<item_id>.<副檔名>`，單檔 50 MB |
 | `lizhi_library_items` 上傳欄位 | 網頁 | `file_name`、`mime`、`size`、`text_excerpt`（瀏覽器抽出的文字，最多 6 萬字）、`thumb`（圖片縮圖 JPEG data URL）、`extract_status`、`extract_note`、`user_note`（使用者給 Claude 的備註） |
 | `lizhi_library_items` 整理欄位 | Claude | `status`、`shelf`、`title`、`summary`、`key_points`、`tags`、`related_ids`、`organized_at`、`organized_by` |
+| 手機資料夾（使用者自選） | 網頁 | 連結資料夾後的檔案本體；`location = 'device'`、`device_path` 是資料夾裡的檔名，`storage_path` 為空 |
 | `lizhi_library_search(q)` | — | 內文搜尋，回傳 `id` 與命中片段；網站搜尋框使用 |
 
 資料表與 bucket 由 `supabase/migrations/008_lizhi_library.sql`、`009_lizhi_library_v2.sql` 建立，權限只開給核准的帳號。
 網頁在有待整理的書時每 30 秒重新讀一次。
+
+### 手機資料夾
+
+在 Android 版 Chrome 132 以上（或桌面版 Chrome／Edge）可以按「改存到手機資料夾」選一個資料夾，
+之後上傳的檔案寫進那個資料夾，雲端只留抽出的文字、縮圖與整理結果（`010_lizhi_library_device.sql`）。
+資料夾授權存在那台裝置的瀏覽器裡，重新打開網站時可能要點一下「允許存取」。
+
+- **同步資料夾**：把用檔案管理員直接放進資料夾、還沒登記的檔案加進圖書館（只看第一層）。
+- **把雲端的 N 本搬到手機**：下載雲端原檔寫進資料夾，再刪掉雲端那份，騰出雲端空間。
+- 其他裝置打不開手機上的原檔，閱讀器會改顯示抽出的文字。
+- Claude 整理時本來就只讀雲端的 `text_excerpt` 與 `thumb`，所以檔案存手機不影響自動整理。
 
 文字抽取在瀏覽器裡完成：PDF（pdf.js，最多 30 頁，每頁前面標「［第 N 頁］」）、Word `.docx`（mammoth）、
 Excel／`.ods`（SheetJS）、PowerPoint `.pptx`（JSZip，每張前面標「［投影片 N］」）、純文字類檔案直接讀。
