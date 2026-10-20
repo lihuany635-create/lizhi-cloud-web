@@ -5,9 +5,9 @@ import {apiFetch} from './api-transport.mjs?v=28';
 
 export const HANDOFF_LIMITS={imageBytes:10*1024*1024,totalBytes:24*1024*1024,references:8};
 export async function handoffRequest(path,options={}){
- const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),45000);
+ const {timeoutMs=45000,...rest}=options;options=rest;const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
  try{
-  const response=await apiFetch('/api/handoff/'+path,{...options,credentials:'same-origin',cache:'no-store',redirect:'error',signal:controller.signal});
+  const response=await apiFetch('/api/handoff/'+path,{...options,timeoutMs,credentials:'same-origin',cache:'no-store',redirect:'error',signal:controller.signal});
   if(!response.ok){let message='任務交接失敗（'+response.status+'）';try{message=(await response.json()).error||message}catch{}throw Object.assign(Error(message),{status:response.status})}
   if(options.binary)return response;
   if(!response.headers.get('Content-Type')?.includes('application/json'))throw Error('登入狀態需要更新，請從「帳號」重新登入後重試');
@@ -53,7 +53,10 @@ export async function copyHistoricalRun(project,run){
  const spec={...structuredClone(run.spec),project_id:project.id,project_revision:project.revision??0};
  return {id:uid(),created_at:new Date().toISOString(),spec,spec_hash:await hash(stable(spec)),status:'awaiting_import',outputs:[],copied_from:{project_id:run.spec.project_id,run_id:run.id,spec_hash:run.spec_hash}};
 }
-export async function sendHandoffTask({project,run,readOriginal,save,request=handoffRequest}){
+// 上傳時間依檔案大小放寬：以最慢約 64 KiB/s（手機訊號差時）估算，另加 45 秒基本等待
+export const uploadTimeout=bytes=>45000+Math.ceil(bytes/(64*1024))*1000;
+const mib=bytes=>(bytes/1048576).toFixed(1)+' MiB';
+export async function sendHandoffTask({project,run,readOriginal,save,request=handoffRequest,onProgress=()=>{}}){
  assertTaskActive(project,run.id);
  if(run.spec.project_id!==project.id)throw Error('這是原專案的歷史快照，請建立本專案的新任務後傳送');
  handoffPreflight(project,run.spec);
@@ -72,7 +75,9 @@ export async function sendHandoffTask({project,run,readOriginal,save,request=han
   if(existing){const remote=await reconcileHandoff({project,run,save,request});if(remote)return remote}
   const images=new Map();let total=0;
   // Verify every required original before uploading any. Thumbnails never substitute.
+  let index=0;
   for(const ref of refs){
+   index++;onProgress({phase:'read',done:index,total:refs.length});
    const version=project.versions.find(v=>v.id===ref.asset_version_id);
    if(!version||version.sha256!==ref.sha256||version.mime!==ref.mime)throw Error('固定參考版本遺失或不符');
    if(images.has(ref.sha256))continue;
@@ -82,7 +87,9 @@ export async function sendHandoffTask({project,run,readOriginal,save,request=han
    total+=data.length;if(total>HANDOFF_LIMITS.totalBytes)throw Error('每個交接任務的參考圖合計最多 24 MiB，請減少參考圖');
    images.set(ref.sha256,{data,mime:ref.mime});
   }
-  for(const [sha,image] of images)await request('images/'+sha,{method:'PUT',headers:{'Content-Type':image.mime},body:image.data});
+  let sent=0;
+  for(const [sha,image] of images){sent++;onProgress({phase:'upload',done:sent,total:images.size,bytes:image.data.length,size:mib(image.data.length),total_size:mib(total)});await request('images/'+sha,{method:'PUT',headers:{'Content-Type':image.mime},body:image.data,timeoutMs:uploadTimeout(image.data.length)})}
+  onProgress({phase:'task',done:images.size,total:images.size});
   const result=await request('tasks',jsonOptions('POST',{run_id:h.task_id,spec_hash:run.spec_hash,spec:run.spec}));
   if(result.id!==h.task_id||result.spec_hash!==run.spec_hash||result.status!=='received')throw Error('任務交接回應與固定規格不符');
   h.status='received';h.sent_at??=new Date().toISOString();delete h.error;await saved(save);

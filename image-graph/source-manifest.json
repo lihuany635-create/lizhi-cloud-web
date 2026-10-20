@@ -13,7 +13,7 @@
     },
     {
       "name": "app.mjs",
-      "sha256": "b7b5007a0a00d23bf12cc3d30568a24d3b31370e6675d88689e50fa96488bcb4"
+      "sha256": "5e2a1f101a31e7a046388bb8178d553fb5ff83b03c7a6e0d6dd90573be60a87e"
     },
     {
       "name": "asset-actions.mjs",
@@ -29,7 +29,7 @@
     },
     {
       "name": "bridge-client.mjs",
-      "sha256": "03030e86080a8d671b147103ff3737e4069a2808d8d702f29f50724b5f146903"
+      "sha256": "151c58db06e7887f01a88b80d6871f0e618dbd1bf3f97b1189e34b6fbbd65cf2"
     },
     {
       "name": "bridge-navigation.mjs",
@@ -65,7 +65,7 @@
     },
     {
       "name": "handoff.mjs",
-      "sha256": "836875bd0dc0ef8d4a68e453ff50a5ffbb0d683c0c43cfcda4fcea8e6ff81709"
+      "sha256": "c5072d7353fa263c7aaa228d1ac42629443b416a537b43e76bb266287a28182f"
     },
     {
       "name": "image-input.mjs",
@@ -73,7 +73,7 @@
     },
     {
       "name": "index.html",
-      "sha256": "1e19066c17d8e9d263208393269b6495d79426ec881ae404fc7775fbbb2271cc"
+      "sha256": "d87361bff64583a8be580028fec2b55a2621e2c7d3f8e01401906846bf0b43e8"
     },
     {
       "name": "integration-projects.mjs",

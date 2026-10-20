@@ -37,12 +37,12 @@ export function createBridgeClient({backendOrigin,scope=window,timeoutMs=60000})
   update();if(scope.setInterval)watch=scope.setInterval(check,1500);
   return popup;
  }
- function request(action,fields={},signal){
+ function request(action,fields={},signal,waitMs=timeoutMs){
   check();
   if(!status())return Promise.reject(Error('請先按「連接私人交接」，並在映構視窗允許連線'));
   if(signal?.aborted)return Promise.reject(new DOMException('已取消','AbortError'));
   const id=crypto.randomUUID();return new Promise((resolve,reject)=>{
-   const timer=setTimeout(()=>finish(reject,Error('私人交接逾時，請確認連接視窗仍開啟後重試')),timeoutMs);
+   const timer=setTimeout(()=>finish(reject,Error('私人交接逾時，請確認連接視窗仍開啟後重試')),waitMs);
    const abort=()=>finish(reject,new DOMException('已取消','AbortError'));
    function finish(fn,value){clearTimeout(timer);signal?.removeEventListener('abort',abort);pending.delete(id);fn(value)}
    pending.set(id,{resolve:value=>finish(resolve,value),reject:error=>finish(reject,error)});signal?.addEventListener('abort',abort,{once:true});
@@ -50,7 +50,7 @@ export function createBridgeClient({backendOrigin,scope=window,timeoutMs=60000})
   });
  }
  async function fetcher(path,options={}){
-  const h=new Headers(options.headers),result=await request('api',{path,method:options.method||'GET',body:options.body,contentType:h.get('Content-Type')||undefined},options.signal);
+  const h=new Headers(options.headers),result=await request('api',{path,method:options.method||'GET',body:options.body,contentType:h.get('Content-Type')||undefined},options.signal,Math.max(timeoutMs,(options.timeoutMs||0)+15000));
   return new Response(result.body,{status:result.status,headers:result.headers});
  }
  scope.addEventListener('focus',check);scope.addEventListener('pageshow',check);
