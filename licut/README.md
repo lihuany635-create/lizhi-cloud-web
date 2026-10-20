@@ -159,5 +159,5 @@
 
 ### 特效與轉場（一鍵）
 - 轉場另有：`wipedown`、`slideup`、`slidedown`、`whipup`、`whipdown`、`zoomout`、`diamond`、`heart`、`blinds`、`squeeze`、`rgbsplit`、`lightleak`、`ripple`、`shake`、`blocks`、`dreamy`、`crosszoom`、`dipblack`、`pageturn`
-- `vfx {type, amount}`（片段、子母畫面）：動態特效，`null` 關閉。type：`shake` `glitch` `rgbsplit` `vhs` `oldfilm` `grain` `leak` `strobe` `soul` `breathe` `fisheye` `mirror` `kaleido` `split3` `pixelate` `rainbow` `posterize` `invert` `sketch` `cctv`
+- `vfx {type, amount}`（片段、子母畫面）：動態特效，`null` 關閉。type：`shake` `glitch` `rgbsplit` `vhs` `oldfilm` `grain` `leak` `strobe` `soul` `breathe` `fisheye` `mirror` `kaleido` `split3` `pixelate` `rainbow` `posterize` `invert` `sketch` `cctv`，趣味：`snow` `hearts` `sparkles` `confetti` `rain` `tiktok` `tvonoff` `camcorder` `letterbox` `spotlight` `flare` `nightvision` `thermal` `colorpop` `neon` `halftone` `warhol` `grid9` `kaleido6` `infinite` `swirl` `wave` `heat` `pixel8`
 - 「特效」分頁的一鍵動畫（入場／出場／強調／運鏡）、一鍵風格、轉場面板的無縫轉場，都是用 `set_keyframe`、`filters`、`lut`、`vfx`、`set_transition` 組合出來的
