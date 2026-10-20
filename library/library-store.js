@@ -5,7 +5,7 @@
   const TABLE="lizhi_library_items";
   const BUCKET="lizhi-library";
   const MAX_BYTES=50*1024*1024;
-  const COLUMNS="id,file_name,mime,size,storage_path,thumb,extract_status,extract_note,user_note,status,shelf,title,summary,tags,organized_at,created_at,updated_at";
+  const COLUMNS="id,file_name,mime,size,storage_path,thumb,extract_status,extract_note,user_note,status,shelf,title,summary,tags,key_points,related_ids,organized_at,created_at,updated_at";
 
   const auth=()=>global.LizhiAuth;
   const client=()=>auth()?.client;
@@ -47,6 +47,24 @@
     return data;
   }
 
+  // 開啟閱讀器時才抓大欄位（抽出的全文）
+  async function detail(id){
+    requireReady();
+    const {data,error}=await client().from(TABLE).select("id,text_excerpt,extract_note").eq("id",id).single();
+    if(error)throw friendly(error);
+    return data;
+  }
+
+  // 內文搜尋：回傳 [{id, snippet}]
+  async function search(q){
+    requireReady();
+    const term=String(q||"").trim();
+    if(!term)return [];
+    const {data,error}=await client().rpc("lizhi_library_search",{q:term.slice(0,100)});
+    if(error)throw friendly(error);
+    return data||[];
+  }
+
   async function openUrl(item,{download=false}={}){
     requireReady();
     const {data,error}=await client().storage.from(BUCKET).createSignedUrl(item.storage_path,300,download?{download:item.file_name}:undefined);
@@ -71,12 +89,12 @@
 
   function friendly(error){
     const message=String(error?.message||error||"");
-    if(/relation .*lizhi_library_items.* does not exist|Bucket not found|schema cache/i.test(message))
+    if(/relation .*lizhi_library_items.* does not exist|Bucket not found|lizhi_library_search|schema cache/i.test(message))
       return new Error("圖書館的雲端空間還沒建立（需要套用 008_lizhi_library.sql）");
     if(/row-level security|not authorized|permission/i.test(message))return new Error("這個帳號沒有圖書館的存取權限");
     if(/exceeded the maximum allowed size|Payload too large/i.test(message))return new Error("檔案超過雲端空間的大小上限");
     return new Error(message||"雲端操作失敗");
   }
 
-  global.LibraryStore=Object.freeze({available,list,upload,openUrl,update,remove,MAX_BYTES});
+  global.LibraryStore=Object.freeze({available,list,detail,search,upload,openUrl,update,remove,MAX_BYTES});
 })(window);

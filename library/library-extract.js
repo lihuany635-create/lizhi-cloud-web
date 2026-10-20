@@ -115,5 +115,12 @@
     }
   }
 
-  global.LibraryExtract=Object.freeze({extract,ext});
+  // 閱讀器用：載入 pdf.js 並回傳 pdfjsLib
+  async function pdfLib(){
+    await loadScript(CDN.pdf);
+    global.pdfjsLib.GlobalWorkerOptions.workerSrc=CDN.pdfWorker;
+    return global.pdfjsLib;
+  }
+
+  global.LibraryExtract=Object.freeze({extract,ext,pdfLib});
 })(window);

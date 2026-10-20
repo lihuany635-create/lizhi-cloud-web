@@ -33,6 +33,8 @@
   }
 
   function render(){
+    // 圖書館取代了舊的本機收藏與 Obsidian Vault 區塊；舊資料仍留在瀏覽器，只是不再顯示
+    if(global.LibraryHome)return LibraryHome.render();
     if(!service)return typeof renderKnowledge==="function"?renderKnowledge():empty("知識服務尚未準備完成");
     ensureLoaded();
     const snapshot=service.current(),query=global.state?.query??state?.query??"";
