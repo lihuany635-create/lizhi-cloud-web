@@ -41,7 +41,11 @@ void main() {
   q = vec2(q.x * c - q.y * s, q.x * s + q.y * c) + u_center;
   gl_Position = vec4(q / (u_view * 0.5), 0.0, 1.0);
 }`,jh=`
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
+#endif
 varying vec2 v_uv;
 uniform sampler2D u_tex;
 uniform sampler2D u_curve;  // 256×1：曲線查找表
@@ -456,7 +460,11 @@ void main() {
   if (u_blend == 2) gl_FragColor = vec4(mix(vec3(1.0), c, a), 1.0);
   else gl_FragColor = vec4(c * a, a);
 }`,Gh=`
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
+#endif
 varying vec2 v_uv;
 uniform sampler2D u_a;
 uniform sampler2D u_b;
