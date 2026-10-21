@@ -22,7 +22,7 @@ const commit=execFileSync('git',['rev-parse','HEAD'],{cwd:sourceRoot,encoding:'u
 await writeFile(resolve(target,'source-manifest.json'),JSON.stringify({source:'映構圖片關係生成工作台',source_commit:commit,backend:'https://lizhi-image-graph.lihuany635.chatgpt.site',files},null,2)+'\n');
 const swPath=resolve(root,'sw.js'),sw=await readFile(swPath,'utf8'),start='  // BEGIN IMAGE GRAPH ASSETS',end='  // END IMAGE GRAPH ASSETS';
 const queries=new Map();for(const f of files){const content=await readFile(resolve(target,f.name),'utf8');for(const match of content.matchAll(/(?:\.\/)?([a-z0-9-]+\.(?:mjs|css))\?v=(\d+)/g)){const set=queries.get(match[1])||new Set();set.add(match[2]);queries.set(match[1],set)}}
-const assets=['image-graph/?v=35',...files.flatMap(f=>queries.has(f.name)?[...queries.get(f.name)].map(v=>'image-graph/'+f.name+'?v='+v):['image-graph/'+f.name]),'image-graph/source-manifest.json'];
+const assets=['image-graph/?v=36',...files.flatMap(f=>queries.has(f.name)?[...queries.get(f.name)].map(v=>'image-graph/'+f.name+'?v='+v):['image-graph/'+f.name]),'image-graph/source-manifest.json'];
 const block=start+'\n'+assets.map(a=>'  '+JSON.stringify(a)+',').join('\n')+'\n'+end+'\n';
 const updated=sw.includes(start)?sw.slice(0,sw.indexOf(start))+block+sw.slice(sw.indexOf(end)+end.length+1):sw.replace('const FILES=[\n','const FILES=[\n'+block);
 await writeFile(swPath,updated);process.stdout.write('Vendored '+files.length+' frontend files; runtime credentials/data excluded.\n');

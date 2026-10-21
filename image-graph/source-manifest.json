@@ -13,7 +13,7 @@
     },
     {
       "name": "app.mjs",
-      "sha256": "5e2a1f101a31e7a046388bb8178d553fb5ff83b03c7a6e0d6dd90573be60a87e"
+      "sha256": "fbbbf03f457fe14d6ba11a4e2cb9f5d58ad4ebc0d12a2002fd51efafed1ffd84"
     },
     {
       "name": "asset-actions.mjs",
@@ -73,7 +73,7 @@
     },
     {
       "name": "index.html",
-      "sha256": "d87361bff64583a8be580028fec2b55a2621e2c7d3f8e01401906846bf0b43e8"
+      "sha256": "6e87f4b27d2798c2537829a3cc2e77028668b5fd4a30bf1dd8520503d3b44f6b"
     },
     {
       "name": "integration-projects.mjs",
@@ -133,7 +133,7 @@
     },
     {
       "name": "style.css",
-      "sha256": "76c9f2a21a93359e496a6f74928b00dd426d30d27196133640d0e44a529240d3"
+      "sha256": "6bf6e3b6d9a35f499fb9c6b9c7147b38dac7d60acc3d159f066b4077e576815e"
     },
     {
       "name": "task-actions.mjs",

@@ -1,8 +1,8 @@
 import {projectBackupFiles,validateExternalVersion} from './project-backup.mjs?v=28';
 import {prepareReturnedImage,saveReturnedImage,retainReturnedImage} from './returned-images.mjs?v=28';
 import {createIntegrationUI} from './integration-ui.mjs?v=28';
-import {createSourceFolders,sourceReference} from './source-folders.mjs?v=35';
-import {createSourceFolderUI} from './source-folder-ui.mjs?v=35';
+import {createSourceFolders,sourceReference} from './source-folders.mjs?v=36';
+import {createSourceFolderUI} from './source-folder-ui.mjs?v=36';
 import {createWorkspaceUI} from './workspace-ui.mjs?v=28';import {integrated,privateBridge} from './api-transport.mjs?v=28';
 import {createAccountUI} from './account-ui.mjs?v=28';
 import {createOriginalStore,directoryProject,imagePreview,projectImageLimit,browserImageBytes,validateDirectoryIndex} from './original-store.mjs?v=28';
@@ -210,7 +210,7 @@ async function exclusiveHandoff(action){
  try{await action()}catch(e){toast(e.message,true)}finally{busy=false;blockProjectTransition(false);$('#runsView').inert=false;renderAll();syncAssetToolbar()}
 }
 function saveHandoff(){changed();clearTimeout(saveTimer);return persist({index:false})}
-async function sendRun(run){if(run.spec.project_id!==p.id){if(!confirm('這是原專案的歷史快照。保留原紀錄，並建立屬於目前專案的新任務？'))throw Error('已保留歷史任務，未傳送');if(allProjectRuns(p).length>=500)throw Error('任務已達上限');const next=await copyHistoricalRun(p,run);handoffPreflight(p,next.spec);p.runs.unshift(next);run=next;changed();if(!await persist())throw Error('新任務尚未保存')}if(!run.output_source||!ownsHandoff(p,run))run.output_source=sourceFolders.current();const started=Date.now(),secs=()=>Math.round((Date.now()-started)/1000);let last=null;const say=()=>{if(!last)return;const e=last;toast(e.phase==='read'?`正在讀取原圖 ${e.done} / ${e.total}（已 ${secs()} 秒）`:e.phase==='upload'?`正在上傳第 ${e.done} / ${e.total} 張（${e.size}，共 ${e.total_size}；已 ${secs()} 秒）。網路慢時會比較久，請停留在這個畫面`:`原圖已上傳，正在建立任務（已 ${secs()} 秒）`)},ticker=setInterval(say,1000);try{return await sendHandoffTask({project:p,run,readOriginal:(project,version)=>originals.read(project,version),save:saveHandoff,onProgress:e=>{last=e;say()}})}finally{clearInterval(ticker)}}
+async function sendRun(run){if(run.spec.project_id!==p.id){if(!confirm('這是原專案的歷史快照。保留原紀錄，並建立屬於目前專案的新任務？'))throw Error('已保留歷史任務，未傳送');if(allProjectRuns(p).length>=500)throw Error('任務已達上限');const next=await copyHistoricalRun(p,run);handoffPreflight(p,next.spec);p.runs.unshift(next);run=next;changed();if(!await persist())throw Error('新任務尚未保存')}if(!run.output_source||!ownsHandoff(p,run))run.output_source=sourceFolders.current();const started=Date.now(),secs=(from=started)=>Math.round((Date.now()-from)/1000);let last=null,phaseAt=started,readSecs=null;const say=()=>{if(!last)return;const e=last;toast(e.phase==='read'?`正在讀取原圖 ${e.done} / ${e.total}（讀圖已 ${secs()} 秒）`:e.phase==='upload'?`正在上傳第 ${e.done} / ${e.total} 張（${e.size}，共 ${e.total_size}）\n這張已 ${secs(phaseAt)} 秒；讀原圖花了 ${readSecs} 秒，總共 ${secs()} 秒。網路慢時會比較久，請停留在這個畫面`:`原圖已上傳，正在建立任務（總共 ${secs()} 秒）`)},ticker=setInterval(say,1000);try{return await sendHandoffTask({project:p,run,readOriginal:(project,version)=>originals.read(project,version),save:saveHandoff,onProgress:e=>{if(e.phase!=='read'&&readSecs===null)readSecs=secs();if(e.phase!==last?.phase||e.done!==last?.done)phaseAt=Date.now();last=e;say()}})}finally{clearInterval(ticker)}}
 async function refreshHandoff(){
  await exclusiveHandoff(async()=>{
   const failures=[];const added=await receiveHandoffTasks({project:p,readCandidate:readReturnedCandidate,save:saveHandoff,totalBytes,maxBytes:()=>Infinity,onError:issue=>failures.push(issue)});

@@ -1,10 +1,10 @@
 const CACHE="lizhi-cloud-v105";
 const FILES=[
   // BEGIN IMAGE GRAPH ASSETS
-  "image-graph/?v=35",
+  "image-graph/?v=36",
   "image-graph/account-ui.mjs?v=28",
   "image-graph/api-transport.mjs?v=28",
-  "image-graph/app.mjs?v=35",
+  "image-graph/app.mjs?v=36",
   "image-graph/asset-actions.mjs",
   "image-graph/asset-folders.mjs",
   "image-graph/asset-kinds.mjs",
@@ -32,11 +32,11 @@ const FILES=[
   "image-graph/source-folder-ui.mjs?v=28",
   "image-graph/source-folders.mjs?v=28",
   "image-graph/source-read.mjs?v=28",
-  "image-graph/style.css?v=35",
-  "image-graph/settings-status.mjs?v=35",
+  "image-graph/style.css?v=36",
+  "image-graph/settings-status.mjs?v=36",
   "image-graph/source-thumbs.mjs?v=32",
-  "image-graph/source-folder-ui.mjs?v=35",
-  "image-graph/source-folders.mjs?v=35",
+  "image-graph/source-folder-ui.mjs?v=36",
+  "image-graph/source-folders.mjs?v=36",
   "image-graph/task-actions.mjs",
   "image-graph/task-ui.mjs?v=28",
   "image-graph/workspace-ui.mjs?v=28",
