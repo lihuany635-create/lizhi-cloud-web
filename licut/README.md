@@ -161,3 +161,9 @@
 - 轉場另有：`wipedown`、`slideup`、`slidedown`、`whipup`、`whipdown`、`zoomout`、`diamond`、`heart`、`blinds`、`squeeze`、`rgbsplit`、`lightleak`、`ripple`、`shake`、`blocks`、`dreamy`、`crosszoom`、`dipblack`、`pageturn`
 - `vfx {type, amount}`（片段、子母畫面）：動態特效，`null` 關閉。type：`shake` `glitch` `rgbsplit` `vhs` `oldfilm` `grain` `leak` `strobe` `soul` `breathe` `fisheye` `mirror` `kaleido` `split3` `pixelate` `rainbow` `posterize` `invert` `sketch` `cctv`，趣味：`snow` `hearts` `sparkles` `confetti` `rain` `tiktok` `tvonoff` `camcorder` `letterbox` `spotlight` `flare` `nightvision` `thermal` `colorpop` `neon` `halftone` `warhol` `grid9` `kaleido6` `infinite` `swirl` `wave` `heat` `pixel8`
 - 「特效」分頁的一鍵動畫（入場／出場／強調／運鏡）、一鍵風格、轉場面板的無縫轉場，都是用 `set_keyframe`、`filters`、`lut`、`vfx`、`set_transition` 組合出來的
+
+### 聲音對字幕
+- 字幕面板「聲音對字幕」：Silero VAD（人聲偵測，從 jsDelivr 載入 onnxruntime-web 1.20.1＋silero_vad_v5）找出說話的地方，排除音樂與音效；再用人聲頻段（300–3000Hz）的能量峰值找音節，動態規劃把每個字對到一個音節，句子邊界偏好落在停頓上。
+- 用 EP01（12 分鐘、有配樂）實測：字幕開始時間誤差中位數約 0.1 秒，82% 在 0.5 秒內、92% 在 1 秒內（舊版只看音量平均分配：中位數誤差約 10 秒）。
+- 「現有字幕依聲音重新對時」：文字不變，只修正時間；可以只處理播放頭之後。
+- 程式：`src/engine/align.js`（純計算）、`src/engine/vad.js`、`src/engine/captions.js` 的 `alignByVoice`。
