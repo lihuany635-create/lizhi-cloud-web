@@ -100,6 +100,7 @@ button,label.btn{font:inherit;cursor:pointer}
   <label class="sample" for="sampleSel"><span>範例</span>
     <select id="sampleSel">
       <option value="reality-home">現實主角家（一、二樓）</option>
+      <option value="hades-house">哈德斯家（一、二樓合併）</option>
       <option value="hades-bedroom">哈德斯家主角臥室（二樓）</option>
       <option value="hades-1f">哈德斯家一樓（RG-GAME-03 v0.1）</option>
       <option value="reality-highschool">現實高中（校園外觀）</option>
@@ -243,7 +244,9 @@ async function openModel(buf,name,opts={}){
     if(!isFinite(size.x)||size.length()===0)throw new Error('模型沒有可顯示的幾何。');
     // place model on ground
     model.position.y-=box.min.y;box.setFromObject(model);box.getCenter(center);
-    layoutHelpers();stats(name);setCut(opts.cut??1);fit(opts.top);
+    layoutHelpers();stats(name);setCut(opts.cut??1);
+    fitBox=opts.fit?new THREE.Box3(new THREE.Vector3(opts.fit[0],opts.fit[1]+model.position.y,opts.fit[2]),new THREE.Vector3(opts.fit[3],opts.fit[4]+model.position.y,opts.fit[5])):null;
+    fit(opts.top);
     $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();
   }catch(e){console.error(e);showError(e&&e.message?e.message:String(e));}
 }
@@ -273,11 +276,13 @@ function stats(){
 
 /* ---------- camera ---------- */
 let anim=null;
+let fitBox=null;
 function fit(top){
-  const r=size.length()/2;const fov=camera.fov*Math.PI/180;
+  const fb=fitBox||box,fs=fb.getSize(new THREE.Vector3()),fc=fb.getCenter(new THREE.Vector3());
+  const r=fs.length()/2;const fov=camera.fov*Math.PI/180;
   const dist=r/Math.sin(fov/2)*(camera.aspect<1?1/camera.aspect*0.9:1)*0.95;
-  const tgt=center.clone();tgt.y=box.min.y+size.y*0.3;
-  const pos=top?new THREE.Vector3(center.x,center.y+dist,center.z+0.001):tgt.clone().add(new THREE.Vector3(-0.55,0.62,0.7).normalize().multiplyScalar(dist));
+  const tgt=fc.clone();tgt.y=fb.min.y+fs.y*0.3;
+  const pos=top?new THREE.Vector3(fc.x,fc.y+dist,fc.z+0.001):tgt.clone().add(new THREE.Vector3(-0.55,0.62,0.7).normalize().multiplyScalar(dist));
   anim={p:pos,t:tgt};
   $('tTop').setAttribute('aria-pressed',!!top);
 }
@@ -313,6 +318,7 @@ stage.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)readFile(
 const SAMPLES={
   "reality-home":{name:"現實主角家.glb",file:"reality-home.glb?v=7",cut:0.8},
   "hades-bedroom":{name:"哈德斯主角臥室.glb",file:"hades-bedroom.glb?v=4",cut:0.72},
+  "hades-house":{name:"哈德斯家.glb",file:"hades-house.glb?v=1",cut:0.74,fit:[-12,0,-11,12,7.2,12]},
   "hades-1f":{name:"哈德斯家一樓.glb",file:"hades-1f.glb?v=1",cut:0.44},
   "reality-highschool":{name:"現實高中.glb",file:"reality-highschool.glb?v=1",cut:1},
   "xiji-station":{name:"溪磯鎮車站.glb",file:"xiji-station.glb?v=1",cut:1},
@@ -324,7 +330,7 @@ async function loadSample(key){
     const total=+res.headers.get('content-length')||0;const reader=res.body.getReader();const chunks=[];let got=0;
     for(;;){const {done,value}=await reader.read();if(done)break;chunks.push(value);got+=value.length;if(total)setProg(got/total);}
     const buf=new Uint8Array(got);let o=0;chunks.forEach(c=>{buf.set(c,o);o+=c.length;});
-    openModel(buf.buffer,smp.name,{cut:smp.cut,key:key});
+    openModel(buf.buffer,smp.name,{cut:smp.cut,key:key,fit:smp.fit});
   }catch(e){showError(e.message);}
 }
 const sampleSel=$('sampleSel');
