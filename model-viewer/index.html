@@ -54,6 +54,26 @@ button,label.btn{font:inherit;cursor:pointer}
 .cut output{font-family:var(--f-mono);font-size:12px;min-width:56px;text-align:right;color:var(--muted)}
 .hint{position:absolute;right:max(10px,env(safe-area-inset-right,0px));bottom:10px;font-size:11px;color:var(--muted);background:var(--panel);padding:4px 8px;border-radius:6px;opacity:.9}
 .tog:disabled{opacity:.45;cursor:not-allowed}
+.pov-ui{overflow:hidden}
+.guide{position:absolute;box-shadow:0 0 0 9999px rgba(8,12,16,.5);outline:1px solid rgba(255,255,255,.75);pointer-events:none;
+  background-image:linear-gradient(to right,transparent calc(33.333% - .5px),rgba(255,255,255,.28) calc(33.333% - .5px),rgba(255,255,255,.28) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.666% - .5px),rgba(255,255,255,.28) calc(66.666% - .5px),rgba(255,255,255,.28) calc(66.666% + .5px),transparent calc(66.666% + .5px)),
+  linear-gradient(to bottom,transparent calc(33.333% - .5px),rgba(255,255,255,.28) calc(33.333% - .5px),rgba(255,255,255,.28) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.666% - .5px),rgba(255,255,255,.28) calc(66.666% - .5px),rgba(255,255,255,.28) calc(66.666% + .5px),transparent calc(66.666% + .5px))}
+.guide-label{position:absolute;left:8px;top:6px;font-family:var(--f-mono);font-size:11px;color:#f1f4f5;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.panel.pov .stats,.panel.pov .ctrls{display:none}
+.shots{display:flex;flex-direction:column;gap:8px;font-size:13px}
+.shots .row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.shots .lbl{color:var(--muted);font-size:12px;min-width:2.6em}
+.shots input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
+.shots output,.shots .num{font-family:var(--f-mono);font-size:12px;font-variant-numeric:tabular-nums}
+.shots select,.shots input[type=text]{font:inherit;font-size:13px;color:var(--ink);background:var(--chip);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+.shots input[type=text]{flex:1;min-width:120px}
+.slots{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+@media(max-width:560px){.slots{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.slot{position:relative;aspect-ratio:16/9;max-width:100%;border:1px solid var(--line);border-radius:7px;background:var(--chip) center/cover no-repeat;color:var(--ink);font:600 12px var(--f-mono);display:flex;align-items:flex-end;justify-content:flex-start;padding:3px 5px;cursor:pointer;overflow:hidden}
+.slot.filled{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8);border-color:var(--accent)}
+.slot.current{box-shadow:0 0 0 2px var(--accent)}
+.slot:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.shots .msg{font-size:12px;color:var(--muted);min-height:1.2em}
 .place-banner{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:var(--accent);color:var(--accent-ink);font-size:13px;font-weight:700;padding:7px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.18);pointer-events:none;white-space:nowrap}
 .pov-ui{position:absolute;inset:0;pointer-events:none}
 .pov-ui>*{pointer-events:auto}
@@ -97,6 +117,7 @@ button,label.btn{font:inherit;cursor:pointer}
   <div class="hint" id="hint">拖曳旋轉・右鍵/雙指平移・滾輪縮放・可把檔案拖進來</div>
   <div class="place-banner" id="placeBanner" hidden>點模型上的地板放置人偶</div>
   <div class="pov-ui" id="povUi" hidden>
+    <div class="guide" id="guide"><span class="guide-label" id="guideLabel"></span></div>
     <div class="crosshair"></div>
     <button class="btn pov-exit" id="povExit">← 離開人偶視角</button>
     <button class="btn pov-speed" id="povSpeed">步行</button>
@@ -111,6 +132,19 @@ button,label.btn{font:inherit;cursor:pointer}
     <span>網格<b id="sMesh">—</b></span>
     <span>三角面<b id="sTri">—</b></span>
     <span>材質<b id="sMat">—</b></span>
+  </div>
+  <div class="shots" id="shotPanel" hidden>
+    <div class="row"><span class="lbl">眼高</span>
+      <button class="tog" id="eyeStand">站姿 1.6</button><button class="tog" id="eyeSit">坐姿 1.15</button>
+      <button class="tog" id="eyeDn" aria-label="眼高降低 5 公分">−</button><span class="num" id="eyeVal">1.60 m</span><button class="tog" id="eyeUp" aria-label="眼高增加 5 公分">＋</button></div>
+    <div class="row"><label class="lbl" for="focalIn">焦距</label><input type="range" id="focalIn" min="12" max="85" step="1" value="28"><output id="focalOut">28 mm</output>
+      <label class="lbl" for="aspectSel">比例</label><select id="aspectSel"><option>16:9</option><option>2.39:1</option><option>4:3</option><option>1:1</option><option>9:16</option></select></div>
+    <div class="slots" id="slots"></div>
+    <div class="row"><input type="text" id="shotNote" placeholder="鏡頭說明（選填，例：主角坐在書桌前）" maxlength="60">
+      <button class="tog" id="overwrite" aria-pressed="false">覆寫模式</button></div>
+    <div class="row"><button class="btn primary" id="expZip">匯出參考圖＋鏡位（ZIP）</button><button class="btn" id="expJson">匯出 JSON</button>
+      <label class="btn" for="impJson">匯入 JSON</label><input type="file" id="impJson" accept=".json,application/json" hidden><button class="btn" id="clearShots">清空</button></div>
+    <div class="msg" id="shotMsg" aria-live="polite">點空白格儲存目前鏡頭；點已存的格子回到該鏡頭。</div>
   </div>
   <div class="ctrls">
     <button class="tog" id="tPlace" aria-pressed="false">放置人偶</button>
@@ -136,6 +170,7 @@ button,label.btn{font:inherit;cursor:pointer}
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/fflate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 (function(){
 const $=id=>document.getElementById(id);
@@ -193,6 +228,7 @@ function loadBuffer(buf,name){
   });
 }
 
+let modelKey="",modelName="";
 async function openModel(buf,name,opts={}){
   showLoading(name);
   try{
@@ -207,7 +243,7 @@ async function openModel(buf,name,opts={}){
     // place model on ground
     model.position.y-=box.min.y;box.setFromObject(model);box.getCenter(center);
     layoutHelpers();stats(name);setCut(opts.cut??1);fit(opts.top);
-    $('fileName').textContent=name;ov.hidden=true;
+    $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();
   }catch(e){console.error(e);showError(e&&e.message?e.message:String(e));}
 }
 
@@ -286,7 +322,7 @@ async function loadSample(key){
     const total=+res.headers.get('content-length')||0;const reader=res.body.getReader();const chunks=[];let got=0;
     for(;;){const {done,value}=await reader.read();if(done)break;chunks.push(value);got+=value.length;if(total)setProg(got/total);}
     const buf=new Uint8Array(got);let o=0;chunks.forEach(c=>{buf.set(c,o);o+=c.length;});
-    openModel(buf.buffer,smp.name,{cut:smp.cut});
+    openModel(buf.buffer,smp.name,{cut:smp.cut,key:key});
   }catch(e){showError(e.message);}
 }
 const sampleSel=$('sampleSel');
@@ -295,7 +331,7 @@ if(SAMPLES[startKey])sampleSel.value=startKey;
 sampleSel.onchange=()=>loadSample(sampleSel.value);
 
 /* ---------- mannequin ---------- */
-const EYE=1.6, FIG_H=1.72;
+let EYE=1.6; const FIG_H=1.72;
 let figure=null, figFeet=new THREE.Vector3(), figYaw=0, placing=false, pov=false;
 const figMat=new THREE.MeshStandardMaterial({color:0xe3803d,roughness:.45,metalness:.05,emissive:0x2a1004});
 const jointMat=new THREE.MeshStandardMaterial({color:0x3a3f45,roughness:.5});
@@ -363,13 +399,13 @@ renderer.domElement.addEventListener('pointerup',e=>{
 /* ---------- first-person (mannequin) view ---------- */
 let yaw=0,pitch=0,saved=null,speedIdx=0;const SPEEDS=[['步行',1.4],['跑步',4],['快速',12]];
 const keys=new Set(),joyV=new THREE.Vector2();
-function enterPov(){
+function enterPov(keepView){
   if(!figure||pov)return;pov=true;setPlacing(false);
   saved={pos:camera.position.clone(),tgt:controls.target.clone(),fov:camera.fov,near:camera.near,cut:cutIn.value};
   anim=null;controls.enabled=false;controls.autoRotate=false;$('tRot').setAttribute('aria-pressed',false);
   setCut(1);cutIn.disabled=true;figure.visible=false;
-  yaw=figYaw;pitch=0;camera.fov=70;camera.near=0.05;camera.updateProjectionMatrix();
-  $('povUi').hidden=false;$('hint').hidden=true;$('tPov').setAttribute('aria-pressed',true);$('tPov').textContent='離開視角';
+  if(!keepView){yaw=figYaw;pitch=0;}camera.near=0.05;layoutGuide();
+  $('povUi').hidden=false;$('hint').hidden=true;$('shotPanel').hidden=false;document.querySelector('.panel').classList.add('pov');$('tPov').setAttribute('aria-pressed',true);$('tPov').textContent='離開視角';
   updatePovCamera();
 }
 function exitPov(){
@@ -378,10 +414,10 @@ function exitPov(){
   camera.fov=saved.fov;camera.near=saved.near;camera.updateProjectionMatrix();
   camera.position.copy(saved.pos);controls.target.copy(saved.tgt);controls.enabled=true;
   cutIn.disabled=false;cutIn.value=saved.cut;applyCut();
-  $('povUi').hidden=true;$('hint').hidden=false;$('tPov').setAttribute('aria-pressed',false);$('tPov').textContent='人偶視角';
+  $('povUi').hidden=true;$('hint').hidden=false;$('shotPanel').hidden=true;document.querySelector('.panel').classList.remove('pov');$('tPov').setAttribute('aria-pressed',false);$('tPov').textContent='人偶視角';
   keys.clear();joyV.set(0,0);
 }
-$('tPov').onclick=()=>pov?exitPov():enterPov();
+$('tPov').onclick=()=>pov?exitPov():enterPov(false);
 $('povExit').onclick=exitPov;
 $('povSpeed').onclick=()=>{speedIdx=(speedIdx+1)%SPEEDS.length;$('povSpeed').textContent=SPEEDS[speedIdx][0];};
 function updatePovCamera(){
@@ -436,8 +472,105 @@ function stepPov(dt){
   updatePovCamera();
 }
 
+/* ---------- animation shot mode (C01–C08) ---------- */
+const ASPECTS={'16:9':[1920,1080],'2.39:1':[2048,858],'4:3':[1600,1200],'1:1':[1440,1440],'9:16':[1080,1920]};
+const SLOT_IDS=['C01','C02','C03','C04','C05','C06','C07','C08'];
+let shotCfg={focal:28,aspect:'16:9'}, shots={}, currentSlot=null;
+const deg=r=>r*180/Math.PI;
+function vfovDeg(focal){return deg(2*Math.atan(12/focal));}               // full-frame 36 x 24 mm, vertical
+function guideBox(){const W=stage.clientWidth,H=stage.clientHeight,[aw,ah]=ASPECTS[shotCfg.aspect],a=aw/ah;
+  let gw=W,gh=W/a;if(gh>H){gh=H;gw=H*a;}gw*=0.96;gh*=0.96;return {W,H,gw,gh,x:(W-gw)/2,y:(H-gh)/2};}
+function layoutGuide(){
+  const g=guideBox(),el=$('guide');el.style.left=g.x+'px';el.style.top=g.y+'px';el.style.width=g.gw+'px';el.style.height=g.gh+'px';
+  const vf=vfovDeg(shotCfg.focal)*Math.PI/180;                                        // make the framed area match the shot's FOV
+  camera.fov=deg(2*Math.atan(Math.tan(vf/2)*g.H/g.gh));camera.updateProjectionMatrix();
+  $('guideLabel').textContent=`${currentSlot||'—'} · ${shotCfg.focal}mm · 眼高 ${EYE.toFixed(2)}m · ${shotCfg.aspect}`;
+  $('focalOut').textContent=`${shotCfg.focal} mm · 垂直視野 ${vfovDeg(shotCfg.focal).toFixed(0)}°`;$('eyeVal').textContent=EYE.toFixed(2)+' m';
+}
+function setEye(v){EYE=Math.max(0.3,Math.min(2.2,Math.round(v*100)/100));$('eyeStand').setAttribute('aria-pressed',EYE===1.6);$('eyeSit').setAttribute('aria-pressed',EYE===1.15);if(pov){updatePovCamera();layoutGuide();}}
+$('eyeStand').onclick=()=>setEye(1.6);$('eyeSit').onclick=()=>setEye(1.15);
+$('eyeUp').onclick=()=>setEye(EYE+0.05);$('eyeDn').onclick=()=>setEye(EYE-0.05);
+$('focalIn').oninput=e=>{shotCfg.focal=+e.target.value;layoutGuide();};
+$('aspectSel').onchange=e=>{shotCfg.aspect=e.target.value;layoutGuide();};
+function storeKey(){return 'mv-shots:'+modelKey;}
+function persist(){try{localStorage.setItem(storeKey(),JSON.stringify(shots));}catch(e){msg('瀏覽器無法保存鏡位（可能是無痕模式），請記得匯出 JSON。');}}
+function loadShots(){shots={};currentSlot=null;try{const t=localStorage.getItem(storeKey());if(t)shots=JSON.parse(t)||{};}catch(e){}renderSlots();}
+function msg(t){$('shotMsg').textContent=t;}
+function renderSlots(){
+  const box_=$('slots');box_.innerHTML='';
+  for(const id of SLOT_IDS){const s=shots[id];const b=document.createElement('button');b.className='slot'+(s?' filled':'')+(id===currentSlot?' current':'');
+    b.textContent=id;b.title=s?(s.note||id):`${id}（空白，點一下儲存）`;b.setAttribute('aria-label',s?`${id} ${s.note||''} 回到此鏡頭`:`${id} 空白，儲存目前鏡頭`);
+    if(s&&s.thumb)b.style.backgroundImage=`url(${s.thumb})`;b.onclick=()=>slotClick(id);box_.appendChild(b);}
+}
+function currentShotData(id){
+  const [w,h]=ASPECTS[shotCfg.aspect];const pos=new THREE.Vector3(figFeet.x,figFeet.y+EYE,figFeet.z);
+  const dir=new THREE.Vector3(Math.sin(yaw)*Math.cos(pitch),Math.sin(pitch),Math.cos(yaw)*Math.cos(pitch));
+  const off=model?model.position.clone():new THREE.Vector3();                    // viewer world -> model (glTF) space
+  const pm=pos.clone().sub(off),tm=pos.clone().add(dir.clone().multiplyScalar(10)).sub(off),fm=figFeet.clone().sub(off);
+  const vf=vfovDeg(shotCfg.focal),hf=deg(2*Math.atan(Math.tan(vf*Math.PI/360)*w/h));
+  return {id,note:$('shotNote').value.trim(),model:modelName,eye_height_m:EYE,focal_mm:shotCfg.focal,sensor:'36x24mm',vfov_deg:+vf.toFixed(3),hfov_deg:+hf.toFixed(3),
+    aspect:shotCfg.aspect,image:[w,h],yaw_deg:+deg(yaw).toFixed(3),pitch_deg:+deg(pitch).toFixed(3),
+    feet:fm.toArray().map(v=>+v.toFixed(4)),position:pm.toArray().map(v=>+v.toFixed(4)),target:tm.toArray().map(v=>+v.toFixed(4)),
+    blender:{location:[+pm.x.toFixed(4),+(-pm.z).toFixed(4),+pm.y.toFixed(4)],target:[+tm.x.toFixed(4),+(-tm.z).toFixed(4),+tm.y.toFixed(4)],lens_mm:shotCfg.focal,sensor_fit:'VERTICAL',sensor_height_mm:24}};
+}
+function applyShot(s){
+  const off=model?model.position:new THREE.Vector3();
+  if(!figure){figure=buildFigure();scene.add(figure);$('tPov').disabled=false;}
+  figFeet.set(s.feet[0]+off.x,s.feet[1]+off.y,s.feet[2]+off.z);figYaw=yaw=s.yaw_deg*Math.PI/180;pitch=s.pitch_deg*Math.PI/180;
+  EYE=s.eye_height_m;shotCfg.focal=s.focal_mm;shotCfg.aspect=s.aspect;$('focalIn').value=s.focal_mm;$('aspectSel').value=s.aspect;
+  $('shotNote').value=s.note||'';
+  if(!pov)enterPov(true);setEye(EYE);updatePovCamera();layoutGuide();
+}
+function renderToDataURL(w,h,type='image/png',q){
+  const prevPR=renderer.getPixelRatio(),sz=new THREE.Vector2();renderer.getSize(sz);const prevFov=camera.fov,prevAsp=camera.aspect;
+  renderer.setPixelRatio(1);renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=vfovDeg(shotCfg.focal);camera.updateProjectionMatrix();
+  if(figure)figure.visible=false;renderer.render(scene,camera);const url=renderer.domElement.toDataURL(type,q);
+  renderer.setPixelRatio(prevPR);renderer.setSize(sz.x,sz.y,false);camera.aspect=prevAsp;camera.fov=prevFov;camera.updateProjectionMatrix();
+  return url;
+}
+function slotClick(id){
+  if(!pov){msg('先進入人偶視角再儲存或切換鏡頭。');return;}
+  const ow=$('overwrite').getAttribute('aria-pressed')==='true';
+  if(shots[id]&&!ow){currentSlot=id;applyShot(shots[id]);renderSlots();msg(`已切換到 ${id}${shots[id].note?'：'+shots[id].note:''}`);return;}
+  const d=currentShotData(id);const [w,h]=ASPECTS[shotCfg.aspect];const tw=200,th=Math.round(200*h/w);
+  d.thumb=renderToDataURL(tw,th,'image/jpeg',0.72);shots[id]=d;currentSlot=id;persist();renderSlots();layoutGuide();
+  msg(`已儲存 ${id}（${d.focal_mm}mm、眼高 ${d.eye_height_m.toFixed(2)}m、${d.aspect}）`);
+}
+toggle('overwrite',on=>msg(on?'覆寫模式：點任一格會用目前鏡頭覆蓋。':'點空白格儲存目前鏡頭；點已存的格子回到該鏡頭。'));
+function shotsJSON(){
+  const list=SLOT_IDS.filter(id=>shots[id]).map(id=>{const {thumb,...rest}=shots[id];return rest;});
+  return {format:'lizhi-camera-shots/1',model:modelName,units:'m',up_axis:'+Y (glTF / three.js)',coords:'model space as exported (glTF); blender block is Z-up',created:new Date().toISOString(),shots:list};
+}
+function safeName(){return (modelName||'model').replace(/\.[^.]+$/,'').replace(/[\\/:*?"<>|]/g,'_');}
+function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);}
+$('expJson').onclick=()=>{const j=shotsJSON();if(!j.shots.length){msg('還沒有儲存任何鏡頭。');return;}
+  download(new Blob([JSON.stringify(j,null,2)],{type:'application/json'}),`${safeName()}_鏡位.json`);msg(`已匯出 ${j.shots.length} 個鏡頭的 JSON。`);};
+$('expZip').onclick=async()=>{
+  const ids=SLOT_IDS.filter(id=>shots[id]);if(!ids.length){msg('還沒有儲存任何鏡頭。');return;}
+  if(typeof JSZip==='undefined'){msg('壓縮元件載入失敗，請先用「匯出 JSON」。');return;}
+  const keep={feet:figFeet.clone(),yaw,pitch,eye:EYE,focal:shotCfg.focal,aspect:shotCfg.aspect,slot:currentSlot};
+  const zip=new JSZip();const j=shotsJSON();zip.file(`${safeName()}_鏡位.json`,JSON.stringify(j,null,2));
+  for(const [i,id] of ids.entries()){
+    msg(`正在算圖 ${id}（${i+1}/${ids.length}）…`);await new Promise(r=>setTimeout(r,30));
+    const s=shots[id];applyShot(s);const [w,h]=ASPECTS[s.aspect];
+    const url=renderToDataURL(w,h,'image/png');zip.file(`${id}${s.note?'_'+s.note.replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,24):''}.png`,url.split(',')[1],{base64:true});
+  }
+  // restore the view the user was on
+  figFeet.copy(keep.feet);yaw=keep.yaw;pitch=keep.pitch;EYE=keep.eye;shotCfg.focal=keep.focal;shotCfg.aspect=keep.aspect;currentSlot=keep.slot;
+  $('focalIn').value=keep.focal;$('aspectSel').value=keep.aspect;setEye(EYE);updatePovCamera();layoutGuide();renderSlots();
+  msg('正在打包…');const blob=await zip.generateAsync({type:'blob'});download(blob,`${safeName()}_參考圖.zip`);
+  msg(`已匯出 ${ids.length} 張參考圖與鏡位 JSON。`);
+};
+$('impJson').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const j=JSON.parse(r.result);if(!j||!Array.isArray(j.shots))throw new Error('格式不符');
+      let n=0;for(const s of j.shots){if(SLOT_IDS.includes(s.id)&&Array.isArray(s.feet)){shots[s.id]=s;n++;}}
+      persist();renderSlots();msg(`已匯入 ${n} 個鏡頭${j.model&&j.model!==modelName?`（原模型：${j.model}，目前：${modelName}）`:''}。縮圖會在重新儲存時產生。`);
+    }catch(err){msg('無法讀取這個 JSON：'+err.message);}};r.readAsText(f);};
+$('clearShots').onclick=()=>{if(!Object.keys(shots).length)return;if(!confirm('清空這個模型的 C01～C08 鏡位？'))return;shots={};currentSlot=null;persist();renderSlots();msg('已清空。');};
+renderSlots();
+
 /* ---------- loop ---------- */
-function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();}
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();if(pov)layoutGuide();}
 new ResizeObserver(resize).observe(stage);resize();
 camera.position.set(-6,6,8);controls.target.set(0,1,0);
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
