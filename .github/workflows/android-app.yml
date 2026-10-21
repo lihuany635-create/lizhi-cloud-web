@@ -1,0 +1,36 @@
+name: Android App
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/android-app-foundation]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - run: npm ci
+      - run: npm run mobile:build
+      - run: npm run test:mobile
+      - run: node --test scripts/test-image-graph-auth.mjs scripts/test-image-graph-integration.mjs finance/tests/finance-credit-card-separation.test.mjs
+      - run: npx cap sync android
+      - run: node scripts/build-android.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lizhi-cloud-android-debug
+          path: artifacts/*.apk
+          retention-days: 14

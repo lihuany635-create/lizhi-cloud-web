@@ -1,0 +1,10 @@
+import { spawnSync } from 'node:child_process';
+import { mkdir, copyFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+const android = fileURLToPath(new URL('../android/',import.meta.url));
+const result = spawnSync(process.platform === 'win32' ? 'gradlew.bat' : './gradlew', ['assembleDebug','--no-daemon'], { cwd:android, stdio:'inherit', shell:process.platform === 'win32' });
+if (result.error) throw result.error;
+if (result.status !== 0) process.exit(result.status || 1);
+await mkdir(new URL('../artifacts/',import.meta.url),{recursive:true});
+await copyFile(new URL('../android/app/build/outputs/apk/debug/app-debug.apk',import.meta.url),new URL('../artifacts/lizhi-cloud-0.1.0-debug.apk',import.meta.url));
+console.log('APK: artifacts/lizhi-cloud-0.1.0-debug.apk (development signing; device verification required)');

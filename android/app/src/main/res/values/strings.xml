@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">立之雲端庫</string>
+    <string name="title_activity_main">立之雲端庫</string>
+    <string name="package_name">tw.lizhi.cloud</string>
+    <string name="custom_url_scheme">lizhi-cloud</string>
+</resources>

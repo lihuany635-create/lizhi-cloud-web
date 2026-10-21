@@ -1,0 +1,8 @@
+html { min-height: 100%; background: #f3ead9; }
+body { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.topbar { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (max-width: 600px) {
+  button, .button, input, select { min-height: 44px; }
+  input, textarea, select { font-size: 16px; }
+  .actions { flex-wrap: wrap; }
+}
