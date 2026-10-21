@@ -100,9 +100,7 @@ button,label.btn{font:inherit;cursor:pointer}
   <label class="sample" for="sampleSel"><span>範例</span>
     <select id="sampleSel">
       <option value="reality-home">現實主角家（一、二樓）</option>
-      <option value="hades-house">哈德斯家（一、二樓合併）</option>
-      <option value="hades-bedroom">哈德斯家主角臥室（二樓）</option>
-      <option value="hades-1f">哈德斯家一樓（RG-GAME-03 v0.1）</option>
+      <option value="hades-house">哈德斯家（遊戲主角家，一、二樓）</option>
       <option value="reality-highschool">現實高中（校園＋3F 教室）</option>
       <option value="xiji-station">溪磯鎮車站</option>
       <option value="lahudi-academy">拉乎迪學院（校園外觀＋薇媞後花園）</option>
@@ -317,9 +315,7 @@ stage.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)readFile(
 /* ---------- sample ---------- */
 const SAMPLES={
   "reality-home":{name:"現實主角家.glb",file:"reality-home.glb?v=7",cut:0.8},
-  "hades-bedroom":{name:"哈德斯主角臥室.glb",file:"hades-bedroom.glb?v=4",cut:0.72},
   "hades-house":{name:"哈德斯家.glb",file:"hades-house.glb?v=1",cut:0.74,fit:[-12,0,-11,12,7.2,12]},
-  "hades-1f":{name:"哈德斯家一樓.glb",file:"hades-1f.glb?v=1",cut:0.44},
   "reality-highschool":{name:"現實高中.glb",file:"reality-highschool.glb?v=2",cut:1},
   "xiji-station":{name:"溪磯鎮車站.glb",file:"xiji-station.glb?v=1",cut:1},
   "lahudi-academy":{name:"拉乎迪學院.glb",file:"lahudi-academy.glb?v=3",cut:1}
