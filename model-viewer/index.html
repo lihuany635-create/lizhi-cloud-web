@@ -24,6 +24,9 @@ html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);display:flex;flex-direction:column;overflow:hidden}
 .bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--panel);border-bottom:1px solid var(--line)}
 .bar h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.02em}
+.sample{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.sample select{font:inherit;font-size:13px;color:var(--ink);background:var(--chip);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.sample select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .bar .file{font-family:var(--f-mono);font-size:12px;color:var(--muted);min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 button,label.btn{font:inherit;cursor:pointer}
 .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:7px 12px;border-radius:8px;font-size:13px;font-weight:500}
@@ -63,7 +66,11 @@ button,label.btn{font:inherit;cursor:pointer}
   <span class="file" id="fileName">未載入</span>
   <label class="btn primary" for="fileIn">開啟檔案</label>
   <input type="file" id="fileIn" accept=".glb,.gltf,.obj,.stl,.fbx">
-  <button class="btn" id="bSample">範例：主角臥室</button>
+  <label class="sample" for="sampleSel"><span>範例</span>
+    <select id="sampleSel">
+      <option value="reality-home">現實主角家（一樓）</option>
+      <option value="hades-bedroom">哈德斯家主角臥室</option>
+    </select></label>
 </div>
 
 <div id="stage">
@@ -242,16 +249,23 @@ $('fileIn').onchange=e=>{const f=e.target.files[0];if(f)readFile(f);e.target.val
 stage.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)readFile(f);});
 
 /* ---------- sample ---------- */
-async function loadSample(){
-  const name='哈德斯主角臥室.glb';showLoading(name);
-  try{const res=await fetch('hades-bedroom.glb?v=2');if(!res.ok)throw new Error('範例檔讀取失敗（'+res.status+'）');
+const SAMPLES={
+  "reality-home":{name:"現實主角家.glb",file:"reality-home.glb?v=1",cut:0.8},
+  "hades-bedroom":{name:"哈德斯主角臥室.glb",file:"hades-bedroom.glb?v=2",cut:0.72}
+};
+async function loadSample(key){
+  const smp=SAMPLES[key]||SAMPLES["reality-home"];showLoading(smp.name);
+  try{const res=await fetch(smp.file);if(!res.ok)throw new Error('範例檔讀取失敗（'+res.status+'）');
     const total=+res.headers.get('content-length')||0;const reader=res.body.getReader();const chunks=[];let got=0;
     for(;;){const {done,value}=await reader.read();if(done)break;chunks.push(value);got+=value.length;if(total)setProg(got/total);}
     const buf=new Uint8Array(got);let o=0;chunks.forEach(c=>{buf.set(c,o);o+=c.length;});
-    openModel(buf.buffer,name,{cut:0.72});
+    openModel(buf.buffer,smp.name,{cut:smp.cut});
   }catch(e){showError(e.message);}
 }
-$('bSample').onclick=loadSample;
+const sampleSel=$('sampleSel');
+const startKey=(location.hash||'').slice(1);
+if(SAMPLES[startKey])sampleSel.value=startKey;
+sampleSel.onchange=()=>loadSample(sampleSel.value);
 
 /* ---------- loop ---------- */
 function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();}
@@ -262,7 +276,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(anim){const k=reduce?1:0.1;camera.position.lerp(anim.p,k);controls.target.lerp(anim.t,k);if(camera.position.distanceTo(anim.p)<size.length()*0.0005)anim=null;}
   controls.update();renderer.render(scene,camera);})();
 
-loadSample();
+loadSample(sampleSel.value);
 })();
 </script>
 
