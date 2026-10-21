@@ -1,4 +1,4 @@
-const CACHE="lizhi-cloud-v109";
+const CACHE="lizhi-cloud-v110";
 const FILES=[
   // BEGIN IMAGE GRAPH ASSETS
   "image-graph/?v=36",
@@ -79,5 +79,5 @@ self.addEventListener("fetch",event=>{
   const url=new URL(event.request.url);
   if(event.request.method!=="GET"||url.origin!==self.location.origin||url.pathname.endsWith("/upload-status.json"))return;
   if(event.request.headers.has("range"))return;
-  event.respondWith(fetch(event.request).then(response=>{if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(event.request,copy)).catch(()=>{}));}return response;}).catch(async()=>await caches.match(event.request)||(event.request.mode==="navigate"?await caches.match(new URL("index.html",self.registration.scope).href):null)||new Response("離線且尚未快取此內容",{status:503})));
+  event.respondWith(fetch(event.request,event.request.mode==="navigate"?{cache:"no-cache"}:undefined).then(response=>{if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(event.request,copy)).catch(()=>{}));}return response;}).catch(async()=>await caches.match(event.request)||(event.request.mode==="navigate"?await caches.match(new URL("index.html",self.registration.scope).href):null)||new Response("離線且尚未快取此內容",{status:503})));
 });
