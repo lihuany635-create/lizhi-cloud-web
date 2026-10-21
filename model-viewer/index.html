@@ -53,6 +53,17 @@ button,label.btn{font:inherit;cursor:pointer}
 .cut input{flex:1;accent-color:var(--accent)}
 .cut output{font-family:var(--f-mono);font-size:12px;min-width:56px;text-align:right;color:var(--muted)}
 .hint{position:absolute;right:max(10px,env(safe-area-inset-right,0px));bottom:10px;font-size:11px;color:var(--muted);background:var(--panel);padding:4px 8px;border-radius:6px;opacity:.9}
+.tog:disabled{opacity:.45;cursor:not-allowed}
+.place-banner{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:var(--accent);color:var(--accent-ink);font-size:13px;font-weight:700;padding:7px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.18);pointer-events:none;white-space:nowrap}
+.pov-ui{position:absolute;inset:0;pointer-events:none}
+.pov-ui>*{pointer-events:auto}
+.pov-exit{position:absolute;left:max(12px,env(safe-area-inset-left,0px));top:12px}
+.pov-speed{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:12px}
+.pov-ui .btn{background:rgba(20,26,30,.72);color:#f1f4f5;border-color:rgba(255,255,255,.22);backdrop-filter:blur(6px)}
+.joy{position:absolute;left:max(18px,env(safe-area-inset-left,0px));bottom:22px;width:116px;height:116px;border-radius:50%;background:rgba(20,26,30,.35);border:2px solid rgba(255,255,255,.45);touch-action:none}
+.joy i{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.pov-tip{position:absolute;right:max(12px,env(safe-area-inset-right,0px));bottom:12px;max-width:60%;font-size:11px;color:#f1f4f5;background:rgba(20,26,30,.6);padding:5px 9px;border-radius:6px;pointer-events:none}
+.crosshair{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:0 0 0 1px rgba(0,0,0,.35);pointer-events:none}
   :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
   body{margin:0;font-size:14px}
   [hidden]{display:none!important}
@@ -82,7 +93,15 @@ button,label.btn{font:inherit;cursor:pointer}
       <div class="prog"><i id="progBar"></i></div>
     </div>
   </div>
-  <div class="hint">拖曳旋轉・右鍵/雙指平移・滾輪縮放・可把檔案拖進來</div>
+  <div class="hint" id="hint">拖曳旋轉・右鍵/雙指平移・滾輪縮放・可把檔案拖進來</div>
+  <div class="place-banner" id="placeBanner" hidden>點模型上的地板放置人偶</div>
+  <div class="pov-ui" id="povUi" hidden>
+    <div class="crosshair"></div>
+    <button class="btn pov-exit" id="povExit">← 離開人偶視角</button>
+    <button class="btn pov-speed" id="povSpeed">步行</button>
+    <div class="joy" id="joy" aria-label="移動搖桿"><i id="joyKnob"></i></div>
+    <div class="pov-tip">拖曳畫面轉頭・左下搖桿移動<br>電腦：WASD／方向鍵移動，Shift 加速</div>
+  </div>
 </div>
 
 <div class="panel">
@@ -93,6 +112,8 @@ button,label.btn{font:inherit;cursor:pointer}
     <span>材質<b id="sMat">—</b></span>
   </div>
   <div class="ctrls">
+    <button class="tog" id="tPlace" aria-pressed="false">放置人偶</button>
+    <button class="tog" id="tPov" disabled>人偶視角</button>
     <button class="tog" id="tFit">重新置中</button>
     <button class="tog" id="tTop" aria-pressed="false">俯視</button>
     <button class="tog" id="tRot" aria-pressed="false">自動旋轉</button>
@@ -175,7 +196,7 @@ async function openModel(buf,name,opts={}){
   showLoading(name);
   try{
     const obj=await loadBuffer(buf,name);
-    clearModel();model=obj;
+    clearModel();model=obj;removeFigure();
     if(name.toLowerCase().endsWith('.fbx')||opts.scaleGuess){/* FBX often in cm */}
     model.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true;
       [].concat(o.material).forEach(m=>{if(m){m.clippingPlanes=[clip];m.clipShadows=true;m.side=m.side??THREE.FrontSide;}});}});
@@ -271,12 +292,157 @@ const startKey=(location.hash||'').slice(1);
 if(SAMPLES[startKey])sampleSel.value=startKey;
 sampleSel.onchange=()=>loadSample(sampleSel.value);
 
+/* ---------- mannequin ---------- */
+const EYE=1.6, FIG_H=1.72;
+let figure=null, figFeet=new THREE.Vector3(), figYaw=0, placing=false, pov=false;
+const figMat=new THREE.MeshStandardMaterial({color:0xe3803d,roughness:.45,metalness:.05,emissive:0x2a1004});
+const jointMat=new THREE.MeshStandardMaterial({color:0x3a3f45,roughness:.5});
+function part(geo,mat,x,y,z,rx=0,rz=0){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.set(rx,0,rz);m.castShadow=true;return m;}
+function buildFigure(){
+  const g=new THREE.Group();
+  const leg=new THREE.CylinderGeometry(.065,.055,.82,12), arm=new THREE.CylinderGeometry(.045,.04,.62,10);
+  g.add(part(leg,figMat,-.1,.43,0),part(leg,figMat,.1,.43,0));
+  g.add(part(new THREE.CylinderGeometry(.15,.12,.22,16),figMat,0,.93,0));          // hips
+  g.add(part(new THREE.CylinderGeometry(.19,.15,.5,16),figMat,0,1.27,0));          // torso
+  g.add(part(new THREE.SphereGeometry(.2,16,10),figMat,0,1.5,0));                  // shoulders
+  g.add(part(arm,figMat,-.25,1.2,0,0,.12),part(arm,figMat,.25,1.2,0,0,-.12));
+  g.add(part(new THREE.CylinderGeometry(.05,.05,.1,10),jointMat,0,1.6,0));          // neck
+  g.add(part(new THREE.SphereGeometry(.115,20,14),figMat,0,1.66+.04,0));          // head
+  const nose=part(new THREE.ConeGeometry(.035,.09,10),jointMat,0,1.7,.125,Math.PI/2);g.add(nose);   // facing +Z
+  for(const x of [-.1,.1])g.add(part(new THREE.SphereGeometry(.065,10,8),jointMat,x,.43,0));
+  const ring=new THREE.Mesh(new THREE.RingGeometry(.32,.4,40),new THREE.MeshBasicMaterial({color:0xe3803d,transparent:true,opacity:.75,side:THREE.DoubleSide}));
+  ring.rotation.x=-Math.PI/2;ring.position.y=.01;g.add(ring);
+  const arrow=new THREE.Mesh(new THREE.ConeGeometry(.12,.28,3),ring.material);arrow.rotation.x=Math.PI/2;arrow.position.set(0,.012,.55);arrow.scale.y=1;g.add(arrow);
+  return g;
+}
+function removeFigure(){if(figure){scene.remove(figure);figure=null;}$('tPov').disabled=true;if(pov)exitPov();}
+function placeFigure(p,yaw){
+  if(!figure){figure=buildFigure();scene.add(figure);}
+  figFeet.copy(p);figYaw=yaw;figure.position.copy(p);figure.rotation.y=yaw;$('tPov').disabled=false;
+}
+const ray=new THREE.Raycaster(), ndc=new THREE.Vector2(), tmpN=new THREE.Vector3();
+function cutHeight(){return clip.constant<1e5?clip.constant:Infinity;}
+function pickFloor(clientX,clientY){
+  const r=renderer.domElement.getBoundingClientRect();
+  ndc.set(((clientX-r.left)/r.width)*2-1,-((clientY-r.top)/r.height)*2+1);
+  ray.setFromCamera(ndc,camera);ray.far=Infinity;
+  const hits=model?ray.intersectObject(model,true):[];const top=cutHeight()+1e-3;
+  for(const h of hits){
+    if(h.point.y>top)continue;                                      // clipped away: look through it
+    if(!h.face)continue;
+    tmpN.copy(h.face.normal).transformDirection(h.object.matrixWorld);
+    if(tmpN.y>0.55)return h.point.clone();                          // floor-like surface
+    // a wall or furniture side: step back toward the viewer and drop to the floor in front of it
+    const back=ray.ray.direction.clone().setY(0).normalize().multiplyScalar(-0.35);
+    const from=h.point.clone().add(back);from.y=Math.min(top,h.point.y+0.3);
+    ray.set(from,new THREE.Vector3(0,-1,0));ray.far=Infinity;
+    const g=ray.intersectObject(model,true).find(k=>k.point.y<=top);
+    return g?g.point.clone():null;
+  }
+  // nothing hit: drop onto the ground plane
+  const t=-(ray.ray.origin.y-box.min.y)/ray.ray.direction.y;
+  return t>0?ray.ray.origin.clone().addScaledVector(ray.ray.direction,t):null;
+}
+function setPlacing(on){placing=on;$('tPlace').setAttribute('aria-pressed',on);$('placeBanner').hidden=!on;
+  $('placeBanner').textContent='點模型上的地板放置人偶';}
+$('tPlace').onclick=()=>{if(!model)return;setPlacing(!placing);};
+let downAt=null;
+renderer.domElement.addEventListener('pointerdown',e=>{downAt={x:e.clientX,y:e.clientY,t:performance.now()};});
+renderer.domElement.addEventListener('pointerup',e=>{
+  if(!placing||!downAt||pov)return;
+  const moved=Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y);downAt=null;
+  if(moved>8)return;
+  const p=pickFloor(e.clientX,e.clientY);
+  if(!p){$('placeBanner').textContent='這裡是牆面，請點在地板上';return;}
+  const f=new THREE.Vector3();camera.getWorldDirection(f);
+  placeFigure(p,Math.atan2(f.x,f.z));setPlacing(false);
+});
+
+/* ---------- first-person (mannequin) view ---------- */
+let yaw=0,pitch=0,saved=null,speedIdx=0;const SPEEDS=[['步行',1.4],['跑步',4],['快速',12]];
+const keys=new Set(),joyV=new THREE.Vector2();
+function enterPov(){
+  if(!figure||pov)return;pov=true;setPlacing(false);
+  saved={pos:camera.position.clone(),tgt:controls.target.clone(),fov:camera.fov,near:camera.near,cut:cutIn.value};
+  anim=null;controls.enabled=false;controls.autoRotate=false;$('tRot').setAttribute('aria-pressed',false);
+  setCut(1);cutIn.disabled=true;figure.visible=false;
+  yaw=figYaw;pitch=0;camera.fov=70;camera.near=0.05;camera.updateProjectionMatrix();
+  $('povUi').hidden=false;$('hint').hidden=true;$('tPov').setAttribute('aria-pressed',true);$('tPov').textContent='離開視角';
+  updatePovCamera();
+}
+function exitPov(){
+  if(!pov)return;pov=false;
+  figure&&(figure.visible=true,figure.position.copy(figFeet),figure.rotation.y=figYaw=yaw);
+  camera.fov=saved.fov;camera.near=saved.near;camera.updateProjectionMatrix();
+  camera.position.copy(saved.pos);controls.target.copy(saved.tgt);controls.enabled=true;
+  cutIn.disabled=false;cutIn.value=saved.cut;applyCut();
+  $('povUi').hidden=true;$('hint').hidden=false;$('tPov').setAttribute('aria-pressed',false);$('tPov').textContent='人偶視角';
+  keys.clear();joyV.set(0,0);
+}
+$('tPov').onclick=()=>pov?exitPov():enterPov();
+$('povExit').onclick=exitPov;
+$('povSpeed').onclick=()=>{speedIdx=(speedIdx+1)%SPEEDS.length;$('povSpeed').textContent=SPEEDS[speedIdx][0];};
+function updatePovCamera(){
+  camera.position.set(figFeet.x,figFeet.y+EYE,figFeet.z);
+  const d=new THREE.Vector3(Math.sin(yaw)*Math.cos(pitch),Math.sin(pitch),Math.cos(yaw)*Math.cos(pitch));
+  camera.lookAt(camera.position.clone().add(d));
+}
+// drag to look
+let look=null;
+renderer.domElement.addEventListener('pointerdown',e=>{if(!pov)return;look={id:e.pointerId,x:e.clientX,y:e.clientY};renderer.domElement.setPointerCapture(e.pointerId);});
+renderer.domElement.addEventListener('pointermove',e=>{if(!pov||!look||e.pointerId!==look.id)return;
+  const k=0.0042;yaw-=(e.clientX-look.x)*k;pitch=Math.max(-1.35,Math.min(1.35,pitch-(e.clientY-look.y)*k));look.x=e.clientX;look.y=e.clientY;});
+['pointerup','pointercancel'].forEach(t=>renderer.domElement.addEventListener(t,e=>{if(look&&e.pointerId===look.id)look=null;}));
+// joystick
+const joy=$('joy'),knob=$('joyKnob');let joyId=null;
+function joyMove(e){const r=joy.getBoundingClientRect();let x=(e.clientX-(r.left+r.width/2))/(r.width/2),y=(e.clientY-(r.top+r.height/2))/(r.height/2);
+  const l=Math.hypot(x,y);if(l>1){x/=l;y/=l;}joyV.set(x,y);knob.style.transform=`translate(${x*34}px,${y*34}px)`;}
+joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joy.setPointerCapture(e.pointerId);joyMove(e);e.stopPropagation();});
+joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)joyMove(e);});
+['pointerup','pointercancel'].forEach(t=>joy.addEventListener(t,e=>{if(e.pointerId!==joyId)return;joyId=null;joyV.set(0,0);knob.style.transform='';}));
+addEventListener('keydown',e=>{if(!pov)return;keys.add(e.key.toLowerCase());if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase()))e.preventDefault();if(e.key==='Escape')exitPov();});
+addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
+const down=new THREE.Vector3(0,-1,0), hz=new THREE.Vector3();
+function blocked(from,dir,dist){
+  for(const h of [0.45,1.15]){
+    ray.set(new THREE.Vector3(from.x,from.y+h,from.z),dir);ray.far=dist;
+    if(ray.intersectObject(model,true).length)return true;
+  }
+  return false;
+}
+function stepPov(dt){
+  let f=0,s=0;
+  if(keys.has('w')||keys.has('arrowup'))f+=1; if(keys.has('s')||keys.has('arrowdown'))f-=1;
+  if(keys.has('a')||keys.has('arrowleft'))s-=1; if(keys.has('d')||keys.has('arrowright'))s+=1;
+  f-=joyV.y; s+=joyV.x;
+  const len=Math.hypot(f,s);
+  if(len>0.05&&model){
+    const sp=SPEEDS[speedIdx][1]*(keys.has('shift')?2.5:1)*dt/Math.max(1,len);
+    const fx=Math.sin(yaw),fz=Math.cos(yaw), rx=-Math.cos(yaw),rz=Math.sin(yaw);
+    const mx=(fx*f+rx*s)*sp, mz=(fz*f+rz*s)*sp;
+    // slide along walls: try each axis separately
+    for(const [dx,dz] of [[mx,0],[0,mz]]){
+      const d=Math.hypot(dx,dz);if(d<1e-6)continue;
+      hz.set(dx/d,0,dz/d);
+      if(!blocked(figFeet,hz,d+0.25)){figFeet.x+=dx;figFeet.z+=dz;}
+    }
+    // follow floors / stairs / terrain (step up to 0.45 m, fall any height)
+    ray.set(new THREE.Vector3(figFeet.x,figFeet.y+0.45,figFeet.z),down);ray.far=200;
+    const hit=ray.intersectObject(model,true)[0];
+    figFeet.y=hit?hit.point.y:Math.max(box.min.y,figFeet.y-9.8*dt);
+  }
+  updatePovCamera();
+}
+
 /* ---------- loop ---------- */
 function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();}
 new ResizeObserver(resize).observe(stage);resize();
 camera.position.set(-6,6,8);controls.target.set(0,1,0);
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let lastT=performance.now();
 (function loop(){requestAnimationFrame(loop);
+  const now=performance.now(),dt=Math.min(.05,(now-lastT)/1000);lastT=now;
+  if(pov){stepPov(dt);renderer.render(scene,camera);return;}
   if(anim){const k=reduce?1:0.1;camera.position.lerp(anim.p,k);controls.target.lerp(anim.t,k);if(camera.position.distanceTo(anim.p)<size.length()*0.0005)anim=null;}
   controls.update();renderer.render(scene,camera);})();
 
