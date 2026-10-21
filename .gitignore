@@ -8,4 +8,16 @@ Thumbs.db
 .cloudflared/
 cert.pem
 cloudflared.log
+node_modules/
+dist-mobile/
+artifacts/
+android/.gradle/
+android/.kotlin/
+android/local.properties
+android/**/build/
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+*.keystore
+*.jks
 

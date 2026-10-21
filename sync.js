@@ -5,7 +5,7 @@
   let timer = null;
 
   function isCloud() {
-    return Boolean(window.LizhiAuth && location.hostname.endsWith("github.io"));
+    return Boolean(window.LizhiAuth && (window.LizhiPlatform?.isNative || location.hostname.endsWith("github.io")));
   }
 
   function schedule() {

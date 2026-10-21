@@ -1,13 +1,15 @@
 (function () {
   const ALLOWED_EMAIL = "lihuany635@gmail.com";
+  const native = Boolean(window.LizhiPlatform?.isNative);
   const client = window.supabase.createClient(
     window.LIZHI_SUPABASE_URL,
     window.LIZHI_SUPABASE_PUBLISHABLE_KEY,
-    { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+    { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: !native, ...(native ? { flowType: "pkce" } : {}) } }
   );
+  window.LizhiMobile?.attachAuth(client);
 
   let currentUser = null;
-  const allowedRoutes = new Set(["home","knowledge","weave","finance","engineering","media","chat","study","a4","licut","imagegraph","trash","settings","uploads","library","ai"]);
+  const allowedRoutes = new Set(["home","knowledge","weave","finance","engineering","media","chat","study","a4","licut","imagegraph","model3d","animation","trash","settings","uploads","library","ai"]);
   function returnURL() {
     const target = new URL(location.origin + location.pathname), requested = new URLSearchParams(location.search).get("open");
     if (allowedRoutes.has(requested)) target.searchParams.set("open", requested);
@@ -23,6 +25,12 @@
       const button = document.querySelector("#lizhi-google-login");
       button.disabled = true;
       button.textContent = "正在前往 Google…";
+      if (native) {
+        try { await window.LizhiMobile.signIn(client); }
+        catch { renderGate("無法開啟登入，請確認網路與 App 登入回傳網址設定。"); }
+        finally { button.disabled = false; button.textContent = "使用 Google 登入"; }
+        return;
+      }
       const { error } = await client.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: returnURL() }

@@ -1,0 +1,8 @@
+{
+  "appId": "tw.lizhi.cloud",
+  "appName": "立之雲端庫",
+  "webDir": "dist-mobile",
+  "server": { "hostname": "localhost", "androidScheme": "https", "cleartext": false },
+  "android": { "allowMixedContent": false },
+  "plugins": { "SystemBars": { "insetsHandling": "native" } }
+}
