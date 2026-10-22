@@ -30,6 +30,9 @@
   const dev=()=>global.LibraryDevice;
   const deviceReady=()=>dev()?.status==="ready";
   const onDevice=item=>item.location==="device";
+  const onComputer=item=>item.location==="computer";
+  const computer=()=>global.LibraryComputer;
+  let scanning=false,scanProgress="";
   const toast=message=>typeof global.toast==="function"?global.toast(message):typeof window.toast==="function"?window.toast(message):alert(message);
 
   function highlight(text){
@@ -131,8 +134,35 @@
     });
   }
 
+  async function scanComputer(){
+    if(scanning)return;
+    scanning=true;scanProgress="正在讀取電腦檔案";rerender();
+    let added=0,unchanged=0,failed=0;
+    try{
+      const result=await computer().scan({limit:750});
+      for(const entry of result.entries){
+        try{
+          const out=await global.LibraryStore.registerComputer(entry,result);
+          if(out.skipped)unchanged++;
+          else{added++;items=[out.row,...items.filter(it=>it.id!==out.row.id)];}
+        }catch(err){failed++;console.warn("圖書館索引失敗",entry.path,err);}
+        scanProgress=`已檢查 ${added+unchanged+failed}/${result.entries.length} 個 · 新增/更新 ${added}`;
+        if((added+unchanged+failed)%10===0)rerender();
+      }
+      toast(`電腦館藏：新增/更新 ${added}、未變更 ${unchanged}、失敗 ${failed}${result.truncated?"；本次最多掃描750筆，尚未完成全部掃描":""}`);
+    }catch(err){alert(err.message);}
+    finally{scanning=false;scanProgress="";schedulePoll();rerender();}
+  }
+  function computerPanel(){
+    const pc=computer();
+    if(!pc||pc.status==="loading")return "";
+    if(!pc.supported)return '<div class="library-storage"><span>🖥️ 電腦館藏</span><small>在 Windows 的 Chrome／Edge 開啟同一個圖書館，即可連結電腦資料夾；手機可搜尋已建立索引的館藏。</small></div>';
+    if(pc.status==="none")return '<div class="library-storage"><span>🖥️ 擴充電腦館藏</span><button class="button" data-library-pc-link>連結電腦資料夾</button><small>只讀取你選擇的資料夾及子資料夾，原檔留在電腦，僅上傳文字摘錄與縮圖。</small></div>';
+    return `<div class="library-storage"><span>🖥️ 電腦館藏：「${esc(pc.name)}」</span><div class="library-storage-actions">${pc.status==="needs-permission"?'<button class="button" data-library-pc-grant>允許讀取</button>':`<button class="button primary" data-library-pc-scan ${scanning?"disabled":""}>${scanning?"建立索引中…":"掃描並更新館藏"}</button>`}<button class="button" data-library-pc-link>更換資料夾</button><button class="button" data-library-pc-unlink>解除本機連結</button></div><small>${esc(scanProgress||"原檔不會上傳；這台電腦關機後手機仍可搜尋摘要，但無法直接讀取電腦原檔。")}</small></div>`;
+  }
+
   async function moveAllToDevice(){
-    const cloud=items.filter(item=>!onDevice(item));
+    const cloud=items.filter(item=>item.location==="cloud");
     if(!cloud.length)return;
     if(!confirm(`把雲端的 ${cloud.length} 本搬到手機資料夾「${dev().name}」？搬完後雲端只留文字與摘要，原檔只在這支手機上。`))return;
     await runJobs(cloud.map(item=>({name:item.file_name,stage:"moving",error:"",id:item.id})),async job=>{
@@ -144,7 +174,7 @@
   function storagePanel(){
     const d=dev();
     if(!d||d.status==="loading")return "";
-    const cloudCount=items.filter(item=>!onDevice(item)).length;
+    const cloudCount=items.filter(item=>item.location==="cloud").length;
     if(d.status==="unsupported")return `<div class="library-storage"><span>☁ 檔案存在雲端</span><small>這個瀏覽器不能存到手機資料夾；Android 請用 Chrome 132 以上。</small></div>`;
     if(d.status==="none")return `<div class="library-storage"><span>☁ 檔案目前存在雲端</span><button class="button" data-library-link>改存到手機資料夾</button><small>選一個手機資料夾（例如「文件／立之圖書館」），之後上傳的檔案都放那裡，雲端只留文字與摘要。</small></div>`;
     if(d.status==="needs-permission")return `<div class="library-storage warn"><span>📱 手機資料夾「${esc(d.name)}」</span><button class="button primary" data-library-grant>允許存取</button><small>重新打開網站後，要點一下允許才能讀寫資料夾。</small></div>`;
@@ -163,7 +193,7 @@
       ${item.summary?`<p class="library-summary">${highlight(item.summary)}</p>`:inbox?`<p class="library-hint">${esc(item.extract_note||"等整理後會寫上摘要與重點")}</p>`:""}
       ${snippet&&query()?`<p class="library-snippet">…${highlight(snippet)}…</p>`:""}
       ${item.tags?.length?`<div class="meta">${item.tags.map(tag=>`<span class="chip">${highlight(tag)}</span>`).join("")}</div>`:""}
-      <p class="library-meta">${onDevice(item)?"📱":"☁"} ${bytes(item.size||0)} · ${day(item.created_at)}${item.key_points?.length?` · ${item.key_points.length} 個重點`:""}</p>
+      <p class="library-meta">${onDevice(item)?"📱":onComputer(item)?"🖥️":"☁"} ${bytes(item.size||0)} · ${day(item.created_at)}${item.key_points?.length?` · ${item.key_points.length} 個重點`:""}</p>
     </article>`;
   }
 
@@ -219,6 +249,7 @@
     return `${header}<section class="section library-section">
       <div class="library-intake">
         ${storagePanel()}
+        ${computerPanel()}
         <div class="dropzone library-drop" data-library-drop role="button" tabindex="0">
           <strong>${busy?"正在上傳…":"把檔案放進圖書館"}</strong>
           <small>點這裡選檔案或拖曳進來 · PDF、Word、Excel、PowerPoint、文字檔、圖片${deviceReady()?" · 存到手機資料夾":" · 雲端單檔 50 MB"}</small>
@@ -254,7 +285,7 @@
         ${item.tags?.length?`<h3>標籤</h3><div class="meta">${item.tags.map(tag=>`<button class="chip" data-library-tag-jump="${esc(tag)}">${esc(tag)}</button>`).join("")}</div>`:""}
         ${related.length?`<h3>相關的書</h3><ul class="lib-related">${related.map(book=>`<li><button data-library-read="${esc(book.id)}"><span>${icon(book)}</span>${esc(titleOf(book))}</button></li>`).join("")}</ul>`:""}
         <h3>檔案</h3>
-        <p class="lib-file-meta">${onDevice(item)?`📱 手機資料夾裡的「${esc(item.device_path)}」`:`☁ 雲端：${esc(item.file_name)}`}<br>${bytes(item.size||0)} · ${day(item.created_at)} 上傳${item.organized_at?` · ${day(item.organized_at)} 整理`:""}</p>
+        <p class="lib-file-meta">${onDevice(item)?`📱 手機資料夾裡的「${esc(item.device_path)}」`:onComputer(item)?`🖥️ 電腦「${esc(item.computer_name)}」／${esc(item.computer_path)}`:`☁ 雲端：${esc(item.file_name)}`}<br>${bytes(item.size||0)} · ${day(item.created_at)} 上傳${item.organized_at?` · ${day(item.organized_at)} 整理`:""}</p>
         <p class="lib-note">${item.user_note?`備註：${esc(item.user_note)}`:"還沒有備註"}</p>
         <div class="lib-info-actions">
           <button class="button" data-library-note="${esc(item.id)}">${item.user_note?"改備註":"加備註"}</button>
@@ -268,7 +299,7 @@
           <button class="icon-button" data-reader-close aria-label="返回圖書館">‹</button>
           <h2>${esc(titleOf(item))}</h2>
           <button class="button" data-reader-ask title="複製問句，貼給 Claude">問這本書</button>
-          ${onDevice(item)?"":`<button class="button" data-reader-download>下載</button>`}
+          ${onDevice(item)||onComputer(item)&&!computer()?.canRead(item)?"":`<button class="button" data-reader-download>下載</button>`}
         </header>
         <nav class="lib-reader-tabs"><button data-reader-tab="content" class="${tab==="content"?"active":""}">內容</button><button data-reader-tab="info" class="${tab==="info"?"active":""}">摘要與重點</button></nav>
         <div class="lib-reader-body">
@@ -297,6 +328,10 @@
     }
 
     async function renderContent(item,viewer,mine){
+      if(onComputer(item)&&!computer()?.canRead(item)){
+        await showExcerpt(item,viewer,mine,"原檔保存在連結的電腦；手機目前可查看館藏索引與文字摘錄。");
+        return;
+      }
       if(onDevice(item)&&!deviceReady()){
         const d=dev();
         if(d?.status==="needs-permission"){
@@ -390,7 +425,7 @@
 
   async function deleteItem(id){
     const item=find(id);if(!item)return;
-    if(!confirm(`確定要從圖書館刪除「${titleOf(item)}」？${onDevice(item)?"手機資料夾裡的原檔也會一起刪除。":"雲端的檔案會一起刪除。"}`))return;
+    if(!confirm(`確定要從圖書館刪除「${titleOf(item)}」？${onComputer(item)?"只會移除館藏索引，電腦原檔不會刪除。":onDevice(item)?"手機資料夾裡的原檔也會一起刪除。":"雲端的檔案會一起刪除。"}`))return;
     if(onDevice(item)&&!deviceReady()&&dev()?.status==="needs-permission"&&!(await dev().grant().catch(()=>false))){alert("需要允許存取手機資料夾才能刪除原檔");return;}
     try{await global.LibraryStore.remove(item);items=items.filter(entry=>entry.id!==item.id);if(Reader.id===item.id)Reader.close();rerender();}
     catch(err){alert(err.message);}
@@ -410,6 +445,10 @@
     if(el.hasAttribute("data-reader-grant")){stop();Reader.grantAndReload();return;}
     if(el.hasAttribute("data-library-link")){stop();dev().link().then(name=>{toast(`之後的檔案會存到「${name}」`);rerender();}).catch(err=>{if(err?.name!=="AbortError")alert(err.message);});return;}
     if(el.hasAttribute("data-library-grant")){stop();dev().grant().then(()=>rerender()).catch(err=>alert(err.message));return;}
+    if(el.hasAttribute("data-library-pc-link")){stop();computer().link().then(()=>rerender()).catch(err=>{if(err?.name!=="AbortError")alert(err.message);});return;}
+    if(el.hasAttribute("data-library-pc-grant")){stop();computer().grant().then(()=>rerender()).catch(err=>alert(err.message));return;}
+    if(el.hasAttribute("data-library-pc-scan")){stop();scanComputer();return;}
+    if(el.hasAttribute("data-library-pc-unlink")){stop();computer().unlink().then(()=>rerender()).catch(err=>alert(err.message));return;}
     if(el.hasAttribute("data-library-sync")){stop();syncFolder();return;}
     if(el.hasAttribute("data-library-move")){stop();moveAllToDevice();return;}
     if(el.hasAttribute("data-reader-ask")){stop();Reader.ask();return;}
@@ -420,6 +459,7 @@
   function installEvents(root){
     document.body.append(fileInput);
     global.LibraryDevice?.init().then(()=>rerender());
+    global.LibraryComputer?.init().then(()=>rerender());
     fileInput.addEventListener("change",()=>{if(fileInput.files.length)uploadFiles(fileInput.files);fileInput.value="";});
 
     root.addEventListener("click",onClick,true);
