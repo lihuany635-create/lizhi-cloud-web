@@ -1,0 +1,66 @@
+{
+  "format": "rg-current-models/1",
+  "version": "v2.3",
+  "scene_count": 5,
+  "active_selector_count": 5,
+  "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
+  "meaning": "Each scene uses its already combined complete GLB at the canonical path. Versions are archived; separate real/game scenes are preserved.",
+  "full_422_accepted": false,
+  "models": [
+    {
+      "model": "reality-home.glb",
+      "version": "v2.3",
+      "source_candidate": "reality-home_v2_3_candidate.glb",
+      "current_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+      "backup": "backups/pre-v2.3/reality-home.glb",
+      "backup_sha256": "8e1ee17116da722756e073db8f2e980f090b0d965ec5f5a2bd40c30b341b64ed",
+      "git_blob_sha": "4f19333fd766c4f0e89dd6756f15a4990a2f41e6",
+      "integrated_contents": "Existing scene and added geometry in one self-contained GLB. Not concatenated with original a second time.",
+      "author_full_item_approval": "PENDING"
+    },
+    {
+      "model": "hades-house.glb",
+      "version": "v2.3",
+      "source_candidate": "hades-house_v2_3_candidate.glb",
+      "current_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+      "backup": "backups/pre-v2.3/hades-house.glb",
+      "backup_sha256": "909fabe5960faca4ad8bd24e1e59dfb7201323b537749191963a5808f7b386a5",
+      "git_blob_sha": "86cd874711f620c9d4072efcfe2fe5313551d327",
+      "integrated_contents": "Existing scene and added geometry in one self-contained GLB. Not concatenated with original a second time.",
+      "author_full_item_approval": "PENDING"
+    },
+    {
+      "model": "reality-highschool.glb",
+      "version": "v2.3",
+      "source_candidate": "reality-highschool_v2_3_candidate.glb",
+      "current_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+      "backup": "backups/pre-v2.3/reality-highschool.glb",
+      "backup_sha256": "91fadd17b792cb411c83c19d7ccbedd9d49f1dff22c48b2bfafbfcf9aa1c0cff",
+      "git_blob_sha": "b81fa79c00c87ee2d4699068560eea2bff86c83d",
+      "integrated_contents": "Existing scene and added geometry in one self-contained GLB. Not concatenated with original a second time.",
+      "author_full_item_approval": "PENDING"
+    },
+    {
+      "model": "xiji-station.glb",
+      "version": "v2.3",
+      "source_candidate": "xiji-station_v2_3_candidate.glb",
+      "current_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+      "backup": "backups/pre-v2.3/xiji-station.glb",
+      "backup_sha256": "d56f799604fa40b76a12c6b8a588d9c2401140a1e0ea8440f04d6e929431b8c1",
+      "git_blob_sha": "3939e64338de02b14ab57faa33c16873d178b79a",
+      "integrated_contents": "Existing scene and added geometry in one self-contained GLB. Not concatenated with original a second time.",
+      "author_full_item_approval": "PENDING"
+    },
+    {
+      "model": "lahudi-academy.glb",
+      "version": "v2.3",
+      "source_candidate": "lahudi-academy_v2_3_candidate.glb",
+      "current_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "backup": "backups/pre-v2.3/lahudi-academy.glb",
+      "backup_sha256": "3bde0d09b74d49ca92d70007638b2b9b0a1f5fffad4e0071635b5375639842c8",
+      "git_blob_sha": "68d999ba32914c6ac206f93ed9cbf2ddf93a3f32",
+      "integrated_contents": "Existing scene and added geometry in one self-contained GLB. Not concatenated with original a second time.",
+      "author_full_item_approval": "PENDING"
+    }
+  ]
+}

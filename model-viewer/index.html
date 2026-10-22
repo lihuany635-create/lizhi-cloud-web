@@ -103,15 +103,7 @@ button,label.btn{font:inherit;cursor:pointer}
       <option value="hades-house">哈德斯家（遊戲主角家，一、二樓）</option>
       <option value="reality-highschool">現實高中（校園＋3F 教室）</option>
       <option value="xiji-station">溪磯鎮車站</option>
-      <option value="lahudi-academy">拉乎迪學院（校園外觀＋薇媞後花園）</option>
-
-      <optgroup label="v2.3 候選版（待核定）">
-        <option value="reality-home-v23">現實主角家 · v2.3 候選</option>
-        <option value="hades-house-v23">哈德斯家 · v2.3 候選</option>
-        <option value="reality-highschool-v23">現實高中 · v2.3 候選</option>
-        <option value="xiji-station-v23">溪磯鎮車站 · v2.3 候選</option>
-        <option value="lahudi-academy-v23">拉乎迪學院 · v2.3 候選</option>
-      </optgroup>
+      <option value="lahudi-academy">拉乎迪學院（校園＋教室＋告白走廊）</option>
     </select></label>
 </div>
 
@@ -322,16 +314,71 @@ stage.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)readFile(
 
 /* ---------- sample ---------- */
 const SAMPLES={
-  "reality-home":{name:"現實主角家.glb",file:"reality-home.glb?v=7",cut:0.8},
-  "hades-house":{name:"哈德斯家.glb",file:"hades-house.glb?v=1",cut:0.74,fit:[-12,0,-11,12,7.2,12]},
-  "reality-highschool":{name:"現實高中.glb",file:"reality-highschool.glb?v=2",cut:1},
-  "xiji-station":{name:"溪磯鎮車站.glb",file:"xiji-station.glb?v=1",cut:1},
-  "lahudi-academy":{name:"拉乎迪學院.glb",file:"lahudi-academy.glb?v=3",cut:1},
-  "reality-home-v23":{"name":"現實主角家 · v2.3 候選.glb","file":"candidates/v2.3/reality-home_v2_3_candidate.glb","cut":1,"fit":[-4.5,0,-6.2,4.5,5.4,6]},
-  "hades-house-v23":{"name":"哈德斯家 · v2.3 候選.glb","file":"candidates/v2.3/hades-house_v2_3_candidate.glb","cut":1,"fit":[-12,0,-11,12,7.2,12]},
-  "reality-highschool-v23":{"name":"現實高中 · v2.3 候選.glb","file":"candidates/v2.3/reality-highschool_v2_3_candidate.glb","cut":1,"fit":[-158,0,-33,-133,11,-13]},
-  "xiji-station-v23":{"name":"溪磯鎮車站 · v2.3 候選.glb","file":"candidates/v2.3/xiji-station_v2_3_candidate.glb","cut":1,"fit":[-15,0,-24,40,7,14]},
-  "lahudi-academy-v23":{"name":"拉乎迪學院 · v2.3 候選.glb","file":"candidates/v2.3/lahudi-academy_v2_3_candidate.glb","cut":0.018,"fit":[-90,0,-68,-65,16,27]}
+  "reality-home": {
+    "name": "現實主角家.glb",
+    "file": "reality-home.glb?v=2.3-merged-20261022",
+    "cut": 1,
+    "fit": [
+      -4.5,
+      0,
+      -6.2,
+      4.5,
+      5.4,
+      6
+    ]
+  },
+  "hades-house": {
+    "name": "哈德斯家.glb",
+    "file": "hades-house.glb?v=2.3-merged-20261022",
+    "cut": 1,
+    "fit": [
+      -12,
+      0,
+      -11,
+      12,
+      7.2,
+      12
+    ]
+  },
+  "reality-highschool": {
+    "name": "現實高中.glb",
+    "file": "reality-highschool.glb?v=2.3-merged-20261022",
+    "cut": 1,
+    "fit": [
+      -158,
+      0,
+      -33,
+      -133,
+      11,
+      -13
+    ]
+  },
+  "xiji-station": {
+    "name": "溪磯鎮車站.glb",
+    "file": "xiji-station.glb?v=2.3-merged-20261022",
+    "cut": 1,
+    "fit": [
+      -15,
+      0,
+      -24,
+      40,
+      7,
+      14
+    ]
+  },
+  "lahudi-academy": {
+    "name": "拉乎迪學院.glb",
+    "file": "lahudi-academy.glb?v=2.3-merged-20261022",
+    "cut": 0.018,
+    "fit": [
+      -90,
+      0,
+      -68,
+      -65,
+      16,
+      27
+    ]
+  }
 };
 async function loadSample(key){
   const smp=SAMPLES[key]||SAMPLES["reality-home"];showLoading(smp.name);
@@ -343,7 +390,7 @@ async function loadSample(key){
   }catch(e){showError(e.message);}
 }
 const sampleSel=$('sampleSel');
-const startKey=(location.hash||'').slice(1);
+const startKey=(location.hash||'').slice(1).replace(/-v23$/,''); // keep previously shared version links working
 if(SAMPLES[startKey])sampleSel.value=startKey;
 sampleSel.onchange=()=>loadSample(sampleSel.value);
 
