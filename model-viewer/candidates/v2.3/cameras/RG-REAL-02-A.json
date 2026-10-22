@@ -1,0 +1,447 @@
+{
+  "format": "lizhi-camera-shots/1",
+  "model": "reality-highschool_v2_3_candidate.glb",
+  "units": "m",
+  "up_axis": "+Y (glTF / three.js)",
+  "coords": "original model space; no recentering",
+  "scene_id": "RG-REAL-02",
+  "group_id": "A",
+  "group_title": "放學教室",
+  "created": "2026-10-22T07:43:36.686284+08:00",
+  "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+  "author_approval": "PENDING",
+  "shots": [
+    {
+      "id": "C01",
+      "unique_id": "RG-REAL-02-A-C01",
+      "note": "教室門見全景｜候選背景鏡位，角色／演技／特效另製",
+      "model": "reality-highschool_v2_3_candidate.glb",
+      "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 20,
+      "sensor": "36x24mm",
+      "vfov_deg": 61.92751306414704,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": -20.136303428248045,
+      "pitch_deg": -3.9783091313262675,
+      "feet": [
+        -150.02,
+        7.200000000000001,
+        -24.2
+      ],
+      "position": [
+        -150.02,
+        8.8,
+        -24.2
+      ],
+      "target": [
+        -152,
+        8.4,
+        -18.8
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -150.02,
+          24.2,
+          8.8
+        ],
+        "target": [
+          -152,
+          18.8,
+          8.4
+        ],
+        "lens_mm": 20,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C02",
+      "unique_id": "RG-REAL-02-A-C02",
+      "note": "窗向夕陽桌面｜候選背景鏡位，角色／演技／特效另製",
+      "model": "reality-highschool_v2_3_candidate.glb",
+      "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 28,
+      "sensor": "36x24mm",
+      "vfov_deg": 46.39718102729637,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 45.0,
+      "pitch_deg": -31.00758300686715,
+      "feet": [
+        -154.8,
+        7.200000000000001,
+        -18
+      ],
+      "position": [
+        -154.8,
+        8.8,
+        -18
+      ],
+      "target": [
+        -153.8,
+        7.95,
+        -17
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -154.8,
+          18,
+          8.8
+        ],
+        "target": [
+          -153.8,
+          17,
+          7.95
+        ],
+        "lens_mm": 28,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C03",
+      "unique_id": "RG-REAL-02-A-C03",
+      "note": "翔吾收書包｜候選背景鏡位，角色／演技／特效另製",
+      "model": "reality-highschool_v2_3_candidate.glb",
+      "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 35,
+      "sensor": "36x24mm",
+      "vfov_deg": 37.84928883210247,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 149.0362434679267,
+      "pitch_deg": -30.974079104309595,
+      "feet": [
+        -154.4,
+        7.050000000000001,
+        -16
+      ],
+      "position": [
+        -154.4,
+        8.65,
+        -16
+      ],
+      "target": [
+        -153.8,
+        7.95,
+        -17
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -154.4,
+          16,
+          8.65
+        ],
+        "target": [
+          -153.8,
+          17,
+          7.95
+        ],
+        "lens_mm": 35,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C04",
+      "unique_id": "RG-REAL-02-A-C04",
+      "note": "阿亦靠近桌側｜候選背景鏡位，角色／演技／特效另製",
+      "model": "reality-highschool_v2_3_candidate.glb",
+      "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 35,
+      "sensor": "36x24mm",
+      "vfov_deg": 37.84928883210247,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": -122.00538320808315,
+      "pitch_deg": -20.35481643003531,
+      "feet": [
+        -152.2,
+        7.200000000000001,
+        -16
+      ],
+      "position": [
+        -152.2,
+        8.8,
+        -16
+      ],
+      "target": [
+        -153.8,
+        8.1,
+        -17
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -152.2,
+          16,
+          8.8
+        ],
+        "target": [
+          -153.8,
+          17,
+          8.1
+        ],
+        "lens_mm": 35,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C05",
+      "unique_id": "RG-REAL-02-A-C05",
+      "note": "兩人交談雙人景｜候選背景鏡位，角色／演技／特效另製",
+      "model": "reality-highschool_v2_3_candidate.glb",
+      "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 28,
+      "sensor": "36x24mm",
+      "vfov_deg": 46.39718102729637,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 0.0,
+      "pitch_deg": -21.80140948635183,
+      "feet": [
+        -153.8,
+        7.200000000000001,
+        -19
+      ],
+      "position": [
+        -153.8,
+        8.8,
+        -19
+      ],
+      "target": [
+        -153.8,
+        8.0,
+        -17
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -153.8,
+          19,
+          8.8
+        ],
+        "target": [
+          -153.8,
+          17,
+          8.0
+        ],
+        "lens_mm": 28,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C06",
+      "unique_id": "RG-REAL-02-A-C06",
+      "note": "阿亦給出遊戲資訊｜候選背景鏡位，角色／演技／特效另製",
+      "model": "reality-highschool_v2_3_candidate.glb",
+      "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 50,
+      "sensor": "36x24mm",
+      "vfov_deg": 26.991466561591622,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 180.0,
+      "pitch_deg": -32.73522627210763,
+      "feet": [
+        -153.8,
+        6.800000000000001,
+        -16.3
+      ],
+      "position": [
+        -153.8,
+        8.4,
+        -16.3
+      ],
+      "target": [
+        -153.8,
+        7.95,
+        -17
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -153.8,
+          16.3,
+          8.4
+        ],
+        "target": [
+          -153.8,
+          17,
+          7.95
+        ],
+        "lens_mm": 50,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C07",
+      "unique_id": "RG-REAL-02-A-C07",
+      "note": "走廊老師質問頸環｜候選背景鏡位，角色／演技／特效另製",
+      "model": "reality-highschool_v2_3_candidate.glb",
+      "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 28,
+      "sensor": "36x24mm",
+      "vfov_deg": 46.39718102729637,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 90.0,
+      "pitch_deg": -2.726310993906275,
+      "feet": [
+        -148.8,
+        7.200000000000001,
+        -26.6
+      ],
+      "position": [
+        -148.8,
+        8.8,
+        -26.6
+      ],
+      "target": [
+        -146.7,
+        8.7,
+        -26.6
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -148.8,
+          26.6,
+          8.8
+        ],
+        "target": [
+          -146.7,
+          26.6,
+          8.7
+        ],
+        "lens_mm": 28,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C08",
+      "unique_id": "RG-REAL-02-A-C08",
+      "note": "走廊轉角消失｜候選背景鏡位，角色／演技／特效另製",
+      "model": "reality-highschool_v2_3_candidate.glb",
+      "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 107.44718842328217,
+      "pitch_deg": -26.133739176215947,
+      "feet": [
+        -142,
+        7.200000000000001,
+        -26.6
+      ],
+      "position": [
+        -142,
+        8.8,
+        -26.6
+      ],
+      "target": [
+        -138.5,
+        7,
+        -27.7
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -142,
+          26.6,
+          8.8
+        ],
+        "target": [
+          -138.5,
+          27.7,
+          7
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "revision": "v2.3-candidate-20261022",
+  "models": [
+    {
+      "file": "hades-house_v2_3_candidate.glb",
+      "bytes": 7688104,
+      "sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+      "active_nodes": 2248,
+      "mesh_primitives": 2248,
+      "triangles": 245206,
+      "validator_errors": 0,
+      "validator_warnings": 1,
+      "author_approval": "PENDING",
+      "deployment": "PUBLISHED_CANDIDATE_PREVIEW_ONLY"
+    },
+    {
+      "file": "lahudi-academy_v2_3_candidate.glb",
+      "bytes": 5309172,
+      "sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "active_nodes": 7724,
+      "mesh_primitives": 7736,
+      "triangles": 298916,
+      "validator_errors": 0,
+      "validator_warnings": 0,
+      "author_approval": "PENDING",
+      "deployment": "PUBLISHED_CANDIDATE_PREVIEW_ONLY"
+    },
+    {
+      "file": "reality-highschool_v2_3_candidate.glb",
+      "bytes": 3446264,
+      "sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+      "active_nodes": 3593,
+      "mesh_primitives": 3592,
+      "triangles": 172214,
+      "validator_errors": 0,
+      "validator_warnings": 0,
+      "author_approval": "PENDING",
+      "deployment": "PUBLISHED_CANDIDATE_PREVIEW_ONLY"
+    },
+    {
+      "file": "reality-home_v2_3_candidate.glb",
+      "bytes": 3885536,
+      "sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+      "active_nodes": 1570,
+      "mesh_primitives": 1570,
+      "triangles": 150006,
+      "validator_errors": 0,
+      "validator_warnings": 0,
+      "author_approval": "PENDING",
+      "deployment": "PUBLISHED_CANDIDATE_PREVIEW_ONLY"
+    },
+    {
+      "file": "xiji-station_v2_3_candidate.glb",
+      "bytes": 2955068,
+      "sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+      "active_nodes": 2175,
+      "mesh_primitives": 2175,
+      "triangles": 39590,
+      "validator_errors": 0,
+      "validator_warnings": 0,
+      "author_approval": "PENDING",
+      "deployment": "PUBLISHED_CANDIDATE_PREVIEW_ONLY"
+    }
+  ],
+  "route_count": 15,
+  "route_pass_count": 15,
+  "route_method_limit": "sampled vertical boundary, lateral body rays at three heights, and local foot support; does not prove continuous collision-free motion between samples; no legal compliance claim",
+  "supplementary_geometry_review_images": 4,
+  "reference_camera_count": 96,
+  "reference_current_image_count": 96,
+  "design_items_tracked": 422,
+  "design_state_counts": {
+    "EXISTING_GEOMETRY_BOUND": 65,
+    "UNVERIFIED": 197,
+    "CANDIDATE_GEOMETRY": 66,
+    "SPATIAL_QC_PENDING": 56,
+    "STATE_OR_SOUND_PENDING": 32,
+    "RULE_RECORDED": 3,
+    "CANDIDATE_BLOCKING_ANCHOR": 3
+  },
+  "full_422_item_acceptance": false,
+  "author_approval": "PENDING",
+  "deployed": false,
+  "ai_visual_review_counts": {
+    "PASS_BACKGROUND_GEOMETRY_SCOPE": 91,
+    "VISTA_VISIBLE_FROM_CORRIDOR_ONLY": 1,
+    "NEEDS_ACTOR_LAYER": 1,
+    "NEEDS_TRAIN_ANIMATION": 1,
+    "NEEDS_PROP_ACTOR_LAYER": 2
+  },
+  "image_status_note": "96 images produced and tied to exact current model+camera; not 96 accepted dramatic shots.",
+  "deployment": "PUBLISHED_CANDIDATE_PREVIEW_ONLY",
+  "deployment_note": "Candidate files only. Canonical five model-viewer/*.glb files unchanged. No formal model acceptance."
+}

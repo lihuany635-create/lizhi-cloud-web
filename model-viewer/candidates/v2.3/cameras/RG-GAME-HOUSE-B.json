@@ -1,0 +1,447 @@
+{
+  "format": "lizhi-camera-shots/1",
+  "model": "hades-house_v2_3_candidate.glb",
+  "units": "m",
+  "up_axis": "+Y (glTF / three.js)",
+  "coords": "original model space; no recentering",
+  "scene_id": "RG-GAME-HOUSE",
+  "group_id": "B",
+  "group_title": "父子出門",
+  "created": "2026-10-22T07:43:36.682589+08:00",
+  "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+  "author_approval": "PENDING",
+  "shots": [
+    {
+      "id": "C01",
+      "unique_id": "RG-GAME-HOUSE-B-C01",
+      "note": "臥室門外走廊｜候選背景鏡位，角色／演技／特效另製",
+      "model": "hades-house_v2_3_candidate.glb",
+      "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 180.0,
+      "pitch_deg": -3.0127875041833425,
+      "feet": [
+        -7.25,
+        3.6,
+        0.8
+      ],
+      "position": [
+        -7.25,
+        5.2,
+        0.8
+      ],
+      "target": [
+        -7.25,
+        5.0,
+        -3
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -7.25,
+          -0.8,
+          5.2
+        ],
+        "target": [
+          -7.25,
+          3,
+          5.0
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C02",
+      "unique_id": "RG-GAME-HOUSE-B-C02",
+      "note": "二樓樓梯上望下｜候選背景鏡位，角色／演技／特效另製",
+      "model": "hades-house_v2_3_candidate.glb",
+      "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": -164.11283149723604,
+      "pitch_deg": -56.60189538436159,
+      "feet": [
+        -7.26,
+        3.4999999999999996,
+        -3.4
+      ],
+      "position": [
+        -7.26,
+        5.1,
+        -3.4
+      ],
+      "target": [
+        -8,
+        1,
+        -6
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -7.26,
+          3.4,
+          5.1
+        ],
+        "target": [
+          -8,
+          6,
+          1
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C03",
+      "unique_id": "RG-GAME-HOUSE-B-C03",
+      "note": "一樓客廳天奧站位｜候選背景鏡位，角色／演技／特效另製",
+      "model": "hades-house_v2_3_candidate.glb",
+      "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 28,
+      "sensor": "36x24mm",
+      "vfov_deg": 46.39718102729637,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 147.1714582085875,
+      "pitch_deg": -5.419555630254344,
+      "feet": [
+        -4,
+        0.0,
+        -3.9
+      ],
+      "position": [
+        -4,
+        1.6,
+        -3.9
+      ],
+      "target": [
+        -2,
+        1.25,
+        -7
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -4,
+          3.9,
+          1.6
+        ],
+        "target": [
+          -2,
+          7,
+          1.25
+        ],
+        "lens_mm": 28,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C04",
+      "unique_id": "RG-GAME-HOUSE-B-C04",
+      "note": "父子談話雙人反打｜候選背景鏡位，角色／演技／特效另製",
+      "model": "hades-house_v2_3_candidate.glb",
+      "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 28,
+      "sensor": "36x24mm",
+      "vfov_deg": 46.39718102729637,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": -48.01278750418334,
+      "pitch_deg": -1.4192968751515984,
+      "feet": [
+        -2,
+        0.0,
+        -7
+      ],
+      "position": [
+        -2,
+        1.6,
+        -7
+      ],
+      "target": [
+        -5,
+        1.5,
+        -4.3
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -2,
+          7,
+          1.6
+        ],
+        "target": [
+          -5,
+          4.3,
+          1.5
+        ],
+        "lens_mm": 28,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C05",
+      "unique_id": "RG-GAME-HOUSE-B-C05",
+      "note": "玄關鑰匙盤｜候選背景鏡位，角色／演技／特效另製",
+      "model": "hades-house_v2_3_candidate.glb",
+      "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 35,
+      "sensor": "36x24mm",
+      "vfov_deg": 37.84928883210247,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 48.179830119864235,
+      "pitch_deg": -27.017123217850248,
+      "feet": [
+        1.2,
+        -0.10000000000000009,
+        1.7
+      ],
+      "position": [
+        1.2,
+        1.5,
+        1.7
+      ],
+      "target": [
+        2.15,
+        0.85,
+        2.55
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          1.2,
+          -1.7,
+          1.5
+        ],
+        "target": [
+          2.15,
+          -2.55,
+          0.85
+        ],
+        "lens_mm": 35,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C06",
+      "unique_id": "RG-GAME-HOUSE-B-C06",
+      "note": "取鑰匙手部近景｜候選背景鏡位，角色／演技／特效另製",
+      "model": "hades-house_v2_3_candidate.glb",
+      "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 55,
+      "sensor": "36x24mm",
+      "vfov_deg": 24.61603163485585,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": -1.060911690264205,
+      "pitch_deg": -34.41378451704215,
+      "feet": [
+        2.15,
+        -0.3800000000000001,
+        2.0
+      ],
+      "position": [
+        2.15,
+        1.22,
+        2.0
+      ],
+      "target": [
+        2.14,
+        0.85,
+        2.54
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          2.15,
+          -2.0,
+          1.22
+        ],
+        "target": [
+          2.14,
+          -2.54,
+          0.85
+        ],
+        "lens_mm": 55,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C07",
+      "unique_id": "RG-GAME-HOUSE-B-C07",
+      "note": "玄關向門廊｜候選背景鏡位，角色／演技／特效另製",
+      "model": "hades-house_v2_3_candidate.glb",
+      "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 0.0,
+      "pitch_deg": -3.1221304621157087,
+      "feet": [
+        -0.87,
+        0.0,
+        1.5
+      ],
+      "position": [
+        -0.87,
+        1.6,
+        1.5
+      ],
+      "target": [
+        -0.87,
+        1.3,
+        7
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -0.87,
+          -1.5,
+          1.6
+        ],
+        "target": [
+          -0.87,
+          -7,
+          1.3
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C08",
+      "unique_id": "RG-GAME-HOUSE-B-C08",
+      "note": "院落黑轎車｜候選背景鏡位，角色／演技／特效另製",
+      "model": "hades-house_v2_3_candidate.glb",
+      "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 28,
+      "sensor": "36x24mm",
+      "vfov_deg": 46.39718102729637,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 56.63363399894045,
+      "pitch_deg": -10.388683563195437,
+      "feet": [
+        -5,
+        0.0,
+        7.5
+      ],
+      "position": [
+        -5,
+        1.6,
+        7.5
+      ],
+      "target": [
+        -0.9,
+        0.7,
+        10.2
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -5,
+          -7.5,
+          1.6
+        ],
+        "target": [
+          -0.9,
+          -10.2,
+          0.7
+        ],
+        "lens_mm": 28,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    }
+  ]
+}

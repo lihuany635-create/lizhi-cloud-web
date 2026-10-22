@@ -1,0 +1,447 @@
+{
+  "format": "lizhi-camera-shots/1",
+  "model": "lahudi-academy_v2_3_candidate.glb",
+  "units": "m",
+  "up_axis": "+Y (glTF / three.js)",
+  "coords": "original model space; no recentering",
+  "scene_id": "RG-GAME-02",
+  "group_id": "C",
+  "group_title": "校園遊走",
+  "created": "2026-10-22T07:43:36.692238+08:00",
+  "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+  "author_approval": "PENDING",
+  "shots": [
+    {
+      "id": "C01",
+      "unique_id": "RG-GAME-02-C-C01",
+      "note": "校門黑車方向｜候選背景鏡位，角色／演技／特效另製",
+      "model": "lahudi-academy_v2_3_candidate.glb",
+      "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 20,
+      "sensor": "36x24mm",
+      "vfov_deg": 61.92751306414704,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 180.0,
+      "pitch_deg": 5.548466293718066,
+      "feet": [
+        -24,
+        0.0,
+        155
+      ],
+      "position": [
+        -24,
+        1.6,
+        155
+      ],
+      "target": [
+        -24,
+        5,
+        120
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -24,
+          -155,
+          1.6
+        ],
+        "target": [
+          -24,
+          -120,
+          5
+        ],
+        "lens_mm": 20,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C02",
+      "unique_id": "RG-GAME-02-C-C02",
+      "note": "接駁候車方向｜候選背景鏡位，角色／演技／特效另製",
+      "model": "lahudi-academy_v2_3_candidate.glb",
+      "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 0.0,
+      "pitch_deg": 1.9091524329963763,
+      "feet": [
+        -20,
+        0.0,
+        148
+      ],
+      "position": [
+        -20,
+        1.6,
+        148
+      ],
+      "target": [
+        -20,
+        2,
+        160
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -20,
+          -148,
+          1.6
+        ],
+        "target": [
+          -20,
+          -160,
+          2
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C03",
+      "unique_id": "RG-GAME-02-C-C03",
+      "note": "圖書館借還櫃台｜候選背景鏡位，角色／演技／特效另製",
+      "model": "lahudi-academy_v2_3_candidate.glb",
+      "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": -130.6012946450045,
+      "pitch_deg": -6.190399458571857,
+      "feet": [
+        -18.5,
+        0.0,
+        -155
+      ],
+      "position": [
+        -18.5,
+        1.6,
+        -155
+      ],
+      "target": [
+        -22,
+        1.1,
+        -158
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -18.5,
+          155,
+          1.6
+        ],
+        "target": [
+          -22,
+          158,
+          1.1
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C04",
+      "unique_id": "RG-GAME-02-C-C04",
+      "note": "中庭打掃區｜候選背景鏡位，角色／演技／特效另製",
+      "model": "lahudi-academy_v2_3_candidate.glb",
+      "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": -133.1523897340054,
+      "pitch_deg": 4.432323791164112,
+      "feet": [
+        -45,
+        0.0,
+        0
+      ],
+      "position": [
+        -45,
+        1.6,
+        0
+      ],
+      "target": [
+        -77,
+        5,
+        -30
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -45,
+          0,
+          1.6
+        ],
+        "target": [
+          -77,
+          30,
+          5
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C05",
+      "unique_id": "RG-GAME-02-C-C05",
+      "note": "操場巡邏｜候選背景鏡位，角色／演技／特效另製",
+      "model": "lahudi-academy_v2_3_candidate.glb",
+      "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 48.366460663429805,
+      "pitch_deg": -0.5709597601545904,
+      "feet": [
+        245,
+        0.0,
+        -40
+      ],
+      "position": [
+        245,
+        1.6,
+        -40
+      ],
+      "target": [
+        290,
+        1,
+        0
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          245,
+          40,
+          1.6
+        ],
+        "target": [
+          290,
+          0,
+          1
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C06",
+      "unique_id": "RG-GAME-02-C-C06",
+      "note": "屋頂樓梯前｜候選背景鏡位，角色／演技／特效另製",
+      "model": "lahudi-academy_v2_3_candidate.glb",
+      "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 180.0,
+      "pitch_deg": 13.495733280795816,
+      "feet": [
+        -70.25,
+        3.9999999999999996,
+        -50
+      ],
+      "position": [
+        -70.25,
+        5.6,
+        -50
+      ],
+      "target": [
+        -70.25,
+        7.4,
+        -57.5
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -70.25,
+          50,
+          5.6
+        ],
+        "target": [
+          -70.25,
+          57.5,
+          7.4
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C07",
+      "unique_id": "RG-GAME-02-C-C07",
+      "note": "薇媞後花園｜候選背景鏡位，角色／演技／特效另製",
+      "model": "lahudi-academy_v2_3_candidate.glb",
+      "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": -153.434948822922,
+      "pitch_deg": -1.5370382753950325,
+      "feet": [
+        -180,
+        0.0,
+        -140
+      ],
+      "position": [
+        -180,
+        1.6,
+        -140
+      ],
+      "target": [
+        -190,
+        1.0,
+        -160
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -180,
+          140,
+          1.6
+        ],
+        "target": [
+          -190,
+          160,
+          1.0
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C08",
+      "unique_id": "RG-GAME-02-C-C08",
+      "note": "空教室兩人對話｜候選背景鏡位，角色／演技／特效另製",
+      "model": "lahudi-academy_v2_3_candidate.glb",
+      "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 141.84277341263095,
+      "pitch_deg": -2.5727108257461215,
+      "feet": [
+        -84,
+        3.9999999999999996,
+        -16
+      ],
+      "position": [
+        -84,
+        5.6,
+        -16
+      ],
+      "target": [
+        -78.5,
+        5.2,
+        -23
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          -84,
+          16,
+          5.6
+        ],
+        "target": [
+          -78.5,
+          23,
+          5.2
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    }
+  ]
+}

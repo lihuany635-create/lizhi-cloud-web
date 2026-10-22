@@ -1,0 +1,770 @@
+[
+  {
+    "unique_id": "RG-REAL-01-A-C01",
+    "title": "C01 玄關父親鞋視線",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "A",
+    "png": "previews/RG-REAL-01-A-C01.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-A-C02",
+    "title": "C02 客廳沙發看新聞",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "A",
+    "png": "previews/RG-REAL-01-A-C02.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-A-C03",
+    "title": "C03 廚房切水果望客廳",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "A",
+    "png": "previews/RG-REAL-01-A-C03.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-A-C04",
+    "title": "C04 三人餐桌廣角",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "A",
+    "png": "previews/RG-REAL-01-A-C04.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-A-C05",
+    "title": "C05 主角餐桌反打",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "A",
+    "png": "previews/RG-REAL-01-A-C05.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-A-C06",
+    "title": "C06 門外低聲父母視角",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "A",
+    "png": "previews/RG-REAL-01-A-C06.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-A-C07",
+    "title": "C07 樓梯向臥室廊道",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "A",
+    "png": "previews/RG-REAL-01-A-C07.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-A-C08",
+    "title": "C08 客廳送客與食物",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "A",
+    "png": "previews/RG-REAL-01-A-C08.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-B-C01",
+    "title": "C01 床邊摘頸環",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "B",
+    "png": "previews/RG-REAL-01-B-C01.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-B-C02",
+    "title": "C02 書桌電腦主機低機位",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "B",
+    "png": "previews/RG-REAL-01-B-C02.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-B-C03",
+    "title": "C03 椅背衣服與雜書",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "B",
+    "png": "previews/RG-REAL-01-B-C03.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-B-C04",
+    "title": "C04 關門看向客廳",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "B",
+    "png": "previews/RG-REAL-01-B-C04.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-B-C05",
+    "title": "C05 浴室鏡正面反打",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "B",
+    "png": "previews/RG-REAL-01-B-C05.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-B-C06",
+    "title": "C06 窗外車流",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "B",
+    "png": "previews/RG-REAL-01-B-C06.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-B-C07",
+    "title": "C07 夜間攻略筆記桌面",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "B",
+    "png": "previews/RG-REAL-01-B-C07.png"
+  },
+  {
+    "unique_id": "RG-REAL-01-B-C08",
+    "title": "C08 走出房門回餐桌",
+    "model": "reality-home_v2_3_candidate.glb",
+    "model_sha256": "d98996b59fff0bee5243cbceaf4a0ef1003b8a6bb40b64475152f498ae3b07d5",
+    "group": "B",
+    "png": "previews/RG-REAL-01-B-C08.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-A-C01",
+    "title": "C01 臥室床上躺姿仰視",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "A",
+    "png": "previews/RG-GAME-HOUSE-A-C01.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-A-C02",
+    "title": "C02 床單手部",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "A",
+    "png": "previews/RG-GAME-HOUSE-A-C02.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-A-C03",
+    "title": "C03 床邊坐起側面",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "A",
+    "png": "previews/RG-GAME-HOUSE-A-C03.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-A-C04",
+    "title": "C04 臥室轉頭看畫外聲源",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "A",
+    "png": "previews/RG-GAME-HOUSE-A-C04.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-A-C05",
+    "title": "C05 坐姿看書桌與窗",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "A",
+    "png": "previews/RG-GAME-HOUSE-A-C05.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-A-C06",
+    "title": "C06 房門方向和走廊",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "A",
+    "png": "previews/RG-GAME-HOUSE-A-C06.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-A-C07",
+    "title": "C07 床邊中景",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "A",
+    "png": "previews/RG-GAME-HOUSE-A-C07.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-A-C08",
+    "title": "C08 窗外冬晨",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "A",
+    "png": "previews/RG-GAME-HOUSE-A-C08.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-B-C01",
+    "title": "C01 臥室門外走廊",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "B",
+    "png": "previews/RG-GAME-HOUSE-B-C01.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-B-C02",
+    "title": "C02 二樓樓梯上望下",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "B",
+    "png": "previews/RG-GAME-HOUSE-B-C02.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-B-C03",
+    "title": "C03 一樓客廳天奧站位",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "B",
+    "png": "previews/RG-GAME-HOUSE-B-C03.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-B-C04",
+    "title": "C04 父子談話雙人反打",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "B",
+    "png": "previews/RG-GAME-HOUSE-B-C04.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-B-C05",
+    "title": "C05 玄關鑰匙盤",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "B",
+    "png": "previews/RG-GAME-HOUSE-B-C05.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-B-C06",
+    "title": "C06 取鑰匙手部近景",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "B",
+    "png": "previews/RG-GAME-HOUSE-B-C06.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-B-C07",
+    "title": "C07 玄關向門廊",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "B",
+    "png": "previews/RG-GAME-HOUSE-B-C07.png"
+  },
+  {
+    "unique_id": "RG-GAME-HOUSE-B-C08",
+    "title": "C08 院落黑轎車",
+    "model": "hades-house_v2_3_candidate.glb",
+    "model_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+    "group": "B",
+    "png": "previews/RG-GAME-HOUSE-B-C08.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-A-C01",
+    "title": "C01 教室門見全景",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "A",
+    "png": "previews/RG-REAL-02-A-C01.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-A-C02",
+    "title": "C02 窗向夕陽桌面",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "A",
+    "png": "previews/RG-REAL-02-A-C02.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-A-C03",
+    "title": "C03 翔吾收書包",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "A",
+    "png": "previews/RG-REAL-02-A-C03.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-A-C04",
+    "title": "C04 阿亦靠近桌側",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "A",
+    "png": "previews/RG-REAL-02-A-C04.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-A-C05",
+    "title": "C05 兩人交談雙人景",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "A",
+    "png": "previews/RG-REAL-02-A-C05.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-A-C06",
+    "title": "C06 阿亦給出遊戲資訊",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "A",
+    "png": "previews/RG-REAL-02-A-C06.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-A-C07",
+    "title": "C07 走廊老師質問頸環",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "A",
+    "png": "previews/RG-REAL-02-A-C07.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-A-C08",
+    "title": "C08 走廊轉角消失",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "A",
+    "png": "previews/RG-REAL-02-A-C08.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-B-C01",
+    "title": "C01 三樓走廊長透視",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "B",
+    "png": "previews/RG-REAL-02-B-C01.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-B-C02",
+    "title": "C02 校門進入",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "B",
+    "png": "previews/RG-REAL-02-B-C02.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-B-C03",
+    "title": "C03 樓梯層間",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "B",
+    "png": "previews/RG-REAL-02-B-C03.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-B-C04",
+    "title": "C04 走廊冬風窗",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "B",
+    "png": "previews/RG-REAL-02-B-C04.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-B-C05",
+    "title": "C05 販賣機等待",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "B",
+    "png": "previews/RG-REAL-02-B-C05.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-B-C06",
+    "title": "C06 中庭通行",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "B",
+    "png": "previews/RG-REAL-02-B-C06.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-B-C07",
+    "title": "C07 午間教室",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "B",
+    "png": "previews/RG-REAL-02-B-C07.png"
+  },
+  {
+    "unique_id": "RG-REAL-02-B-C08",
+    "title": "C08 夜晚無人校園外景",
+    "model": "reality-highschool_v2_3_candidate.glb",
+    "model_sha256": "f9c541ad9834d853d4e83bbea6e5941964df2e04d8b5983314a66163e83998fc",
+    "group": "B",
+    "png": "previews/RG-REAL-02-B-C08.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-A-C01",
+    "title": "C01 A班教室門廣角",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "A",
+    "png": "previews/RG-GAME-02-A-C01.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-A-C02",
+    "title": "C02 老師講台指向後排",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "A",
+    "png": "previews/RG-GAME-02-A-C02.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-A-C03",
+    "title": "C03 主角後排趴桌",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "A",
+    "png": "previews/RG-GAME-02-A-C03.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-A-C04",
+    "title": "C04 凱薩門口進場",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "A",
+    "png": "previews/RG-GAME-02-A-C04.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-A-C05",
+    "title": "C05 凱薩遞筆記",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "A",
+    "png": "previews/RG-GAME-02-A-C05.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-A-C06",
+    "title": "C06 後排看窗外山脊",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "A",
+    "png": "previews/RG-GAME-02-A-C06.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-A-C07",
+    "title": "C07 午餐雙人對話",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "A",
+    "png": "previews/RG-GAME-02-A-C07.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-A-C08",
+    "title": "C08 A班離場走廊",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "A",
+    "png": "previews/RG-GAME-02-A-C08.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-B-C01",
+    "title": "C01 A班到C班來路",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "B",
+    "png": "previews/RG-GAME-02-B-C01.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-B-C02",
+    "title": "C02 轉角看C班門",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "B",
+    "png": "previews/RG-GAME-02-B-C02.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-B-C03",
+    "title": "C03 公告板遮掩主角",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "B",
+    "png": "previews/RG-GAME-02-B-C03.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-B-C04",
+    "title": "C04 凱薩由後方靠近",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "B",
+    "png": "previews/RG-GAME-02-B-C04.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-B-C05",
+    "title": "C05 另一端學生讓路",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "B",
+    "png": "previews/RG-GAME-02-B-C05.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-B-C06",
+    "title": "C06 貝西從C班門走出",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "B",
+    "png": "previews/RG-GAME-02-B-C06.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-B-C07",
+    "title": "C07 貝西正常走遠",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "B",
+    "png": "previews/RG-GAME-02-B-C07.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-B-C08",
+    "title": "C08 主角凱薩同框目送",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "B",
+    "png": "previews/RG-GAME-02-B-C08.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-C-C01",
+    "title": "C01 校門黑車方向",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "C",
+    "png": "previews/RG-GAME-02-C-C01.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-C-C02",
+    "title": "C02 接駁候車方向",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "C",
+    "png": "previews/RG-GAME-02-C-C02.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-C-C03",
+    "title": "C03 圖書館借還櫃台",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "C",
+    "png": "previews/RG-GAME-02-C-C03.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-C-C04",
+    "title": "C04 中庭打掃區",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "C",
+    "png": "previews/RG-GAME-02-C-C04.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-C-C05",
+    "title": "C05 操場巡邏",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "C",
+    "png": "previews/RG-GAME-02-C-C05.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-C-C06",
+    "title": "C06 屋頂樓梯前",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "C",
+    "png": "previews/RG-GAME-02-C-C06.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-C-C07",
+    "title": "C07 薇媞後花園",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "C",
+    "png": "previews/RG-GAME-02-C-C07.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-C-C08",
+    "title": "C08 空教室兩人對話",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "C",
+    "png": "previews/RG-GAME-02-C-C08.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-D-C01",
+    "title": "C01 漏風走廊全景",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "D",
+    "png": "previews/RG-GAME-02-D-C01.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-D-C02",
+    "title": "C02 主角朝貝西的主觀位置",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "D",
+    "png": "previews/RG-GAME-02-D-C02.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-D-C03",
+    "title": "C03 貝西站位反打",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "D",
+    "png": "previews/RG-GAME-02-D-C03.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-D-C04",
+    "title": "C04 兩人同框視線及間距",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "D",
+    "png": "previews/RG-GAME-02-D-C04.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-D-C05",
+    "title": "C05 拒絕後貝西轉身",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "D",
+    "png": "previews/RG-GAME-02-D-C05.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-D-C06",
+    "title": "C06 貝西走向樓梯轉角",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "D",
+    "png": "previews/RG-GAME-02-D-C06.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-D-C07",
+    "title": "C07 主角目送空鏡",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "D",
+    "png": "previews/RG-GAME-02-D-C07.png"
+  },
+  {
+    "unique_id": "RG-GAME-02-D-C08",
+    "title": "C08 主角與畫面左下系統提示同構圖",
+    "model": "lahudi-academy_v2_3_candidate.glb",
+    "model_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+    "group": "D",
+    "png": "previews/RG-GAME-02-D-C08.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-A-C01",
+    "title": "C01 車站入口",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "A",
+    "png": "previews/RG-REAL-03-A-C01.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-A-C02",
+    "title": "C02 站廳人稀疏",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "A",
+    "png": "previews/RG-REAL-03-A-C02.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-A-C03",
+    "title": "C03 票口通行",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "A",
+    "png": "previews/RG-REAL-03-A-C03.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-A-C04",
+    "title": "C04 往月台通道",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "A",
+    "png": "previews/RG-REAL-03-A-C04.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-A-C05",
+    "title": "C05 月台梁曼禾等待",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "A",
+    "png": "previews/RG-REAL-03-A-C05.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-A-C06",
+    "title": "C06 兩人溫飲交接",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "A",
+    "png": "previews/RG-REAL-03-A-C06.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-A-C07",
+    "title": "C07 列車遠方進站",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "A",
+    "png": "previews/RG-REAL-03-A-C07.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-A-C08",
+    "title": "C08 列車門位置",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "A",
+    "png": "previews/RG-REAL-03-A-C08.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-B-C01",
+    "title": "C01 上車門口",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "B",
+    "png": "previews/RG-REAL-03-B-C01.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-B-C02",
+    "title": "C02 車廂靠窗雙座",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "B",
+    "png": "previews/RG-REAL-03-B-C02.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-B-C03",
+    "title": "C03 她靠在翔吾肩旁",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "B",
+    "png": "previews/RG-REAL-03-B-C03.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-B-C04",
+    "title": "C04 車窗外移動風景",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "B",
+    "png": "previews/RG-REAL-03-B-C04.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-B-C05",
+    "title": "C05 書包內頸環視線",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "B",
+    "png": "previews/RG-REAL-03-B-C05.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-B-C06",
+    "title": "C06 飲料與手部",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "B",
+    "png": "previews/RG-REAL-03-B-C06.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-B-C07",
+    "title": "C07 車廂交談反打",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "B",
+    "png": "previews/RG-REAL-03-B-C07.png"
+  },
+  {
+    "unique_id": "RG-REAL-03-B-C08",
+    "title": "C08 列車離站外景",
+    "model": "xiji-station_v2_3_candidate.glb",
+    "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+    "group": "B",
+    "png": "previews/RG-REAL-03-B-C08.png"
+  }
+]

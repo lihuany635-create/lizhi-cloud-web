@@ -1,0 +1,447 @@
+{
+  "format": "lizhi-camera-shots/1",
+  "model": "xiji-station_v2_3_candidate.glb",
+  "units": "m",
+  "up_axis": "+Y (glTF / three.js)",
+  "coords": "original model space; no recentering",
+  "scene_id": "RG-REAL-03",
+  "group_id": "B",
+  "group_title": "列車與關係",
+  "created": "2026-10-22T07:43:36.695353+08:00",
+  "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+  "author_approval": "PENDING",
+  "shots": [
+    {
+      "id": "C01",
+      "unique_id": "RG-REAL-03-B-C01",
+      "note": "上車門口｜候選背景鏡位，角色／演技／特效另製",
+      "model": "xiji-station_v2_3_candidate.glb",
+      "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 180.0,
+      "pitch_deg": -7.829076510059604,
+      "feet": [
+        33.5,
+        1.15,
+        -13.5
+      ],
+      "position": [
+        33.5,
+        2.75,
+        -13.5
+      ],
+      "target": [
+        33.5,
+        2.2,
+        -17.5
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          33.5,
+          13.5,
+          2.75
+        ],
+        "target": [
+          33.5,
+          17.5,
+          2.2
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C02",
+      "unique_id": "RG-REAL-03-B-C02",
+      "note": "車廂靠窗雙座｜候選背景鏡位，角色／演技／特效另製",
+      "model": "xiji-station_v2_3_candidate.glb",
+      "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 28,
+      "sensor": "36x24mm",
+      "vfov_deg": 46.39718102729637,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 48.012787504183386,
+      "pitch_deg": -30.737211459905616,
+      "feet": [
+        27,
+        1.15,
+        -17.65
+      ],
+      "position": [
+        27,
+        2.75,
+        -17.65
+      ],
+      "target": [
+        28,
+        1.95,
+        -16.75
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          27,
+          17.65,
+          2.75
+        ],
+        "target": [
+          28,
+          16.75,
+          1.95
+        ],
+        "lens_mm": 28,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C03",
+      "unique_id": "RG-REAL-03-B-C03",
+      "note": "她靠在翔吾肩旁｜候選背景鏡位，角色／演技／特效另製",
+      "model": "xiji-station_v2_3_candidate.glb",
+      "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 35,
+      "sensor": "36x24mm",
+      "vfov_deg": 37.84928883210247,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": -53.13010235415601,
+      "pitch_deg": -16.699244233993625,
+      "feet": [
+        29.2,
+        0.9499999999999997,
+        -17.65
+      ],
+      "position": [
+        29.2,
+        2.55,
+        -17.65
+      ],
+      "target": [
+        28,
+        2.1,
+        -16.75
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          29.2,
+          17.65,
+          2.55
+        ],
+        "target": [
+          28,
+          16.75,
+          2.1
+        ],
+        "lens_mm": 35,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C04",
+      "unique_id": "RG-REAL-03-B-C04",
+      "note": "車窗外移動風景｜候選背景鏡位，角色／演技／特效另製",
+      "model": "xiji-station_v2_3_candidate.glb",
+      "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 0.0,
+      "pitch_deg": 0.0,
+      "feet": [
+        28,
+        1.0,
+        -16.8
+      ],
+      "position": [
+        28,
+        2.6,
+        -16.8
+      ],
+      "target": [
+        28,
+        2.6,
+        -10
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          28,
+          16.8,
+          2.6
+        ],
+        "target": [
+          28,
+          10,
+          2.6
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C05",
+      "unique_id": "RG-REAL-03-B-C05",
+      "note": "書包內頸環視線｜候選背景鏡位，角色／演技／特效另製",
+      "model": "xiji-station_v2_3_candidate.glb",
+      "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 50,
+      "sensor": "36x24mm",
+      "vfov_deg": 26.991466561591622,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 14.931417178137504,
+      "pitch_deg": -47.59808582670675,
+      "feet": [
+        27.8,
+        0.8999999999999999,
+        -17.5
+      ],
+      "position": [
+        27.8,
+        2.5,
+        -17.5
+      ],
+      "target": [
+        28,
+        1.65,
+        -16.75
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          27.8,
+          17.5,
+          2.5
+        ],
+        "target": [
+          28,
+          16.75,
+          1.65
+        ],
+        "lens_mm": 50,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C06",
+      "unique_id": "RG-REAL-03-B-C06",
+      "note": "飲料與手部｜候選背景鏡位，角色／演技／特效另製",
+      "model": "xiji-station_v2_3_candidate.glb",
+      "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 50,
+      "sensor": "36x24mm",
+      "vfov_deg": 26.991466561591622,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 0.0,
+      "pitch_deg": -43.02506598911802,
+      "feet": [
+        28,
+        0.7999999999999998,
+        -17.5
+      ],
+      "position": [
+        28,
+        2.4,
+        -17.5
+      ],
+      "target": [
+        28,
+        1.7,
+        -16.75
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          28,
+          17.5,
+          2.4
+        ],
+        "target": [
+          28,
+          16.75,
+          1.7
+        ],
+        "lens_mm": 50,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C07",
+      "unique_id": "RG-REAL-03-B-C07",
+      "note": "車廂交談反打｜候選背景鏡位，角色／演技／特效另製",
+      "model": "xiji-station_v2_3_candidate.glb",
+      "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 28,
+      "sensor": "36x24mm",
+      "vfov_deg": 46.39718102729637,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": 55.304846468766094,
+      "pitch_deg": -20.78041748766359,
+      "feet": [
+        26.7,
+        1.0,
+        -17.65
+      ],
+      "position": [
+        26.7,
+        2.6,
+        -17.65
+      ],
+      "target": [
+        28,
+        2,
+        -16.75
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          26.7,
+          17.65,
+          2.6
+        ],
+        "target": [
+          28,
+          16.75,
+          2
+        ],
+        "lens_mm": 28,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    },
+    {
+      "id": "C08",
+      "unique_id": "RG-REAL-03-B-C08",
+      "note": "列車離站外景｜候選背景鏡位，角色／演技／特效另製",
+      "model": "xiji-station_v2_3_candidate.glb",
+      "model_sha256": "aa97c1d256f71f829ce1fcca64ba597161fb6e34fcf54f8e99886d33bf2fd574",
+      "eye_height_m": 1.6,
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true,
+      "focal_mm": 24,
+      "sensor": "36x24mm",
+      "vfov_deg": 53.13010235415598,
+      "aspect": "16:9",
+      "image": [
+        640,
+        360
+      ],
+      "yaw_deg": -108.06047193619918,
+      "pitch_deg": -9.388589249282608,
+      "feet": [
+        48,
+        4.4,
+        -10
+      ],
+      "position": [
+        48,
+        6,
+        -10
+      ],
+      "target": [
+        25,
+        2,
+        -17.5
+      ],
+      "author_approval": "PENDING",
+      "visual_qc": "PENDING",
+      "actor_action_layer": "NOT_INCLUDED",
+      "lighting_test": "neutral_geometry",
+      "blender": {
+        "location": [
+          48,
+          10,
+          6
+        ],
+        "target": [
+          25,
+          17.5,
+          2
+        ],
+        "lens_mm": 24,
+        "sensor_fit": "VERTICAL",
+        "sensor_height_mm": 24
+      }
+    }
+  ]
+}
