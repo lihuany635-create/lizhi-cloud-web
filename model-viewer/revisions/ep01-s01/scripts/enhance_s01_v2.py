@@ -31,7 +31,7 @@ def rib(model, mesh, z, tag, n=14):
     out=[]
     xl,xr=-72.22,-68.94
     # A restrained pointed arch with a visibly sharper apex than circular barrel ribs.
-    def height(t): return 6.08+1.06*math.sin(math.pi*t)**.63
+    def height(t): return 6.06+1.11*(1-abs(2*t-1)**.90)
     for i in range(n):
         t0,t1=i/n,(i+1)/n
         a=(xl+(xr-xl)*t0,height(t0),z)
