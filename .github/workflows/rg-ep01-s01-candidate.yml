@@ -9,7 +9,7 @@ on:
 permissions:
   contents: write
 jobs:
-  build-s01-corridor-v2:
+  build-s01-corridor-v3:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -25,7 +25,7 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          r=json.loads(Path("candidate-output/report_v3.json").read_text())
+          r=json.loads(Path("candidate-output/report_v2.json").read_text())
           v=r["validation"]
           assert v["binary_container"]=="PASS"
           assert v["all_source_nodes_preserved"]=="PASS"
@@ -67,7 +67,7 @@ jobs:
             git commit -m 'artifact(S01): preserve review-only model and QA output on stage branch'
             git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
           fi
-      - name: Upload S01 V2 candidate GLB and reports, not to production
+      - name: Upload S01 V3 candidate GLB and reports, not to production
         uses: actions/upload-artifact@v4
         with:
           name: rg-ep01-s01-gothic-corridor-v3-glb-preview
