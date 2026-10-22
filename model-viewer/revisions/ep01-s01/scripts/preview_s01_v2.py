@@ -6,7 +6,7 @@ from PIL import Image,ImageDraw,ImageFont
 import build_s01_candidate as glb
 
 P=Path("candidate-output")
-model, buf, raw=glb.load_glb(P/"lahudi-academy_ep01_s01_gothic_corridor_v2_review.glb")
+model, buf, raw=glb.load_glb(P/"lahudi-academy_ep01_s01_corridor_v3_review.glb")
 W,H=1700,950
 im=Image.new("RGB",(W,H),(239,242,245)); d=ImageDraw.Draw(im)
 fontpath="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
@@ -14,7 +14,7 @@ def f(s):
  try:return ImageFont.truetype(fontpath,s)
  except:return ImageFont.load_default()
 f_title=f(29);f_body=f(19);f_small=f(15)
-d.text((35,24),"EP01 S01  |  Gothic corridor V2 - geometry check",font=f_title,fill=(34,42,58))
+d.text((35,24),"EP01 S01  |  Gothic corridor V3 - geometric review",font=f_title,fill=(34,42,58))
 d.text((36,66),"Engineering camera projection; not an original-animation camera match",font=f_body,fill=(86,96,107))
 d.rounded_rectangle((30,105,1185,855),radius=14,fill=(225,229,235))
 d.rounded_rectangle((1210,105,1672,855),radius=14,fill=(250,251,253),outline=(202,207,215),width=2)
@@ -94,5 +94,5 @@ d.text((1240,735),"Doors: visually staged, not yet passable",font=f_small,fill=(
 d.text((1240,762),"Far stair: original geometry unchanged",font=f_small,fill=(128,85,58))
 d.text((1240,790),"S06 and canonical GLB untouched",font=f_small,fill=(70,102,78))
 d.text((36,886),"REVIEW ONLY  |  no 1:1 animation overlay  |  verify left doors / right windows / end stair before merge",font=f_body,fill=(84,63,54))
-dest=P/"s01_corridor_v2_geometry_preview.png";im.save(dest)
+dest=P/"s01_corridor_v3_geometry_preview.png";im.save(dest)
 print(f"Saved {dest} size={dest.stat().st_size} projected_faces={len(items)}")
