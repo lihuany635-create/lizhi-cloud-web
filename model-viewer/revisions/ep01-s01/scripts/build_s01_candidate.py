@@ -138,12 +138,12 @@ def main():
     # with three window bays at z≈3,6,9 and y≈4-7.3.
     # Add only ceiling rib moulding prototypes; no doors, windows, floor or staircase altered.
     x_start,x_end=-72.22,-68.94
-    base,rise=6.52,.56
+    base,rise=6.06,1.11
     for bay,z in enumerate((2.96,5.96,8.96),1):
         points=[]
         for j in range(13):
             t=j/12
-            points.append((x_start+(x_end-x_start)*t,base+rise*math.sin(math.pi*t),z))
+            points.append((x_start+(x_end-x_start)*t,base+rise*(1-abs(2*t-1)**.90),z))
         for j in range(12):
             a,b=points[j:j+2]
             added.append(add_beam(model,model.get("scene",0),cube,
