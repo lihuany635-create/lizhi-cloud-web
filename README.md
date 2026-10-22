@@ -28,3 +28,9 @@
 ## 動畫與模型流程入口
 
 主站 `?open=animationflow` 提供製作工作台與 3D 模型流程入口，工作台以同分頁開啟並使用 ChatGPT 登入。請勿將私有工作台放在 iframe 中，以免瀏覽器阻擋登入；模型入口使用 `?view=models`，登入後保留目的頁。工作台左上角可返回主站流程入口。
+
+## 內建製作工作台
+
+`?open=animationflow` 直接掛載主站內的 React 工作台，不使用 iframe 或外站登入。使用既有 Google／Supabase session；動畫、模型、採用版與 AI 交接集中於 Supabase `lizhi_production_state`。獨立 Site 只保留 ChatGPT OAuth／MCP 轉接，AI 與主站讀寫同一份資料。
+
+資料寫入由 `lizhi-production` Edge Function 驗證登入、使用者、AI 角色、專案版本及狀態版本；瀏覽器沒有伺服器金鑰。原 D1 保留作搬移備份。完整前端與後端來源由製作工作台 Site 的同一份來源庫維護，建置入口 `native/build.mjs`，主站發佈資產 `production/production-workspace.js`。
