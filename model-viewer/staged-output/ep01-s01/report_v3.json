@@ -1,0 +1,33 @@
+{
+  "project": "現實遊戲",
+  "shot": "EP01-S01",
+  "revision": "S01-REV3-REVIEW",
+  "base_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+  "result_sha256": "706de654733f4509d9ea433eaae8b19d07561b9a61c0c8e1296febec77ff7855",
+  "file": "lahudi-academy_ep01_s01_corridor_v3_review.glb",
+  "file_bytes": 5459704,
+  "stage1_added_nodes": 36,
+  "stage2_added_nodes": 199,
+  "stage3_added_nodes": 92,
+  "added_details_stage3": {
+    "vault_panels": 84,
+    "vault_ridge": 1,
+    "winter_window": 6,
+    "floor_slab": 1
+  },
+  "total_new_nodes": 327,
+  "validation": {
+    "glb_roundtrip": "PASS",
+    "existing_base_and_stage2_nodes_preserved": "PASS",
+    "corridor_center_height_above_floor_m": 2.06,
+    "main_scene_unchanged": true,
+    "S06_unchanged": true,
+    "animation_camera_match": "NOT_RUN",
+    "visual_effects_and_real_winter_view": "NOT_RENDERED",
+    "stair_turn_vs_animation": "OPEN_DESIGN_CONFLICT",
+    "left_decorative_doors_not_passable": "OPEN_DESIGN_CONFLICT",
+    "author_acceptance": "PENDING"
+  },
+  "qa_classification": "geometry-completeness and source-node checks only; preview not a photoreal Blender render",
+  "next": "Camera-match original S01 hallway 02:36, window 00:12, and Bessy departure stairs before merging."
+}
