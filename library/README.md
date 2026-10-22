@@ -1,5 +1,8 @@
 # 立之圖書館（library）
 
+> 跨裝置電腦館藏、Windows Library Host、DigUp 式多模態搜尋與 ChatGPT 唯讀工具的進階規格：請先看 [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md)。該文件清楚區分已開發原型與尚未實作部分。
+
+
 立之雲端庫的「圖書館」（網址 `?open=library` 或 `?open=knowledge`）。上傳的檔案存在雲端，
 Claude 每天自動讀過，取書名、寫摘要與重點、貼標籤、排上書架並連出相關書。網站上可以搜尋、篩選，直接閱讀。
 
