@@ -117,6 +117,7 @@ button,label.btn{font:inherit;cursor:pointer}
       <option value="lahudi-academy">拉乎迪學院（校園＋教室＋告白走廊）</option>
     </select></label>
   <button class="btn" id="openPreview" type="button">配置圖預覽</button>
+  <span id="viewerVersion" class="file" aria-live="polite"></span>
   <span id="houseViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="house1F">一樓俯視</button><button class="btn" id="house2F">二樓俯視</button><button class="btn" id="houseWhole">完整外觀</button><a class="btn" href="revisions/hades-v2.4/">配置圖</a></span>
 </div>
 
@@ -185,6 +186,9 @@ button,label.btn{font:inherit;cursor:pointer}
     <button class="tog" id="tWire" aria-pressed="false">線框</button>
     <button class="tog" id="tGrid" aria-pressed="true">格線</button>
     <button class="tog" id="tShadow" aria-pressed="true">陰影</button>
+    <button class="tog" id="tInspect" aria-pressed="true" title="使用中性檢查光，停用模型內建強光；不改動原始GLB">檢查照明</button>
+    <label class="cut" for="exposureIn">曝光 <input id="exposureIn" type="range" min="25" max="150" value="90"><output id="exposureOut">0.90</output></label>
+    <button class="tog" id="exportDiagnostics">匯出檢查紀錄</button>
     <label class="cut" for="cutIn">剖切高度
       <input type="range" id="cutIn" min="0" max="1000" value="1000">
       <output id="cutOut">關閉</output>
@@ -192,6 +196,7 @@ button,label.btn{font:inherit;cursor:pointer}
   </div>
 </div>
 
+<script src="viewer-inspection.js?v=20261022-2"></script>
 <script src="preview-mode.js?v=20261022-1"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -218,7 +223,7 @@ if(!renderer){window.GLBPreview.open({unavailable:true});return;}
 renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();window.GLBPreview.open({unavailable:true});});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.outputEncoding=THREE.sRGBEncoding;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.9;
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 stage.prepend(renderer.domElement);
 
@@ -268,12 +273,25 @@ function loadBuffer(buf,name){
   });
 }
 
-let modelKey="",modelName="";
+let modelKey="",modelName="",loadSerial=0;
+let inspection=true,meshLayers=[],modelLights=[],sourceInfo=null,activeCutHeight=null;
+let manifestPromise=fetch('current-models.json?v=20261022-2',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('版本清單讀取失敗');return r.json();}).then(j=>j.models).catch(()=>[]);
+function disposeObject(obj){obj.traverse(o=>{o.geometry?.dispose();if(o.material)[].concat(o.material).forEach(m=>{Object.values(m).forEach(v=>{if(v&&v.isTexture)v.dispose();});m.dispose();});});}
+function applyInspection(){
+  modelLights.forEach(x=>{x.object.visible=window.GLBInspection.lightVisible(x.originalVisible,inspection);});
+  meshLayers.forEach(x=>{x.object.visible=x.originalVisible&&window.GLBInspection.keepMesh(x.bounds,activeCutHeight);});
+}
+function diagnostics(){return {format:'lizhi-glb-viewer-inspection/1',at:new Date().toISOString(),viewerVersion:window.GLBInspection.version,model:modelName,modelKey,source:sourceInfo,inspectionLighting:inspection,exposure:renderer.toneMappingExposure,cutHeight:activeCutHeight,embeddedLights:modelLights.length,embeddedIntensityMax:Math.max(0,...modelLights.map(x=>x.intensity)),hiddenMeshes:meshLayers.filter(x=>!x.object.visible).length,meshCount:meshLayers.length,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),viewport:[stage.clientWidth,stage.clientHeight],pixelRatio:renderer.getPixelRatio(),threeRevision:THREE.REVISION,androidVerified:false};}
+$('tInspect').onclick=()=>{inspection=!inspection;$('tInspect').setAttribute('aria-pressed',String(inspection));applyInspection();};
+$('exposureIn').oninput=e=>{renderer.toneMappingExposure=Number(e.target.value)/100;$('exposureOut').textContent=renderer.toneMappingExposure.toFixed(2);};
+$('exportDiagnostics').onclick=()=>download(new Blob([JSON.stringify(diagnostics(),null,2)],{type:'application/json'}),'GLB_檢查紀錄.json');
+
 async function openModel(buf,name,opts={}){
   showLoading(name);
   try{
     const obj=await loadBuffer(buf,name);
-    clearModel();model=obj;removeFigure();
+    if(opts.serial!=null&&opts.serial!==loadSerial){disposeObject(obj);return;}
+    clearModel();model=obj;removeFigure();sourceInfo=opts.sourceInfo||null;
     if(name.toLowerCase().endsWith('.fbx')||opts.scaleGuess){/* FBX often in cm */}
     model.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true;
       [].concat(o.material).forEach(m=>{if(m){m.clippingPlanes=[clip];m.clipShadows=true;m.side=m.side??THREE.FrontSide;}});}});
@@ -281,11 +299,15 @@ async function openModel(buf,name,opts={}){
     box.setFromObject(model);box.getSize(size);box.getCenter(center);
     if(!isFinite(size.x)||size.length()===0)throw new Error('模型沒有可顯示的幾何。');
     // place model on ground
-    model.position.y-=box.min.y;box.setFromObject(model);box.getCenter(center);
+    model.position.y-=box.min.y;model.updateMatrixWorld(true);box.setFromObject(model);box.getCenter(center);
+    meshLayers=[];modelLights=[];
+    model.traverse(o=>{if(o.isLight){modelLights.push({object:o,originalVisible:o.visible,intensity:o.intensity});}if(o.isMesh){const b=new THREE.Box3().setFromObject(o);meshLayers.push({object:o,originalVisible:o.visible,bounds:{min:b.min.toArray(),max:b.max.toArray()}});}});
+    applyInspection();
     layoutHelpers();stats(name);setCut(opts.cut??1);
     fitBox=opts.fit?new THREE.Box3(new THREE.Vector3(opts.fit[0],opts.fit[1]+model.position.y,opts.fit[2]),new THREE.Vector3(opts.fit[3],opts.fit[4]+model.position.y,opts.fit[5])):null;
     fit(opts.top);
-    $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();$('houseViews').hidden=modelKey!=='hades-house'||window.GLBPreview.active;
+    $('viewerVersion').textContent=sourceInfo?.version?sourceInfo.version+' · SHA '+sourceInfo.actualSHA.slice(0,12):'本機檔案 · 版本未登記';
+    $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();$('houseViews').hidden=modelKey!=='hades-house'||window.GLBPreview.active;if(modelKey==='hades-house')houseView(2);
   }catch(e){console.error(e);showError(e&&e.message?e.message:String(e));}
 }
 
@@ -337,8 +359,8 @@ toggle('tShadow',on=>{sun.castShadow=on;ground.visible=on;});
 const cutIn=$('cutIn'),cutOut=$('cutOut');
 function setCut(f){cutIn.value=Math.round(f*1000);applyCut();}
 function applyCut(){const f=cutIn.value/1000;
-  if(!model||f>=0.999){renderer.clippingPlanes=[];clip.constant=1e6;cutOut.textContent='關閉';return;}
-  const h=box.min.y+size.y*f;clip.constant=h;cutOut.textContent=fmtLen(h-box.min.y);}
+  if(!model||f>=0.999){renderer.clippingPlanes=[];clip.constant=1e6;activeCutHeight=null;applyInspection();cutOut.textContent='關閉';return;}
+  const h=box.min.y+size.y*f;clip.constant=h;activeCutHeight=h;applyInspection();cutOut.textContent=fmtLen(h-box.min.y);}
 cutIn.oninput=applyCut;
 renderer.localClippingEnabled=true;
 
@@ -357,8 +379,8 @@ $('house1F').onclick=()=>houseView(1);$('house2F').onclick=()=>houseView(2);$('h
 /* ---------- file input + drag & drop ---------- */
 const MAX=200*1024*1024;
 function readFile(f){if(f.size>MAX){showError('檔案超過 200 MB，瀏覽器可能無法負荷。');return;}
-  showLoading(f.name);const r=new FileReader();r.onprogress=e=>e.lengthComputable&&setProg(e.loaded/e.total);
-  r.onload=()=>openModel(r.result,f.name);r.onerror=()=>showError('讀取檔案失敗。');r.readAsArrayBuffer(f);}
+  const serial=++loadSerial;showLoading(f.name);const r=new FileReader();r.onprogress=e=>e.lengthComputable&&setProg(e.loaded/e.total);
+  r.onload=()=>openModel(r.result,f.name,{serial});r.onerror=()=>showError('讀取檔案失敗。');r.readAsArrayBuffer(f);}
 $('fileIn').onchange=e=>{const f=e.target.files[0];if(f)readFile(f);e.target.value='';};
 ['dragenter','dragover'].forEach(t=>stage.addEventListener(t,e=>{e.preventDefault();stage.classList.add('drag');}));
 ['dragleave','drop'].forEach(t=>stage.addEventListener(t,e=>{e.preventDefault();stage.classList.remove('drag');}));
@@ -433,13 +455,19 @@ const SAMPLES={
   }
 };
 async function loadSample(key){
-  const smp=SAMPLES[key]||SAMPLES["reality-home"];showLoading(smp.name);
+  const serial=++loadSerial;const smp=SAMPLES[key]||SAMPLES["reality-home"];showLoading(smp.name);
   try{const res=await fetch(smp.file);if(!res.ok)throw new Error('範例檔讀取失敗（'+res.status+'）');
     const total=+res.headers.get('content-length')||0;const reader=res.body.getReader();const chunks=[];let got=0;
     for(;;){const {done,value}=await reader.read();if(done)break;chunks.push(value);got+=value.length;if(total)setProg(got/total);}
     const buf=new Uint8Array(got);let o=0;chunks.forEach(c=>{buf.set(c,o);o+=c.length;});
-    openModel(buf.buffer,smp.name,{cut:smp.cut,key:key,fit:smp.fit});
-  }catch(e){showError(e.message);}
+    if(serial!==loadSerial)return;
+    const actualSHA=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',buf))).map(v=>v.toString(16).padStart(2,'0')).join('');
+    const entry=(await manifestPromise).find(x=>x.model===key+'.glb');
+    if(!entry?.current_sha256)throw Error('無法取得模型版本清單，請重新整理後再試。');
+    if(!window.GLBInspection.checkHash(entry.current_sha256,actualSHA))throw Error('模型與版本清單不一致，已停止載入；請重新整理後再試。');
+    if(serial!==loadSerial)return;
+    await openModel(buf.buffer,smp.name,{serial,cut:smp.cut,key:key,fit:smp.fit,sourceInfo:{version:entry?.version||null,expectedSHA:entry?.current_sha256||null,actualSHA,url:smp.file,manifestVerified:!!entry}});
+  }catch(e){if(serial===loadSerial)showError(e.message);}
 }
 const sampleSel=$('sampleSel');
 const startKey=(location.hash||'').slice(1).replace(/-v23$/,''); // keep previously shared version links working
@@ -706,3 +734,4 @@ window.GLBPreview.ready(()=>{if(model){$('ov').hidden=true;$('fileName').textCon
 
 </body>
 </html>
+

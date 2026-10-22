@@ -1,0 +1,19 @@
+{
+  "work_id": "GLB-VIEW-20261022-001",
+  "status": "FIX_STAGED_ANDROID_RETEST_REQUIRED",
+  "model": "hades-house.glb",
+  "verified_deployed_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+  "verified_deployed_bytes": 10809676,
+  "viewer_changes": [
+    "Default inspection lighting hides the GLB's 11 point lights at intensity 1100; original lighting can be restored without modifying GLB bytes.",
+    "Cut height also hides meshes wholly above its world-space plane. Exact model bounds show 1682 meshes above 3.12m and 63 above 6.60m, including all roof meshes.",
+    "Whole-view restores original visibility, exposure is adjustable, diagnostics export records model hash and view state.",
+    "Canonical sample loads verify actual SHA-256 against current-models.json and reject stale loads when another file was selected."
+  ],
+  "checks": {"syntax": "PASS", "policy_tests": "5/5 PASS", "live_glb_hash": "PASS", "browser_image_fallback": "PASS", "browser_webgl": "UNAVAILABLE", "android_3d": "NOT_TESTED"},
+  "root_cause": "Not confirmed on the affected Android device. High imported light intensity and roof occlusion are isolated by the inspection controls, not claimed as the sole cause.",
+  "next_action": "Retest 1F, 2F and full exterior on the affected Android device; compare inspection/original lighting, exposure and clipping. Save diagnostics plus screenshots. Keep issue open until interiors are legible.",
+  "geometry_modified": false,
+  "all_422_complete": false,
+  "author_approval": "PENDING"
+}
