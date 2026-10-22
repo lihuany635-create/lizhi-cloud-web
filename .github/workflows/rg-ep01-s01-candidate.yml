@@ -1,0 +1,40 @@
+name: RG EP01 S01 Candidate Review
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - 'model-viewer/revisions/ep01-s01/**'
+      - '.github/workflows/rg-ep01-s01-candidate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-s01-arch-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout isolated stage branch
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build additive GLB candidate with SHA and anchor gates
+        run: |
+          python model-viewer/revisions/ep01-s01/scripts/build_s01_candidate.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("candidate-output/report.json").read_text())
+          assert r["added_rib_nodes"] == 36
+          assert r["S06_touched"] is False
+          assert r["camera_overlay"] == "NOT_RUN"
+          assert r["glb_container_validation"] == "PASS"
+          print("S01 candidate checks PASS",r["output_sha256"])
+          PY
+      - name: Publish review-only artifact (do not change canonical model)
+        uses: actions/upload-artifact@v4
+        with:
+          name: rg-ep01-s01-preview-glb-and-qa
+          path: candidate-output/
+          retention-days: 30
