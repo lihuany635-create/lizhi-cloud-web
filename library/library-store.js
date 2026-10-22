@@ -76,6 +76,13 @@
   async function registerComputer(entry,source){
     requireReady();
     const {file,path}=entry;
+    const {data:existing,error:findError}=await client().from(TABLE).select("id,size,computer_modified_at").eq("computer_id",source.computerId).eq("computer_path",path).is("deleted_at",null).limit(1);
+    if(findError)throw friendly(findError);
+    if(existing?.length){
+      const prev=existing[0];
+      // 未修改的檔案不重新抽文字／建立縮圖；大幅降低重掃成本。
+      if(Number(prev.size)===file.size&&new Date(prev.computer_modified_at).getTime()===(file.lastModified||0))return {skipped:true};
+    }
     const extracted=await global.LibraryExtract.extract(file);
     const payload={user_id:user().id,location:"computer",computer_id:source.computerId,
       computer_name:source.computerName,computer_path:path,
@@ -83,11 +90,8 @@
       file_name:file.name.slice(0,300),mime:file.type||"",size:file.size,
       storage_path:null,device_path:null,text_excerpt:extracted.text,thumb:extracted.thumb,
       extract_status:extracted.status,extract_note:extracted.note||null};
-    const {data:existing,error:findError}=await client().from(TABLE).select("id,size,computer_modified_at").eq("computer_id",source.computerId).eq("computer_path",path).is("deleted_at",null).limit(1);
-    if(findError)throw friendly(findError);
     if(existing?.length){
       const prev=existing[0];
-      if(Number(prev.size)===file.size&&new Date(prev.computer_modified_at).getTime()===(file.lastModified||0))return {skipped:true};
       const {data,error}=await client().from(TABLE).update({...payload,status:"inbox",title:null,summary:null,tags:[],key_points:[],related_ids:[],shelf:null,organized_at:null,organized_by:null}).eq("id",prev.id).select(COLUMNS).single();
       if(error)throw friendly(error);return {row:data};
     }
