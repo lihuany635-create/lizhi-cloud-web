@@ -7,7 +7,7 @@
   const TABLE="lizhi_library_items";
   const BUCKET="lizhi-library";
   const MAX_CLOUD_BYTES=50*1024*1024;
-  const COLUMNS="id,file_name,mime,size,storage_path,location,device_path,thumb,extract_status,extract_note,user_note,status,shelf,title,summary,tags,key_points,related_ids,organized_at,created_at,updated_at";
+  const COLUMNS="id,file_name,mime,size,storage_path,location,device_path,computer_id,computer_name,computer_path,computer_modified_at,thumb,extract_status,extract_note,user_note,status,shelf,title,summary,tags,key_points,related_ids,organized_at,created_at,updated_at";
 
   const auth=()=>global.LizhiAuth;
   const client=()=>auth()?.client;
@@ -72,6 +72,29 @@
     return insertRow(file,extracted,{id:crypto.randomUUID(),note:"",location:"device",devicePath:name});
   }
 
+  // 電腦原檔不進入 Storage；索引同步到 Supabase，手機也能搜尋。
+  async function registerComputer(entry,source){
+    requireReady();
+    const {file,path}=entry;
+    const extracted=await global.LibraryExtract.extract(file);
+    const payload={user_id:user().id,location:"computer",computer_id:source.computerId,
+      computer_name:source.computerName,computer_path:path,
+      computer_modified_at:new Date(file.lastModified||Date.now()).toISOString(),
+      file_name:file.name.slice(0,300),mime:file.type||"",size:file.size,
+      storage_path:null,device_path:null,text_excerpt:extracted.text,thumb:extracted.thumb,
+      extract_status:extracted.status,extract_note:extracted.note||null};
+    const {data:existing,error:findError}=await client().from(TABLE).select("id,size,computer_modified_at").eq("computer_id",source.computerId).eq("computer_path",path).is("deleted_at",null).limit(1);
+    if(findError)throw friendly(findError);
+    if(existing?.length){
+      const prev=existing[0];
+      if(Number(prev.size)===file.size&&new Date(prev.computer_modified_at).getTime()===(file.lastModified||0))return {skipped:true};
+      const {data,error}=await client().from(TABLE).update({...payload,status:"inbox",title:null,summary:null,tags:[],key_points:[],related_ids:[],shelf:null,organized_at:null,organized_by:null}).eq("id",prev.id).select(COLUMNS).single();
+      if(error)throw friendly(error);return {row:data};
+    }
+    const {data,error}=await client().from(TABLE).insert({...payload,id:crypto.randomUUID()}).select(COLUMNS).single();
+    if(error)throw friendly(error);return {row:data};
+  }
+
   // 雲端的檔案搬到手機資料夾，搬完刪掉雲端那份
   async function moveToDevice(item){
     requireReady();
@@ -110,6 +133,10 @@
   async function openUrl(item,{download=false}={}){
     requireReady();
     if(item.location==="device")return URL.createObjectURL(await device().read(item.device_path));
+    if(item.location==="computer"){
+      if(!global.LibraryComputer?.canRead(item))throw new Error("原檔在電腦上；請回到已連結的電腦開啟，手機可閱讀文字摘錄。");
+      return URL.createObjectURL(await global.LibraryComputer.read(item.computer_path));
+    }
     const {data,error}=await client().storage.from(BUCKET).createSignedUrl(item.storage_path,300,download?{download:item.file_name}:undefined);
     if(error)throw friendly(error);
     return data.signedUrl;
@@ -126,6 +153,7 @@
   async function remove(item,{deleteDeviceFile=true}={}){
     requireReady();
     if(item.location==="device"){if(deleteDeviceFile)await device().remove(item.device_path);}
+    else if(item.location==="computer"){ /* 僅移除館藏索引，不刪除電腦原檔 */ }
     else await client().storage.from(BUCKET).remove([item.storage_path]);
     const {error}=await client().from(TABLE).update({deleted_at:new Date().toISOString()}).eq("id",item.id);
     if(error)throw friendly(error);
@@ -141,5 +169,5 @@
     return new Error(message||"雲端操作失敗");
   }
 
-  global.LibraryStore=Object.freeze({available,list,detail,search,upload,register,moveToDevice,openUrl,update,remove,MAX_CLOUD_BYTES});
+  global.LibraryStore=Object.freeze({available,list,detail,search,upload,register,registerComputer,moveToDevice,openUrl,update,remove,MAX_CLOUD_BYTES});
 })(window);
