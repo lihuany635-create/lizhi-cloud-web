@@ -32,7 +32,7 @@
   const onDevice=item=>item.location==="device";
   const onComputer=item=>item.location==="computer";
   const computer=()=>global.LibraryComputer;
-  let scanning=false,scanProgress="";
+  let scanning=false,scanProgress="",computerConsentId=null;
   const toast=message=>typeof global.toast==="function"?global.toast(message):typeof window.toast==="function"?window.toast(message):alert(message);
 
   function highlight(text){
@@ -137,6 +137,12 @@
 
   async function scanComputer(){
     if(scanning)return;
+    const computerId=computer()?.id;
+    if(computerConsentId!==computerId){
+      const okay=confirm("將掃描你授權的電腦資料夾及其子資料夾。原檔不會上傳，但檔名、相對路徑、最多 6 萬字摘錄與小縮圖會儲存到你的私有雲端館藏，供手機和 AI 搜尋。請先確認資料夾不含不想同步的私人檔案。是否繼續？");
+      if(!okay)return;
+      computerConsentId=computerId;
+    }
     scanning=true;scanProgress="正在讀取電腦檔案";rerender();
     let added=0,unchanged=0,failed=0;
     try{
