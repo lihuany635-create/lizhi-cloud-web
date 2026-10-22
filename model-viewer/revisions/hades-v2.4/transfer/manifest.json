@@ -1,0 +1,21 @@
+{
+  "parts": [
+    "hades-house.glb.gz.000",
+    "hades-house.glb.gz.001",
+    "hades-house.glb.gz.002",
+    "hades-house.glb.gz.003",
+    "hades-house.glb.gz.004",
+    "hades-house.glb.gz.005",
+    "hades-house.glb.gz.006",
+    "hades-house.glb.gz.007",
+    "hades-house.glb.gz.008",
+    "hades-house.glb.gz.009",
+    "hades-house.glb.gz.010",
+    "hades-house.glb.gz.011",
+    "hades-house.glb.gz.012",
+    "hades-house.glb.gz.013"
+  ],
+  "compressed_sha256": "681abfd9b39799620fb02bec5d7310ab6f21557f1be7da8778ae4b2c88d790fc",
+  "model_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+  "previous_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb"
+}

@@ -1,0 +1,143 @@
+{
+  "format": "lizhi-camera-shots/1",
+  "model": "哈德斯家.glb",
+  "source_file": "hades-house.glb",
+  "model_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+  "revision": "HADES-v2.4",
+  "group_id": "B",
+  "units": "m",
+  "shots": [
+    {
+      "id": "C01",
+      "note": "H24_LIVING｜v2.4住宅檢查鏡位",
+      "model": "哈德斯家.glb",
+      "source_file": "hades-house.glb",
+      "model_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+      "eye_height_m": 1.6,
+      "focal_mm": 24,
+      "aspect": "4:3",
+      "image": [
+        1200,
+        900
+      ],
+      "yaw_deg": -100.7842978675626,
+      "pitch_deg": -9.949459658677279,
+      "feet": [
+        1.5,
+        0.04999999999999982,
+        -6.2
+      ],
+      "position": [
+        1.5,
+        1.65,
+        -6.2
+      ],
+      "target": [
+        -2.7,
+        0.9,
+        -7
+      ],
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true
+    },
+    {
+      "id": "C02",
+      "note": "H24_KITCHEN｜v2.4住宅檢查鏡位",
+      "model": "哈德斯家.glb",
+      "source_file": "hades-house.glb",
+      "model_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+      "eye_height_m": 1.6,
+      "focal_mm": 24,
+      "aspect": "4:3",
+      "image": [
+        1200,
+        900
+      ],
+      "yaw_deg": 65.85445803957835,
+      "pitch_deg": -8.941008825225657,
+      "feet": [
+        5.2,
+        0.0,
+        -0.2
+      ],
+      "position": [
+        5.2,
+        1.6,
+        -0.2
+      ],
+      "target": [
+        8.1,
+        1.1,
+        1.1
+      ],
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true
+    },
+    {
+      "id": "C03",
+      "note": "H24_DEN｜v2.4住宅檢查鏡位",
+      "model": "哈德斯家.glb",
+      "source_file": "hades-house.glb",
+      "model_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+      "eye_height_m": 1.6,
+      "focal_mm": 24,
+      "aspect": "4:3",
+      "image": [
+        1200,
+        900
+      ],
+      "yaw_deg": -70.01689347810003,
+      "pitch_deg": -9.696570807062265,
+      "feet": [
+        -5.2,
+        0.0,
+        1.6
+      ],
+      "position": [
+        -5.2,
+        1.6,
+        1.6
+      ],
+      "target": [
+        -8.5,
+        1.0,
+        2.8
+      ],
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true
+    },
+    {
+      "id": "C04",
+      "note": "H24_DESK｜v2.4住宅檢查鏡位",
+      "model": "哈德斯家.glb",
+      "source_file": "hades-house.glb",
+      "model_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+      "eye_height_m": 1.6,
+      "focal_mm": 28,
+      "aspect": "4:3",
+      "image": [
+        1200,
+        900
+      ],
+      "yaw_deg": -58.736268305622566,
+      "pitch_deg": -20.119677234524694,
+      "feet": [
+        -1.4,
+        3.3000000000000003,
+        2.4
+      ],
+      "position": [
+        -1.4,
+        4.9,
+        2.4
+      ],
+      "target": [
+        -2.8,
+        4.3,
+        3.25
+      ],
+      "feet_is_virtual_camera_anchor": true,
+      "actor_feet_not_provided": true
+    }
+  ]
+}

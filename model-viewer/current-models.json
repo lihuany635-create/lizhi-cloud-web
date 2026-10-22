@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "v2.3",
+  "version": "mixed-current-20261022",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -20,14 +20,18 @@
     },
     {
       "model": "hades-house.glb",
-      "version": "v2.3",
+      "version": "HADES-v2.4",
       "source_candidate": "hades-house_v2_3_candidate.glb",
-      "current_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
-      "backup": "backups/pre-v2.3/hades-house.glb",
-      "backup_sha256": "909fabe5960faca4ad8bd24e1e59dfb7201323b537749191963a5808f7b386a5",
-      "git_blob_sha": "86cd874711f620c9d4072efcfe2fe5313551d327",
-      "integrated_contents": "Existing scene and added geometry in one self-contained GLB. Not concatenated with original a second time.",
-      "author_full_item_approval": "PENDING"
+      "current_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+      "backup": "backups/pre-hades-v2.4/hades-house.glb",
+      "backup_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
+      "integrated_contents": "Complete two-storey envelope with inferred room layout, retained yard/car/stair, newly furnished household.",
+      "author_full_item_approval": "PENDING",
+      "review_url": "revisions/hades-v2.4/",
+      "deployment_source": "revisions/hades-v2.4/transfer/manifest.json",
+      "repository_baseline_version": "v2.3",
+      "repository_baseline_git_blob_sha": "86cd874711f620c9d4072efcfe2fe5313551d327",
+      "deployment_assembly": "Pages assembles exact v2.4 GLB from verified compressed parts before upload. Workflow permissions remain contents:read/pages:write/id-token:write; no repository write."
     },
     {
       "model": "reality-highschool.glb",

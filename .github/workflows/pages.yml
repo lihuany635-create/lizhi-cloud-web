@@ -22,6 +22,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Assemble reviewed Hades v2.4 model
+        run: |
+          python - <<'PY'
+          import pathlib,json,gzip,hashlib
+          root=pathlib.Path('model-viewer/revisions/hades-v2.4/transfer')
+          m=json.loads((root/'manifest.json').read_text())
+          archive=b''.join((root/name).read_bytes() for name in m['parts'])
+          assert hashlib.sha256(archive).hexdigest()==m['compressed_sha256']
+          data=gzip.decompress(archive)
+          assert hashlib.sha256(data).hexdigest()==m['model_sha256']
+          target=pathlib.Path('model-viewer/hades-house.glb')
+          assert hashlib.sha256(target.read_bytes()).hexdigest() in [m['previous_sha256'],m['model_sha256']], 'Unexpected house source'
+          target.write_bytes(data)
+          print('Verified exact HADES-v2.4 deployment model:',len(data),'bytes')
+          PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -29,4 +44,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

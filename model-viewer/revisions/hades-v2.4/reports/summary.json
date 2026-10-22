@@ -1,0 +1,23 @@
+{
+  "revision": "HADES-v2.4",
+  "model_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+  "validator_errors": 0,
+  "validator_warnings": 1,
+  "route_count": 11,
+  "sampled_route_pass_count": 11,
+  "qa_images": 12,
+  "narrative_anchors": [
+    "第3章：整齊臥室、床、書桌、課本、制服外套、學生證及通學資料；窗外可見住宅街和院內黑車。",
+    "第4章：傍晚回家，在床邊思考。",
+    "第8章：天奧在早餐桌邊翻報紙，戴黑框眼鏡；主角吃麥片。"
+  ],
+  "inference_notes": [
+    "天奧臥室、書房、兩間未指定住戶的備用房、共用起居區、衛浴及家務間，均為依使用者指示作的整棟住宅推測。",
+    "早餐桌上的眼鏡是無人場景的推測收納狀態；原文明寫天奧戴著眼鏡。",
+    "二樓外牆軸線與一樓相同，約22×13.97m；保留既有樓梯孔洞與3.6m樓面高。",
+    "主角房由約64m²改為約28m²，床與書桌改成日常尺度。",
+    "上傳和技術檢查不等於所有422項或新增設定已經正式核定。"
+  ],
+  "model": "hades-house.glb",
+  "publication_source": "Exact reviewed GLB is stored as verified gzip parts and assembled only in the Pages deployment workspace. Canonical published URL is v2.4; repository baseline GLB remains v2.3. No automatic repository write permissions."
+}

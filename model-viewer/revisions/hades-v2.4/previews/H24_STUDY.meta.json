@@ -1,0 +1,26 @@
+{
+  "render_signature": "v23-clear-glazing-2",
+  "transparent_surface_policy": "QA hides low-alpha glazing; no glTF material changed",
+  "model": "hades-house.glb",
+  "model_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+  "camera_position_gltf": [
+    2.1,
+    5.2,
+    -4.8
+  ],
+  "camera_target_gltf": [
+    4.2,
+    4.5,
+    -8.3
+  ],
+  "focal_mm": 24,
+  "render_engine": "Blender 4.3.2 Workbench studio material colors",
+  "samples": null,
+  "mode": "QA_workbench",
+  "image_size": [
+    1200,
+    900
+  ],
+  "author_approval": "PENDING",
+  "visual_qc": "PENDING"
+}
