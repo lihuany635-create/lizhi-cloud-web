@@ -47,7 +47,8 @@
     if(!supported)throw new Error("請在 Windows 電腦使用 Chrome 或 Edge 連結資料夾。");
     // 必須在使用者直接按下按鈕後立即叫出選取器。
     const handle=await global.showDirectoryPicker({id:"lizhi-library-computer",mode:"read",startIn:"documents"});
-    const record={id:crypto.randomUUID(),name:handle.name,handle};
+    const same=linked?.handle?.isSameEntry?await linked.handle.isSameEntry(handle).catch(()=>false):false;
+    const record={id:same?linked.id:crypto.randomUUID(),name:handle.name,handle};
     await db("readwrite",store=>store.put(record,KEY));
     linked=record;status="ready";initPromise=Promise.resolve(status);
     return handle.name;
