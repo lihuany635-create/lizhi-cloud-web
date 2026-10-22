@@ -83,7 +83,11 @@
       // 未修改的檔案不重新抽文字／建立縮圖；大幅降低重掃成本。
       if(Number(prev.size)===file.size&&new Date(prev.computer_modified_at).getTime()===(file.lastModified||0))return {skipped:true};
     }
-    const extracted=await global.LibraryExtract.extract(file);
+    // 避免大型 PDF 或高解析圖片在瀏覽器索引時耗盡記憶體。
+    const limit=(file.type||"").startsWith("image/")?30*1024*1024:100*1024*1024;
+    const extracted=file.size>limit
+      ?{text:null,thumb:null,status:"none",note:"檔案過大：只登記檔名與位置，不抽取內容"}
+      :await global.LibraryExtract.extract(file);
     const payload={user_id:user().id,location:"computer",computer_id:source.computerId,
       computer_name:source.computerName,computer_path:path,
       computer_modified_at:new Date(file.lastModified||Date.now()).toISOString(),
