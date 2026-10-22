@@ -8,7 +8,7 @@
   const TEXT_EXT=/\.(txt|md|markdown|csv|tsv|json|html?|xml|ya?ml|log|js|ts|py|css|sql)$/i;
 
   let rerender=()=>{},items=[],loaded=false,loading=false,error="",uploads=[],note="",pollTimer=null;
-  let shelfFilter="",tagFilter="",timeFilter="",sortBy="new";
+  let shelfFilter="",tagFilter="",timeFilter="",sortBy="new",sourceFilter="";
   let contentHits=new Map(),searchedFor="",searchTimer=null,searching=false;
 
   const fileInput=document.createElement("input");
@@ -81,6 +81,7 @@
   function filtered(){
     const needle=query(),since=timeFilter?Date.now()-Number(timeFilter)*86400000:0;
     let rows=items.filter(item=>{
+      if(sourceFilter&&item.location!==sourceFilter)return false;
       if(shelfFilter&&(item.shelf||"未分類")!==shelfFilter)return false;
       if(tagFilter&&!(item.tags||[]).includes(tagFilter))return false;
       if(since&&Date.parse(item.created_at)<since)return false;
@@ -202,6 +203,16 @@
     return `<ul class="library-uploads">${uploads.slice(0,6).map(job=>`<li class="${job.stage}"><b>${esc(job.name)}</b><span>${esc(STAGE[job.stage]||job.stage)}${job.error?`：${esc(job.error)}`:""}</span></li>`).join("")}</ul>`;
   }
 
+  function sourceTabs(){
+    const groups=[["","全部館藏"],["cloud","☁ 雲端"],["device","📱 手機"],["computer","🖥️ 電腦"]];
+    return `<div class="library-source-tabs" role="group" aria-label="館藏來源">
+      ${groups.map(([value,label])=>{
+        const count=value?items.filter(item=>item.location===value).length:items.length;
+        return `<button class="chip ${sourceFilter===value?"active":""}" data-library-source="${value}" aria-pressed="${sourceFilter===value}">${label} <span class="library-source-count">${count}</span></button>`;
+      }).join("")}
+    </div>`;
+  }
+
   function toolbar(allTags){
     const option=(value,label,current)=>`<option value="${esc(value)}" ${value===current?"selected":""}>${esc(label)}</option>`;
     return `<div class="library-toolbar">
@@ -226,7 +237,7 @@
     const allTags=[...new Set(items.flatMap(item=>item.tags||[]))].sort((a,b)=>a.localeCompare(b,"zh-Hant"));
     if(shelfFilter&&!allShelves.includes(shelfFilter))shelfFilter="";
     if(tagFilter&&!allTags.includes(tagFilter))tagFilter="";
-    const rows=filtered(),filtering=!!(query()||tagFilter||timeFilter||shelfFilter);
+    const rows=filtered(),filtering=!!(query()||tagFilter||timeFilter||shelfFilter||sourceFilter);
     const busy=uploads.some(job=>!["done","error"].includes(job.stage));
     const inboxCount=items.filter(item=>item.status==="inbox").length;
 
@@ -259,6 +270,7 @@
       </div>
       ${error?`<div class="library-error">${esc(error)} <button class="button" data-library-refresh>重試</button></div>`:""}
       <p class="library-count">館藏 ${items.length} 本 · 書架 ${allShelves.length} 個${inboxCount?` · 待整理 ${inboxCount} 本`:""}</p>
+      ${sourceTabs()}
       ${toolbar(allTags)}
       ${allShelves.length>1?`<div class="library-shelf-tabs"><button class="chip ${shelfFilter?"":"active"}" data-library-shelf="">全部書架</button>${allShelves.map(name=>`<button class="chip ${shelfFilter===name?"active":""}" data-library-shelf="${esc(name)}">${esc(name)}</button>`).join("")}</div>`:""}
       ${body}
@@ -437,6 +449,7 @@
     if(el.matches("[data-library-drop]")||el.dataset.action==="upload-library"){stop();if(dev()?.status==="needs-permission"){dev().grant().then(ok=>{rerender();if(ok)toast("已允許，再點一次選檔案");}).catch(err=>alert(err.message));return;}fileInput.click();return;}
     if(el.hasAttribute("data-library-refresh")){stop();load({force:true});return;}
     if(el.dataset.libraryRead){stop();Reader.open(el.dataset.libraryRead);return;}
+    if(el.dataset.librarySource!==undefined){stop();sourceFilter=el.dataset.librarySource;rerender();return;}
     if(el.dataset.libraryShelf!==undefined){stop();shelfFilter=el.dataset.libraryShelf;rerender();return;}
     if(el.dataset.libraryTagJump){stop();tagFilter=el.dataset.libraryTagJump;shelfFilter="";Reader.close();rerender();return;}
     if(el.dataset.libraryNote){stop();editNote(el.dataset.libraryNote);return;}
