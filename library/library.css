@@ -90,3 +90,10 @@ body.library-reading{overflow:hidden}
 .library-storage-actions{display:flex;flex-wrap:wrap;gap:.45rem;flex-basis:100%}
 .library-storage .button{padding:.45rem .75rem;font-size:.88rem}
 .library-uploads li.moving span{color:#8a6a28}.library-uploads li.moved span{color:#26734d}
+
+/* v2：同一座圖書館切換雲端、手機、電腦來源，不新增第二套入口。 */
+.library-source-tabs{display:flex;gap:.45rem;align-items:center;overflow-x:auto;scrollbar-width:thin;padding:.1rem 0 .55rem;margin:0 0 .45rem}
+.library-source-tabs .chip{flex:none;white-space:nowrap;cursor:pointer;border:1px solid var(--line,#d8d3c8);font:inherit;font-size:.86rem;padding:.45rem .7rem}
+.library-source-tabs .chip.active{background:#2d2925;color:#fffaf0;border-color:#2d2925}
+.library-source-count{font-size:.8em;opacity:.7;font-variant-numeric:tabular-nums}
+@media(max-width:640px){.library-source-tabs{margin-left:-.35rem;margin-right:-.35rem;padding-left:.35rem;padding-right:.35rem}}
