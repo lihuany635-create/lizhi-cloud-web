@@ -25,7 +25,7 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          r=json.loads(Path("candidate-output/report_v2.json").read_text())
+          r=json.loads(Path("candidate-output/report_v3.json").read_text())
           v=r["validation"]
           assert v["binary_container"]=="PASS"
           assert v["all_source_nodes_preserved"]=="PASS"
@@ -34,6 +34,19 @@ jobs:
           assert v["animation_camera_overlay"]=="NOT_RUN"
           assert r["new_detail_groups"]["ribs"]==56
           print("Review candidate GLB",r["glb_sha256"],"new nodes",r["added_nodes_stage2"])
+          PY
+      - name: Add continuous Gothic stone-vault and glazing to S01 candidate
+        run: |
+          python model-viewer/revisions/ep01-s01/scripts/enhance_s01_v3.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("candidate-output/report_v3.json").read_text())
+          assert r["stage3_added_nodes"]==92
+          assert r["validation"]["glb_roundtrip"]=="PASS"
+          assert r["validation"]["S06_unchanged"] is True
+          assert r["validation"]["animation_camera_match"]=="NOT_RUN"
+          print("S01 V3 candidate complete",r["result_sha256"],r["total_new_nodes"])
           PY
       - name: Install QA image dependency
         run: python -m pip install --disable-pip-version-check Pillow==11.3.0
@@ -44,9 +57,9 @@ jobs:
       - name: Preserve candidate in isolated stage branch (never edit canonical model)
         run: |
           mkdir -p model-viewer/staged-output/ep01-s01
-          cp candidate-output/lahudi-academy_ep01_s01_gothic_corridor_v2_review.glb model-viewer/staged-output/ep01-s01/
-          cp candidate-output/s01_corridor_v2_geometry_preview.png model-viewer/staged-output/ep01-s01/
-          cp candidate-output/report_v2.json model-viewer/staged-output/ep01-s01/
+          cp candidate-output/lahudi-academy_ep01_s01_corridor_v3_review.glb model-viewer/staged-output/ep01-s01/
+          cp candidate-output/s01_corridor_v3_geometry_preview.png model-viewer/staged-output/ep01-s01/
+          cp candidate-output/report_v3.json model-viewer/staged-output/ep01-s01/
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add model-viewer/staged-output/ep01-s01/
@@ -57,10 +70,10 @@ jobs:
       - name: Upload S01 V2 candidate GLB and reports, not to production
         uses: actions/upload-artifact@v4
         with:
-          name: rg-ep01-s01-gothic-corridor-v2-glb-preview
+          name: rg-ep01-s01-gothic-corridor-v3-glb-preview
           path: |
-            candidate-output/lahudi-academy_ep01_s01_gothic_corridor_v2_review.glb
-            candidate-output/s01_corridor_v2_geometry_preview.png
-            candidate-output/report_v2.json
+            candidate-output/lahudi-academy_ep01_s01_corridor_v3_review.glb
+            candidate-output/s01_corridor_v3_geometry_preview.png
+            candidate-output/report_v3.json
             candidate-output/stage1_report.json
           retention-days: 30
