@@ -1,0 +1,40 @@
+{
+  "project": "現實遊戲",
+  "scene": "RG-GAME-02",
+  "shot": "EP01-S01",
+  "revision": "S01-REV2-REVIEW",
+  "status": "REVIEW_ONLY_CAMERA_NOT_MATCHED_AUTHOR_PENDING",
+  "result_glb": "lahudi-academy_ep01_s01_gothic_corridor_v2_review.glb",
+  "glb_sha256": "6e4b855f1cba2cdf120e07d1f1ccaf45b2660cb24ea089483625869004e40571",
+  "input_stage1_sha256": "de2c7a3145f5d4245eeddc52343734aba039671485ff73e3102bb38aa2950121",
+  "original_v23_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+  "source_nodes_preserved": 7761,
+  "added_nodes_stage2": 199,
+  "new_detail_groups": {
+    "ribs": 56,
+    "pilasters": 42,
+    "doors": 6,
+    "panel_casing": 54,
+    "window_tracery": 8,
+    "wainscot": 9,
+    "floor_inlay": 9,
+    "sconces": 15
+  },
+  "validation": {
+    "binary_container": "PASS",
+    "all_source_nodes_preserved": "PASS",
+    "existing_transforms_unchanged": "PASS",
+    "author_approval": "PENDING",
+    "animation_camera_overlay": "NOT_RUN",
+    "end_stair_matches_film": "NOT_VERIFIED",
+    "original_staircase_modified": false,
+    "S06_modified": false
+  },
+  "design_note": [
+    "Stage2: visible stone pilasters/capitals, 7 pointed vault ribs across S01 bay zone.",
+    "Left 6 doors are decorative leaf overlays on extant solid wall, NOT guaranteed passable.",
+    "Right window tracery anchors to pre-existing 3 frames; snowy world view not yet simulated.",
+    "A01 warm winter sunlight needs material/light/camera rendering test, not implied by shader.",
+    "Far end staircase geometry remains side-turn descending; may differ from filmed frontal ascending stair."
+  ]
+}
