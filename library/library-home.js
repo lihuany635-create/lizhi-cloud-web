@@ -200,7 +200,7 @@
       ${item.summary?`<p class="library-summary">${highlight(item.summary)}</p>`:inbox?`<p class="library-hint">${esc(item.extract_note||"等整理後會寫上摘要與重點")}</p>`:""}
       ${snippet&&query()?`<p class="library-snippet">…${highlight(snippet)}…</p>`:""}
       ${item.tags?.length?`<div class="meta">${item.tags.map(tag=>`<span class="chip">${highlight(tag)}</span>`).join("")}</div>`:""}
-      <p class="library-meta">${onDevice(item)?"📱":onComputer(item)?"🖥️":"☁"} ${bytes(item.size||0)} · ${day(item.created_at)}${item.key_points?.length?` · ${item.key_points.length} 個重點`:""}</p>
+      <p class="library-meta">${onDevice(item)?"📱":onComputer(item)?"🖥️":"☁"} ${bytes(item.size||0)}${onComputer(item)&&!computer()?.canRead(item)?" · 原檔僅可在已連結電腦開啟":""} · ${day(item.created_at)}${item.key_points?.length?` · ${item.key_points.length} 個重點`:""}</p>
     </article>`;
   }
 
@@ -286,11 +286,15 @@
   // ───────── 閱讀器：獨立掛在 body 上，頁面重繪不會打斷 PDF 繪製 ─────────
   const Reader=(()=>{
     let root=null,currentId="",pdfTask=null,observer=null,tab="content",version=0;
+    const localObjectUrls=new Set();
+    function trackLocalUrl(url){if(String(url).startsWith("blob:"))localObjectUrls.add(url);return url;}
 
     function close({fromHistory=false}={}){
       if(!root)return;
       version++;observer?.disconnect();observer=null;
       try{pdfTask?.destroy?.();}catch{}pdfTask=null;
+      for(const url of localObjectUrls)URL.revokeObjectURL(url);
+      localObjectUrls.clear();
       root.remove();root=null;currentId="";document.body.classList.remove("library-reading");
       if(!fromHistory&&history.state?.libraryReader)history.back();
     }
@@ -362,12 +366,12 @@
       }
       try{
         if(isImage(item)){
-          const url=await global.LibraryStore.openUrl(item);if(mine!==version)return;
+          const url=trackLocalUrl(await global.LibraryStore.openUrl(item));if(mine!==version)return;
           viewer.innerHTML=`<img class="lib-image" src="${esc(url)}" alt="${esc(titleOf(item))}">`;
         }else if(isPdf(item)){
           await renderPdf(item,viewer,mine);
         }else if(isText(item)){
-          const url=await global.LibraryStore.openUrl(item);
+          const url=trackLocalUrl(await global.LibraryStore.openUrl(item));
           const text=await (await fetch(url)).text();if(mine!==version)return;
           viewer.innerHTML=`<pre class="lib-text">${esc(text.slice(0,500000))}</pre>`;
         }else{
@@ -381,6 +385,7 @@
     async function renderPdf(item,viewer,mine){
       viewer.innerHTML=`<div class="lib-viewer-status">正在載入 PDF…</div>`;
       const [lib,url]=await Promise.all([global.LibraryExtract.pdfLib(),global.LibraryStore.openUrl(item)]);
+      trackLocalUrl(url);if(mine!==version)return;
       pdfTask=lib.getDocument({url});
       const pdf=await pdfTask.promise;if(mine!==version)return;
       const first=await pdf.getPage(1),base=first.getViewport({scale:1});
