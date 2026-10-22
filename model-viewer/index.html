@@ -88,6 +88,16 @@ button,label.btn{font:inherit;cursor:pointer}
   :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
   body{margin:0;font-size:14px}
   [hidden]{display:none!important}
+
+#modelPreview{position:absolute;inset:0;z-index:30;background:var(--stage);display:flex;flex-direction:column;min-height:0}
+.preview-head{padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.preview-head h2{font-size:17px;margin:0}.preview-head p{flex-basis:100%;margin:0;font-size:13px;color:var(--muted)}
+.preview-head nav{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.preview-head button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.preview-head select{max-width:160px;padding:5px}.preview-zoom{display:inline-flex;align-items:center;gap:5px;font-size:13px}.preview-zoom input{width:100px}
+#previewViewport{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;touch-action:pan-x pan-y}
+#previewImage{display:block;width:100%;max-width:none;height:auto;margin:auto}
+#previewImageStatus{margin:0;padding:6px 14px;font-size:12px;background:var(--panel);color:var(--muted)}
+@media(max-width:600px){.preview-head{padding:8px}.preview-head h2{font-size:15px}.preview-head .btn{padding:6px 9px;font-size:12px}.preview-zoom input{width:80px}}
 </style>
 </head>
 <body>
@@ -106,10 +116,28 @@ button,label.btn{font:inherit;cursor:pointer}
       <option value="xiji-station">溪磯鎮車站</option>
       <option value="lahudi-academy">拉乎迪學院（校園＋教室＋告白走廊）</option>
     </select></label>
+  <button class="btn" id="openPreview" type="button">配置圖預覽</button>
   <span id="houseViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="house1F">一樓俯視</button><button class="btn" id="house2F">二樓俯視</button><button class="btn" id="houseWhole">完整外觀</button><a class="btn" href="revisions/hades-v2.4/">配置圖</a></span>
 </div>
 
 <div id="stage">
+  <section id="modelPreview" hidden aria-labelledby="previewTitle">
+    <header class="preview-head">
+      <h2 id="previewTitle">配置圖預覽</h2>
+      <p id="previewMessage" role="status"></p>
+      <nav id="previewFloors" aria-label="樓層與外觀"></nav>
+      <label>視角 <select id="previewShot" aria-label="預覽視角"></select></label>
+      <label class="preview-zoom">放大 <input id="previewZoom" aria-label="預覽放大比例" type="range" min="100" max="300" step="25" value="100"><output id="previewZoomOut">100%</output></label>
+      <button class="btn" id="previewReset" type="button">重設大小</button>
+      <a class="btn" id="previewReview" href="revisions/hades-v2.4/">完整配置圖</a>
+      <a class="btn" id="previewDownload" href="hades-house.glb?v=2.4-20261022" download>下載 GLB</a>
+      <button class="btn" id="previewRetry" type="button">重試 3D</button>
+      <button class="btn" id="previewBack" type="button" hidden>返回 3D</button>
+    </header>
+    <div id="previewViewport" tabindex="0" role="region" aria-label="配置圖，可放大後捲動檢查"><img id="previewImage" alt="住宅配置圖"></div>
+    <p id="previewImageStatus" role="status" aria-live="polite"></p>
+  </section>
+
   <div class="overlay" id="ov">
     <div class="card" id="ovCard">
       <strong>載入中…</strong>
@@ -164,6 +192,7 @@ button,label.btn{font:inherit;cursor:pointer}
   </div>
 </div>
 
+<script src="preview-mode.js?v=20261022-1"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -177,7 +206,16 @@ button,label.btn{font:inherit;cursor:pointer}
 (function(){
 const $=id=>document.getElementById(id);
 const stage=$('stage');
-const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:false});
+try {
+if(!window.THREE||!THREE.OrbitControls||!THREE.GLTFLoader||!THREE.RoomEnvironment){
+  window.GLBPreview.open({unavailable:true});return;
+}
+let renderer;
+for(const options of [{antialias:true,preserveDrawingBuffer:false},{antialias:false,preserveDrawingBuffer:false,powerPreference:'low-power',failIfMajorPerformanceCaveat:false}]){
+  try{renderer=new THREE.WebGLRenderer(options);break;}catch(error){console.warn('3D renderer startup attempt failed:',error.message);}
+}
+if(!renderer){window.GLBPreview.open({unavailable:true});return;}
+renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();window.GLBPreview.open({unavailable:true});});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.outputEncoding=THREE.sRGBEncoding;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;
@@ -247,7 +285,7 @@ async function openModel(buf,name,opts={}){
     layoutHelpers();stats(name);setCut(opts.cut??1);
     fitBox=opts.fit?new THREE.Box3(new THREE.Vector3(opts.fit[0],opts.fit[1]+model.position.y,opts.fit[2]),new THREE.Vector3(opts.fit[3],opts.fit[4]+model.position.y,opts.fit[5])):null;
     fit(opts.top);
-    $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();$('houseViews').hidden=modelKey!=='hades-house';
+    $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();$('houseViews').hidden=modelKey!=='hades-house'||window.GLBPreview.active;
   }catch(e){console.error(e);showError(e&&e.message?e.message:String(e));}
 }
 
@@ -655,14 +693,16 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let lastT=performance.now();
 (function loop(){requestAnimationFrame(loop);
   const now=performance.now(),dt=Math.min(.05,(now-lastT)/1000);lastT=now;
+  if(window.GLBPreview.active)return;
   if(pov){stepPov(dt);renderer.render(scene,camera);return;}
   if(anim){const k=reduce?1:0.1;camera.position.lerp(anim.p,k);controls.target.lerp(anim.t,k);if(camera.position.distanceTo(anim.p)<size.length()*0.0005)anim=null;}
   controls.update();renderer.render(scene,camera);})();
 
 loadSample(sampleSel.value);
+window.GLBPreview.ready(()=>{if(model){$('ov').hidden=true;$('fileName').textContent=modelName;}else{$('ov').hidden=false;}},()=>{if(pov)exitPov();});
+}catch(error){console.error('3D viewer startup failed:',error);window.GLBPreview.open({unavailable:true});}
 })();
 </script>
 
 </body>
 </html>
-
