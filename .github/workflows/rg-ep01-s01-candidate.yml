@@ -9,9 +9,9 @@ on:
 permissions:
   contents: read
 jobs:
-  build-s01-arch-candidate:
+  build-s01-corridor-v2:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout isolated stage branch
         uses: actions/checkout@v4
@@ -19,22 +19,35 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Build additive GLB candidate with SHA and anchor gates
+      - name: Build structural GLB with S01 assets only
         run: |
-          python model-viewer/revisions/ep01-s01/scripts/build_s01_candidate.py
+          python model-viewer/revisions/ep01-s01/scripts/enhance_s01_v2.py
           python - <<'PY'
           import json
           from pathlib import Path
-          r=json.loads(Path("candidate-output/report.json").read_text())
-          assert r["added_rib_nodes"] == 36
-          assert r["S06_touched"] is False
-          assert r["camera_overlay"] == "NOT_RUN"
-          assert r["glb_container_validation"] == "PASS"
-          print("S01 candidate checks PASS",r["output_sha256"])
+          r=json.loads(Path("candidate-output/report_v2.json").read_text())
+          v=r["validation"]
+          assert v["binary_container"]=="PASS"
+          assert v["all_source_nodes_preserved"]=="PASS"
+          assert v["existing_transforms_unchanged"]=="PASS"
+          assert v["S06_modified"] is False
+          assert v["animation_camera_overlay"]=="NOT_RUN"
+          assert r["new_detail_groups"]["ribs"]==56
+          print("Review candidate GLB",r["glb_sha256"],"new nodes",r["added_nodes_stage2"])
           PY
-      - name: Publish review-only artifact (do not change canonical model)
+      - name: Install QA image dependency
+        run: python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Render geometry-only perspective and topology guide
+        run: python model-viewer/revisions/ep01-s01/scripts/preview_s01_v2.py
+      - name: Remove transient stage 1 duplication from artifact
+        run: rm -f candidate-output/stage1.glb
+      - name: Upload S01 V2 candidate GLB and reports, not to production
         uses: actions/upload-artifact@v4
         with:
-          name: rg-ep01-s01-preview-glb-and-qa
-          path: candidate-output/
+          name: rg-ep01-s01-gothic-corridor-v2-glb-preview
+          path: |
+            candidate-output/lahudi-academy_ep01_s01_gothic_corridor_v2_review.glb
+            candidate-output/s01_corridor_v2_geometry_preview.png
+            candidate-output/report_v2.json
+            candidate-output/stage1_report.json
           retention-days: 30
