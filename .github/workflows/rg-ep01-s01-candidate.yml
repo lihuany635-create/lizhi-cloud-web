@@ -7,7 +7,7 @@ on:
       - '.github/workflows/rg-ep01-s01-candidate.yml'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build-s01-corridor-v2:
     runs-on: ubuntu-latest
@@ -41,6 +41,19 @@ jobs:
         run: python model-viewer/revisions/ep01-s01/scripts/preview_s01_v2.py
       - name: Remove transient stage 1 duplication from artifact
         run: rm -f candidate-output/stage1.glb
+      - name: Preserve candidate in isolated stage branch (never edit canonical model)
+        run: |
+          mkdir -p model-viewer/staged-output/ep01-s01
+          cp candidate-output/lahudi-academy_ep01_s01_gothic_corridor_v2_review.glb model-viewer/staged-output/ep01-s01/
+          cp candidate-output/s01_corridor_v2_geometry_preview.png model-viewer/staged-output/ep01-s01/
+          cp candidate-output/report_v2.json model-viewer/staged-output/ep01-s01/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(S01): preserve review-only model and QA output on stage branch'
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
       - name: Upload S01 V2 candidate GLB and reports, not to production
         uses: actions/upload-artifact@v4
         with:
