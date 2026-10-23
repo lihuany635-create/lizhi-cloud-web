@@ -70,9 +70,9 @@ s=s.replace(cache,"current-models.json?v=20261023-academy-rb2-v13")
 old='whole:[-141.5,-1.5,-202.5,29.35,28.34,56.5],'
 assert s.count(old)==1
 s=s.replace(old,'whole:[-146,-1.5,-202.5,36,28.34,91.5],\n    gate:[-112,-1,51,-19,13,89],')
-old='[-141.5,\n      -1.5,\n      -202.5,\n      29.35,\n      28.34,\n      56.5'
+old='[\n      -141.5,\n      -1.5,\n      -202.5,\n      29.35,\n      28.34,\n      56.5'
 assert s.count(old)==1,("V13 default fit not found")
-s=s.replace(old,'[-146,\n      -1.5,\n      -202.5,\n      36,\n      28.34,\n      91.5')
+s=s.replace(old,'[\n      -146,\n      -1.5,\n      -202.5,\n      36,\n      28.34,\n      91.5')
 button='<button class="btn" id="academyLibrary" type="button">圖書館區</button>'
 assert s.count(button)==1
 s=s.replace(button,button+'<button class="btn" id="academyGate" type="button">學院大門</button>')
