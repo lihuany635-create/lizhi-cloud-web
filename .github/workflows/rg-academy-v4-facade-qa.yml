@@ -1,0 +1,31 @@
+name: RG Academy V4 Door Clearance Structural No Render QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v4-facade-qa.yml'
+      - 'model-viewer/revisions/academy-all-corridors/verify_campus_facade_v4.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  geometry-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Gate 28 hall facades and ground floor doorway clearances
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-all-corridors/verify_campus_facade_v4.py
+      - name: Save factual non-render QA
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-all-corridors-rb2-v4/geometry-qa.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy V4): verify original 9245 nodes, door-zone clearances and 28 hall facades'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
