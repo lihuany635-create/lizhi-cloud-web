@@ -1,0 +1,46 @@
+{
+  "sample": {
+    "at": "2026-10-23T16:14:36.328Z",
+    "preview": false,
+    "modelKey": "N/A",
+    "modelName": "N/A",
+    "visibleMeshes": -1,
+    "totalMeshes": -1,
+    "canvasSize": null,
+    "render": null,
+    "webglLost": null,
+    "sceneChildren": null,
+    "modelVisible": null,
+    "camera": null,
+    "target": null,
+    "cut": null,
+    "overlay": true,
+    "version": "ACADEMY-V15-VITTI-REAR-GARDEN-REVIEW · SHA e269a295159f",
+    "grid": null,
+    "gardenButton": "GARDEN_BUTTON_CLICKED",
+    "gardenStats": {
+      "label": "薇媞後花園 V15",
+      "selected": "true",
+      "camera": [],
+      "visibleMeshes": 0,
+      "sha": "ACADEMY-V15-VITTI-REAR-GARDEN-REVIEW · SHA e269a295159f"
+    },
+    "webglRenderReady": false
+  },
+  "events": [
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()",
+          "timestamp": 1792771991537.567,
+          "url": "https://lihuany635-create.github.io/favicon.ico",
+          "networkRequestId": "2270.364"
+        }
+      }
+    }
+  ],
+  "chromeStderr": "[2183:2213:1023/161302.491144:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2183:2213:1023/161303.374800:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2183:2213:1023/161303.374820:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2183:2213:1023/161303.704828:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2183:2213:1023/161304.126578:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n\nDevTools listening on ws://127.0.0.1:9223/devtools/browser/b2b9d638-59f4-402c-8c75-b3abdeac41e1\n[2183:2183:1023/161305.993773:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2183:2213:1023/161305.993875:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2183:2183:1023/161305.993956:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2183:2213:1023/161305.994342:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2183:2183:1023/161305.994541:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2183:2183:1023/161306.038244:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2183:2213:1023/161306.044374:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2183:2183:1023/161306.493010:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2183:2183:1023/161306.500411:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2183:2213:1023/161306.500614:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2183:2183:1023/161306.542102:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2183:2183:1023/161306.642910:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files\n[2183:2183:1023/161306.646796:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2183:2213:1023/161306.646877:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2183:2183:1023/161306.746298:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2183:2213:1023/161306.746440:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2183:2183:1023/161306.759372:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2183:2215:1023/161309.369311:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: QUOTA_EXCEEDED\nCreated TensorFlow Lite XNNPACK delegate for CPU.\n"
+}
