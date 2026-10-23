@@ -1,0 +1,57 @@
+{
+  "version": "V12-INTERIOR-CAMERA-REVIEW",
+  "result": "SCREENSHOT_AND_CONTROL_PASS",
+  "count": 5,
+  "screens": {
+    "B1": {
+      "bytes": 231096,
+      "sha256": "8a009c894dab4d28a324ccfefd7abca8905fcc94718607a53d1087d3fa4ae53e",
+      "px": [
+        720,
+        1237
+      ],
+      "selection": "B1"
+    },
+    "B2": {
+      "bytes": 250805,
+      "sha256": "5ad1f37cdf8bf2a1111541c40d2e0bb3c8a1202144b9938961996a1943376e87",
+      "px": [
+        720,
+        1237
+      ],
+      "selection": "B2"
+    },
+    "C1": {
+      "bytes": 198045,
+      "sha256": "ad21d9873591c1d43bad912dd0b6073080a06f5aba9521019c21b5ee9687a657",
+      "px": [
+        720,
+        1237
+      ],
+      "selection": "C1"
+    },
+    "G1": {
+      "bytes": 150109,
+      "sha256": "a91ee91ac39fe7aaf82bb0e2119fb453b5e00dacc332727dfadb3b7775a8b227",
+      "px": [
+        720,
+        1237
+      ],
+      "selection": "G1"
+    },
+    "H1": {
+      "bytes": 151395,
+      "sha256": "1d5ac09c47744c38f449057e3adb59a4b3afcaa067c42c9a2153032a09f20beb",
+      "px": [
+        720,
+        1237
+      ],
+      "selection": "H1"
+    }
+  },
+  "rendered_3d_output": "VISUALLY_VERIFIED_BY_IMAGE_EXAMINATION",
+  "viewer_JS_global_scope": "PRIVATELY_SCOPED__RUNTIME_DIAGNOSTIC_NOT_AVAILABLE",
+  "original_run": "39966358881",
+  "manual_review_needed": "Check artistic quality; assets are still low-poly",
+  "not_claimed": "No code-independent WebGL FPS or GPU performance measured"
+}
