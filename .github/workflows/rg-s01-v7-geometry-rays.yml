@@ -1,0 +1,87 @@
+name: RG EP01 S01 V7 Real Door and Stair Rays
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-s01-v7-geometry-rays.yml'
+      - 'model-viewer/revisions/ep01-s01/tests/v7-doorway-rays.html'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-s01-v7-geometry-rays
+  cancel-in-progress: true
+jobs:
+  door-stair-raycheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare exact V7 GLB for browser mesh raycast
+        run: |
+          mkdir -p candidate-output/v7-rays
+          cp model-viewer/revisions/ep01-s01/tests/v7-doorway-rays.html candidate-output/v7-rays/index.html
+          cp model-viewer/staged-output/ep01-s01/v7/lahudi-academy_ep01_s01_v7_vestibules_review.glb candidate-output/v7-rays/model.glb
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          report=json.loads(Path('model-viewer/staged-output/ep01-s01/v7/report_v7.json').read_text())
+          model=Path('candidate-output/v7-rays/model.glb').read_bytes()
+          assert len(model)==report['bytes']==5566760
+          assert hashlib.sha256(model).hexdigest()==report['sha256']
+          print('Verified exact V7 GLB for real geometric raycasts.')
+          PY
+      - name: Run 36 doorway triangle ray checks and 14 stair height checks in Chrome
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8137 --bind 127.0.0.1 --directory candidate-output/v7-rays > candidate-output/v7-rays-server.log 2>&1 &
+          sleep 2
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 85s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --disable-gpu-sandbox --window-size=1280,900 --virtual-time-budget=17000 --dump-dom http://127.0.0.1:8137/ > candidate-output/v7-rays-page.html
+          python - <<'PY'
+          from html import unescape
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import json
+          class Parser(HTMLParser):
+              in_pre=False
+              txt=''
+              def handle_starttag(self,tag,attrs):
+                  if tag=='pre' and ('id','qa-json') in attrs:self.in_pre=True
+              def handle_endtag(self,tag):
+                  if tag=='pre':self.in_pre=False
+              def handle_data(self,data):
+                  if self.in_pre:self.txt+=data
+          html=Path('candidate-output/v7-rays-page.html').read_text(errors='replace')
+          p=Parser();p.feed(html)
+          assert p.txt and p.txt not in ('WAITING','LOADING'),html[-1200:]
+          report=json.loads(unescape(p.txt))
+          assert report['result'] in ('SAMPLED_GEOMETRY_PASS','SAMPLED_GEOMETRY_REVIEW_REQUIRED'),report
+          assert len(report['rays'])==36,report
+          assert len(report['stair_samples'])==14,report
+          report['status']='REAL_TRIANGLE_RAY_QA_RECORDED'
+          report['film_camera_match']='NOT_RUN'
+          report['full_swept_actor_collision']='NOT_RUN'
+          output=Path('candidate-output/v7-ray-result.json')
+          output.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps({'result':report['result'],'summary':report['summary']},ensure_ascii=False),flush=True)
+          PY
+      - name: Save checks to stage branch regardless of geometric obstructions
+        run: |
+          mkdir -p model-viewer/staged-output/ep01-s01/v7/ray-qa
+          cp candidate-output/v7-ray-result.json model-viewer/staged-output/ep01-s01/v7/ray-qa/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/v7/ray-qa/
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(S01 V7): measure door and stair triangle-ray obstruction results'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - name: QA evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ep01-s01-v7-door-stair-rays
+          path: candidate-output/v7-ray-result.json
+          retention-days: 30
