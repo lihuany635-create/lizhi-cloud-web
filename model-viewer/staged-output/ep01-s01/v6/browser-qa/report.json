@@ -1,0 +1,12 @@
+{
+  "version": "S01-V6-OPEN-DOORS-REVIEW",
+  "model_sha256": "d062b88d2553d9ef0bbbce5da77980460ba65ad993cbcaf41c77112af27ec069",
+  "screenshot_bytes": 165027,
+  "render_method": "Headless Chrome Three.js WebGL (temporary local URL)",
+  "published": false,
+  "canonical_unchanged": true,
+  "camera_match": "NOT_RUN",
+  "door_collision": "NOT_TESTED",
+  "S06_untouched": true,
+  "author_approval": "PENDING"
+}
