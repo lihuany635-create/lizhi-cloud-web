@@ -1,0 +1,64 @@
+name: RG Academy V12 Furnished Interior Candidate Build
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v12-furniture-build.yml'
+      - 'model-viewer/revisions/academy-interior-v12/build_v12_furnished_rooms.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v12-room-furniture
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build 3D rooms and furniture into one actual GLB without changing V11
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-interior-v12/build_v12_furnished_rooms.py
+      - name: Validate original nodes, furniture mapping and provisional-only state
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import struct,json,hashlib
+          d=Path('candidate-output/academy-interior-furniture-v12')
+          r=json.loads((d/'report.json').read_text())
+          b=(d/r['file']).read_bytes()
+          assert b[:4]==b'glTF' and struct.unpack_from('<I',b,8)[0]==len(b)==r['bytes']
+          assert hashlib.sha256(b).hexdigest()==r['sha256']
+          assert r['source_nodes_preserved']==11923
+          assert r['source_v11_sha256']=='caab8cba4cbb9af22252ea2b05a35588b9529fb4af5720b787cf96b33229a9ae'
+          assert r['new_rooms']>=40 and r['furniture_instances']>900
+          assert r['new_batched_meshes']<110
+          assert r['untouched_story_districts']==['A_MAIN','F_LIBRARY']
+          assert r['no_3f_floor_over_A01']
+          assert r['rooms_are_provisional']
+          assert r['no_character_collision']=='SKIPPED_AS_REQUESTED'
+          placement=json.loads((d/'furniture-placements.json').read_text())
+          assert len(placement['placements'])==r['furniture_instances']
+          assert len(placement['rooms'])==r['new_rooms']
+          print('STAGED V12 INTERIORS, not published',r['sha256'])
+          PY
+      - name: Save furniture GLB preview candidate and editable placement plan
+        run: |
+          set -euo pipefail
+          dst=model-viewer/staged-output/academy-interior-furniture-v12
+          mkdir -p "$dst"
+          cp candidate-output/academy-interior-furniture-v12/*.glb "$dst/"
+          cp candidate-output/academy-interior-furniture-v12/*.json "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V12): staged provisional classrooms and low-poly furniture'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
