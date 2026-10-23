@@ -1,0 +1,52 @@
+name: RG Academy V10 Portal and Stair Repair Build
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v10-build.yml'
+      - 'model-viewer/revisions/academy-route-repair-v10/build_v10.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v10-build
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construct actual V10 access fixes without altering locked masterplan
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-route-repair-v10/build_v10.py
+      - name: Confirm real GLB, original SHA and fixes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,struct
+          d=Path('candidate-output/academy-route-repair-v10')
+          r=json.loads((d/'report.json').read_text())
+          b=(d/r['file']).read_bytes()
+          assert b[:4]==b'glTF' and struct.unpack_from('<I',b,8)[0]==len(b)
+          assert hashlib.sha256(b).hexdigest()==r['sha256']
+          assert r['original_nodes']==11775 and r['source_sha256']=='ada3ae9c9e55f995b4c8c60f63655c01e572561e523e199ef1cdf298c7e668c3'
+          assert r['zone_footprints_locked'] and len(r['disabled_old_nodes'])==16
+          assert r['fixed_routes']['C-05']['steps']==26
+          print('V10 true GLB constructed with intact campus:',r['sha256'])
+          PY
+      - name: Keep V10 candidate and evidence on review branch only
+        run: |
+          d=model-viewer/staged-output/academy-route-repair-v10
+          mkdir -p "$d"
+          cp candidate-output/academy-route-repair-v10/*.glb "$d/"
+          cp candidate-output/academy-route-repair-v10/report.json "$d/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$d"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V10): repaired model candidate'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
