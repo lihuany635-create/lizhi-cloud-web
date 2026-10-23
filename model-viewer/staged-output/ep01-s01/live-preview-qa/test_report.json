@@ -6,6 +6,7 @@
     "preview_html_starts_with_doctype": true,
     "preview_has_V5_notice": true,
     "preview_has_model_route": true,
+    "corridor_camera_not_behind_end_wall": true,
     "glb_magic": true,
     "glb_expected_length": true,
     "glb_sha256_pinned": true,
