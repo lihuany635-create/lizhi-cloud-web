@@ -38,7 +38,9 @@ details summary{cursor:pointer;font-weight:600}.note{font-size:13px;color:#b9c6c
 <div class="progress-board" role="status" aria-label="S01 V7 測試狀態">
   <strong>目前版本：</strong>S01 V7，六組門洞已補淺層過渡空間；5.57 MB GLB、102 個新增節點。<br>
   <strong>已通過：</strong>模型結構檢查，以及長廊與門後側視兩張實際 Chrome 3D 渲染。<br>
-  <strong>未完成：</strong>門後完整室內、角色碰撞驗證、原動畫 A01/A03 疊圖、樓梯動線與作者驗收。<br>
+  <strong>通行初檢：</strong>六個門洞 36 條射線無阻擋，樓梯 14 個採樣高度遞增；仍未完成完整人物碰撞。<br>
+  <strong>鏡位測試：</strong>已確認反向觀看時左木門、右高窗、遠端上行樓梯可同時入鏡；仍未和原動畫疊圖。<br>
+  <strong>未完成：</strong>門後完整室內、角色完整碰撞、原動畫 A01/A03 疊圖、樓梯動線與作者驗收。<br>
   <strong>可回退：</strong><a href="../">查看已保留的 V5 測試版</a>；<strong>正式版：</strong>不變；S06 暫停。<br>
   <small>本頁是單次輸出的可檢查模型，不代表有 AI 在背景持續製作。</small>
 </div>
@@ -54,7 +56,7 @@ details summary{cursor:pointer;font-weight:600}.note{font-size:13px;color:#b9c6c
 <div class="scene" id="stage" role="region" aria-label="GLB 3D 互動預覽區">
   <div id="status" role="status" aria-live="polite">準備載入 S01 V7（5.57 MB）…</div>
 </div>
-<p class="note">注意：這些是工程檢查視角，未與 EP01 原動畫一對一對位。主視角改為從走廊內部拍攝；遠端入口牆與舊樓梯空間衝突仍待修復。左側木門尚非可通行門洞；原有側向樓梯仍在模型中。冬季光線、遮擋與人物離場動線仍在修訂。若手機不支援 WebGL，可先查看下方 Blender 幾何檢查圖。</p>
+<p class="note">注意：V7 預設為已在實際 WebGL 截圖驗證的「左側木門、右側高窗、遠端樓梯」工程鏡位，並非原動畫逐格比對後的正式攝影機。六個門洞已建立幾何開口，36 條門洞射線通過，但尚未做完整角色碰撞與門後全室檢查；原有側向樓梯仍保留，冬季光線與人物離場動線也尚未驗收。</p>
 <details>
   <summary>施工版本與驗證狀態</summary>
   <p class="note"><strong>檔案：</strong>lahudi-academy-s01-v7.glb<br>
@@ -85,7 +87,7 @@ const buttons=["viewA01","viewA02","viewA03","viewWhole","toggleIsolate"];
 let renderer,scene,camera,controls,model=null,meshes=[],isolated=true;
 const bounds={min:[-74,3.5,-9],max:[-68,8,13]};
 const presets=[
- {name:"走廊主視角",pos:[-70.42,5.49,-5.2],target:[-70.43,5.40,9.0],fov:71},
+ {name:"走廊主視角",pos:[-70.43,5.50,5.4],target:[-70.43,5.72,-11.3],fov:68},
  {name:"高窗細節",pos:[-72.9,5.85,2.8],target:[-68.7,5.93,6.5],fov:59},
  {name:"樓梯方向",pos:[-70.2,5.64,3.0],target:[-70.55,5.0,12.1],fov:65}
 ];
