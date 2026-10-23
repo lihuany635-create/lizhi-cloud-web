@@ -1,0 +1,3304 @@
+{
+  "source_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+  "nodes": 7725,
+  "mesh": 2400,
+  "scene_nodes": 7724,
+  "groups": [
+    [
+      "RG-GAME-02-LIB-002",
+      424
+    ],
+    [
+      "RG-GAME-02-A1-004",
+      236
+    ],
+    [
+      "RG-GAME-02-CROOM-004",
+      236
+    ],
+    [
+      "RG-GAME-02-CONFESS-005",
+      48
+    ],
+    [
+      "RG-GAME-02-EXT-001",
+      39
+    ],
+    [
+      "RG-GAME-02-EXT-002",
+      38
+    ],
+    [
+      "hall",
+      30
+    ],
+    [
+      "RG-GAME-02-ROOF-001",
+      30
+    ],
+    [
+      "RG-GAME-02-LIB-006",
+      24
+    ],
+    [
+      "RG-GAME-02-ACOR-002",
+      21
+    ],
+    [
+      "O05",
+      14
+    ],
+    [
+      "RG-GAME-02-LIB-003",
+      10
+    ],
+    [
+      "RG-GAME-02-LIB-004",
+      7
+    ],
+    [
+      "RG-GAME-02-A1-005",
+      6
+    ],
+    [
+      "RG-GAME-02-CROOM-005",
+      6
+    ],
+    [
+      "L08",
+      5
+    ],
+    [
+      "L04",
+      5
+    ],
+    [
+      "RG-GAME-02-EXT-006",
+      5
+    ],
+    [
+      "RG-GAME-02-A1-001",
+      5
+    ],
+    [
+      "RG-GAME-02-CROOM-001",
+      5
+    ],
+    [
+      "RG-GAME-02-LIB-001",
+      5
+    ],
+    [
+      "RG-GAME-02-CCOR-003",
+      4
+    ],
+    [
+      "RG-GAME-02-CONFESS-001",
+      4
+    ],
+    [
+      "RG-GAME-02-ACOR-004",
+      4
+    ],
+    [
+      "RG-GAME-02-A1-008",
+      3
+    ],
+    [
+      "RG-GAME-02-CROOM-008",
+      3
+    ],
+    [
+      "L03",
+      2
+    ],
+    [
+      "L01",
+      2
+    ],
+    [
+      "ribbon",
+      1
+    ],
+    [
+      "ribbon.001",
+      1
+    ],
+    [
+      "ribbon.002",
+      1
+    ],
+    [
+      "ribbon.003",
+      1
+    ],
+    [
+      "ribbon.004",
+      1
+    ],
+    [
+      "ribbon.005",
+      1
+    ],
+    [
+      "ribbon.006",
+      1
+    ],
+    [
+      "box",
+      1
+    ],
+    [
+      "box.001",
+      1
+    ],
+    [
+      "cyl.026",
+      1
+    ],
+    [
+      "cyl.027",
+      1
+    ],
+    [
+      "cyl.028",
+      1
+    ],
+    [
+      "cyl.029",
+      1
+    ],
+    [
+      "cyl.030",
+      1
+    ],
+    [
+      "cyl.031",
+      1
+    ],
+    [
+      "cyl.032",
+      1
+    ],
+    [
+      "cyl.033",
+      1
+    ],
+    [
+      "box.002",
+      1
+    ],
+    [
+      "cyl.034",
+      1
+    ],
+    [
+      "cyl.035",
+      1
+    ],
+    [
+      "cyl.036",
+      1
+    ],
+    [
+      "cyl.037",
+      1
+    ],
+    [
+      "cyl.038",
+      1
+    ],
+    [
+      "cyl.039",
+      1
+    ],
+    [
+      "cyl.040",
+      1
+    ],
+    [
+      "cyl.041",
+      1
+    ],
+    [
+      "cyl.042",
+      1
+    ],
+    [
+      "cyl.043",
+      1
+    ],
+    [
+      "cyl.044",
+      1
+    ],
+    [
+      "sph",
+      1
+    ],
+    [
+      "cyl.045",
+      1
+    ],
+    [
+      "cyl.046",
+      1
+    ],
+    [
+      "cyl.047",
+      1
+    ],
+    [
+      "cyl.048",
+      1
+    ],
+    [
+      "tower",
+      1
+    ],
+    [
+      "cyl.049",
+      1
+    ],
+    [
+      "cyl.050",
+      1
+    ],
+    [
+      "cyl.051",
+      1
+    ],
+    [
+      "sph.001",
+      1
+    ],
+    [
+      "tower.001",
+      1
+    ],
+    [
+      "cyl.052",
+      1
+    ],
+    [
+      "cyl.053",
+      1
+    ],
+    [
+      "cyl.054",
+      1
+    ],
+    [
+      "sph.002",
+      1
+    ],
+    [
+      "box.003",
+      1
+    ],
+    [
+      "hall.001",
+      1
+    ],
+    [
+      "box.004",
+      1
+    ],
+    [
+      "hall.002",
+      1
+    ],
+    [
+      "box.005",
+      1
+    ],
+    [
+      "hall.003",
+      1
+    ],
+    [
+      "box.006",
+      1
+    ],
+    [
+      "hall.004",
+      1
+    ],
+    [
+      "box.007",
+      1
+    ],
+    [
+      "plane.001",
+      1
+    ],
+    [
+      "box.008",
+      1
+    ],
+    [
+      "cyl.055",
+      1
+    ],
+    [
+      "cyl.056",
+      1
+    ],
+    [
+      "cyl.057",
+      1
+    ],
+    [
+      "cyl.058",
+      1
+    ],
+    [
+      "cyl.059",
+      1
+    ],
+    [
+      "cyl.060",
+      1
+    ],
+    [
+      "cyl.061",
+      1
+    ],
+    [
+      "cyl.062",
+      1
+    ],
+    [
+      "box.009",
+      1
+    ],
+    [
+      "cyl.063",
+      1
+    ],
+    [
+      "cyl.064",
+      1
+    ],
+    [
+      "cyl.065",
+      1
+    ],
+    [
+      "cyl.066",
+      1
+    ],
+    [
+      "cyl.067",
+      1
+    ],
+    [
+      "cyl.068",
+      1
+    ],
+    [
+      "cyl.069",
+      1
+    ],
+    [
+      "cyl.070",
+      1
+    ],
+    [
+      "cyl.071",
+      1
+    ],
+    [
+      "cyl.072",
+      1
+    ],
+    [
+      "cyl.073",
+      1
+    ],
+    [
+      "sph.003",
+      1
+    ],
+    [
+      "cyl.074",
+      1
+    ],
+    [
+      "cyl.075",
+      1
+    ],
+    [
+      "cyl.076",
+      1
+    ],
+    [
+      "cyl.077",
+      1
+    ],
+    [
+      "tower.002",
+      1
+    ],
+    [
+      "cyl.078",
+      1
+    ],
+    [
+      "cyl.079",
+      1
+    ],
+    [
+      "cyl.080",
+      1
+    ],
+    [
+      "sph.004",
+      1
+    ],
+    [
+      "tower.003",
+      1
+    ],
+    [
+      "cyl.081",
+      1
+    ],
+    [
+      "cyl.082",
+      1
+    ],
+    [
+      "cyl.083",
+      1
+    ],
+    [
+      "sph.005",
+      1
+    ],
+    [
+      "tower.004",
+      1
+    ],
+    [
+      "cyl.084",
+      1
+    ],
+    [
+      "cyl.085",
+      1
+    ],
+    [
+      "cyl.086",
+      1
+    ],
+    [
+      "sph.006",
+      1
+    ],
+    [
+      "tower.005",
+      1
+    ],
+    [
+      "cyl.087",
+      1
+    ],
+    [
+      "cyl.088",
+      1
+    ],
+    [
+      "cyl.089",
+      1
+    ],
+    [
+      "sph.007",
+      1
+    ],
+    [
+      "hall.005",
+      1
+    ],
+    [
+      "box.010",
+      1
+    ],
+    [
+      "hall.006",
+      1
+    ],
+    [
+      "box.011",
+      1
+    ],
+    [
+      "hall.007",
+      1
+    ],
+    [
+      "box.012",
+      1
+    ],
+    [
+      "hall.008",
+      1
+    ],
+    [
+      "box.013",
+      1
+    ],
+    [
+      "box.014",
+      1
+    ],
+    [
+      "cyl.090",
+      1
+    ],
+    [
+      "cyl.091",
+      1
+    ],
+    [
+      "cyl.092",
+      1
+    ]
+  ],
+  "keyword_matches": [
+    {
+      "index": 8,
+      "name": "L08_library",
+      "mesh": 8,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 9,
+      "name": "L08_library_roof",
+      "mesh": 9,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 20,
+      "name": "L08_nave_roof",
+      "mesh": 20,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 49,
+      "name": "hall",
+      "mesh": 49,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 50,
+      "name": "hall_roof",
+      "mesh": 50,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 52,
+      "name": "hall.001",
+      "mesh": 52,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 53,
+      "name": "hall_roof.001",
+      "mesh": 53,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 55,
+      "name": "hall.002",
+      "mesh": 55,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 56,
+      "name": "hall_roof.002",
+      "mesh": 56,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 58,
+      "name": "hall.003",
+      "mesh": 58,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 59,
+      "name": "hall_roof.003",
+      "mesh": 59,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 61,
+      "name": "hall.004",
+      "mesh": 61,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 62,
+      "name": "hall_roof.004",
+      "mesh": 62,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 65,
+      "name": "L04_wings",
+      "mesh": 65,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 66,
+      "name": "L04_wings_roof",
+      "mesh": 66,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 77,
+      "name": "L04_centre_roof",
+      "mesh": 77,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 116,
+      "name": "hall.005",
+      "mesh": null,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 117,
+      "name": "hall_roof.005",
+      "mesh": 117,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 119,
+      "name": "hall.006",
+      "mesh": 119,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 120,
+      "name": "hall_roof.006",
+      "mesh": 120,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 122,
+      "name": "hall.007",
+      "mesh": 122,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 123,
+      "name": "hall_roof.007",
+      "mesh": 123,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 125,
+      "name": "hall.008",
+      "mesh": 125,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 126,
+      "name": "hall_roof.008",
+      "mesh": 126,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 129,
+      "name": "L03_gatehouse_roof",
+      "mesh": 129,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 158,
+      "name": "hall.009",
+      "mesh": 158,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 159,
+      "name": "hall_roof.009",
+      "mesh": 159,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 161,
+      "name": "hall.010",
+      "mesh": 161,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 162,
+      "name": "hall_roof.010",
+      "mesh": 162,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 164,
+      "name": "hall.011",
+      "mesh": 164,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 165,
+      "name": "hall_roof.011",
+      "mesh": 165,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 167,
+      "name": "hall.012",
+      "mesh": 167,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 168,
+      "name": "hall_roof.012",
+      "mesh": 168,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 189,
+      "name": "hall.013",
+      "mesh": 189,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 190,
+      "name": "hall_roof.013",
+      "mesh": 190,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 192,
+      "name": "hall.014",
+      "mesh": 192,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 193,
+      "name": "hall_roof.014",
+      "mesh": 193,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 195,
+      "name": "hall.015",
+      "mesh": 195,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 196,
+      "name": "hall_roof.015",
+      "mesh": 196,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 198,
+      "name": "hall.016",
+      "mesh": 198,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 199,
+      "name": "hall_roof.016",
+      "mesh": 199,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 201,
+      "name": "hall.017",
+      "mesh": 201,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 202,
+      "name": "hall_roof.017",
+      "mesh": 202,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 215,
+      "name": "L07_stair_tower",
+      "mesh": 215,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 224,
+      "name": "hall.018",
+      "mesh": 224,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 225,
+      "name": "hall_roof.018",
+      "mesh": 225,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 227,
+      "name": "hall.019",
+      "mesh": 227,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 228,
+      "name": "hall_roof.019",
+      "mesh": 228,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 230,
+      "name": "hall.020",
+      "mesh": 230,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 231,
+      "name": "hall_roof.020",
+      "mesh": 231,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 233,
+      "name": "hall.021",
+      "mesh": 233,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 234,
+      "name": "hall_roof.021",
+      "mesh": 234,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 244,
+      "name": "hall.022",
+      "mesh": 244,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 245,
+      "name": "hall_roof.022",
+      "mesh": 245,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 247,
+      "name": "hall.023",
+      "mesh": 247,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 248,
+      "name": "hall_roof.023",
+      "mesh": 248,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 251,
+      "name": "hall.024",
+      "mesh": 251,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 252,
+      "name": "hall_roof.024",
+      "mesh": 252,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 264,
+      "name": "hall.025",
+      "mesh": 264,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 265,
+      "name": "hall_roof.025",
+      "mesh": 265,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 290,
+      "name": "hall.026",
+      "mesh": 290,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 291,
+      "name": "hall_roof.026",
+      "mesh": 291,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 293,
+      "name": "hall.027",
+      "mesh": 293,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 294,
+      "name": "hall_roof.027",
+      "mesh": 294,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 709,
+      "name": "hall.028",
+      "mesh": 709,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 710,
+      "name": "hall_roof.028",
+      "mesh": 710,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 718,
+      "name": "O05_north_range_roof",
+      "mesh": 718,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 729,
+      "name": "O05_west_range_roof",
+      "mesh": 729,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 732,
+      "name": "O05_east_range_roof",
+      "mesh": 732,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 735,
+      "name": "O05_south_range_roof",
+      "mesh": 735,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 738,
+      "name": "O05_G01_gate_roof",
+      "mesh": 738,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6598,
+      "name": "RG-GAME-02-ACOR-002__floor",
+      "mesh": 1300,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6599,
+      "name": "RG-GAME-02-EXT-006__groundfloor",
+      "mesh": 1301,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6600,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread0",
+      "mesh": 1302,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6601,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread1",
+      "mesh": 1303,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6602,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread2",
+      "mesh": 1304,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6603,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread3",
+      "mesh": 1305,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6604,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread4",
+      "mesh": 1306,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6605,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread5",
+      "mesh": 1307,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6606,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread6",
+      "mesh": 1308,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6607,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread7",
+      "mesh": 1309,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6608,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread8",
+      "mesh": 1310,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6609,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread9",
+      "mesh": 1311,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6610,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread10",
+      "mesh": 1312,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6611,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread11",
+      "mesh": 1313,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6612,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread12",
+      "mesh": 1314,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6613,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread13",
+      "mesh": 1315,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6614,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread14",
+      "mesh": 1316,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6615,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread15",
+      "mesh": 1317,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6616,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread16",
+      "mesh": 1318,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6617,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread17",
+      "mesh": 1319,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6618,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread18",
+      "mesh": 1320,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6619,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread19",
+      "mesh": 1321,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6620,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread20",
+      "mesh": 1322,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6621,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread21",
+      "mesh": 1323,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6622,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread22",
+      "mesh": 1324,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6623,
+      "name": "RG-GAME-02-EXT-001__entry_stair__tread23",
+      "mesh": 1325,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6624,
+      "name": "RG-GAME-02-EXT-001__entry_stair__handrail",
+      "mesh": 1326,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6625,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1327,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6626,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1328,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6627,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1329,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6628,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1330,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6629,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1331,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6630,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1332,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6631,
+      "name": "RG-GAME-02-EXT-001__entry_stair__handrail",
+      "mesh": 1333,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6632,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1334,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6633,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1335,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6634,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1336,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6635,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1337,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6636,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1338,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6637,
+      "name": "RG-GAME-02-EXT-001__entry_stair__post",
+      "mesh": 1339,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6638,
+      "name": "RG-GAME-02-EXT-001__entry_landing",
+      "mesh": 1340,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6639,
+      "name": "RG-GAME-02-A1-004__floor",
+      "mesh": 1341,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6644,
+      "name": "RG-GAME-02-A1-005__doorhead",
+      "mesh": 1346,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6645,
+      "name": "RG-GAME-02-A1-005__open_door",
+      "mesh": 1347,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6877,
+      "name": "RG-GAME-02-CROOM-004__floor",
+      "mesh": 1579,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6882,
+      "name": "RG-GAME-02-CROOM-005__doorhead",
+      "mesh": 1584,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 6883,
+      "name": "RG-GAME-02-CROOM-005__open_door",
+      "mesh": 1585,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7119,
+      "name": "RG-GAME-02-CONFESS-001__window_sill",
+      "mesh": 1821,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7120,
+      "name": "RG-GAME-02-CONFESS-001__frame",
+      "mesh": 1822,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7121,
+      "name": "RG-GAME-02-CONFESS-001__frame",
+      "mesh": 1823,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7122,
+      "name": "RG-GAME-02-CONFESS-001__frame",
+      "mesh": 1824,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7123,
+      "name": "RG-GAME-02-ROOF-001__approach__tread0",
+      "mesh": 1825,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7124,
+      "name": "RG-GAME-02-ROOF-001__approach__tread1",
+      "mesh": 1826,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7125,
+      "name": "RG-GAME-02-ROOF-001__approach__tread2",
+      "mesh": 1827,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7126,
+      "name": "RG-GAME-02-ROOF-001__approach__tread3",
+      "mesh": 1828,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7127,
+      "name": "RG-GAME-02-ROOF-001__approach__tread4",
+      "mesh": 1829,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7128,
+      "name": "RG-GAME-02-ROOF-001__approach__tread5",
+      "mesh": 1830,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7129,
+      "name": "RG-GAME-02-ROOF-001__approach__tread6",
+      "mesh": 1831,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7130,
+      "name": "RG-GAME-02-ROOF-001__approach__tread7",
+      "mesh": 1832,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7131,
+      "name": "RG-GAME-02-ROOF-001__approach__tread8",
+      "mesh": 1833,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7132,
+      "name": "RG-GAME-02-ROOF-001__approach__tread9",
+      "mesh": 1834,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7133,
+      "name": "RG-GAME-02-ROOF-001__approach__tread10",
+      "mesh": 1835,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7134,
+      "name": "RG-GAME-02-ROOF-001__approach__tread11",
+      "mesh": 1836,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7135,
+      "name": "RG-GAME-02-ROOF-001__approach__tread12",
+      "mesh": 1837,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7136,
+      "name": "RG-GAME-02-ROOF-001__approach__tread13",
+      "mesh": 1838,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7137,
+      "name": "RG-GAME-02-ROOF-001__approach__tread14",
+      "mesh": 1839,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7138,
+      "name": "RG-GAME-02-ROOF-001__approach__tread15",
+      "mesh": 1840,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7139,
+      "name": "RG-GAME-02-ROOF-001__approach__tread16",
+      "mesh": 1841,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7140,
+      "name": "RG-GAME-02-ROOF-001__approach__tread17",
+      "mesh": 1842,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7141,
+      "name": "RG-GAME-02-ROOF-001__approach__handrail",
+      "mesh": 1843,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7142,
+      "name": "RG-GAME-02-ROOF-001__approach__post",
+      "mesh": 1844,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7143,
+      "name": "RG-GAME-02-ROOF-001__approach__post",
+      "mesh": 1845,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7144,
+      "name": "RG-GAME-02-ROOF-001__approach__post",
+      "mesh": 1846,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7145,
+      "name": "RG-GAME-02-ROOF-001__approach__post",
+      "mesh": 1847,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7146,
+      "name": "RG-GAME-02-ROOF-001__approach__post",
+      "mesh": 1848,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7147,
+      "name": "RG-GAME-02-ROOF-001__approach__handrail",
+      "mesh": 1849,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7148,
+      "name": "RG-GAME-02-ROOF-001__approach__post",
+      "mesh": 1850,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7149,
+      "name": "RG-GAME-02-ROOF-001__approach__post",
+      "mesh": 1851,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7150,
+      "name": "RG-GAME-02-ROOF-001__approach__post",
+      "mesh": 1852,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7151,
+      "name": "RG-GAME-02-ROOF-001__approach__post",
+      "mesh": 1853,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7152,
+      "name": "RG-GAME-02-ROOF-001__approach__post",
+      "mesh": 1854,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7153,
+      "name": "RG-GAME-02-ROOF-003__closed_door",
+      "mesh": 1855,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7674,
+      "name": "RG-GAME-02-CONFESS-005__end_wall",
+      "mesh": 2352,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7675,
+      "name": "RG-GAME-02-CONFESS-005__occlusion_wall",
+      "mesh": 2353,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7676,
+      "name": "RG-GAME-02-CONFESS-005__side_header",
+      "mesh": 2354,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7677,
+      "name": "RG-GAME-02-CONFESS-005__turn_landing",
+      "mesh": 2355,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7678,
+      "name": "RG-GAME-02-CONFESS-005__tread_0",
+      "mesh": 2356,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7679,
+      "name": "RG-GAME-02-CONFESS-005__tread_1",
+      "mesh": 2357,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7680,
+      "name": "RG-GAME-02-CONFESS-005__tread_2",
+      "mesh": 2358,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7681,
+      "name": "RG-GAME-02-CONFESS-005__tread_3",
+      "mesh": 2359,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7682,
+      "name": "RG-GAME-02-CONFESS-005__tread_4",
+      "mesh": 2360,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7683,
+      "name": "RG-GAME-02-CONFESS-005__tread_5",
+      "mesh": 2361,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7684,
+      "name": "RG-GAME-02-CONFESS-005__tread_6",
+      "mesh": 2362,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7685,
+      "name": "RG-GAME-02-CONFESS-005__tread_7",
+      "mesh": 2363,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7686,
+      "name": "RG-GAME-02-CONFESS-005__tread_8",
+      "mesh": 2364,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7687,
+      "name": "RG-GAME-02-CONFESS-005__tread_9",
+      "mesh": 2365,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7688,
+      "name": "RG-GAME-02-CONFESS-005__tread_10",
+      "mesh": 2366,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7689,
+      "name": "RG-GAME-02-CONFESS-005__tread_11",
+      "mesh": 2367,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7690,
+      "name": "RG-GAME-02-CONFESS-005__tread_12",
+      "mesh": 2368,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7691,
+      "name": "RG-GAME-02-CONFESS-005__tread_13",
+      "mesh": 2369,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7692,
+      "name": "RG-GAME-02-CONFESS-005__tread_14",
+      "mesh": 2370,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7693,
+      "name": "RG-GAME-02-CONFESS-005__tread_15",
+      "mesh": 2371,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7694,
+      "name": "RG-GAME-02-CONFESS-005__tread_16",
+      "mesh": 2372,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7695,
+      "name": "RG-GAME-02-CONFESS-005__tread_17",
+      "mesh": 2373,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7696,
+      "name": "RG-GAME-02-CONFESS-005__tread_18",
+      "mesh": 2374,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7697,
+      "name": "RG-GAME-02-CONFESS-005__tread_19",
+      "mesh": 2375,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7698,
+      "name": "RG-GAME-02-CONFESS-005__tread_20",
+      "mesh": 2376,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7699,
+      "name": "RG-GAME-02-CONFESS-005__tread_21",
+      "mesh": 2377,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7700,
+      "name": "RG-GAME-02-CONFESS-005__tread_22",
+      "mesh": 2378,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7701,
+      "name": "RG-GAME-02-CONFESS-005__tread_23",
+      "mesh": 2379,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7702,
+      "name": "RG-GAME-02-CONFESS-005__handrail",
+      "mesh": 2380,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7703,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2381,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7704,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2382,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7705,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2383,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7706,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2384,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7707,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2385,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7708,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2386,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7709,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2387,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7710,
+      "name": "RG-GAME-02-CONFESS-005__stairwell_wall",
+      "mesh": 2388,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7711,
+      "name": "RG-GAME-02-CONFESS-005__handrail",
+      "mesh": 2389,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7712,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2390,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7713,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2391,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7714,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2392,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7715,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2393,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7716,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2394,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7717,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2395,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7718,
+      "name": "RG-GAME-02-CONFESS-005__post",
+      "mesh": 2396,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7719,
+      "name": "RG-GAME-02-CONFESS-005__stairwell_wall",
+      "mesh": 2397,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7720,
+      "name": "RG-GAME-02-CONFESS-005__lower_landing",
+      "mesh": 2398,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7721,
+      "name": "RG-GAME-02-CONFESS-005__ceiling",
+      "mesh": 2399,
+      "translation": null,
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7722,
+      "name": "RG-GAME-02-CONFESS-003__blocking_anchor",
+      "mesh": null,
+      "translation": [
+        -70.2,
+        4,
+        4
+      ],
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7723,
+      "name": "RG-GAME-02-CONFESS-004__blocking_anchor",
+      "mesh": null,
+      "translation": [
+        -70.2,
+        4,
+        7
+      ],
+      "scale": null,
+      "children_count": 0
+    },
+    {
+      "index": 7724,
+      "name": "RG-GAME-02-CONFESS-006__blocking_anchor",
+      "mesh": null,
+      "translation": [
+        -73.6,
+        4,
+        11.35
+      ],
+      "scale": null,
+      "children_count": 0
+    }
+  ],
+  "node_samples": [
+    {
+      "index": 0,
+      "name": "ribbon",
+      "translation": null
+    },
+    {
+      "index": 1,
+      "name": "ribbon.001",
+      "translation": null
+    },
+    {
+      "index": 2,
+      "name": "ribbon.002",
+      "translation": null
+    },
+    {
+      "index": 3,
+      "name": "ribbon.003",
+      "translation": null
+    },
+    {
+      "index": 4,
+      "name": "ribbon.004",
+      "translation": null
+    },
+    {
+      "index": 5,
+      "name": "ribbon.005",
+      "translation": null
+    },
+    {
+      "index": 6,
+      "name": "ribbon.006",
+      "translation": null
+    },
+    {
+      "index": 7,
+      "name": "box",
+      "translation": [
+        319.95001220703125,
+        0.800000011920929,
+        21.600000381469727
+      ]
+    },
+    {
+      "index": 8,
+      "name": "L08_library",
+      "translation": null
+    },
+    {
+      "index": 9,
+      "name": "L08_library_roof",
+      "translation": null
+    },
+    {
+      "index": 10,
+      "name": "box.001",
+      "translation": [
+        -24.299999237060547,
+        58.95500183105469,
+        -184.67999267578125
+      ]
+    },
+    {
+      "index": 11,
+      "name": "cyl.026",
+      "translation": [
+        -90.72000122070312,
+        10.600000381469727,
+        -217.0800018310547
+      ]
+    },
+    {
+      "index": 12,
+      "name": "cyl.027",
+      "translation": [
+        -90.72000122070312,
+        22.799999237060547,
+        -217.0800018310547
+      ]
+    },
+    {
+      "index": 13,
+      "name": "cyl.028",
+      "translation": [
+        42.119998931884766,
+        10.600000381469727,
+        -217.0800018310547
+      ]
+    },
+    {
+      "index": 14,
+      "name": "cyl.029",
+      "translation": [
+        42.119998931884766,
+        22.799999237060547,
+        -217.0800018310547
+      ]
+    },
+    {
+      "index": 15,
+      "name": "cyl.030",
+      "translation": [
+        -90.72000122070312,
+        10.600000381469727,
+        -152.27999877929688
+      ]
+    },
+    {
+      "index": 16,
+      "name": "cyl.031",
+      "translation": [
+        -90.72000122070312,
+        22.799999237060547,
+        -152.27999877929688
+      ]
+    },
+    {
+      "index": 17,
+      "name": "cyl.032",
+      "translation": [
+        42.119998931884766,
+        10.600000381469727,
+        -152.27999877929688
+      ]
+    },
+    {
+      "index": 18,
+      "name": "cyl.033",
+      "translation": [
+        42.119998931884766,
+        22.799999237060547,
+        -152.27999877929688
+      ]
+    },
+    {
+      "index": 19,
+      "name": "L08_nave",
+      "translation": null
+    },
+    {
+      "index": 20,
+      "name": "L08_nave_roof",
+      "translation": null
+    },
+    {
+      "index": 21,
+      "name": "box.002",
+      "translation": [
+        -24.299999237060547,
+        53.93899917602539,
+        -191.16000366210938
+      ]
+    },
+    {
+      "index": 22,
+      "name": "cyl.034",
+      "translation": [
+        -47.52000045776367,
+        13.600000381469727,
+        -237.60000610351562
+      ]
+    },
+    {
+      "index": 23,
+      "name": "cyl.035",
+      "translation": [
+        -47.52000045776367,
+        28.799999237060547,
+        -237.60000610351562
+      ]
+    },
+    {
+      "index": 24,
+      "name": "cyl.036",
+      "translation": [
+        -1.0800000429153442,
+        13.600000381469727,
+        -237.60000610351562
+      ]
+    },
+    {
+      "index": 25,
+      "name": "cyl.037",
+      "translation": [
+        -1.0800000429153442,
+        28.799999237060547,
+        -237.60000610351562
+      ]
+    },
+    {
+      "index": 26,
+      "name": "cyl.038",
+      "translation": [
+        -47.52000045776367,
+        13.600000381469727,
+        -144.72000122070312
+      ]
+    },
+    {
+      "index": 27,
+      "name": "cyl.039",
+      "translation": [
+        -47.52000045776367,
+        28.799999237060547,
+        -144.72000122070312
+      ]
+    },
+    {
+      "index": 28,
+      "name": "cyl.040",
+      "translation": [
+        -1.0800000429153442,
+        13.600000381469727,
+        -144.72000122070312
+      ]
+    },
+    {
+      "index": 29,
+      "name": "cyl.041",
+      "translation": [
+        -1.0800000429153442,
+        28.799999237060547,
+        -144.72000122070312
+      ]
+    },
+    {
+      "index": 30,
+      "name": "L08_spire",
+      "translation": null
+    },
+    {
+      "index": 31,
+      "name": "cyl.042",
+      "translation": [
+        -24.299999237060547,
+        36.400001525878906,
+        -240.83999633789062
+      ]
+    },
+    {
+      "index": 32,
+      "name": "cyl.043",
+      "translation": [
+        -24.299999237060547,
+        58.79999923706055,
+        -240.83999633789062
+      ]
+    },
+    {
+      "index": 33,
+      "name": "cyl.044",
+      "translation": [
+        -24.299999237060547,
+        82.05000305175781,
+        -240.83999633789062
+      ]
+    },
+    {
+      "index": 34,
+      "name": "sph",
+      "translation": [
+        -24.299999237060547,
+        81.19999694824219,
+        -240.83999633789062
+      ]
+    },
+    {
+      "index": 35,
+      "name": "cyl.045",
+      "translation": [
+        -19.061603546142578,
+        49.29999923706055,
+        -243.0098114013672
+      ]
+    },
+    {
+      "index": 36,
+      "name": "cyl.046",
+      "translation": [
+        -26.46981430053711,
+        49.29999923706055,
+        -246.07839965820312
+      ]
+    },
+    {
+      "index": 37,
+      "name": "cyl.047",
+      "translation": [
+        -29.53839683532715,
+        49.29999923706055,
+        -238.67018127441406
+      ]
+    },
+    {
+      "index": 38,
+      "name": "cyl.048",
+      "translation": [
+        -22.130184173583984,
+        49.29999923706055,
+        -235.6016082763672
+      ]
+    },
+    {
+      "index": 39,
+      "name": "tower",
+      "translation": null
+    },
+    {
+      "index": 40,
+      "name": "cyl.049",
+      "translation": [
+        -90.72000122070312,
+        24.399999618530273,
+        -214.9199981689453
+      ]
+    },
+    {
+      "index": 41,
+      "name": "cyl.050",
+      "translation": [
+        -90.72000122070312,
+        29.799999237060547,
+        -214.9199981689453
+      ]
+    },
+    {
+      "index": 42,
+      "name": "cyl.051",
+      "translation": [
+        -90.72000122070312,
+        36.04999923706055,
+        -214.9199981689453
+      ]
+    },
+    {
+      "index": 43,
+      "name": "sph.001",
+      "translation": [
+        -90.72000122070312,
+        35.20000076293945,
+        -214.9199981689453
+      ]
+    },
+    {
+      "index": 44,
+      "name": "tower.001",
+      "translation": null
+    },
+    {
+      "index": 45,
+      "name": "cyl.052",
+      "translation": [
+        42.119998931884766,
+        24.399999618530273,
+        -214.9199981689453
+      ]
+    },
+    {
+      "index": 46,
+      "name": "cyl.053",
+      "translation": [
+        42.119998931884766,
+        29.799999237060547,
+        -214.9199981689453
+      ]
+    },
+    {
+      "index": 47,
+      "name": "cyl.054",
+      "translation": [
+        42.119998931884766,
+        36.04999923706055,
+        -214.9199981689453
+      ]
+    },
+    {
+      "index": 48,
+      "name": "sph.002",
+      "translation": [
+        42.119998931884766,
+        35.20000076293945,
+        -214.9199981689453
+      ]
+    },
+    {
+      "index": 49,
+      "name": "hall",
+      "translation": null
+    },
+    {
+      "index": 50,
+      "name": "hall_roof",
+      "translation": null
+    },
+    {
+      "index": 51,
+      "name": "box.003",
+      "translation": [
+        68.04000091552734,
+        34.16299819946289,
+        -169.02000427246094
+      ]
+    },
+    {
+      "index": 52,
+      "name": "hall.001",
+      "translation": null
+    },
+    {
+      "index": 53,
+      "name": "hall_roof.001",
+      "translation": null
+    },
+    {
+      "index": 54,
+      "name": "box.004",
+      "translation": [
+        120.1500015258789,
+        20.527000427246094,
+        -180.08999633789062
+      ]
+    },
+    {
+      "index": 55,
+      "name": "hall.002",
+      "translation": null
+    },
+    {
+      "index": 56,
+      "name": "hall_roof.002",
+      "translation": null
+    },
+    {
+      "index": 57,
+      "name": "box.005",
+      "translation": [
+        120.1500015258789,
+        20.527000427246094,
+        -142.2899932861328
+      ]
+    },
+    {
+      "index": 58,
+      "name": "hall.003",
+      "translation": null
+    },
+    {
+      "index": 59,
+      "name": "hall_roof.003",
+      "translation": null
+    },
+    {
+      "index": 60,
+      "name": "box.006",
+      "translation": [
+        100.44000244140625,
+        20.202999114990234,
+        -161.19000244140625
+      ]
+    },
+    {
+      "index": 61,
+      "name": "hall.004",
+      "translation": null
+    },
+    {
+      "index": 62,
+      "name": "hall_roof.004",
+      "translation": null
+    },
+    {
+      "index": 63,
+      "name": "box.007",
+      "translation": [
+        139.86000061035156,
+        20.202999114990234,
+        -161.19000244140625
+      ]
+    },
+    {
+      "index": 64,
+      "name": "plane.001",
+      "translation": [
+        0,
+        0.029999999329447746,
+        0
+      ]
+    },
+    {
+      "index": 65,
+      "name": "L04_wings",
+      "translation": null
+    },
+    {
+      "index": 66,
+      "name": "L04_wings_roof",
+      "translation": null
+    },
+    {
+      "index": 67,
+      "name": "box.008",
+      "translation": [
+        -23.489999771118164,
+        53.770999908447266,
+        -97.19999694824219
+      ]
+    },
+    {
+      "index": 68,
+      "name": "cyl.055",
+      "translation": [
+        -87.4800033569336,
+        10.600000381469727,
+        -125.27999877929688
+      ]
+    },
+    {
+      "index": 69,
+      "name": "cyl.056",
+      "translation": [
+        -87.4800033569336,
+        22.799999237060547,
+        -125.27999877929688
+      ]
+    },
+    {
+      "index": 70,
+      "name": "cyl.057",
+      "translation": [
+        40.5,
+        10.600000381469727,
+        -125.27999877929688
+      ]
+    },
+    {
+      "index": 71,
+      "name": "cyl.058",
+      "translation": [
+        40.5,
+        22.799999237060547,
+        -125.27999877929688
+      ]
+    },
+    {
+      "index": 72,
+      "name": "cyl.059",
+      "translation": [
+        -87.4800033569336,
+        10.600000381469727,
+        -69.12000274658203
+      ]
+    },
+    {
+      "index": 73,
+      "name": "cyl.060",
+      "translation": [
+        -87.4800033569336,
+        22.799999237060547,
+        -69.12000274658203
+      ]
+    },
+    {
+      "index": 74,
+      "name": "cyl.061",
+      "translation": [
+        40.5,
+        10.600000381469727,
+        -69.12000274658203
+      ]
+    },
+    {
+      "index": 75,
+      "name": "cyl.062",
+      "translation": [
+        40.5,
+        22.799999237060547,
+        -69.12000274658203
+      ]
+    },
+    {
+      "index": 76,
+      "name": "L04_centre",
+      "translation": null
+    },
+    {
+      "index": 77,
+      "name": "L04_centre_roof",
+      "translation": null
+    },
+    {
+      "index": 78,
+      "name": "box.009",
+      "translation": [
+        -24.299999237060547,
+        57.82699966430664,
+        -102.5999984741211
+      ]
+    },
+    {
+      "index": 79,
+      "name": "cyl.063",
+      "translation": [
+        -50.7599983215332,
+        13.600000381469727,
+        -141.47999572753906
+      ]
+    },
+    {
+      "index": 80,
+      "name": "cyl.064",
+      "translation": [
+        -50.7599983215332,
+        28.799999237060547,
+        -141.47999572753906
+      ]
+    },
+    {
+      "index": 81,
+      "name": "cyl.065",
+      "translation": [
+        2.1600000858306885,
+        13.600000381469727,
+        -141.47999572753906
+      ]
+    },
+    {
+      "index": 82,
+      "name": "cyl.066",
+      "translation": [
+        2.1600000858306885,
+        28.799999237060547,
+        -141.47999572753906
+      ]
+    },
+    {
+      "index": 83,
+      "name": "cyl.067",
+      "translation": [
+        -50.7599983215332,
+        13.600000381469727,
+        -63.720001220703125
+      ]
+    },
+    {
+      "index": 84,
+      "name": "cyl.068",
+      "translation": [
+        -50.7599983215332,
+        28.799999237060547,
+        -63.720001220703125
+      ]
+    },
+    {
+      "index": 85,
+      "name": "cyl.069",
+      "translation": [
+        2.1600000858306885,
+        13.600000381469727,
+        -63.720001220703125
+      ]
+    },
+    {
+      "index": 86,
+      "name": "cyl.070",
+      "translation": [
+        2.1600000858306885,
+        28.799999237060547,
+        -63.720001220703125
+      ]
+    },
+    {
+      "index": 87,
+      "name": "L04_spire",
+      "translation": null
+    },
+    {
+      "index": 88,
+      "name": "cyl.071",
+      "translation": [
+        -24.299999237060547,
+        40.400001525878906,
+        -139.32000732421875
+      ]
+    },
+    {
+      "index": 89,
+      "name": "cyl.072",
+      "translation": [
+        -24.299999237060547,
+        60.79999923706055,
+        -139.32000732421875
+      ]
+    },
+    {
+      "index": 90,
+      "name": "cyl.073",
+      "translation": [
+        -24.299999237060547,
+        82.05000305175781,
+        -139.32000732421875
+      ]
+    },
+    {
+      "index": 91,
+      "name": "sph.003",
+      "translation": [
+        -24.299999237060547,
+        81.19999694824219,
+        -139.32000732421875
+      ]
+    },
+    {
+      "index": 92,
+      "name": "cyl.074",
+      "translation": [
+        -18.71237564086914,
+        52.29999923706055,
+        -141.6344757080078
+      ]
+    },
+    {
+      "index": 93,
+      "name": "cyl.075",
+      "translation": [
+        -26.614469528198242,
+        52.29999923706055,
+        -144.90762329101562
+      ]
+    },
+    {
+      "index": 94,
+      "name": "cyl.076",
+      "translation": [
+        -29.887622833251953,
+        52.29999923706055,
+        -137.00552368164062
+      ]
+    },
+    {
+      "index": 95,
+      "name": "cyl.077",
+      "translation": [
+        -21.985530853271484,
+        52.29999923706055,
+        -133.7323760986328
+      ]
+    },
+    {
+      "index": 96,
+      "name": "tower.002",
+      "translation": null
+    },
+    {
+      "index": 97,
+      "name": "cyl.078",
+      "translation": [
+        -87.4800033569336,
+        26.399999618530273,
+        -123.12000274658203
+      ]
+    },
+    {
+      "index": 98,
+      "name": "cyl.079",
+      "translation": [
+        -87.4800033569336,
+        31.799999237060547,
+        -123.12000274658203
+      ]
+    },
+    {
+      "index": 99,
+      "name": "cyl.080",
+      "translation": [
+        -87.4800033569336,
+        38.04999923706055,
+        -123.12000274658203
+      ]
+    },
+    {
+      "index": 100,
+      "name": "sph.004",
+      "translation": [
+        -87.4800033569336,
+        37.20000076293945,
+        -123.12000274658203
+      ]
+    },
+    {
+      "index": 101,
+      "name": "tower.003",
+      "translation": null
+    },
+    {
+      "index": 102,
+      "name": "cyl.081",
+      "translation": [
+        40.5,
+        26.399999618530273,
+        -123.12000274658203
+      ]
+    },
+    {
+      "index": 103,
+      "name": "cyl.082",
+      "translation": [
+        40.5,
+        31.799999237060547,
+        -123.12000274658203
+      ]
+    },
+    {
+      "index": 104,
+      "name": "cyl.083",
+      "translation": [
+        40.5,
+        38.04999923706055,
+        -123.12000274658203
+      ]
+    },
+    {
+      "index": 105,
+      "name": "sph.005",
+      "translation": [
+        40.5,
+        37.20000076293945,
+        -123.12000274658203
+      ]
+    },
+    {
+      "index": 106,
+      "name": "tower.004",
+      "translation": null
+    },
+    {
+      "index": 107,
+      "name": "cyl.084",
+      "translation": [
+        -108,
+        22.399999618530273,
+        -136.0800018310547
+      ]
+    },
+    {
+      "index": 108,
+      "name": "cyl.085",
+      "translation": [
+        -108,
+        28.799999237060547,
+        -136.0800018310547
+      ]
+    },
+    {
+      "index": 109,
+      "name": "cyl.086",
+      "translation": [
+        -108,
+        36.04999923706055,
+        -136.0800018310547
+      ]
+    },
+    {
+      "index": 110,
+      "name": "sph.006",
+      "translation": [
+        -108,
+        35.20000076293945,
+        -136.0800018310547
+      ]
+    },
+    {
+      "index": 111,
+      "name": "tower.005",
+      "translation": null
+    },
+    {
+      "index": 112,
+      "name": "cyl.087",
+      "translation": [
+        59.400001525878906,
+        20.399999618530273,
+        -136.0800018310547
+      ]
+    },
+    {
+      "index": 113,
+      "name": "cyl.088",
+      "translation": [
+        59.400001525878906,
+        25.799999237060547,
+        -136.0800018310547
+      ]
+    },
+    {
+      "index": 114,
+      "name": "cyl.089",
+      "translation": [
+        59.400001525878906,
+        32.04999923706055,
+        -136.0800018310547
+      ]
+    },
+    {
+      "index": 115,
+      "name": "sph.007",
+      "translation": [
+        59.400001525878906,
+        31.200000762939453,
+        -136.0800018310547
+      ]
+    },
+    {
+      "index": 116,
+      "name": "hall.005",
+      "translation": null
+    },
+    {
+      "index": 117,
+      "name": "hall_roof.005",
+      "translation": null
+    },
+    {
+      "index": 118,
+      "name": "box.010",
+      "translation": [
+        -77.48999786376953,
+        28.062999725341797,
+        -20.790000915527344
+      ]
+    },
+    {
+      "index": 119,
+      "name": "hall.006",
+      "translation": null
+    },
+    {
+      "index": 120,
+      "name": "hall_roof.006",
+      "translation": null
+    },
+    {
+      "index": 121,
+      "name": "box.011",
+      "translation": [
+        30.510000228881836,
+        28.062999725341797,
+        -20.790000915527344
+      ]
+    },
+    {
+      "index": 122,
+      "name": "hall.007",
+      "translation": null
+    },
+    {
+      "index": 123,
+      "name": "hall_roof.007",
+      "translation": null
+    },
+    {
+      "index": 124,
+      "name": "box.012",
+      "translation": [
+        -62.099998474121094,
+        28.062999725341797,
+        34.290000915527344
+      ]
+    },
+    {
+      "index": 125,
+      "name": "hall.008",
+      "translation": null
+    },
+    {
+      "index": 126,
+      "name": "hall_roof.008",
+      "translation": null
+    },
+    {
+      "index": 127,
+      "name": "box.013",
+      "translation": [
+        14.3100004196167,
+        28.062999725341797,
+        34.290000915527344
+      ]
+    },
+    {
+      "index": 128,
+      "name": "L03_gatehouse",
+      "translation": null
+    },
+    {
+      "index": 129,
+      "name": "L03_gatehouse_roof",
+      "translation": null
+    },
+    {
+      "index": 130,
+      "name": "box.014",
+      "translation": [
+        -24.299999237060547,
+        35.62699890136719,
+        33.47999954223633
+      ]
+    },
+    {
+      "index": 131,
+      "name": "cyl.090",
+      "translation": [
+        -37.79999923706055,
+        10.600000381469727,
+        20.520000457763672
+      ]
+    },
+    {
+      "index": 132,
+      "name": "cyl.091",
+      "translation": [
+        -37.79999923706055,
+        22.799999237060547,
+        20.520000457763672
+      ]
+    },
+    {
+      "index": 133,
+      "name": "cyl.092",
+      "translation": [
+        -10.800000190734863,
+        10.600000381469727,
+        20.520000457763672
+      ]
+    },
+    {
+      "index": 134,
+      "name": "cyl.093",
+      "translation": [
+        -10.800000190734863,
+        22.799999237060547,
+        20.520000457763672
+      ]
+    },
+    {
+      "index": 135,
+      "name": "cyl.094",
+      "translation": [
+        -37.79999923706055,
+        10.600000381469727,
+        46.439998626708984
+      ]
+    },
+    {
+      "index": 136,
+      "name": "cyl.095",
+      "translation": [
+        -37.79999923706055,
+        22.799999237060547,
+        46.439998626708984
+      ]
+    },
+    {
+      "index": 137,
+      "name": "cyl.096",
+      "translation": [
+        -10.800000190734863,
+        10.600000381469727,
+        46.439998626708984
+      ]
+    },
+    {
+      "index": 138,
+      "name": "cyl.097",
+      "translation": [
+        -10.800000190734863,
+        22.799999237060547,
+        46.439998626708984
+      ]
+    },
+    {
+      "index": 139,
+      "name": "plane.002",
+      "translation": [
+        0,
+        0.029999999329447746,
+        0
+      ]
+    }
+  ]
+}
