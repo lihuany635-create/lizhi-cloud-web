@@ -46,3 +46,10 @@
 
 /* In-page production application; styles live in its Shadow DOM. */
 .route-animationflow .main{min-width:0;overflow:auto}.route-animationflow .workspace-panel{padding:0!important}#production-root{display:block;width:100%;min-height:calc(100dvh - 70px);background:#f7f8fa}.production-loading{padding:36px;font-size:16px;color:#4c6152}
+
+/* Private, read-only mobile agent workbench. */
+.phone-agent-card{display:grid;gap:12px;max-width:880px}
+.phone-agent-controls{display:flex;gap:8px;flex-wrap:wrap}
+.phone-agent-state{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.phone-agent-screen{max-width:360px;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;display:block}
+.phone-agent-ui{width:100%;min-height:110px;max-height:380px;overflow:auto;white-space:pre-wrap;font-size:12px;word-break:break-word;background:#f8f7f4;padding:12px;border-radius:8px}
