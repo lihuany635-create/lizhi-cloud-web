@@ -225,7 +225,7 @@ for(const options of [{antialias:true,preserveDrawingBuffer:false},{antialias:fa
 }
 if(!renderer){window.GLBPreview.open({unavailable:true});return;}
 renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();window.GLBPreview.open({unavailable:true});});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
 renderer.outputEncoding=THREE.sRGBEncoding;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.9;
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
@@ -310,6 +310,9 @@ async function openModel(buf,name,opts={}){
     layoutHelpers();stats(name);setCut(opts.cut??1);
     fitBox=opts.fit?new THREE.Box3(new THREE.Vector3(opts.fit[0],opts.fit[1]+model.position.y,opts.fit[2]),new THREE.Vector3(opts.fit[3],opts.fit[4]+model.position.y,opts.fit[5])):null;
     fit(opts.top);
+    if(opts.key==='lahudi-academy'&&anim){camera.position.copy(anim.p);controls.target.copy(anim.t);controls.update();anim=null;}
+    if(opts.key==='lahudi-academy'){renderer.setPixelRatio(Math.min(devicePixelRatio,1.15));renderer.toneMappingExposure=.68;$('exposureIn').value=68;$('exposureOut').textContent='0.68';$('academyWhole').setAttribute('aria-pressed','true');}
+    else{renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.toneMappingExposure=.9;$('exposureIn').value=90;$('exposureOut').textContent='0.90';}
     $('viewerVersion').textContent=sourceInfo?.version?sourceInfo.version+' · SHA '+sourceInfo.actualSHA.slice(0,12):'本機檔案 · 版本未登記';
     $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();$('houseViews').hidden=modelKey!=='hades-house'||window.GLBPreview.active;if(modelKey==='hades-house')houseView(2);$('academyViews').hidden=modelKey!=='lahudi-academy'||window.GLBPreview.active;
   }catch(e){console.error(e);showError(e&&e.message?e.message:String(e));}
@@ -394,6 +397,7 @@ function academyView(region){
     new THREE.Vector3(q[3],q[4]+offset,q[5]));
   setCut(1);
   fit(false);
+  if(anim){camera.position.copy(anim.p);controls.target.copy(anim.t);controls.update();anim=null;}
   document.querySelectorAll('#academyViews button').forEach(b=>b.setAttribute('aria-pressed',
     String((region==='whole'&&b.id==='academyWhole')||
       (region==='school'&&b.id==='academySchool')||
