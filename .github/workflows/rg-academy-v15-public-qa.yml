@@ -1,0 +1,78 @@
+name: RG Academy V15 Public Garden GLB Screenshot QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v15-public-qa.yml'
+      - 'model-viewer/revisions/academy-garden-v15/check_public_garden_v15.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  garden_live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify public site manifests and physically deployed GLB
+        run: |
+          set -euo pipefail
+          dir=candidate-output/academy-v15-public
+          mkdir -p "$dir"
+          base='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer'
+          curl -fSL --retry 9 --retry-all-errors --retry-delay 3 --max-time 150 "$base/" -o "$dir/index.html"
+          curl -fSL --retry 9 --retry-all-errors --retry-delay 3 --max-time 150 "$base/current-models.json?v=20261023-academy-rb2-v15" -o "$dir/manifest.json"
+          curl -fSL --retry 9 --retry-all-errors --retry-delay 3 --max-time 150 "$base/lahudi-academy.glb?v=rb2-vitti-winter-garden-v15-20261023" -o "$dir/academy.glb"
+          python - <<'PY'
+          import hashlib,json,struct
+          from pathlib import Path
+          d=Path('candidate-output/academy-v15-public')
+          b=(d/'academy.glb').read_bytes()
+          sha=hashlib.sha256(b).hexdigest()
+          assert sha=='e269a295159f0f7d3e82df864376579e66f4b92be204ce66667a3c78b9d3ea41'
+          assert b[:4]==b'glTF'
+          assert struct.unpack_from('<I',b,8)[0]==len(b)==23971056
+          j=json.loads((d/'manifest.json').read_text())
+          a=next(x for x in j['models'] if x['model']=='lahudi-academy.glb')
+          assert len(j['models'])==5 and a['current_sha256']==sha
+          assert a['version']=='ACADEMY-V15-VITTI-REAR-GARDEN-REVIEW'
+          h=(d/'index.html').read_text()
+          assert 'id="academyGarden"' in h and "academyView('garden')" in h
+          assert 'rb2-vitti-winter-garden-v15-20261023' in h
+          length=struct.unpack_from('<I',b,12)[0]
+          gj=json.loads(b[20:20+length])
+          new=[n for n in gj['nodes'] if n.get('name','').startswith('RG-GAME-02-VITTI-GARDEN-V15__')]
+          assert len(new)==27
+          assert len(gj['nodes'])==12067
+          oldwall=[n for n in gj['nodes'] if n.get('name')=='RG-GAME-02-EXTERIOR-REBUILD-V5__library_endwall_north']
+          assert len(oldwall)==1 and 'mesh' not in oldwall[0]
+          print('PUBLIC V15 INTEGRATED GLB VERIFIED',sha)
+          PY
+      - name: Open public 3D and capture garden vantage
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium)"              node model-viewer/revisions/academy-garden-v15/check_public_garden_v15.mjs
+          python - <<'PY'
+          import pathlib,struct
+          p=pathlib.Path('candidate-output/academy-v15-garden-diagnostic/garden-actual-cdp.png')
+          b=p.read_bytes()
+          assert b[:8]==b'\x89PNG\r\n\x1a\n'
+          assert len(b)>65000,('Image too small/blank',len(b))
+          print('V15 public garden screenshot captured',len(b),'bytes')
+          PY
+      - name: Preserve screenshots for author animation art review
+        if: always()
+        run: |
+          set -euo pipefail
+          dst=model-viewer/staged-output/academy-rear-garden-v15/public-qa
+          mkdir -p "$dst"
+          cp candidate-output/academy-v15-garden-diagnostic/*.png "$dst/" 2>/dev/null || true
+          cp candidate-output/academy-v15-garden-diagnostic/*.json "$dst/" 2>/dev/null || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy V15): real online back garden screenshot and renderer diagnostics'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
