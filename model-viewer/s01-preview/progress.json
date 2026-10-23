@@ -32,14 +32,29 @@
     "browser_side_render": "PASS",
     "author_approved": false,
     "preview_page": "https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/v7/",
-    "url": "https://github.com/lihuany635-create/lizhi-cloud-web/tree/rg-ep01-s01-stage-20261023/model-viewer/staged-output/ep01-s01/v7"
+    "url": "https://github.com/lihuany635-create/lizhi-cloud-web/tree/rg-ep01-s01-stage-20261023/model-viewer/staged-output/ep01-s01/v7",
+    "collision_rays": {
+      "scope": "Six doorways at three z offsets, two head/torso heights",
+      "sampled_rays": 36,
+      "blocked": 0,
+      "result": "SAMPLED_GEOMETRY_PASS",
+      "not_full_collision": true,
+      "run_url": "https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/39893831456"
+    },
+    "stair_height_samples": {
+      "sampled": 14,
+      "ascending": 14,
+      "result": "PASS_HEIGHT_ORDER_ONLY",
+      "not_stair_actor_walk": true
+    }
   },
   "open_issues": [
-    "V7 shallow doorway vestibules are NOT full rooms",
-    "Full mesh collision and actor walk not tested",
-    "Legacy side staircase and alternate front staircase remain and need film-camera alignment",
-    "Original EP01 film-shot camera overlay not completed",
-    "Mobile Android WebGL not verified on actual device"
+    "Doorway sampled line rays pass; full body swept collision still untested",
+    "Six vestibules remain shallow unfinished rooms",
+    "Front stair height order passes, but continuous character stair-walk remains untested",
+    "Opposite side original stair persists; shot camera and physical routing require review",
+    "Original EP01 camera overlays not completed",
+    "Android WebGL not tested on user's device"
   ],
   "formal_canonical_academy_glb_changed": false,
   "S06_status": "PAUSED",
