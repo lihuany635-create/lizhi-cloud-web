@@ -1,0 +1,74 @@
+name: RG Academy Full Gothic Corridor Retrofit No Render
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-full-corridor-retrofit.yml'
+      - 'model-viewer/revisions/academy-all-corridors/build_full_academy_gothic.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-full-corridors-no-render
+  cancel-in-progress: true
+jobs:
+  actual-school-glb:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build full school GLB with corridor retrofit (NO RENDER)
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-all-corridors/build_full_academy_gothic.py
+      - name: Gate exact hash, true GLB, all school nodes and class-door continuity
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,struct
+          base=Path('candidate-output/academy-wide-corridors')
+          r=json.loads((base/'report.json').read_text())
+          p=base/r['model']
+          raw=p.read_bytes()
+          assert raw[:4]==b'glTF' and len(raw)==r['bytes']
+          assert struct.unpack_from('<I',raw,8)[0]==len(raw)
+          assert hashlib.sha256(raw).hexdigest()==r['output_sha256']
+          assert r['source_nodes']==7725
+          assert r['added_corridor_nodes']>=500
+          assert r['disabled_legacy_corridor_nodes']>=20
+          assert r['corridor_length_m']>85.4
+          assert r['added_groups']['real_classroom_jamb']==4
+          assert r['added_groups']['continuous_floor']==1
+          assert r['structural_gltf_roundtrip']=='PASS'
+          assert r['rendering']=='NOT_RUN_BY_USER_REQUEST'
+          assert r['existing_non_corridor_node_structure_unchanged']
+          assert r['formal_author_approval'] is False
+          print('Full academy 85.42m corridor GLB structural QA PASS',r['output_sha256'])
+          PY
+      - name: Preserve full real GLB and engineering QA only, no images
+        run: |
+          set -euo pipefail
+          dst=model-viewer/staged-output/academy-all-corridors-rb2-v1
+          mkdir -p "$dst"
+          cp candidate-output/academy-wide-corridors/lahudi-academy_ALL-CORRIDORS_RB2-GOTHIC_v1.glb "$dst/"
+          cp candidate-output/academy-wide-corridors/report.json "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy): integrated full-school RB2 Gothic corridor GLB, no rendering'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: academy-combined-glb-corridor-rb2-no-render
+          path: |
+            candidate-output/academy-wide-corridors/lahudi-academy_ALL-CORRIDORS_RB2-GOTHIC_v1.glb
+            candidate-output/academy-wide-corridors/report.json
+          retention-days: 30
