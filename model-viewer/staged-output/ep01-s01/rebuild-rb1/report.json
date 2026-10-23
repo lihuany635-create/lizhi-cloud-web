@@ -1,0 +1,72 @@
+{
+  "project": "現實遊戲",
+  "scene": "RG-GAME-02",
+  "episode": "EP01",
+  "shot": "S01",
+  "version": "S01-CLEAN-SHEET-RB1",
+  "model": "lahudi-academy_ep01_s01_REBUILT_v1.glb",
+  "source_policy": "NEW_GEOMETRY__NOT_BOUND_TO_PRELIMINARY_ACADEMY_MODEL",
+  "reference": "1000038427.mp4 02:36 A01 frame and 00:12 A02",
+  "model_bytes": 937624,
+  "sha256": "d9cf9379f92e04877684542b3c17eca5a9a1418fc5b36f89b61751957ad1e2eb",
+  "mesh_count": 1200,
+  "groups": {
+    "vault": 1,
+    "floor": 3,
+    "floor_tile": 64,
+    "left_wall": 21,
+    "door": 35,
+    "vestibule": 28,
+    "door_detail": 35,
+    "pillar": 49,
+    "sconce": 21,
+    "right_wall": 14,
+    "window": 56,
+    "sunlight": 4,
+    "moulding": 2,
+    "arch_rib": 690,
+    "stair": 33,
+    "stair_rail": 20,
+    "far_wall": 1,
+    "far_window": 4,
+    "gallery": 4,
+    "outdoor": 2,
+    "forest": 105,
+    "castle": 8
+  },
+  "hall_width_m": 8.2,
+  "hall_length_m": 34.1,
+  "vault_spring_m": 8.15,
+  "vault_crown_m": 11.55,
+  "door_count": 7,
+  "door_clearance_nominal_m": 2.38,
+  "window_count": 7,
+  "central_stair_steps": 16,
+  "bounding_box": [
+    [
+      -6.65500020980835,
+      -3.5,
+      -27.25
+    ],
+    [
+      30.0,
+      23.5,
+      25.75
+    ]
+  ],
+  "GLB_reparse": "PASS",
+  "S06_modified": false,
+  "five_canonical_GLBS_modified": false,
+  "camera_film_overlay": "NOT_RUN",
+  "actor_swept_collision": "NOT_RUN",
+  "physically_based_golden_sun": "NOT_RUN",
+  "author_approved": false,
+  "next": "Render A01 perspective from NEW local axis and inspect against original, then optimize proportion; do not merge into entire academy before school-wide interfaces checked.",
+  "limits": [
+    "Standalone corridor rebuilt, not entire Academy campus/classrooms.",
+    "Approximate architecture from 2D animation, not exact surveyed world coordinates.",
+    "Sun pools represented by separate translucent geometry, not traced dynamic sunlight.",
+    "Door leaf raised panels remain simplified in this candidate; geometry is not final cinematic.",
+    "No automatic 1:1 camera or character blocking claim."
+  ]
+}
