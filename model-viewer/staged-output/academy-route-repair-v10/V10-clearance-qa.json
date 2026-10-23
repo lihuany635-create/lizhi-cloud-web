@@ -1,0 +1,276 @@
+{
+  "version": "ACADEMY-LOCKED-PLAN-COLLISION-REPAIR-V10",
+  "sha256": "f1177cd51f89f6a5ba1176951d2a94d2f80d68f45460ce166e1f0814d6b69ba6",
+  "check": "V10_CIRCULATION_CENTRELINE_AABB",
+  "status": "PASS",
+  "visible_nodes_scanned": 5146,
+  "obstacle_meshes": 630,
+  "assumed_actor_capsule": {
+    "radius_m": 0.4,
+    "height_m": 1.9
+  },
+  "sample_spacing_m": 0.25,
+  "route_results": [
+    {
+      "route": "WEST_TO_MAIN",
+      "sample_count": 45,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -101,
+          -10.2
+        ],
+        [
+          -90,
+          -10.2
+        ]
+      ]
+    },
+    {
+      "route": "EAST_TO_MAIN",
+      "sample_count": 53,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -51,
+          -10.2
+        ],
+        [
+          -64,
+          -10.2
+        ]
+      ]
+    },
+    {
+      "route": "MAIN_TO_E_SOUTH",
+      "sample_count": 55,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -84,
+          -81.5
+        ],
+        [
+          -84,
+          -68.1
+        ]
+      ]
+    },
+    {
+      "route": "E_NORTH_TO_LIBRARY",
+      "sample_count": 121,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -45.2,
+          -112.5
+        ],
+        [
+          -45.2,
+          -142.4
+        ]
+      ]
+    },
+    {
+      "route": "E_TO_G_CHAPEL",
+      "sample_count": 50,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -105,
+          -112.4
+        ],
+        [
+          -105,
+          -124.6
+        ]
+      ]
+    },
+    {
+      "route": "F_TO_H_ARCHIVE",
+      "sample_count": 25,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -2,
+          -151.5
+        ],
+        [
+          3.8,
+          -151.5
+        ]
+      ]
+    },
+    {
+      "route": "WEST_TO_D_WEST_Z",
+      "sample_count": 55,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -123,
+          24.3
+        ],
+        [
+          -123,
+          37.8
+        ]
+      ]
+    },
+    {
+      "route": "WEST_TO_D_WEST_X",
+      "sample_count": 137,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -124.5,
+          38
+        ],
+        [
+          -90.5,
+          38
+        ]
+      ]
+    },
+    {
+      "route": "EAST_TO_D_EAST",
+      "sample_count": 23,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -31.5,
+          24.35
+        ],
+        [
+          -31.5,
+          29.7
+        ]
+      ]
+    },
+    {
+      "route": "MAIN_TO_ENTRANCE",
+      "sample_count": 54,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -70.1,
+          26.4
+        ],
+        [
+          -70.1,
+          39.6
+        ]
+      ]
+    }
+  ],
+  "transition_results": [
+    {
+      "route": "GROUND_TO_STAIR",
+      "sample_count": 33,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -84,
+          -79.25
+        ],
+        [
+          -91.8,
+          -79.25
+        ]
+      ]
+    },
+    {
+      "route": "SKYBRIDGE_Z",
+      "sample_count": 41,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -89.4,
+          -78.85
+        ],
+        [
+          -89.4,
+          -69.0
+        ]
+      ]
+    },
+    {
+      "route": "SKYBRIDGE_X",
+      "sample_count": 28,
+      "blocker_count": 0,
+      "blockers": [],
+      "assumed_radius_m": 0.4,
+      "assumed_height_m": 1.9,
+      "centerline": [
+        [
+          -89.4,
+          -68.85
+        ],
+        [
+          -84.0,
+          -68.85
+        ],
+        [
+          -84,
+          -67.9
+        ]
+      ]
+    }
+  ],
+  "unresolved_issues": [
+    "C-06",
+    "C-07",
+    "C-08",
+    "C-09",
+    "C-10",
+    "C-11"
+  ],
+  "C-01_to_C-04_repaired_in_glb": true,
+  "C-05_stair_and_upper_walkway_geometry_added": true,
+  "stairs_count": 26,
+  "stairs_rise_m": 0.149,
+  "locked_masterplan_remains_unchanged": true,
+  "visual_review": "NOT_RUN",
+  "triangle_level_collision": "NOT_RUN",
+  "warnings": [
+    "The broadphase uses bounding boxes; a zero route centerline collision is not an exhaustive full-building animation walk-through.",
+    "Stair headroom and each tread exact polygon clearance still require 3D sampled sweep and character/animation check.",
+    "No real-world structural engineering or egress compliance is claimed."
+  ],
+  "blocking_evidence": []
+}
