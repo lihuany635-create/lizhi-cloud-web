@@ -1,0 +1,31 @@
+name: RG Academy V12 Room Placement QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v12-room-qa.yml'
+      - 'model-viewer/revisions/academy-interior-v12/verify_furniture_placements_v12.py'
+      - 'model-viewer/staged-output/academy-interior-furniture-v12/report.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check 8-district lock against every staged furniture location
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-interior-v12/verify_furniture_placements_v12.py
+      - name: Commit measured V12 placement and dimensions evidence
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-interior-furniture-v12/placement-qa.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy V12): verify furniture footprints and two real 26-riser stairs'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
