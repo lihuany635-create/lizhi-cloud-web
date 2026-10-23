@@ -1,0 +1,53 @@
+name: RG Promote Entire School V7 Mobile Optimized To Original GLB
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v7-promote-main.yml'
+      - 'model-viewer/revisions/academy-all-corridors/promote_mobile_optimized_v7.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v7-mobile-promotion
+  cancel-in-progress: true
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+          persist-credentials: false
+      - name: Promote optimized full-campus V7 with strict hash checks
+        run: python .academy-stage/model-viewer/revisions/academy-all-corridors/promote_mobile_optimized_v7.py
+      - name: Gate only original school and viewer are modified
+        run: |
+          python - <<'PY'
+          import subprocess
+          allowed={
+           'model-viewer/lahudi-academy.glb',
+           'model-viewer/current-models.json',
+           'model-viewer/index.html',
+           'model-viewer/backups/pre-academy-mobile-optimized-v7/lahudi-academy.glb'
+          }
+          values=set()
+          for line in subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],text=True).splitlines():
+            name=line[3:]
+            if name.startswith('.academy-stage/'):continue
+            values.add(name)
+          assert values==allowed,{'actual':values,'wanted':allowed}
+          PY
+      - name: Commit together and push main
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/lahudi-academy.glb model-viewer/current-models.json model-viewer/index.html model-viewer/backups/pre-academy-mobile-optimized-v7/lahudi-academy.glb
+          git commit -m 'perf(academy): keep full 8-wing campus but merge 5068 repeated meshes for mobile'
+          git push origin HEAD:refs/heads/main
