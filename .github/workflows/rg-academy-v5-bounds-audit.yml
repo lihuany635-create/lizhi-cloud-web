@@ -1,0 +1,28 @@
+name: RG Academy Visible Bounds Audit V5
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v5-bounds-audit.yml'
+      - 'model-viewer/revisions/academy-all-corridors/audit_visible_bounds_v5.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Measure displayed school geometry bounds
+        run: python model-viewer/revisions/academy-all-corridors/audit_visible_bounds_v5.py
+      - name: Archive measurement
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-exterior-rebuild-v5/bounds-audit.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'audit(academy): preserve true current GLB node bounding box inspection'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
