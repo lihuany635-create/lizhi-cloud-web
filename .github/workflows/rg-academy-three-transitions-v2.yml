@@ -1,0 +1,73 @@
+name: RG Academy Full Corridor V2 Three Transitions No Render
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-three-transitions-v2.yml'
+      - 'model-viewer/revisions/academy-all-corridors/build_stair_transitions_v2.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-full-corridor-transitions-v2
+  cancel-in-progress: true
+jobs:
+  full-school-glb:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build integrated full-school GLB without any rendering
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-all-corridors/build_stair_transitions_v2.py
+      - name: Validate original academy and 3 transition access points
+        run: |
+          python - <<'PY'
+          import pathlib,json,hashlib,struct
+          path=pathlib.Path('candidate-output/academy-corridors-rb2-v2')
+          report=json.loads((path/'report.json').read_text())
+          raw=(path/report['model']).read_bytes()
+          assert raw[:4]==b'glTF'
+          assert struct.unpack_from('<I',raw,8)[0]==len(raw)
+          assert len(raw)==report['bytes']
+          assert hashlib.sha256(raw).hexdigest()==report['sha256']
+          assert report['source_v1_nodes']==8931
+          assert report['new_nodes']>250
+          assert report['new_groups']['connection_anchor']==6
+          assert len(report['new_regions'])==3
+          assert report['original_8931_nodes_identical']
+          assert report['native_roof_stair_geometry_unchanged']
+          assert report['native_confession_side_stair_geometry_unchanged']
+          assert report['native_entrance_stair_geometry_unchanged']
+          assert report['glb_roundtrip']=='PASS'
+          assert report['rendering']=='NOT_RUN_BY_USER_REQUEST'
+          assert not report['author_approved']
+          print('V2 INTEGRATED SCHOOL MODEL CREATED AND VALIDATED')
+          PY
+      - name: Preserve only real GLB and technical audit on stage branch
+        run: |
+          set -euo pipefail
+          dst=model-viewer/staged-output/academy-all-corridors-rb2-v2
+          mkdir -p "$dst"
+          cp candidate-output/academy-corridors-rb2-v2/*.glb "$dst/"
+          cp candidate-output/academy-corridors-rb2-v2/report.json "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy): full school corridor V2 Gothic stair transition GLB (no render)'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: academy-v2-gothic-stair-transitions-glb-no-render
+          path: |
+            candidate-output/academy-corridors-rb2-v2/*.glb
+            candidate-output/academy-corridors-rb2-v2/report.json
+          retention-days: 30
