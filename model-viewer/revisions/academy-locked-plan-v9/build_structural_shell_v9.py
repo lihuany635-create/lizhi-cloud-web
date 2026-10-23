@@ -166,13 +166,13 @@ def main():
         "roof_rake",zone,rot,"z")
   box(f"{name}_ridge","deep_stone",cx,ridge,(z0+z1)/2,.30,.30,z1-z0,"ridge",zone)
  def wing(name,x0,x1,z0,z1,eave,ridge,mat="cold_stone",roofmat="slate_roof",
-          east_doors=None,west_doors=None,north_doors=None,south_doors=None):
+          east_doors=None,west_doors=None,north_doors=None,south_doors=None, omit_west=False, omit_east=False):
   shells.append({"id":name,"bbox":{"x":[x0,x1],"z":[z0,z1]},"eave":eave,"ridge":ridge})
   # Exterior footprint floor, not a mass filling entire building interior.
   box(name+"_ground_slab","structural_floor",(x0+x1)/2,-.12,(z0+z1)/2,
       x1-x0,.24,z1-z0,"foundation_slab",name)
-  segment_wall(name+"_west",name,mat,"x",x0,z0,z1,eave,west_doors or [])
-  segment_wall(name+"_east",name,mat,"x",x1,z0,z1,eave,east_doors or [])
+  if not omit_west:segment_wall(name+"_west",name,mat,"x",x0,z0,z1,eave,west_doors or [])
+  if not omit_east:segment_wall(name+"_east",name,mat,"x",x1,z0,z1,eave,east_doors or [])
   segment_wall(name+"_north",name,mat,"z",z0,x0,x1,eave,north_doors or [])
   segment_wall(name+"_south",name,mat,"z",z1,x0,x1,eave,south_doors or [])
   roof(name,name,x0,x1,z0,z1,eave,ridge,roofmat)
@@ -190,12 +190,17 @@ def main():
  # Clock tower is old V5 x -74.2..-65.8, z~25.6..35.4. Keep it central to *existing* walkway x=-70.1.
  # E's 78m-wide roof cannot be one unaffordable 39m half-span; split into 3 gabled volumes
  wing("E_WEST_ACADEMY",-118,-94,-112,-82,11.6,16.0,mat="warm_stone",
-      north_doors=[(-108,-104)])
+      north_doors=[(-108,-104)],omit_east=True)
  wing("E_CENTER_HALL",-94,-62,-112,-82,12.8,17.6,
       north_doors=[(-86,-82)],south_doors=[(-86,-82)],
-      east_doors=[(-102,-98)])
+      omit_west=True,omit_east=True)
  wing("E_EAST_LINK",-62,-40,-112,-82,11.6,16.0,
-      north_doors=[(-47,-43)],west_doors=[(-102,-98)])
+      north_doors=[(-47,-43)],omit_west=True)
+ # Structural shared columns between the three northern roof segments:
+ for xi in (-94,-62):
+  for zi in (-109,-102,-95,-85):
+   box(f"E_PARTY_PIER_{xi}_{zi}","light_stone",xi,6,zi,
+       .68,12.0,.68,"party_wall_pier","E_NORTH_ACADEMY")
  # G high roof
  wing("G_ASSEMBLY",-123,-95,-170,-125,12.5,19.5,
       north_doors=[(-107,-103)],mat="cold_stone",roofmat="copper_roof")
@@ -215,6 +220,26 @@ def main():
   assert xa<xb and za<zb,(name,xa,xb,za,zb)
   box(name,"passage",(xa+xb)/2,.065,(za+zb)/2,xb-xa,.13,zb-za,
       "walkable_connector_slab","LINK")
+  # A structural COVERED connector, not just a decorative ground strip.
+  # Keep entrances open at either end; arches/columns sit outside clear path width.
+  if name.endswith("MAIN_TO_ENTRANCE"):return  # old clock portal already carries its own roof
+  along_x=(xb-xa)>(zb-za)
+  box(name+"_roof","slate_roof",(xa+xb)/2,5.13,(za+zb)/2,
+      xb-xa+.35,.24,zb-za+.35,"covered_connector_roof","LINK")
+  span=(xb-xa) if along_x else (zb-za)
+  stations=max(2,math.ceil(span/4.6))
+  for i in range(stations+1):
+   t=i/stations
+   if along_x:
+    xi=xa+(xb-xa)*t
+    for suffix,zi in (("a",za-.19),("b",zb+.19)):
+     box(name+f"_pier_{i}_{suffix}","light_stone",xi,2.55,zi,
+         .30,5.10,.30,"arcade_support","LINK")
+   else:
+    zi=za+(zb-za)*t
+    for suffix,xi in (("a",xa-.19),("b",xb+.19)):
+     box(name+f"_pier_{i}_{suffix}","light_stone",xi,2.55,zi,
+         .30,5.10,.30,"arcade_support","LINK")
  links={
  "WEST_TO_MAIN":(-114,-87.95,-14,-9),
  "EAST_TO_MAIN":(-67.18,-35,-14,-9),
