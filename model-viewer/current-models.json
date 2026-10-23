@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-academy-v14-anime-gate-20261023",
+  "version": "mixed-current-academy-v15-vitti-garden-20261023",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -57,16 +57,16 @@
     },
     {
       "model": "lahudi-academy.glb",
-      "version": "ACADEMY-V14-ANIMATION-STYLE-GATE-REVIEW",
-      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-gate-anime-v14/lahudi-academy_ANIMATION-STYLE-GATE_V14.glb",
-      "current_sha256": "1d2ac5373a3ae9e276048aa647d3f65ef19bc01ada3ee0e0473b1154568c53b2",
-      "backup": "backups/pre-academy-v14-animation-gate/lahudi-academy.glb",
-      "backup_sha256": "580e8b4bc0a1a9c1bb070074de539bf225286f12219460d6af3365cc3060c9d2",
+      "version": "ACADEMY-V15-VITTI-REAR-GARDEN-REVIEW",
+      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-rear-garden-v15/lahudi-academy_VITTI-REAR-GARDEN_V15.glb",
+      "current_sha256": "e269a295159f0f7d3e82df864376579e66f4b92be204ce66667a3c78b9d3ea41",
+      "backup": "backups/pre-academy-v15-vitti-rear-garden/lahudi-academy.glb",
+      "backup_sha256": "1d2ac5373a3ae9e276048aa647d3f65ef19bc01ada3ee0e0473b1154568c53b2",
       "git_blob_sha": "fa1eded139fcd7dff0794208067550db71d05344",
-      "integrated_contents": "V14 anime-directed campus main gate: cool gray-blue simplified Gothic stone, central tall entrance piers, open two wrought iron leaves, simplified low perimeter fencing, two true pedestrian wickets, subdued guardhouse, winter bare trees and snow, two waiting benches, clean main axis X=-70.1. Maintains existing asymmetric school facades, all V12 architecture/44 provisional rooms/1734 furniture placements, 2 stair cores and V11 exterior. In source V13 old 28 gate batch roots disabled, 29 new V14 gate batch roots enabled. All original V12 11983 nodes unchanged.",
+      "integrated_contents": "One official academy V15 GLB. All existing V14 anime gate, V12 44 provisional school rooms and 1734 procedural furniture, V11 exterior, original A01 and library furniture preserved. The former F_LIBRARY solid north-end wall is replaced by 3m actual back door, adjoining Vitti winter rear garden 36m × 28m with central lawn, loop stone walks, 3 wooden benches, 6 hardy flowerbeds, 4 leafless trees, 4 lamps, one story-marked potted plant for Bessie, and low garden perimeter stone-and-iron railings. Placement behind library is cinema-design inference, not explicitly specified by source novel.",
       "author_full_item_approval": "PENDING",
       "static_geometry_qa": "PASS: 10 1F routes + 3 stair/upper walk centerline radius-0.4m clearance checks, 26 3D stair treads obstacle-free AABB, 3.55m modeled roof headroom",
-      "visual_qa": "PUBLIC_V14_FRONT_GATE_RENDER_CAPTURED__ART_STYLE_REFINEMENT_NEEDED",
+      "visual_qa": "V15_STATIC_GEOMETRY_QA_PASS__PUBLIC_VISUAL_PENDING",
       "wing_interiors": "PARTIALLY_MODELED_44_PROVISIONAL_BC_ROOMS_AND_SELECTED_SHARED_SPACES",
       "mobile_performance_note": "Reduced new campus mesh draws by 5068; device FPS unverified",
       "design_book": "https://docs.google.com/document/d/1seSK9uMrnNV2_Mh1RwmG50JtjFgXqJzHOQoCqiNFTPQ/edit?usp=drivesdk",
@@ -92,7 +92,18 @@
       "gate_visual_qa": "PASS_PUBLIC_BROWSER_SCREENSHOT_PRESENT__AUTHOR_ANIMATION_MATCH_UNVERIFIED",
       "gate_public_screenshot": "https://github.com/lihuany635-create/lizhi-cloud-web/blob/rg-ep01-s01-stage-20261023/model-viewer/staged-output/academy-gate-anime-v14/public-qa/gate-actual-cdp.png",
       "gate_animation_style_limit": "Existing school facade and old roof silhouette remain low-poly / box-like versus concept. V14 gate edited in real GLB but not final frame-matched anime exterior.",
-      "gate_public_renderer_stats": "HEADLESS_CDP_LEXICAL_VARIABLES_INACCESSIBLE; visible screenshot captured and public SHA verified"
+      "gate_public_renderer_stats": "HEADLESS_CDP_LEXICAL_VARIABLES_INACCESSIBLE; visible screenshot captured and public SHA verified",
+      "rear_garden_version": "V15_VITTI_WINTER_GARDEN",
+      "garden_footprint_rect_m2": 1008,
+      "garden_built_mesh_components": 261,
+      "library_true_rear_exit_portal_m": [
+        3.0,
+        3.6
+      ],
+      "garden_path_qa": "PASS_STATIC_7_APPROACHES_ZERO_BLOCKERS",
+      "garden_story_grounding": "NOVEL_CH07 winter garden, isolated corner pot, hardy plants, solitary Bessie",
+      "garden_library_adjacency": "DESIGN_INFERENCE_PENDING_AUTHOR_APPROVAL",
+      "garden_visual_qa": "PENDING_PUBLIC_RENDER"
     }
   ]
 }
