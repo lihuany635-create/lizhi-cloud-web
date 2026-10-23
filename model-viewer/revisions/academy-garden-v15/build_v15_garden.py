@@ -127,7 +127,7 @@ def flowerbed(id,x,z,l,w,rare=False):
     cub("GARDEN_PLANTING",id+f"_flower_{i}_{j}","winter_flower",
         qx,.90,qz,.17,.15,.14,"winter_bloom")
  if rare:
-  cub("GARDEN_PLANTING",id+"_snow_cap","snow",x,.55,z+.w*.40 if False else z+w*.35,l*.30,.06,w*.15,"bed_snow")
+  cub("GARDEN_PLANTING",id+"_snow_cap","snow",x,.55,z+w*.35,l*.30,.06,w*.15,"bed_snow")
 def lamp(name,x,z,height=3.5):
  cub("GARDEN_FURNITURE",name+"_base","old_stone",x,.21,z,.48,.42,.48,"lamp_base")
  cub("GARDEN_FURNITURE",name+"_shaft","wrought_iron",x,height*.48,z,.14,height*.85,.14,"lamp_post")
