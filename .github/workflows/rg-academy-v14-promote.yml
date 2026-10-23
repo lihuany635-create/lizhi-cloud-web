@@ -1,0 +1,53 @@
+name: RG Academy V14 Publish Animation Gate To Original School
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v14-promote.yml'
+      - 'model-viewer/revisions/academy-gate-v14/promote_v14_to_main.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v14-release
+  cancel-in-progress: true
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+          persist-credentials: false
+      - name: Guard and promote V14 staged real GLB with immutable V12 story spaces
+        run: |
+          set -euo pipefail
+          python .academy-stage/model-viewer/revisions/academy-gate-v14/promote_v14_to_main.py
+      - name: Check precise file changes no unrelated models
+        run: |
+          python - <<'PY'
+          import subprocess
+          allowed={'model-viewer/lahudi-academy.glb',
+           'model-viewer/backups/pre-academy-v14-animation-gate/lahudi-academy.glb',
+           'model-viewer/current-models.json',
+           'model-viewer/index.html'}
+          got=set()
+          for line in subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],text=True).splitlines():
+           p=line[3:]
+           if p.startswith('.academy-stage/'):continue
+           got.add(p)
+          assert got==allowed,{"expected":allowed,"changed":got}
+          PY
+      - name: Publish same one academy GLB main branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/lahudi-academy.glb model-viewer/backups/pre-academy-v14-animation-gate/lahudi-academy.glb model-viewer/current-models.json model-viewer/index.html
+          git commit -m 'feat(academy V14): align winter campus gate with anime art direction'
+          git push origin HEAD:refs/heads/main
