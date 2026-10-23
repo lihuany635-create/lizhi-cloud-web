@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-academy-collision-repair-v10-20261023",
+  "version": "mixed-current-academy-gothic-exterior-v11-20261023",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -57,23 +57,25 @@
     },
     {
       "model": "lahudi-academy.glb",
-      "version": "ACADEMY-LOCKED-PLAN-COLLISION-REPAIR-V10",
-      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-route-repair-v10/lahudi-academy_LOCKED-PLAN-ACCESS-V10.glb",
-      "current_sha256": "f2b4c82a7ea3b6625a7ffef3157c56b8e7f288bf9cd2d3bbf699c7ca67ef1b5c",
-      "backup": "backups/pre-academy-v10-collision-repairs/lahudi-academy.glb",
-      "backup_sha256": "ada3ae9c9e55f995b4c8c60f63655c01e572561e523e199ef1cdf298c7e668c3",
+      "version": "ACADEMY-LOCKED-PLAN-GOTHIC-EXTERIOR-FINISH-V11",
+      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-exterior-finish-v11/lahudi-academy_EXTERIOR-GOTHIC-FINISH_V11.glb",
+      "current_sha256": "caab8cba4cbb9af22252ea2b05a35588b9529fb4af5720b787cf96b33229a9ae",
+      "backup": "backups/pre-academy-v11-exterior-finish/lahudi-academy.glb",
+      "backup_sha256": "f2b4c82a7ea3b6625a7ffef3157c56b8e7f288bf9cd2d3bbf699c7ca67ef1b5c",
       "git_blob_sha": "fa1eded139fcd7dff0794208067550db71d05344",
-      "integrated_contents": "V9 locked 8-zone campus retained; actual openings now aligned for west D, C east south, E west north; old A south/north portals kept and connector slabs narrowed; added 26-tread outdoor switchback north of A, 2F skywalk, 7.55m-roofed two-level access link. No A01 corridor/classroom or F library geometry removed.",
+      "integrated_contents": "Official single GLB Gothic exterior only: 3505 decorative shapes in 96 combined standard meshes; 274 second-floor blue lancet glass bays, carved stone frames and tracery, 62 roof dormers, copper gutters, gable crests and finials, clocktower cornices and clock panel, glowing lamps, courtyard stone paths and shrubs. Existing V10 geometry / doors / stair / classrooms and locked 8-district campus coords unchanged.",
       "author_full_item_approval": "PENDING",
       "static_geometry_qa": "PASS: 10 1F routes + 3 stair/upper walk centerline radius-0.4m clearance checks, 26 3D stair treads obstacle-free AABB, 3.55m modeled roof headroom",
-      "visual_qa": "NOT_RUN_BY_USER_REQUEST",
+      "visual_qa": "PENDING_REAL_MOBILE_PREVIEW",
       "wing_interiors": "NOT_MODELED: only exterior architectural shell and connected campus ground paths",
       "mobile_performance_note": "Reduced new campus mesh draws by 5068; device FPS unverified",
       "design_book": "https://docs.google.com/document/d/1seSK9uMrnNV2_Mh1RwmG50JtjFgXqJzHOQoCqiNFTPQ/edit?usp=drivesdk",
       "animation_vs_geometry_width_conflict": "UNRESOLVED: source corridor 4.50m outer span vs proposed animation clear width 5.20m",
       "P0_status": "P0 geometry route blockers repaired to centerline AABB gate; further fully articulated 3D animation character & precise triangle-level QA still required",
       "open_followups": "A01 source corridor 4.5m outer span vs 5.2m proposed net width, unbuilt 3F slab/vault relation, detailed roof intersections, character animation acceptance",
-      "collision_book": "https://docs.google.com/document/d/1UlrxFUNmu6-3u3vPwPkSDj7EOJcXICY74ms1m34wUNc/edit?usp=drivesdk"
+      "collision_book": "https://docs.google.com/document/d/1UlrxFUNmu6-3u3vPwPkSDj7EOJcXICY74ms1m34wUNc/edit?usp=drivesdk",
+      "exterior_decoration_qa": "PASS - geometric source checks, batched material groups, GLB roundtrip, 3505 shapes",
+      "character_collision": "SKIPPED_BY_USER_REQUEST"
     }
   ]
 }
