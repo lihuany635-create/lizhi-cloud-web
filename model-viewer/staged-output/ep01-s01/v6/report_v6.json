@@ -1,0 +1,93 @@
+{
+  "scene": "EP01-S01",
+  "version": "S01-V6-OPEN-DOORS-REVIEW",
+  "status": "REAL_GLB_BUILT_REVIEW_ONLY",
+  "model": "lahudi-academy_ep01_s01_v6_open_doors_review.glb",
+  "bytes": 5520848,
+  "input_v5_sha256": "c875ba7f00814840723615942a523e9617d55457f3943216325b61343461e66e",
+  "sha256": "d062b88d2553d9ef0bbbce5da77980460ba65ad993cbcaf41c77112af27ec069",
+  "original_long_solid_wall_node": "RG-GAME-02-CONFESS-005__occlusion_wall",
+  "source_wall_mesh_backed_up_idx": 2353,
+  "source_wall_node_id": 7675,
+  "original_wall_render_disabled": true,
+  "corridor_wall_segments": 6,
+  "functional_open_door_apertures": [
+    {
+      "door": 1,
+      "z": -5.53,
+      "opening": [
+        -6.32,
+        -4.74
+      ],
+      "clear_width_m": 1.58,
+      "open_leaf_inside_room": true
+    },
+    {
+      "door": 2,
+      "z": -2.53,
+      "opening": [
+        -3.32,
+        -1.74
+      ],
+      "clear_width_m": 1.58,
+      "open_leaf_inside_room": true
+    },
+    {
+      "door": 3,
+      "z": 0.47,
+      "opening": [
+        -0.32,
+        1.26
+      ],
+      "clear_width_m": 1.58,
+      "open_leaf_inside_room": true
+    },
+    {
+      "door": 4,
+      "z": 3.47,
+      "opening": [
+        2.68,
+        4.26
+      ],
+      "clear_width_m": 1.58,
+      "open_leaf_inside_room": true
+    },
+    {
+      "door": 5,
+      "z": 6.47,
+      "opening": [
+        5.68,
+        7.26
+      ],
+      "clear_width_m": 1.58,
+      "open_leaf_inside_room": true
+    },
+    {
+      "door": 6,
+      "z": 9.47,
+      "opening": [
+        8.68,
+        10.2
+      ],
+      "clear_width_m": 1.52,
+      "open_leaf_inside_room": true
+    }
+  ],
+  "new_mesh_nodes": 18,
+  "disabled_decorative_leaf_and_panel_nodes": 42,
+  "original_side_stair_treads_preserved": 24,
+  "v4_front_stair_preserved": true,
+  "S06_untouched": true,
+  "original_canonical_model_untouched": true,
+  "geometry_checks": "PASS",
+  "visual_render": "NOT_RUN",
+  "actual_player_collision_walk": "NOT_RUN",
+  "film_camera_match": "NOT_RUN",
+  "author_approval": "PENDING",
+  "known_limits": [
+    "Openings exist in S01 wall only; adjoining room interiors and route colliders not yet audited.",
+    "Open doors rotate outside the corridor; animation of swinging doors is not authored.",
+    "Original side stair remains as existing school geometry; alternative front stair still unapproved.",
+    "3D design requires actual renderer and film frame match before replacing published V5."
+  ]
+}
