@@ -1,0 +1,62 @@
+name: RG Academy Entire Gothic Campus V6 Geometry Build
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v6-entire-campus.yml'
+      - 'model-viewer/revisions/academy-all-corridors/build_entire_campus_v6.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: academy-v6-entire-campus
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build actual entire school campus GLB no rendering
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-all-corridors/build_entire_campus_v6.py
+      - name: Gate actual binary GLB integrity and completeness
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,struct
+          root=Path("candidate-output/academy-entire-campus-v6")
+          r=json.loads((root/"report.json").read_text())
+          b=(root/r["model"]).read_bytes()
+          assert b[:4]==b"glTF" and struct.unpack_from("<I",b,8)[0]==len(b)
+          assert len(b)==r["bytes"] and hashlib.sha256(b).hexdigest()==r["sha256"]
+          assert r["source_nodes"]==11097
+          assert r["wing_count_added"]==8
+          assert len(r["old_distant_terrain_outliers_disabled"])==4
+          assert r["contrasting_stone_plazas"]==3
+          assert r["new_architectural_nodes"]>=1800
+          assert r["previous_v5_classrooms_and_library_unchanged"]
+          assert r["previous_v5_corridors_and_stairs_unchanged"]
+          assert r["GLB_reparse"]=="PASS"
+          assert r["rendering"]=="NOT_RUN"
+          print("Entire-campus real binary GLB PASS",r["sha256"])
+          PY
+      - name: Save in independent construction staging
+        run: |
+          set -euo pipefail
+          dst=model-viewer/staged-output/academy-entire-campus-v6
+          mkdir -p "$dst"
+          cp candidate-output/academy-entire-campus-v6/*.glb "$dst/"
+          cp candidate-output/academy-entire-campus-v6/report.json "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V6): coherent complete colored 8-wing campus GLB'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
