@@ -115,12 +115,13 @@ button,label.btn{font:inherit;cursor:pointer}
       <option value="reality-highschool">現實高中（校園＋3F 教室）</option>
       <option value="xiji-station">溪磯鎮車站</option>
       <option value="lahudi-academy">拉乎迪學院（校園＋教室＋告白走廊）</option>
-      <option value="lahudi-academy-s01-v5">S01 V5｜拉乎迪告白走廊（測試版・尚未驗收）</option>
+      
     </select></label>
   <button class="btn" id="openPreview" type="button">配置圖預覽</button>
-  <a class="btn" href="s01-preview/?v=20261023-v5" title="S01 告白走廊 V5 未驗收測試版，正式 GLB 不受影響">S01 V5 模型測試版</a>
-  <a class="btn" href="./index.html?v=20261023-s01-v5#lahudi-academy-s01-v5" title="獨立 S01 V5 模型測試版，原拉乎迪學院正式模型不變">S01 V5 測試模型</a>
+  
+  
   <span id="viewerVersion" class="file" aria-live="polite"></span>
+  <span id="academyViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="academyWhole" type="button">整座學院</button><button class="btn" id="academySchool" type="button">主教學樓</button><button class="btn" id="academyLibrary" type="button">圖書館區</button></span>
   <span id="houseViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="house1F">一樓俯視</button><button class="btn" id="house2F">二樓俯視</button><button class="btn" id="houseWhole">完整外觀</button><a class="btn" href="revisions/hades-v2.4/">配置圖</a></span>
 </div>
 
@@ -278,7 +279,7 @@ function loadBuffer(buf,name){
 
 let modelKey="",modelName="",loadSerial=0;
 let inspection=true,meshLayers=[],modelLights=[],sourceInfo=null,activeCutHeight=null;
-let manifestPromise=fetch('current-models.json?v=20261023-academy-rb2-v5',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('版本清單讀取失敗');return r.json();}).then(j=>j.models).catch(()=>[]);
+let manifestPromise=fetch('current-models.json?v=20261023-academy-rb2-v6',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('版本清單讀取失敗');return r.json();}).then(j=>j.models).catch(()=>[]);
 function disposeObject(obj){obj.traverse(o=>{o.geometry?.dispose();if(o.material)[].concat(o.material).forEach(m=>{Object.values(m).forEach(v=>{if(v&&v.isTexture)v.dispose();});m.dispose();});});}
 function applyInspection(){
   modelLights.forEach(x=>{x.object.visible=window.GLBInspection.lightVisible(x.originalVisible,inspection);});
@@ -310,7 +311,7 @@ async function openModel(buf,name,opts={}){
     fitBox=opts.fit?new THREE.Box3(new THREE.Vector3(opts.fit[0],opts.fit[1]+model.position.y,opts.fit[2]),new THREE.Vector3(opts.fit[3],opts.fit[4]+model.position.y,opts.fit[5])):null;
     fit(opts.top);
     $('viewerVersion').textContent=sourceInfo?.version?sourceInfo.version+' · SHA '+sourceInfo.actualSHA.slice(0,12):'本機檔案 · 版本未登記';
-    $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();$('houseViews').hidden=modelKey!=='hades-house'||window.GLBPreview.active;if(modelKey==='hades-house')houseView(2);
+    $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();$('houseViews').hidden=modelKey!=='hades-house'||window.GLBPreview.active;if(modelKey==='hades-house')houseView(2);$('academyViews').hidden=modelKey!=='lahudi-academy'||window.GLBPreview.active;
   }catch(e){console.error(e);showError(e&&e.message?e.message:String(e));}
 }
 
@@ -377,6 +378,31 @@ function houseView(level){
   setCut(Math.max(0,Math.min(1,(top+off-box.min.y)/size.y)));
   fitBox=new THREE.Box3(new THREE.Vector3(-11.3,floor+off,-10),new THREE.Vector3(11.3,top+off,4.5));fit(true);
 }
+
+function academyView(region){
+  if(!model||modelKey!=='lahudi-academy')return;
+  if(pov)exitPov();
+  const offset=model.position.y;
+  const presets={
+    whole:[-141.5,-1.5,-202.5,29.35,28.34,56.5],
+    school:[-133,-1,-115,-26,29,58],
+    library:[-132,-1,-193,31,30,-118]
+  };
+  const q=presets[region]||presets.whole;
+  fitBox=new THREE.Box3(
+    new THREE.Vector3(q[0],q[1]+offset,q[2]),
+    new THREE.Vector3(q[3],q[4]+offset,q[5]));
+  setCut(1);
+  fit(false);
+  document.querySelectorAll('#academyViews button').forEach(b=>b.setAttribute('aria-pressed',
+    String((region==='whole'&&b.id==='academyWhole')||
+      (region==='school'&&b.id==='academySchool')||
+      (region==='library'&&b.id==='academyLibrary'))));
+}
+$('academyWhole').onclick=()=>academyView('whole');
+$('academySchool').onclick=()=>academyView('school');
+$('academyLibrary').onclick=()=>academyView('library');
+
 $('house1F').onclick=()=>houseView(1);$('house2F').onclick=()=>houseView(2);$('houseWhole').onclick=()=>houseView(0);
 
 /* ---------- file input + drag & drop ---------- */
@@ -445,15 +471,15 @@ const SAMPLES={
   },
   "lahudi-academy": {
     "name": "拉乎迪學院.glb",
-    "file": "lahudi-academy.glb?v=rb2-exterior-rebuilt-20261023",
+    "file": "lahudi-academy.glb?v=rb2-entire-campus-20261023",
     "cut": 1,
     "fit": [
-      -123,
-      -1,
-      -201,
-      25,
-      27,
-      54
+      -141.5,
+      -1.5,
+      -202.5,
+      29.35,
+      28.34,
+      56.5
     ]
   },
   "lahudi-academy-s01-v5": {

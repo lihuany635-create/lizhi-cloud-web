@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-academy-rb2-v5-20261023",
+  "version": "mixed-current-academy-rb2-entire-campus-v6-20261023",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -57,16 +57,17 @@
     },
     {
       "model": "lahudi-academy.glb",
-      "version": "ACADEMY-RB2-EXTERIOR-REBUILT-V5",
-      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-exterior-rebuild-v5/lahudi-academy_REBUILT-EXTERIOR-RB2_v5.glb",
-      "current_sha256": "347ba0a423726d4a2c83e1ddc568509a5b3ac35ca99dc6019f513085053b842f",
-      "backup": "backups/pre-academy-rb2-exterior-v5/lahudi-academy.glb",
-      "backup_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "version": "ACADEMY-RB2-ENTIRE-CAMPUS-V6",
+      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-entire-campus-v6/lahudi-academy_ENTIRE-GOTHIC-CAMPUS_RB2_v6.glb",
+      "current_sha256": "e3d2465807cba69ba52a3d1df2a9e3f84a77a970f94301bdeaecd26537d5a6bc",
+      "backup": "backups/pre-academy-complete-campus-v6/lahudi-academy.glb",
+      "backup_sha256": "347ba0a423726d4a2c83e1ddc568509a5b3ac35ca99dc6019f513085053b842f",
       "git_blob_sha": "fa1eded139fcd7dff0794208067550db71d05344",
-      "integrated_contents": "Main 85.42m RB2 Gothic corridor, preserved classrooms and stairs, removed oversized old campus, replaced exterior main teaching wing and library, connected cloister, blue-gray masonry, slate roofs, gold and oak.",
+      "integrated_contents": "Single official school GLB: preserved native classrooms/library/85m RB2 Gothic corridor/stairs, rebuilt main and library envelopes, eight new exterior college wings, paved quadrangle, arches, fountains, front school colonnade; disabled four kilometer-scale outliers.",
       "author_full_item_approval": "PENDING",
-      "static_geometry_qa": "PASS",
-      "visual_qa": "NOT_RUN"
+      "static_geometry_qa": "PASS: world visible 166.852 x 253.0 x 26.24m; verified nonwhite material contrasts and old huge terrain gone",
+      "visual_qa": "NOT_RUN_BY_USER_REQUEST",
+      "wing_interiors": "NOT_MODELED: only exterior architectural shell and connected campus ground paths"
     }
   ]
 }
