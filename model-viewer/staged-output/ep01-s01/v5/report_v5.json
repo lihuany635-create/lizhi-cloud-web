@@ -1,0 +1,23 @@
+{
+  "revision": "S01-V5-ART-REVIEW",
+  "status": "REAL_GLB_CANDIDATE_UNAPPROVED",
+  "source_v4_sha256": "4f3ef5dfaf1f40d13a18663ce803228e84a0723a33dd25547e5a4cb60cade5c4",
+  "sha256": "c875ba7f00814840723615942a523e9617d55457f3943216325b61343461e66e",
+  "bytes": 5508420,
+  "source_7725_nodes_unchanged": true,
+  "stage_curved_vault_pieces_adjusted": 176,
+  "embedded_winter_matte_png_bytes": 11341,
+  "scenic_backdrop_node": 8120,
+  "original_stair_untouched": true,
+  "new_v4_front_stair_retained": true,
+  "S06_untouched": true,
+  "original_animation_camera_match": "NOT_RUN",
+  "winter_scene": "ART_REFERENCE_NOT_STORY_CANON",
+  "daylight_render": "NOT_RUN",
+  "author_acceptance": "PENDING",
+  "critical_open": [
+    "decorative_left_doors_not_passable",
+    "original_side_descending_stair_remains",
+    "Gothic-vault physical continuity and Blender shade render need review"
+  ]
+}
