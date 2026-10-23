@@ -1,0 +1,28 @@
+name: RG Academy Spatial Corridor Audit
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-spatial-audit.yml'
+      - 'model-viewer/revisions/academy-all-corridors/audit_spatial.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Index all original school corridor bounds without rendering
+        run: python model-viewer/revisions/academy-all-corridors/audit_spatial.py
+      - name: Preserve measured geometry evidence
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-corridor-audit/spatial.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'audit(academy): record measured hall and stair mesh bounds'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
