@@ -46,7 +46,7 @@ details summary{cursor:pointer;font-weight:600}.note{font-size:13px;color:#b9c6c
 <div class="scene" id="stage" role="region" aria-label="GLB 3D 互動預覽區">
   <div id="status" role="status" aria-live="polite">準備載入 S01 V5（5.51 MB）…</div>
 </div>
-<p class="note">注意：這些是工程檢查視角，未與 EP01 原動畫一對一對位。左側木門尚非可通行門洞；原有側向樓梯仍在模型中。冬季光線、遮擋與人物離場動線仍在修訂。若手機不支援 WebGL，可先查看下方 Blender 幾何檢查圖。</p>
+<p class="note">注意：這些是工程檢查視角，未與 EP01 原動畫一對一對位。主視角採用已成功渲染的走廊前向鏡位，以免被盡頭牆遮住。左側木門尚非可通行門洞；原有側向樓梯仍在模型中。冬季光線、遮擋與人物離場動線仍在修訂。若手機不支援 WebGL，可先查看下方 Blender 幾何檢查圖。</p>
 <details>
   <summary>施工版本與驗證狀態</summary>
   <p class="note"><strong>檔案：</strong>lahudi-academy-s01-v5.glb<br>
@@ -77,7 +77,7 @@ const buttons=["viewA01","viewA02","viewA03","viewWhole","toggleIsolate"];
 let renderer,scene,camera,controls,model=null,meshes=[],isolated=true;
 const bounds={min:[-74,3.5,-9],max:[-68,8,13]};
 const presets=[
- {name:"走廊主視角",pos:[-70.35,5.67,15],target:[-70.25,5.55,0.0],fov:64},
+ {name:"走廊主視角",pos:[-70.37,5.55,-11.7],target:[-70.49,5.55,9.6],fov:63},
  {name:"高窗細節",pos:[-72.9,5.85,2.8],target:[-68.7,5.93,6.5],fov:59},
  {name:"樓梯方向",pos:[-70.2,5.64,3.0],target:[-70.55,5.0,12.1],fov:65}
 ];
