@@ -1,0 +1,87 @@
+{
+  "project": "現實遊戲",
+  "scene": "拉乎迪學院／薇媞後花園",
+  "version": "V15_GARDEN_REAL_3D_PHASE1",
+  "status": "DESIGN_TO_MODEL__NOT_AUTHOR_FINAL_APPROVAL",
+  "evidence": {
+    "novel_chapter": "07_發現女主.md",
+    "derived_details": [
+      "放學後貝西偶爾去薇媞後花園",
+      "冬天後花園不算熱鬧",
+      "花圃裡只剩耐寒植物",
+      "貝西站在角落的一盆植物前",
+      "花園深處適合短暫對話"
+    ],
+    "interpretative_details": [
+      "圖書館北側選址",
+      "圖書館後門新切口",
+      "庭院步道與長椅",
+      "冬季樹列及石燈"
+    ]
+  },
+  "locked_existing": {
+    "academy_sha256": "1d2ac5373a3ae9e276048aa647d3f65ef19bc01ada3ee0e0473b1154568c53b2",
+    "library_xy_floor_y": 0,
+    "library_footprint_x": [
+      -49.2,
+      -2.2
+    ],
+    "library_footprint_z": [
+      -183.2,
+      -142.75
+    ],
+    "plot_z_axis": "more_negative_is_library_back_north",
+    "preserve_school_8_zones": true,
+    "do_not_change_main_story_books_furniture": true,
+    "library_north_endwall_mesh_to_replace": "RG-GAME-02-EXTERIOR-REBUILD-V5__library_endwall_north"
+  },
+  "new_garden": {
+    "id": "VITTI_REAR_GARDEN",
+    "bounds_x": [
+      -44,
+      -8
+    ],
+    "bounds_z": [
+      -212,
+      -184
+    ],
+    "rectangular_area_m2": 1008,
+    "entry_center_x": -25.7,
+    "entry_north_wall_z": -183.2,
+    "entrance_aperture_width_m": 3,
+    "entrance_aperture_height_m": 3.6,
+    "walkable_main_path_width_m": 2.8,
+    "lawn_rect_x": [
+      -34,
+      -18
+    ],
+    "lawn_rect_z": [
+      -204,
+      -191
+    ],
+    "main_bench_side": "east_of_lawn",
+    "main_bench_center_xz": [
+      -13.3,
+      -196
+    ],
+    "solitary_plant_corner_xz": [
+      -39.7,
+      -208
+    ],
+    "layout": {
+      "south_terrace": "圖書館後門外石平台",
+      "transition": "中心步道銜接環形石板路",
+      "central": "冬季草地留白區",
+      "talk": "主長椅與相互面對的兩人對話位置",
+      "quiet": "角落獨處盆栽及耐寒植物",
+      "border": "矮石牆、冬季落葉樹、花壇"
+    },
+    "prohibited": [
+      "大教堂式新主樓",
+      "中央噴泉或大型雕像",
+      "占滿中軸的人造景物",
+      "覆寫 V14 校門或既有教室圖書館家具"
+    ],
+    "final_approval": "PENDING"
+  }
+}
