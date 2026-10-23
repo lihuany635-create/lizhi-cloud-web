@@ -23,7 +23,8 @@ def recurve(model):
     xa,xb=-72.22,-68.94
     for index,node in enumerate(model["nodes"]):
         name=node.get("name","")
-        is_orig_rib=name.startswith("RG-GAME-02-EP01-S01-ARCH-REV__")
+        is_orig_rib=(name.startswith("RG-GAME-02-EP01-S01-ARCH-REV__") or
+                     (name.startswith("RG-GAME-02-EP01-S01-REV2__") and "__rib_" in name))
         is_vault_panel=name.startswith("RG-GAME-02-EP01-S01-REV3__vault_bay")
         if not is_orig_rib and not is_vault_panel:continue
         if is_orig_rib:
