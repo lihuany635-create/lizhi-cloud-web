@@ -10,7 +10,8 @@
     "GLB_magic": true,
     "GLB_length": true,
     "GLB_SHA256": true,
-    "V5_rollback_link": true
+    "V5_rollback_link": true,
+    "reverse_camera_matches_filmed_left_right": true
   },
   "render_qa": "SEPARATE_BROWSER_CHECK",
   "canonical_unchanged": true
