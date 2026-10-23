@@ -1,0 +1,52 @@
+name: RG Promote Academy V10 Clear Routes To Official GLB
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v10-promote-main.yml'
+      - 'model-viewer/revisions/academy-route-repair-v10/promote_v10_to_main.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v10-official
+  cancel-in-progress: true
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+          persist-credentials: false
+      - name: Atomically verify independent collision gates then backup V9 and replace same school
+        run: |
+          set -euo pipefail
+          python .academy-stage/model-viewer/revisions/academy-route-repair-v10/promote_v10_to_main.py
+      - name: Strictly allow only original school, manifest, original viewer and backup
+        run: |
+          python - <<'PY'
+          import subprocess
+          expected={'model-viewer/lahudi-academy.glb','model-viewer/current-models.json',
+                    'model-viewer/index.html',
+                    'model-viewer/backups/pre-academy-v10-collision-repairs/lahudi-academy.glb'}
+          actual=set()
+          for line in subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],text=True).splitlines():
+            p=line[3:]
+            if p.startswith('.academy-stage/'):continue
+            actual.add(p)
+          assert actual==expected,{'actual':actual,'expected':expected}
+          PY
+      - name: Commit and publish V10 with rollback history
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/lahudi-academy.glb model-viewer/current-models.json model-viewer/index.html model-viewer/backups/pre-academy-v10-collision-repairs/lahudi-academy.glb
+          git commit -m 'fix(academy V10): repair doors, align 10 passage routes and build 26-step 1F-2F transfer'
+          git push origin HEAD:refs/heads/main
