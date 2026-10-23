@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-academy-rb2-entire-campus-v6-20261023",
+  "version": "mixed-current-academy-rb2-campus-v7-mobile-20261023",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -57,17 +57,18 @@
     },
     {
       "model": "lahudi-academy.glb",
-      "version": "ACADEMY-RB2-ENTIRE-CAMPUS-V6",
-      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-entire-campus-v6/lahudi-academy_ENTIRE-GOTHIC-CAMPUS_RB2_v6.glb",
-      "current_sha256": "e3d2465807cba69ba52a3d1df2a9e3f84a77a970f94301bdeaecd26537d5a6bc",
-      "backup": "backups/pre-academy-complete-campus-v6/lahudi-academy.glb",
-      "backup_sha256": "347ba0a423726d4a2c83e1ddc568509a5b3ac35ca99dc6019f513085053b842f",
+      "version": "ACADEMY-RB2-ENTIRE-CAMPUS-MOBILE-OPTIMIZED-V7",
+      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-entire-campus-optimized-v7/lahudi-academy_ENTIRE-GOTHIC-CAMPUS_OPTIMIZED_v7.glb",
+      "current_sha256": "14f564dd0a2e85c40105d7565ad04a0bf1bb2949d15ec05f96aa45ebf31cdddf",
+      "backup": "backups/pre-academy-mobile-optimized-v7/lahudi-academy.glb",
+      "backup_sha256": "e3d2465807cba69ba52a3d1df2a9e3f84a77a970f94301bdeaecd26537d5a6bc",
       "git_blob_sha": "fa1eded139fcd7dff0794208067550db71d05344",
-      "integrated_contents": "Single official school GLB: preserved native classrooms/library/85m RB2 Gothic corridor/stairs, rebuilt main and library envelopes, eight new exterior college wings, paved quadrangle, arches, fountains, front school colonnade; disabled four kilometer-scale outliers.",
+      "integrated_contents": "Same official 8-wing entire Gothic school V6 geometry and palette, preserving all native classrooms/stairs/library; 5145 new campus details baked into 77 region/material batches for mobile draw efficiency; kilometer-sized old terrain stays disabled.",
       "author_full_item_approval": "PENDING",
-      "static_geometry_qa": "PASS: world visible 166.852 x 253.0 x 26.24m; verified nonwhite material contrasts and old huge terrain gone",
+      "static_geometry_qa": "PASS: 5145 source cube surfaces baked into 77 region/material meshes, original school core geometry unchanged",
       "visual_qa": "NOT_RUN_BY_USER_REQUEST",
-      "wing_interiors": "NOT_MODELED: only exterior architectural shell and connected campus ground paths"
+      "wing_interiors": "NOT_MODELED: only exterior architectural shell and connected campus ground paths",
+      "mobile_performance_note": "Reduced new campus mesh draws by 5068; device FPS unverified"
     }
   ]
 }
