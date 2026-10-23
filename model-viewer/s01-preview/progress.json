@@ -1,0 +1,39 @@
+{
+  "format": "rg-ep01-model-progress/1",
+  "project": "現實遊戲",
+  "scene": "S01 拉乎迪學院告白走廊",
+  "public_preview": {
+    "version": "S01 V5",
+    "status": "PUBLISHED_TEST_PREVIEW",
+    "url": "https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/",
+    "sha256": "c875ba7f00814840723615942a523e9617d55457f3943216325b61343461e66e",
+    "bytes": 5508420,
+    "live_binary_integrity": "PASS",
+    "live_browser_3d_render": "PASS",
+    "source_workflow_run": "https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/39887671749",
+    "author_approved": false
+  },
+  "next_candidate": {
+    "version": "S01 V6",
+    "status": "BUILT_AND_BROWSER_RENDERED_REVIEW_ONLY",
+    "sha256": "d062b88d2553d9ef0bbbce5da77980460ba65ad993cbcaf41c77112af27ec069",
+    "bytes": 5520848,
+    "real_door_apertures": 6,
+    "structural_check": "PASS",
+    "browser_geometry_render": "PASS",
+    "author_approved": false,
+    "url": "https://github.com/lihuany635-create/lizhi-cloud-web/tree/rg-ep01-s01-stage-20261023/model-viewer/staged-output/ep01-s01/v6"
+  },
+  "open_issues": [
+    "V6 door openings not walk-collision tested",
+    "Room interiors behind six doors incomplete",
+    "Original side stair remains and new front stair not film matched",
+    "Original animation same-camera render overlay not completed",
+    "Mobile Android WebGL not physically retested"
+  ],
+  "formal_canonical_academy_glb_changed": false,
+  "S06_status": "PAUSED",
+  "automatic_continuous_background_processing": false,
+  "current_task_execution": "ON_DEMAND_ONLY",
+  "explanation": "進度以已產生的真實 GLB、GitHub Actions 及瀏覽器測試為準。此靜態狀態檔不代表 AI 在背景持續執行。"
+}
