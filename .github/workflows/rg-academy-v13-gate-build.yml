@@ -27,9 +27,9 @@ jobs:
       - name: Build staged V13 school from actual official V12 GLB
         run: |
           set -euo pipefail
-          cp .academy-stage/model-viewer/revisions/academy-gate-v13/build_v13_gate.py model-viewer/revisions/academy-locked-plan-v9/tmp_v13_build.py
-          cp .academy-stage/model-viewer/revisions/academy-gate-v13/gate-masterplan-v13.json model-viewer/revisions/academy-locked-plan-v9/tmp_gate_plan.json
-          mkdir -p model-viewer/revisions/academy-gate-v13
+          mkdir -p model-viewer/revisions/academy-gate-v13 model-viewer/revisions/ep01-s01/scripts model-viewer/revisions/academy-locked-plan-v9
+          cp .academy-stage/model-viewer/revisions/ep01-s01/scripts/build_s01_candidate.py model-viewer/revisions/ep01-s01/scripts/
+          cp .academy-stage/model-viewer/revisions/academy-locked-plan-v9/masterplan-v1.json model-viewer/revisions/academy-locked-plan-v9/
           cp .academy-stage/model-viewer/revisions/academy-gate-v13/{build_v13_gate.py,gate-masterplan-v13.json} model-viewer/revisions/academy-gate-v13/
           python model-viewer/revisions/academy-gate-v13/build_v13_gate.py
       - name: Ensure glTF scene and existing original scene are preserved
