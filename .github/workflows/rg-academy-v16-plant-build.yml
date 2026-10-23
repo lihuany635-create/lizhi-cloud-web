@@ -1,0 +1,59 @@
+name: RG Academy V16 Indoor Plant Assets And Placement Build
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v16-plant-build.yml'
+      - 'model-viewer/revisions/academy-interior-plants-v16/build_v16_greenery.py'
+      - 'model-viewer/revisions/academy-interior-plants-v16/verify_v16_greenery.py'
+      - 'model-viewer/revisions/academy-interior-plants-v16/greenery-masterplan-v16.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v16-plants
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+      - name: Fetch all stage inputs while locking official V15 model
+        run: |
+          set -euo pipefail
+          mkdir -p model-viewer/revisions/academy-interior-plants-v16 model-viewer/revisions/ep01-s01/scripts model-viewer/revisions/academy-locked-plan-v9
+          cp .academy-stage/model-viewer/revisions/academy-interior-plants-v16/{build_v16_greenery.py,verify_v16_greenery.py,greenery-masterplan-v16.json} model-viewer/revisions/academy-interior-plants-v16/
+          cp .academy-stage/model-viewer/revisions/ep01-s01/scripts/build_s01_candidate.py model-viewer/revisions/ep01-s01/scripts/
+          cp .academy-stage/model-viewer/revisions/academy-locked-plan-v9/masterplan-v1.json model-viewer/revisions/academy-locked-plan-v9/
+      - name: Construct 10 standalone real plant GLB assets and populated school GLB
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-interior-plants-v16/build_v16_greenery.py
+      - name: Validate floor pots vs V12 furniture and 10 source model checksums
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-interior-plants-v16/verify_v16_greenery.py
+      - name: Preserve stage 3D candidate files and editable design manifest
+        run: |
+          set -euo pipefail
+          dest=.academy-stage/model-viewer/staged-output/academy-interior-greenery-v16
+          mkdir -p "$dest/plant-assets"
+          cp candidate-output/academy-interior-greenery-v16/*.json "$dest/"
+          cp candidate-output/academy-interior-greenery-v16/*.glb "$dest/"
+          cp candidate-output/academy-interior-greenery-v16/plant-assets/*.glb "$dest/plant-assets/"
+          cd .academy-stage
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-interior-greenery-v16
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V16): 10 source GLB plant assets, furnished academy greenery with spatial QA'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
