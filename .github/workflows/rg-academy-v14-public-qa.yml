@@ -1,0 +1,66 @@
+name: RG Academy V14 Public Animation Gate Verification
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v14-public-qa.yml'
+      - 'model-viewer/revisions/academy-gate-v14/check_public_gate_v14.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  public:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download production site HTML, manifest, real 3D file
+        run: |
+          set -euo pipefail
+          d=candidate-output/academy-v14-public
+          mkdir -p "$d"
+          url='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer'
+          curl -fSL --retry 9 --retry-all-errors --retry-delay 3 --max-time 150 "$url/" -o "$d/index.html"
+          curl -fSL --retry 9 --retry-all-errors --retry-delay 3 --max-time 150 "$url/current-models.json?v=20261023-academy-rb2-v14" -o "$d/manifest.json"
+          curl -fSL --retry 9 --retry-all-errors --retry-delay 3 --max-time 150 "$url/lahudi-academy.glb?v=rb2-campus-gate-animation-v14-20261023" -o "$d/academy.glb"
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,struct
+          p=Path('candidate-output/academy-v14-public')
+          data=(p/'academy.glb').read_bytes()
+          sha=hashlib.sha256(data).hexdigest()
+          expect='1d2ac5373a3ae9e276048aa647d3f65ef19bc01ada3ee0e0473b1154568c53b2'
+          assert sha==expect
+          assert data[:4]==b'glTF' and struct.unpack_from('<I',data,8)[0]==len(data)
+          m=json.loads((p/'manifest.json').read_text())
+          a=next(x for x in m['models'] if x['model']=='lahudi-academy.glb')
+          assert len(m['models'])==5
+          assert a['version']=='ACADEMY-V14-ANIMATION-STYLE-GATE-REVIEW'
+          assert a['current_sha256']==sha
+          html=(p/'index.html').read_text()
+          assert 'academyGate' in html and '動畫校門 V14' in html
+          assert 'rb2-campus-gate-animation-v14-20261023' in html
+          n=struct.unpack_from('<I',data,12)[0]
+          j=json.loads(data[20:20+n])
+          visible=[x for x in j['nodes'] if x.get('name','').startswith('RG-GAME-02-GATE-ANIME-V14__')]
+          assert len(visible)==29
+          print('PUBLIC PRODUCTION V14 GLB verified',sha,'bytes',len(data))
+          PY
+      - name: Take actual public front-facing gate screenshot and WebGL stats
+        run: |
+          CHROME="$(command -v google-chrome || command -v chromium)"             node model-viewer/revisions/academy-gate-v14/check_public_gate_v14.mjs
+      - name: Commit public QA evidence, not another school model
+        if: always()
+        run: |
+          dst=model-viewer/staged-output/academy-gate-anime-v14/public-qa
+          mkdir -p "$dst"
+          cp candidate-output/academy-v14-gate-diagnostic/*.png "$dst/" 2>/dev/null || true
+          cp candidate-output/academy-v14-gate-diagnostic/*.json "$dst/" 2>/dev/null || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy V14): public animation gate render and WebGL stats'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
