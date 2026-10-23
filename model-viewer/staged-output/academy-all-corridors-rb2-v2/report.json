@@ -1,0 +1,51 @@
+{
+  "model": "lahudi-academy_ALL-CORRIDORS_RB2-GOTHIC_v2.glb",
+  "revision": "ACADEMY-RB2-GOTHIC-ALL-CORRIDORS-V2",
+  "source_v1_sha256": "3ba0261dffb76f277c64f88ad186203335de0b81e5ac1fa3a04cba16d7fe556c",
+  "sha256": "684e558cc858cb31278cf6180f73e974675830933da7fb9446426d3ce40b1c86",
+  "bytes": 5818444,
+  "source_v1_nodes": 8931,
+  "result_nodes": 9245,
+  "new_nodes": 314,
+  "new_groups": {
+    "gothic_arch_rib": 168,
+    "pilaster": 30,
+    "capital": 30,
+    "balustrade": 24,
+    "balustrade_handrail": 22,
+    "dado": 10,
+    "sconce": 24,
+    "connection_anchor": 6
+  },
+  "new_regions": {
+    "confession_side_stair": 132,
+    "roof_stair_lobby": 84,
+    "main_entrance_arcade": 98
+  },
+  "anchors": [
+    "RG-GAME-02-ALLCOR-RB2-V2__ANCHOR_to_roof_stair",
+    "RG-GAME-02-ALLCOR-RB2-V2__ANCHOR_to_main_corridor_north",
+    "RG-GAME-02-ALLCOR-RB2-V2__ANCHOR_to_confession_corridor",
+    "RG-GAME-02-ALLCOR-RB2-V2__ANCHOR_to_confession_lower_stair",
+    "RG-GAME-02-ALLCOR-RB2-V2__ANCHOR_to_main_corridor_south",
+    "RG-GAME-02-ALLCOR-RB2-V2__ANCHOR_to_external_entry_stair"
+  ],
+  "native_roof_stair_geometry_unchanged": true,
+  "native_confession_side_stair_geometry_unchanged": true,
+  "native_entrance_stair_geometry_unchanged": true,
+  "original_8931_nodes_identical": true,
+  "base_corridor_and_classrooms_unchanged": true,
+  "glb_roundtrip": "PASS",
+  "rendering": "NOT_RUN_BY_USER_REQUEST",
+  "actor_continuous_collision": "NOT_RUN",
+  "academy_exterior_hall_semantics": "NOT_IDENTIFIED_AS_WALKABLE_INTERIOR",
+  "author_approved": false,
+  "five_canonical_models_untouched": true,
+  "notes": [
+    "Side stair arch and balustrade alignment inferred from actual native tread AABB; verify nonintersections before actor rig work.",
+    "A1/CROOM entrances remain in parent V1 and are not covered or modified in V2.",
+    "Rooftop stair and main entrance portals now carry the same stone/wood/amber architectural vocabulary.",
+    "The rest of the broad campus hall-named objects are architectural shells, not verified interior hallways.",
+    "No rendering requested or executed. Static mesh-level and humanoid path validation remains required."
+  ]
+}
