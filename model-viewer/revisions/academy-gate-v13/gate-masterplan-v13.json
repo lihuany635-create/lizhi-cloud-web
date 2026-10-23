@@ -1,0 +1,121 @@
+{
+  "schema": "reality-game-lahudi-main-gate-v13-architectural-proposal",
+  "version": "V13-GATE-COMPLEX-PROPOSAL-20261023",
+  "evidence": {
+    "novel": "第五章：接駁車在校門附近放下主角、凱薩在校門附近等候；第七章：學院逾百年、冬季舊牆維護良好",
+    "canon_gate_material_appearance": "NOT_DEFINED_IN_TEXT",
+    "model_source": "V12 canonical GLB (b975ace3cd12744621688f4f5a0a8aa27f5dff1fbed4beb7ae5b9306dbbd3a66)",
+    "locked_plan": "model-viewer/revisions/academy-locked-plan-v9/masterplan-v1.json"
+  },
+  "locks": {
+    "gate_main_axis_x_m": -70.1,
+    "existing_south_entrance_zone": {
+      "x": [
+        -98,
+        -22
+      ],
+      "z": [
+        30,
+        53
+      ]
+    },
+    "last_existing_south_wall_z_m": 53,
+    "clock_tower_existing_center_x_m": -70.1,
+    "preserve_all_existing_nodes": true,
+    "no_plot_building_shifts": true,
+    "target_viewer_extension_z_m": 86
+  },
+  "proposed_geometry": {
+    "boundary_line_z_m": 79,
+    "gate_front_axis_x_m": -70.1,
+    "primary_clear_portal_x_m": [
+      -75.35,
+      -64.85
+    ],
+    "nominal_primary_clear_width_m": 10.5,
+    "gate_clear_walkway_core_x_m": [
+      -73.5,
+      -66.7
+    ],
+    "central_walkway_x_m": [
+      -74.2,
+      -66
+    ],
+    "central_walkway_z_m": [
+      53.15,
+      82
+    ],
+    "cross_forecourt_walkway_x_m": [
+      -94,
+      -27
+    ],
+    "cross_forecourt_walkway_z_m": [
+      55,
+      58.2
+    ],
+    "court_available_length_between_front_door_and_boundary_m": 26,
+    "wickets": [
+      {
+        "label": "WEST",
+        "clear_opening_x": [
+          -82.3,
+          -79.8
+        ],
+        "z": 79
+      },
+      {
+        "label": "EAST",
+        "clear_opening_x": [
+          -60.4,
+          -57.9
+        ],
+        "z": 79
+      }
+    ],
+    "boundary_approx_x_m": [
+      -145,
+      35
+    ],
+    "gatehouse_rect_xz_m": [
+      -103,
+      -97,
+      68,
+      75.5
+    ],
+    "post_height_m": 7.6,
+    "gate_arch_crest_y_m": 9.65,
+    "main_leaf_height_m": 4.7,
+    "main_gate_open_angle_deg": 75,
+    "wall_height_m": 2.5,
+    "walkway_probe_y_m": [
+      0.1,
+      2.25
+    ],
+    "side_doors_existing": [
+      {
+        "building": "D_WEST_ENTRY",
+        "south_door_x_m": [
+          -90,
+          -85
+        ],
+        "z": 53
+      },
+      {
+        "building": "D_EAST_ENTRY",
+        "south_door_x_m": [
+          -34,
+          -29
+        ],
+        "z": 53
+      }
+    ],
+    "purpose": "Daily school entrance pedestrian social staging, winter academy long shot; south D main building facade remains visible"
+  },
+  "open_items": [
+    "Exact academy grounds cadastral boundary not stated in manuscript; perimeter line is a cinematic proposal.",
+    "Guard hut / iron gate / school crest shapes are art-directed additions, not canonical novel facts.",
+    "Public street and drop-off curb are offsite staging assumptions, not modeled city infrastructure.",
+    "No physics-based hinge animation or character collision requested.",
+    "Author must approve exterior look and sightlines before animation usage."
+  ]
+}
