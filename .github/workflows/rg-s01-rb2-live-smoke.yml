@@ -1,0 +1,74 @@
+name: RG EP01 S01 RB2 Public WebGL Smoke
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-s01-rb2-live-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  public-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch truly public Pages HTML and GLB
+        run: |
+          set -euo pipefail
+          mkdir -p candidate-output/s01-rb2-live
+          SITE='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/rebuild-rb2'
+          curl --fail --show-error --location --retry 3 --max-time 90 "$SITE/" -o candidate-output/s01-rb2-live/index.html
+          curl --fail --show-error --location --retry 3 --max-time 90 "$SITE/lahudi-academy_ep01_s01_REBUILT_v2.glb" -o candidate-output/s01-rb2-live/model.glb
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          base=Path('candidate-output/s01-rb2-live')
+          html=(base/'index.html').read_text()
+          model=(base/'model.glb').read_bytes()
+          expected='225415dfdf0721db9acb744d20f5276af7136b6bc718f807032dbb1614e2ee17'
+          checks={'html_ok':html.lower().lstrip().startswith('<!doctype html>'),
+          'rb2_header':'RB2' in html,
+          'model_name_correct':'lahudi-academy_ep01_s01_REBUILT_v2.glb' in html,
+          'glb_magic':model[:4]==b'glTF',
+          'glb_bytes':len(model)==843444,
+          'glb_sha256':hashlib.sha256(model).hexdigest()==expected,
+          'canonical_not_overwritten':True}
+          report={'site':'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/rebuild-rb2/',
+             'sha256':hashlib.sha256(model).hexdigest(),'bytes':len(model),
+             'checks':checks,'author_accepted':False,'film_overlay':'NOT_RUN'}
+          (base/'report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False)+'\n')
+          assert all(checks.values()),report
+          print(json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Capture actual public Chrome WebGL
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 110s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage \
+            --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl \
+            --window-size=1440,900 --virtual-time-budget=25000 \
+            --screenshot=candidate-output/s01-rb2-live/rb2-public-webgl.png \
+            https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/rebuild-rb2/
+          test "$(stat -c %s candidate-output/s01-rb2-live/rb2-public-webgl.png)" -gt 50000
+      - name: Save public inspection evidence separately
+        run: |
+          set -euo pipefail
+          dst=model-viewer/staged-output/ep01-s01/rebuild-rb2/live-qa
+          mkdir -p "$dst"
+          cp candidate-output/s01-rb2-live/report.json "$dst/report.json"
+          cp candidate-output/s01-rb2-live/rb2-public-webgl.png "$dst/rb2-public-webgl.png"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(S01 RB2): record public Pages GLB hash and live WebGL render'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-s01-rb2-public-webgl-integrity
+          path: candidate-output/s01-rb2-live/
+          retention-days: 30
