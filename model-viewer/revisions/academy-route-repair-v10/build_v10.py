@@ -146,14 +146,14 @@ slab(-92.5,-84.0,-79.85,-78.25,kind="STAIR_GROUND_APPROACH")
 # upper landing and one elevated Z bridge, then X bridge into existing north door.
 beam(-90.95,-88.95,-79.9,-78.3,
      3.84,4.0,"floor","STAIR_UPPER_LANDING","skywalk_landing","NORTH_STAIR")
-beam(-90.25,-88.55,-79.15,-68.8,3.84,4.0,"floor",
+beam(-90.75,-88.55,-79.15,-68.8,3.84,4.0,"floor",
      "UPPER_SKYWALK_Z","skywalk_floor","NORTH_STAIR")
-beam(-90.25,-83.85,-69.8,-67.85,3.84,4.0,"floor",
+beam(-90.75,-83.85,-69.8,-67.85,3.84,4.0,"floor",
      "UPPER_SKYWALK_X","skywalk_floor","NORTH_STAIR")
 # Simple safety barriers for exposed flights and upper elevated walk.
 for x,side in ((-91.36,"first"),(-90.99,"second")):
  pass
-for x,tag in ((-90.40,"left"),(-88.40,"right")):
+for x,tag in ((-90.68,"left"),(-88.35,"right")):
  beam(x-.07,x+.07,-79.2,-70.25,4.08,5.14,"railing",
       "UPPER_SKYWALK_RAIL_"+tag,"guardrail","NORTH_STAIR")
 # Rail on landing outer edge (not across the path to the original north door)
