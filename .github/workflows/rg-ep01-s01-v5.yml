@@ -1,0 +1,81 @@
+name: RG EP01 S01 V5 Architectural Art QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - 'model-viewer/revisions/ep01-s01/scripts/enhance_s01_v5.py'
+      - 'model-viewer/revisions/ep01-s01/scripts/render_s01_blender_v5.py'
+      - '.github/workflows/rg-ep01-s01-v5.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-s01-v5-stage
+  cancel-in-progress: true
+jobs:
+  build-and-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Pillow for embedded winter scene texture
+        run: python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Rebuild S01 V5 candidate from unchanged academy source
+        run: |
+          python model-viewer/revisions/ep01-s01/scripts/enhance_s01_v5.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("candidate-output/report_v5.json").read_text())
+          assert r["source_7725_nodes_unchanged"] is True
+          assert r["S06_untouched"] is True
+          assert r["stage_curved_vault_pieces_adjusted"]>=150
+          assert r["embedded_winter_matte_png_bytes"]>10000
+          assert r["original_animation_camera_match"]=="NOT_RUN"
+          print("S01 V5 GLB valid",r["sha256"],r["bytes"],r["stage_curved_vault_pieces_adjusted"])
+          PY
+      - name: Install Blender software render and Xvfb
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender python3-numpy libegl1 libgl1-mesa-dri libgbm1 xvfb
+          blender --version | head -n 3
+      - name: Render actual V5 glTF materials with Eevee winter light
+        run: |
+          LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a blender --background --python-exit-code 17 --python model-viewer/revisions/ep01-s01/scripts/render_s01_blender_v5.py -- candidate-output/lahudi-academy_ep01_s01_corridor_v5_art_review.glb
+      - name: Inspect and stage candidate (production unchanged)
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("candidate-output/blender_v5/render_report.json").read_text())
+          assert r["corridor_meshes_rendered"]>10
+          assert len(r["image_files"])==3
+          assert all(Path(p).stat().st_size>10000 for p in r["image_files"])
+          assert r["original_EP01_footage_overlay"]=="NOT_RUN"
+          print("V5 3 Blender PBR views",r["image_files"])
+          PY
+          mkdir -p model-viewer/staged-output/ep01-s01/v5/blender
+          cp candidate-output/lahudi-academy_ep01_s01_corridor_v5_art_review.glb model-viewer/staged-output/ep01-s01/v5/
+          cp candidate-output/report_v5.json model-viewer/staged-output/ep01-s01/v5/
+          cp candidate-output/blender_v5/*.png model-viewer/staged-output/ep01-s01/v5/blender/
+          cp candidate-output/blender_v5/render_report.json model-viewer/staged-output/ep01-s01/v5/blender/
+      - name: Commit approved build outputs only to isolated stage branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/v5/
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(S01): V5 curved arch and embedded winter scene GLB, Eevee QA'
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rg-ep01-s01-v5-winter-corridor-candidate
+          path: |
+            candidate-output/lahudi-academy_ep01_s01_corridor_v5_art_review.glb
+            candidate-output/report_v5.json
+            candidate-output/blender_v5/
+          retention-days: 30
