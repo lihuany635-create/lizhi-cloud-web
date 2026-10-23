@@ -6,6 +6,7 @@ on:
       - '.github/workflows/rg-academy-v12-room-qa.yml'
       - 'model-viewer/revisions/academy-interior-v12/verify_furniture_placements_v12.py'
       - 'model-viewer/staged-output/academy-interior-furniture-v12/report.json'
+      - 'model-viewer/revisions/academy-interior-v12/build_v12_furnished_rooms.py'
   workflow_dispatch:
 permissions:
   contents: write
