@@ -1,0 +1,53 @@
+name: RG Academy V12 Interactive Interior Floor Screenshots
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v12-interior-visual-qa.yml'
+      - 'model-viewer/revisions/academy-interior-v12/inspect_public_v12_interior.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select real published academy interior views B1 B2 C1 G1 H1
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium)"             node model-viewer/revisions/academy-interior-v12/inspect_public_v12_interior.mjs
+      - name: Validate viewer cut-height, render info and all five screenshots
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          d=Path('candidate-output/academy-v12-interior-diagnostic')
+          j=json.loads((d/'interior-qa.json').read_text())
+          for name in ('B1','B2','C1','G1','H1'):
+           item=j['sections'][name]
+           assert item['control']['selected']==name
+           assert item['viewer']['webglLost'] is False
+           assert item['viewer']['render']['triangles']>5000
+           assert item['viewer']['visibleMeshes']>500
+           p=d/f'furniture-{name}-mobile.png'
+           assert p.stat().st_size>70000,(name,p.stat().st_size)
+          assert j['sections']['B2']['viewer']['cut']>j['sections']['B1']['viewer']['cut']
+          print('PASS: 5 1F/2F real interactive 3D interior camera screenshots')
+          PY
+      - name: Preserve visual QA and source console records
+        if: always()
+        run: |
+          d=model-viewer/staged-output/academy-interior-furniture-v12/interior-visual-qa
+          mkdir -p "$d"
+          cp candidate-output/academy-v12-interior-diagnostic/*.png "$d/" 2>/dev/null || true
+          cp candidate-output/academy-v12-interior-diagnostic/*.json "$d/" 2>/dev/null || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$d"
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy V12): save actual west east auditorium and archive interior views'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
