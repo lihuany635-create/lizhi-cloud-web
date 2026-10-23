@@ -1,0 +1,110 @@
+{
+  "scene": "EP01-S01",
+  "version": "S01-V7-VESTIBULES-REVIEW",
+  "status": "REAL_GLB_BUILT_REVIEW_ONLY",
+  "input_v6_sha256": "d062b88d2553d9ef0bbbce5da77980460ba65ad993cbcaf41c77112af27ec069",
+  "sha256": "a7c6cf6f9281c2758a450c12d3c0f8c70e9167a7efaaa8a6aba68533c64e11d7",
+  "bytes": 5566760,
+  "model": "lahudi-academy_ep01_s01_v7_vestibules_review.glb",
+  "source_nodes_preserved": 8139,
+  "added_nodes": 102,
+  "groups": {
+    "threshold": 12,
+    "side_wall": 12,
+    "back_wall": 6,
+    "roof": 6,
+    "bookshelf": 24,
+    "scenery": 12,
+    "light": 6,
+    "jamb": 12,
+    "skirting": 12
+  },
+  "vestibules": [
+    {
+      "door": 1,
+      "center_z_m": -5.53,
+      "depth_m": 2.35,
+      "clear_width_m": 1.58,
+      "threshold_m": 4.0,
+      "has_back_wall": true,
+      "has_side_walls": true,
+      "has_floor": true,
+      "room_purpose": "UNASSIGNED_BEYOND_CAMERA_FRUSTUM"
+    },
+    {
+      "door": 2,
+      "center_z_m": -2.53,
+      "depth_m": 2.35,
+      "clear_width_m": 1.58,
+      "threshold_m": 4.0,
+      "has_back_wall": true,
+      "has_side_walls": true,
+      "has_floor": true,
+      "room_purpose": "UNASSIGNED_BEYOND_CAMERA_FRUSTUM"
+    },
+    {
+      "door": 3,
+      "center_z_m": 0.47,
+      "depth_m": 2.35,
+      "clear_width_m": 1.58,
+      "threshold_m": 4.0,
+      "has_back_wall": true,
+      "has_side_walls": true,
+      "has_floor": true,
+      "room_purpose": "UNASSIGNED_BEYOND_CAMERA_FRUSTUM"
+    },
+    {
+      "door": 4,
+      "center_z_m": 3.47,
+      "depth_m": 2.35,
+      "clear_width_m": 1.58,
+      "threshold_m": 4.0,
+      "has_back_wall": true,
+      "has_side_walls": true,
+      "has_floor": true,
+      "room_purpose": "UNASSIGNED_BEYOND_CAMERA_FRUSTUM"
+    },
+    {
+      "door": 5,
+      "center_z_m": 6.47,
+      "depth_m": 2.35,
+      "clear_width_m": 1.58,
+      "threshold_m": 4.0,
+      "has_back_wall": true,
+      "has_side_walls": true,
+      "has_floor": true,
+      "room_purpose": "UNASSIGNED_BEYOND_CAMERA_FRUSTUM"
+    },
+    {
+      "door": 6,
+      "center_z_m": 9.47,
+      "depth_m": 1.28,
+      "clear_width_m": 1.52,
+      "threshold_m": 4.0,
+      "has_back_wall": true,
+      "has_side_walls": true,
+      "has_floor": true,
+      "room_purpose": "UNASSIGNED_BEYOND_CAMERA_FRUSTUM"
+    }
+  ],
+  "validation": {
+    "glb_reparse": "PASS",
+    "V6_node_graph_unchanged": true,
+    "scene_roots_preserved": true,
+    "six_openings_preserved": true,
+    "all_six_have_screen_depth": true,
+    "no_new_geometry_in_S06": true,
+    "source_side_stairs_preserved": true,
+    "3d_browser_render": "NOT_RUN",
+    "full_mesh_collision": "NOT_RUN",
+    "camera_overlay": "NOT_RUN",
+    "author_approved": false
+  },
+  "known_limits": [
+    "Vestibules are 1.28–2.35m deep partial rooms only; unseen Academy classrooms are not fully specified.",
+    "Existing legacy geometry behind doorways was not exhaustively collision-tested.",
+    "Room purpose and furniture beyond shallow camera-visible zone remain unassigned.",
+    "Front and side stairs both exist in this rehearsal asset; filmed staircase route not accepted.",
+    "This is a separate candidate. Public V5 and five canonical models remain unchanged."
+  ]
+}
