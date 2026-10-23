@@ -79,7 +79,7 @@ batch=collections.defaultdict(list);counts=collections.Counter();catalog=collect
 instances=[];rooms=[];blocks=[]
 def cube(zone,id,mat,x,y,z,sx,sy,sz,kind):
  assert min(sx,sy,sz)>.008,(id,sx,sy,sz)
- batch[(zone,mat)].append((id,x,y,z,sx,sy,sz,kind))
+ batch[(zone,mat,"2F" if y>3.55 else "1F")].append((id,x,y,z,sx,sy,sz,kind))
  counts[kind]+=1
 def emit(zone,kind,x,y,z,L,W,H,orient=0,room_id=""):
  # Parametric furniture facsimile at ACTUAL design-catalogue width/depth/height.
@@ -370,7 +370,7 @@ for j in range(3):
 # bake merged meshes like V11; keep original GLB nodes immutable, attach editable
 # instance-placement manifest and original 62 reusable standalone GLBs externally.
 baked=[]
-for (area,mat),parts in sorted(batch.items()):
+for (area,mat,layer),parts in sorted(batch.items()):
  pos=[];nor=[];inds=[];mi=[float("inf")]*3;ma=[-float("inf")]*3
  for name,x,y,z,sx,sy,sz,kind in parts:
   off=len(pos)//3
@@ -388,9 +388,9 @@ for (area,mat),parts in sorted(batch.items()):
  pa=len(acc);acc.append({"bufferView":pv,"componentType":5126,"count":v,"type":"VEC3","min":mi,"max":ma})
  na=len(acc);acc.append({"bufferView":nv,"componentType":5126,"count":v,"type":"VEC3"})
  ia=len(acc);acc.append({"bufferView":iv,"componentType":5125,"count":len(inds),"type":"SCALAR","min":[0],"max":[v-1]})
- m["meshes"].append({"name":TAG+area+"_"+mat,"primitives":[{"attributes":{"POSITION":pa,"NORMAL":na},"indices":ia,"material":materials[mat],"mode":4}]})
+ m["meshes"].append({"name":TAG+area+"_"+layer+"_"+mat,"primitives":[{"attributes":{"POSITION":pa,"NORMAL":na},"indices":ia,"material":materials[mat],"mode":4}]})
  m["nodes"].append({"name":TAG+area+"_"+mat,"mesh":len(m["meshes"])-1,"extras":{
-  "area":area,"material":mat,"baked_parts":len(parts),
+  "area":area,"material":mat,"floor_layer":layer,"baked_parts":len(parts),
   "version":"V12_PROVISIONAL_FURNITURE","actual_individual_GLBs_embedded":False,
   "all_previous_nodes_preserved":True,"author_approval":"PENDING"}})
  m["scenes"][m.get("scene",0)]["nodes"].append(len(m["nodes"])-1)
@@ -416,7 +416,7 @@ report={
  "sha256":hashlib.sha256(payload).hexdigest(),"bytes":len(payload),
  "source_v11_sha256":EXPECTED,
  "source_nodes_preserved":11923,"nodes":len(m["nodes"]),
- "new_batched_meshes":len(baked),"new_cubes":sum(counts.values()),
+ "new_batched_meshes":len(baked),"new_cubes":sum(counts.values()),"floor_aware_batched_meshes":True,
  "new_rooms":len(rooms),"furniture_instances":len(instances),
  "furniture_types_used":len(catalog),"catalog_max_types":62,
  "districts_furnished":sorted({x["zone"] for x in instances}),
