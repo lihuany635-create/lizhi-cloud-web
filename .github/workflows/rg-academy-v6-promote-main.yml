@@ -1,0 +1,58 @@
+name: RG Promote Complete Academy Campus V6 To Original GLB
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v6-promote-main.yml'
+      - 'model-viewer/revisions/academy-all-corridors/promote_entire_campus_v6.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-promote-academy-campus-v6
+  cancel-in-progress: true
+jobs:
+  publish-canonical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+          persist-credentials: false
+      - name: Promote V6 to same five-model collection
+        run: |
+          set -euo pipefail
+          python .academy-stage/model-viewer/revisions/academy-all-corridors/promote_entire_campus_v6.py
+      - name: Gate exactly allowed files before commit
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import subprocess
+          wanted={
+           'model-viewer/lahudi-academy.glb',
+           'model-viewer/index.html',
+           'model-viewer/current-models.json',
+           'model-viewer/backups/pre-academy-complete-campus-v6/lahudi-academy.glb'
+          }
+          diff=subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],text=True)
+          actual=set()
+          for item in diff.splitlines():
+           v=item[3:]
+           if v.startswith('.academy-stage/'):continue
+           actual.add(v)
+          assert actual==wanted,{'actual':actual,'wanted':wanted}
+          print('Only academy and model viewer were modified')
+          PY
+      - name: Commit and push one canonical V6 merge
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/lahudi-academy.glb model-viewer/current-models.json model-viewer/index.html model-viewer/backups/pre-academy-complete-campus-v6/lahudi-academy.glb
+          git commit -m 'feat(academy): truly complete eight-wing colored Gothic campus and fix tiny-view scale'
+          git push origin HEAD:refs/heads/main
