@@ -79,7 +79,7 @@ beam(-98.30,-97.70,36,40,3.57,3.95,"trim","D_WEST_PORTAL_LINTEL","door_header","
 for nm in ("C_EAST_south_low_wall_-35.00_-32.00",
  "C_EAST_south_low_wall_-28.00_-14.00",
  "C_EAST_south_portal_0_a","C_EAST_south_portal_0_b",
- "C_EAST_south_portal_0_head","C_EAST_south_baypier_1"):
+ "C_EAST_south_portal_0_head"):
  disable(nm,"C02 re-center south opening X=-34..-29")
 beam(-35,-34,23.775,24.225,0,3.55,"cold","C_EAST_NEW_SOUTH_LOW_0","structural_wall","C_EAST")
 beam(-29,-14,23.775,24.225,0,3.55,"cold","C_EAST_NEW_SOUTH_LOW_1","structural_wall","C_EAST")
@@ -173,7 +173,7 @@ OUT.mkdir(parents=True,exist_ok=True)
 f=OUT/NAME;f.write_bytes(data)
 parsed,binary,_=glb.load_glb(f)
 assert len(parsed["nodes"])==len(m["nodes"]) and len(binary)==len(buf)
-assert len(disabled)==(2+6+5+2+1)
+assert len(disabled)==(2+5+5+2+1)
 assert len(changed)>=8
 sha=hashlib.sha256(data).hexdigest()
 report={
