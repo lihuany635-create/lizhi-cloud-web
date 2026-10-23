@@ -1,0 +1,41 @@
+{
+  "version": "ACADEMY-INTERIOR-FURNITURE-V12-PHASE1",
+  "sha256": "89f93c091641b5c4b87644f31ec6bc8d2fd8dbc7af5ca97a1a97e4952c20f9d3",
+  "status": "PASS_COORDINATE_AND_PRESERVATION_ONLY",
+  "rooms_checked": 44,
+  "furniture_instances_checked": 1734,
+  "furniture_types_used": 30,
+  "counts_by_zone": {
+    "B": 1173,
+    "C": 440,
+    "D": 28,
+    "E": 21,
+    "G": 47,
+    "H": 25
+  },
+  "floor_origin_counts": {
+    "0": 908,
+    "4": 825,
+    "0.45": 1
+  },
+  "rooms_zone_B": 24,
+  "rooms_zone_C": 20,
+  "stair_count": 2,
+  "riser_per_stair": 26,
+  "locked_masterplan_8_districts": true,
+  "original_A01_and_main_library_protected": true,
+  "source_scene_11923_nodes_bytewise_same_json": true,
+  "no_furniture_outside_district_or_y_without_slab": true,
+  "real_62_GLBS_embedded": false,
+  "original_62_GLBS_available_as_separate_user_asset_pack": true,
+  "actual_story_classroom_layout_accepted": false,
+  "full_102_room_plan_implemented": false,
+  "animation_camera_qa": "NOT_RUN",
+  "user_requested_character_collision": "SKIPPED",
+  "unresolved": [
+    "A_MAIN/F_LIBRARY room subdivision and pre-existing furniture count audit",
+    "All 62 source standalone GLB meshes are NOT byte-for-byte imported to V12; V12 uses low-poly approximations keyed to their IDs",
+    "Planned 102 rooms not yet built; phase1 room divisions are provisional",
+    "Visual QA and scene camera evaluation needed before final furniture lock"
+  ]
+}
