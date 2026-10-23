@@ -1,0 +1,315 @@
+{
+  "school": "拉乎迪學院",
+  "scene": "RG-GAME-02",
+  "version": "ACADEMY-RB2-ENTIRE-CAMPUS-V6",
+  "model": "lahudi-academy_ENTIRE-GOTHIC-CAMPUS_RB2_v6.glb",
+  "sha256": "e3d2465807cba69ba52a3d1df2a9e3f84a77a970f94301bdeaecd26537d5a6bc",
+  "bytes": 9315360,
+  "parent_v5_sha256": "347ba0a423726d4a2c83e1ddc568509a5b3ac35ca99dc6019f513085053b842f",
+  "source_nodes": 11097,
+  "total_nodes": 16242,
+  "new_architectural_nodes": 5145,
+  "old_distant_terrain_outliers_disabled": [
+    "RG-GAME-02-ACOR-004__foothill",
+    "RG-GAME-02-ACOR-004__rock",
+    "RG-GAME-02-ACOR-004__snowcap",
+    "RG-GAME-02-ACOR-004__curved_road"
+  ],
+  "previous_v5_classrooms_and_library_unchanged": true,
+  "previous_v5_corridors_and_stairs_unchanged": true,
+  "campus_added_wings": [
+    {
+      "area": "WEST_CLASSROOM_GALLERY",
+      "role": "western teaching wing",
+      "bbox_x": [
+        -124,
+        -103
+      ],
+      "bbox_z": [
+        -68.0,
+        24.0
+      ],
+      "entrance": [
+        "south",
+        3.3
+      ]
+    },
+    {
+      "area": "EAST_CLASSROOM_GALLERY",
+      "role": "eastern teaching wing",
+      "bbox_x": [
+        -57.0,
+        -36.5
+      ],
+      "bbox_z": [
+        -67.6,
+        24.1
+      ],
+      "entrance": [
+        "south",
+        3.2
+      ]
+    },
+    {
+      "area": "NORTH_COLLEGE_LINK",
+      "role": "north academic cross wing",
+      "bbox_x": [
+        -120.0,
+        -90.5
+      ],
+      "bbox_z": [
+        -104.8,
+        -80.5
+      ],
+      "entrance": [
+        "south",
+        3.5
+      ]
+    },
+    {
+      "area": "NORTH_ARCHIVE_WING",
+      "role": "north archive cross wing",
+      "bbox_x": [
+        -78.0,
+        -43.0
+      ],
+      "bbox_z": [
+        -104.8,
+        -81.5
+      ],
+      "entrance": [
+        "south",
+        3.4
+      ]
+    },
+    {
+      "area": "SOUTH_CAMPUS_GALLERY",
+      "role": "main front gallery west",
+      "bbox_x": [
+        -125.5,
+        -91.0
+      ],
+      "bbox_z": [
+        25.0,
+        45.0
+      ],
+      "entrance": [
+        "north",
+        3.3
+      ]
+    },
+    {
+      "area": "SOUTH_CAMPUS_HALL",
+      "role": "main front gallery east",
+      "bbox_x": [
+        -62.0,
+        -34.0
+      ],
+      "bbox_z": [
+        25.0,
+        45.0
+      ],
+      "entrance": [
+        "north",
+        3.2
+      ]
+    },
+    {
+      "area": "CHAPEL_WESTERN_GALLERY",
+      "role": "historic chapel/assembly wing",
+      "bbox_x": [
+        -121.5,
+        -96.0
+      ],
+      "bbox_z": [
+        -170.0,
+        -125.0
+      ],
+      "entrance": [
+        "south",
+        3.3
+      ]
+    },
+    {
+      "area": "LIBRARY_EAST_ARCHIVE",
+      "role": "outer library archive",
+      "bbox_x": [
+        4.2,
+        27.0
+      ],
+      "bbox_z": [
+        -174.2,
+        -143.0
+      ],
+      "entrance": [
+        "north",
+        3.4
+      ]
+    }
+  ],
+  "wing_count_added": 8,
+  "new_regions": {
+    "COURTYARD": 86,
+    "WEST_CLASSROOM_GALLERY": 1237,
+    "EAST_CLASSROOM_GALLERY": 1237,
+    "NORTH_COLLEGE_LINK": 333,
+    "NORTH_ARCHIVE_WING": 333,
+    "SOUTH_CAMPUS_GALLERY": 333,
+    "SOUTH_CAMPUS_HALL": 333,
+    "CHAPEL_WESTERN_GALLERY": 613,
+    "LIBRARY_EAST_ARCHIVE": 473,
+    "CAMPUS_LINK": 18,
+    "FRONT_GATE": 113,
+    "TOWERS": 36
+  },
+  "new_geometry_types": {
+    "paved_courtyard": 3,
+    "ceremonial_walk": 1,
+    "path_border": 2,
+    "foundation": 8,
+    "masonry_wall": 384,
+    "lancet_glass": 256,
+    "stone_window_mullion": 768,
+    "window_sill": 256,
+    "pointed_arch": 2948,
+    "buttress": 128,
+    "sconce": 42,
+    "sconce_light": 42,
+    "gable_wall": 24,
+    "open_entry_portal": 8,
+    "pitched_roof": 16,
+    "roof_rake": 32,
+    "roof_ridge": 8,
+    "corner_buttress": 32,
+    "spire_finial": 44,
+    "facade_belt": 8,
+    "connective_paving": 6,
+    "path_rim": 12,
+    "entrance_colonnade_pier": 13,
+    "courtyard_garden_post": 24,
+    "garden_patch": 13,
+    "planter": 13,
+    "tree_trunk": 13,
+    "evergreen_canopy": 13,
+    "fountain_basin": 1,
+    "fountain_water": 1,
+    "fountain_sculpture": 2,
+    "spire_tower": 12,
+    "spire_roof": 12
+  },
+  "winter_base_recolored_to_blue_gray": true,
+  "contrasting_stone_plazas": 3,
+  "glass_and_stone_roof_material_palette": {
+    "ash_stone": [
+      0.3,
+      0.37,
+      0.44,
+      1
+    ],
+    "sand_stone": [
+      0.46,
+      0.39,
+      0.33,
+      1
+    ],
+    "cream_trim": [
+      0.69,
+      0.6,
+      0.46,
+      1
+    ],
+    "blue_trim": [
+      0.54,
+      0.6,
+      0.66,
+      1
+    ],
+    "slate": [
+      0.055,
+      0.1,
+      0.16,
+      1
+    ],
+    "copper_roof": [
+      0.21,
+      0.3,
+      0.29,
+      1
+    ],
+    "gothic_glass": [
+      0.16,
+      0.37,
+      0.59,
+      0.78
+    ],
+    "stained_glass": [
+      0.23,
+      0.43,
+      0.6,
+      0.88
+    ],
+    "wood": [
+      0.24,
+      0.105,
+      0.062,
+      1
+    ],
+    "gold": [
+      0.75,
+      0.46,
+      0.14,
+      1
+    ],
+    "dark_iron": [
+      0.1,
+      0.12,
+      0.16,
+      1
+    ],
+    "plaza": [
+      0.22,
+      0.26,
+      0.31,
+      1
+    ],
+    "plaza_band": [
+      0.13,
+      0.17,
+      0.22,
+      1
+    ],
+    "grass": [
+      0.2,
+      0.29,
+      0.26,
+      1
+    ],
+    "fountain_water": [
+      0.16,
+      0.34,
+      0.43,
+      1
+    ],
+    "snowbank": [
+      0.61,
+      0.67,
+      0.72,
+      1
+    ],
+    "light": [
+      0.99,
+      0.57,
+      0.21,
+      1
+    ]
+  },
+  "real_entrance_openings_in_wing_gables": true,
+  "cloister_from_v5_preserved": true,
+  "same_complete_singular_glb": true,
+  "GLB_reparse": "PASS",
+  "rendering": "NOT_RUN",
+  "mobile_camera_still_requires_current_geometry_bounding_audit": true,
+  "ground_passage_collisions": "NOT_RUN",
+  "author_visual_acceptance": "PENDING",
+  "footnote": "Eight added buildings represent coherent exterior architectural wing designs; interiors of new wings are deliberately not asserted as modeled."
+}
