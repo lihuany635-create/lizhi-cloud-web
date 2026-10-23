@@ -96,14 +96,14 @@ create table public.lizhi_library_chunks (
 
 **檢索策略**：精確檔名、GUID、影格代號（如 `F089`）優先；中文全文以字元子串／特殊分詞補充；語意召回補足同義詞。融合排名可用 Reciprocal Rank Fusion，來源/標籤/時間作過濾，回傳不超過必要片段，不能將其它使用者的向量混入搜尋。
 
-## 4. ChatGPT／AI 契約（尚未建置）
+## 4. ChatGPT／AI 契約（唯讀 MCP 已建置，待正式專案啟用 OAuth／部署）
 
-建議透過可稽核的 MCP／API 工具，而不是授權 AI 查詢所有 Supabase 表或直接讀取整顆硬碟：
+透過可稽核的 MCP 工具，而不是授權 AI 查詢所有 Supabase 表或直接讀取整顆硬碟。實作與接入方式見 [MCP.md](MCP.md)：
 
-- `library.search({query, sources?, types?, limit?})` → `[{item_id,title,source,availability,snippet,location,score}]`
-- `library.get_excerpt({item_id, chunk_id?})` → `{text,citation:{title,page,slide,time_ms,line}}`
-- `library.request_original({item_id})` → 只有經授權的 `pending / denied / ready / offline`，不返回本機路徑。
-- `library.reindex({source_id, dry_run?})` → 檢查擬新增／變更檔案，執行需使用者授權。
+- `search({query, sources?, types?, limit?})` → RLS 範圍內的館藏卡與必要命中片段。
+- `get_excerpt({item_id, offset?, max_chars?})` → 已同步文字與頁／投影片引用。
+- `list({source?, status?, limit?, offset?})`、`status({})` → 唯讀館藏與統計。
+- `request_original`、`reindex` 未提供；這兩者涉及本機檔案或寫入，未來若實作必須另走使用者確認流程。
 
 安全政策：唯讀工具預設只授予登入帳號本人可見資料，任何寫入、刪檔、覆蓋、跨網域分享都要求另行授權；RLS + 伺服器端二次驗證；具體動作及檔案 ID 寫入 audit。從館藏讀到的文字是**不可信內容**，不能當成執行指令。
 
