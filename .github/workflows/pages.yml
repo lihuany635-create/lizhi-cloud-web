@@ -99,6 +99,35 @@ jobs:
           print('RG S01 preview assembled:',target,'bytes',target.stat().st_size)
           PY
           rm -rf _rg_s01_candidate
+      - name: Pin S01 V7 independently of V5 and canonical academy
+        uses: actions/checkout@v4
+        with:
+          ref: 23d7e9dcff72d6e3d339b27a1de98c74690fe6bf
+          path: _rg_s01_v7
+          sparse-checkout: model-viewer/staged-output/ep01-s01/v7
+          persist-credentials: false
+      - name: Assemble S01 V7 TEST preview with exact SHA256
+        run: |
+          python - <<'PY'
+          import pathlib,hashlib,json,shutil
+          p=pathlib.Path('_rg_s01_v7/model-viewer/staged-output/ep01-s01/v7')
+          report=json.loads((p/'report_v7.json').read_text(encoding='utf-8'))
+          source=p/'lahudi-academy_ep01_s01_v7_vestibules_review.glb'
+          expected='a7c6cf6f9281c2758a450c12d3c0f8c70e9167a7efaaa8a6aba68533c64e11d7'
+          assert report['sha256']==expected, 'V7 report integrity mismatch'
+          assert report['bytes']==5566760
+          assert report['validation']['six_openings_preserved']
+          assert report['validation']['no_new_geometry_in_S06']
+          data=source.read_bytes()
+          assert len(data)==5566760 and data[:4]==b'glTF'
+          assert hashlib.sha256(data).hexdigest()==expected, 'V7 model hash changed'
+          target=pathlib.Path('model-viewer/s01-preview/v7/lahudi-academy-s01-v7.glb')
+          target.parent.mkdir(parents=True,exist_ok=True)
+          target.write_bytes(data)
+          assert hashlib.sha256(target.read_bytes()).hexdigest()==expected
+          print('S01 V7 TEST preview ready:',len(data),'bytes')
+          PY
+          rm -rf _rg_s01_v7
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
