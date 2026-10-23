@@ -271,6 +271,18 @@ block("D_ENTRANCE","CLOCK_FACE_BACK","recess",(-70.1,16.6,25.83),
 for i,(x,y) in enumerate(((-70.1,17.95),(-70.1,15.25),(-71.45,16.6),(-68.75,16.6))):
  block("D_ENTRANCE","CLOCK_MARK_"+str(i),"bronze",(x,y,25.69),
        (.18,.35,.13),"clock_hour_mark")
+# Exterior portal reliefs at the two D-wing public gates: no opaque wooden leaf
+# is placed in any real route opening. Work above or outside walkable clear span.
+for cx,gate,zone in ((-87.5,"WEST_GATE","D_WEST_ENTRY"),(-31.5,"EAST_GATE","D_EAST_ENTRY")):
+ z=53.28
+ pointed_arch(zone,gate+"_carved_crown","z",z,cx,4.30,4.10,.80)
+ block(zone,gate+"_keystone","bronze",(cx,5.06,z),(.25,.43,.24),"entrance_keystone")
+ for i,x in enumerate((cx-2.8,cx+2.8)):
+  block(zone,gate+"_lamp_"+str(i),"warm_lamp",(x,3.55,z),(.22,.44,.23),
+        "entry_lantern")
+  block(zone,gate+"_lamp_mount_"+str(i),"bronze",(x,3.27,z+.08),(.29,.14,.30),
+        "entry_lamp_mount")
+
 # Main entry axial stair kept intact: decorate sides, NOT stair treads.
 for x,label in ((-74.90,"west"),(-65.20,"east")):
  block("D_ENTRANCE","STAIR_ENTRY_BUTTRESS_"+label,"carved_stone",(x,1.05,45.5),
@@ -362,7 +374,7 @@ report={"version":"ACADEMY-LOCKED-PLAN-EXTERIOR-GOTHIC-FINISH-V11",
  "special_features":["Gothic pointed upper lancet stone frames","deep-blue glazing in actual upper open-wall bands",
                      "copper gutters and limestone cornices","dark-slate roof dormers",
                      "gable crests and bronze finials","clock-tower stone stringcourses and clock dial",
-                     "timber double main-entry doors and warm brass lanterns",
+                     "ornamental main-gate arch crowns and warm brass lanterns without blocking portals",
                      "courtyard paving and small winter shrubs"],
  "lower_opaque_wall_windows_are_blind_architectural_insets":"YES, do NOT call them openings",
  "visual_render":"NOT_RUN",
