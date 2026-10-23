@@ -41,13 +41,13 @@ def main():
         rib=is_rib(name);panel=is_panel(name)
         if not (rib or panel):continue
         if rib:
-            m=re.search(r"rib_?(\\d{1,2})$",name)
+            m=re.search(r"rib_?(\d{1,2})$",name)
             if not m:continue
             i=int(m.group(1))
             n=14 if "new_bay" in name else 12
-            if re.search(r"__bay\\d+_rib\\d+$",name):i-=1
+            if re.search(r"__bay\d+_rib\d+$",name):i-=1
         else:
-            m=re.search(r"strip(\\d{1,2})$",name)
+            m=re.search(r"strip(\d{1,2})$",name)
             if not m:continue
             i=int(m.group(1))-1;n=14
         if not 0<=i<n:continue
@@ -78,7 +78,7 @@ def main():
     model["buffers"][0]["byteLength"]=len(buf)
     jb=json.dumps(model,ensure_ascii=False,separators=(",",":")).encode("utf-8")
     jb+=b" "*((-len(jb))%4)
-    buf+=b"\\x00"*((-len(buf))%4)
+    buf+=b"\x00"*((-len(buf))%4)
     raw=(struct.pack("<4sII",b"glTF",2,12+8+len(jb)+8+len(buf))+
          struct.pack("<II",len(jb),glb.CHUNK_JSON)+jb+
          struct.pack("<II",len(buf),glb.CHUNK_BIN)+bytes(buf))
@@ -107,6 +107,6 @@ def main():
        "Five production canonical models and S06 are unchanged."
       ]
     }
-    (OUT/"report_v8.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\\n")
+    (OUT/"report_v8.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
     print(json.dumps(report,ensure_ascii=False),flush=True)
 if __name__=="__main__":main()
