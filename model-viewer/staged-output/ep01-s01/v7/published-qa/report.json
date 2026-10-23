@@ -1,0 +1,17 @@
+{
+  "url": "https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/v7/",
+  "file_bytes": 5566760,
+  "sha256": "a7c6cf6f9281c2758a450c12d3c0f8c70e9167a7efaaa8a6aba68533c64e11d7",
+  "checks": {
+    "preview_html_ok": true,
+    "S01_V7_visible": true,
+    "model_path": true,
+    "expected_SHA_embedded": true,
+    "GLB_magic": true,
+    "GLB_length": true,
+    "GLB_SHA256": true,
+    "V5_rollback_link": true
+  },
+  "render_qa": "SEPARATE_BROWSER_CHECK",
+  "canonical_unchanged": true
+}
