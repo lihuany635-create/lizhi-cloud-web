@@ -1,0 +1,171 @@
+{
+  "project": "現實遊戲",
+  "scene": "RG-GAME-02",
+  "name": "拉乎迪學院",
+  "plan_id": "ACADEMY_LOCKED_MASTERPLAN_V1",
+  "source_book_url": "https://docs.google.com/document/d/1seSK9uMrnNV2_Mh1RwmG50JtjFgXqJzHOQoCqiNFTPQ/edit?usp=drivesdk",
+  "coordinate_unit": "meters",
+  "coordinate_system": "glb_existing_XYZ",
+  "status": "AUTHOR_PLAN_SELECTED_NOT_ENGINEERING_APPROVED",
+  "preserve_exact_geometry": [
+    "RG-GAME-02-A1-005__open_door",
+    "RG-GAME-02-CROOM-005__open_door",
+    "RG-GAME-02-CONFESS-005__tread_0",
+    "RG-GAME-02-ROOF-001__approach__tread0"
+  ],
+  "zones": [
+    {
+      "id": "A_MAIN",
+      "x": [
+        -87.95,
+        -67.18
+      ],
+      "z": [
+        -67.85,
+        26.14
+      ],
+      "footprint_m2": 1952.17,
+      "revision": "EXISTING_CORE"
+    },
+    {
+      "id": "B_WEST",
+      "x": [
+        -139,
+        -114
+      ],
+      "z": [
+        -68,
+        24
+      ],
+      "footprint_m2": 2300,
+      "revision": "MOVE_TO_LOCKED_FOOTPRINT"
+    },
+    {
+      "id": "C_EAST",
+      "x": [
+        -35,
+        -14
+      ],
+      "z": [
+        -68,
+        24
+      ],
+      "footprint_m2": 1932,
+      "revision": "MOVE_TO_LOCKED_FOOTPRINT"
+    },
+    {
+      "id": "D_ENTRANCE",
+      "x": [
+        -98,
+        -22
+      ],
+      "z": [
+        30,
+        53
+      ],
+      "footprint_m2": 1748,
+      "revision": "BUILD_AROUND_EXISTING_CLOCK_AXIS_X_MINUS_70_1"
+    },
+    {
+      "id": "E_NORTH",
+      "x": [
+        -118,
+        -40
+      ],
+      "z": [
+        -112,
+        -82
+      ],
+      "footprint_m2": 2340,
+      "revision": "MAKE_THREE_SHORT_ROOFS"
+    },
+    {
+      "id": "F_LIBRARY",
+      "x": [
+        -49.2,
+        -2.2
+      ],
+      "z": [
+        -183.2,
+        -142.75
+      ],
+      "footprint_m2": 1901.15,
+      "revision": "EXISTING_CORE_CUT_GROUND_ENTRY"
+    },
+    {
+      "id": "G_ASSEMBLY",
+      "x": [
+        -123,
+        -95
+      ],
+      "z": [
+        -170,
+        -125
+      ],
+      "footprint_m2": 1260,
+      "revision": "NEW_SHELL"
+    },
+    {
+      "id": "H_ARCHIVE",
+      "x": [
+        4,
+        28
+      ],
+      "z": [
+        -174,
+        -143
+      ],
+      "footprint_m2": 744,
+      "revision": "NEW_SHELL"
+    }
+  ],
+  "total_rectangular_footprint_m2": 14177.32,
+  "unresolved": [
+    {
+      "id": "A01_WIDTH",
+      "measured_span_m": 4.5,
+      "animated_candidate_clear_width_m": 5.2,
+      "status": "UNRESOLVED"
+    },
+    {
+      "id": "A01_DOUBLE_HEIGHT",
+      "floor2_y_m": 4,
+      "proposed_roof_crown_y_m": 13.2,
+      "floor3_y_m": 8,
+      "status": "DO_NOT_BUILD_3F_SLAB_OVER_VAULT"
+    },
+    {
+      "id": "ENTRANCE_AXIS",
+      "locked_footprint_center_x": -60,
+      "existing_clock_x": -70.1,
+      "delta_m": 10.1,
+      "status": "USE_ASYMMETRIC_WINGS"
+    },
+    {
+      "id": "LIBRARY_AXIS",
+      "shared_east_frontage_x": [
+        -49.2,
+        -40
+      ],
+      "link_axis_x": -45,
+      "status": "OFFSET_LIBRARY_CONNECTOR"
+    }
+  ],
+  "first_pass_scope": [
+    "footprint",
+    "real_thickness_exterior_walls",
+    "actual_open_portals",
+    "roof_gables",
+    "clock_tower_preserved",
+    "entry_stair_preserved",
+    "connected_walkway_floor"
+  ],
+  "exclude": [
+    "interior_furniture",
+    "fine_material_decals",
+    "decorative_sculptures",
+    "rendered_scene"
+  ],
+  "canonical_file": "model-viewer/lahudi-academy.glb",
+  "source_model_v8_sha256": "07392e83c165854c00f13fb39687253fbd185a1a5aa0d134264651a626af8c8f"
+}
