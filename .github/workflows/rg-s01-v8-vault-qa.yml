@@ -1,0 +1,130 @@
+name: RG EP01 S01 V8 Vault Lighting Review
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-s01-v8-vault-qa.yml'
+      - 'model-viewer/revisions/ep01-s01/scripts/enhance_s01_v8_vault.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-s01-v8-vault-qa
+  cancel-in-progress: true
+jobs:
+  build-render-compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Rebuild V8 real GLB from pinned V7
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/ep01-s01/scripts/enhance_s01_v8_vault.py
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          root=Path('candidate-output')
+          r=json.loads((root/'report_v8.json').read_text())
+          data=(root/r['model']).read_bytes()
+          assert hashlib.sha256(data).hexdigest()==r['sha256']
+          assert r['changed_vault_nodes']>=150 and r['curved_vault_apex_m']>7.7
+          assert r['base_7725_nodes_unchanged'] and r['v6_v7_door_and_vestibule_nodes_unchanged']
+          assert r['no_new_geometry_in_S06'] and r['structural_GLTF_reload']=='PASS'
+          print('V8 true GLB structurally valid:',r['sha256'])
+          PY
+      - name: Build two same-camera local WebGL preview pages
+        run: |
+          set -euo pipefail
+          mkdir -p candidate-output/compare/v7 candidate-output/compare/v8
+          curl --fail --show-error --location --retry 2 --max-time 70 \
+            https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/v7/ \
+            -o candidate-output/compare/v7/index.html
+          cp model-viewer/staged-output/ep01-s01/v7/lahudi-academy_ep01_s01_v7_vestibules_review.glb candidate-output/compare/v7/lahudi-academy-s01-v7.glb
+          cp candidate-output/lahudi-academy_ep01_s01_v8_vault_floor_review.glb candidate-output/compare/v8/lahudi-academy-s01-v8.glb
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          src=Path('candidate-output/compare/v7/index.html').read_text()
+          r=json.loads(Path('candidate-output/report_v8.json').read_text())
+          old='a7c6cf6f9281c2758a450c12d3c0f8c70e9167a7efaaa8a6aba68533c64e11d7'
+          assert old in src and 'lahudi-academy-s01-v7.glb' in src
+          # Both views inherit exactly the same approved LEFT DOORS / RIGHT WINDOWS camera.
+          assert 'pos:[-70.43,5.50,5.4],target:[-70.43,5.72,-11.3],fov:68' in src
+          new=src.replace(old,r['sha256']).replace('lahudi-academy-s01-v7.glb','lahudi-academy-s01-v8.glb')
+          new=new.replace('S01 V7','S01 V8')
+          Path('candidate-output/compare/v8/index.html').write_text(new)
+          PY
+      - name: Real headless Chrome WebGL paired screenshots
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8148 --bind 127.0.0.1 --directory candidate-output/compare > candidate-output/compare/http.log 2>&1 &
+          sleep 2
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          for rev in v7 v8; do
+            timeout 90s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage \
+              --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl \
+              --window-size=1440,900 --virtual-time-budget=18000 \
+              --screenshot="candidate-output/compare/${rev}.png" "http://127.0.0.1:8148/${rev}/"
+            test "$(stat -c %s candidate-output/compare/${rev}.png)" -gt 50000
+          done
+      - name: Save visual difference contact sheet and limits
+        run: |
+          python -m pip -q install pillow
+          python - <<'PY'
+          from PIL import Image,ImageChops,ImageDraw
+          from pathlib import Path
+          import json,hashlib
+          out=Path('candidate-output/compare')
+          a=Image.open(out/'v7.png').convert('RGB')
+          b=Image.open(out/'v8.png').convert('RGB')
+          assert a.size==b.size
+          # Body-only comparison excludes UI labels/header changes.
+          clip=(18,305,min(a.width,1408),min(a.height,895))
+          dif=ImageChops.difference(a.crop(clip),b.crop(clip))
+          hist=dif.histogram()
+          mean_abs=sum((i%256)*count for i,count in enumerate(hist))/(a.crop(clip).width*a.crop(clip).height*3)
+          canvas=Image.new('RGB',(a.width*2,a.height+44),(25,30,36))
+          canvas.paste(a,(0,44));canvas.paste(b,(a.width,44))
+          ImageDraw.Draw(canvas).text((22,14),'S01 V7 baseline / left',fill='white')
+          ImageDraw.Draw(canvas).text((a.width+22,14),'S01 V8 stage / right',fill='white')
+          canvas.save(out/'v7-v8-side-by-side.png')
+          record={'scene':'EP01-S01','camera':'same-published-film-direction-V7-camera',
+            'render':'Chrome real local WebGL','pixel_mae_canvas_0_255':round(mean_abs,4),
+            'reference_film_match':'NOT_RUN','V8_acceptance':'AUTHOR_PENDING',
+            'S06_unchanged':True,'canonical_unchanged':True,
+            'notes':'Image difference alone cannot prove improvement; compare to EP01 film A01 02:36 and A02 00:12.'}
+          (out/'visual-qa.json').write_text(json.dumps(record,indent=2)+'\n')
+          print(json.dumps(record))
+          PY
+      - name: Preserve only staged V8 model and evidence on staging branch
+        run: |
+          set -euo pipefail
+          DST=model-viewer/staged-output/ep01-s01/v8
+          mkdir -p "$DST"
+          cp candidate-output/lahudi-academy_ep01_s01_v8_vault_floor_review.glb "$DST/"
+          cp candidate-output/report_v8.json "$DST/"
+          cp candidate-output/compare/v7-v8-side-by-side.png "$DST/"
+          cp candidate-output/compare/visual-qa.json "$DST/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$DST"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(S01): save V8 vault material GLB and same-camera V7 comparison'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ep01-s01-v8-actual-glb-render-qa
+          path: |
+            candidate-output/report_v8.json
+            candidate-output/compare/v7.png
+            candidate-output/compare/v8.png
+            candidate-output/compare/v7-v8-side-by-side.png
+            candidate-output/compare/visual-qa.json
+          retention-days: 30
