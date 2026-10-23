@@ -1,0 +1,270 @@
+{
+  "scene": "RG-GAME-02",
+  "name": "拉乎迪學院",
+  "version": "ACADEMY-RB2-GOTHIC-ALL-CORRIDORS-V1",
+  "status": "REAL_COMPLETE_SCHOOL_GLB_REVIEW_ONLY",
+  "model": "lahudi-academy_ALL-CORRIDORS_RB2-GOTHIC_v1.glb",
+  "source_canonical_glb_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+  "output_sha256": "3ba0261dffb76f277c64f88ad186203335de0b81e5ac1fa3a04cba16d7fe556c",
+  "bytes": 5722664,
+  "source_nodes": 7725,
+  "result_nodes": 8931,
+  "disabled_legacy_corridor_nodes": 37,
+  "legacy_geometry_restorable": true,
+  "added_corridor_nodes": 1206,
+  "corridor_length_m": 85.42,
+  "corridor_width_m": 4.5,
+  "corridor_world_range": {
+    "x": [
+      -72.5,
+      -68.0
+    ],
+    "y_floor": 4.0,
+    "z": [
+      -67.5,
+      17.92
+    ]
+  },
+  "native_classes_preserved": [
+    "RG-GAME-02-A1-005",
+    "RG-GAME-02-CROOM-005"
+  ],
+  "native_staircases_preserved": [
+    "RG-GAME-02-ROOF-001",
+    "RG-GAME-02-CONFESS-005__tread_"
+  ],
+  "zones": {
+    "connector": 7,
+    "roof_stair_lobby": 2,
+    "classroom_A1": 3,
+    "classroom_C": 2,
+    "confession": 5,
+    "entrance_lobby": 1
+  },
+  "added_groups": {
+    "continuous_floor": 1,
+    "floor_border": 2,
+    "vault_surface": 440,
+    "rib": 360,
+    "tile": 20,
+    "pilaster": 40,
+    "capital": 40,
+    "dado": 20,
+    "window": 40,
+    "tracery": 80,
+    "left_wall": 17,
+    "door_panel": 17,
+    "door_frame": 51,
+    "sconce": 60,
+    "real_classroom_jamb": 4,
+    "real_classroom_lintel": 2,
+    "reflective_inlay": 5,
+    "turning_lobby": 1,
+    "portal_header": 2,
+    "portal_jamb": 4
+  },
+  "disabled": [
+    {
+      "index": 6575,
+      "name": "RG-GAME-02-EXT-002__wall",
+      "mesh": 1277
+    },
+    {
+      "index": 6576,
+      "name": "RG-GAME-02-EXT-002__wall",
+      "mesh": 1278
+    },
+    {
+      "index": 6577,
+      "name": "RG-GAME-02-EXT-002__wall",
+      "mesh": 1279
+    },
+    {
+      "index": 6578,
+      "name": "RG-GAME-02-EXT-002__sill",
+      "mesh": 1280
+    },
+    {
+      "index": 6579,
+      "name": "RG-GAME-02-EXT-002__head",
+      "mesh": 1281
+    },
+    {
+      "index": 6580,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1282
+    },
+    {
+      "index": 6581,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1283
+    },
+    {
+      "index": 6582,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1284
+    },
+    {
+      "index": 6583,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1285
+    },
+    {
+      "index": 6584,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1286
+    },
+    {
+      "index": 6585,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1287
+    },
+    {
+      "index": 6586,
+      "name": "RG-GAME-02-EXT-002__sill",
+      "mesh": 1288
+    },
+    {
+      "index": 6587,
+      "name": "RG-GAME-02-EXT-002__head",
+      "mesh": 1289
+    },
+    {
+      "index": 6588,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1290
+    },
+    {
+      "index": 6589,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1291
+    },
+    {
+      "index": 6590,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1292
+    },
+    {
+      "index": 6591,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1293
+    },
+    {
+      "index": 6592,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1294
+    },
+    {
+      "index": 6593,
+      "name": "RG-GAME-02-EXT-002__mullion",
+      "mesh": 1295
+    },
+    {
+      "index": 6598,
+      "name": "RG-GAME-02-ACOR-002__floor",
+      "mesh": 1300
+    },
+    {
+      "index": 7119,
+      "name": "RG-GAME-02-CONFESS-001__window_sill",
+      "mesh": 1821
+    },
+    {
+      "index": 7120,
+      "name": "RG-GAME-02-CONFESS-001__frame",
+      "mesh": 1822
+    },
+    {
+      "index": 7121,
+      "name": "RG-GAME-02-CONFESS-001__frame",
+      "mesh": 1823
+    },
+    {
+      "index": 7122,
+      "name": "RG-GAME-02-CONFESS-001__frame",
+      "mesh": 1824
+    },
+    {
+      "index": 7626,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "mesh": 2320
+    },
+    {
+      "index": 7628,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "mesh": 2321
+    },
+    {
+      "index": 7630,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "mesh": 2322
+    },
+    {
+      "index": 7632,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "mesh": 2323
+    },
+    {
+      "index": 7634,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "mesh": 2324
+    },
+    {
+      "index": 7636,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "mesh": 2325
+    },
+    {
+      "index": 7638,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "mesh": 2326
+    },
+    {
+      "index": 7640,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "mesh": 2327
+    },
+    {
+      "index": 7642,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "mesh": 2328
+    },
+    {
+      "index": 7644,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "mesh": 2329
+    },
+    {
+      "index": 7674,
+      "name": "RG-GAME-02-CONFESS-005__end_wall",
+      "mesh": 2352
+    },
+    {
+      "index": 7675,
+      "name": "RG-GAME-02-CONFESS-005__occlusion_wall",
+      "mesh": 2353
+    },
+    {
+      "index": 7676,
+      "name": "RG-GAME-02-CONFESS-005__side_header",
+      "mesh": 2354
+    }
+  ],
+  "structural_gltf_roundtrip": "PASS",
+  "existing_non_corridor_node_structure_unchanged": true,
+  "rendering": "NOT_RUN_BY_USER_REQUEST",
+  "camera_film_overlay": "NOT_RUN",
+  "actor_collision": "NOT_RUN",
+  "full_school_hallway_coverage": "ALL_DISCOVERED_ACOR-002_CONTINUOUS_INTERIOR_PATH; OTHER_CAMPUS_HALL OBJECTS_REQUIRE_SEMANTIC_SURVEY",
+  "separate_campus_halls": "EXTERIOR_ARCHITECTURAL_HALL_LABELS_NOT_ASSUMED_WALKABLE_INTERIOR",
+  "formal_author_approval": false,
+  "canonical_main_untouched": true,
+  "notes": [
+    "One integrated academy GLB, not loose detached corridor modules.",
+    "Entire measured main school interior corridor from roof stair to campus entrance dressed consistently.",
+    "The two confirmed classroom doorways and original entrance/roof/side stairs remain in place.",
+    "Unassigned oak-door shapes are explicitly decorative, not invented passable rooms.",
+    "Original exterior north/south walls and library geometry remain; distant campus exterior hall shells not classified as connected walkable corridor.",
+    "No rendering was executed. Physical navigation and actor collision remain unverified."
+  ]
+}
