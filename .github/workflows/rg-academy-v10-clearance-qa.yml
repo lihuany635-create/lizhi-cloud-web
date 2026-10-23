@@ -1,0 +1,32 @@
+name: RG Academy V10 Repaired Route Clearance Gate
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v10-clearance-qa.yml'
+      - 'model-viewer/revisions/academy-route-repair-v10/verify_v10_clearance.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independently sweep avatar radii through all ten corridors, stair access and elevated route
+        run: |
+          python model-viewer/revisions/academy-route-repair-v10/verify_v10_clearance.py
+      - name: Commit measured evidence of full GLB walk routes
+        if: always()
+        run: |
+          if [ -f model-viewer/staged-output/academy-route-repair-v10/V10-clearance-qa.json ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add model-viewer/staged-output/academy-route-repair-v10/V10-clearance-qa.json
+            if ! git diff --cached --quiet; then
+              git commit -m 'qa(academy V10): record measured route and stair-clearance blockers'
+              git pull --rebase origin rg-ep01-s01-stage-20261023
+              git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+            fi
+          fi
