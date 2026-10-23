@@ -1,0 +1,58 @@
+name: RG Academy V9 Locked Plan Structural Shell
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v9-locked-shell.yml'
+      - 'model-viewer/revisions/academy-locked-plan-v9/build_structural_shell_v9.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: academy-v9-shell-building
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construct the actual locked-plan school shell with open corridors
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-locked-plan-v9/build_structural_shell_v9.py
+      - name: Verify finished shell binary and actual district coordinates
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import struct,hashlib,json
+          d=Path('candidate-output/academy-locked-massing-v9')
+          j=json.loads((d/'report.json').read_text())
+          raw=(d/j['file']).read_bytes()
+          assert raw[:4]==b'glTF' and struct.unpack_from('<I',raw,8)[0]==len(raw)
+          assert hashlib.sha256(raw).hexdigest()==j['output_sha256']
+          assert j['source_total_nodes']==11174
+          assert j['kept_core_nodes']==11097
+          assert j['old_v6_external_wing_mesh_batches_removed']==77
+          assert len(j['locked_districts'])==8
+          assert j['new_structure_nodes']>=250
+          assert len(j['actual_wall_portal_core_cuts'])>=4
+          assert len(j['new_real_connector_slabs'])>=8
+          assert j['structural_roundtrip']=='PASS'
+          assert j['rendering']=='NOT_RUN'
+          print('SUCCESS: Locked architectural shell GLB',j['output_sha256'],j['new_structure_nodes'])
+          PY
+      - name: Commit V9 candidate model and evidence without rendering
+        run: |
+          dst=model-viewer/staged-output/academy-locked-plan-v9
+          mkdir -p "$dst"
+          cp candidate-output/academy-locked-massing-v9/*.glb "$dst/"
+          cp candidate-output/academy-locked-massing-v9/report.json "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V9): locked-plan architectural walls roofs and connections'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
