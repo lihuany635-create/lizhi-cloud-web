@@ -1,0 +1,55 @@
+name: RG Promote Exterior Gothic V11 To Original Academy GLB
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v11-promote.yml'
+      - 'model-viewer/revisions/academy-exterior-finish-v11/promote_v11_to_main.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v11-exterior-release
+  cancel-in-progress: true
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+          persist-credentials: false
+      - name: Replace canonical academy V10 with verified V11 EXTERIOR only
+        run: |
+          set -euo pipefail
+          python .academy-stage/model-viewer/revisions/academy-exterior-finish-v11/promote_v11_to_main.py
+      - name: Check only existing official school viewer and backup changed
+        run: |
+          python - <<'PY'
+          import subprocess
+          allowed={
+           'model-viewer/lahudi-academy.glb',
+           'model-viewer/current-models.json',
+           'model-viewer/index.html',
+           'model-viewer/backups/pre-academy-v11-exterior-finish/lahudi-academy.glb'
+          }
+          change=set()
+          for item in subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],text=True).splitlines():
+            path=item[3:]
+            if path.startswith('.academy-stage/'):continue
+            change.add(path)
+          assert change==allowed,{'actual':change,'required':allowed}
+          PY
+      - name: Commit one canonical GLB with no extra viewer model
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/lahudi-academy.glb model-viewer/current-models.json model-viewer/index.html model-viewer/backups/pre-academy-v11-exterior-finish/lahudi-academy.glb
+          git commit -m 'feat(academy V11): Gothic exterior facade, lancet windows, dormers and courtyard accents'
+          git push origin HEAD:refs/heads/main
