@@ -1,0 +1,1694 @@
+{
+  "scene": "RG-GAME-02",
+  "shot": "S01",
+  "source_model": "model-viewer/staged-output/ep01-s01/v5/lahudi-academy_ep01_s01_corridor_v5_art_review.glb",
+  "original_node_count": 7725,
+  "inspected_total_nodes": 8121,
+  "aabb_note": "Bounds are an aid only: rotation/parent hierarchy not included. Do not derive reliable collision from these numbers.",
+  "original_corridor_wall_or_door_nodes": [],
+  "original_stair_nodes": [
+    {
+      "id": 7720,
+      "name": "RG-GAME-02-CONFESS-005__lower_landing",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -82.8,
+        -0.1,
+        10.2,
+        -81.7,
+        0.0,
+        12.5
+      ]
+    },
+    {
+      "id": 7710,
+      "name": "RG-GAME-02-CONFESS-005__stairwell_wall",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -82.8,
+        0.0,
+        10.13,
+        -74.5,
+        7.3,
+        10.25
+      ]
+    },
+    {
+      "id": 7719,
+      "name": "RG-GAME-02-CONFESS-005__stairwell_wall",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -82.8,
+        0.0,
+        12.45,
+        -74.5,
+        7.3,
+        12.57
+      ]
+    },
+    {
+      "id": 7678,
+      "name": "RG-GAME-02-CONFESS-005__tread_0",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -74.8,
+        3.743,
+        10.3,
+        -74.5,
+        3.833,
+        12.4
+      ]
+    },
+    {
+      "id": 7679,
+      "name": "RG-GAME-02-CONFESS-005__tread_1",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -75.1,
+        3.577,
+        10.3,
+        -74.8,
+        3.667,
+        12.4
+      ]
+    },
+    {
+      "id": 7688,
+      "name": "RG-GAME-02-CONFESS-005__tread_10",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -77.8,
+        2.077,
+        10.3,
+        -77.5,
+        2.167,
+        12.4
+      ]
+    },
+    {
+      "id": 7689,
+      "name": "RG-GAME-02-CONFESS-005__tread_11",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -78.1,
+        1.91,
+        10.3,
+        -77.8,
+        2.0,
+        12.4
+      ]
+    },
+    {
+      "id": 7690,
+      "name": "RG-GAME-02-CONFESS-005__tread_12",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -78.4,
+        1.743,
+        10.3,
+        -78.1,
+        1.833,
+        12.4
+      ]
+    },
+    {
+      "id": 7691,
+      "name": "RG-GAME-02-CONFESS-005__tread_13",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -78.7,
+        1.577,
+        10.3,
+        -78.4,
+        1.667,
+        12.4
+      ]
+    },
+    {
+      "id": 7692,
+      "name": "RG-GAME-02-CONFESS-005__tread_14",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -79.0,
+        1.41,
+        10.3,
+        -78.7,
+        1.5,
+        12.4
+      ]
+    },
+    {
+      "id": 7693,
+      "name": "RG-GAME-02-CONFESS-005__tread_15",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -79.3,
+        1.243,
+        10.3,
+        -79.0,
+        1.333,
+        12.4
+      ]
+    },
+    {
+      "id": 7694,
+      "name": "RG-GAME-02-CONFESS-005__tread_16",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -79.6,
+        1.077,
+        10.3,
+        -79.3,
+        1.167,
+        12.4
+      ]
+    },
+    {
+      "id": 7695,
+      "name": "RG-GAME-02-CONFESS-005__tread_17",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -79.9,
+        0.91,
+        10.3,
+        -79.6,
+        1.0,
+        12.4
+      ]
+    },
+    {
+      "id": 7696,
+      "name": "RG-GAME-02-CONFESS-005__tread_18",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -80.2,
+        0.743,
+        10.3,
+        -79.9,
+        0.833,
+        12.4
+      ]
+    },
+    {
+      "id": 7697,
+      "name": "RG-GAME-02-CONFESS-005__tread_19",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -80.5,
+        0.577,
+        10.3,
+        -80.2,
+        0.667,
+        12.4
+      ]
+    },
+    {
+      "id": 7680,
+      "name": "RG-GAME-02-CONFESS-005__tread_2",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -75.4,
+        3.41,
+        10.3,
+        -75.1,
+        3.5,
+        12.4
+      ]
+    },
+    {
+      "id": 7698,
+      "name": "RG-GAME-02-CONFESS-005__tread_20",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -80.8,
+        0.41,
+        10.3,
+        -80.5,
+        0.5,
+        12.4
+      ]
+    },
+    {
+      "id": 7699,
+      "name": "RG-GAME-02-CONFESS-005__tread_21",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -81.1,
+        0.243,
+        10.3,
+        -80.8,
+        0.333,
+        12.4
+      ]
+    },
+    {
+      "id": 7700,
+      "name": "RG-GAME-02-CONFESS-005__tread_22",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -81.4,
+        0.077,
+        10.3,
+        -81.1,
+        0.167,
+        12.4
+      ]
+    },
+    {
+      "id": 7701,
+      "name": "RG-GAME-02-CONFESS-005__tread_23",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -81.7,
+        -0.09,
+        10.3,
+        -81.4,
+        0.0,
+        12.4
+      ]
+    },
+    {
+      "id": 7681,
+      "name": "RG-GAME-02-CONFESS-005__tread_3",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -75.7,
+        3.243,
+        10.3,
+        -75.4,
+        3.333,
+        12.4
+      ]
+    },
+    {
+      "id": 7682,
+      "name": "RG-GAME-02-CONFESS-005__tread_4",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -76.0,
+        3.077,
+        10.3,
+        -75.7,
+        3.167,
+        12.4
+      ]
+    },
+    {
+      "id": 7683,
+      "name": "RG-GAME-02-CONFESS-005__tread_5",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -76.3,
+        2.91,
+        10.3,
+        -76.0,
+        3.0,
+        12.4
+      ]
+    },
+    {
+      "id": 7684,
+      "name": "RG-GAME-02-CONFESS-005__tread_6",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -76.6,
+        2.743,
+        10.3,
+        -76.3,
+        2.833,
+        12.4
+      ]
+    },
+    {
+      "id": 7685,
+      "name": "RG-GAME-02-CONFESS-005__tread_7",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -76.9,
+        2.577,
+        10.3,
+        -76.6,
+        2.667,
+        12.4
+      ]
+    },
+    {
+      "id": 7686,
+      "name": "RG-GAME-02-CONFESS-005__tread_8",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -77.2,
+        2.41,
+        10.3,
+        -76.9,
+        2.5,
+        12.4
+      ]
+    },
+    {
+      "id": 7687,
+      "name": "RG-GAME-02-CONFESS-005__tread_9",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -77.5,
+        2.243,
+        10.3,
+        -77.2,
+        2.333,
+        12.4
+      ]
+    },
+    {
+      "id": 7677,
+      "name": "RG-GAME-02-CONFESS-005__turn_landing",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -74.5,
+        3.9,
+        10.2,
+        -72.45,
+        4.0,
+        12.5
+      ]
+    }
+  ],
+  "candidate_facing_nodes": [
+    {
+      "id": 7859,
+      "name": "RG-GAME-02-EP01-S01-REV2__left_door_01_leaf",
+      "original": false,
+      "t": [
+        -72.34,
+        5.19,
+        -5.53
+      ],
+      "s": [
+        0.09,
+        2.38,
+        1.52
+      ],
+      "aabb_ignoring_rotation": [
+        -72.385,
+        4.0,
+        -6.29,
+        -72.295,
+        6.38,
+        -4.77
+      ]
+    },
+    {
+      "id": 7869,
+      "name": "RG-GAME-02-EP01-S01-REV2__left_door_02_leaf",
+      "original": false,
+      "t": [
+        -72.34,
+        5.19,
+        -2.53
+      ],
+      "s": [
+        0.09,
+        2.38,
+        1.52
+      ],
+      "aabb_ignoring_rotation": [
+        -72.385,
+        4.0,
+        -3.29,
+        -72.295,
+        6.38,
+        -1.77
+      ]
+    },
+    {
+      "id": 7879,
+      "name": "RG-GAME-02-EP01-S01-REV2__left_door_03_leaf",
+      "original": false,
+      "t": [
+        -72.34,
+        5.19,
+        0.47
+      ],
+      "s": [
+        0.09,
+        2.38,
+        1.52
+      ],
+      "aabb_ignoring_rotation": [
+        -72.385,
+        4.0,
+        -0.29,
+        -72.295,
+        6.38,
+        1.23
+      ]
+    },
+    {
+      "id": 7889,
+      "name": "RG-GAME-02-EP01-S01-REV2__left_door_04_leaf",
+      "original": false,
+      "t": [
+        -72.34,
+        5.19,
+        3.47
+      ],
+      "s": [
+        0.09,
+        2.38,
+        1.52
+      ],
+      "aabb_ignoring_rotation": [
+        -72.385,
+        4.0,
+        2.71,
+        -72.295,
+        6.38,
+        4.23
+      ]
+    },
+    {
+      "id": 7899,
+      "name": "RG-GAME-02-EP01-S01-REV2__left_door_05_leaf",
+      "original": false,
+      "t": [
+        -72.34,
+        5.19,
+        6.47
+      ],
+      "s": [
+        0.09,
+        2.38,
+        1.52
+      ],
+      "aabb_ignoring_rotation": [
+        -72.385,
+        4.0,
+        5.71,
+        -72.295,
+        6.38,
+        7.23
+      ]
+    },
+    {
+      "id": 7909,
+      "name": "RG-GAME-02-EP01-S01-REV2__left_door_06_leaf",
+      "original": false,
+      "t": [
+        -72.34,
+        5.19,
+        9.47
+      ],
+      "s": [
+        0.09,
+        2.38,
+        1.52
+      ],
+      "aabb_ignoring_rotation": [
+        -72.385,
+        4.0,
+        8.71,
+        -72.295,
+        6.38,
+        10.23
+      ]
+    },
+    {
+      "id": 8052,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_00",
+      "original": false,
+      "t": [
+        -71.05,
+        4.082,
+        -8.325
+      ],
+      "s": [
+        1.62,
+        0.165,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -8.476,
+        -70.24,
+        4.165,
+        -8.174
+      ]
+    },
+    {
+      "id": 8053,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_00",
+      "original": false,
+      "t": [
+        -71.05,
+        4.157,
+        -8.212
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        4.146,
+        -8.23,
+        -70.195,
+        4.168,
+        -8.194
+      ]
+    },
+    {
+      "id": 8054,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_01",
+      "original": false,
+      "t": [
+        -71.05,
+        4.165,
+        -8.615
+      ],
+      "s": [
+        1.62,
+        0.33,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -8.766,
+        -70.24,
+        4.33,
+        -8.464
+      ]
+    },
+    {
+      "id": 8055,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_01",
+      "original": false,
+      "t": [
+        -71.05,
+        4.322,
+        -8.502
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        4.311,
+        -8.52,
+        -70.195,
+        4.333,
+        -8.484
+      ]
+    },
+    {
+      "id": 8056,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_02",
+      "original": false,
+      "t": [
+        -71.05,
+        4.247,
+        -8.905
+      ],
+      "s": [
+        1.62,
+        0.495,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -9.056,
+        -70.24,
+        4.495,
+        -8.754
+      ]
+    },
+    {
+      "id": 8057,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_02",
+      "original": false,
+      "t": [
+        -71.05,
+        4.487,
+        -8.792
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        4.476,
+        -8.81,
+        -70.195,
+        4.498,
+        -8.774
+      ]
+    },
+    {
+      "id": 8058,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_03",
+      "original": false,
+      "t": [
+        -71.05,
+        4.33,
+        -9.195
+      ],
+      "s": [
+        1.62,
+        0.66,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -9.346,
+        -70.24,
+        4.66,
+        -9.044
+      ]
+    },
+    {
+      "id": 8059,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_03",
+      "original": false,
+      "t": [
+        -71.05,
+        4.652,
+        -9.082
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        4.641,
+        -9.1,
+        -70.195,
+        4.663,
+        -9.064
+      ]
+    },
+    {
+      "id": 8060,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_04",
+      "original": false,
+      "t": [
+        -71.05,
+        4.412,
+        -9.485
+      ],
+      "s": [
+        1.62,
+        0.825,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -9.636,
+        -70.24,
+        4.825,
+        -9.334
+      ]
+    },
+    {
+      "id": 8061,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_04",
+      "original": false,
+      "t": [
+        -71.05,
+        4.817,
+        -9.372
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        4.806,
+        -9.39,
+        -70.195,
+        4.829,
+        -9.354
+      ]
+    },
+    {
+      "id": 8062,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_05",
+      "original": false,
+      "t": [
+        -71.05,
+        4.495,
+        -9.775
+      ],
+      "s": [
+        1.62,
+        0.99,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -9.926,
+        -70.24,
+        4.99,
+        -9.624
+      ]
+    },
+    {
+      "id": 8063,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_05",
+      "original": false,
+      "t": [
+        -71.05,
+        4.982,
+        -9.662
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        4.971,
+        -9.68,
+        -70.195,
+        4.994,
+        -9.644
+      ]
+    },
+    {
+      "id": 8064,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_06",
+      "original": false,
+      "t": [
+        -71.05,
+        4.577,
+        -10.065
+      ],
+      "s": [
+        1.62,
+        1.155,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -10.216,
+        -70.24,
+        5.155,
+        -9.914
+      ]
+    },
+    {
+      "id": 8065,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_06",
+      "original": false,
+      "t": [
+        -71.05,
+        5.147,
+        -9.952
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        5.136,
+        -9.97,
+        -70.195,
+        5.159,
+        -9.934
+      ]
+    },
+    {
+      "id": 8066,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_07",
+      "original": false,
+      "t": [
+        -71.05,
+        4.66,
+        -10.355
+      ],
+      "s": [
+        1.62,
+        1.32,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -10.506,
+        -70.24,
+        5.32,
+        -10.204
+      ]
+    },
+    {
+      "id": 8067,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_07",
+      "original": false,
+      "t": [
+        -71.05,
+        5.312,
+        -10.242
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        5.301,
+        -10.26,
+        -70.195,
+        5.324,
+        -10.224
+      ]
+    },
+    {
+      "id": 8068,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_08",
+      "original": false,
+      "t": [
+        -71.05,
+        4.742,
+        -10.645
+      ],
+      "s": [
+        1.62,
+        1.485,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -10.796,
+        -70.24,
+        5.485,
+        -10.494
+      ]
+    },
+    {
+      "id": 8069,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_08",
+      "original": false,
+      "t": [
+        -71.05,
+        5.477,
+        -10.532
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        5.466,
+        -10.55,
+        -70.195,
+        5.489,
+        -10.514
+      ]
+    },
+    {
+      "id": 8070,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_09",
+      "original": false,
+      "t": [
+        -71.05,
+        4.825,
+        -10.935
+      ],
+      "s": [
+        1.62,
+        1.65,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -11.086,
+        -70.24,
+        5.65,
+        -10.784
+      ]
+    },
+    {
+      "id": 8071,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_09",
+      "original": false,
+      "t": [
+        -71.05,
+        5.642,
+        -10.822
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        5.631,
+        -10.84,
+        -70.195,
+        5.654,
+        -10.804
+      ]
+    },
+    {
+      "id": 8072,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_10",
+      "original": false,
+      "t": [
+        -71.05,
+        4.907,
+        -11.225
+      ],
+      "s": [
+        1.62,
+        1.815,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -11.376,
+        -70.24,
+        5.815,
+        -11.074
+      ]
+    },
+    {
+      "id": 8073,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_10",
+      "original": false,
+      "t": [
+        -71.05,
+        5.807,
+        -11.112
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        5.796,
+        -11.13,
+        -70.195,
+        5.819,
+        -11.094
+      ]
+    },
+    {
+      "id": 8074,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_11",
+      "original": false,
+      "t": [
+        -71.05,
+        4.99,
+        -11.515
+      ],
+      "s": [
+        1.62,
+        1.98,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -11.666,
+        -70.24,
+        5.98,
+        -11.364
+      ]
+    },
+    {
+      "id": 8075,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_11",
+      "original": false,
+      "t": [
+        -71.05,
+        5.972,
+        -11.402
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        5.961,
+        -11.42,
+        -70.195,
+        5.984,
+        -11.384
+      ]
+    },
+    {
+      "id": 8076,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_12",
+      "original": false,
+      "t": [
+        -71.05,
+        5.072,
+        -11.805
+      ],
+      "s": [
+        1.62,
+        2.145,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -11.956,
+        -70.24,
+        6.145,
+        -11.654
+      ]
+    },
+    {
+      "id": 8077,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_12",
+      "original": false,
+      "t": [
+        -71.05,
+        6.137,
+        -11.692
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        6.125,
+        -11.71,
+        -70.195,
+        6.148,
+        -11.674
+      ]
+    },
+    {
+      "id": 8078,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_tread_13",
+      "original": false,
+      "t": [
+        -71.05,
+        5.155,
+        -12.095
+      ],
+      "s": [
+        1.62,
+        2.31,
+        0.302
+      ],
+      "aabb_ignoring_rotation": [
+        -71.86,
+        4.0,
+        -12.246,
+        -70.24,
+        6.31,
+        -11.944
+      ]
+    },
+    {
+      "id": 8079,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_nosing_13",
+      "original": false,
+      "t": [
+        -71.05,
+        6.302,
+        -11.982
+      ],
+      "s": [
+        1.71,
+        0.023,
+        0.036
+      ],
+      "aabb_ignoring_rotation": [
+        -71.905,
+        6.291,
+        -12.0,
+        -70.195,
+        6.314,
+        -11.964
+      ]
+    },
+    {
+      "id": 8088,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_handrail_L",
+      "original": false,
+      "t": [
+        -71.985,
+        6.105,
+        -10.21
+      ],
+      "s": [
+        0.11,
+        0.11,
+        4.758
+      ],
+      "aabb_ignoring_rotation": [
+        -72.04,
+        6.05,
+        -12.589,
+        -71.93,
+        6.16,
+        -7.831
+      ]
+    },
+    {
+      "id": 8101,
+      "name": "RG-GAME-02-EP01-S01-REV4__ascending_handrail_R",
+      "original": false,
+      "t": [
+        -70.115,
+        6.105,
+        -10.21
+      ],
+      "s": [
+        0.11,
+        0.11,
+        4.758
+      ],
+      "aabb_ignoring_rotation": [
+        -70.17,
+        6.05,
+        -12.589,
+        -70.06,
+        6.16,
+        -7.831
+      ]
+    },
+    {
+      "id": 8107,
+      "name": "RG-GAME-02-EP01-S01-REV4__west_stairwell_outerwall",
+      "original": false,
+      "t": [
+        -72.54,
+        5.6,
+        -10.55
+      ],
+      "s": [
+        0.19,
+        3.24,
+        5.12
+      ],
+      "aabb_ignoring_rotation": [
+        -72.635,
+        3.98,
+        -13.11,
+        -72.445,
+        7.22,
+        -7.99
+      ]
+    },
+    {
+      "id": 8108,
+      "name": "RG-GAME-02-EP01-S01-REV4__east_stairwell_outerwall",
+      "original": false,
+      "t": [
+        -68.63,
+        5.6,
+        -10.55
+      ],
+      "s": [
+        0.19,
+        3.24,
+        5.12
+      ],
+      "aabb_ignoring_rotation": [
+        -68.725,
+        3.98,
+        -13.11,
+        -68.535,
+        7.22,
+        -7.99
+      ]
+    },
+    {
+      "id": 8109,
+      "name": "RG-GAME-02-EP01-S01-REV4__far_wall_left_pier",
+      "original": false,
+      "t": [
+        -72.0,
+        5.25,
+        -13.29
+      ],
+      "s": [
+        0.9,
+        2.6,
+        0.25
+      ],
+      "aabb_ignoring_rotation": [
+        -72.45,
+        3.95,
+        -13.415,
+        -71.55,
+        6.55,
+        -13.165
+      ]
+    },
+    {
+      "id": 8110,
+      "name": "RG-GAME-02-EP01-S01-REV4__far_wall_right_pier",
+      "original": false,
+      "t": [
+        -69.35,
+        5.25,
+        -13.29
+      ],
+      "s": [
+        0.9,
+        2.6,
+        0.25
+      ],
+      "aabb_ignoring_rotation": [
+        -69.8,
+        3.95,
+        -13.415,
+        -68.9,
+        6.55,
+        -13.165
+      ]
+    }
+  ],
+  "original_corridor_other_sample": [
+    {
+      "id": 7637,
+      "name": "RG-GAME-02-ACOR-002__light",
+      "original": true,
+      "t": [
+        -70.2,
+        7,
+        -16
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": null
+    },
+    {
+      "id": 7639,
+      "name": "RG-GAME-02-ACOR-002__light",
+      "original": true,
+      "t": [
+        -70.2,
+        7,
+        -8
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": null
+    },
+    {
+      "id": 7641,
+      "name": "RG-GAME-02-ACOR-002__light",
+      "original": true,
+      "t": [
+        -70.2,
+        7,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": null
+    },
+    {
+      "id": 7643,
+      "name": "RG-GAME-02-ACOR-002__light",
+      "original": true,
+      "t": [
+        -70.2,
+        7,
+        8
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": null
+    },
+    {
+      "id": 7722,
+      "name": "RG-GAME-02-CONFESS-003__blocking_anchor",
+      "original": true,
+      "t": [
+        -70.2,
+        4,
+        4
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": null
+    },
+    {
+      "id": 7723,
+      "name": "RG-GAME-02-CONFESS-004__blocking_anchor",
+      "original": true,
+      "t": [
+        -70.2,
+        4,
+        7
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": null
+    },
+    {
+      "id": 7724,
+      "name": "RG-GAME-02-CONFESS-006__blocking_anchor",
+      "original": true,
+      "t": [
+        -73.6,
+        4,
+        11.35
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": null
+    }
+  ],
+  "non_destructive": true,
+  "decision": "DOOR_OPENING_UNVERIFIED_AND_ORIGINAL_SIDE_STAIR_REMAINS",
+  "required_next": "Check world transforms and parent graph, then replace only targeted corridor wall geometry, or make scene-specific non-destructive visibility variants."
+}
