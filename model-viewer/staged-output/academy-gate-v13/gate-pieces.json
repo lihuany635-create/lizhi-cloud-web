@@ -7163,7 +7163,7 @@
       ],
       "kind": "gatehouse_roof_slope",
       "yaw_rad": 0,
-      "roll_rad": -0.36520144978817304
+      "roll_rad": 0.36520144978817304
     },
     {
       "name": "RG-GAME-02-GATE-COMPLEX-V13__GUARD_SLOPE_EAST",
@@ -7181,7 +7181,7 @@
       ],
       "kind": "gatehouse_roof_slope",
       "yaw_rad": 0,
-      "roll_rad": 0.36520144978817304
+      "roll_rad": -0.36520144978817304
     },
     {
       "name": "RG-GAME-02-GATE-COMPLEX-V13__GUARD_RIDGE",
