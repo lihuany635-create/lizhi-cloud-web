@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>《現實遊戲》S01 V7｜3D 施工預覽 - 立之雲端庫</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,"Noto Sans TC","Microsoft JhengHei",sans-serif;background:#13191e;color:#e9eef2}
+*{box-sizing:border-box}body{margin:0}header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;background:#1c252c;border-bottom:1px solid #37434d}
+h1{font-size:18px;margin:0;font-weight:700}.pill{border:1px solid #af8349;color:#f3d3a5;background:#403126;border-radius:999px;padding:4px 9px;font-size:12px}
+a{color:#8fcee9;text-decoration:none}a:hover{text-decoration:underline}
+header a{margin-left:auto}.sub{color:#b8c4cd;font-size:13px}
+main{max-width:1500px;margin:auto;padding:12px 16px 28px}
+.progress-board{border:1px solid #4d6270;border-radius:10px;background:#1d2d37;padding:12px 14px;margin:10px 0;font-size:13px;line-height:1.8}.progress-board strong{color:#e2f6ff}.progress-board a{color:#8fcee9}
+.scene{position:relative;width:100%;height:min(72dvh,780px);min-height:380px;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#4e575c,#1b252d 80%);border:1px solid #3d505c}
+canvas{display:block;width:100%;height:100%}#status{position:absolute;top:12px;left:12px;right:12px;pointer-events:none;padding:9px 12px;border:1px solid #52616e;border-radius:8px;background:#111b24db;font-size:13px;white-space:normal}
+#status.error{background:#4c2929e8;border-color:#bb7269}#status.ok{background:#1d352fe5;border-color:#52887d}
+nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+button,.btn{background:#263b4a;color:#eef8ff;border:1px solid #5e7484;padding:10px 13px;border-radius:7px;font-size:14px;cursor:pointer}
+button[aria-pressed="true"]{background:#4683a0;color:white;border-color:#8ed6fc}
+button:disabled{cursor:not-allowed;opacity:.4}
+#progress{width:100%;accent-color:#6bbccf;height:5px;display:none}
+details{margin-top:14px;background:#1a242c;border:1px solid #394854;border-radius:10px;padding:12px 16px}
+details summary{cursor:pointer;font-weight:600}.note{font-size:13px;color:#b9c6cf;line-height:1.7}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.frame{border-radius:8px;width:100%;height:auto;border:1px solid #56636d}.caption{font-size:12px;color:#adbac5;margin-top:4px}
+@media(max-width:650px){header{padding:10px}header a{margin-left:0}.scene{height:62dvh;min-height:340px}h1{font-size:16px}button,.btn{padding:9px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>《現實遊戲》｜S01 拉乎迪學院</h1>
+  <span class="pill">V7 門後空間測試 · 非正式版</span>
+  <a href="../../">返回五模型檢視器</a>
+</header>
+<main>
+<p class="sub">本頁顯示 S01 V7 門後淺層空間測試 GLB，提供滑鼠與觸控操作；左側與右側以工程座標為準。正式學院模型未被替換。</p>
+<div class="progress-board" role="status" aria-label="S01 V7 測試狀態">
+  <strong>目前版本：</strong>S01 V7，六組門洞已補淺層過渡空間；5.57 MB GLB、102 個新增節點。<br>
+  <strong>已通過：</strong>模型結構檢查，以及長廊與門後側視兩張實際 Chrome 3D 渲染。<br>
+  <strong>未完成：</strong>門後完整室內、角色碰撞驗證、原動畫 A01/A03 疊圖、樓梯動線與作者驗收。<br>
+  <strong>可回退：</strong><a href="../">查看已保留的 V5 測試版</a>；<strong>正式版：</strong>不變；S06 暫停。<br>
+  <small>本頁是單次輸出的可檢查模型，不代表有 AI 在背景持續製作。</small>
+</div>
+<nav aria-label="場景鏡位">
+  <button type="button" id="viewA01" aria-pressed="true" disabled>走廊主視角</button>
+  <button type="button" id="viewA02" disabled>高窗細節</button>
+  <button type="button" id="viewA03" disabled>樓梯方向</button>
+  <button type="button" id="viewWhole" disabled>整座學院</button>
+  <button type="button" id="toggleIsolate" aria-pressed="true" disabled>只看 S01 區域</button>
+  <a class="btn" href="./lahudi-academy-s01-v7.glb" download>下載此版 GLB</a>
+</nav>
+<progress id="progress" max="100" value="0"></progress>
+<div class="scene" id="stage" role="region" aria-label="GLB 3D 互動預覽區">
+  <div id="status" role="status" aria-live="polite">準備載入 S01 V7（5.57 MB）…</div>
+</div>
+<p class="note">注意：這些是工程檢查視角，未與 EP01 原動畫一對一對位。主視角改為從走廊內部拍攝；遠端入口牆與舊樓梯空間衝突仍待修復。左側木門尚非可通行門洞；原有側向樓梯仍在模型中。冬季光線、遮擋與人物離場動線仍在修訂。若手機不支援 WebGL，可先查看下方 Blender 幾何檢查圖。</p>
+<details>
+  <summary>施工版本與驗證狀態</summary>
+  <p class="note"><strong>檔案：</strong>lahudi-academy-s01-v7.glb<br>
+  <strong>大小：</strong>5,566,760 bytes<br>
+  <strong>模型 SHA-256：</strong><code id="sha">a7c6cf6f9281c2758a450c12d3c0f8c70e9167a7efaaa8a6aba68533c64e11d7</code><br>
+  <strong>狀態：</strong>V7 GLB 已製作，Chrome 3D 渲染通過；角色碰撞未驗證、相機疊圖未執行、作者驗收待確認。已修改範圍僅 S01，未修改 S06。<br>
+  <strong>施工紀錄：</strong><a href="https://github.com/lihuany635-create/lizhi-cloud-web/tree/rg-ep01-s01-stage-20261023/model-viewer/staged-output/ep01-s01/v7" target="_blank" rel="noopener">查看 GitHub V5 模型及報告</a></p>
+</details>
+<details open>
+  <summary>先前通過的 Blender V3 結構渲染（不是 V5 影格驗收）</summary>
+  <div class="cols">
+    <div><img class="frame" loading="lazy" src="https://raw.githubusercontent.com/lihuany635-create/lizhi-cloud-web/rg-ep01-s01-stage-20261023/model-viewer/staged-output/ep01-s01/blender-qa/S01_A01_corridor_look_forward.png" alt="V3 Blender 走廊工程檢查圖"><div class="caption">V3 走廊結構檢查</div></div>
+    <div><img class="frame" loading="lazy" src="https://raw.githubusercontent.com/lihuany635-create/lizhi-cloud-web/rg-ep01-s01-stage-20261023/model-viewer/staged-output/ep01-s01/blender-qa/S01_A03_stair_end.png" alt="V3 Blender 樓梯工程檢查圖"><div class="caption">V3 樓梯方向檢查</div></div>
+  </div>
+</details>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const expectedSHA="a7c6cf6f9281c2758a450c12d3c0f8c70e9167a7efaaa8a6aba68533c64e11d7";
+const modelFile="./lahudi-academy-s01-v7.glb";
+const status=(s,mode)=>{$('status').textContent=s;$('status').className=mode||'';};
+const buttons=["viewA01","viewA02","viewA03","viewWhole","toggleIsolate"];
+let renderer,scene,camera,controls,model=null,meshes=[],isolated=true;
+const bounds={min:[-74,3.5,-9],max:[-68,8,13]};
+const presets=[
+ {name:"走廊主視角",pos:[-70.42,5.49,-5.2],target:[-70.43,5.40,9.0],fov:71},
+ {name:"高窗細節",pos:[-72.9,5.85,2.8],target:[-68.7,5.93,6.5],fov:59},
+ {name:"樓梯方向",pos:[-70.2,5.64,3.0],target:[-70.55,5.0,12.1],fov:65}
+];
+function fail(message){status("預覽無法載入："+message,"error");console.error("S01 V7 preview:",message);}
+if(!window.THREE||!THREE.GLTFLoader||!THREE.OrbitControls){fail("3D 核心元件未能載入，可先下載 GLB 或查看下方 Blender 圖片。");return;}
+try{
+ renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"low-power",alpha:false});
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+ renderer.setClearColor(0x27313b);
+ renderer.outputEncoding=THREE.sRGBEncoding;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;
+ renderer.toneMappingExposure=1.0;
+ $('stage').appendChild(renderer.domElement);
+ renderer.domElement.addEventListener("webglcontextlost",e=>{e.preventDefault();fail("WebGL 已中斷。請重新整理頁面。");});
+ scene=new THREE.Scene();
+ scene.background=new THREE.Color(0x27313b);
+ camera=new THREE.PerspectiveCamera(62,1,.07,500);
+ controls=new THREE.OrbitControls(camera,renderer.domElement);
+ controls.enableDamping=true;
+ controls.dampingFactor=.1;
+ controls.maxDistance=180;
+ controls.minDistance=.18;
+ controls.target.set(-70.3,5.4,2.0);
+ scene.add(new THREE.HemisphereLight(0xe2f1ff,0x665747,.75));
+ const sun=new THREE.DirectionalLight(0xffdeb1,1.25);
+ sun.position.set(-60,23,-25);
+ scene.add(sun);
+ const fill=new THREE.DirectionalLight(0xd1e5ff,.55);
+ fill.position.set(-80,12,21);scene.add(fill);
+ function resize(){const rect=$('stage').getBoundingClientRect();renderer.setSize(Math.max(1,rect.width),Math.max(1,rect.height),false);camera.aspect=Math.max(1,rect.width)/Math.max(1,rect.height);camera.updateProjectionMatrix();}
+ new ResizeObserver(resize).observe($('stage'));resize();
+ function setView(p){
+   camera.position.set(...p.pos);controls.target.set(...p.target);camera.fov=p.fov;camera.updateProjectionMatrix();controls.update();
+   ['viewA01','viewA02','viewA03','viewWhole'].forEach((id,i)=>$(id).setAttribute('aria-pressed',String((i<3?i===presets.indexOf(p):p.name==="整座學院"))));
+ }
+ function applyIsolation(){
+   if(!model)return;
+   const targetBox=new THREE.Box3(new THREE.Vector3(...bounds.min),new THREE.Vector3(...bounds.max));
+   let count=0;
+   for(const m of meshes){
+     const wb=new THREE.Box3().setFromObject(m);
+     const span=wb.getSize(new THREE.Vector3());
+     const show=!isolated||(wb.intersectsBox(targetBox)&&Math.max(span.x,span.y,span.z)<130)||/S01.*(REV|STAIR)/i.test(m.name);
+     m.visible=show;if(show)count++;
+   }
+   $('toggleIsolate').setAttribute('aria-pressed',String(isolated));
+   $('toggleIsolate').textContent=isolated?"只看 S01 區域":"顯示全學院";
+   status("已載入 S01 V7 · 目前顯示 "+count+" 個網格 · 測試版未驗收","ok");
+ }
+ function fitWhole(){
+   if(!model)return;
+   const b=new THREE.Box3().setFromObject(model),sz=b.getSize(new THREE.Vector3()),center=b.getCenter(new THREE.Vector3());
+   const d=Math.max(35,sz.length()*.85);
+   setView({name:"整座學院",pos:[center.x-d*.62,center.y+d*.46,center.z+d*.75],target:center.toArray(),fov:60});
+ }
+ $('viewA01').onclick=()=>setView(presets[0]);
+ $('viewA02').onclick=()=>setView(presets[1]);
+ $('viewA03').onclick=()=>setView(presets[2]);
+ $('viewWhole').onclick=()=>{isolated=false;applyIsolation();fitWhole();};
+ $('toggleIsolate').onclick=()=>{isolated=!isolated;applyIsolation();};
+ let alive=true;
+ (function loop(){if(!alive)return;requestAnimationFrame(loop);controls.update();renderer.render(scene,camera);})();
+ async function load(){
+  $('progress').style.display="block";
+  let response=await fetch(modelFile,{cache:"no-cache"});
+  if(!response.ok)throw new Error("模型下載回應 "+response.status);
+  let bytes;
+  if(response.body&&response.body.getReader){
+    const size=Number(response.headers.get("content-length"))||5508420;
+    const reader=response.body.getReader(),chunks=[];let got=0;
+    while(true){const {done,value}=await reader.read();if(done)break;chunks.push(value);got+=value.byteLength;const pct=Math.min(99,Math.floor(got/size*100));$('progress').value=pct;status("正在載入 V5：下載 "+pct+"%");}
+    bytes=new Uint8Array(got);let off=0;for(const c of chunks){bytes.set(c,off);off+=c.byteLength;}
+  }else{bytes=new Uint8Array(await response.arrayBuffer());}
+  if(!crypto.subtle)throw new Error("瀏覽器不支援模型 SHA-256 驗證（需 HTTPS）。");
+  status("檔案已下載，正在驗證模型版本…");
+  const hash=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",bytes))).map(n=>n.toString(16).padStart(2,"0")).join("");
+  if(hash!==expectedSHA)throw new Error("GLB SHA-256 不相符，已停止載入。預期 "+expectedSHA.slice(0,12)+"…，實際 "+hash.slice(0,12)+"…");
+  $('progress').value=100;status("雜湊檢查通過，正在建立 3D 網格…");
+  const result=await new Promise((resolve,reject)=>new THREE.GLTFLoader().parse(bytes.buffer,"",resolve,reject));
+  model=result.scene;
+  model.traverse(o=>{if(o.isMesh){o.frustumCulled=true;meshes.push(o);}if(o.isLight)o.visible=false;});
+  scene.add(model);
+  buttons.forEach(id=>$(id).disabled=false);
+  setView(presets[0]);applyIsolation();
+  $('progress').style.display="none";
+ }
+ load().catch(e=>{fail(e.message);$('progress').style.display="none";});
+}catch(e){fail("WebGL 初始化失敗："+e.message);}
+})();
+</script>
+</body></html>
