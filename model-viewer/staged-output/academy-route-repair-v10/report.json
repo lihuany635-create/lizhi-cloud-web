@@ -1,0 +1,100 @@
+{
+  "version": "ACADEMY-LOCKED-PLAN-COLLISION-REPAIR-V10",
+  "file": "lahudi-academy_LOCKED-PLAN-ACCESS-V10.glb",
+  "sha256": "f1177cd51f89f6a5ba1176951d2a94d2f80d68f45460ce166e1f0814d6b69ba6",
+  "bytes": 11316780,
+  "source_sha256": "ada3ae9c9e55f995b4c8c60f63655c01e572561e523e199ef1cdf298c7e668c3",
+  "original_nodes": 11775,
+  "result_nodes": 11827,
+  "nodes_added": 52,
+  "disabled_old_nodes": [
+    "RG-GAME-02-PLAN-LOCK-V9__D_WEST_ENTRY_west_low_wall_30.00_53.00",
+    "RG-GAME-02-PLAN-LOCK-V9__D_WEST_ENTRY_west_baypier_2",
+    "RG-GAME-02-PLAN-LOCK-V9__C_EAST_south_low_wall_-35.00_-32.00",
+    "RG-GAME-02-PLAN-LOCK-V9__C_EAST_south_low_wall_-28.00_-14.00",
+    "RG-GAME-02-PLAN-LOCK-V9__C_EAST_south_portal_0_a",
+    "RG-GAME-02-PLAN-LOCK-V9__C_EAST_south_portal_0_b",
+    "RG-GAME-02-PLAN-LOCK-V9__C_EAST_south_portal_0_head",
+    "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_low_wall_-118.00_-108.00",
+    "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_low_wall_-104.00_-94.00",
+    "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_portal_0_a",
+    "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_portal_0_b",
+    "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_portal_0_head",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_ENTRANCE",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_roof"
+  ],
+  "modified_old_columns": [
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_0_a",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_0_b",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_1_a",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_1_b",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_2_a",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_2_b",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_3_a",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_3_b",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_4_a",
+    "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_4_b"
+  ],
+  "zone_footprints_locked": true,
+  "fixed_routes": {
+    "C-01": {
+      "west_D_opening_x": -98,
+      "z": [
+        36,
+        40
+      ],
+      "status": "REPLACED_SOLID_WALL_WITH_TRUE_OPENING"
+    },
+    "C-02": {
+      "C_east_south_door_x": [
+        -34,
+        -29
+      ],
+      "status": "ALIGNED_TO_ROUTE"
+    },
+    "C-03": {
+      "E_west_north_door_x": [
+        -107,
+        -103
+      ],
+      "status": "ALIGNED_TO_ROUTE_AND_G_DOOR"
+    },
+    "C-04": {
+      "north_effective_slab_x": [
+        -85.45,
+        -82.55
+      ],
+      "south_effective_slab_x": [
+        -71.3,
+        -68.9
+      ],
+      "status": "PRESERVED_HISTORIC_PORTAL__NARROWED_WALKWAY"
+    },
+    "C-05": {
+      "stair_riser_m": 0.149,
+      "steps": 26,
+      "lower_level_y_m": 0.126,
+      "upper_level_y_m": 4.0,
+      "switchback_region_x": [
+        -93.55,
+        -88.8
+      ],
+      "switchback_region_z": [
+        -79.9,
+        -72.45
+      ],
+      "upper_skywalk_slab_y_m": 4.0,
+      "old_covered_link_roof_raised_bottom_y_m": 7.55,
+      "status": "EXTERIOR_STAIR_AND_TWO_UPPER_SKYWALKS_MODELED__COLLISION_QA_PENDING"
+    }
+  },
+  "unresolved_animation_requirements": [
+    "C-06 proposed upper A01 vault vs 3F slab",
+    "C-07 source corridor X span4.50 vs animation proposed net width5.20"
+  ],
+  "design_scope": "fictional animation set, not a code-conformant staircase design",
+  "character_continuous_collision": "NOT_YET_TESTED",
+  "model_visual_qa": "NOT_RUN",
+  "author_final_acceptance": "PENDING"
+}
