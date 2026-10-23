@@ -1,0 +1,38 @@
+{
+  "version": "ACADEMY-V16-INTERIOR-GREENERY-PHASE1",
+  "source_sha256": "e269a295159f0f7d3e82df864376579e66f4b92be204ce66667a3c78b9d3ea41",
+  "candidate_sha256": "aa1f5778f9d87672d0df1c7ba36b6202108eb14bbc4aeb4bb322504c7dbf2dc0",
+  "main_school": {
+    "file": "lahudi-academy_INDOOR-GREENERY-V16.glb",
+    "bytes": 25135944,
+    "sha256": "aa1f5778f9d87672d0df1c7ba36b6202108eb14bbc4aeb4bb322504c7dbf2dc0",
+    "nodes": 12122
+  },
+  "source_school_nodes_preserved": 12067,
+  "new_plant_glb_assets": 10,
+  "plant_instances": 105,
+  "zone_counts": {
+    "B": 48,
+    "C": 36,
+    "D": 6,
+    "E": 8,
+    "G": 4,
+    "H": 3
+  },
+  "classroom_wall_pots": 44,
+  "existing_desk_top_pots": 40,
+  "no_furniture_removal": true,
+  "no_A01_corridor_rebuild": true,
+  "no_library_books_modified": true,
+  "no_Bessie_hero_plant_modified": true,
+  "original_8_zones_unchanged": true,
+  "A_and_F_planted_interior_nodes": 0,
+  "A_F_design_status": "DESIGNED_NOT_INSTALLED__SOURCE_ORIGINAL_STORY_SCENE_SAFE_PLACEMENT_REQUIRES_SEPARATE_REVIEW",
+  "not_all_102_planned_rooms_built": true,
+  "unplaced_classroom_walls": [],
+  "rejected_public_candidates": [],
+  "rendering": "NOT_RUN",
+  "no_character_collision": "SKIPPED_AS_REQUESTED",
+  "source_plant_names_are_design_families_not_novel_canon": true,
+  "author_approval": "PENDING"
+}

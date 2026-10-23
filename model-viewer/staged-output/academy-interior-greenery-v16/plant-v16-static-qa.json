@@ -1,0 +1,31 @@
+{
+  "version": "ACADEMY-V16-INTERIOR-GREENERY-PHASE1",
+  "status": "PASS_REGISTERED_FURNITURE_SPATIAL_QA",
+  "sha256": "aa1f5778f9d87672d0df1c7ba36b6202108eb14bbc4aeb4bb322504c7dbf2dc0",
+  "garden_v15_source_sha256": "e269a295159f0f7d3e82df864376579e66f4b92be204ce66667a3c78b9d3ea41",
+  "standalone_glb_assets_verified": 10,
+  "original_school_nodes": 12067,
+  "plants_verified": 105,
+  "installed_zones": {
+    "B": 48,
+    "C": 36,
+    "D": 6,
+    "E": 8,
+    "G": 4,
+    "H": 3
+  },
+  "provisional_room_pots_checked": 44,
+  "real_desk_supporting_furniture_verified": 40,
+  "A01_and_library_original_geometry_protected": true,
+  "native_A_F_plants_pending_native_scene_location": true,
+  "V15_story_hero_plant_unchanged": true,
+  "static_plant_to_registered_furniture_overlap_count": 0,
+  "character_collision": "SKIPPED_AS_REQUESTED",
+  "animation_visual_qa": "PENDING",
+  "limitations": [
+    "Existing V12 furniture inventory is low-poly and provisional in 44 classrooms",
+    "No additions in A01 narrative corridor nor F native library until exact camera/props audit",
+    "Floorplan bounds and desk tabletop source positions were checked, not full triangle/navmesh clearance",
+    "All plants are original Gothic school styling, not novel-verified botanical species"
+  ]
+}

@@ -1,0 +1,1911 @@
+{
+  "version": "ACADEMY-V16-INTERIOR-GREENERY-PHASE1",
+  "models": [
+    {
+      "id": "PL01",
+      "name": "高窄直立觀葉",
+      "width": 0.54,
+      "height": 1.65,
+      "usage": "門廳與走廊端景",
+      "pot": "dark-stone",
+      "leaf": "upright",
+      "tier": "hero"
+    },
+    {
+      "id": "PL02",
+      "name": "深綠寬葉盆栽",
+      "width": 0.85,
+      "height": 1.5,
+      "usage": "入口與休息邊界",
+      "pot": "stone",
+      "leaf": "broad",
+      "tier": "hero"
+    },
+    {
+      "id": "PL03",
+      "name": "室內細枝小樹",
+      "width": 0.92,
+      "height": 1.87,
+      "usage": "大平台/中庭不占通道",
+      "pot": "dark-wood",
+      "leaf": "branch",
+      "tier": "hero"
+    },
+    {
+      "id": "PL04",
+      "name": "陰性叢生盆栽",
+      "width": 0.66,
+      "height": 0.88,
+      "usage": "教學翼靠牆角",
+      "pot": "stone",
+      "leaf": "bush",
+      "tier": "support"
+    },
+    {
+      "id": "PL05",
+      "name": "中型窄葉叢植",
+      "width": 0.52,
+      "height": 0.96,
+      "usage": "教室側邊",
+      "pot": "iron",
+      "leaf": "narrow",
+      "tier": "support"
+    },
+    {
+      "id": "PL06",
+      "name": "低型窗下觀葉",
+      "width": 0.47,
+      "height": 0.54,
+      "usage": "不遮擋窗景",
+      "pot": "stone",
+      "leaf": "low",
+      "tier": "support"
+    },
+    {
+      "id": "PL07",
+      "name": "細葉桌面盆栽",
+      "width": 0.22,
+      "height": 0.28,
+      "usage": "教師桌與辦公桌",
+      "pot": "dark-wood",
+      "leaf": "fine",
+      "tier": "accent"
+    },
+    {
+      "id": "PL08",
+      "name": "圓葉書桌盆栽",
+      "width": 0.27,
+      "height": 0.34,
+      "usage": "書架台面與接待",
+      "pot": "stone",
+      "leaf": "round",
+      "tier": "accent"
+    },
+    {
+      "id": "PL09",
+      "name": "節制垂墜綠植",
+      "width": 0.46,
+      "height": 0.77,
+      "usage": "待實際高處架面驗證",
+      "pot": "iron",
+      "leaf": "trailing",
+      "tier": "hanging"
+    },
+    {
+      "id": "PL10",
+      "name": "低彩花葉點綴",
+      "width": 0.39,
+      "height": 0.45,
+      "usage": "少量裝飾桌面",
+      "pot": "stone",
+      "leaf": "bloom",
+      "tier": "accent"
+    }
+  ],
+  "instances": [
+    {
+      "instance_id": "GRN-001",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-00-0",
+      "position": [
+        -137.82,
+        0.0,
+        -58.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-002",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-00-0",
+      "position": [
+        -133.025,
+        0.763,
+        -62.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-003",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-00-1",
+      "position": [
+        -115.18,
+        0.0,
+        -58.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-004",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-00-1",
+      "position": [
+        -118.775,
+        0.763,
+        -62.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-005",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-01-0",
+      "position": [
+        -137.82,
+        0.0,
+        -45.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-006",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-01-0",
+      "position": [
+        -133.025,
+        0.763,
+        -49.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-007",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-01-1",
+      "position": [
+        -115.18,
+        0.0,
+        -45.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-008",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-01-1",
+      "position": [
+        -118.775,
+        0.763,
+        -49.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-009",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-02-0",
+      "position": [
+        -137.82,
+        0.0,
+        -32.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-010",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-02-0",
+      "position": [
+        -133.015,
+        0.783,
+        -32.8
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-OF05",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-011",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-02-1",
+      "position": [
+        -115.18,
+        0.0,
+        -32.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-012",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-02-1",
+      "position": [
+        -118.775,
+        0.763,
+        -36.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-013",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-03-0",
+      "position": [
+        -137.82,
+        0.0,
+        -19.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-014",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-03-0",
+      "position": [
+        -133.025,
+        0.763,
+        -23.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-015",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-03-1",
+      "position": [
+        -115.18,
+        0.0,
+        -19.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-016",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-03-1",
+      "position": [
+        -118.775,
+        0.763,
+        -23.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-017",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-04-0",
+      "position": [
+        -137.82,
+        0.0,
+        -6.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-018",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-04-0",
+      "position": [
+        -133.025,
+        0.763,
+        -10.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-019",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-04-1",
+      "position": [
+        -115.18,
+        0.0,
+        -6.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-020",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-04-1",
+      "position": [
+        -118.775,
+        0.763,
+        -10.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-021",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-05-0",
+      "position": [
+        -137.82,
+        0.0,
+        6.18
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-022",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-05-0",
+      "position": [
+        -133.015,
+        0.783,
+        6.2
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-OF05",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-023",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-1F-05-1",
+      "position": [
+        -115.18,
+        0.0,
+        6.18
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-024",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-1F-05-1",
+      "position": [
+        -118.775,
+        0.763,
+        2.1
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-025",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-00-0",
+      "position": [
+        -137.82,
+        4.0,
+        -58.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-026",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-00-0",
+      "position": [
+        -133.025,
+        4.763,
+        -62.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-027",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-00-1",
+      "position": [
+        -115.18,
+        4.0,
+        -58.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-028",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-00-1",
+      "position": [
+        -118.775,
+        4.763,
+        -62.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-029",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-01-0",
+      "position": [
+        -137.82,
+        4.0,
+        -45.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-030",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-01-0",
+      "position": [
+        -133.025,
+        4.763,
+        -49.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-031",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-01-1",
+      "position": [
+        -115.18,
+        4.0,
+        -45.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-032",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-01-1",
+      "position": [
+        -118.775,
+        4.763,
+        -49.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-033",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-02-0",
+      "position": [
+        -137.82,
+        4.0,
+        -32.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-034",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-02-0",
+      "position": [
+        -133.025,
+        4.763,
+        -36.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-035",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-02-1",
+      "position": [
+        -115.18,
+        4.0,
+        -32.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-036",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-02-1",
+      "position": [
+        -118.775,
+        4.763,
+        -36.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-037",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-03-0",
+      "position": [
+        -137.82,
+        4.0,
+        -19.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-038",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-03-0",
+      "position": [
+        -133.025,
+        4.763,
+        -23.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-039",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-03-1",
+      "position": [
+        -115.18,
+        4.0,
+        -19.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-040",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-03-1",
+      "position": [
+        -118.775,
+        4.763,
+        -23.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-041",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-04-0",
+      "position": [
+        -137.82,
+        4.0,
+        -6.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-042",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-04-0",
+      "position": [
+        -133.025,
+        4.763,
+        -10.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-043",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-04-1",
+      "position": [
+        -115.18,
+        4.0,
+        -6.82
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-044",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-04-1",
+      "position": [
+        -118.775,
+        4.763,
+        -10.9
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-045",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-05-0",
+      "position": [
+        -137.82,
+        4.0,
+        6.18
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-046",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-05-0",
+      "position": [
+        -133.025,
+        4.763,
+        2.1
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-047",
+      "asset_id": "PL05",
+      "zone": "B",
+      "room": "B-2F-05-1",
+      "position": [
+        -115.18,
+        4.0,
+        6.18
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-048",
+      "asset_id": "PL07",
+      "zone": "B",
+      "room": "B-2F-05-1",
+      "position": [
+        -119.84,
+        4.773,
+        3.0
+      ],
+      "diameter_m": 0.22,
+      "height_m": 0.28,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-OF01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-049",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-1F-00-0",
+      "position": [
+        -33.82,
+        0.0,
+        -58.82
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-050",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-1F-00-0",
+      "position": [
+        -31.54,
+        0.783,
+        -61.5
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-SP01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-051",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-1F-00-1",
+      "position": [
+        -15.18,
+        0.0,
+        -58.82
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-052",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-1F-00-1",
+      "position": [
+        -19.215,
+        0.783,
+        -61.5
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-SP01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-053",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-1F-01-0",
+      "position": [
+        -33.82,
+        0.0,
+        -42.02
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-054",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-1F-01-1",
+      "position": [
+        -15.18,
+        0.0,
+        -42.02
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-055",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-1F-02-0",
+      "position": [
+        -33.82,
+        0.0,
+        -26.4
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-056",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-1F-02-0",
+      "position": [
+        -31.662,
+        0.773,
+        -29.0
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-LB08",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-057",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-1F-02-1",
+      "position": [
+        -15.18,
+        0.0,
+        -25.22
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-058",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-1F-02-1",
+      "position": [
+        -19.337,
+        0.773,
+        -29.0
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-LB08",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-059",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-1F-03-0",
+      "position": [
+        -33.82,
+        0.0,
+        -8.42
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-060",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-1F-03-0",
+      "position": [
+        -31.615,
+        0.773,
+        -11.6
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-OF01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-061",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-1F-03-1",
+      "position": [
+        -15.18,
+        0.0,
+        -8.42
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-062",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-1F-03-1",
+      "position": [
+        -19.29,
+        0.773,
+        -11.6
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-OF01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-063",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-1F-04-0",
+      "position": [
+        -33.82,
+        0.0,
+        8.38
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-064",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-1F-04-0",
+      "position": [
+        -30.55,
+        0.763,
+        4.3
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-065",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-1F-04-1",
+      "position": [
+        -15.18,
+        0.0,
+        8.38
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-066",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-1F-04-1",
+      "position": [
+        -18.225,
+        0.763,
+        4.3
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-067",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-2F-00-0",
+      "position": [
+        -33.82,
+        4.0,
+        -58.82
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-068",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-2F-00-0",
+      "position": [
+        -31.54,
+        4.783,
+        -61.5
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-SP01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-069",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-2F-00-1",
+      "position": [
+        -15.18,
+        4.0,
+        -58.82
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-070",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-2F-00-1",
+      "position": [
+        -19.215,
+        4.783,
+        -61.5
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-SP01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-071",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-2F-01-0",
+      "position": [
+        -33.82,
+        4.0,
+        -42.02
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-072",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-2F-01-1",
+      "position": [
+        -15.18,
+        4.0,
+        -42.02
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-073",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-2F-02-0",
+      "position": [
+        -33.82,
+        4.0,
+        -26.4
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-074",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-2F-02-0",
+      "position": [
+        -31.662,
+        4.773,
+        -29.0
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-LB08",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-075",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-2F-02-1",
+      "position": [
+        -15.18,
+        4.0,
+        -25.22
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-076",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-2F-02-1",
+      "position": [
+        -19.337,
+        4.773,
+        -29.0
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-LB08",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-077",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-2F-03-0",
+      "position": [
+        -33.82,
+        4.0,
+        -8.42
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-078",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-2F-03-0",
+      "position": [
+        -31.615,
+        4.773,
+        -11.6
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-OF01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-079",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-2F-03-1",
+      "position": [
+        -15.18,
+        4.0,
+        -8.42
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-080",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-2F-03-1",
+      "position": [
+        -19.29,
+        4.773,
+        -11.6
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-OF01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-081",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-2F-04-0",
+      "position": [
+        -33.82,
+        4.0,
+        8.38
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-082",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-2F-04-0",
+      "position": [
+        -30.55,
+        4.763,
+        4.3
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-083",
+      "asset_id": "PL04",
+      "zone": "C",
+      "room": "C-2F-04-1",
+      "position": [
+        -15.18,
+        4.0,
+        8.38
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "teacher-room sideline; non-story wall",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-084",
+      "asset_id": "PL08",
+      "zone": "C",
+      "room": "C-2F-04-1",
+      "position": [
+        -18.225,
+        4.763,
+        4.3
+      ],
+      "diameter_m": 0.27,
+      "height_m": 0.34,
+      "placement_type": "desktop",
+      "purpose": "on existing modeled desk",
+      "support_furniture": "LH-TC01",
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-085",
+      "asset_id": "PL01",
+      "zone": "D",
+      "room": "D_COMMON",
+      "position": [
+        -95.4,
+        0,
+        39.6
+      ],
+      "diameter_m": 0.54,
+      "height_m": 1.65,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-086",
+      "asset_id": "PL01",
+      "zone": "D",
+      "room": "D_COMMON",
+      "position": [
+        -25.0,
+        0,
+        39.7
+      ],
+      "diameter_m": 0.54,
+      "height_m": 1.65,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-087",
+      "asset_id": "PL04",
+      "zone": "D",
+      "room": "D_COMMON",
+      "position": [
+        -95.1,
+        0,
+        51.2
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-088",
+      "asset_id": "PL04",
+      "zone": "D",
+      "room": "D_COMMON",
+      "position": [
+        -24.1,
+        0,
+        50.2
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-089",
+      "asset_id": "PL02",
+      "zone": "D",
+      "room": "D_COMMON",
+      "position": [
+        -91.6,
+        0,
+        33.0
+      ],
+      "diameter_m": 0.85,
+      "height_m": 1.5,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-090",
+      "asset_id": "PL02",
+      "zone": "D",
+      "room": "D_COMMON",
+      "position": [
+        -33.3,
+        0,
+        33.0
+      ],
+      "diameter_m": 0.85,
+      "height_m": 1.5,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-091",
+      "asset_id": "PL02",
+      "zone": "E",
+      "room": "E_COMMON",
+      "position": [
+        -114.9,
+        0,
+        -86.1
+      ],
+      "diameter_m": 0.85,
+      "height_m": 1.5,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-092",
+      "asset_id": "PL04",
+      "zone": "E",
+      "room": "E_COMMON",
+      "position": [
+        -104.7,
+        0,
+        -86.1
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-093",
+      "asset_id": "PL03",
+      "zone": "E",
+      "room": "E_COMMON",
+      "position": [
+        -95.5,
+        0,
+        -87.0
+      ],
+      "diameter_m": 0.92,
+      "height_m": 1.87,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-094",
+      "asset_id": "PL01",
+      "zone": "E",
+      "room": "E_COMMON",
+      "position": [
+        -77.8,
+        0,
+        -87.5
+      ],
+      "diameter_m": 0.54,
+      "height_m": 1.65,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-095",
+      "asset_id": "PL04",
+      "zone": "E",
+      "room": "E_COMMON",
+      "position": [
+        -65.7,
+        0,
+        -85.8
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-096",
+      "asset_id": "PL01",
+      "zone": "E",
+      "room": "E_COMMON",
+      "position": [
+        -56.3,
+        0,
+        -85.8
+      ],
+      "diameter_m": 0.54,
+      "height_m": 1.65,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-097",
+      "asset_id": "PL05",
+      "zone": "E",
+      "room": "E_COMMON",
+      "position": [
+        -115.5,
+        0,
+        -109.7
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-098",
+      "asset_id": "PL05",
+      "zone": "E",
+      "room": "E_COMMON",
+      "position": [
+        -57.0,
+        0,
+        -109.1
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-099",
+      "asset_id": "PL02",
+      "zone": "G",
+      "room": "G_COMMON",
+      "position": [
+        -120.6,
+        0,
+        -166.3
+      ],
+      "diameter_m": 0.85,
+      "height_m": 1.5,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-100",
+      "asset_id": "PL02",
+      "zone": "G",
+      "room": "G_COMMON",
+      "position": [
+        -97.0,
+        0,
+        -166.0
+      ],
+      "diameter_m": 0.85,
+      "height_m": 1.5,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-101",
+      "asset_id": "PL01",
+      "zone": "G",
+      "room": "G_COMMON",
+      "position": [
+        -121.0,
+        0,
+        -128.7
+      ],
+      "diameter_m": 0.54,
+      "height_m": 1.65,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-102",
+      "asset_id": "PL01",
+      "zone": "G",
+      "room": "G_COMMON",
+      "position": [
+        -97.2,
+        0,
+        -128.8
+      ],
+      "diameter_m": 0.54,
+      "height_m": 1.65,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-103",
+      "asset_id": "PL05",
+      "zone": "H",
+      "room": "H_COMMON",
+      "position": [
+        26.1,
+        0,
+        -147.2
+      ],
+      "diameter_m": 0.52,
+      "height_m": 0.96,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-104",
+      "asset_id": "PL04",
+      "zone": "H",
+      "room": "H_COMMON",
+      "position": [
+        26.0,
+        0,
+        -149.2
+      ],
+      "diameter_m": 0.66,
+      "height_m": 0.88,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    },
+    {
+      "instance_id": "GRN-105",
+      "asset_id": "PL06",
+      "zone": "H",
+      "room": "H_COMMON",
+      "position": [
+        5.4,
+        0,
+        -145.5
+      ],
+      "diameter_m": 0.47,
+      "height_m": 0.54,
+      "placement_type": "floor",
+      "purpose": "side wall/quiet corner",
+      "support_furniture": null,
+      "state": "INSTALLED_PROVISIONAL"
+    }
+  ],
+  "statusA": {
+    "id": "A_MAIN",
+    "status": "DESIGNED_NOT_INSTALLED",
+    "locations": [
+      "A01端點壁龕",
+      "非戲劇鏡頭的小平台"
+    ],
+    "reason": "原建模 A01 告白走廊/班級分鏡尚無安全植栽碰撞定位；不要硬塞"
+  },
+  "statusF": {
+    "id": "F_LIBRARY",
+    "status": "DESIGNED_NOT_INSTALLED",
+    "locations": [
+      "借書櫃台",
+      "閱覽區邊緣",
+      "後花園出口外側"
+    ],
+    "reason": "原生書架/桌面精確座標尚未做專門復核；不覆蓋小說關鍵與既有3D場景"
+  }
+}
