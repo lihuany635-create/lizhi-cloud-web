@@ -66,7 +66,7 @@
       "integrated_contents": "V16 105 original Gothic indoor plant placements installed in B/C 44 provisional teaching rooms, D entrance, E northern public academic, G assembly and H archive; 10 standalone botanical reusable source GLB files on stage. 44 floor pots in classrooms, 40 actual desk tabletop pots, 21 shared-room floor pots. Original A01 and F_NATIVE_LIBRARY interior not planted yet pending native geometry/camera mapping. Old V15 Bessie garden pot, all V14 entry and 1734 prior furniture preserved; no character collision required by author. Plant models are batched low-poly matte Gothic styling, not story-canonical species and not final photoreal assets.",
       "author_full_item_approval": "PENDING",
       "static_geometry_qa": "PASS: 10 1F routes + 3 stair/upper walk centerline radius-0.4m clearance checks, 26 3D stair treads obstacle-free AABB, 3.55m modeled roof headroom",
-      "visual_qa": "PASS_PUBLIC_GARDEN_3D_PRESENT__STILL_PROVISIONAL_LOW_POLY_STYLE",
+      "visual_qa": "V16_PUBLIC_3D_RENDER_CAPTURED__PLANT_ART_AND_AUTHOR_ACCEPTANCE_PENDING",
       "wing_interiors": "PARTIALLY_MODELED_44_PROVISIONAL_BC_ROOMS_AND_SELECTED_SHARED_SPACES",
       "mobile_performance_note": "Reduced new campus mesh draws by 5068; device FPS unverified",
       "design_book": "https://docs.google.com/document/d/1seSK9uMrnNV2_Mh1RwmG50JtjFgXqJzHOQoCqiNFTPQ/edit?usp=drivesdk",
@@ -120,9 +120,11 @@
       },
       "interior_A01_native_F_plants_status": "NOT_INSTALLED__NATIVE_STORY_SCENE_PROTECTED",
       "interior_greenery_registered_furniture_qa": "PASS_NO_REGISTERED_FURNITURE_OVERLAP",
-      "interior_greenery_render_qa": "PENDING_PUBLIC_SCREENSHOT",
+      "interior_greenery_render_qa": "PASS_PUBLIC_GLTF_SHA_AND_ACTUAL_CLASSROOM_CAMERA_SCREENSHOT__MODEL_IS_LOW_POLY_DRAFT",
       "interior_plant_approval": "PENDING_AUTHOR_ANIMATION_REVIEW",
-      "V15_Bessie_back_garden_plant_preserved": true
+      "V15_Bessie_back_garden_plant_preserved": true,
+      "interior_greenery_visual_screenshot": "https://github.com/lihuany635-create/lizhi-cloud-web/blob/rg-ep01-s01-stage-20261023/model-viewer/staged-output/academy-interior-greenery-v16/public-qa/plants-actual-cdp.png",
+      "interior_greenery_qa_note": "Classroom top view shows green pot wall side and small desk accent. Leaf mesh modest, simplified anime-blocking look; native A01/F plants deliberately omitted pending source coordinate audits. Browser headless lexical WebGL fields are inaccessible but captured screenshot confirms display."
     }
   ]
 }
