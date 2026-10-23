@@ -1,0 +1,41 @@
+{
+  "scene": "EP01-S01",
+  "revision": "S01-V8-VAULT-FLOOR-REVIEW",
+  "model": "lahudi-academy_ep01_s01_v8_vault_floor_review.glb",
+  "input_v7_sha256": "a7c6cf6f9281c2758a450c12d3c0f8c70e9167a7efaaa8a6aba68533c64e11d7",
+  "sha256": "b3591f3ca522ca7be0dc7892ab5fdf0dfa178a20294840d8af20a3f030d84863",
+  "bytes": 5575344,
+  "changed_vault_nodes": 176,
+  "curved_vault_edge_m": 6.06,
+  "curved_vault_apex_m": 7.91,
+  "changed_vault_index_sample": [
+    7725,
+    7726,
+    7727,
+    7728,
+    7729,
+    7730,
+    7731,
+    7732,
+    7733,
+    7734
+  ],
+  "floor_material": "S01_REV3__reflective_gray_stone",
+  "floor_roughness_before": 0.24,
+  "floor_roughness_after": 0.15,
+  "base_7725_nodes_unchanged": true,
+  "v6_v7_door_and_vestibule_nodes_unchanged": true,
+  "node_count_unchanged": true,
+  "no_new_geometry_in_S06": true,
+  "structural_GLTF_reload": "PASS",
+  "film_frame_alignment": "NOT_RUN",
+  "chrome_visual_qa": "NOT_RUN",
+  "real_reflection_qa": "NOT_RUN",
+  "author_approved": false,
+  "known_limits": [
+    "Pointed vault retone is a candidate; actual animated A01/A03 camera and height proportions remain unapproved.",
+    "Floor roughness change does not bake moving/window sunlight or guarantee physical environment reflections.",
+    "Existing side stair and candidate ascending front stair both remain; no route selection or actor capsule walk certified.",
+    "Five production canonical models and S06 are unchanged."
+  ]
+}

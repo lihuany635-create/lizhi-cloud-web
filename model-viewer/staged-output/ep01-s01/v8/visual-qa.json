@@ -1,0 +1,11 @@
+{
+  "scene": "EP01-S01",
+  "camera": "same-published-film-direction-V7-camera",
+  "render": "Chrome real local WebGL",
+  "pixel_mae_canvas_0_255": 8.4299,
+  "reference_film_match": "NOT_RUN",
+  "V8_acceptance": "AUTHOR_PENDING",
+  "S06_unchanged": true,
+  "canonical_unchanged": true,
+  "notes": "Image difference alone cannot prove improvement; compare to EP01 film A01 02:36 and A02 00:12."
+}
