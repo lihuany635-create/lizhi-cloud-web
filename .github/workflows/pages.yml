@@ -37,6 +37,42 @@ jobs:
           target.write_bytes(data)
           print('Verified exact HADES-v2.4 deployment model:',len(data),'bytes')
           PY
+      - name: Publish isolated EP01 S01 V5 preview model from stage branch
+        uses: actions/checkout@v4
+        with:
+          repository: lihuany635-create/lizhi-cloud-web
+          ref: rg-ep01-s01-stage-20261023
+          path: .s01-stage-publish
+          persist-credentials: false
+      - name: Verify and stage V5 preview (do not overwrite canonical academy)
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib,shutil
+          root=pathlib.Path('.s01-stage-publish/model-viewer/staged-output/ep01-s01/v5')
+          manifest=json.loads((root/'report_v5.json').read_text())
+          source=root/'lahudi-academy_ep01_s01_corridor_v5_art_review.glb'
+          payload=source.read_bytes()
+          actual=hashlib.sha256(payload).hexdigest()
+          assert actual==manifest['sha256'], 'S01 V5 SHA mismatch'
+          assert len(payload)==manifest['bytes'], 'S01 V5 byte length mismatch'
+          assert payload[:4]==b'glTF', 'S01 V5 is not GLB'
+          assert manifest['S06_untouched'] is True
+          assert manifest['author_acceptance']=='PENDING'
+          target=pathlib.Path('model-viewer/preview')
+          target.mkdir(parents=True,exist_ok=True)
+          (target/'s01-v5.glb').write_bytes(payload)
+          (target/'s01-v5-status.json').write_text(json.dumps({
+            'project':'現實遊戲','scene':'EP01-S01','version':'S01-V5-TEST',
+            'sha256':actual,'bytes':len(payload),
+            'author_approval':'PENDING','camera_match':'NOT_RUN',
+            'canonical_glb_unchanged':True,
+            'source_branch':'rg-ep01-s01-stage-20261023',
+            'source_report':manifest,
+            'publication':'TEST_PREVIEW_ONLY'
+          },ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')
+          print('Published isolated S01 V5 preview:',len(payload),'bytes SHA256',actual)
+          PY
+          rm -rf .s01-stage-publish
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
