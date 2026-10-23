@@ -1,0 +1,32 @@
+name: RG Academy V13 School Entrance Geometry QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v13-gate-qa.yml'
+      - 'model-viewer/revisions/academy-gate-v13/verify_v13_gate.py'
+      - 'model-viewer/staged-output/academy-gate-v13/report.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify true open gate/wickets and unobstructed forecourt geometry
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-gate-v13/verify_v13_gate.py
+      - name: Store the actual candidate's geometry audit
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-gate-v13/gate-static-qa.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy V13): store verified open school entrance walkway gates and side route results'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
