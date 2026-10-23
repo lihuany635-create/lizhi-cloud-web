@@ -65,10 +65,10 @@ def main():
     tail=name.rsplit("_",1)[1]
     if tail.isdigit():
      k=int(tail);a=-183.2+(40.45)*k/10;b=a+40.45/10
-     if a<=-151<=b:
+     if k in (7,8):
       n.setdefault("extras",{})["passage_original_mesh"]=n.pop("mesh")
       opened_core.append(name)
- assert len(opened_core)>=4,opened_core
+ assert len(opened_core)==5,opened_core
 
  palettes={
   "cold_stone":([.30,.37,.43,1],.80,.01),
@@ -178,9 +178,9 @@ def main():
   roof(name,name,x0,x1,z0,z1,eave,ridge,roofmat)
  # 6 NEW masses, 2 preserved original masses:
  wing("B_WEST",-139,-114,-68,24,11.6,15.8,
-      east_doors=[(-14,-9)],south_doors=[(-125,-121)])
+      east_doors=[(-12.2,-8.2)],south_doors=[(-125,-121)])
  wing("C_EAST",-35,-14,-68,24,11.6,15.6,mat="warm_stone",
-      west_doors=[(-14,-9)],south_doors=[(-32,-28)])
+      west_doors=[(-12.2,-8.2)],south_doors=[(-32,-28)])
  # South entrance D composed asymmetrically around existing x=-70.1 clock tower
  # using the exact locked bounding union x[-98,-22], z[30,53].
  wing("D_WEST_ENTRY",-98,-75,30,53,10.8,15.5,mat="warm_stone",
@@ -214,7 +214,14 @@ def main():
               -49.2,-2.2,11.0,[(-47,-43.4)])
  # Repair rear V5 library east wall / true link opening.
  segment_wall("F_LIBRARY_EAST_PORTAL","F_LIBRARY","cold_stone","x",-2.2,
-              -154.7,-148.3,4.0,[(-154,-149)])
+              -154.885,-146.795,4.0,[(-154,-149)])
+ # Re-frame exact original V5 single-bay courtyard portals (old mesh panel 13 suppressed).
+ for x,label in ((-87.95,"west"),(-67.18,"east")):
+  for z,end in ((-12.2,"north"),(-8.2,"south")):
+   box(f"A_MAIN_court_door_jamb_{label}_{end}","light_stone",x,1.78,z,
+       .58,3.55,.28,"real_passage_jamb","A_MAIN")
+  box(f"A_MAIN_court_door_header_{label}","light_stone",x,3.83,-10.2,
+      .58,.32,4.0,"passage_header","A_MAIN")
  # Pathways and slabs across exact measured gaps. These do not imply full collision QA.
  def link(name,xa,xb,za,zb):
   assert xa<xb and za<zb,(name,xa,xb,za,zb)
@@ -241,8 +248,8 @@ def main():
      box(name+f"_pier_{i}_{suffix}","light_stone",xi,2.55,zi,
          .30,5.10,.30,"arcade_support","LINK")
  links={
- "WEST_TO_MAIN":(-114,-87.95,-14,-9),
- "EAST_TO_MAIN":(-67.18,-35,-14,-9),
+ "WEST_TO_MAIN":(-114,-87.95,-12.0,-8.4),
+ "EAST_TO_MAIN":(-67.18,-35,-12.0,-8.4),
  "MAIN_TO_E_SOUTH":(-86,-82,-82,-67.85),
  "E_NORTH_TO_LIBRARY":(-47,-43.4,-142.75,-112),
  "E_TO_G_CHAPEL":(-107,-103,-125,-112),
