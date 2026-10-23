@@ -2,6 +2,7 @@
 (function(){
   const api = "https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-mobile-agent";
   let renderedHost = null;
+  const attachedHosts = new WeakSet();
   let busy = false;
   let screenUrl = null;
   function cleanup(){ if(screenUrl)URL.revokeObjectURL(screenUrl);screenUrl=null; }
@@ -53,7 +54,7 @@
   window.LizhiPhoneAgent={
     mount(host){
       if(!host)return;
-      if(renderedHost===host)return;
+      if(renderedHost===host && host.querySelector("[data-phone-status]"))return;
       cleanup();
       renderedHost=host;
       host.innerHTML='<div class="phone-agent-card">'+
@@ -66,7 +67,9 @@
         '<img class="phone-agent-screen" data-phone-screen alt="A22 螢幕畫面" hidden>'+
         '<pre class="phone-agent-ui" data-phone-ui hidden></pre>'+
         '<small>不保存 OPERATOR 金鑰，也不提供點擊、滑動與輸入功能。請勿在金融或敏感畫面使用。</small></div>';
-      host.addEventListener('click',e=>{
+      if(!attachedHosts.has(host)) {
+        attachedHosts.add(host);
+        host.addEventListener('click',e=>{
         const button=e.target.closest('[data-phone-read]');
         if(!button||!host.contains(button))return;
         const action=button.dataset.phoneRead;
@@ -74,7 +77,8 @@
         if(action==='ui')host.querySelector('[data-phone-ui]').hidden=false;
         if(action==='screen')host.querySelector('[data-phone-screen]').hidden=false;
         load(host,action);
-      });
+        });
+      }
       load(host,'status');
     }
   };

@@ -62,12 +62,18 @@ function renderWorkspace() {
       }
     }
   } else {
-    const renderers = {home:renderHome,knowledge:KnowledgeHome.render,weave:(window.AiCenter?AiCenter.render:KnowledgeWeaving.render),finance:FinanceHome.render,engineering:renderEngineeringHub,trash:renderTrash,settings:renderSettings,uploads:renderUploads};
+    const renderers = {home:renderHome,knowledge:KnowledgeHome.render,weave:(window.AiCenter?AiCenter.render:KnowledgeWeaving.render),finance:FinanceHome.render,engineering:renderEngineeringHub,phoneagent:renderPhoneAgent,trash:renderTrash,settings:renderSettings,uploads:renderUploads};
     const focused = document.activeElement;
     const searchFocused = panel.contains(focused) && focused.matches('[data-search]');
     const selection = searchFocused ? [focused.selectionStart, focused.selectionEnd] : null;
     panel.innerHTML = (renderers[state.route] || renderHome)();
     if(selection) { const input = panel.querySelector('[data-search]'); input?.focus(); input?.setSelectionRange(...selection); }
+  }
+  // Phone agent is a separate, read-only dashboard. Render it inside the
+  // existing protected Lizhi Cloud route; do not expose any operator token.
+  if(state.route === 'phoneagent' && window.LizhiPhoneAgent) {
+    const host = panel.querySelector('#lizhi-phone-host');
+    if(host) window.LizhiPhoneAgent.mount(host);
   }
   if(state.route === 'animationflow' && !panel.dataset.productionMounted) {
     panel.dataset.productionMounted = 'loading';
