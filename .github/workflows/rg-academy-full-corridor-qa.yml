@@ -1,0 +1,30 @@
+name: RG Academy Full Corridor Structure No Render QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-full-corridor-qa.yml'
+      - 'model-viewer/revisions/academy-all-corridors/verify_geometry_no_render.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  static-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert corridor and classroom opening geometry, no renderer
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-all-corridors/verify_geometry_no_render.py
+      - name: Save unrendered QA
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-all-corridors-rb2-v1/geometry-qa.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy): archive corridor geometry checks without rendering'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
