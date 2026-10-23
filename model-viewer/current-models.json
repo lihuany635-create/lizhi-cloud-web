@@ -66,7 +66,7 @@
       "integrated_contents": "V14 anime-directed campus main gate: cool gray-blue simplified Gothic stone, central tall entrance piers, open two wrought iron leaves, simplified low perimeter fencing, two true pedestrian wickets, subdued guardhouse, winter bare trees and snow, two waiting benches, clean main axis X=-70.1. Maintains existing asymmetric school facades, all V12 architecture/44 provisional rooms/1734 furniture placements, 2 stair cores and V11 exterior. In source V13 old 28 gate batch roots disabled, 29 new V14 gate batch roots enabled. All original V12 11983 nodes unchanged.",
       "author_full_item_approval": "PENDING",
       "static_geometry_qa": "PASS: 10 1F routes + 3 stair/upper walk centerline radius-0.4m clearance checks, 26 3D stair treads obstacle-free AABB, 3.55m modeled roof headroom",
-      "visual_qa": "PENDING_AUTHOR_VISUAL_REVIEW",
+      "visual_qa": "PUBLIC_V14_FRONT_GATE_RENDER_CAPTURED__ART_STYLE_REFINEMENT_NEEDED",
       "wing_interiors": "PARTIALLY_MODELED_44_PROVISIONAL_BC_ROOMS_AND_SELECTED_SHARED_SPACES",
       "mobile_performance_note": "Reduced new campus mesh draws by 5068; device FPS unverified",
       "design_book": "https://docs.google.com/document/d/1seSK9uMrnNV2_Mh1RwmG50JtjFgXqJzHOQoCqiNFTPQ/edit?usp=drivesdk",
@@ -89,7 +89,10 @@
       "gate_open_geometry_static_qa": "PASS_V14_6_ACCESS_VOLUMES_ZERO_BLOCKERS",
       "gate_animated_door_open_close": "NOT_IMPLEMENTED_GATE_LEAVES_FIXED_OPEN",
       "original_V12_furniture_preserved": true,
-      "gate_visual_qa": "PENDING_PUBLIC_BROWSER_INSPECTION"
+      "gate_visual_qa": "PASS_PUBLIC_BROWSER_SCREENSHOT_PRESENT__AUTHOR_ANIMATION_MATCH_UNVERIFIED",
+      "gate_public_screenshot": "https://github.com/lihuany635-create/lizhi-cloud-web/blob/rg-ep01-s01-stage-20261023/model-viewer/staged-output/academy-gate-anime-v14/public-qa/gate-actual-cdp.png",
+      "gate_animation_style_limit": "Existing school facade and old roof silhouette remain low-poly / box-like versus concept. V14 gate edited in real GLB but not final frame-matched anime exterior.",
+      "gate_public_renderer_stats": "HEADLESS_CDP_LEXICAL_VARIABLES_INACCESSIBLE; visible screenshot captured and public SHA verified"
     }
   ]
 }
