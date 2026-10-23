@@ -1,0 +1,195 @@
+{
+  "scene": "RG-GAME-02",
+  "school": "拉乎迪學院",
+  "version": "ACADEMY-REBUILT-EXTERIOR-RB2-V5",
+  "model": "lahudi-academy_REBUILT-EXTERIOR-RB2_v5.glb",
+  "sha256": "347ba0a423726d4a2c83e1ddc568509a5b3ac35ca99dc6019f513085053b842f",
+  "bytes": 7310612,
+  "parent_v4_sha256": "34db823260c85e77e787fc5d9fbe172996bb413ed5695820d4186a3b9c561bef",
+  "geometry_strategy": "REMOVE_OVERSIZED_PRELIM_CAMPUS_AND_REBUILD_COHERENT_MASSES_AROUND_REAL_INTERIORS",
+  "recovered_without_irreversible_geometry_loss": true,
+  "old_exterior_meshes_deactivated": 6586,
+  "old_v4_fake_facade_nodes_removed": 5115,
+  "preserved_pre_exterior_nodes": 9245,
+  "total_nodes": 11097,
+  "added_nodes": 1852,
+  "regions": {
+    "CAMPUS": 25,
+    "ACADEMIC_MAIN_WING": 848,
+    "ENTRANCE_CLOCK_TOWER": 21,
+    "LIBRARY_WING": 406,
+    "COVERED_CLOISTER_LINK": 552
+  },
+  "feature_groups": {
+    "winter_landscape": 1,
+    "actual_walkable_groundfloor": 2,
+    "foundation": 2,
+    "masonry_wall": 129,
+    "facade_glass": 64,
+    "window_tracery": 192,
+    "window_sill": 44,
+    "gothic_arch": 1116,
+    "buttress": 44,
+    "capital": 102,
+    "outdoor_lamp": 28,
+    "gable_end_wall": 4,
+    "link_portal": 1,
+    "front_portal": 1,
+    "pitched_slate_roof": 6,
+    "roof_ridge": 3,
+    "corner_buttress": 8,
+    "finial": 5,
+    "tower_wall": 4,
+    "tower_pilaster": 4,
+    "portal_lintel": 1,
+    "clock_detail": 4,
+    "library_portal": 1,
+    "covered_walkable_floor": 2,
+    "covered_walkway_roof": 2,
+    "cloister_pillar": 58,
+    "courtyard_walkway": 1,
+    "conifer": 9,
+    "snow_tree_cap": 9,
+    "gate_step": 1,
+    "gate_post": 2,
+    "gate_lamp": 2
+  },
+  "main_wing_actual_footprint": {
+    "x": [
+      -87.95,
+      -67.18
+    ],
+    "z": [
+      -67.85,
+      26.14
+    ],
+    "y_floor0": 0,
+    "native_upper_corridor_y": 4.0
+  },
+  "library_fit_to_actual_furniture": {
+    "x": [
+      -49.2,
+      -2.2
+    ],
+    "z": [
+      -183.2,
+      -142.75
+    ]
+  },
+  "fully_connected_cloister_floor": true,
+  "classroom_entrances_preserved": true,
+  "stair_meshes_preserved": true,
+  "library_furniture_preserved": true,
+  "real_open_air_window_spans_on_exterior": true,
+  "material_palette": {
+    "stone": [
+      0.4,
+      0.46,
+      0.56,
+      1
+    ],
+    "stone_highlight": [
+      0.66,
+      0.69,
+      0.7,
+      1
+    ],
+    "stone_deep": [
+      0.25,
+      0.29,
+      0.37,
+      1
+    ],
+    "arch_shadow": [
+      0.13,
+      0.16,
+      0.23,
+      1
+    ],
+    "foundation": [
+      0.26,
+      0.31,
+      0.38,
+      1
+    ],
+    "roof": [
+      0.085,
+      0.125,
+      0.19,
+      1
+    ],
+    "roof_trim": [
+      0.23,
+      0.29,
+      0.36,
+      1
+    ],
+    "oak": [
+      0.25,
+      0.11,
+      0.062,
+      1
+    ],
+    "oak_rich": [
+      0.4,
+      0.2,
+      0.11,
+      1
+    ],
+    "glass": [
+      0.3,
+      0.56,
+      0.77,
+      0.72
+    ],
+    "glass_glow": [
+      0.55,
+      0.72,
+      0.87,
+      0.8
+    ],
+    "gold": [
+      0.74,
+      0.49,
+      0.19,
+      1
+    ],
+    "warm_light": [
+      1,
+      0.65,
+      0.28,
+      1
+    ],
+    "snow": [
+      0.76,
+      0.83,
+      0.92,
+      1
+    ],
+    "evergreen": [
+      0.052,
+      0.13,
+      0.12,
+      1
+    ],
+    "road": [
+      0.21,
+      0.26,
+      0.31,
+      1
+    ]
+  },
+  "legacy_RB2_materials_preserved": true,
+  "native_Rg_classroom_materials_retoned": true,
+  "structural_reparse": "PASS",
+  "rendering": "NOT_RUN_YET",
+  "collision_and_visual_certification": "NOT_RUN",
+  "canonical_main_file": "NOT_YET_PROMOTED_UNTIL_CI_INTEGRITY_PASS",
+  "author_approval": "PENDING",
+  "limits": [
+    "Entire rebuilt envelope follows verified classroom, roof stair, entrance stair, library interior anchors. Unmodeled wing classrooms are not invented.",
+    "Building masses and ornate details are an architectural design interpretation, not an engineering survey.",
+    "Main teaching wing shell near two native classrooms and true open-window model may require camera/color QA before formal acceptance.",
+    "Older school building shells were deactivated, not physically removed from bufferView arrays; original recoverable copy retained."
+  ]
+}
