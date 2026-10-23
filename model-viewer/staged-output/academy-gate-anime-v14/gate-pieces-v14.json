@@ -1,0 +1,5909 @@
+{
+  "version": "ACADEMY-V14-ANIME-STYLE-GATE-REVIEW",
+  "pieces": [
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_WEST_core",
+      "group": "GATE",
+      "material": "stone",
+      "center": [
+        -76.02,
+        4.1,
+        79
+      ],
+      "dimensions": [
+        1.2688,
+        8.2,
+        1.22
+      ],
+      "kind": "portal_pier",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_WEST_lower",
+      "group": "GATE",
+      "material": "stone_trim",
+      "center": [
+        -76.02,
+        0.4,
+        79
+      ],
+      "dimensions": [
+        1.5699999999999998,
+        0.8,
+        1.58
+      ],
+      "kind": "base_course",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_WEST_cap",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -76.02,
+        8.01,
+        79
+      ],
+      "dimensions": [
+        1.6,
+        0.35,
+        1.62
+      ],
+      "kind": "capital",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_WEST_finial",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -76.02,
+        8.42,
+        79
+      ],
+      "dimensions": [
+        0.22,
+        0.67,
+        0.22
+      ],
+      "kind": "spire_tip",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_WEST_band_1.25",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -76.02,
+        1.25,
+        79
+      ],
+      "dimensions": [
+        1.2863999999999998,
+        0.15,
+        1.3599999999999999
+      ],
+      "kind": "pier_stringcourse",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_WEST_band_4.7",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -76.02,
+        4.7,
+        79
+      ],
+      "dimensions": [
+        1.2863999999999998,
+        0.15,
+        1.3599999999999999
+      ],
+      "kind": "pier_stringcourse",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_WEST_band_6.77",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -76.02,
+        6.77,
+        79
+      ],
+      "dimensions": [
+        1.2863999999999998,
+        0.15,
+        1.3599999999999999
+      ],
+      "kind": "pier_stringcourse",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_EAST_core",
+      "group": "GATE",
+      "material": "stone",
+      "center": [
+        -64.18,
+        4.1,
+        79
+      ],
+      "dimensions": [
+        1.2688,
+        8.2,
+        1.22
+      ],
+      "kind": "portal_pier",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_EAST_lower",
+      "group": "GATE",
+      "material": "stone_trim",
+      "center": [
+        -64.18,
+        0.4,
+        79
+      ],
+      "dimensions": [
+        1.5699999999999998,
+        0.8,
+        1.58
+      ],
+      "kind": "base_course",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_EAST_cap",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -64.18,
+        8.01,
+        79
+      ],
+      "dimensions": [
+        1.6,
+        0.35,
+        1.62
+      ],
+      "kind": "capital",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_EAST_finial",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -64.18,
+        8.42,
+        79
+      ],
+      "dimensions": [
+        0.22,
+        0.67,
+        0.22
+      ],
+      "kind": "spire_tip",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_EAST_band_1.25",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -64.18,
+        1.25,
+        79
+      ],
+      "dimensions": [
+        1.2863999999999998,
+        0.15,
+        1.3599999999999999
+      ],
+      "kind": "pier_stringcourse",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_EAST_band_4.7",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -64.18,
+        4.7,
+        79
+      ],
+      "dimensions": [
+        1.2863999999999998,
+        0.15,
+        1.3599999999999999
+      ],
+      "kind": "pier_stringcourse",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_EAST_band_6.77",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -64.18,
+        6.77,
+        79
+      ],
+      "dimensions": [
+        1.2863999999999998,
+        0.15,
+        1.3599999999999999
+      ],
+      "kind": "pier_stringcourse",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__LEFT_POINTED_STONE_ARCH",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -72.75999999999999,
+        7.365,
+        79
+      ],
+      "dimensions": [
+        6.440442531379352,
+        0.49,
+        0.56
+      ],
+      "kind": "pointed_gate_arch",
+      "yaw_rad": 0,
+      "roll_rad": 0.5987687680925184
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__RIGHT_POINTED_STONE_ARCH",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -67.44,
+        7.365,
+        79
+      ],
+      "dimensions": [
+        6.4404425313793405,
+        0.49,
+        0.56
+      ],
+      "kind": "pointed_gate_arch",
+      "yaw_rad": 0,
+      "roll_rad": -0.5987687680925197
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_KEYSTONE",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -70.1,
+        9.25,
+        79
+      ],
+      "dimensions": [
+        0.5625,
+        0.96,
+        0.72
+      ],
+      "kind": "keystone",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__ACADEMY_HERALDIC_CREAST",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -70.1,
+        8.98,
+        78.43
+      ],
+      "dimensions": [
+        0.47,
+        0.76,
+        0.18
+      ],
+      "kind": "emblem_no_readable_text",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_FRAME_TOP",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.65142248220498,
+        4.57,
+        76.69143727516912
+      ],
+      "dimensions": [
+        4.78,
+        0.108,
+        0.1
+      ],
+      "kind": "open_gate_leaf",
+      "yaw_rad": 1.3089969389957472,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_FRAME_BOTTOM",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.65142248220498,
+        0.32,
+        76.69143727516912
+      ],
+      "dimensions": [
+        4.78,
+        0.135,
+        0.12
+      ],
+      "kind": "open_gate_leaf",
+      "yaw_rad": 1.3089969389957472,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_0",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -75.22876149881367,
+        2.4,
+        78.84609581834461
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_1",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -75.146284496441,
+        2.4,
+        78.53828745503382
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_2",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -75.06380749406833,
+        2.4,
+        78.23047909172304
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_3",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.98133049169566,
+        2.4,
+        77.92267072841226
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_4",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.89885348932299,
+        2.4,
+        77.61486236510147
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_GOLD_TIP_4",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -74.89885348932299,
+        4.74,
+        77.61486236510147
+      ],
+      "dimensions": [
+        0.115,
+        0.27,
+        0.12
+      ],
+      "kind": "wrought_iron_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_5",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.81637648695032,
+        2.4,
+        77.30705400179069
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_6",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.73389948457765,
+        2.4,
+        76.9992456384799
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_7",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.65142248220498,
+        2.4,
+        76.69143727516912
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_8",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.56894547983231,
+        2.4,
+        76.38362891185834
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_9",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.48646847745964,
+        2.4,
+        76.07582054854755
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_10",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.40399147508697,
+        2.4,
+        75.76801218523678
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_GOLD_TIP_10",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -74.40399147508697,
+        4.74,
+        75.76801218523678
+      ],
+      "dimensions": [
+        0.115,
+        0.27,
+        0.12
+      ],
+      "kind": "wrought_iron_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_11",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.3215144727143,
+        2.4,
+        75.460203821926
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_12",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.23903747034163,
+        2.4,
+        75.15239545861522
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_13",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.15656046796896,
+        2.4,
+        74.84458709530443
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BALUSTER_14",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -74.07408346559629,
+        2.4,
+        74.53677873199365
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_MID_RAIL",
+      "group": "GATE",
+      "material": "iron_light",
+      "center": [
+        -74.65142248220498,
+        2.12,
+        76.69143727516912
+      ],
+      "dimensions": [
+        4.78,
+        0.117,
+        0.12
+      ],
+      "kind": "open_gate_leaf",
+      "yaw_rad": 1.3089969389957472,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_FRAME_TOP",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.54857751779502,
+        4.57,
+        76.69143727516912
+      ],
+      "dimensions": [
+        4.78,
+        0.108,
+        0.1
+      ],
+      "kind": "open_gate_leaf",
+      "yaw_rad": -1.3089969389957472,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_FRAME_BOTTOM",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.54857751779502,
+        0.32,
+        76.69143727516912
+      ],
+      "dimensions": [
+        4.78,
+        0.135,
+        0.12
+      ],
+      "kind": "open_gate_leaf",
+      "yaw_rad": -1.3089969389957472,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_0",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -64.97123850118633,
+        2.4,
+        78.84609581834461
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_1",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.053715503559,
+        2.4,
+        78.53828745503382
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_2",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.13619250593167,
+        2.4,
+        78.23047909172304
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_3",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.21866950830434,
+        2.4,
+        77.92267072841226
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_4",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.30114651067701,
+        2.4,
+        77.61486236510147
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_GOLD_TIP_4",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -65.30114651067701,
+        4.74,
+        77.61486236510147
+      ],
+      "dimensions": [
+        0.115,
+        0.27,
+        0.12
+      ],
+      "kind": "wrought_iron_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_5",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.38362351304968,
+        2.4,
+        77.30705400179069
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_6",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.46610051542235,
+        2.4,
+        76.9992456384799
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_7",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.54857751779502,
+        2.4,
+        76.69143727516912
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_8",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.6310545201677,
+        2.4,
+        76.38362891185834
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_9",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.71353152254036,
+        2.4,
+        76.07582054854755
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_10",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.79600852491303,
+        2.4,
+        75.76801218523678
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_GOLD_TIP_10",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -65.79600852491303,
+        4.74,
+        75.76801218523678
+      ],
+      "dimensions": [
+        0.115,
+        0.27,
+        0.12
+      ],
+      "kind": "wrought_iron_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_11",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.8784855272857,
+        2.4,
+        75.460203821926
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_12",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -65.96096252965837,
+        2.4,
+        75.15239545861522
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_13",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -66.04343953203104,
+        2.4,
+        74.84458709530443
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BALUSTER_14",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -66.12591653440371,
+        2.4,
+        74.53677873199365
+      ],
+      "dimensions": [
+        0.049920000000000006,
+        4.5,
+        0.056159999999999995
+      ],
+      "kind": "open_gate_bars",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_MID_RAIL",
+      "group": "GATE",
+      "material": "iron_light",
+      "center": [
+        -65.54857751779502,
+        2.12,
+        76.69143727516912
+      ],
+      "dimensions": [
+        4.78,
+        0.117,
+        0.12
+      ],
+      "kind": "open_gate_leaf",
+      "yaw_rad": -1.3089969389957472,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_PIER_LEFT",
+      "group": "GATE",
+      "material": "stone",
+      "center": [
+        -82.95,
+        2.175,
+        79
+      ],
+      "dimensions": [
+        0.78,
+        4.35,
+        0.81
+      ],
+      "kind": "wicket_pier",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_CAP_LEFT",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -82.95,
+        4.37,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.28,
+        1.0
+      ],
+      "kind": "wicket_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_LAMP_LEFT",
+      "group": "GATE",
+      "material": "lamp",
+      "center": [
+        -82.95,
+        4.85,
+        78.99
+      ],
+      "dimensions": [
+        0.23,
+        0.35,
+        0.28
+      ],
+      "kind": "gate_lantern",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_PIER_RIGHT",
+      "group": "GATE",
+      "material": "stone",
+      "center": [
+        -79.14999999999999,
+        2.175,
+        79
+      ],
+      "dimensions": [
+        0.78,
+        4.35,
+        0.81
+      ],
+      "kind": "wicket_pier",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_CAP_RIGHT",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -79.14999999999999,
+        4.37,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.28,
+        1.0
+      ],
+      "kind": "wicket_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_LAMP_RIGHT",
+      "group": "GATE",
+      "material": "lamp",
+      "center": [
+        -79.14999999999999,
+        4.85,
+        78.99
+      ],
+      "dimensions": [
+        0.23,
+        0.35,
+        0.28
+      ],
+      "kind": "gate_lantern",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_ARCH_1",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -81.675,
+        4.07,
+        79
+      ],
+      "dimensions": [
+        1.5883639381451597,
+        0.34,
+        0.43
+      ],
+      "kind": "wicket_ogive",
+      "yaw_rad": 0,
+      "roll_rad": 0.6649084174092865
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_ARCH_2",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -80.425,
+        4.07,
+        79
+      ],
+      "dimensions": [
+        1.5883639381451597,
+        0.34,
+        0.43
+      ],
+      "kind": "wicket_ogive",
+      "yaw_rad": 0,
+      "roll_rad": -0.6649084174092865
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_SWUNG_LEAF",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -82.17,
+        2.03,
+        77.9
+      ],
+      "dimensions": [
+        0.11,
+        3.9,
+        2.07
+      ],
+      "kind": "wicket_open_leaf",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_LEAF_SPIKE_0",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -82.22,
+        4.17,
+        76.93
+      ],
+      "dimensions": [
+        0.15,
+        0.18,
+        0.11
+      ],
+      "kind": "wicket_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_LEAF_SPIKE_2",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -82.22,
+        4.17,
+        77.53
+      ],
+      "dimensions": [
+        0.15,
+        0.18,
+        0.11
+      ],
+      "kind": "wicket_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_LEAF_SPIKE_4",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -82.22,
+        4.17,
+        78.13000000000001
+      ],
+      "dimensions": [
+        0.15,
+        0.18,
+        0.11
+      ],
+      "kind": "wicket_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WICKET_LEAF_SPIKE_6",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -82.22,
+        4.17,
+        78.73
+      ],
+      "dimensions": [
+        0.15,
+        0.18,
+        0.11
+      ],
+      "kind": "wicket_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_PIER_LEFT",
+      "group": "GATE",
+      "material": "stone",
+      "center": [
+        -61.05,
+        2.175,
+        79
+      ],
+      "dimensions": [
+        0.78,
+        4.35,
+        0.81
+      ],
+      "kind": "wicket_pier",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_CAP_LEFT",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -61.05,
+        4.37,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.28,
+        1.0
+      ],
+      "kind": "wicket_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_LAMP_LEFT",
+      "group": "GATE",
+      "material": "lamp",
+      "center": [
+        -61.05,
+        4.85,
+        78.99
+      ],
+      "dimensions": [
+        0.23,
+        0.35,
+        0.28
+      ],
+      "kind": "gate_lantern",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_PIER_RIGHT",
+      "group": "GATE",
+      "material": "stone",
+      "center": [
+        -57.25,
+        2.175,
+        79
+      ],
+      "dimensions": [
+        0.78,
+        4.35,
+        0.81
+      ],
+      "kind": "wicket_pier",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_CAP_RIGHT",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -57.25,
+        4.37,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.28,
+        1.0
+      ],
+      "kind": "wicket_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_LAMP_RIGHT",
+      "group": "GATE",
+      "material": "lamp",
+      "center": [
+        -57.25,
+        4.85,
+        78.99
+      ],
+      "dimensions": [
+        0.23,
+        0.35,
+        0.28
+      ],
+      "kind": "gate_lantern",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_ARCH_1",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -59.775,
+        4.07,
+        79
+      ],
+      "dimensions": [
+        1.5883639381451597,
+        0.34,
+        0.43
+      ],
+      "kind": "wicket_ogive",
+      "yaw_rad": 0,
+      "roll_rad": 0.6649084174092865
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_ARCH_2",
+      "group": "GATE",
+      "material": "stone_light",
+      "center": [
+        -58.525,
+        4.07,
+        79
+      ],
+      "dimensions": [
+        1.5883639381451597,
+        0.34,
+        0.43
+      ],
+      "kind": "wicket_ogive",
+      "yaw_rad": 0,
+      "roll_rad": -0.6649084174092865
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_SWUNG_LEAF",
+      "group": "GATE",
+      "material": "iron",
+      "center": [
+        -60.269999999999996,
+        2.03,
+        77.9
+      ],
+      "dimensions": [
+        0.11,
+        3.9,
+        2.07
+      ],
+      "kind": "wicket_open_leaf",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_LEAF_SPIKE_0",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -60.32,
+        4.17,
+        76.93
+      ],
+      "dimensions": [
+        0.15,
+        0.18,
+        0.11
+      ],
+      "kind": "wicket_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_LEAF_SPIKE_2",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -60.32,
+        4.17,
+        77.53
+      ],
+      "dimensions": [
+        0.15,
+        0.18,
+        0.11
+      ],
+      "kind": "wicket_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_LEAF_SPIKE_4",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -60.32,
+        4.17,
+        78.13000000000001
+      ],
+      "dimensions": [
+        0.15,
+        0.18,
+        0.11
+      ],
+      "kind": "wicket_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WICKET_LEAF_SPIKE_6",
+      "group": "GATE",
+      "material": "brass",
+      "center": [
+        -60.32,
+        4.17,
+        78.73
+      ],
+      "dimensions": [
+        0.15,
+        0.18,
+        0.11
+      ],
+      "kind": "wicket_finial",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_STONE_BASE",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -114.35499999999999,
+        0.37,
+        79
+      ],
+      "dimensions": [
+        61.290000000000006,
+        0.74,
+        0.53
+      ],
+      "kind": "perimeter_plinth",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_TOP_RAIL",
+      "group": "BOUNDARY",
+      "material": "iron_light",
+      "center": [
+        -114.35499999999999,
+        2.27,
+        79
+      ],
+      "dimensions": [
+        61.290000000000006,
+        0.1,
+        0.16
+      ],
+      "kind": "fence_rail",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_MID_RAIL",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -114.35499999999999,
+        1.36,
+        79
+      ],
+      "dimensions": [
+        61.290000000000006,
+        0.08,
+        0.14
+      ],
+      "kind": "fence_rail",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_0",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -144.4325,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_0",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -144.4325,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_2",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -142.1625,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_2",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -142.1625,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_4",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -139.8925,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_4",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -139.8925,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_6",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -137.6225,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_6",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -137.6225,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_8",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -135.3525,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_8",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -135.3525,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_10",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -133.0825,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_10",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -133.0825,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_12",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -130.8125,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_12",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -130.8125,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_14",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -128.5425,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_14",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -128.5425,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_16",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -126.2725,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_16",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -126.2725,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_18",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -124.0025,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_18",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -124.0025,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_20",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -121.7325,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_20",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -121.7325,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_22",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -119.4625,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_22",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -119.4625,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_24",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -117.1925,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_24",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -117.1925,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_26",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -114.9225,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_26",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -114.9225,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_28",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -112.6525,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_28",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -112.6525,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_30",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -110.3825,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_30",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -110.3825,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_32",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -108.1125,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_32",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -108.1125,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_34",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -105.8425,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_34",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -105.8425,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_36",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -103.57249999999999,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_36",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -103.57249999999999,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_38",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -101.3025,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_38",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -101.3025,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_40",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -99.0325,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_40",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -99.0325,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_42",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -96.76249999999999,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_42",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -96.76249999999999,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_44",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -94.4925,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_44",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -94.4925,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_46",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -92.2225,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_46",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -92.2225,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_48",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -89.95249999999999,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_48",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -89.95249999999999,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_50",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -87.68249999999999,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_50",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -87.68249999999999,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_52",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -85.4125,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_52",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -85.4125,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_STONE_POST_1",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -132.742,
+        1.23,
+        79
+      ],
+      "dimensions": [
+        0.8,
+        2.46,
+        0.68
+      ],
+      "kind": "boundary_column",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_POST_TOP_1",
+      "group": "BOUNDARY",
+      "material": "stone_light",
+      "center": [
+        -132.742,
+        2.52,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.24,
+        0.89
+      ],
+      "kind": "boundary_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_STONE_POST_2",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -120.484,
+        1.23,
+        79
+      ],
+      "dimensions": [
+        0.8,
+        2.46,
+        0.68
+      ],
+      "kind": "boundary_column",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_POST_TOP_2",
+      "group": "BOUNDARY",
+      "material": "stone_light",
+      "center": [
+        -120.484,
+        2.52,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.24,
+        0.89
+      ],
+      "kind": "boundary_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_STONE_POST_3",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -108.226,
+        1.23,
+        79
+      ],
+      "dimensions": [
+        0.8,
+        2.46,
+        0.68
+      ],
+      "kind": "boundary_column",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_POST_TOP_3",
+      "group": "BOUNDARY",
+      "material": "stone_light",
+      "center": [
+        -108.226,
+        2.52,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.24,
+        0.89
+      ],
+      "kind": "boundary_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_STONE_POST_4",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -95.96799999999999,
+        1.23,
+        79
+      ],
+      "dimensions": [
+        0.8,
+        2.46,
+        0.68
+      ],
+      "kind": "boundary_column",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_POST_TOP_4",
+      "group": "BOUNDARY",
+      "material": "stone_light",
+      "center": [
+        -95.96799999999999,
+        2.52,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.24,
+        0.89
+      ],
+      "kind": "boundary_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_SHORT_STONE_BASE",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -77.52000000000001,
+        0.37,
+        79
+      ],
+      "dimensions": [
+        1.7000000000000028,
+        0.74,
+        0.53
+      ],
+      "kind": "perimeter_plinth",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_SHORT_TOP_RAIL",
+      "group": "BOUNDARY",
+      "material": "iron_light",
+      "center": [
+        -77.52000000000001,
+        2.27,
+        79
+      ],
+      "dimensions": [
+        1.7000000000000028,
+        0.1,
+        0.16
+      ],
+      "kind": "fence_rail",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_SHORT_MID_RAIL",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -77.52000000000001,
+        1.36,
+        79
+      ],
+      "dimensions": [
+        1.7000000000000028,
+        0.08,
+        0.14
+      ],
+      "kind": "fence_rail",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_SHORT_IRON_BAR_0",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -77.52000000000001,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_SHORT_BRASS_TIP_0",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -77.52000000000001,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_SHORT_STONE_BASE",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -62.685,
+        0.37,
+        79
+      ],
+      "dimensions": [
+        1.75,
+        0.74,
+        0.53
+      ],
+      "kind": "perimeter_plinth",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_SHORT_TOP_RAIL",
+      "group": "BOUNDARY",
+      "material": "iron_light",
+      "center": [
+        -62.685,
+        2.27,
+        79
+      ],
+      "dimensions": [
+        1.75,
+        0.1,
+        0.16
+      ],
+      "kind": "fence_rail",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_SHORT_MID_RAIL",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -62.685,
+        1.36,
+        79
+      ],
+      "dimensions": [
+        1.75,
+        0.08,
+        0.14
+      ],
+      "kind": "fence_rail",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_SHORT_IRON_BAR_0",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -62.685,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_SHORT_BRASS_TIP_0",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -62.685,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_STONE_BASE",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -10.739999999999998,
+        0.37,
+        79
+      ],
+      "dimensions": [
+        91.47999999999999,
+        0.74,
+        0.53
+      ],
+      "kind": "perimeter_plinth",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_TOP_RAIL",
+      "group": "BOUNDARY",
+      "material": "iron_light",
+      "center": [
+        -10.739999999999998,
+        2.27,
+        79
+      ],
+      "dimensions": [
+        91.47999999999999,
+        0.1,
+        0.16
+      ],
+      "kind": "fence_rail",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_MID_RAIL",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -10.739999999999998,
+        1.36,
+        79
+      ],
+      "dimensions": [
+        91.47999999999999,
+        0.08,
+        0.14
+      ],
+      "kind": "fence_rail",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_0",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -55.91530864197531,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_0",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -55.91530864197531,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_2",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -53.65654320987654,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_2",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -53.65654320987654,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_4",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -51.397777777777776,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_4",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -51.397777777777776,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_6",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -49.13901234567901,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_6",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -49.13901234567901,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_8",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -46.880246913580244,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_8",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -46.880246913580244,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_10",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -44.62148148148148,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_10",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -44.62148148148148,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_12",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -42.36271604938271,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_12",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -42.36271604938271,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_14",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -40.10395061728395,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_14",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -40.10395061728395,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_16",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -37.84518518518519,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_16",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -37.84518518518519,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_18",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -35.58641975308642,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_18",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -35.58641975308642,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_20",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -33.327654320987655,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_20",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -33.327654320987655,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_22",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -31.06888888888889,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_22",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -31.06888888888889,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_24",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -28.810123456790123,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_24",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -28.810123456790123,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_26",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -26.551358024691357,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_26",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -26.551358024691357,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_28",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -24.29259259259259,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_28",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -24.29259259259259,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_30",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -22.03382716049383,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_30",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -22.03382716049383,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_32",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -19.775061728395066,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_32",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -19.775061728395066,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_34",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -17.516296296296296,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_34",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -17.516296296296296,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_36",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -15.257530864197534,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_36",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -15.257530864197534,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_38",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -12.998765432098764,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_38",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -12.998765432098764,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_40",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -10.740000000000002,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_40",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -10.740000000000002,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_42",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -8.481234567901232,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_42",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -8.481234567901232,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_44",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -6.22246913580247,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_44",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -6.22246913580247,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_46",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -3.9637037037037075,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_46",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -3.9637037037037075,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_48",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        -1.704938271604938,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_48",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        -1.704938271604938,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_50",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        0.5538271604938245,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_50",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        0.5538271604938245,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_52",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        2.812592592592594,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_52",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        2.812592592592594,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_54",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        5.0713580246913565,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_54",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        5.0713580246913565,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_56",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        7.330123456790112,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_56",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        7.330123456790112,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_58",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        9.588888888888881,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_58",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        9.588888888888881,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_60",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        11.847654320987651,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_60",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        11.847654320987651,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_62",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        14.106419753086406,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_62",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        14.106419753086406,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_64",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        16.365185185185176,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_64",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        16.365185185185176,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_66",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        18.623950617283946,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_66",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        18.623950617283946,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_68",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        20.882716049382715,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_68",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        20.882716049382715,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_70",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        23.14148148148147,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_70",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        23.14148148148147,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_72",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        25.40024691358024,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_72",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        25.40024691358024,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_74",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        27.65901234567901,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_74",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        27.65901234567901,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_76",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        29.91777777777778,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_76",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        29.91777777777778,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_78",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        32.176543209876534,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_78",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        32.176543209876534,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_80",
+      "group": "BOUNDARY",
+      "material": "iron",
+      "center": [
+        34.435308641975304,
+        1.63,
+        79
+      ],
+      "dimensions": [
+        0.07,
+        1.28,
+        0.1
+      ],
+      "kind": "perimeter_iron_grille",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_80",
+      "group": "BOUNDARY",
+      "material": "brass",
+      "center": [
+        34.435308641975304,
+        2.36,
+        79
+      ],
+      "dimensions": [
+        0.09,
+        0.22,
+        0.09
+      ],
+      "kind": "perimeter_spike",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_STONE_POST_1",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -45.045,
+        1.23,
+        79
+      ],
+      "dimensions": [
+        0.8,
+        2.46,
+        0.68
+      ],
+      "kind": "boundary_column",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_POST_TOP_1",
+      "group": "BOUNDARY",
+      "material": "stone_light",
+      "center": [
+        -45.045,
+        2.52,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.24,
+        0.89
+      ],
+      "kind": "boundary_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_STONE_POST_2",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -33.61,
+        1.23,
+        79
+      ],
+      "dimensions": [
+        0.8,
+        2.46,
+        0.68
+      ],
+      "kind": "boundary_column",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_POST_TOP_2",
+      "group": "BOUNDARY",
+      "material": "stone_light",
+      "center": [
+        -33.61,
+        2.52,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.24,
+        0.89
+      ],
+      "kind": "boundary_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_STONE_POST_3",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -22.175000000000004,
+        1.23,
+        79
+      ],
+      "dimensions": [
+        0.8,
+        2.46,
+        0.68
+      ],
+      "kind": "boundary_column",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_POST_TOP_3",
+      "group": "BOUNDARY",
+      "material": "stone_light",
+      "center": [
+        -22.175000000000004,
+        2.52,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.24,
+        0.89
+      ],
+      "kind": "boundary_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_STONE_POST_4",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        -10.740000000000002,
+        1.23,
+        79
+      ],
+      "dimensions": [
+        0.8,
+        2.46,
+        0.68
+      ],
+      "kind": "boundary_column",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_POST_TOP_4",
+      "group": "BOUNDARY",
+      "material": "stone_light",
+      "center": [
+        -10.740000000000002,
+        2.52,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.24,
+        0.89
+      ],
+      "kind": "boundary_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_STONE_POST_5",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        0.6950000000000003,
+        1.23,
+        79
+      ],
+      "dimensions": [
+        0.8,
+        2.46,
+        0.68
+      ],
+      "kind": "boundary_column",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_POST_TOP_5",
+      "group": "BOUNDARY",
+      "material": "stone_light",
+      "center": [
+        0.6950000000000003,
+        2.52,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.24,
+        0.89
+      ],
+      "kind": "boundary_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_STONE_POST_6",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        12.129999999999988,
+        1.23,
+        79
+      ],
+      "dimensions": [
+        0.8,
+        2.46,
+        0.68
+      ],
+      "kind": "boundary_column",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_POST_TOP_6",
+      "group": "BOUNDARY",
+      "material": "stone_light",
+      "center": [
+        12.129999999999988,
+        2.52,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.24,
+        0.89
+      ],
+      "kind": "boundary_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_STONE_POST_7",
+      "group": "BOUNDARY",
+      "material": "stone",
+      "center": [
+        23.56499999999999,
+        1.23,
+        79
+      ],
+      "dimensions": [
+        0.8,
+        2.46,
+        0.68
+      ],
+      "kind": "boundary_column",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_POST_TOP_7",
+      "group": "BOUNDARY",
+      "material": "stone_light",
+      "center": [
+        23.56499999999999,
+        2.52,
+        79
+      ],
+      "dimensions": [
+        0.98,
+        0.24,
+        0.89
+      ],
+      "kind": "boundary_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_AXIAL_WALK",
+      "group": "FORECOURT",
+      "material": "pavement",
+      "center": [
+        -70.1,
+        0.018,
+        66.2
+      ],
+      "dimensions": [
+        8.5,
+        0.064,
+        26.0
+      ],
+      "kind": "main_axial_paving",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__BUILDING_FRONT_TRANSVERSE_WALK",
+      "group": "FORECOURT",
+      "material": "pavement",
+      "center": [
+        -60.5,
+        0.02,
+        56.6
+      ],
+      "dimensions": [
+        68.0,
+        0.058,
+        3.4
+      ],
+      "kind": "crosswalk_paving",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_PAVING_JOINT_0",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -70.1,
+        0.054,
+        54.3
+      ],
+      "dimensions": [
+        8.45,
+        0.012,
+        0.075
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_PAVING_JOINT_2",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -70.1,
+        0.054,
+        59.3
+      ],
+      "dimensions": [
+        8.45,
+        0.012,
+        0.075
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_PAVING_JOINT_4",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -70.1,
+        0.054,
+        64.3
+      ],
+      "dimensions": [
+        8.45,
+        0.012,
+        0.075
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_PAVING_JOINT_6",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -70.1,
+        0.054,
+        69.3
+      ],
+      "dimensions": [
+        8.45,
+        0.012,
+        0.075
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_PAVING_JOINT_8",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -70.1,
+        0.054,
+        74.3
+      ],
+      "dimensions": [
+        8.45,
+        0.012,
+        0.075
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CROSS_WALK_JOINT_0",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -94.1,
+        0.049,
+        56.6
+      ],
+      "dimensions": [
+        0.07,
+        0.012,
+        3.3
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CROSS_WALK_JOINT_2",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -88.69999999999999,
+        0.049,
+        56.6
+      ],
+      "dimensions": [
+        0.07,
+        0.012,
+        3.3
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CROSS_WALK_JOINT_4",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -83.3,
+        0.049,
+        56.6
+      ],
+      "dimensions": [
+        0.07,
+        0.012,
+        3.3
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CROSS_WALK_JOINT_6",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -77.89999999999999,
+        0.049,
+        56.6
+      ],
+      "dimensions": [
+        0.07,
+        0.012,
+        3.3
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CROSS_WALK_JOINT_12",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -61.69999999999999,
+        0.049,
+        56.6
+      ],
+      "dimensions": [
+        0.07,
+        0.012,
+        3.3
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CROSS_WALK_JOINT_14",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -56.29999999999999,
+        0.049,
+        56.6
+      ],
+      "dimensions": [
+        0.07,
+        0.012,
+        3.3
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CROSS_WALK_JOINT_16",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -50.89999999999999,
+        0.049,
+        56.6
+      ],
+      "dimensions": [
+        0.07,
+        0.012,
+        3.3
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CROSS_WALK_JOINT_18",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -45.49999999999999,
+        0.049,
+        56.6
+      ],
+      "dimensions": [
+        0.07,
+        0.012,
+        3.3
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CROSS_WALK_JOINT_20",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -40.099999999999994,
+        0.049,
+        56.6
+      ],
+      "dimensions": [
+        0.07,
+        0.012,
+        3.3
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CROSS_WALK_JOINT_22",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -34.69999999999999,
+        0.049,
+        56.6
+      ],
+      "dimensions": [
+        0.07,
+        0.012,
+        3.3
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CROSS_WALK_JOINT_24",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -29.299999999999983,
+        0.049,
+        56.6
+      ],
+      "dimensions": [
+        0.07,
+        0.012,
+        3.3
+      ],
+      "kind": "stone_path_joint",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__W_WICKET_ACCESS",
+      "group": "FORECOURT",
+      "material": "pavement",
+      "center": [
+        -81,
+        0.021,
+        72
+      ],
+      "dimensions": [
+        3.2,
+        0.058,
+        6.1
+      ],
+      "kind": "pedestrian_gate_paving",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__E_WICKET_ACCESS",
+      "group": "FORECOURT",
+      "material": "pavement",
+      "center": [
+        -59.1,
+        0.021,
+        72
+      ],
+      "dimensions": [
+        3.2,
+        0.058,
+        6.1
+      ],
+      "kind": "pedestrian_gate_paving",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__W_WINTER_PLANTER_L",
+      "group": "FORECOURT",
+      "material": "stone_trim",
+      "center": [
+        -87,
+        0.3,
+        65.9
+      ],
+      "dimensions": [
+        3.0,
+        0.6,
+        3.0
+      ],
+      "kind": "court_planter",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__W_SHRUB",
+      "group": "FORECOURT",
+      "material": "plant",
+      "center": [
+        -87,
+        0.74,
+        65.9
+      ],
+      "dimensions": [
+        2.05,
+        0.5247999999999999,
+        2.08
+      ],
+      "kind": "winter_planting",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__W_SNOW_PATCH_0",
+      "group": "FORECOURT",
+      "material": "snow",
+      "center": [
+        -87.8,
+        0.55,
+        65.60000000000001
+      ],
+      "dimensions": [
+        0.65,
+        0.13,
+        0.65
+      ],
+      "kind": "snow_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__W_SNOW_PATCH_1",
+      "group": "FORECOURT",
+      "material": "snow",
+      "center": [
+        -87.0,
+        0.55,
+        66.30000000000001
+      ],
+      "dimensions": [
+        0.65,
+        0.13,
+        0.65
+      ],
+      "kind": "snow_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__W_SNOW_PATCH_2",
+      "group": "FORECOURT",
+      "material": "snow",
+      "center": [
+        -86.2,
+        0.55,
+        65.60000000000001
+      ],
+      "dimensions": [
+        0.65,
+        0.13,
+        0.65
+      ],
+      "kind": "snow_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__E_WINTER_PLANTER_L",
+      "group": "FORECOURT",
+      "material": "stone_trim",
+      "center": [
+        -50,
+        0.3,
+        65.9
+      ],
+      "dimensions": [
+        3.0,
+        0.6,
+        3.0
+      ],
+      "kind": "court_planter",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__E_SHRUB",
+      "group": "FORECOURT",
+      "material": "plant",
+      "center": [
+        -50,
+        0.74,
+        65.9
+      ],
+      "dimensions": [
+        2.05,
+        0.5247999999999999,
+        2.08
+      ],
+      "kind": "winter_planting",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__E_SNOW_PATCH_0",
+      "group": "FORECOURT",
+      "material": "snow",
+      "center": [
+        -50.8,
+        0.55,
+        65.60000000000001
+      ],
+      "dimensions": [
+        0.65,
+        0.13,
+        0.65
+      ],
+      "kind": "snow_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__E_SNOW_PATCH_1",
+      "group": "FORECOURT",
+      "material": "snow",
+      "center": [
+        -50.0,
+        0.55,
+        66.30000000000001
+      ],
+      "dimensions": [
+        0.65,
+        0.13,
+        0.65
+      ],
+      "kind": "snow_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__E_SNOW_PATCH_2",
+      "group": "FORECOURT",
+      "material": "snow",
+      "center": [
+        -49.199999999999996,
+        0.55,
+        65.60000000000001
+      ],
+      "dimensions": [
+        0.65,
+        0.13,
+        0.65
+      ],
+      "kind": "snow_cap",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__DROP_OFF_CURB",
+      "group": "SITE",
+      "material": "stone_trim",
+      "center": [
+        -70.1,
+        0.11,
+        85.6
+      ],
+      "dimensions": [
+        23.5,
+        0.15,
+        0.55
+      ],
+      "kind": "dropoff_curb_not_full_road",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__ARRIVAL_PAVEMENT",
+      "group": "SITE",
+      "material": "pavement_alt",
+      "center": [
+        -70.1,
+        0.01,
+        84
+      ],
+      "dimensions": [
+        21.0,
+        0.042,
+        8.0
+      ],
+      "kind": "arrival_square_not_public_road",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_FLOOR",
+      "group": "GATEHOUSE",
+      "material": "pavement_alt",
+      "center": [
+        -100,
+        0.05,
+        71.5
+      ],
+      "dimensions": [
+        6.0,
+        0.15,
+        8.0
+      ],
+      "kind": "gatehouse_floor",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_WEST_WALL",
+      "group": "GATEHOUSE",
+      "material": "stone",
+      "center": [
+        -103,
+        1.326,
+        71.5
+      ],
+      "dimensions": [
+        0.26,
+        2.652,
+        8.0
+      ],
+      "kind": "gatehouse_wall",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_EAST_WALL_0",
+      "group": "GATEHOUSE",
+      "material": "stone",
+      "center": [
+        -97.0,
+        1.326,
+        69.25
+      ],
+      "dimensions": [
+        0.26,
+        2.652,
+        3.5
+      ],
+      "kind": "gatehouse_wall",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_EAST_WALL_1",
+      "group": "GATEHOUSE",
+      "material": "stone",
+      "center": [
+        -97.0,
+        1.326,
+        74.25
+      ],
+      "dimensions": [
+        0.26,
+        2.652,
+        2.5
+      ],
+      "kind": "gatehouse_wall",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_DOOR_LINTEL",
+      "group": "GATEHOUSE",
+      "material": "stone_light",
+      "center": [
+        -97.0,
+        2.4964000000000004,
+        72
+      ],
+      "dimensions": [
+        0.31,
+        0.48,
+        2.0
+      ],
+      "kind": "gatehouse_door_header",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_NORTH_WALL",
+      "group": "GATEHOUSE",
+      "material": "stone",
+      "center": [
+        -100,
+        1.326,
+        67.5
+      ],
+      "dimensions": [
+        6.0,
+        2.652,
+        0.27
+      ],
+      "kind": "gatehouse_wall",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_FRONT_WALL_0",
+      "group": "GATEHOUSE",
+      "material": "stone",
+      "center": [
+        -102.35,
+        1.326,
+        75.5
+      ],
+      "dimensions": [
+        1.2999999999999972,
+        2.652,
+        0.27
+      ],
+      "kind": "gatehouse_wall",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_FRONT_WALL_1",
+      "group": "GATEHOUSE",
+      "material": "stone",
+      "center": [
+        -97.65,
+        1.326,
+        75.5
+      ],
+      "dimensions": [
+        1.2999999999999972,
+        2.652,
+        0.27
+      ],
+      "kind": "gatehouse_wall",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_WINDOW_SILL",
+      "group": "GATEHOUSE",
+      "material": "stone_light",
+      "center": [
+        -100,
+        0.8295000000000001,
+        75.5
+      ],
+      "dimensions": [
+        3.35,
+        0.18,
+        0.46
+      ],
+      "kind": "gatehouse_window_sill",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_WINDOW_PANEL",
+      "group": "GATEHOUSE",
+      "material": "glass",
+      "center": [
+        -100,
+        1.6195,
+        75.51
+      ],
+      "dimensions": [
+        3.0,
+        1.08,
+        0.08
+      ],
+      "kind": "gatehouse_glazing",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_WINDOW_MULLION",
+      "group": "GATEHOUSE",
+      "material": "iron",
+      "center": [
+        -100,
+        1.6195,
+        75.66
+      ],
+      "dimensions": [
+        0.08,
+        1.08,
+        0.18
+      ],
+      "kind": "gatehouse_window_frame",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_SOUTH_HEADER",
+      "group": "GATEHOUSE",
+      "material": "stone_light",
+      "center": [
+        -100,
+        2.5359000000000003,
+        75.5
+      ],
+      "dimensions": [
+        6.2,
+        0.38,
+        0.42
+      ],
+      "kind": "gatehouse_front_header",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_SLOPE_WEST",
+      "group": "GATEHOUSE",
+      "material": "roof",
+      "center": [
+        -101.57,
+        3.2785000000000006,
+        71.5
+      ],
+      "dimensions": [
+        3.640054944640259,
+        0.2,
+        8.55
+      ],
+      "kind": "gatehouse_roof_slope",
+      "yaw_rad": 0,
+      "roll_rad": 0.36520144978817304
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_SLOPE_EAST",
+      "group": "GATEHOUSE",
+      "material": "roof",
+      "center": [
+        -98.43,
+        3.2785000000000006,
+        71.5
+      ],
+      "dimensions": [
+        3.640054944640259,
+        0.2,
+        8.55
+      ],
+      "kind": "gatehouse_roof_slope",
+      "yaw_rad": 0,
+      "roll_rad": -0.36520144978817304
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_RIDGE",
+      "group": "GATEHOUSE",
+      "material": "iron",
+      "center": [
+        -100,
+        3.8078000000000003,
+        71.5
+      ],
+      "dimensions": [
+        0.22,
+        0.28,
+        8.6
+      ],
+      "kind": "gatehouse_ridge",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_DESK",
+      "group": "GATEHOUSE",
+      "material": "oak",
+      "center": [
+        -100.8,
+        0.79,
+        70.5
+      ],
+      "dimensions": [
+        1.4,
+        0.13,
+        0.74
+      ],
+      "kind": "guard_worktop",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_DESK_LEG_-101.36",
+      "group": "GATEHOUSE",
+      "material": "oak",
+      "center": [
+        -101.36,
+        0.35,
+        70.5
+      ],
+      "dimensions": [
+        0.12,
+        0.7,
+        0.53
+      ],
+      "kind": "guard_worktop_leg",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__GUARD_DESK_LEG_-100.24",
+      "group": "GATEHOUSE",
+      "material": "oak",
+      "center": [
+        -100.24,
+        0.35,
+        70.5
+      ],
+      "dimensions": [
+        0.12,
+        0.7,
+        0.53
+      ],
+      "kind": "guard_worktop_leg",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__LANTERN_OUTSIDE",
+      "group": "GATEHOUSE",
+      "material": "lamp",
+      "center": [
+        -97.45,
+        2.8677,
+        73.65
+      ],
+      "dimensions": [
+        0.24,
+        0.44,
+        0.3
+      ],
+      "kind": "gatehouse_lantern",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WAIT_SEAT",
+      "group": "FORECOURT",
+      "material": "oak",
+      "center": [
+        -88.8,
+        0.51,
+        73.1
+      ],
+      "dimensions": [
+        2.0,
+        0.16,
+        0.52
+      ],
+      "kind": "waiting_bench",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BENCH_LEG_-0.79",
+      "group": "FORECOURT",
+      "material": "oak",
+      "center": [
+        -89.59,
+        0.25,
+        73.1
+      ],
+      "dimensions": [
+        0.11,
+        0.5,
+        0.43
+      ],
+      "kind": "waiting_bench_leg",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_BENCH_LEG_0.79",
+      "group": "FORECOURT",
+      "material": "oak",
+      "center": [
+        -88.00999999999999,
+        0.25,
+        73.1
+      ],
+      "dimensions": [
+        0.11,
+        0.5,
+        0.43
+      ],
+      "kind": "waiting_bench_leg",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WAYFINDING",
+      "group": "FORECOURT",
+      "material": "stone_trim",
+      "center": [
+        -88.8,
+        1.46,
+        75.19999999999999
+      ],
+      "dimensions": [
+        0.23,
+        2.92,
+        0.23
+      ],
+      "kind": "wayfinding_post",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_WAYFINDING_SIGN",
+      "group": "FORECOURT",
+      "material": "oak",
+      "center": [
+        -88.8,
+        2.48,
+        75.19999999999999
+      ],
+      "dimensions": [
+        0.8,
+        0.52,
+        0.1
+      ],
+      "kind": "wayfinding_sign_no_text",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WAIT_SEAT",
+      "group": "FORECOURT",
+      "material": "oak",
+      "center": [
+        -51.4,
+        0.51,
+        73.1
+      ],
+      "dimensions": [
+        2.0,
+        0.16,
+        0.52
+      ],
+      "kind": "waiting_bench",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BENCH_LEG_-0.79",
+      "group": "FORECOURT",
+      "material": "oak",
+      "center": [
+        -52.19,
+        0.25,
+        73.1
+      ],
+      "dimensions": [
+        0.11,
+        0.5,
+        0.43
+      ],
+      "kind": "waiting_bench_leg",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_BENCH_LEG_0.79",
+      "group": "FORECOURT",
+      "material": "oak",
+      "center": [
+        -50.61,
+        0.25,
+        73.1
+      ],
+      "dimensions": [
+        0.11,
+        0.5,
+        0.43
+      ],
+      "kind": "waiting_bench_leg",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WAYFINDING",
+      "group": "FORECOURT",
+      "material": "stone_trim",
+      "center": [
+        -51.4,
+        1.46,
+        75.19999999999999
+      ],
+      "dimensions": [
+        0.23,
+        2.92,
+        0.23
+      ],
+      "kind": "wayfinding_post",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_WAYFINDING_SIGN",
+      "group": "FORECOURT",
+      "material": "oak",
+      "center": [
+        -51.4,
+        2.48,
+        75.19999999999999
+      ],
+      "dimensions": [
+        0.8,
+        0.52,
+        0.1
+      ],
+      "kind": "wayfinding_sign_no_text",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__TREE_0_TRUNK",
+      "group": "FORECOURT",
+      "material": "tree_bark",
+      "center": [
+        -106,
+        2.9,
+        63
+      ],
+      "dimensions": [
+        0.34,
+        5.8,
+        0.37
+      ],
+      "kind": "winter_bare_tree",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__TREE_0_BRANCH_L",
+      "group": "FORECOURT",
+      "material": "tree_bark",
+      "center": [
+        -106.624,
+        4.35,
+        62.8
+      ],
+      "dimensions": [
+        1.65,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_branch",
+      "yaw_rad": 0,
+      "roll_rad": -0.44
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__TREE_0_BRANCH_R",
+      "group": "FORECOURT",
+      "material": "tree_bark",
+      "center": [
+        -105.376,
+        4.35,
+        63.25
+      ],
+      "dimensions": [
+        1.65,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_branch",
+      "yaw_rad": 0,
+      "roll_rad": 0.44
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__TREE_0_SNOW_AT_FOOT",
+      "group": "FORECOURT",
+      "material": "snow",
+      "center": [
+        -106,
+        0.17,
+        63
+      ],
+      "dimensions": [
+        2.05,
+        0.17,
+        2.13
+      ],
+      "kind": "snow_ground",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__TREE_1_TRUNK",
+      "group": "FORECOURT",
+      "material": "tree_bark",
+      "center": [
+        -35,
+        2.9,
+        64
+      ],
+      "dimensions": [
+        0.34,
+        5.8,
+        0.37
+      ],
+      "kind": "winter_bare_tree",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__TREE_1_BRANCH_L",
+      "group": "FORECOURT",
+      "material": "tree_bark",
+      "center": [
+        -35.624,
+        4.35,
+        63.8
+      ],
+      "dimensions": [
+        1.65,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_branch",
+      "yaw_rad": 0,
+      "roll_rad": -0.44
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__TREE_1_BRANCH_R",
+      "group": "FORECOURT",
+      "material": "tree_bark",
+      "center": [
+        -34.376,
+        4.35,
+        64.25
+      ],
+      "dimensions": [
+        1.65,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_branch",
+      "yaw_rad": 0,
+      "roll_rad": 0.44
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__TREE_1_SNOW_AT_FOOT",
+      "group": "FORECOURT",
+      "material": "snow",
+      "center": [
+        -35,
+        0.17,
+        64
+      ],
+      "dimensions": [
+        2.05,
+        0.17,
+        2.13
+      ],
+      "kind": "snow_ground",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    },
+    {
+      "name": "RG-GAME-02-GATE-ANIME-V14__CENTRAL_AXIS_LIGHT_STRIP",
+      "group": "FORECOURT",
+      "material": "pavement_alt",
+      "center": [
+        -70.1,
+        0.058,
+        66.5
+      ],
+      "dimensions": [
+        0.12,
+        0.013,
+        21.5
+      ],
+      "kind": "subtle_paving_axis",
+      "yaw_rad": 0,
+      "roll_rad": 0
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "status": "PASS_STATIC_V14_GATE_ACCESS",
+  "candidate_sha256": "a190034201be4867b6ebe0856be2765e7f2851d6cb96fbc1d74c7954afefcd51",
+  "furniture_source_sha256": "580e8b4bc0a1a9c1bb070074de539bf225286f12219460d6af3365cc3060c9d2",
+  "gate_center_x_m": -70.1,
+  "gate_z_m": 79,
+  "probed_path_volumes": [
+    "main_axial_6p8m",
+    "west_wicket",
+    "east_wicket",
+    "cross_entrance",
+    "waiting_near_gate_west",
+    "waiting_near_gate_east"
+  ],
+  "obstruction_counts": {
+    "main_axial_6p8m": 0,
+    "west_wicket": 0,
+    "east_wicket": 0,
+    "cross_entrance": 0,
+    "waiting_near_gate_west": 0,
+    "waiting_near_gate_east": 0
+  },
+  "old_V13_batches_inactive": 28,
+  "active_V14_batch_nodes": 29,
+  "normal_main_gate_clear_width_m": 10.62,
+  "V12_buildings_and_furniture_preserved": true,
+  "new_winter_style_anime_direction_only_not_novel_canon": true,
+  "actual_render": "NOT_RUN",
+  "user_requested_character_collision": "SKIPPED",
+  "author_visual_review": "PENDING"
+}
