@@ -1,0 +1,55 @@
+name: RG EP01 S01 Blender QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - 'model-viewer/revisions/ep01-s01/scripts/render_s01_blender.py'
+      - '.github/workflows/rg-ep01-s01-blender-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  render-ep01-s01:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender
+          blender --version | head -n 3
+      - name: Inspect S01 GLB from staged output, do not regenerate the base
+        run: |
+          blender --background --python model-viewer/revisions/ep01-s01/scripts/render_s01_blender.py -- model-viewer/staged-output/ep01-s01/lahudi-academy_ep01_s01_corridor_v3_review.glb
+      - name: Verify 3 Blender images and stage them
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("candidate-output/blender")
+          j=json.loads((p/"render_report.json").read_text())
+          assert j["corridor_meshes_rendered"]>=50, j
+          assert len(j["image_files"])==3
+          assert all(Path(x).stat().st_size>10000 for x in j["image_files"])
+          assert j["reference_camera_match"]=="NOT_RUN"
+          print(json.dumps(j,ensure_ascii=False,indent=2))
+          PY
+          mkdir -p model-viewer/staged-output/ep01-s01/blender-qa
+          cp candidate-output/blender/*.png model-viewer/staged-output/ep01-s01/blender-qa/
+          cp candidate-output/blender/render_report.json model-viewer/staged-output/ep01-s01/blender-qa/
+      - name: Commit Blender geometry inspection renders to stage branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/blender-qa/
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(S01): actual Blender render of V3 staged GLB from three engineering cameras'
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - name: Artifact backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: rg-ep01-s01-v3-blender-render-qa
+          path: candidate-output/blender/
+          retention-days: 30
