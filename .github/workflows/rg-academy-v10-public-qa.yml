@@ -1,0 +1,44 @@
+name: RG Academy V10 Public Canonical School QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v10-public-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm GitHub Pages serves exact repaired V10 GLB
+        run: |
+          set -euo pipefail
+          d=/tmp/academy-v10-public
+          mkdir -p "$d"
+          base='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer'
+          curl -fSL --retry 10 --retry-delay 3 --retry-all-errors "$base/" -o "$d/index.html"
+          curl -fSL --retry 10 --retry-delay 3 --retry-all-errors "$base/current-models.json?v=20261023-academy-rb2-v10" -o "$d/manifest.json"
+          curl -fSL --retry 10 --retry-delay 3 --retry-all-errors "$base/lahudi-academy.glb?v=rb2-locked-plan-collision-repair-v10-20261023" -o "$d/academy.glb"
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,struct,json
+          p=Path('/tmp/academy-v10-public')
+          b=(p/'academy.glb').read_bytes()
+          sha=hashlib.sha256(b).hexdigest()
+          want='f2b4c82a7ea3b6625a7ffef3157c56b8e7f288bf9cd2d3bbf699c7ca67ef1b5c'
+          assert b[:4]==b'glTF' and struct.unpack_from('<I',b,8)[0]==len(b)
+          assert len(b)==11316780 and sha==want
+          manifest=json.loads((p/'manifest.json').read_text())
+          models=manifest['models']
+          assert len(models)==5
+          academy=next(m for m in models if m['model']=='lahudi-academy.glb')
+          assert academy['current_sha256']==want
+          assert academy['version']=='ACADEMY-LOCKED-PLAN-COLLISION-REPAIR-V10'
+          html=(p/'index.html').read_text()
+          assert 'rb2-locked-plan-collision-repair-v10-20261023' in html
+          assert 'id="academyViews"' in html
+          print('PUBLIC ORIGINAL GLB V10 VERIFIED',sha,len(b))
+          PY
