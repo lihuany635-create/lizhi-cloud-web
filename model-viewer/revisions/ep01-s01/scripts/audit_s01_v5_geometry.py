@@ -30,11 +30,16 @@ for i,n in enumerate(nodes):
     name=n.get("name","");trans=n.get("translation",[0,0,0]);s=n.get("scale",[1,1,1])
     if len(trans)!=3:continue
     x,y,z=trans;orig=i<7725
-    check=(-74<x<-67 and 2.5<y<9 and -17<z<16)
+    geometry_box=box_for(n)
+    near_local=(-74<x<-67 and 2.5<y<9 and -17<z<16)
+    near_mesh=bool(geometry_box and geometry_box[0]<-68 and geometry_box[3]>-74
+          and geometry_box[1]<8 and geometry_box[4]>3.5
+          and geometry_box[2]<13 and geometry_box[5]>-9)
+    check=near_local or near_mesh
     named=("CONFESS" in name or "EP01-S01" in name)
     if not(check or named):continue
     rec={"id":i,"name":name[:180],"original":orig,"t":[round(v,3) for v in trans],"s":[round(v,3) for v in s],"aabb_ignoring_rotation":box_for(n)}
-    if orig and check and any(k in name.lower() for k in ["wall","occlusion","door","panel"]):
+    if orig and (near_mesh or check) and any(k in name.lower() for k in ["wall","occlusion","door","panel"]):
         original_wall.append(rec)
     if orig and (check or "CONFESS" in name) and any(k in name.lower() for k in ["stair","tread","landing","riser"]):
         original_stairs.append(rec)
@@ -52,6 +57,7 @@ report={
  "original_stair_nodes":original_stairs[:130],
  "candidate_facing_nodes":candidates[:200],
  "original_corridor_other_sample":results[:200],
+ "search_method":"GLB mesh accessor world-coordinate AABB; original nodes often have translation=[0,0,0], so local-origin filtering alone is INVALID",
  "non_destructive":True,
  "decision":"DOOR_OPENING_UNVERIFIED_AND_ORIGINAL_SIDE_STAIR_REMAINS",
  "required_next":"Check world transforms and parent graph, then replace only targeted corridor wall geometry, or make scene-specific non-destructive visibility variants."
