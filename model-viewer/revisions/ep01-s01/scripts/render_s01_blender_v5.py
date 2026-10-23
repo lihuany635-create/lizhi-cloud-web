@@ -34,7 +34,12 @@ for o in all_obj:
     valid=intersects and long_span<130
     o.hide_render=not valid
     if valid:kept.append(o.name)
-scene.render.engine="BLENDER_EEVEE"\nscene.eevee.taa_render_samples=24\nscene.eevee.use_gtao=True\nscene.view_settings.view_transform="Standard"\nscene.view_settings.look="Medium High Contrast"\nscene.view_settings.exposure=.2
+scene.render.engine="BLENDER_EEVEE"
+scene.eevee.taa_render_samples=24
+scene.eevee.use_gtao=True
+scene.view_settings.view_transform="Standard"
+scene.view_settings.look="Medium High Contrast"
+scene.view_settings.exposure=.2
 scene.display.shading.light="STUDIO"
 scene.display.shading.color_type="MATERIAL"
 scene.display.shading.show_shadows=True
@@ -108,5 +113,6 @@ report={
  "S06_touched":False,
  "image_files":[str((dest/(v["name"]+".png")).relative_to(root)) for v in views]
 }
-(dest/"render_report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+(dest/"render_report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"
+")
 print("RG_S01_REPORT",json.dumps(report,ensure_ascii=False),flush=True)
