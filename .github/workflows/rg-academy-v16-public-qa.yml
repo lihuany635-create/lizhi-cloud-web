@@ -1,0 +1,74 @@
+name: RG Academy V16 Public Greenery Model And Camera QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v16-public-qa.yml'
+      - 'model-viewer/revisions/academy-interior-plants-v16/check_public_greenery_v16.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  public:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify online V16 model, manifest and original source preservation
+        run: |
+          set -euo pipefail
+          d=candidate-output/academy-v16-public
+          mkdir -p "$d"
+          base='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer'
+          curl -fSL --retry 10 --retry-all-errors --retry-delay 3 --max-time 160 "$base/" -o "$d/index.html"
+          curl -fSL --retry 10 --retry-all-errors --retry-delay 3 --max-time 160 "$base/current-models.json?v=20261024-academy-rb2-v16" -o "$d/manifest.json"
+          curl -fSL --retry 10 --retry-all-errors --retry-delay 3 --max-time 160 "$base/lahudi-academy.glb?v=rb2-indoor-greenery-v16-20261024" -o "$d/academy.glb"
+          python - <<'PY'
+          from pathlib import Path
+          import json,struct,hashlib
+          d=Path('candidate-output/academy-v16-public')
+          b=(d/'academy.glb').read_bytes()
+          sha=hashlib.sha256(b).hexdigest()
+          assert sha=='aa1f5778f9d87672d0df1c7ba36b6202108eb14bbc4aeb4bb322504c7dbf2dc0'
+          assert b[:4]==b'glTF' and struct.unpack_from('<I',b,8)[0]==len(b)==25135944
+          man=json.loads((d/'manifest.json').read_text())
+          model=next(x for x in man['models'] if x['model']=='lahudi-academy.glb')
+          assert len(man['models'])==5
+          assert model['version']=='ACADEMY-V16-INDOOR-GREENERY-PHASE1-REVIEW'
+          assert model['current_sha256']==sha and model['interior_plants_total']==105
+          html=(d/'index.html').read_text()
+          assert 'id="academyPlants"' in html and "academyPlantFocus" in html
+          assert 'rb2-indoor-greenery-v16-20261024' in html
+          n=struct.unpack_from('<I',b,12)[0]
+          obj=json.loads(b[20:20+n])
+          new=[x for x in obj['nodes'] if x.get('name','').startswith('RG-GAME-02-INDOOR-GREENERY-V16__')]
+          assert len(new)==55 and len(obj['nodes'])==12122
+          assert any(x.get('name','').startswith('RG-GAME-02-VITTI-GARDEN-V15__') for x in obj['nodes'])
+          print('V16 LIVE MODEL + MANIFEST VERIFIED',sha)
+          PY
+      - name: Capture actual mobile-size public classroom greenery view
+        run: |
+          CHROME="$(command -v google-chrome || command -v chromium)"              node model-viewer/revisions/academy-interior-plants-v16/check_public_greenery_v16.mjs
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('candidate-output/academy-v16-plants-diagnostic/plants-actual-cdp.png')
+          b=p.read_bytes()
+          assert b[:8]==b'\x89PNG\r\n\x1a\n'
+          assert len(b)>45000, ('Screenshot unexpectedly small',len(b))
+          print('Real browser interior greenery capture',len(b))
+          PY
+      - name: Save screenshot and browser diagnostics to staging, no extra published GLB
+        if: always()
+        run: |
+          dst=model-viewer/staged-output/academy-interior-greenery-v16/public-qa
+          mkdir -p "$dst"
+          cp candidate-output/academy-v16-plants-diagnostic/*.png "$dst/" 2>/dev/null || true
+          cp candidate-output/academy-v16-plants-diagnostic/*.json "$dst/" 2>/dev/null || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy V16): actual production botanicals camera capture'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
