@@ -1,0 +1,44 @@
+{
+  "name": "RG-GAME-02",
+  "version": "ACADEMY-RB2-GOTHIC-ALL-CORRIDORS-V3",
+  "file": "lahudi-academy_ALL-CORRIDORS_RB2-GOTHIC_v3.glb",
+  "sha256": "b89c8c80f6c8d02fd95b97c9ac8cc39f7a7418598a45f272177f9e37476a88df",
+  "bytes": 5825260,
+  "parent_v2_sha256": "684e558cc858cb31278cf6180f73e974675830933da7fb9446426d3ce40b1c86",
+  "nodes": 9245,
+  "v2_decorations_recalibrated": 132,
+  "handrails_recalibrated": 22,
+  "roof_anchor_y_before": 8.28,
+  "roof_anchor_y_after": 7.26,
+  "side_stair_rise_per_m": 0.555556,
+  "static_original_stair_aabb_checks": {
+    "confession_side_stair": {
+      "original_native_steps": 24,
+      "new_decorative_geometry": 130,
+      "aabb_possible_step_intersections": 0
+    },
+    "roof_stair_lobby": {
+      "original_native_steps": 18,
+      "new_decorative_geometry": 82,
+      "aabb_possible_step_intersections": 0
+    },
+    "main_entrance_arcade": {
+      "original_native_steps": 24,
+      "new_decorative_geometry": 96,
+      "aabb_possible_step_intersections": 0
+    }
+  },
+  "AABB_step_intersections": 0,
+  "all_8931_existing_nodes_unmodified": true,
+  "GLB_roundtrip": "PASS",
+  "rendering": "NOT_RUN_BY_USER_REQUEST",
+  "full_body_swept_actor_navigation": "NOT_RUN",
+  "all_campus_ext_hall_names_classified": "NOT_YET",
+  "main_five_models_untouched": true,
+  "author_approval": "PENDING",
+  "limitations": [
+    "Axis-aligned bounding boxes are conservative geometric checks, not triangle collision or animated avatar navigation.",
+    "Side-stair arch and balustrades kept outside native step boxes and calibrated to original rise/run.",
+    "This model continues to include only the measured continuous academy interior school wing, not invented corridor interiors of 29 exterior hall-shell buildings."
+  ]
+}
