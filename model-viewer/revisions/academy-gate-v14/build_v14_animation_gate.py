@@ -72,7 +72,7 @@ def adapt(item):
   # Remove high-frequency elements that shimmer in 1080p anime background
   try:i=int(name.rsplit("_",1)[1])
   except ValueError:i=0
-  if i%2==1:
+  if i%2==1 or (k=="perimeter_spike" and (i//2)%2==1):
    removed[k]+=1;return None
  if k in ("stone_path_joint","pier_stringcourse","boundary_column","boundary_cap"):
   if "JOINT" in name:
