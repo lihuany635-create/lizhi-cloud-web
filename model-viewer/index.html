@@ -278,7 +278,7 @@ function loadBuffer(buf,name){
 
 let modelKey="",modelName="",loadSerial=0;
 let inspection=true,meshLayers=[],modelLights=[],sourceInfo=null,activeCutHeight=null;
-let manifestPromise=fetch('current-models.json?v=20261022-2',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('版本清單讀取失敗');return r.json();}).then(j=>j.models).catch(()=>[]);
+let manifestPromise=fetch('current-models.json?v=20261023-academy-rb2-v5',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('版本清單讀取失敗');return r.json();}).then(j=>j.models).catch(()=>[]);
 function disposeObject(obj){obj.traverse(o=>{o.geometry?.dispose();if(o.material)[].concat(o.material).forEach(m=>{Object.values(m).forEach(v=>{if(v&&v.isTexture)v.dispose();});m.dispose();});});}
 function applyInspection(){
   modelLights.forEach(x=>{x.object.visible=window.GLBInspection.lightVisible(x.originalVisible,inspection);});
@@ -445,15 +445,15 @@ const SAMPLES={
   },
   "lahudi-academy": {
     "name": "拉乎迪學院.glb",
-    "file": "lahudi-academy.glb?v=2.3-merged-20261022",
-    "cut": 0.018,
+    "file": "lahudi-academy.glb?v=rb2-exterior-rebuilt-20261023",
+    "cut": 1,
     "fit": [
-      -90,
-      0,
-      -68,
-      -65,
-      16,
-      27
+      -123,
+      -1,
+      -201,
+      25,
+      27,
+      54
     ]
   },
   "lahudi-academy-s01-v5": {

@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-20261022",
+  "version": "mixed-current-academy-rb2-v5-20261023",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -57,14 +57,16 @@
     },
     {
       "model": "lahudi-academy.glb",
-      "version": "v2.3",
-      "source_candidate": "lahudi-academy_v2_3_candidate.glb",
-      "current_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
-      "backup": "backups/pre-v2.3/lahudi-academy.glb",
-      "backup_sha256": "3bde0d09b74d49ca92d70007638b2b9b0a1f5fffad4e0071635b5375639842c8",
-      "git_blob_sha": "68d999ba32914c6ac206f93ed9cbf2ddf93a3f32",
-      "integrated_contents": "Existing scene and added geometry in one self-contained GLB. Not concatenated with original a second time.",
-      "author_full_item_approval": "PENDING"
+      "version": "ACADEMY-RB2-EXTERIOR-REBUILT-V5",
+      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-exterior-rebuild-v5/lahudi-academy_REBUILT-EXTERIOR-RB2_v5.glb",
+      "current_sha256": "347ba0a423726d4a2c83e1ddc568509a5b3ac35ca99dc6019f513085053b842f",
+      "backup": "backups/pre-academy-rb2-exterior-v5/lahudi-academy.glb",
+      "backup_sha256": "33c99f530c444ddd8b48542566eebf5579d6f1f3cec9755ccd16d4d62898d324",
+      "git_blob_sha": "fa1eded139fcd7dff0794208067550db71d05344",
+      "integrated_contents": "Main 85.42m RB2 Gothic corridor, preserved classrooms and stairs, removed oversized old campus, replaced exterior main teaching wing and library, connected cloister, blue-gray masonry, slate roofs, gold and oak.",
+      "author_full_item_approval": "PENDING",
+      "static_geometry_qa": "PASS",
+      "visual_qa": "NOT_RUN"
     }
   ]
 }
