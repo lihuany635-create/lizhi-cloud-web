@@ -1,0 +1,58 @@
+name: RG Academy V15 Vitti Garden Model Build QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v15-garden-build.yml'
+      - 'model-viewer/revisions/academy-garden-v15/build_v15_garden.py'
+      - 'model-viewer/revisions/academy-garden-v15/verify_v15_garden.py'
+      - 'model-viewer/revisions/academy-garden-v15/v15-garden-masterplan.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-v15-garden
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+      - name: Copy staged garden spec, builder, and original GLB helper onto official school source
+        run: |
+          set -euo pipefail
+          mkdir -p model-viewer/revisions/academy-garden-v15 model-viewer/revisions/ep01-s01/scripts model-viewer/revisions/academy-locked-plan-v9
+          cp .academy-stage/model-viewer/revisions/academy-garden-v15/*.py model-viewer/revisions/academy-garden-v15/
+          cp .academy-stage/model-viewer/revisions/academy-garden-v15/v15-garden-masterplan.json model-viewer/revisions/academy-garden-v15/
+          cp .academy-stage/model-viewer/revisions/ep01-s01/scripts/build_s01_candidate.py model-viewer/revisions/ep01-s01/scripts/
+          cp .academy-stage/model-viewer/revisions/academy-locked-plan-v9/masterplan-v1.json model-viewer/revisions/academy-locked-plan-v9/
+      - name: Build real V15 garden GLB from V14 canonical and true library rear wall door
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-garden-v15/build_v15_garden.py
+      - name: Check saved GLB furniture garden paths and original school preserved
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-garden-v15/verify_v15_garden.py
+      - name: Stage V15 garden candidate for review
+        run: |
+          set -euo pipefail
+          dir=.academy-stage/model-viewer/staged-output/academy-rear-garden-v15
+          mkdir -p "$dir"
+          cp candidate-output/academy-rear-garden-v15/* "$dir/"
+          cd .academy-stage
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-rear-garden-v15/
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V15): winter garden and real library rear portal'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
