@@ -279,7 +279,7 @@ function loadBuffer(buf,name){
 
 let modelKey="",modelName="",loadSerial=0;
 let inspection=true,meshLayers=[],modelLights=[],sourceInfo=null,activeCutHeight=null;
-let manifestPromise=fetch('current-models.json?v=20261023-academy-rb2-v8',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('版本清單讀取失敗');return r.json();}).then(j=>j.models).catch(()=>[]);
+let manifestPromise=fetch('current-models.json?v=20261023-academy-rb2-v9',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('版本清單讀取失敗');return r.json();}).then(j=>j.models).catch(()=>[]);
 function disposeObject(obj){obj.traverse(o=>{o.geometry?.dispose();if(o.material)[].concat(o.material).forEach(m=>{Object.values(m).forEach(v=>{if(v&&v.isTexture)v.dispose();});m.dispose();});});}
 function applyInspection(){
   modelLights.forEach(x=>{x.object.visible=window.GLBInspection.lightVisible(x.originalVisible,inspection);});
@@ -475,7 +475,7 @@ const SAMPLES={
   },
   "lahudi-academy": {
     "name": "拉乎迪學院.glb",
-    "file": "lahudi-academy.glb?v=rb2-entire-campus-contrast-v8-20261023",
+    "file": "lahudi-academy.glb?v=rb2-locked-plan-shell-v9-20261023",
     "cut": 1,
     "fit": [
       -141.5,
