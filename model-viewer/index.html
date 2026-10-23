@@ -497,7 +497,25 @@ const SAMPLES={
 };
 async function loadSample(key){
   const serial=++loadSerial;const smp=SAMPLES[key]||SAMPLES["reality-home"];showLoading(smp.name);
-  try{const res=await fetch(smp.file);if(!res.ok)throw new Error('範例檔讀取失敗（'+res.status+'）');
+  try{
+    // GitHub Pages occasionally responds 503 during deployment or large GLB delivery.
+    // Retry only transient 5xx/network failures; never accept a mismatched SHA.
+    let res=null,lastError=null;
+    for(let attempt=0;attempt<4;attempt++){
+      if(serial!==loadSerial)return;
+      try{
+        res=await fetch(smp.file,{cache:attempt?'reload':'default'});
+        if(res.ok)break;
+        lastError=new Error('範例檔讀取失敗（'+res.status+'）');
+        if(res.status<500||attempt===3)throw lastError;
+      }catch(error){
+        lastError=error;
+        if(attempt===3||(res&&!res.ok&&res.status<500))throw error;
+      }
+      showLoading(smp.name+' · 連線重試 '+(attempt+2)+'/4');
+      await new Promise(done=>setTimeout(done,500*(attempt+1)));
+    }
+    if(!res?.ok)throw lastError||new Error('模型下載失敗');
     const total=+res.headers.get('content-length')||0;const reader=res.body.getReader();const chunks=[];let got=0;
     for(;;){const {done,value}=await reader.read();if(done)break;chunks.push(value);got+=value.length;if(total)setProg(got/total);}
     const buf=new Uint8Array(got);let o=0;chunks.forEach(c=>{buf.set(c,o);o+=c.length;});
