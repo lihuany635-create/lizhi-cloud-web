@@ -1,0 +1,66 @@
+name: RG Academy V7 Production Mobile Quickview QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v7-public-mobile-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify production HTML and official school GLB are V7
+        run: |
+          set -euo pipefail
+          mkdir -p candidate-output/academy-v7-public-mobile
+          BASE=https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer
+          curl -fSL --retry 10 --retry-all-errors --retry-delay 3 "$BASE/lahudi-academy.glb?v=rb2-entire-campus-optimized-v7-20261023" -o candidate-output/academy-v7-public-mobile/lahudi-academy.glb
+          curl -fSL --retry 10 --retry-all-errors --retry-delay 3 "$BASE/current-models.json?v=20261023-academy-rb2-v7" -o candidate-output/academy-v7-public-mobile/manifest.json
+          curl -fSL --retry 10 --retry-all-errors --retry-delay 3 "$BASE/" -o candidate-output/academy-v7-public-mobile/index.html
+          python - <<'PY'
+          import hashlib,json,struct
+          from pathlib import Path
+          p=Path('candidate-output/academy-v7-public-mobile')
+          b=(p/'lahudi-academy.glb').read_bytes()
+          sha=hashlib.sha256(b).hexdigest()
+          assert b[:4]==b'glTF' and struct.unpack_from('<I',b,8)[0]==len(b)
+          assert len(b)==11111544 and sha=='14f564dd0a2e85c40105d7565ad04a0bf1bb2949d15ec05f96aa45ebf31cdddf'
+          j=json.loads((p/'manifest.json').read_text())
+          m=next(x for x in j['models'] if x['model']=='lahudi-academy.glb')
+          assert m['current_sha256']==sha
+          assert m['version']=='ACADEMY-RB2-ENTIRE-CAMPUS-MOBILE-OPTIMIZED-V7'
+          h=(p/'index.html').read_text()
+          assert 'lahudi-academy.glb?v=rb2-entire-campus-optimized-v7-20261023' in h
+          assert 'id="academyViews"' in h and 'function academyView(' in h
+          print('PUBLIC CANONICAL SCHOOL V7 AND VIEWER VERIFIED',sha)
+          PY
+      - name: Real headless Chrome short-budget mobile viewport QA still image
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 115s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage \
+            --disable-background-networking --disable-extensions \
+            --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl \
+            --force-device-scale-factor=1 --window-size=720,1380 \
+            --virtual-time-budget=10000 \
+            --screenshot=candidate-output/academy-v7-public-mobile/mobile-quickview.png \
+            'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/#lahudi-academy'
+          test "$(stat -c %s candidate-output/academy-v7-public-mobile/mobile-quickview.png)" -gt 45000
+          echo 'mobile-sized production screenshot exists'
+      - name: Archive short Chrome inspection evidence (not a separate model)
+        run: |
+          dst=model-viewer/staged-output/academy-entire-campus-optimized-v7/mobile-qa
+          mkdir -p "$dst"
+          cp candidate-output/academy-v7-public-mobile/mobile-quickview.png "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy V7): public official school mobile Chrome quickview'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
