@@ -1,0 +1,70 @@
+name: RG Academy V4 Campus Hall Facades No Render
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v4-campus-gothic.yml'
+      - 'model-viewer/revisions/academy-all-corridors/dress_all_hall_shells_v4.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v4-campus-gothic
+  cancel-in-progress: true
+jobs:
+  actual-integrated-school:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Retrofit all mapped exterior hall shells to RB2 Gothic upper facades, no rendering
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-all-corridors/dress_all_hall_shells_v4.py
+      - name: Check true GLB file and source full school preservation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,struct
+          d=Path('candidate-output/academy-corridors-rb2-v4')
+          r=json.loads((d/'report.json').read_text())
+          raw=(d/r['model']).read_bytes()
+          assert raw[:4]==b'glTF' and struct.unpack_from('<I',raw,8)[0]==len(raw)
+          assert len(raw)==r['bytes']
+          assert hashlib.sha256(raw).hexdigest()==r['sha256']
+          assert r['original_v3_nodes']==9245
+          assert r['hall_exterior_shells_dressed']==28
+          assert r['new_nodes']>3000
+          assert r['all_prev_9245_nodes_unchanged']
+          assert r['interior_hall_passages_inferred'] is False
+          assert r['source_ground_floor_unchanged']
+          assert r['GLB_reparse']=='PASS'
+          assert r['rendering']=='NOT_RUN_BY_USER_REQUEST'
+          print('V4 CAMPUS SCHOOL GLB SUCCESS')
+          PY
+      - name: Save V4 full school GLB and exact mechanical QA report
+        run: |
+          set -euo pipefail
+          dst=model-viewer/staged-output/academy-all-corridors-rb2-v4
+          mkdir -p "$dst"
+          cp candidate-output/academy-corridors-rb2-v4/*.glb "$dst/"
+          cp candidate-output/academy-corridors-rb2-v4/report.json "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V4): integrated Gothic campus hall-shell facade GLB, no render'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: academy-v4-full-campus-gothic-architecture-no-render
+          path: |
+            candidate-output/academy-corridors-rb2-v4/*.glb
+            candidate-output/academy-corridors-rb2-v4/report.json
+          retention-days: 30
