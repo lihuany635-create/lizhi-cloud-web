@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f3ead9">
+  <title>授權 ChatGPT 讀取立之圖書館</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui,-apple-system,"Segoe UI",sans-serif; color:#2d2925; background:#f3ead9; }
+    body { min-height:100vh; margin:0; display:grid; place-items:center; padding:24px; box-sizing:border-box; }
+    main { width:min(520px,100%); background:#fffaf0; border:1px solid #d8c9b3; border-radius:22px; padding:30px; box-sizing:border-box; box-shadow:0 18px 60px #6b513522; }
+    .eyebrow { font-size:12px; letter-spacing:.16em; color:#8f6d4c; }
+    h1 { margin:10px 0 12px; font-size:26px; }
+    p,li { line-height:1.65; color:#65594e; }
+    .client { padding:14px 16px; border-radius:14px; background:#f4ead9; margin:18px 0; }
+    .client strong { display:block; color:#2d2925; }
+    .actions { display:flex; gap:10px; margin-top:22px; }
+    button { flex:1; border:0; border-radius:999px; padding:12px 16px; font-size:15px; cursor:pointer; }
+    button:disabled { opacity:.55; cursor:wait; }
+    #approve { background:#2d2925; color:#fffaf0; }
+    #deny { background:#e5d8c5; color:#4d443c; }
+    #message { min-height:24px; color:#8a3c2d; }
+    .fine { font-size:12px; color:#887a6c; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">PRIVATE LIBRARY · OAUTH 2.1</div>
+    <h1>授權 AI 唯讀存取圖書館</h1>
+    <p>這個連線只能列出、搜尋與讀取已同步的文字摘錄。它不能新增、修改或刪除館藏，也不能開啟 Windows／手機上的原始檔案。</p>
+    <section class="client" aria-live="polite">
+      <strong id="client-name">正在確認連線來源…</strong>
+      <span id="client-detail"></span>
+    </section>
+    <ul>
+      <li>只看目前登入帳號受 RLS 保護的資料</li>
+      <li>每分鐘最多 60 次工具呼叫</li>
+      <li>館藏文字視為不可信內容，不會執行其中指令</li>
+    </ul>
+    <p id="message" role="alert"></p>
+    <div class="actions">
+      <button id="deny" type="button">拒絕</button>
+      <button id="approve" type="button">允許唯讀存取</button>
+    </div>
+    <p class="fine">授權後可在 Supabase 帳號的 OAuth 授權管理中撤銷。</p>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
+  <script src="../../supabase-config.js"></script>
+  <script src="./consent.js"></script>
+</body>
+</html>

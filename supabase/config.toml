@@ -1,0 +1,18 @@
+project_id = "hrdzywkihfqggiwjgavi"
+
+[auth]
+site_url = "https://lihuany635-create.github.io/lizhi-cloud-web/"
+additional_redirect_urls = [
+  "http://127.0.0.1:3000/oauth/consent/",
+  "https://lihuany635-create.github.io/lizhi-cloud-web/oauth/consent/",
+]
+
+[auth.oauth_server]
+enabled = true
+authorization_url_path = "/oauth/consent/"
+allow_dynamic_registration = true
+
+[functions.library-mcp]
+# OAuth discovery must reach the function before a user token exists. The
+# function validates the OAuth access token itself with @supabase/server.
+verify_jwt = false
