@@ -1,0 +1,67 @@
+name: RG Academy V13 Public Main Gate Viewer QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v13-public-qa.yml'
+      - 'model-viewer/revisions/academy-gate-v13/check_public_gate_v13.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Public official GLB, version manifest and new main gate camera validation
+        run: |
+          set -euo pipefail
+          mkdir -p candidate-output/academy-v13-public
+          url='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer'
+          curl -fSL --retry 10 --retry-delay 3 --retry-all-errors --max-time 140 "$url/current-models.json?v=20261023-academy-rb2-v13" -o candidate-output/academy-v13-public/manifest.json
+          curl -fSL --retry 10 --retry-delay 3 --retry-all-errors --max-time 140 "$url/lahudi-academy.glb?v=rb2-gothic-entrance-v13-20261023" -o candidate-output/academy-v13-public/canonical-v13.glb
+          curl -fSL --retry 10 --retry-delay 3 --retry-all-errors --max-time 140 "$url/" -o candidate-output/academy-v13-public/viewer.html
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,struct
+          d=Path('candidate-output/academy-v13-public')
+          b=(d/'canonical-v13.glb').read_bytes()
+          sha=hashlib.sha256(b).hexdigest()
+          assert b[:4]==b'glTF'
+          assert struct.unpack_from('<I',b,8)[0]==len(b)==23514904
+          assert sha=='580e8b4bc0a1a9c1bb070074de539bf225286f12219460d6af3365cc3060c9d2'
+          j=json.loads((d/'manifest.json').read_text())
+          a=next(x for x in j['models'] if x['model']=='lahudi-academy.glb')
+          assert len(j['models'])==5
+          assert a['current_sha256']==sha
+          assert a['gate_open_geometry_static_qa']=='PASS_MAIN_AND_2_SIDE_GATE_WICKET_AND_D_CROSSWALK'
+          h=(d/'viewer.html').read_text()
+          assert 'id="academyGate"' in h and "function academyView(region)" in h
+          assert 'lahudi-academy.glb?v=rb2-gothic-entrance-v13-20261023' in h
+          size=struct.unpack_from('<I',b,12)[0]
+          gltf=json.loads(b[20:20+size])
+          new=[n for n in gltf['nodes'] if n.get('name','').startswith('RG-GAME-02-GATE-COMPLEX-V13__')]
+          assert len(new)==28
+          assert sum(n['extras']['shapes'] for n in new)==408
+          print('PASS PUBLIC MAIN GATE + 408 GEOMETRY PIECES IN OFFICIAL MODEL:',sha)
+          PY
+      - name: Actual browser WebGL main gate screenshot
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium)"           node model-viewer/revisions/academy-gate-v13/check_public_gate_v13.mjs
+      - name: Save V13 screenshot and browser verdict
+        if: always()
+        run: |
+          set -euo pipefail
+          dst=model-viewer/staged-output/academy-gate-v13/public-browser-qa
+          mkdir -p "$dst"
+          cp candidate-output/academy-v13-gate-diagnostic/* "$dst/" 2>/dev/null || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy V13): verify live gate SHA and capture real WebGL gate camera'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
