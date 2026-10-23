@@ -1,0 +1,46 @@
+name: RG EP01 S01 V5 Corridor Structure Audit
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - 'model-viewer/revisions/ep01-s01/scripts/audit_s01_v5_geometry.py'
+      - '.github/workflows/rg-ep01-s01-v5-geometry-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract door, wall and stair geometry from the real GLB
+        run: |
+          python model-viewer/revisions/ep01-s01/scripts/audit_s01_v5_geometry.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('candidate-output/s01-v5-wall-stair-audit.json').read_text())
+          assert d['inspected_total_nodes']>=8000
+          assert len(d['original_corridor_wall_or_door_nodes'])>0
+          assert len(d['original_stair_nodes'])>0
+          print('Source wall nodes',len(d['original_corridor_wall_or_door_nodes']))
+          print('Source stair nodes',len(d['original_stair_nodes']))
+          PY
+      - name: Save findings to same isolated branch
+        run: |
+          mkdir -p model-viewer/staged-output/ep01-s01/v5
+          cp candidate-output/s01-v5-wall-stair-audit.json model-viewer/staged-output/ep01-s01/v5/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/v5/s01-v5-wall-stair-audit.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(S01): publish precise door and stair inventory'
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ep01-s01-v5-geometry-audit
+          path: candidate-output/s01-v5-wall-stair-audit.json
+          retention-days: 30
