@@ -1,0 +1,55 @@
+name: RG Academy V15 Publish Rear Garden Into Single School
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v15-promote.yml'
+      - 'model-viewer/revisions/academy-garden-v15/promote_v15_to_main.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v15-canonical-garden
+  cancel-in-progress: true
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+          persist-credentials: false
+      - name: Promote V15 original GLB with original furniture and V14 gate checks
+        run: |
+          set -euo pipefail
+          python .academy-stage/model-viewer/revisions/academy-garden-v15/promote_v15_to_main.py
+      - name: Strictly gate all modified files
+        run: |
+          python - <<'PY'
+          import subprocess
+          allow={
+           'model-viewer/lahudi-academy.glb',
+           'model-viewer/backups/pre-academy-v15-vitti-rear-garden/lahudi-academy.glb',
+           'model-viewer/current-models.json',
+           'model-viewer/index.html'
+          }
+          seen=set()
+          for line in subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],text=True).splitlines():
+           path=line[3:]
+           if path.startswith('.academy-stage/'):continue
+           seen.add(path)
+          assert seen==allow,{"modified":seen,"expected":allow}
+          PY
+      - name: Publish V15 official school with one GLB and rollback
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/lahudi-academy.glb model-viewer/backups/pre-academy-v15-vitti-rear-garden/lahudi-academy.glb model-viewer/current-models.json model-viewer/index.html
+          git commit -m 'feat(academy V15): Vitti rear garden and genuine library north passage'
+          git push origin HEAD:refs/heads/main
