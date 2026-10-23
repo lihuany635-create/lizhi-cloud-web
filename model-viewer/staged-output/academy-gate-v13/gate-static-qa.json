@@ -1,0 +1,23 @@
+{
+  "status": "PASS_STATIC_CONSTRUCTION_PATH_CLEARANCE",
+  "source_glb_sha256": "b975ace3cd12744621688f4f5a0a8aa27f5dff1fbed4beb7ae5b9306dbbd3a66",
+  "candidate_sha256": "580e8b4bc0a1a9c1bb070074de539bf225286f12219460d6af3365cc3060c9d2",
+  "new_geo_shapes": 408,
+  "preserved_original_nodes": 11983,
+  "gate_center_x_m": -70.1,
+  "gate_line_z_m": 79,
+  "main_clear_width_probe_m": 6.8,
+  "nominal_10p62m_true_pier_opening": true,
+  "main_walk_collision_count": 0,
+  "west_wicket_collision_count": 0,
+  "east_wicket_collision_count": 0,
+  "crosswalk_collision_count": 0,
+  "guardhouse_gable_roof_facing_correct": true,
+  "V12_story_classrooms_untouched": true,
+  "not_real_world_engineering_permit": true,
+  "novel_does_not_define_gate_dimensions_material": true,
+  "author_visual_approval": "PENDING",
+  "character_collision": "SKIPPED_AS_REQUESTED",
+  "actual_hinge_animation": "NOT_IMPLEMENTED__DOORS_FIXED_OPEN",
+  "visual_review": "PENDING"
+}
