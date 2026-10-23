@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-Hant"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17202b">
+<title>《現實遊戲》拉乎迪學院｜RB2 V4 3D 模型預覽</title>
+<style>
+:root{font:14px/1.5 system-ui,-apple-system,"Noto Sans TC",sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111923;color:#f3f5f7}
+canvas{width:100%;height:100%;display:block;touch-action:none;outline:none}
+aside{position:absolute;z-index:4;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));max-width:min(440px,calc(100vw - 24px));background:#111b27ed;border:1px solid #64778c70;border-radius:14px;padding:14px 16px;box-shadow:0 12px 35px #0005}
+h1{font-size:16px;font-weight:700;margin:0}
+.small{margin:5px 0;color:#c7d3df;font-size:12px}
+#status{color:#c3e2f5;font-size:12px;min-height:19px;word-break:break-word}
+.controls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+button,select{border-radius:7px;background:#324559;border:1px solid #546c80;color:#f4f7f9;font:inherit;padding:7px 9px;cursor:pointer}
+button:hover,select:hover{background:#426078}
+button:focus-visible,select:focus-visible{outline:2px solid #b0d7ff}
+button.active{background:#789ac4;color:#0d1a2a;border-color:#b4cde6;font-weight:650}
+select{margin-top:7px;width:100%;max-width:100%}
+footer{position:absolute;z-index:3;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));background:#101923db;padding:9px 12px;border-radius:9px;font-size:12px;color:#c4d1dc;text-align:right}
+#loadbar{height:3px;background:#2d3c4c;border-radius:5px;overflow:hidden;margin:9px 0 1px}
+#loadbar div{width:2%;height:100%;background:#8cbae4;transition:width .18s}
+a{color:#baddff}
+@media(max-width:650px){aside{padding:10px 12px;max-width:min(390px,calc(100vw - 22px))}h1{font-size:14px}.small{font-size:11px;margin:3px 0}.controls{gap:5px}button{padding:6px;font-size:12px}footer{font-size:11px;padding:7px 9px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"}}</script>
+</head><body>
+<aside>
+<h1>《現實遊戲》拉乎迪學院｜RB2 V4</h1>
+<p class="small">最新整合候選模型 · 哥德式主走廊、三處樓梯銜接、校園建築外立面</p>
+<div id="status" role="status">正在開啟 3D 模型…</div>
+<div id="loadbar"><div id="bar"></div></div>
+<div class="controls" id="views">
+<button type="button" data-camera="corridor" class="active">主走廊</button>
+<button type="button" data-camera="confession">告白區</button>
+<button type="button" data-camera="side">轉角樓梯</button>
+<button type="button" data-camera="roof">頂樓樓梯</button>
+<button type="button" data-camera="entry">學院入口</button>
+<button type="button" data-camera="campus">全校鳥瞰</button>
+</div>
+<label class="small" for="scope">顯示範圍</label>
+<select id="scope" aria-label="顯示範圍">
+<option value="corridor">走廊與相關建築（手機建議）</option>
+<option value="all">整座學院（較吃效能）</option>
+<option value="new">只顯示 RB2 新增建築</option>
+</select>
+<p class="small" id="detail">模型：V4 · 14,360 節點 · 7.90 MB；正式五模型未被覆蓋。</p>
+</aside>
+<canvas id="view" tabindex="0" aria-label="拉乎迪學院互動式三維模型"></canvas>
+<footer>單指旋轉 · 雙指縮放與移動<br>電腦：拖曳旋轉、滾輪縮放</footer>
+<script type="module">
+import * as THREE from "three";
+import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+const status=document.getElementById("status"),bar=document.getElementById("bar"),canvas=document.getElementById("view");
+const controlsHost=document.getElementById("views"),scope=document.getElementById("scope");
+const MODEL="lahudi-academy_ALL-CORRIDORS_RB2-GOTHIC_v4.glb";
+const KNOWN_BYTES=7897432;
+let renderer;
+try {
+ renderer=new THREE.WebGLRenderer({canvas,antialias:false,powerPreference:"default",preserveDrawingBuffer:false});
+} catch(e) {
+ status.textContent="此裝置未能開啟 WebGL，請改用 Chrome 或電腦版瀏覽器。";
+ document.body.dataset.loaded="error";throw e;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.3));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.42;
+renderer.setClearColor(0x172433);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x1b2837);
+const camera=new THREE.PerspectiveCamera(58,1,.08,5000);
+const controls=new OrbitControls(camera,canvas);
+controls.enableDamping=true;controls.dampingFactor=.08;
+controls.minDistance=.35;controls.maxDistance=1600;
+controls.enablePan=true;controls.screenSpacePanning=true;
+const hemi=new THREE.HemisphereLight(0xe9f2ff,0x5c5753,2.1);scene.add(hemi);
+const direct=new THREE.DirectionalLight(0xffdeb7,2.0);
+direct.position.set(-32,80,60);scene.add(direct);
+scene.add(new THREE.AmbientLight(0xffffff,.24));
+let model=null, meshes=[], bounding=null;
+const presets={
+ corridor:{p:[-70.25,5.55,15.25],t:[-70.25,5.75,-30],fov:63},
+ confession:{p:[-70.3,5.5,8.0],t:[-70.25,5.7,-5.5],fov:70},
+ side:{p:[-73.0,5.6,11.38],t:[-80.1,3.0,11.38],fov:65},
+ roof:{p:[-70.25,6.0,-49.1],t:[-70.25,7.2,-57.5],fov:69},
+ entry:{p:[-70.1,2.65,27.9],t:[-70.1,5.0,15.2],fov:67},
+ campus:{p:null,t:null,fov:54}
+};
+function setCam(id){
+ const preset=presets[id]||presets.corridor;
+ const p=preset.p?[...preset.p]:null;
+ const t=preset.t?[...preset.t]:null;
+ if(id==="campus"&&bounding){
+  const c=bounding.getCenter(new THREE.Vector3());
+  const R=Math.max(250,bounding.getSize(new THREE.Vector3()).length()*.8);
+  camera.position.set(c.x+R*.75,c.y+R*.85,c.z+R*.9);
+  controls.target.copy(c);
+  controls.maxDistance=2500;
+ }else if(p){
+  camera.position.set(...p);controls.target.set(...t);
+  controls.maxDistance=1600;
+ }
+ camera.fov=preset.fov;camera.near=.08;camera.far=5000;camera.updateProjectionMatrix();controls.update();
+ for(const b of controlsHost.querySelectorAll("button")){
+  const on=b.dataset.camera===id;b.classList.toggle("active",on);
+  b.setAttribute("aria-pressed",on?"true":"false");
+ }
+}
+function scopeVisible(mode,o){
+ const name=o.name||"";
+ if(mode==="all")return true;
+ if(mode==="new")return name.startsWith("RG-GAME-02-ALLCOR-RB2");
+ return name.startsWith("RG-GAME-02-ALLCOR-RB2")||
+  /^RG-GAME-02-(ACOR|CCOR|CONFESS|A1|CROOM|ROOF|EXT-001|EXT-002|EXT-006)/.test(name);
+}
+function applyScope(mode){
+ if(!model)return;
+ let visible=0;
+ for(const o of meshes){
+  o.visible=scopeVisible(mode,o);
+  if(o.visible)visible++;
+ }
+ status.textContent="已載入 V4 真實 GLB｜顯示 "+visible.toLocaleString()+" / "+meshes.length.toLocaleString()+" 個網格";
+ document.body.dataset.scope=mode;
+}
+function resize(){
+ const w=canvas.clientWidth,h=canvas.clientHeight;
+ if(w>0&&h>0&&(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio()))){
+  renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+ }
+}
+controlsHost.addEventListener("click",e=>{
+ const b=e.target.closest("button[data-camera]");
+ if(!b)return;setCam(b.dataset.camera);
+});
+scope.addEventListener("change",()=>applyScope(scope.value));
+setCam("corridor");
+const loader=new GLTFLoader();
+loader.load(MODEL,gl=>{
+ model=gl.scene;
+ scene.add(model);
+ model.updateMatrixWorld(true);
+ meshes=[];
+ model.traverse(o=>{if(o.isMesh){meshes.push(o);o.frustumCulled=true;}});
+ bounding=new THREE.Box3().setFromObject(model);
+ applyScope(scope.value);
+ bar.style.width="100%";
+ document.body.dataset.loaded="true";
+ document.body.dataset.sha="34db823260c85e77e787fc5d9fbe172996bb413ed5695820d4186a3b9c561bef";
+},event=>{
+ const ratio=event.total>0?event.loaded/event.total:event.loaded/KNOWN_BYTES;
+ bar.style.width=Math.max(2,Math.min(95,ratio*100))+"%";
+ status.textContent="正在下載 3D 模型："+(event.loaded/1048576).toFixed(1)+" MB / 7.5 MB";
+},err=>{
+ status.textContent="模型讀取失敗，請確認網路與瀏覽器支援 WebGL。 "+(err.message||"");
+ document.body.dataset.loaded="error";
+});
+function loop(){requestAnimationFrame(loop);resize();controls.update();renderer.render(scene,camera)}
+loop();
+</script></body></html>
