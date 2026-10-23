@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-academy-locked-shell-v9-20261023",
+  "version": "mixed-current-academy-collision-repair-v10-20261023",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -57,20 +57,23 @@
     },
     {
       "model": "lahudi-academy.glb",
-      "version": "ACADEMY-LOCKED-PLAN-EXTERIOR-SHELL-V9",
-      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-locked-plan-v9/lahudi-academy_LOCKED-PLAN-SHELL_RB2_v9.glb",
-      "current_sha256": "ada3ae9c9e55f995b4c8c60f63655c01e572561e523e199ef1cdf298c7e668c3",
-      "backup": "backups/pre-academy-locked-plan-v9/lahudi-academy.glb",
-      "backup_sha256": "07392e83c165854c00f13fb39687253fbd185a1a5aa0d134264651a626af8c8f",
+      "version": "ACADEMY-LOCKED-PLAN-COLLISION-REPAIR-V10",
+      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-route-repair-v10/lahudi-academy_LOCKED-PLAN-ACCESS-V10.glb",
+      "current_sha256": "f2b4c82a7ea3b6625a7ffef3157c56b8e7f288bf9cd2d3bbf699c7ca67ef1b5c",
+      "backup": "backups/pre-academy-v10-collision-repairs/lahudi-academy.glb",
+      "backup_sha256": "ada3ae9c9e55f995b4c8c60f63655c01e572561e523e199ef1cdf298c7e668c3",
       "git_blob_sha": "fa1eded139fcd7dff0794208067550db71d05344",
-      "integrated_contents": "Architect locked plan eight regions; retain A main and F library; B/C wing reposition; D asym entrance around clock, E north forehall in 3 gables; G chapel, H annex; 9 structural masses, thick outer walls with actual portal holes, 10 connecting floors and 9 roofed corridors. Original A01 corridor, classrooms and native stairs preserved.",
+      "integrated_contents": "V9 locked 8-zone campus retained; actual openings now aligned for west D, C east south, E west north; old A south/north portals kept and connector slabs narrowed; added 26-tread outdoor switchback north of A, 2F skywalk, 7.55m-roofed two-level access link. No A01 corridor/classroom or F library geometry removed.",
       "author_full_item_approval": "PENDING",
-      "static_geometry_qa": "PASS: 5 intended source-wall openings, 8-region locked footprint checks, 10 connectors, 9 covered corridors, 9 gables",
+      "static_geometry_qa": "PASS: 10 1F routes + 3 stair/upper walk centerline radius-0.4m clearance checks, 26 3D stair treads obstacle-free AABB, 3.55m modeled roof headroom",
       "visual_qa": "NOT_RUN_BY_USER_REQUEST",
       "wing_interiors": "NOT_MODELED: only exterior architectural shell and connected campus ground paths",
       "mobile_performance_note": "Reduced new campus mesh draws by 5068; device FPS unverified",
       "design_book": "https://docs.google.com/document/d/1seSK9uMrnNV2_Mh1RwmG50JtjFgXqJzHOQoCqiNFTPQ/edit?usp=drivesdk",
-      "animation_vs_geometry_width_conflict": "UNRESOLVED: source corridor 4.50m outer span vs proposed animation clear width 5.20m"
+      "animation_vs_geometry_width_conflict": "UNRESOLVED: source corridor 4.50m outer span vs proposed animation clear width 5.20m",
+      "P0_status": "P0 geometry route blockers repaired to centerline AABB gate; further fully articulated 3D animation character & precise triangle-level QA still required",
+      "open_followups": "A01 source corridor 4.5m outer span vs 5.2m proposed net width, unbuilt 3F slab/vault relation, detailed roof intersections, character animation acceptance",
+      "collision_book": "https://docs.google.com/document/d/1UlrxFUNmu6-3u3vPwPkSDj7EOJcXICY74ms1m34wUNc/edit?usp=drivesdk"
     }
   ]
 }
