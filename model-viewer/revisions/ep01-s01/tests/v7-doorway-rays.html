@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><title>S01 V7 3D door geometry ray checks</title></head>
+<body><h1>S01 V7 3D raycast QA</h1><p id="status">LOADING</p>
+<pre id="qa-json">WAITING</pre>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+(async()=>{
+ const status=document.getElementById('status'),out=document.getElementById('qa-json');
+ const report={
+  test:"S01 V7 actual glTF triangle-ray inspection",
+  version:"S01-V7",
+  method:"Three.js Raycaster against actual scene meshes at two standing heights and three door Z offsets",
+  scope_limit:"SAMPLED RAYS ONLY: not full body swept volume, continuous collision, or actor animation",
+  result:"IN_PROGRESS",rays:[],stair_samples:[],summary:{},
+ };
+ const done=()=>{out.textContent=JSON.stringify(report,null,2);document.body.setAttribute("data-qa-complete","true");};
+ try{
+  if(!window.THREE||!THREE.GLTFLoader)throw Error("Three.js scripts unavailable");
+  const response=await fetch('./model.glb');
+  if(!response.ok)throw Error('GLB download '+response.status);
+  const buffer=await response.arrayBuffer();
+  if(new DataView(buffer).getUint32(0,true)!==0x46546c67)throw Error('Bad GLB magic');
+  const root=(await new Promise((yes,no)=>new THREE.GLTFLoader().parse(buffer,'',yes,no))).scene;
+  root.updateMatrixWorld(true);
+  const meshes=[];
+  root.traverse(o=>{if(o.isMesh)meshes.push(o);});
+  report.meshes=meshes.length;
+  const doors=[-5.53,-2.53,.47,3.47,6.47,9.47];
+  const raycaster=new THREE.Raycaster();
+  raycaster.near=.02;
+  for(let i=0;i<doors.length;i++){
+   const z=doors[i];
+   for(const offset of [-.18,0,.18]){
+    for(const y of [4.92,5.80]){
+     const from=new THREE.Vector3(-71.94,y,z+offset);
+     const to=new THREE.Vector3(-73.12,y,z+offset);
+     const vec=to.clone().sub(from),length=vec.length();
+     raycaster.set(from,vec.normalize());
+     raycaster.far=length-.015;
+     const hits=raycaster.intersectObjects(meshes,false);
+     const first=hits.find(h=>h.distance>.02);
+     report.rays.push({door:i+1,z:z+offset,eye_y:y,passed:!first,
+      obstruction:first?{mesh:first.object.name,distance_m:+first.distance.toFixed(3),point:first.point.toArray().map(v=>+v.toFixed(3))}:null});
+    }
+   }
+  }
+  // The front stair has 14 authored solid tread volumes. Sample the model
+  // triangles from above in the middle of each V4 step to verify their world
+  // heights are monotonically rising into the far stair.
+  const stairs=meshes.filter(o=>/^RG-GAME-02-EP01-S01-REV4__ascending_tread_\d{2}$/.test(o.name));
+  report.author_stair_meshes_found=stairs.length;
+  for(let i=0;i<14;i++){
+   const z=-8.18-(i+.5)*.290;
+   const from=new THREE.Vector3(-71.05,7.15,z);
+   raycaster.set(from,new THREE.Vector3(0,-1,0));raycaster.far=3.15;
+   const hits=raycaster.intersectObjects(stairs,false);
+   const first=hits[0];
+   report.stair_samples.push({step:i+1,z:+z.toFixed(3),
+      top_y:first?+first.point.y.toFixed(3):null,
+      mesh:first?first.object.name:null});
+  }
+  const blocked=report.rays.filter(x=>!x.passed);
+  let monotonic=report.stair_samples.every((x,i,a)=>x.top_y!==null&&(i===0||x.top_y>a[i-1].top_y+.08));
+  report.summary={
+   doorway_rays_tested:report.rays.length,
+   doorways_any_blocked:[...new Set(blocked.map(x=>x.door))],
+   blocked_ray_count:blocked.length,
+   stair_samples_tested:report.stair_samples.length,
+   rising_stair_samples:monotonic,
+   physical_actor_collision_certified:false,
+   source_GLBCollisionData:"V7 binary GLB loaded into Three.js in headless Chrome"
+  };
+  report.result=blocked.length===0 && monotonic && report.rays.length===36
+   ?'SAMPLED_GEOMETRY_PASS'
+   :'SAMPLED_GEOMETRY_REVIEW_REQUIRED';
+  status.textContent=report.result+"; "+report.rays.length+" checks";
+  done();
+ }catch(e){report.result="QA_ERROR";report.error=String(e);status.textContent="ERROR "+e;done();}
+})();
+</script></body></html>
