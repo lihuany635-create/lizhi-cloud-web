@@ -1,0 +1,58 @@
+name: RG Academy V7 Mobile Geometry Batch Optimizer
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v7-optimize.yml'
+      - 'model-viewer/revisions/academy-all-corridors/optimize_entire_campus_v7.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Merge thousands of campus geometry draw objects preserving color and all school wings
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-all-corridors/optimize_entire_campus_v7.py
+      - name: Verify actual optimized GLB and batch geometry
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,struct
+          d=Path('candidate-output/academy-optimized-v7')
+          r=json.loads((d/'report.json').read_text())
+          data=(d/r['model']).read_bytes()
+          assert data[:4]==b'glTF' and struct.unpack_from('<I',data,8)[0]==len(data)
+          assert hashlib.sha256(data).hexdigest()==r['sha256']
+          assert r['original_v6_scene_nodes']==16242
+          assert r['retained_core_node_count']==11097
+          assert r['original_new_campus_nodes']==5145
+          assert r['merged_campus_nodes']<220
+          assert r['eliminated_draw_call_objects']>4920
+          assert r['triangles_preserved_new_campus']==61740
+          assert r['original_core_nodes_untouched']
+          assert r['all_full_v6_campus_features_preserved_geometrically']
+          assert r['glb_roundtrip']=='PASS'
+          print('OPTIMIZED CAMPUS GLB PASS',r['sha256'],r['merged_campus_nodes'])
+          PY
+      - name: Save optimized school model
+        run: |
+          dst=model-viewer/staged-output/academy-entire-campus-optimized-v7
+          mkdir -p "$dst"
+          cp candidate-output/academy-optimized-v7/*.glb "$dst/"
+          cp candidate-output/academy-optimized-v7/report.json "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V7): mobile batching optimized school GLB'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
