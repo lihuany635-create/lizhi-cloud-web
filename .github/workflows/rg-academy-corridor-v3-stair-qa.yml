@@ -1,0 +1,68 @@
+name: RG Academy Corridor V3 Stair Alignment No Render
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-corridor-v3-stair-qa.yml'
+      - 'model-viewer/revisions/academy-all-corridors/calibrate_stairs_v3.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-corridor-v3-no-render
+  cancel-in-progress: true
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Calibrate native tread positions and build true GLB
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-all-corridors/calibrate_stairs_v3.py
+      - name: Verify no-render GLB structural proof
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,struct,hashlib
+          d=Path('candidate-output/academy-corridors-rb2-v3')
+          r=json.loads((d/'report.json').read_text())
+          b=(d/r['file']).read_bytes()
+          assert b[:4]==b'glTF' and len(b)==struct.unpack_from('<I',b,8)[0]
+          assert len(b)==r['bytes'] and hashlib.sha256(b).hexdigest()==r['sha256']
+          assert r['all_8931_existing_nodes_unmodified']
+          assert r['v2_decorations_recalibrated']>125
+          assert r['handrails_recalibrated']==22
+          assert r['AABB_step_intersections']==0
+          assert r['GLB_roundtrip']=='PASS'
+          assert r['rendering']=='NOT_RUN_BY_USER_REQUEST'
+          assert r['main_five_models_untouched']
+          print('Academy V3 geometry report gate PASS')
+          PY
+      - name: Store combined school GLB and non-render QA only
+        run: |
+          set -euo pipefail
+          dst=model-viewer/staged-output/academy-all-corridors-rb2-v3
+          mkdir -p "$dst"
+          cp candidate-output/academy-corridors-rb2-v3/*.glb "$dst/"
+          cp candidate-output/academy-corridors-rb2-v3/report.json "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy): V3 full school GLB with stair pitch and static collision QA'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: academy-v3-gothic-school-full-glb-no-render
+          path: |
+            candidate-output/academy-corridors-rb2-v3/*.glb
+            candidate-output/academy-corridors-rb2-v3/report.json
+          retention-days: 30
