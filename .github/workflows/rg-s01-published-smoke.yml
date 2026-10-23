@@ -1,0 +1,57 @@
+name: RG EP01 S01 Published Preview Smoke Test
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-s01-published-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-live-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify deployed HTTP pages and exact model bytes
+        run: |
+          set -euo pipefail
+          SITE='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview'
+          mkdir -p candidate-output/s01-live-smoke
+          curl --fail --show-error --location --retry 2 --retry-delay 3 --connect-timeout 15 --max-time 60 "$SITE/" -o candidate-output/s01-live-smoke/index.html
+          curl --fail --show-error --location --retry 2 --retry-delay 3 --connect-timeout 15 --max-time 90 "$SITE/lahudi-academy-s01-v5.glb" -o candidate-output/s01-live-smoke/model.glb
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('candidate-output/s01-live-smoke')
+          html=(root/'index.html').read_text()
+          model=(root/'model.glb').read_bytes()
+          expected='c875ba7f00814840723615942a523e9617d55457f3943216325b61343461e66e'
+          actual=hashlib.sha256(model).hexdigest()
+          checks={
+            'preview_html_starts_with_doctype':html.lower().lstrip().startswith('<!doctype html>'),
+            'preview_has_V5_notice':'S01 V5' in html,
+            'preview_has_model_route':'lahudi-academy-s01-v5.glb' in html,
+            'glb_magic':model[:4]==b'glTF',
+            'glb_expected_length':len(model)==5508420,
+            'glb_sha256_pinned':actual==expected,
+            'canonical_path_untouched':'./lahudi-academy-s01-v5.glb' in html
+          }
+          result={'preview_url':'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/',
+                  'sha256':actual,'bytes':len(model),'checks':checks,
+                  'test_mode':'HTTP+binary integrity, not interactive Android WebGL'}
+          (root/'test_report.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(result,ensure_ascii=False,indent=2),flush=True)
+          assert all(checks.values()), 'Deployed preview or GLB mismatch'
+          PY
+          rm candidate-output/s01-live-smoke/model.glb
+      - name: Optionally screenshot the live preview in preinstalled Chrome
+        continue-on-error: true
+        run: |
+          command -v google-chrome || command -v chromium || exit 0
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 80s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl --window-size=1440,900 --virtual-time-budget=20000 --screenshot=candidate-output/s01-live-smoke/live-preview.png https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/ || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rg-ep01-s01-preview-live-publish-qa
+          path: candidate-output/s01-live-smoke/
+          retention-days: 30
