@@ -1,0 +1,34 @@
+{
+  "model": "S01-V7",
+  "author_approved": false,
+  "film_frame_match": "NOT_RUN",
+  "camera_01": {
+    "pos": [
+      -70.43,
+      5.49,
+      8.1
+    ],
+    "target": [
+      -70.43,
+      5.45,
+      -9.0
+    ],
+    "fov": 69
+  },
+  "camera_02": {
+    "pos": [
+      -70.43,
+      5.5,
+      5.4
+    ],
+    "target": [
+      -70.43,
+      5.72,
+      -11.3
+    ],
+    "fov": 68
+  },
+  "render": "Chrome WebGL headless real V7 GLB",
+  "inspection": "VISUAL_REVIEW_REQUIRED",
+  "S06_modified": false
+}
