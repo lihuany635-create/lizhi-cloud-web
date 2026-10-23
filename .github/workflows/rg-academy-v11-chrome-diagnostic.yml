@@ -1,0 +1,35 @@
+name: RG Academy V11 Chrome Renderer Diagnostic
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v11-chrome-diagnostic.yml'
+      - 'model-viewer/revisions/academy-exterior-finish-v11/diagnose_chrome_v11.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Open actual production viewer and inspect render stats, context loss, console
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium)"           node model-viewer/revisions/academy-exterior-finish-v11/diagnose_chrome_v11.mjs
+      - name: Save screenshot and diagnostic report
+        if: always()
+        run: |
+          dst=model-viewer/staged-output/academy-exterior-finish-v11/renderer-qa
+          mkdir -p "$dst"
+          cp candidate-output/academy-v11-public-diagnostic/*.json "$dst/" 2>/dev/null || true
+          cp candidate-output/academy-v11-public-diagnostic/*.png "$dst/" 2>/dev/null || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy): capture V11 WebGL draw calls/context and screenshot'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
