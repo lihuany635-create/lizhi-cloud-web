@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-academy-v13-gate-20261023",
+  "version": "mixed-current-academy-v14-anime-gate-20261023",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -57,17 +57,17 @@
     },
     {
       "model": "lahudi-academy.glb",
-      "version": "ACADEMY-V13-GOTHIC-ENTRANCE-FORECOURT-REVIEW",
-      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-gate-v13/lahudi-academy_GATE-FORECOURT_V13.glb",
-      "current_sha256": "580e8b4bc0a1a9c1bb070074de539bf225286f12219460d6af3365cc3060c9d2",
-      "backup": "backups/pre-academy-v13-campus-gate/lahudi-academy.glb",
-      "backup_sha256": "b975ace3cd12744621688f4f5a0a8aa27f5dff1fbed4beb7ae5b9306dbbd3a66",
+      "version": "ACADEMY-V14-ANIMATION-STYLE-GATE-REVIEW",
+      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-gate-anime-v14/lahudi-academy_ANIMATION-STYLE-GATE_V14.glb",
+      "current_sha256": "1d2ac5373a3ae9e276048aa647d3f65ef19bc01ada3ee0e0473b1154568c53b2",
+      "backup": "backups/pre-academy-v14-animation-gate/lahudi-academy.glb",
+      "backup_sha256": "580e8b4bc0a1a9c1bb070074de539bf225286f12219460d6af3365cc3060c9d2",
       "git_blob_sha": "fa1eded139fcd7dff0794208067550db71d05344",
-      "integrated_contents": "Original V12 furnished school (1734 provisional furniture placements in B/C/D/E/G/H, two upper teaching-wing stairs) plus V13 south campus wrought iron gate, stone pointed portal, 2 side wicket gates, perimeter fence, 26m entry forecourt with two D-wing crosspaths, winter planting, gatehouse and curb. All 11983 prior GLB nodes and building footprints unchanged. Main entry aligned to existing clock axis X=-70.1, entrance fence at Z=79. Novel supports gate presence but exact architecture is proposed not canonical.",
+      "integrated_contents": "V14 anime-directed campus main gate: cool gray-blue simplified Gothic stone, central tall entrance piers, open two wrought iron leaves, simplified low perimeter fencing, two true pedestrian wickets, subdued guardhouse, winter bare trees and snow, two waiting benches, clean main axis X=-70.1. Maintains existing asymmetric school facades, all V12 architecture/44 provisional rooms/1734 furniture placements, 2 stair cores and V11 exterior. In source V13 old 28 gate batch roots disabled, 29 new V14 gate batch roots enabled. All original V12 11983 nodes unchanged.",
       "author_full_item_approval": "PENDING",
       "static_geometry_qa": "PASS: 10 1F routes + 3 stair/upper walk centerline radius-0.4m clearance checks, 26 3D stair treads obstacle-free AABB, 3.55m modeled roof headroom",
-      "visual_qa": "PENDING_V13_VIEWER_INSPECTION",
-      "wing_interiors": "NOT_MODELED: only exterior architectural shell and connected campus ground paths",
+      "visual_qa": "PENDING_AUTHOR_VISUAL_REVIEW",
+      "wing_interiors": "PARTIALLY_MODELED_44_PROVISIONAL_BC_ROOMS_AND_SELECTED_SHARED_SPACES",
       "mobile_performance_note": "Reduced new campus mesh draws by 5068; device FPS unverified",
       "design_book": "https://docs.google.com/document/d/1seSK9uMrnNV2_Mh1RwmG50JtjFgXqJzHOQoCqiNFTPQ/edit?usp=drivesdk",
       "animation_vs_geometry_width_conflict": "UNRESOLVED: source corridor 4.50m outer span vs proposed animation clear width 5.20m",
@@ -82,13 +82,14 @@
       "original_62_standalone_furniture_GLBS_directly_embedded": false,
       "furniture_generation": "PROCEDURAL_LOW_POLY_BY_DESIGN_ITEM_DIMENSIONS",
       "B_C_second_floor_access": "TWO_PROVISIONAL_26_RISER_STAIRCORES_PRESENT",
-      "gate_version": "V13_SOUTH_GATE_PROPOSAL",
+      "gate_version": "V14_ANIMATION_DIRECTED_SOUTH_GATE",
       "gate_canonical_architecture_author_approval": "PENDING",
       "gate_axial_coordinate_x_m": -70.1,
       "gate_south_boundary_z_m": 79,
-      "gate_open_geometry_static_qa": "PASS_MAIN_AND_2_SIDE_GATE_WICKET_AND_D_CROSSWALK",
+      "gate_open_geometry_static_qa": "PASS_V14_6_ACCESS_VOLUMES_ZERO_BLOCKERS",
       "gate_animated_door_open_close": "NOT_IMPLEMENTED_GATE_LEAVES_FIXED_OPEN",
-      "original_V12_furniture_preserved": true
+      "original_V12_furniture_preserved": true,
+      "gate_visual_qa": "PENDING_PUBLIC_BROWSER_INSPECTION"
     }
   ]
 }

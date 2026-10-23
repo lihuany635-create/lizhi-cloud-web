@@ -121,7 +121,7 @@ button,label.btn{font:inherit;cursor:pointer}
   
   
   <span id="viewerVersion" class="file" aria-live="polite"></span>
-  <span id="academyViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="academyWhole" type="button">整座學院</button><button class="btn" id="academySchool" type="button">主教學樓</button><button class="btn" id="academyLibrary" type="button">圖書館區</button><button class="btn" id="academyGate" type="button">學院大門</button></span><label id="academyInteriorPicker" hidden class="sample"><span>室內家具</span><select id="academyInteriorSelect" aria-label="查看學院室內分區"><option value="">選擇區域／樓層</option><option value="B1">西教學翼 1F</option><option value="B2">西教學翼 2F</option><option value="C1">東教學翼 1F</option><option value="C2">東教學翼 2F</option><option value="D1">南入口 1F</option><option value="E1">北學術廳 1F</option><option value="G1">禮堂 1F</option><option value="H1">檔案翼 1F</option></select></label>
+  <span id="academyViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="academyWhole" type="button">整座學院</button><button class="btn" id="academySchool" type="button">主教學樓</button><button class="btn" id="academyLibrary" type="button">圖書館區</button><button class="btn" id="academyGate" type="button">動畫校門 V14</button></span><label id="academyInteriorPicker" hidden class="sample"><span>室內家具</span><select id="academyInteriorSelect" aria-label="查看學院室內分區"><option value="">選擇區域／樓層</option><option value="B1">西教學翼 1F</option><option value="B2">西教學翼 2F</option><option value="C1">東教學翼 1F</option><option value="C2">東教學翼 2F</option><option value="D1">南入口 1F</option><option value="E1">北學術廳 1F</option><option value="G1">禮堂 1F</option><option value="H1">檔案翼 1F</option></select></label>
   <span id="houseViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="house1F">一樓俯視</button><button class="btn" id="house2F">二樓俯視</button><button class="btn" id="houseWhole">完整外觀</button><a class="btn" href="revisions/hades-v2.4/">配置圖</a></span>
 </div>
 
@@ -279,7 +279,7 @@ function loadBuffer(buf,name){
 
 let modelKey="",modelName="",loadSerial=0;
 let inspection=true,meshLayers=[],modelLights=[],sourceInfo=null,activeCutHeight=null;
-let manifestPromise=fetch('current-models.json?v=20261023-academy-rb2-v13',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('版本清單讀取失敗');return r.json();}).then(j=>j.models).catch(()=>[]);
+let manifestPromise=fetch('current-models.json?v=20261023-academy-rb2-v14',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('版本清單讀取失敗');return r.json();}).then(j=>j.models).catch(()=>[]);
 function disposeObject(obj){obj.traverse(o=>{o.geometry?.dispose();if(o.material)[].concat(o.material).forEach(m=>{Object.values(m).forEach(v=>{if(v&&v.isTexture)v.dispose();});m.dispose();});});}
 function applyInspection(){
   modelLights.forEach(x=>{x.object.visible=window.GLBInspection.lightVisible(x.originalVisible,inspection);});
@@ -398,7 +398,12 @@ function academyView(region){
     new THREE.Vector3(q[3],q[4]+offset,q[5]));
   setCut(1);
   fit(false);
-  if(anim){camera.position.copy(anim.p);controls.target.copy(anim.t);controls.update();anim=null;}
+  if(region==='gate'){
+    // South, frontal camera: preserve explicit animation establishing-shot axis.
+    camera.position.set(-70.1,11+offset,129);
+    controls.target.set(-70.1,4+offset,70);
+    controls.update();anim=null;
+  }else if(anim){camera.position.copy(anim.p);controls.target.copy(anim.t);controls.update();anim=null;}
   document.querySelectorAll('#academyViews button').forEach(b=>b.setAttribute('aria-pressed',
     String((region==='whole'&&b.id==='academyWhole')||
       (region==='school'&&b.id==='academySchool')||
@@ -510,7 +515,7 @@ const SAMPLES={
   },
   "lahudi-academy": {
     "name": "拉乎迪學院.glb",
-    "file": "lahudi-academy.glb?v=rb2-gothic-entrance-v13-20261023",
+    "file": "lahudi-academy.glb?v=rb2-campus-gate-animation-v14-20261023",
     "cut": 1,
     "fit": [
       -146,
