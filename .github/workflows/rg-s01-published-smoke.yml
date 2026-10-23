@@ -31,7 +31,7 @@ jobs:
             'preview_html_starts_with_doctype':html.lower().lstrip().startswith('<!doctype html>'),
             'preview_has_V5_notice':'S01 V5' in html,
             'preview_has_model_route':'lahudi-academy-s01-v5.glb' in html,
-            'corridor_camera_not_behind_end_wall':'pos:[-70.37,5.55,-11.7]' in html,
+            'corridor_camera_not_behind_end_wall':'pos:[-70.42,5.49,-5.2]' in html,
             'glb_magic':model[:4]==b'glTF',
             'glb_expected_length':len(model)==5508420,
             'glb_sha256_pinned':actual==expected,
