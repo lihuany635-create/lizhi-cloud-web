@@ -1,0 +1,18 @@
+{
+  "scene": "RG-GAME-02",
+  "revision": "ACADEMY-RB2-GOTHIC-ALL-CORRIDORS-V1",
+  "model_sha256": "3ba0261dffb76f277c64f88ad186203335de0b81e5ac1fa3a04cba16d7fe556c",
+  "checks": {
+    "sha_check": true,
+    "one_continuous_floor": true,
+    "source_classroom_entrances_clear": true,
+    "stair_bifurcation_clear": true,
+    "original_stair_nodes_preserved": true,
+    "twenty_bays_connected_z": true,
+    "source_mesh_backup_reversible": true,
+    "no_render_executed": true,
+    "full_body_collision_certified": false,
+    "author_approved": false
+  },
+  "QA_LIMIT": "Static axis-aligned module geometry only; no animated person navigation/continuous collision or visual approval."
+}
