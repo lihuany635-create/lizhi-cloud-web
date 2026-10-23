@@ -73,6 +73,32 @@ jobs:
           print('Published isolated S01 V5 preview:',len(payload),'bytes SHA256',actual)
           PY
           rm -rf .s01-stage-publish
+      - name: Checkout pinned S01 V5 candidate into temporary isolated path
+        uses: actions/checkout@v4
+        with:
+          ref: 5c166205ccfc25a8293fce5dcf1a1576c930ec36
+          path: _rg_s01_candidate
+          sparse-checkout: model-viewer/staged-output/ep01-s01/v5
+          persist-credentials: false
+      - name: Assemble S01 preview GLB with exact SHA-256 verification
+        run: |
+          python - <<'PY'
+          import hashlib, pathlib, shutil, json
+          src=pathlib.Path('_rg_s01_candidate/model-viewer/staged-output/ep01-s01/v5')
+          report=json.loads((src/'report_v5.json').read_text(encoding='utf-8'))
+          candidate=src/'lahudi-academy_ep01_s01_corridor_v5_art_review.glb'
+          target=pathlib.Path('model-viewer/s01-preview/lahudi-academy-s01-v5.glb')
+          expected='c875ba7f00814840723615942a523e9617d55457f3943216325b61343461e66e'
+          assert report['sha256']==expected, 'Source model report changed'
+          assert report['bytes']==5508420,'Unexpected source size'
+          assert candidate.stat().st_size==report['bytes'],'Missing or partial S01 GLB'
+          assert hashlib.sha256(candidate.read_bytes()).hexdigest()==expected,'S01 source hash mismatch'
+          target.parent.mkdir(parents=True,exist_ok=True)
+          shutil.copyfile(candidate,target)
+          assert hashlib.sha256(target.read_bytes()).hexdigest()==expected
+          print('RG S01 preview assembled:',target,'bytes',target.stat().st_size)
+          PY
+          rm -rf _rg_s01_candidate
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
