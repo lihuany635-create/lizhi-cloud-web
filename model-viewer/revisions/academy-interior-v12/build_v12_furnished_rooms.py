@@ -216,7 +216,7 @@ def classroom(room,kind,students=24):
  for n in range(capacity):
   col=n%4;row=n//4
   x=mid+(col-1.5)*min(1.05,width/5)
-  z=z0+2.7+row*min(.89,(length-3.2)/8)
+  z=z0+3.0+row*min(.89,(length-3.2)/8)
   if z>z1-.60:continue
   furniture(zone,label,x,z,y,"ST01")
   furniture(zone,label,x,z+.37,y,"ST02")
@@ -277,7 +277,7 @@ for level in (1,2):
    elif level==2 and j==5 and bank==1:specialty(rooms[-1],"office")
    else:classroom(rooms[-1],"ordinary",24)
  # New upper corridor floor supported by building inside; keep 1F aisle open.
- if level==2:cube("B","B_SECOND_CENTRAL_AISLE","interior_floor",-126.0,3.96,-19.0,4.3,.16,89,"corridor_floor")
+ if level==2:cube("B","B_SECOND_CENTRAL_AISLE","interior_floor",-126.0,3.96,-18.5,4.3,.16,85,"corridor_floor")
 # C specialty wing x [-35,-14]; side banks each 7.65m, 4.1m central aisle.
 for level in (1,2):
  for j in range(5):
@@ -287,7 +287,32 @@ for level in (1,2):
    kind=["art","music","study","office","ordinary"][j]
    if kind=="ordinary":classroom(rooms[-1],"ordinary",20)
    else:specialty(rooms[-1],kind)
- if level==2:cube("C","C_SECOND_CENTRAL_AISLE","interior_floor",-24.95,3.96,-19,4.35,.16,89,"corridor_floor")
+ if level==2:cube("C","C_SECOND_CENTRAL_AISLE","interior_floor",-24.95,3.96,-18.5,4.35,.16,85,"corridor_floor")
+# Real 1F -> 2F stair cores within the existing B/C longitudinal hallway.
+# 26 risers to Y=4m, two 13-step flights with switchback landings. Upper
+# hallway slab starts at z=-61, keeping the stairwell opening clear.
+def staircase(zone,xc,label):
+ rise=4.0/26.0
+ left=xc-1.03;right=xc+1.03
+ for i in range(13):
+  z=-61.35-i*.31
+  y=(i+1)*rise
+  cube(zone,label+"_flight_A_"+str(i),"wood",left,y-.065,z,1.34,.13,.31,"stair_tread")
+ for i in range(13):
+  z=-65.15+i*.31
+  y=(i+14)*rise
+  cube(zone,label+"_flight_B_"+str(i),"wood",right,y-.065,z,1.34,.13,.31,"stair_tread")
+ # landing from first flight into reverse second flight
+ cube(zone,label+"_half_landing","interior_floor",xc,1.98,-65.50,4.16,.15,1.05,"stair_landing")
+ cube(zone,label+"_top_landing","interior_floor",right,3.94,-60.70,1.80,.16,1.30,"stair_landing")
+ # Handrails: not blocking central stair tread width.
+ for side,x in (("left",xc-2.03),("right",xc+2.03)):
+  cube(zone,label+"_edge_rail_"+side,"dark",x,1.78,-63.13,.09,2.45,4.45,"stair_guard")
+ # riser analysis uses actual 4m total, not a fake visual staircase.
+ return rise
+stair_rise_B=staircase("B",-126.0,"B_WEST_NORTH_STAIR")
+stair_rise_C=staircase("C",-24.95,"C_EAST_NORTH_STAIR")
+
 # D entrance wings: reserve existing central clock gate and main routes; furniture near perimeter
 # (no internal all-width separation across front door).
 for side,xs in (("WEST",[-93,-87,-81]),("EAST",[-59,-50,-40,-30])):
@@ -401,8 +426,9 @@ report={
  "original_standalone_asset_zip":"拉乎迪學院_62款3D家具模型庫_v1.zip (preserved separately; not injected)",
  "source_plan_rooms":102,"original_plan_objects":2774,
  "rooms_are_provisional":True,
+ "teaching_wing_staircases":2,"each_stair_risers":26,"each_riser_height_m":4.0/26,
  "no_3f_floor_over_A01":True,
- "2f_access_BC":"NOT_COMPLETE__UPPER_STAIR_REQUIRED",
+ "2f_access_BC":"BUILT__26_RISER_SWITCHBACK_STAIRS_EACH__VISUAL_QA_PENDING",
  "single_school_glb":True,
  "author_approval":"PENDING",
  "rendering":"NOT_RUN",
@@ -413,7 +439,7 @@ report={
   "First floor and part of second floor only in new wings; not all 102 spaces.",
   "62 original standalone furniture GLBs were not copied byte for byte into the single school GLB, geometry is algorithmically equivalent in style/ID/dimensions.",
   "A01, original A/C classrooms and native library untouched; no unverified duplicate furniture.",
-  "B/C 2F stairs not yet modeled and no user/animation visual acceptance; candidate only until stair access resolved."
+  "B/C stair cores are modeled as preliminary functional riser geometry; animation/camera clearance remains unverified."
  ]}
 (DST/"report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
 (DST/"furniture-placements.json").write_text(json.dumps({"version":report["version"],"source_catalog_62_types":asset_values,
