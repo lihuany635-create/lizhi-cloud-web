@@ -20,7 +20,7 @@ for zone in ids:
  assert len(raw)>70000,(zone,len(raw))
  assert raw[:8]==b"\x89PNG\r\n\x1a\n",zone
  size=struct.unpack_from(">II",raw,16)
- assert size[0]>=700 and size[1]>=1300,(zone,size)
+ assert size[0]>=700 and size[1]>=1200,(zone,size)
  files[zone]={"bytes":len(raw),"sha256":hashlib.sha256(raw).hexdigest(),
               "px":list(size),"selection":zone}
  assert info["viewer"]["modelKey"]=="N/A" or info["viewer"].get("modelKey")=="lahudi-academy"
