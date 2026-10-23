@@ -1,0 +1,72 @@
+name: RG EP01 S01 V7 Published Preview Integrity
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-s01-v7-published-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-ep01-s01-v7-published-qa
+  cancel-in-progress: true
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download PUBLIC V7 HTML and GLB
+        run: |
+          set -euo pipefail
+          mkdir -p candidate-output/v7-live
+          SITE='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/v7/'
+          curl --fail --show-error --location --retry 2 --retry-delay 3 --connect-timeout 15 --max-time 90 "$SITE" -o candidate-output/v7-live/index.html
+          curl --fail --show-error --location --retry 2 --retry-delay 3 --connect-timeout 15 --max-time 90 "$SITE/lahudi-academy-s01-v7.glb" -o candidate-output/v7-live/model.glb
+          python - <<'PY'
+          import hashlib,json,pathlib
+          base=pathlib.Path('candidate-output/v7-live')
+          html=(base/'index.html').read_text()
+          data=(base/'model.glb').read_bytes()
+          expected='a7c6cf6f9281c2758a450c12d3c0f8c70e9167a7efaaa8a6aba68533c64e11d7'
+          c={
+           'preview_html_ok':html.lower().lstrip().startswith('<!doctype html>'),
+           'S01_V7_visible':'S01 V7' in html,
+           'model_path':'lahudi-academy-s01-v7.glb' in html,
+           'expected_SHA_embedded':expected in html,
+           'GLB_magic':data[:4]==b'glTF',
+           'GLB_length':len(data)==5566760,
+           'GLB_SHA256':hashlib.sha256(data).hexdigest()==expected,
+           'V5_rollback_link':'href="../"' in html}
+          report={'url':'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/v7/',
+                  'file_bytes':len(data),'sha256':hashlib.sha256(data).hexdigest(),'checks':c,
+                  'render_qa':'SEPARATE_BROWSER_CHECK','canonical_unchanged':True}
+          (base/'report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False)+'\n')
+          print(json.dumps(report,indent=2,ensure_ascii=False))
+          assert all(c.values())
+          PY
+      - name: Live Chrome WebGL image from public V7
+        run: |
+          set -e
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 95s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl --window-size=1440,900 --virtual-time-budget=18000 --screenshot=candidate-output/v7-live/live-v7.png https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/v7/
+          test "$(stat -c %s candidate-output/v7-live/live-v7.png)" -gt 50000
+      - name: Record published candidate QA in staging branch
+        run: |
+          mkdir -p model-viewer/staged-output/ep01-s01/v7/published-qa
+          cp candidate-output/v7-live/report.json model-viewer/staged-output/ep01-s01/v7/published-qa/
+          cp candidate-output/v7-live/live-v7.png model-viewer/staged-output/ep01-s01/v7/published-qa/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/v7/published-qa
+          git commit -m 'qa(S01): preserve live V7 public preview WebGL and exact hash proof'
+          git pull --rebase origin rg-ep01-s01-stage-20261023
+          git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ep01-s01-v7-live-publish-qa
+          path: |
+            candidate-output/v7-live/report.json
+            candidate-output/v7-live/live-v7.png
+          retention-days: 30
