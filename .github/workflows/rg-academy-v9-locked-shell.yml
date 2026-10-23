@@ -48,6 +48,7 @@ jobs:
           mkdir -p "$dst"
           cp candidate-output/academy-locked-massing-v9/*.glb "$dst/"
           cp candidate-output/academy-locked-massing-v9/report.json "$dst/"
+          python model-viewer/revisions/academy-locked-plan-v9/verify_structural_shell_v9.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$dst"
