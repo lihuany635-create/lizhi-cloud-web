@@ -24,7 +24,7 @@ jobs:
           if [ -f model-viewer/staged-output/academy-route-repair-v10/V10-stair-headroom-qa.json ]; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add model-viewer/staged-output/academy-route-repair-v10/V10-stair-headroom-qa.json
+            git add model-viewer/staged-output/academy-route-repair-v10/V10-stair-headroom-qa.json model-viewer/staged-output/academy-route-repair-v10/V10-clearance-qa.json
             if ! git diff --cached --quiet; then
               git commit -m 'qa(academy): evidence for all 26 stair headroom tests'
               git pull --rebase origin rg-ep01-s01-stage-20261023
