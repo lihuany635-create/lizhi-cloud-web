@@ -1,0 +1,56 @@
+name: RG Academy V7 Final Mobile View And 503 Retry QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v7-mobile-final-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check current website JS has instant framing and 503 retry
+        run: |
+          set -euo pipefail
+          mkdir -p candidate-output/academy-v7-frame-final
+          curl --fail --show-error -L --retry 6 --retry-delay 3 \
+            'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/' \
+            -o candidate-output/academy-v7-frame-final/index.html
+          python - <<'PY'
+          from pathlib import Path
+          html=Path('candidate-output/academy-v7-frame-final/index.html').read_text()
+          assert "連線重試 " in html, "Website JS did not include new transient-503 retry"
+          assert "camera.position.copy(anim.p)" in html
+          assert "function academyView(region)" in html
+          assert "rb2-entire-campus-optimized-v7-20261023" in html
+          print('FINAL MOBILE HTML UP TO DATE')
+          PY
+      - name: Capture dark-theme public Chrome mobile GLB after instant-fit fix
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 115s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage \
+            --disable-background-networking --disable-extensions \
+            --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl \
+            --force-dark-mode --force-device-scale-factor=1 \
+            --window-size=720,1380 --virtual-time-budget=16000 \
+            --screenshot=candidate-output/academy-v7-frame-final/mobile-framed-with-retry.png \
+            'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/#lahudi-academy'
+          test "$(stat -c %s candidate-output/academy-v7-frame-final/mobile-framed-with-retry.png)" -gt 45000
+      - name: Save QA screenshot with unique filename
+        run: |
+          dst=model-viewer/staged-output/academy-entire-campus-optimized-v7/mobile-qa
+          mkdir -p "$dst"
+          cp candidate-output/academy-v7-frame-final/mobile-framed-with-retry.png "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy): verify public mobile whole-school frame, dark colors and 503 retry'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
