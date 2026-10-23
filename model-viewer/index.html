@@ -115,8 +115,10 @@ button,label.btn{font:inherit;cursor:pointer}
       <option value="reality-highschool">現實高中（校園＋3F 教室）</option>
       <option value="xiji-station">溪磯鎮車站</option>
       <option value="lahudi-academy">拉乎迪學院（校園＋教室＋告白走廊）</option>
+      <option value="lahudi-academy-s01-v5">S01 V5｜拉乎迪告白走廊（測試版・尚未驗收）</option>
     </select></label>
   <button class="btn" id="openPreview" type="button">配置圖預覽</button>
+  <a class="btn" href="./index.html?v=20261023-s01-v5#lahudi-academy-s01-v5" title="獨立 S01 V5 模型測試版，原拉乎迪學院正式模型不變">S01 V5 測試模型</a>
   <span id="viewerVersion" class="file" aria-live="polite"></span>
   <span id="houseViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="house1F">一樓俯視</button><button class="btn" id="house2F">二樓俯視</button><button class="btn" id="houseWhole">完整外觀</button><a class="btn" href="revisions/hades-v2.4/">配置圖</a></span>
 </div>
@@ -452,6 +454,14 @@ const SAMPLES={
       16,
       27
     ]
+  },
+  "lahudi-academy-s01-v5": {
+    "name": "拉乎迪學院 S01 V5（測試・尚未驗收）.glb",
+    "file": "preview/s01-v5.glb?v=20261023-v5",
+    "version": "S01-V5-TEST-PREVIEW",
+    "expectedSHA": "c875ba7f00814840723615942a523e9617d55457f3943216325b61343461e66e",
+    "cut": 1,
+    "fit": [-74, 3, -10, -67.5, 8, 13]
   }
 };
 async function loadSample(key){
@@ -462,7 +472,9 @@ async function loadSample(key){
     const buf=new Uint8Array(got);let o=0;chunks.forEach(c=>{buf.set(c,o);o+=c.length;});
     if(serial!==loadSerial)return;
     const actualSHA=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',buf))).map(v=>v.toString(16).padStart(2,'0')).join('');
-    const entry=(await manifestPromise).find(x=>x.model===key+'.glb');
+    const entry=smp.expectedSHA
+      ? {current_sha256:smp.expectedSHA,version:smp.version||"TEST_PREVIEW"}
+      : (await manifestPromise).find(x=>x.model===key+'.glb');
     if(!entry?.current_sha256)throw Error('無法取得模型版本清單，請重新整理後再試。');
     if(!window.GLBInspection.checkHash(entry.current_sha256,actualSHA))throw Error('模型與版本清單不一致，已停止載入；請重新整理後再試。');
     if(serial!==loadSerial)return;
