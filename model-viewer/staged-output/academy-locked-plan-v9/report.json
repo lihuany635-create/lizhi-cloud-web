@@ -1,0 +1,319 @@
+{
+  "school": "拉乎迪學院",
+  "version": "ACADEMY-LOCKED-PLAN-EXTERIOR-SHELL-V9",
+  "book": "《現實遊戲》拉乎迪學院｜建築總平面與外觀殼體尺寸手冊 v1.0",
+  "book_url": "https://docs.google.com/document/d/1seSK9uMrnNV2_Mh1RwmG50JtjFgXqJzHOQoCqiNFTPQ/edit?usp=drivesdk",
+  "source_v8_sha256": "07392e83c165854c00f13fb39687253fbd185a1a5aa0d134264651a626af8c8f",
+  "output_sha256": "b5de8da89e2ec2e72247020a2a19bd8926b2dff565cc5478dc47c8b7e0146b04",
+  "file": "lahudi-academy_LOCKED-PLAN-SHELL_RB2_v9.glb",
+  "bytes": 11268264,
+  "nodes": 11694,
+  "source_total_nodes": 11174,
+  "kept_core_nodes": 11097,
+  "old_v6_external_wing_mesh_batches_removed": 77,
+  "locked_districts": [
+    "A_MAIN",
+    "B_WEST",
+    "C_EAST",
+    "D_SOUTH_ENTRANCE",
+    "E_NORTH_ACADEMY",
+    "F_LIBRARY",
+    "G_ASSEMBLY",
+    "H_ARCHIVE"
+  ],
+  "existing_locked_districts": {
+    "A_MAIN": {
+      "x": [
+        -87.95,
+        -67.18
+      ],
+      "z": [
+        -67.85,
+        26.14
+      ],
+      "existing": true
+    },
+    "F_LIBRARY": {
+      "x": [
+        -49.2,
+        -2.2
+      ],
+      "z": [
+        -183.2,
+        -142.75
+      ],
+      "existing": true
+    }
+  },
+  "rebuilt_structural_submasses": [
+    {
+      "id": "B_WEST",
+      "bbox": {
+        "x": [
+          -139,
+          -114
+        ],
+        "z": [
+          -68,
+          24
+        ]
+      },
+      "eave": 11.6,
+      "ridge": 15.8
+    },
+    {
+      "id": "C_EAST",
+      "bbox": {
+        "x": [
+          -35,
+          -14
+        ],
+        "z": [
+          -68,
+          24
+        ]
+      },
+      "eave": 11.6,
+      "ridge": 15.6
+    },
+    {
+      "id": "D_WEST_ENTRY",
+      "bbox": {
+        "x": [
+          -98,
+          -75
+        ],
+        "z": [
+          30,
+          53
+        ]
+      },
+      "eave": 10.8,
+      "ridge": 15.5
+    },
+    {
+      "id": "D_EAST_ENTRY",
+      "bbox": {
+        "x": [
+          -65,
+          -22
+        ],
+        "z": [
+          30,
+          53
+        ]
+      },
+      "eave": 10.8,
+      "ridge": 15.0
+    },
+    {
+      "id": "E_WEST_ACADEMY",
+      "bbox": {
+        "x": [
+          -118,
+          -94
+        ],
+        "z": [
+          -112,
+          -82
+        ]
+      },
+      "eave": 11.6,
+      "ridge": 16.0
+    },
+    {
+      "id": "E_CENTER_HALL",
+      "bbox": {
+        "x": [
+          -94,
+          -62
+        ],
+        "z": [
+          -112,
+          -82
+        ]
+      },
+      "eave": 12.8,
+      "ridge": 17.6
+    },
+    {
+      "id": "E_EAST_LINK",
+      "bbox": {
+        "x": [
+          -62,
+          -40
+        ],
+        "z": [
+          -112,
+          -82
+        ]
+      },
+      "eave": 11.6,
+      "ridge": 16.0
+    },
+    {
+      "id": "G_ASSEMBLY",
+      "bbox": {
+        "x": [
+          -123,
+          -95
+        ],
+        "z": [
+          -170,
+          -125
+        ]
+      },
+      "eave": 12.5,
+      "ridge": 19.5
+    },
+    {
+      "id": "H_ARCHIVE",
+      "bbox": {
+        "x": [
+          4,
+          28
+        ],
+        "z": [
+          -174,
+          -143
+        ]
+      },
+      "eave": 10.8,
+      "ridge": 14.8
+    }
+  ],
+  "new_structure_nodes": 597,
+  "material_and_feature_counts": {
+    "foundation_slab": 9,
+    "low_wall": 58,
+    "wall_band": 75,
+    "pilaster": 322,
+    "passage_header": 20,
+    "real_passage_jamb": 40,
+    "pitched_roof": 18,
+    "roof_rake": 36,
+    "ridge": 9,
+    "walkable_connector_slab": 10
+  },
+  "actual_wall_portal_core_cuts": [
+    "RG-GAME-02-EXTERIOR-REBUILD-V5__lower_cladding_west_13",
+    "RG-GAME-02-EXTERIOR-REBUILD-V5__lower_cladding_east_13",
+    "RG-GAME-02-EXTERIOR-REBUILD-V5__library_plinth_east_7",
+    "RG-GAME-02-EXTERIOR-REBUILD-V5__library_endwall_south"
+  ],
+  "new_real_connector_slabs": {
+    "WEST_TO_MAIN": [
+      -114,
+      -87.95,
+      -14,
+      -9
+    ],
+    "EAST_TO_MAIN": [
+      -67.18,
+      -35,
+      -14,
+      -9
+    ],
+    "MAIN_TO_E_SOUTH": [
+      -86,
+      -82,
+      -82,
+      -67.85
+    ],
+    "E_NORTH_TO_LIBRARY": [
+      -47,
+      -43.4,
+      -142.75,
+      -112
+    ],
+    "E_TO_G_CHAPEL": [
+      -107,
+      -103,
+      -125,
+      -112
+    ],
+    "F_TO_H_ARCHIVE": [
+      -2.2,
+      4,
+      -154,
+      -149
+    ],
+    "WEST_TO_D_WEST_Z": [
+      -125,
+      -121,
+      24,
+      40
+    ],
+    "WEST_TO_D_WEST_X": [
+      -125,
+      -90,
+      36,
+      40
+    ],
+    "EAST_TO_D_EAST": [
+      -34,
+      -29,
+      24,
+      36
+    ],
+    "MAIN_TO_ENTRANCE": [
+      -72,
+      -68,
+      26.14,
+      40
+    ]
+  },
+  "protected_open_courts": [
+    {
+      "id": "WEST_COURT",
+      "x": [
+        -114,
+        -87.95
+      ],
+      "z": [
+        -68,
+        24
+      ],
+      "area_m2": 2396.6
+    },
+    {
+      "id": "EAST_COURT",
+      "x": [
+        -67.18,
+        -35
+      ],
+      "z": [
+        -68,
+        24
+      ],
+      "area_m2": 2960.56
+    }
+  ],
+  "main_RB2_corridor_unchanged": true,
+  "native_A01_story_vault_height_conflict": "3F floor across vaulted segment NOT added; protected for section analysis",
+  "new_region_counts": {
+    "B_WEST": 82,
+    "C_EAST": 80,
+    "D_WEST_ENTRY": 53,
+    "D_EAST_ENTRY": 63,
+    "E_WEST_ACADEMY": 53,
+    "E_CENTER_HALL": 61,
+    "E_EAST_LINK": 54,
+    "G_ASSEMBLY": 62,
+    "H_ARCHIVE": 53,
+    "F_LIBRARY": 26,
+    "LINK": 10
+  },
+  "structural_roundtrip": "PASS",
+  "rendering": "NOT_RUN",
+  "body_collision": "NOT_RUN",
+  "author_visual_approval": "PENDING",
+  "warnings": [
+    "Architectural shell massing only: no code-conformant real structural design.",
+    "Existing library link is an approximate corridor at X=-45, not perfect centered axes.",
+    "Entrance frontage D is asymmetrical because the already existing clock tower X=-70.1 differs from locked frontage midpoint X=-60 by 10.1m.",
+    "Original school 4.5m corridor width retained, while animation 5.2m proposal remains unresolved.",
+    "Preserving existing main shell and library but cutting selected ground wall panels where essential for circulation.",
+    "Windows are open structural wall bands; refinement of window jamb and classroom relationships still necessary."
+  ]
+}
