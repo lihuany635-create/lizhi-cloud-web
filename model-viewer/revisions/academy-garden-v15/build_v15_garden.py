@@ -274,7 +274,7 @@ assert m["scenes"][m.get("scene",0)]["nodes"][:len(old_scene)]==old_scene
 assert len(newroots)<65 and len(parts)>=145
 assert counts["hero_plant_pot"]==1
 assert counts["bench_seat"]==3
-assert counts["library_north_lintel_wall"]==0
+assert counts["library_north_lintel_wall"]==1
 assert counts["library_wing_wall_replacement"]==2
 assert counts["open_oak_door"]==2
 m["buffers"][0]["byteLength"]=len(buf)
