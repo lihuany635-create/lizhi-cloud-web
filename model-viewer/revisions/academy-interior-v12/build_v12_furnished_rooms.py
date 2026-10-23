@@ -330,7 +330,7 @@ for x in (-90,-50,-31):
  furniture("D","D_ENTRY",x,50.4,0,"SV03")
 # E north academic forehall, don't block true axial passages X=-84 & X=-45.
 for side,x0,x1 in (("W",-117,-95),("CENTER",-93,-63),("E",-61,-41)):
- for level in (1,2):
+ for level in (1,):
   y=4 if level==2 else 0
   for j in range(3):
    x=x0+2.5+(x1-x0-5)*(j+.5)/3
@@ -344,7 +344,7 @@ for side,x0,x1 in (("W",-117,-95),("CENTER",-93,-63),("E",-61,-41)):
  # No full 2F slab here until north academic circulation layout is approved.
 # G assembly: stage at north end Z -163; audience from -154 to -131.
 furniture("G","G_HALL",-109,-162,0,"AS03")
-furniture("G","G_HALL",-109,-161,0,"AS02")
+furniture("G","G_HALL",-109,-161,.45,"AS02")
 for row in range(8):
  z=-153+row*2.28
  for col in range(4):
@@ -436,7 +436,7 @@ report={
  "box_counts":dict(counts),"catalog_counts":dict(catalog),
  "warnings":[
   "Floor/room dividers are provisional where the school had only outer shell.",
-  "First floor and part of second floor only in new wings; not all 102 spaces.",
+  "First floor and part of second floor only in B/C teaching wings; north forehall E second level not fitted until slab and access are designed.",
   "62 original standalone furniture GLBs were not copied byte for byte into the single school GLB, geometry is algorithmically equivalent in style/ID/dimensions.",
   "A01, original A/C classrooms and native library untouched; no unverified duplicate furniture.",
   "B/C stair cores are modeled as preliminary functional riser geometry; animation/camera clearance remains unverified."
