@@ -1,0 +1,168 @@
+{
+  "version": "ACADEMY-LOCKED-PLAN-EXTERIOR-GOTHIC-FINISH-V11",
+  "source_model_sha256": "f2b4c82a7ea3b6625a7ffef3157c56b8e7f288bf9cd2d3bbf699c7ca67ef1b5c",
+  "file": "lahudi-academy_EXTERIOR-GOTHIC-FINISH_V11.glb",
+  "sha256": "f294d395e1488b7ec7ef7c7215d64fcc85e5d37bba2fe81a90af5751258e5177",
+  "bytes": 13919480,
+  "source_nodes": 11827,
+  "result_nodes": 11923,
+  "baked_decorative_shapes": 3487,
+  "batched_decorative_nodes": 96,
+  "exterior_decorations": {
+    "upper_clear_glazing": 274,
+    "window_stone_jamb": 548,
+    "window_tracery": 274,
+    "window_mullion": 274,
+    "window_sill": 274,
+    "pointed_window_arch": 1096,
+    "buttress_cap": 102,
+    "blind_window_inset": 56,
+    "wall_sconce": 56,
+    "warm_lantern": 56,
+    "eave_stone_cornice": 18,
+    "copper_gutter": 18,
+    "gable_eave_band": 18,
+    "gable_crest": 22,
+    "gable_finial": 22,
+    "gable_boss": 44,
+    "roof_dormer_mass": 62,
+    "dormer_window": 62,
+    "dormer_copper_roof": 62,
+    "roof_ridge_crest": 84,
+    "historic_masonry_stringcourse": 20,
+    "clock_tower_cornice": 12,
+    "clock_face_panel": 1,
+    "clock_hour_mark": 4,
+    "entry_stair_parapet": 2,
+    "courtyard_axis": 2,
+    "courtyard_cross_paving": 16,
+    "exterior_planter": 4,
+    "winter_evergreen": 4
+  },
+  "region_counts": {
+    "B_WEST": 606,
+    "C_EAST": 606,
+    "D_WEST_ENTRY": 244,
+    "D_EAST_ENTRY": 332,
+    "E_WEST_ACADEMY": 273,
+    "E_CENTER_HALL": 317,
+    "E_EAST_LINK": 273,
+    "G_ASSEMBLY": 391,
+    "H_ARCHIVE": 295,
+    "A_MAIN": 68,
+    "F_LIBRARY": 37,
+    "D_ENTRANCE": 19,
+    "WEST_COURTYARD": 13,
+    "EAST_COURTYARD": 13
+  },
+  "color_palette": {
+    "limestone": [
+      0.59,
+      0.59,
+      0.55,
+      1
+    ],
+    "carved_stone": [
+      0.42,
+      0.46,
+      0.49,
+      1
+    ],
+    "recess": [
+      0.115,
+      0.17,
+      0.225,
+      1
+    ],
+    "blue_glass": [
+      0.14,
+      0.35,
+      0.51,
+      0.82
+    ],
+    "gold_glass": [
+      0.54,
+      0.32,
+      0.15,
+      0.85
+    ],
+    "dark_oak": [
+      0.23,
+      0.113,
+      0.072,
+      1
+    ],
+    "bronze": [
+      0.68,
+      0.45,
+      0.19,
+      1
+    ],
+    "iron": [
+      0.115,
+      0.15,
+      0.19,
+      1
+    ],
+    "slate": [
+      0.08,
+      0.13,
+      0.19,
+      1
+    ],
+    "roof_copper": [
+      0.25,
+      0.34,
+      0.29,
+      1
+    ],
+    "warm_lamp": [
+      1.0,
+      0.64,
+      0.27,
+      1
+    ],
+    "paving": [
+      0.29,
+      0.33,
+      0.36,
+      1
+    ],
+    "paving_dark": [
+      0.165,
+      0.2,
+      0.23,
+      1
+    ],
+    "planter": [
+      0.28,
+      0.32,
+      0.3,
+      1
+    ],
+    "ivy": [
+      0.135,
+      0.22,
+      0.18,
+      1
+    ]
+  },
+  "all_previous_V10_nodes_and_access_routes_unchanged": true,
+  "eight_district_locked_positions_preserved": true,
+  "A01_original_interior_and_stairs_preserved": true,
+  "special_features": [
+    "Gothic pointed upper lancet stone frames",
+    "deep-blue glazing in actual upper open-wall bands",
+    "copper gutters and limestone cornices",
+    "dark-slate roof dormers",
+    "gable crests and bronze finials",
+    "clock-tower stone stringcourses and clock dial",
+    "timber double main-entry doors and warm brass lanterns",
+    "courtyard paving and small winter shrubs"
+  ],
+  "lower_opaque_wall_windows_are_blind_architectural_insets": "YES, do NOT call them openings",
+  "visual_render": "NOT_RUN",
+  "character_collision": "SKIPPED_AS_USER_REQUESTED",
+  "main_version_write": "NOT_PROMOTED_AT_BUILD_STAGE",
+  "approval": "PENDING"
+}
