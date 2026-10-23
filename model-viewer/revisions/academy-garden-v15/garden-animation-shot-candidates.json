@@ -1,0 +1,106 @@
+{
+  "project": "現實遊戲",
+  "scene": "薇媞後花園",
+  "version": "V15_GARDEN_ANIMATION_CAMERA_CANDIDATES",
+  "status": "NOT_AUTHOR_SHOT_APPROVED",
+  "source": {
+    "text": "07_發現女主.md",
+    "moments": [
+      "初次發現貝西",
+      "角落盆栽旁的對話",
+      "隔天再到後花園",
+      "角色離開後的空景"
+    ],
+    "geometry": "model-viewer/staged-output/academy-rear-garden-v15/lahudi-academy_VITTI-REAR-GARDEN_V15.glb"
+  },
+  "axis": "GLB world XYZ, Y up; all values metres; cameras are candidates, not direct shot final",
+  "candidates": [
+    {
+      "id": "GDN-C01",
+      "title": "圖書館出口看庭園",
+      "camera": [
+        -25.7,
+        1.85,
+        -182.2
+      ],
+      "target": [
+        -25.7,
+        1.25,
+        -195.8
+      ],
+      "narrative": "從圖書館往冬季草地與步道望去",
+      "lens_mm_candidate": 35
+    },
+    {
+      "id": "GDN-C02",
+      "title": "貝西的盆栽與側影",
+      "camera": [
+        -36.8,
+        1.72,
+        -211.5
+      ],
+      "target": [
+        -40.1,
+        1.2,
+        -208.5
+      ],
+      "narrative": "讓獨立盆栽占有足夠畫面，人物站位另於動畫層配置",
+      "lens_mm_candidate": 50
+    },
+    {
+      "id": "GDN-C03",
+      "title": "長椅低語對話",
+      "camera": [
+        -18.3,
+        1.63,
+        -197.4
+      ],
+      "target": [
+        -12.4,
+        1,
+        -196.8
+      ],
+      "narrative": "兩人談話點位，花圃作後景",
+      "lens_mm_candidate": 50
+    },
+    {
+      "id": "GDN-C04",
+      "title": "落葉樹間的冬季全景",
+      "camera": [
+        -26,
+        9.5,
+        -239
+      ],
+      "target": [
+        -26,
+        2.1,
+        -192
+      ],
+      "narrative": "花園低石牆、中央草地與圖書館外牆構成三層",
+      "lens_mm_candidate": 24
+    },
+    {
+      "id": "GDN-C05",
+      "title": "貝西離開後的空鏡",
+      "camera": [
+        -36.2,
+        1.6,
+        -208
+      ],
+      "target": [
+        -25.7,
+        1,
+        -192
+      ],
+      "narrative": "冬季耐寒植物作前景，主軸留空",
+      "lens_mm_candidate": 35
+    }
+  ],
+  "prohibited": [
+    "Do not place furniture over actual garden paths",
+    "Do not relocate canonical school",
+    "Do not label these shot IDs as author-approved animation cuts",
+    "Do not claim the garden is canonically next to library if only planning inference"
+  ],
+  "original_novel_does_not_define_exact_garden_coordinates": true
+}
