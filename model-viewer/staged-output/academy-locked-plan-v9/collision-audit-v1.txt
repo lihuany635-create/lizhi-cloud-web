@@ -1,0 +1,54 @@
+V9 collision and obstruction audit for RG-GAME-02
+visible AABB nodes=5109, blocker candidates=638, V9 targeted=594
+Walkable link AABB collisions by route:
+  WEST_TO_MAIN                 width  3.60m  blockers=  0
+  EAST_TO_MAIN                 width  3.60m  blockers=  0
+  MAIN_TO_E_SOUTH              width  4.00m  blockers=  4
+    original_solid         (-86.775, 5.8, -67.85) overlap=[0.345, 2.15, 0.13] RG-GAME-02-EXTERIOR-REBUILD-V5__north_end_-88.0
+    original_solid         (-74.79, 5.8, -67.85) overlap=[0.345, 2.15, 0.13] RG-GAME-02-EXTERIOR-REBUILD-V5__north_end_-82.4
+    real_passage_jamb      (-86.0, 1.8, -82.0) overlap=[0.155, 2.15, 0.215] RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_south_portal_0_a
+    real_passage_jamb      (-82.0, 1.8, -82.0) overlap=[0.155, 2.15, 0.215] RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_south_portal_0_b
+  E_NORTH_TO_LIBRARY           width  3.60m  blockers=  3
+    real_passage_jamb      (-47.0, 1.8, -112.0) overlap=[0.155, 2.15, 0.215] RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_north_portal_0_a
+    real_passage_jamb      (-47.0, 1.8, -142.75) overlap=[0.155, 2.15, 0.215] RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_SOUTH_REPLACEMENT_portal_0_a
+    real_passage_jamb      (-43.4, 1.8, -142.75) overlap=[0.155, 2.15, 0.215] RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_SOUTH_REPLACEMENT_portal_0_b
+  E_TO_G_CHAPEL                width  4.00m  blockers=  6
+    low_wall               (-99.0, 1.775, -112.0) overlap=[0.945, 2.15, 0.17] RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_low_wall_-104.00_-94.00
+    real_passage_jamb      (-104.0, 1.8, -112.0) overlap=[0.42, 2.15, 0.215] RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_portal_0_b
+    real_passage_jamb      (-107.0, 1.8, -125.0) overlap=[0.155, 2.15, 0.215] RG-GAME-02-PLAN-LOCK-V9__G_ASSEMBLY_south_portal_0_a
+    real_passage_jamb      (-103.0, 1.8, -125.0) overlap=[0.155, 2.15, 0.215] RG-GAME-02-PLAN-LOCK-V9__G_ASSEMBLY_south_portal_0_b
+  F_TO_H_ARCHIVE               width  5.00m  blockers=  4
+    real_passage_jamb      (4.0, 1.8, -154.0) overlap=[0.215, 2.15, 0.155] RG-GAME-02-PLAN-LOCK-V9__H_ARCHIVE_west_portal_0_a
+    real_passage_jamb      (4.0, 1.8, -149.0) overlap=[0.215, 2.15, 0.155] RG-GAME-02-PLAN-LOCK-V9__H_ARCHIVE_west_portal_0_b
+    real_passage_jamb      (-2.2, 1.8, -154.0) overlap=[0.215, 2.15, 0.155] RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_EAST_PORTAL_portal_0_a
+    real_passage_jamb      (-2.2, 1.8, -149.0) overlap=[0.215, 2.15, 0.155] RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_EAST_PORTAL_portal_0_b
+  WEST_TO_D_WEST_Z             width  4.00m  blockers=  3
+    arcade_support         (-125.0, 2.55, 35.81) overlap=[0.095, 2.15, 0.3] RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_D_WEST_X_pier_0_a
+    real_passage_jamb      (-125.0, 1.8, 24.0) overlap=[0.155, 2.15, 0.215] RG-GAME-02-PLAN-LOCK-V9__B_WEST_south_portal_0_a
+    real_passage_jamb      (-121.0, 1.8, 24.0) overlap=[0.155, 2.15, 0.215] RG-GAME-02-PLAN-LOCK-V9__B_WEST_south_portal_0_b
+  WEST_TO_D_WEST_X             width  4.00m  blockers=  4
+    low_wall               (-98.0, 1.775, 41.5) overlap=[0.45, 2.15, 3.89] RG-GAME-02-PLAN-LOCK-V9__D_WEST_ENTRY_west_low_wall_30.00_53.00
+    pilaster               (-98.0, 5.2, 39.2) overlap=[0.37, 2.15, 0.34] RG-GAME-02-PLAN-LOCK-V9__D_WEST_ENTRY_west_baypier_2
+    arcade_support         (-120.81, 2.55, 36.0) overlap=[0.3, 2.15, 0.095] RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_D_WEST_Z_pier_3_b
+    arcade_support         (-120.81, 2.55, 40.0) overlap=[0.3, 2.15, 0.095] RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_D_WEST_Z_pier_4_b
+  EAST_TO_D_EAST               width  5.00m  blockers=  4
+    low_wall               (-33.5, 1.775, 24.0) overlap=[1.945, 2.15, 0.17] RG-GAME-02-PLAN-LOCK-V9__C_EAST_south_low_wall_-35.00_-32.00
+    real_passage_jamb      (-34.0, 1.8, 30.0) overlap=[0.155, 2.15, 0.54] RG-GAME-02-PLAN-LOCK-V9__D_EAST_ENTRY_north_portal_0_a
+    real_passage_jamb      (-29.0, 1.8, 30.0) overlap=[0.155, 2.15, 0.54] RG-GAME-02-PLAN-LOCK-V9__D_EAST_ENTRY_north_portal_0_b
+    real_passage_jamb      (-32.0, 1.8, 24.0) overlap=[0.42, 2.15, 0.215] RG-GAME-02-PLAN-LOCK-V9__C_EAST_south_portal_0_a
+  MAIN_TO_ENTRANCE             width  4.00m  blockers=  4
+    original_solid         (-67.975, 5.7, 26.14) overlap=[0.715, 2.15, 0.13] RG-GAME-02-EXTERIOR-REBUILD-V5__south_end_-68.8
+    original_solid         (-67.285, 10.4, 35.44) overlap=[0.715, 2.15, 0.5] RG-GAME-02-EXTERIOR-REBUILD-V5__tower_front_-68.77
+    original_solid         (-79.69, 5.7, 26.14) overlap=[0.515, 2.15, 0.13] RG-GAME-02-EXTERIOR-REBUILD-V5__south_end_-88.0
+    original_solid         (-72.815, 10.4, 35.44) overlap=[0.515, 2.15, 0.5] RG-GAME-02-EXTERIOR-REBUILD-V5__tower_front_-74.20
+Prioritized risks:
+  P01 HIGH     主樓西、東側連接入口 1F: 新主樓門洞與校舍低牆已切開，但原有主樓壁柱與窗台需逐件查核
+  P02 HIGH     主樓北端入口接 E 前廳: 主樓原北入口 X[-85.60,-82.40] 寬3.20m，連接地坪X[-86,-82]寬4.00m，差0.80m；兩端各0.40m被原牆控制
+  P03 HIGH     E 前廳到禮堂 G 門洞軸線偏差: E_WEST北門 X[-108,-104]，連通廊 X[-107,-103]；相對平移1.0m，重疊寬3.0m（其餘1m對著低牆）
+  P04 CRITICAL 西側翼連接南入口 D 的西側外牆: WEST_TO_D_WEST_X 沿 X[-125,-90]、Z[36,40] 進入 D_WEST_ENTRY 西立面 X=-98；此立面 V9 無 west_doors，低牆未開口
+  P05 CRITICAL 主樓二樓走廊與一樓連接廊高差: 原RB2主走廊板面約Y=4.0m，新連通廊地坪Y=0.13m，上下落差約3.87m；若規劃由2F直接進廊則會懸空
+  P06 CRITICAL A01二樓高拱頂與第三層樓板: 二樓地坪Y=4，動畫候選最高拱頂相對+9.2=>Y=13.2，若整片3F樓板Y=8則直接貫入預留拱頂4m~5.2m
+  P07 MEDIUM   南入口 D 偏心鐘樓與兩翼收邊: 既有鐘樓 X≈-74.2..-65.8；新增 D 西翼 X[-98,-75]、東翼 X[-65,-22]，雙側最短間隙約0.8m，尚不能證明包板/排水/門樓空間足夠
+  P08 HIGH     圖書館東側連通 H 及南入口: 原東牆兩個舊模數網格已停用，新門洞Z[-154,-149]；原高窗立柱/玻璃仍需查核是否堵塞門洞及水平轉角
+  P09 HIGH     走廊淨寬尺寸來源衝突: 既有RB2走廊模型跨度4.50m，手冊A01動畫建議淨寬5.20m；差0.70m，尚不確定原模型牆內淨空
+  P10 MEDIUM   V9有頂連接廊與地面通道淨空: 廊道地坪厚0.13m，屋頂中心Y=5.13厚0.24m；純剖面高差約4.88m，但檐柱在廊道邊線外偏0.19m，柱寬0.30m仍可能侵入通行邊界

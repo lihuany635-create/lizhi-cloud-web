@@ -1,0 +1,1775 @@
+{
+  "model": "拉乎迪學院 V9",
+  "audit": "V9_CLASH_PREVENTION_01",
+  "source_sha256": "ada3ae9c9e55f995b4c8c60f63655c01e572561e523e199ef1cdf298c7e668c3",
+  "method": "glTF node mesh local extrema + node TRS transformed to world AABB; corridor walk volumes and architectural envelope comparisons",
+  "bounds_scope": "only meshes without complex parent transforms for hotspot estimates; V9 new construction root-level",
+  "visible_nodes_aabb_evaluated": 5109,
+  "v9_structural_nodes": 594,
+  "solid_nodes_screened": 638,
+  "routes": [
+    {
+      "route": "WEST_TO_MAIN",
+      "nominal_rect_xz_m": [
+        -114,
+        -87.95,
+        -12.0,
+        -8.4
+      ],
+      "nominal_width_m": 3.6,
+      "body_check_y_m": [
+        0.19,
+        2.34
+      ],
+      "aabb_candidates": 0,
+      "significant_examples": [],
+      "likely_congestion": false
+    },
+    {
+      "route": "EAST_TO_MAIN",
+      "nominal_rect_xz_m": [
+        -67.18,
+        -35,
+        -12.0,
+        -8.4
+      ],
+      "nominal_width_m": 3.6,
+      "body_check_y_m": [
+        0.19,
+        2.34
+      ],
+      "aabb_candidates": 0,
+      "significant_examples": [],
+      "likely_congestion": false
+    },
+    {
+      "route": "MAIN_TO_E_SOUTH",
+      "nominal_rect_xz_m": [
+        -86,
+        -82,
+        -82,
+        -67.85
+      ],
+      "nominal_width_m": 4,
+      "body_check_y_m": [
+        0.19,
+        2.34
+      ],
+      "aabb_candidates": 4,
+      "significant_examples": [
+        {
+          "mesh": "RG-GAME-02-EXTERIOR-REBUILD-V5__north_end_-88.0",
+          "kind": "original_solid",
+          "zone": "preserved_core",
+          "overlap_m_xyz": [
+            0.345,
+            2.15,
+            0.13
+          ],
+          "bbox_m_xyz": [
+            [
+              -87.95,
+              0.0,
+              -68.035
+            ],
+            [
+              -85.60000000000001,
+              11.6,
+              -67.66499999999999
+            ]
+          ],
+          "center_xyz": [
+            -86.775,
+            5.8,
+            -67.85
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-EXTERIOR-REBUILD-V5__north_end_-82.4",
+          "kind": "original_solid",
+          "zone": "preserved_core",
+          "overlap_m_xyz": [
+            0.345,
+            2.15,
+            0.13
+          ],
+          "bbox_m_xyz": [
+            [
+              -82.4,
+              0.0,
+              -68.035
+            ],
+            [
+              -67.18,
+              11.6,
+              -67.66499999999999
+            ]
+          ],
+          "center_xyz": [
+            -74.79,
+            5.8,
+            -67.85
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_south_portal_0_a",
+          "kind": "real_passage_jamb",
+          "zone": "E_CENTER_HALL",
+          "overlap_m_xyz": [
+            0.155,
+            2.15,
+            0.215
+          ],
+          "bbox_m_xyz": [
+            [
+              -86.21,
+              0.0,
+              -82.27
+            ],
+            [
+              -85.79,
+              3.6,
+              -81.73
+            ]
+          ],
+          "center_xyz": [
+            -86.0,
+            1.8,
+            -82.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_south_portal_0_b",
+          "kind": "real_passage_jamb",
+          "zone": "E_CENTER_HALL",
+          "overlap_m_xyz": [
+            0.155,
+            2.15,
+            0.215
+          ],
+          "bbox_m_xyz": [
+            [
+              -82.21,
+              0.0,
+              -82.27
+            ],
+            [
+              -81.79,
+              3.6,
+              -81.73
+            ]
+          ],
+          "center_xyz": [
+            -82.0,
+            1.8,
+            -82.0
+          ]
+        }
+      ],
+      "likely_congestion": true
+    },
+    {
+      "route": "E_NORTH_TO_LIBRARY",
+      "nominal_rect_xz_m": [
+        -47,
+        -43.4,
+        -142.75,
+        -112
+      ],
+      "nominal_width_m": 3.6,
+      "body_check_y_m": [
+        0.19,
+        2.34
+      ],
+      "aabb_candidates": 3,
+      "significant_examples": [
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_north_portal_0_a",
+          "kind": "real_passage_jamb",
+          "zone": "E_EAST_LINK",
+          "overlap_m_xyz": [
+            0.155,
+            2.15,
+            0.215
+          ],
+          "bbox_m_xyz": [
+            [
+              -47.21,
+              0.0,
+              -112.27
+            ],
+            [
+              -46.79,
+              3.6,
+              -111.73
+            ]
+          ],
+          "center_xyz": [
+            -47.0,
+            1.8,
+            -112.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_SOUTH_REPLACEMENT_portal_0_a",
+          "kind": "real_passage_jamb",
+          "zone": "F_LIBRARY",
+          "overlap_m_xyz": [
+            0.155,
+            2.15,
+            0.215
+          ],
+          "bbox_m_xyz": [
+            [
+              -47.21,
+              0.0,
+              -143.02
+            ],
+            [
+              -46.79,
+              3.6,
+              -142.48
+            ]
+          ],
+          "center_xyz": [
+            -47.0,
+            1.8,
+            -142.75
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_SOUTH_REPLACEMENT_portal_0_b",
+          "kind": "real_passage_jamb",
+          "zone": "F_LIBRARY",
+          "overlap_m_xyz": [
+            0.155,
+            2.15,
+            0.215
+          ],
+          "bbox_m_xyz": [
+            [
+              -43.61,
+              0.0,
+              -143.02
+            ],
+            [
+              -43.19,
+              3.6,
+              -142.48
+            ]
+          ],
+          "center_xyz": [
+            -43.4,
+            1.8,
+            -142.75
+          ]
+        }
+      ],
+      "likely_congestion": true
+    },
+    {
+      "route": "E_TO_G_CHAPEL",
+      "nominal_rect_xz_m": [
+        -107,
+        -103,
+        -125,
+        -112
+      ],
+      "nominal_width_m": 4,
+      "body_check_y_m": [
+        0.19,
+        2.34
+      ],
+      "aabb_candidates": 6,
+      "significant_examples": [
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_low_wall_-104.00_-94.00",
+          "kind": "low_wall",
+          "zone": "E_WEST_ACADEMY",
+          "overlap_m_xyz": [
+            0.945,
+            2.15,
+            0.17
+          ],
+          "bbox_m_xyz": [
+            [
+              -104.0,
+              0.0,
+              -112.225
+            ],
+            [
+              -94.0,
+              3.55,
+              -111.775
+            ]
+          ],
+          "center_xyz": [
+            -99.0,
+            1.775,
+            -112.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_portal_0_b",
+          "kind": "real_passage_jamb",
+          "zone": "E_WEST_ACADEMY",
+          "overlap_m_xyz": [
+            0.42,
+            2.15,
+            0.215
+          ],
+          "bbox_m_xyz": [
+            [
+              -104.21,
+              0.0,
+              -112.27
+            ],
+            [
+              -103.79,
+              3.6,
+              -111.73
+            ]
+          ],
+          "center_xyz": [
+            -104.0,
+            1.8,
+            -112.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__G_ASSEMBLY_south_portal_0_a",
+          "kind": "real_passage_jamb",
+          "zone": "G_ASSEMBLY",
+          "overlap_m_xyz": [
+            0.155,
+            2.15,
+            0.215
+          ],
+          "bbox_m_xyz": [
+            [
+              -107.21,
+              0.0,
+              -125.27
+            ],
+            [
+              -106.79,
+              3.6,
+              -124.73
+            ]
+          ],
+          "center_xyz": [
+            -107.0,
+            1.8,
+            -125.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__G_ASSEMBLY_south_portal_0_b",
+          "kind": "real_passage_jamb",
+          "zone": "G_ASSEMBLY",
+          "overlap_m_xyz": [
+            0.155,
+            2.15,
+            0.215
+          ],
+          "bbox_m_xyz": [
+            [
+              -103.21,
+              0.0,
+              -125.27
+            ],
+            [
+              -102.79,
+              3.6,
+              -124.73
+            ]
+          ],
+          "center_xyz": [
+            -103.0,
+            1.8,
+            -125.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__G_ASSEMBLY_south_baypier_4",
+          "kind": "pilaster",
+          "zone": "G_ASSEMBLY",
+          "overlap_m_xyz": [
+            0.115,
+            2.15,
+            0.13
+          ],
+          "bbox_m_xyz": [
+            [
+              -107.17,
+              0.0,
+              -125.185
+            ],
+            [
+              -106.83,
+              10.4,
+              -124.815
+            ]
+          ],
+          "center_xyz": [
+            -107.0,
+            5.2,
+            -125.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__G_ASSEMBLY_south_baypier_5",
+          "kind": "pilaster",
+          "zone": "G_ASSEMBLY",
+          "overlap_m_xyz": [
+            0.115,
+            2.15,
+            0.13
+          ],
+          "bbox_m_xyz": [
+            [
+              -103.17,
+              0.0,
+              -125.185
+            ],
+            [
+              -102.83,
+              10.4,
+              -124.815
+            ]
+          ],
+          "center_xyz": [
+            -103.0,
+            5.2,
+            -125.0
+          ]
+        }
+      ],
+      "likely_congestion": true
+    },
+    {
+      "route": "F_TO_H_ARCHIVE",
+      "nominal_rect_xz_m": [
+        -2.2,
+        4,
+        -154,
+        -149
+      ],
+      "nominal_width_m": 5,
+      "body_check_y_m": [
+        0.19,
+        2.34
+      ],
+      "aabb_candidates": 4,
+      "significant_examples": [
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__H_ARCHIVE_west_portal_0_a",
+          "kind": "real_passage_jamb",
+          "zone": "H_ARCHIVE",
+          "overlap_m_xyz": [
+            0.215,
+            2.15,
+            0.155
+          ],
+          "bbox_m_xyz": [
+            [
+              3.73,
+              0.0,
+              -154.21
+            ],
+            [
+              4.27,
+              3.6,
+              -153.79
+            ]
+          ],
+          "center_xyz": [
+            4.0,
+            1.8,
+            -154.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__H_ARCHIVE_west_portal_0_b",
+          "kind": "real_passage_jamb",
+          "zone": "H_ARCHIVE",
+          "overlap_m_xyz": [
+            0.215,
+            2.15,
+            0.155
+          ],
+          "bbox_m_xyz": [
+            [
+              3.73,
+              0.0,
+              -149.21
+            ],
+            [
+              4.27,
+              3.6,
+              -148.79
+            ]
+          ],
+          "center_xyz": [
+            4.0,
+            1.8,
+            -149.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_EAST_PORTAL_portal_0_a",
+          "kind": "real_passage_jamb",
+          "zone": "F_LIBRARY",
+          "overlap_m_xyz": [
+            0.215,
+            2.15,
+            0.155
+          ],
+          "bbox_m_xyz": [
+            [
+              -2.47,
+              0.0,
+              -154.21
+            ],
+            [
+              -1.9300000000000002,
+              3.6,
+              -153.79
+            ]
+          ],
+          "center_xyz": [
+            -2.2,
+            1.8,
+            -154.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_EAST_PORTAL_portal_0_b",
+          "kind": "real_passage_jamb",
+          "zone": "F_LIBRARY",
+          "overlap_m_xyz": [
+            0.215,
+            2.15,
+            0.155
+          ],
+          "bbox_m_xyz": [
+            [
+              -2.47,
+              0.0,
+              -149.21
+            ],
+            [
+              -1.9300000000000002,
+              3.6,
+              -148.79
+            ]
+          ],
+          "center_xyz": [
+            -2.2,
+            1.8,
+            -149.0
+          ]
+        }
+      ],
+      "likely_congestion": true
+    },
+    {
+      "route": "WEST_TO_D_WEST_Z",
+      "nominal_rect_xz_m": [
+        -125,
+        -121,
+        24,
+        40
+      ],
+      "nominal_width_m": 4,
+      "body_check_y_m": [
+        0.19,
+        2.34
+      ],
+      "aabb_candidates": 3,
+      "significant_examples": [
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_D_WEST_X_pier_0_a",
+          "kind": "arcade_support",
+          "zone": "LINK",
+          "overlap_m_xyz": [
+            0.095,
+            2.15,
+            0.3
+          ],
+          "bbox_m_xyz": [
+            [
+              -125.15,
+              0.0,
+              35.660000000000004
+            ],
+            [
+              -124.85,
+              5.1,
+              35.96
+            ]
+          ],
+          "center_xyz": [
+            -125.0,
+            2.55,
+            35.81
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__B_WEST_south_portal_0_a",
+          "kind": "real_passage_jamb",
+          "zone": "B_WEST",
+          "overlap_m_xyz": [
+            0.155,
+            2.15,
+            0.215
+          ],
+          "bbox_m_xyz": [
+            [
+              -125.21,
+              0.0,
+              23.73
+            ],
+            [
+              -124.79,
+              3.6,
+              24.27
+            ]
+          ],
+          "center_xyz": [
+            -125.0,
+            1.8,
+            24.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__B_WEST_south_portal_0_b",
+          "kind": "real_passage_jamb",
+          "zone": "B_WEST",
+          "overlap_m_xyz": [
+            0.155,
+            2.15,
+            0.215
+          ],
+          "bbox_m_xyz": [
+            [
+              -121.21,
+              0.0,
+              23.73
+            ],
+            [
+              -120.79,
+              3.6,
+              24.27
+            ]
+          ],
+          "center_xyz": [
+            -121.0,
+            1.8,
+            24.0
+          ]
+        }
+      ],
+      "likely_congestion": true
+    },
+    {
+      "route": "WEST_TO_D_WEST_X",
+      "nominal_rect_xz_m": [
+        -125,
+        -90,
+        36,
+        40
+      ],
+      "nominal_width_m": 4,
+      "body_check_y_m": [
+        0.19,
+        2.34
+      ],
+      "aabb_candidates": 4,
+      "significant_examples": [
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__D_WEST_ENTRY_west_low_wall_30.00_53.00",
+          "kind": "low_wall",
+          "zone": "D_WEST_ENTRY",
+          "overlap_m_xyz": [
+            0.45,
+            2.15,
+            3.89
+          ],
+          "bbox_m_xyz": [
+            [
+              -98.225,
+              0.0,
+              30.0
+            ],
+            [
+              -97.775,
+              3.55,
+              53.0
+            ]
+          ],
+          "center_xyz": [
+            -98.0,
+            1.775,
+            41.5
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__D_WEST_ENTRY_west_baypier_2",
+          "kind": "pilaster",
+          "zone": "D_WEST_ENTRY",
+          "overlap_m_xyz": [
+            0.37,
+            2.15,
+            0.34
+          ],
+          "bbox_m_xyz": [
+            [
+              -98.185,
+              0.0,
+              39.03
+            ],
+            [
+              -97.815,
+              10.4,
+              39.370000000000005
+            ]
+          ],
+          "center_xyz": [
+            -98.0,
+            5.2,
+            39.2
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_D_WEST_Z_pier_3_b",
+          "kind": "arcade_support",
+          "zone": "LINK",
+          "overlap_m_xyz": [
+            0.3,
+            2.15,
+            0.095
+          ],
+          "bbox_m_xyz": [
+            [
+              -120.96000000000001,
+              0.0,
+              35.85
+            ],
+            [
+              -120.66,
+              5.1,
+              36.15
+            ]
+          ],
+          "center_xyz": [
+            -120.81,
+            2.55,
+            36.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_D_WEST_Z_pier_4_b",
+          "kind": "arcade_support",
+          "zone": "LINK",
+          "overlap_m_xyz": [
+            0.3,
+            2.15,
+            0.095
+          ],
+          "bbox_m_xyz": [
+            [
+              -120.96000000000001,
+              0.0,
+              39.85
+            ],
+            [
+              -120.66,
+              5.1,
+              40.15
+            ]
+          ],
+          "center_xyz": [
+            -120.81,
+            2.55,
+            40.0
+          ]
+        }
+      ],
+      "likely_congestion": true
+    },
+    {
+      "route": "EAST_TO_D_EAST",
+      "nominal_rect_xz_m": [
+        -34,
+        -29,
+        24,
+        36
+      ],
+      "nominal_width_m": 5,
+      "body_check_y_m": [
+        0.19,
+        2.34
+      ],
+      "aabb_candidates": 4,
+      "significant_examples": [
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__C_EAST_south_low_wall_-35.00_-32.00",
+          "kind": "low_wall",
+          "zone": "C_EAST",
+          "overlap_m_xyz": [
+            1.945,
+            2.15,
+            0.17
+          ],
+          "bbox_m_xyz": [
+            [
+              -35.0,
+              0.0,
+              23.775
+            ],
+            [
+              -32.0,
+              3.55,
+              24.225
+            ]
+          ],
+          "center_xyz": [
+            -33.5,
+            1.775,
+            24.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__D_EAST_ENTRY_north_portal_0_a",
+          "kind": "real_passage_jamb",
+          "zone": "D_EAST_ENTRY",
+          "overlap_m_xyz": [
+            0.155,
+            2.15,
+            0.54
+          ],
+          "bbox_m_xyz": [
+            [
+              -34.21,
+              0.0,
+              29.73
+            ],
+            [
+              -33.79,
+              3.6,
+              30.27
+            ]
+          ],
+          "center_xyz": [
+            -34.0,
+            1.8,
+            30.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__D_EAST_ENTRY_north_portal_0_b",
+          "kind": "real_passage_jamb",
+          "zone": "D_EAST_ENTRY",
+          "overlap_m_xyz": [
+            0.155,
+            2.15,
+            0.54
+          ],
+          "bbox_m_xyz": [
+            [
+              -29.21,
+              0.0,
+              29.73
+            ],
+            [
+              -28.79,
+              3.6,
+              30.27
+            ]
+          ],
+          "center_xyz": [
+            -29.0,
+            1.8,
+            30.0
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-PLAN-LOCK-V9__C_EAST_south_portal_0_a",
+          "kind": "real_passage_jamb",
+          "zone": "C_EAST",
+          "overlap_m_xyz": [
+            0.42,
+            2.15,
+            0.215
+          ],
+          "bbox_m_xyz": [
+            [
+              -32.21,
+              0.0,
+              23.73
+            ],
+            [
+              -31.79,
+              3.6,
+              24.27
+            ]
+          ],
+          "center_xyz": [
+            -32.0,
+            1.8,
+            24.0
+          ]
+        }
+      ],
+      "likely_congestion": true
+    },
+    {
+      "route": "MAIN_TO_ENTRANCE",
+      "nominal_rect_xz_m": [
+        -72,
+        -68,
+        26.14,
+        40
+      ],
+      "nominal_width_m": 4,
+      "body_check_y_m": [
+        0.19,
+        2.34
+      ],
+      "aabb_candidates": 4,
+      "significant_examples": [
+        {
+          "mesh": "RG-GAME-02-EXTERIOR-REBUILD-V5__south_end_-68.8",
+          "kind": "original_solid",
+          "zone": "preserved_core",
+          "overlap_m_xyz": [
+            0.715,
+            2.15,
+            0.13
+          ],
+          "bbox_m_xyz": [
+            [
+              -68.77,
+              0.0,
+              25.955000000000002
+            ],
+            [
+              -67.17999999999999,
+              11.4,
+              26.325
+            ]
+          ],
+          "center_xyz": [
+            -67.975,
+            5.7,
+            26.14
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-EXTERIOR-REBUILD-V5__tower_front_-68.77",
+          "kind": "original_solid",
+          "zone": "preserved_core",
+          "overlap_m_xyz": [
+            0.715,
+            2.15,
+            0.5
+          ],
+          "bbox_m_xyz": [
+            [
+              -68.77,
+              0.0,
+              35.19
+            ],
+            [
+              -65.8,
+              20.8,
+              35.69
+            ]
+          ],
+          "center_xyz": [
+            -67.285,
+            10.4,
+            35.44
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-EXTERIOR-REBUILD-V5__south_end_-88.0",
+          "kind": "original_solid",
+          "zone": "preserved_core",
+          "overlap_m_xyz": [
+            0.515,
+            2.15,
+            0.13
+          ],
+          "bbox_m_xyz": [
+            [
+              -87.95,
+              0.0,
+              25.955000000000002
+            ],
+            [
+              -71.42999999999999,
+              11.4,
+              26.325
+            ]
+          ],
+          "center_xyz": [
+            -79.69,
+            5.7,
+            26.14
+          ]
+        },
+        {
+          "mesh": "RG-GAME-02-EXTERIOR-REBUILD-V5__tower_front_-74.20",
+          "kind": "original_solid",
+          "zone": "preserved_core",
+          "overlap_m_xyz": [
+            0.515,
+            2.15,
+            0.5
+          ],
+          "bbox_m_xyz": [
+            [
+              -74.2,
+              0.0,
+              35.19
+            ],
+            [
+              -71.42999999999999,
+              20.8,
+              35.69
+            ]
+          ],
+          "center_xyz": [
+            -72.815,
+            10.4,
+            35.44
+          ]
+        }
+      ],
+      "likely_congestion": true
+    }
+  ],
+  "issues": [
+    {
+      "id": "P01",
+      "description": "主樓西、東側連接入口 1F",
+      "category": "GEOMETRY",
+      "risk": "HIGH",
+      "position_xyz": [
+        -87.95,
+        1.8,
+        -10.2
+      ],
+      "status": "AABB_AND_SOURCE",
+      "condition": "新主樓門洞與校舍低牆已切開，但原有主樓壁柱與窗台需逐件查核",
+      "prevention": "在 B/C 進入主樓的 Z=-12.2..-8.2 設置2.1m高通行包絡；碰到的V5柱/護牆局部改框而非削弱主柱",
+      "route_id": "WEST_TO_MAIN",
+      "route_aabb_candidates": 0
+    },
+    {
+      "id": "P02",
+      "description": "主樓北端入口接 E 前廳",
+      "category": "WIDTH_AND_LEVEL",
+      "risk": "HIGH",
+      "position_xyz": [
+        -84,
+        0,
+        -67.85
+      ],
+      "status": "MEASURED_CODE_GEOMETRY",
+      "condition": "主樓原北入口 X[-85.60,-82.40] 寬3.20m，連接地坪X[-86,-82]寬4.00m，差0.80m；兩端各0.40m被原牆控制",
+      "prevention": "採3.00~3.20m的頸縮過渡並保持兩側內縮柱，或按結構校核將門洞改為4m；不可將4m地坪當4m有效淨寬",
+      "route_id": "MAIN_TO_E_SOUTH",
+      "route_aabb_candidates": 4
+    },
+    {
+      "id": "P03",
+      "description": "E 前廳到禮堂 G 門洞軸線偏差",
+      "category": "DOORWAY_ALIGNMENT",
+      "risk": "HIGH",
+      "position_xyz": [
+        -105,
+        -0.0,
+        -112
+      ],
+      "status": "MEASURED_CODE_GEOMETRY",
+      "condition": "E_WEST北門 X[-108,-104]，連通廊 X[-107,-103]；相對平移1.0m，重疊寬3.0m（其餘1m對著低牆）",
+      "prevention": "保留原座標，將廊道中心改至X=-106並於轉角設斜接/過渡平台，或同步修改E門洞到[-107,-103]",
+      "route_id": "E_TO_G_CHAPEL",
+      "route_aabb_candidates": 6
+    },
+    {
+      "id": "P04",
+      "description": "西側翼連接南入口 D 的西側外牆",
+      "category": "BLOCKED_PORTAL",
+      "risk": "CRITICAL",
+      "position_xyz": [
+        -98,
+        1.5,
+        38
+      ],
+      "status": "MEASURED_CODE_GEOMETRY",
+      "condition": "WEST_TO_D_WEST_X 沿 X[-125,-90]、Z[36,40] 進入 D_WEST_ENTRY 西立面 X=-98；此立面 V9 無 west_doors，低牆未開口",
+      "prevention": "在 D_WEST_ENTRY 的西外牆 X=-98、Z[36,40] 開足夠寬實門洞並補門楣；保護柱位後再做局部牆洞，避免走廊穿牆",
+      "route_id": "WEST_TO_D_WEST_X",
+      "route_aabb_candidates": 4
+    },
+    {
+      "id": "P05",
+      "description": "主樓二樓走廊與一樓連接廊高差",
+      "category": "VERTICAL_ROUTE",
+      "risk": "CRITICAL",
+      "position_xyz": [
+        -84,
+        0,
+        -67.85
+      ],
+      "status": "MODEL_SECTION_INFERENCE",
+      "condition": "原RB2主走廊板面約Y=4.0m，新連通廊地坪Y=0.13m，上下落差約3.87m；若規劃由2F直接進廊則會懸空",
+      "prevention": "圖上明確把V9連廊定為1F、與2F專用走廊分開；設具踏步/平台/出入口的垂直交通，兩端節點都需能通行",
+      "route_id": "MAIN_TO_E_SOUTH",
+      "route_aabb_candidates": 4
+    },
+    {
+      "id": "P06",
+      "description": "A01二樓高拱頂與第三層樓板",
+      "category": "FUTURE_3F_VAULT",
+      "risk": "CRITICAL",
+      "position_xyz": [
+        -70.25,
+        8,
+        -25
+      ],
+      "status": "DESIGN_PROPOSAL_NOT_CONSTRUCTED",
+      "condition": "二樓地坪Y=4，動畫候選最高拱頂相對+9.2=>Y=13.2，若整片3F樓板Y=8則直接貫入預留拱頂4m~5.2m",
+      "prevention": "A01設『二樓挑高雙層廊』保留3F樓板洞口，必要時調整坡屋頂高程；3F樓板不得跨越拱頂空間"
+    },
+    {
+      "id": "P07",
+      "description": "南入口 D 偏心鐘樓與兩翼收邊",
+      "category": "MASSING_AND_ROOF",
+      "risk": "MEDIUM",
+      "position_xyz": [
+        -70.1,
+        14,
+        35
+      ],
+      "status": "MODEL_REVIEW",
+      "condition": "既有鐘樓 X≈-74.2..-65.8；新增 D 西翼 X[-98,-75]、東翼 X[-65,-22]，雙側最短間隙約0.8m，尚不能證明包板/排水/門樓空間足夠",
+      "prevention": "鐘樓與兩翼建立結構伸縮/收邊節點與屋簷排水空間；以屋頂AABB和三視圖檢查，不硬拉鐘樓到X=-60"
+    },
+    {
+      "id": "P08",
+      "description": "圖書館東側連通 H 及南入口",
+      "category": "ENTRY_AND_TRACERY",
+      "risk": "HIGH",
+      "position_xyz": [
+        -2.2,
+        1.5,
+        -151
+      ],
+      "status": "CUT_AND_REFRAME",
+      "condition": "原東牆兩個舊模數網格已停用，新門洞Z[-154,-149]；原高窗立柱/玻璃仍需查核是否堵塞門洞及水平轉角",
+      "prevention": "逐件查核窗楣、窗柱、門框與角色1.9m×0.8m包絡；門前後至少留轉身平台，不以窗框當門扇",
+      "route_id": "F_TO_H_ARCHIVE",
+      "route_aabb_candidates": 4
+    },
+    {
+      "id": "P09",
+      "description": "走廊淨寬尺寸來源衝突",
+      "category": "DIMENSION_CONFLICT",
+      "risk": "HIGH",
+      "position_xyz": [
+        -70.25,
+        4,
+        -25
+      ],
+      "status": "VERIFIED_PLAN_CONFLICT",
+      "condition": "既有RB2走廊模型跨度4.50m，手冊A01動畫建議淨寬5.20m；差0.70m，尚不確定原模型牆內淨空",
+      "prevention": "固定角色1.70m比例量規，先量走廊真實牆內淨空；選擇維持4.5m鏡頭還是局部擴寬，不得兩個尺寸並存"
+    },
+    {
+      "id": "P10",
+      "description": "V9有頂連接廊與地面通道淨空",
+      "category": "COLUMN_SWEEP",
+      "risk": "MEDIUM",
+      "position_xyz": [
+        -45,
+        2,
+        -127
+      ],
+      "status": "CHECKED_BY_AABB",
+      "condition": "廊道地坪厚0.13m，屋頂中心Y=5.13厚0.24m；純剖面高差約4.88m，但檐柱在廊道邊線外偏0.19m，柱寬0.30m仍可能侵入通行邊界",
+      "prevention": "實測柱/窗突出與整段可行走寬度；通路淨寬以最窄斷面為準，角色碰撞膠囊沿轉角連續掃掠",
+      "route_id": "E_NORTH_TO_LIBRARY",
+      "route_aabb_candidates": 3
+    }
+  ],
+  "zone_aabb_contact_counts": {
+    "B_WEST + LINK": 16,
+    "E_CENTER_HALL + E_WEST_ACADEMY": 15,
+    "E_CENTER_HALL + E_EAST_LINK": 15,
+    "C_EAST + LINK": 13,
+    "F_LIBRARY + LINK": 13,
+    "G_ASSEMBLY + LINK": 11,
+    "E_CENTER_HALL + LINK": 7,
+    "H_ARCHIVE + LINK": 7,
+    "E_EAST_LINK + LINK": 6,
+    "E_WEST_ACADEMY + LINK": 4,
+    "E_NORTH_ACADEMY + E_WEST_ACADEMY": 4,
+    "E_EAST_LINK + E_NORTH_ACADEMY": 4,
+    "A_MAIN + LINK": 4,
+    "D_WEST_ENTRY + LINK": 2,
+    "D_EAST_ENTRY + LINK": 1
+  },
+  "zone_aabb_contact_examples": {
+    "B_WEST + LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__B_WEST_east_low_wall_-68.00_-12.20",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_MAIN_pier_0_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.14
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__B_WEST_east_low_wall_-8.20_24.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_MAIN_pier_0_b",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.14
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__B_WEST_east_wall_band_-68.00_24.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_MAIN_roof",
+        "penetration_aabb_xyz_m": [
+          0.4,
+          0.24,
+          3.95
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__B_WEST_east_wall_band_-68.00_24.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_MAIN_pier_0_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          1.55,
+          0.3
+        ]
+      }
+    ],
+    "C_EAST + LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__C_EAST_west_low_wall_-68.00_-12.20",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_EAST_TO_MAIN_pier_7_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.14
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__C_EAST_west_low_wall_-8.20_24.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_EAST_TO_MAIN_pier_7_b",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.14
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__C_EAST_west_wall_band_-68.00_24.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_EAST_TO_MAIN_roof",
+        "penetration_aabb_xyz_m": [
+          0.4,
+          0.24,
+          3.95
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__C_EAST_west_wall_band_-68.00_24.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_EAST_TO_MAIN_pier_7_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          1.55,
+          0.3
+        ]
+      }
+    ],
+    "D_WEST_ENTRY + LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__D_WEST_ENTRY_west_wall_band_30.00_53.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_D_WEST_X_roof",
+        "penetration_aabb_xyz_m": [
+          0.45,
+          0.24,
+          4.35
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__D_WEST_ENTRY_west_baypier_2",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_D_WEST_X_roof",
+        "penetration_aabb_xyz_m": [
+          0.37,
+          0.24,
+          0.34
+        ]
+      }
+    ],
+    "D_EAST_ENTRY + LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__D_EAST_ENTRY_north_wall_band_-65.00_-22.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_EAST_TO_D_EAST_roof",
+        "penetration_aabb_xyz_m": [
+          5.35,
+          0.24,
+          0.45
+        ]
+      }
+    ],
+    "E_CENTER_HALL + E_WEST_ACADEMY": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_low_wall_-104.00_-94.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_north_baypier_0",
+        "penetration_aabb_xyz_m": [
+          0.17,
+          3.55,
+          0.37
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_wall_band_-118.00_-94.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_north_baypier_0",
+        "penetration_aabb_xyz_m": [
+          0.17,
+          2.45,
+          0.37
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_wall_band_-118.00_-94.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_north_baypier_0",
+        "penetration_aabb_xyz_m": [
+          0.17,
+          2.75,
+          0.37
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_baypier_6",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_north_low_wall_-94.00_-86.00",
+        "penetration_aabb_xyz_m": [
+          0.17,
+          3.55,
+          0.37
+        ]
+      }
+    ],
+    "E_WEST_ACADEMY + LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_low_wall_-104.00_-94.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_TO_G_CHAPEL_pier_3_b",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_wall_band_-118.00_-94.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_TO_G_CHAPEL_roof",
+        "penetration_aabb_xyz_m": [
+          4.35,
+          0.24,
+          0.4
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_wall_band_-118.00_-94.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_TO_G_CHAPEL_pier_3_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          1.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_north_wall_band_-118.00_-94.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_TO_G_CHAPEL_pier_3_b",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          1.55,
+          0.3
+        ]
+      }
+    ],
+    "E_NORTH_ACADEMY + E_WEST_ACADEMY": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_side_1",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_PARTY_PIER_-94_-109",
+        "penetration_aabb_xyz_m": [
+          0.383,
+          0.5174,
+          0.68
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_side_1",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_PARTY_PIER_-94_-102",
+        "penetration_aabb_xyz_m": [
+          0.383,
+          0.5174,
+          0.68
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_side_1",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_PARTY_PIER_-94_-95",
+        "penetration_aabb_xyz_m": [
+          0.383,
+          0.5174,
+          0.68
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_WEST_ACADEMY_side_1",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_PARTY_PIER_-94_-85",
+        "penetration_aabb_xyz_m": [
+          0.383,
+          0.5174,
+          0.68
+        ]
+      }
+    ],
+    "E_CENTER_HALL + E_EAST_LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_north_low_wall_-82.00_-62.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_north_baypier_0",
+        "penetration_aabb_xyz_m": [
+          0.17,
+          3.55,
+          0.37
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_north_wall_band_-94.00_-62.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_north_baypier_0",
+        "penetration_aabb_xyz_m": [
+          0.17,
+          2.45,
+          0.37
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_north_wall_band_-94.00_-62.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_north_baypier_0",
+        "penetration_aabb_xyz_m": [
+          0.17,
+          2.75,
+          0.37
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_north_baypier_7",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_north_low_wall_-62.00_-47.00",
+        "penetration_aabb_xyz_m": [
+          0.17,
+          3.55,
+          0.37
+        ]
+      }
+    ],
+    "E_CENTER_HALL + LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_south_low_wall_-94.00_-86.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_0_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_south_low_wall_-82.00_-62.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_0_b",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_south_wall_band_-94.00_-62.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_roof",
+        "penetration_aabb_xyz_m": [
+          4.35,
+          0.24,
+          0.4
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_CENTER_HALL_south_wall_band_-94.00_-62.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_MAIN_TO_E_SOUTH_pier_0_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          1.55,
+          0.3
+        ]
+      }
+    ],
+    "E_EAST_LINK + LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_north_low_wall_-62.00_-47.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_NORTH_TO_LIBRARY_pier_7_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_north_wall_band_-62.00_-40.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_NORTH_TO_LIBRARY_roof",
+        "penetration_aabb_xyz_m": [
+          3.95,
+          0.24,
+          0.4
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_north_wall_band_-62.00_-40.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_NORTH_TO_LIBRARY_pier_7_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          1.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_north_wall_band_-62.00_-40.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_NORTH_TO_LIBRARY_pier_7_b",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          1.55,
+          0.3
+        ]
+      }
+    ],
+    "E_EAST_LINK + E_NORTH_ACADEMY": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_side_0",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_PARTY_PIER_-62_-109",
+        "penetration_aabb_xyz_m": [
+          0.3864,
+          0.5161,
+          0.68
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_side_0",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_PARTY_PIER_-62_-102",
+        "penetration_aabb_xyz_m": [
+          0.3864,
+          0.5161,
+          0.68
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_side_0",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_PARTY_PIER_-62_-95",
+        "penetration_aabb_xyz_m": [
+          0.3864,
+          0.5161,
+          0.68
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__E_EAST_LINK_side_0",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__E_PARTY_PIER_-62_-85",
+        "penetration_aabb_xyz_m": [
+          0.3864,
+          0.5161,
+          0.68
+        ]
+      }
+    ],
+    "G_ASSEMBLY + LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__G_ASSEMBLY_south_low_wall_-123.00_-107.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_TO_G_CHAPEL_pier_0_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__G_ASSEMBLY_south_low_wall_-103.00_-95.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_TO_G_CHAPEL_pier_0_b",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__G_ASSEMBLY_south_wall_band_-123.00_-95.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_TO_G_CHAPEL_roof",
+        "penetration_aabb_xyz_m": [
+          4.35,
+          0.24,
+          0.4
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__G_ASSEMBLY_south_wall_band_-123.00_-95.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_TO_G_CHAPEL_pier_0_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          1.55,
+          0.3
+        ]
+      }
+    ],
+    "H_ARCHIVE + LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__H_ARCHIVE_west_low_wall_-174.00_-154.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_F_TO_H_ARCHIVE_pier_2_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__H_ARCHIVE_west_low_wall_-149.00_-143.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_F_TO_H_ARCHIVE_pier_2_b",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__H_ARCHIVE_west_wall_band_-174.00_-143.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_F_TO_H_ARCHIVE_roof",
+        "penetration_aabb_xyz_m": [
+          0.4,
+          0.24,
+          5.35
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__H_ARCHIVE_west_wall_band_-174.00_-143.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_F_TO_H_ARCHIVE_pier_2_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          1.55,
+          0.3
+        ]
+      }
+    ],
+    "F_LIBRARY + LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_SOUTH_REPLACEMENT_low_wall_-49.20_-47.00",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_NORTH_TO_LIBRARY_pier_0_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_SOUTH_REPLACEMENT_low_wall_-43.40_-2.20",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_NORTH_TO_LIBRARY_pier_0_b",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.3
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_SOUTH_REPLACEMENT_wall_band_-49.20_-2.20",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_NORTH_TO_LIBRARY_roof",
+        "penetration_aabb_xyz_m": [
+          3.95,
+          0.24,
+          0.4
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__F_LIBRARY_SOUTH_REPLACEMENT_wall_band_-49.20_-2.20",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_E_NORTH_TO_LIBRARY_pier_0_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          1.55,
+          0.3
+        ]
+      }
+    ],
+    "A_MAIN + LINK": [
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__A_MAIN_court_door_jamb_west_north",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_MAIN_pier_6_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.28
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__A_MAIN_court_door_jamb_west_south",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_WEST_TO_MAIN_pier_6_b",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.28
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__A_MAIN_court_door_jamb_east_north",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_EAST_TO_MAIN_pier_0_a",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.28
+        ]
+      },
+      {
+        "a": "RG-GAME-02-PLAN-LOCK-V9__A_MAIN_court_door_jamb_east_south",
+        "b": "RG-GAME-02-PLAN-LOCK-V9__LINK_EAST_TO_MAIN_pier_0_b",
+        "penetration_aabb_xyz_m": [
+          0.3,
+          3.55,
+          0.28
+        ]
+      }
+    ]
+  },
+  "source_notes": [
+    "AABB intersections are conservative, may include sloping-roof false positives; not triangle-triangle collision.",
+    "Portals and path widths are based on exact construction code and GLB node coordinates.",
+    "Second-floor Y=4 to first-floor Y=0.13 is a route design conflict, not evidence an unbuilt stair physically collides.",
+    "Third floor Y=8 and A01 vault crown Y=13.2 are animation proposal, not both built; flag preconstruction only.",
+    "Character body/shoulder collision is not yet simulated; no physical structural safety approval."
+  ],
+  "recommended_gate": {
+    "design_capsule": {
+      "radius_m": 0.4,
+      "height_m": 1.9,
+      "status": "TEST_ASSUMPTION"
+    },
+    "minimum_provisional_clear_passage_m": 1.2,
+    "door_clearance_test": "3-dimensional swept capsule sampled every 0.25m along all 10 links, check y=0 to 1.9",
+    "floor_level_gate": "any adjacent walking segments >.15m rise require explicitly modeled steps/ramps and landing",
+    "intersections_gate": "new structural walls vs route capsules (NOT wall/jamb intentional joints)",
+    "A01_animation_gate": "overlay door/human/arch/keyframe viewpoints before finalizing span and story height",
+    "not_code_compliance": true
+  },
+  "qa_status": "AABB_BROADPHASE_AND_DESIGN_RISK_COMPLETED__TRIANGLE_AND_CHARACTER_SWEEP_NOT_RUN"
+}
