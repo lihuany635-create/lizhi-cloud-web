@@ -13,7 +13,8 @@
     'reality-home':{name:'現實主角家',file:'reality-home.glb?v=2.3-merged-20261022',hero:'HERO_reality_home'},
     'reality-highschool':{name:'現實高中',file:'reality-highschool.glb?v=2.3-merged-20261022',hero:'HERO_highschool'},
     'xiji-station':{name:'溪磯鎮車站',file:'xiji-station.glb?v=2.3-merged-20261022',hero:'HERO_station'},
-    'lahudi-academy':{name:'拉乎迪學院',file:'lahudi-academy.glb?v=2.3-merged-20261022',hero:'HERO_academy'}
+    'lahudi-academy':{name:'拉乎迪學院',file:'lahudi-academy.glb?v=2.3-merged-20261022',hero:'HERO_academy'},
+    'lahudi-academy-s01-v5':{name:'S01 V5 測試版（尚未驗收）',file:'preview/s01-v5.glb?v=20261023-v5',hero:'HERO_academy',review:'preview/s01-v5-status.json'}
   };
   let active=false,rendererAvailable=false,unavailable=false,zoom=1,onClose=null,onOpen=null;
   function key(){return scenes[sample.value]?sample.value:'reality-home';}
@@ -48,6 +49,7 @@
       if(i<3){const button=document.createElement('button');button.type='button';button.className='btn';button.textContent=view[0];button.onclick=()=>showView(i);$('previewFloors').append(button);}
     });
     $('previewMessage').textContent=unavailable?'此瀏覽器目前無法啟用 3D，已切換為圖片預覽。可切換視角、放大或下載模型。':'圖片預覽模式。可切換視角、放大，或返回 3D。';
+    if(key()==='lahudi-academy-s01-v5')$('previewMessage').textContent='注意：此處圖片仍是舊版學院的示意圖，並非 V5 渲染。要檢查 V5 請返回 3D，或下載候選 GLB。';
     $('previewBack').hidden=!rendererAvailable||unavailable;
     showView(key()==='hades-house'?1:0);
   }
