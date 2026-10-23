@@ -1,0 +1,42 @@
+{
+  "revision": "S01-REV4-20261023A",
+  "status": "REVIEW_ONLY_FAR_STAIR_DIRECTION_CANDIDATE",
+  "source_sha256": "706de654733f4509d9ea433eaae8b19d07561b9a61c0c8e1296febec77ff7855",
+  "output_sha256": "4f3ef5dfaf1f40d13a18663ce803228e84a0723a33dd25547e5a4cb60cade5c4",
+  "bytes": 5495388,
+  "added_nodes_stage4": 68,
+  "added_groups": {
+    "ascending_treads": 28,
+    "stair_balustrades": 26,
+    "rear_walls": 6,
+    "stair_landing": 1,
+    "rear_lancet": 6,
+    "stair_extension_floor": 1
+  },
+  "left_doors_right_windows_view": "+Z looking -Z",
+  "far_stair_floor": 4.0,
+  "far_stair_top": 6.3100000000000005,
+  "tread_count": 14,
+  "stair_center_x": -71.05,
+  "stair_origin_z": -8.18,
+  "stair_far_z": -12.239999999999998,
+  "validation": {
+    "glb_reparse": "PASS",
+    "preexisting_nodes_untouched": "PASS",
+    "all_existing_scene_roots_retained": "PASS",
+    "S06_untouched": true,
+    "author_acceptance": "PENDING",
+    "original_film_camera_match": "NOT_RUN",
+    "film_stair_geometry_match": "NOT_VERIFIED",
+    "actor_path": "NOT_TESTED",
+    "original_side_stair_unchanged": true,
+    "production_model_untouched": true
+  },
+  "notes": [
+    "Makes a new straight ascending far-end flight for positive-Z looking negative-Z camera composition.",
+    "The original side-descending staircase at z~10.2 remains in the GLB; this is a scenario-specific design variant, not a single verified circulation system.",
+    "Decorative six door leaves remain not-passable because the underlying source wall is solid.",
+    "Winter glass is a placeholder; warm sun beams, snowy exterior, and photoreal material remain pending.",
+    "No automatic production merge; S01 A01/A02/A03 camera overlay required."
+  ]
+}

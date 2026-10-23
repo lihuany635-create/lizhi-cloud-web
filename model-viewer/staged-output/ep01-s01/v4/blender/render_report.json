@@ -1,0 +1,18 @@
+{
+  "source": "candidate-output/lahudi-academy_ep01_s01_corridor_v4_stair_review.glb",
+  "source_sha256": "4f3ef5dfaf1f40d13a18663ce803228e84a0723a33dd25547e5a4cb60cade5c4",
+  "renderer": "Blender Workbench / studio material color",
+  "scene_meshes": 8092,
+  "corridor_meshes_rendered": 416,
+  "reference_camera_match": "NOT_RUN",
+  "proposed_camera_direction": "+Z->-Z",
+  "source_stair_conflict": "ORIGINAL_SIDE_STAIR_PRESENT",
+  "original_EP01_footage_overlay": "NOT_RUN",
+  "source_annotation": "A01/A02/A03 are engineering cameras, not exact film cameras",
+  "S06_touched": false,
+  "image_files": [
+    "candidate-output/blender_v4/S01_V4_A01_left_doors_right_windows.png",
+    "candidate-output/blender_v4/S01_V4_A02_right_high_windows.png",
+    "candidate-output/blender_v4/S01_V4_A03_far_ascending_stair.png"
+  ]
+}
