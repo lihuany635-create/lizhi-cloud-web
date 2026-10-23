@@ -46,6 +46,26 @@
       "ascending": 14,
       "result": "PASS_HEIGHT_ORDER_ONLY",
       "not_stair_actor_walk": true
+    },
+    "camera_direction_qa": {
+      "result": "WEBGL_DIRECTION_PASS",
+      "camera": {
+        "pos": [
+          -70.43,
+          5.5,
+          5.4
+        ],
+        "target": [
+          -70.43,
+          5.72,
+          -11.3
+        ],
+        "fov_deg": 68
+      },
+      "camera_shows": "Left timber doorways, right winter windows, far ascending stair",
+      "public_preview_live_sha_verified": true,
+      "not_original_animation_overlay": true,
+      "workflow": "https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/39894243070"
     }
   },
   "open_issues": [
