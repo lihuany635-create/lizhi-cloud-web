@@ -1,0 +1,52 @@
+name: RG Academy V8 Whole Campus Color Contrast
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v8-contrast.yml'
+      - 'model-viewer/revisions/academy-all-corridors/retone_school_v8.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  material:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Darken the excessive white of school facade and snow, preserve all geometry
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-all-corridors/retone_school_v8.py
+      - name: Gate contrast and exact real GLB
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,struct
+          p=Path('candidate-output/academy-contrast-v8')
+          r=json.loads((p/'report.json').read_text())
+          data=(p/r['model']).read_bytes()
+          assert data[:4]==b'glTF' and len(data)==struct.unpack_from('<I',data,8)[0]
+          assert hashlib.sha256(data).hexdigest()==r['sha256']
+          assert r['node_structure_unchanged']
+          assert r['source_mesh_geometry_buffer_unchanged']
+          assert r['same_eight_wing_building_geometry']
+          assert r['same_77_batched_campus_meshes']
+          assert len(r['pbr_color_revisions'])>=16
+          assert r['GLB_roundtrip']=='PASS'
+          print('Academy V8 corrected dark PBR GLB',r['sha256'])
+          PY
+      - name: Save V8 actual colored GLB
+        run: |
+          dst=model-viewer/staged-output/academy-entire-campus-contrast-v8
+          mkdir -p "$dst"
+          cp candidate-output/academy-contrast-v8/*.glb "$dst/"
+          cp candidate-output/academy-contrast-v8/report.json "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V8): high contrast cool stone, sandstone, dark slate, charcoal court'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
