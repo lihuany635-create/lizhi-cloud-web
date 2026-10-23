@@ -1,0 +1,169 @@
+{
+  "sections": {
+    "B1": {
+      "control": {
+        "selected": "B1",
+        "cut": null,
+        "visibleMeshes": 0
+      },
+      "viewer": {
+        "at": "2026-10-23T14:05:02.344Z",
+        "preview": false,
+        "modelKey": "N/A",
+        "modelName": "N/A",
+        "visibleMeshes": -1,
+        "totalMeshes": -1,
+        "canvasSize": null,
+        "render": null,
+        "webglLost": null,
+        "sceneChildren": null,
+        "modelVisible": null,
+        "camera": null,
+        "target": null,
+        "cut": null,
+        "overlay": true,
+        "version": "ACADEMY-V12-INTERIOR-FURNITURE-PHASE1-REVIEW · SHA b975ace3cd12",
+        "grid": null
+      }
+    },
+    "B2": {
+      "control": {
+        "selected": "B2",
+        "cut": null,
+        "visibleMeshes": 0
+      },
+      "viewer": {
+        "at": "2026-10-23T14:05:08.033Z",
+        "preview": false,
+        "modelKey": "N/A",
+        "modelName": "N/A",
+        "visibleMeshes": -1,
+        "totalMeshes": -1,
+        "canvasSize": null,
+        "render": null,
+        "webglLost": null,
+        "sceneChildren": null,
+        "modelVisible": null,
+        "camera": null,
+        "target": null,
+        "cut": null,
+        "overlay": true,
+        "version": "ACADEMY-V12-INTERIOR-FURNITURE-PHASE1-REVIEW · SHA b975ace3cd12",
+        "grid": null
+      }
+    },
+    "C1": {
+      "control": {
+        "selected": "C1",
+        "cut": null,
+        "visibleMeshes": 0
+      },
+      "viewer": {
+        "at": "2026-10-23T14:05:15.614Z",
+        "preview": false,
+        "modelKey": "N/A",
+        "modelName": "N/A",
+        "visibleMeshes": -1,
+        "totalMeshes": -1,
+        "canvasSize": null,
+        "render": null,
+        "webglLost": null,
+        "sceneChildren": null,
+        "modelVisible": null,
+        "camera": null,
+        "target": null,
+        "cut": null,
+        "overlay": true,
+        "version": "ACADEMY-V12-INTERIOR-FURNITURE-PHASE1-REVIEW · SHA b975ace3cd12",
+        "grid": null
+      }
+    },
+    "G1": {
+      "control": {
+        "selected": "G1",
+        "cut": null,
+        "visibleMeshes": 0
+      },
+      "viewer": {
+        "at": "2026-10-23T14:05:21.035Z",
+        "preview": false,
+        "modelKey": "N/A",
+        "modelName": "N/A",
+        "visibleMeshes": -1,
+        "totalMeshes": -1,
+        "canvasSize": null,
+        "render": null,
+        "webglLost": null,
+        "sceneChildren": null,
+        "modelVisible": null,
+        "camera": null,
+        "target": null,
+        "cut": null,
+        "overlay": true,
+        "version": "ACADEMY-V12-INTERIOR-FURNITURE-PHASE1-REVIEW · SHA b975ace3cd12",
+        "grid": null
+      }
+    },
+    "H1": {
+      "control": {
+        "selected": "H1",
+        "cut": null,
+        "visibleMeshes": 0
+      },
+      "viewer": {
+        "at": "2026-10-23T14:05:25.845Z",
+        "preview": false,
+        "modelKey": "N/A",
+        "modelName": "N/A",
+        "visibleMeshes": -1,
+        "totalMeshes": -1,
+        "canvasSize": null,
+        "render": null,
+        "webglLost": null,
+        "sceneChildren": null,
+        "modelVisible": null,
+        "camera": null,
+        "target": null,
+        "cut": null,
+        "overlay": true,
+        "version": "ACADEMY-V12-INTERIOR-FURNITURE-PHASE1-REVIEW · SHA b975ace3cd12",
+        "grid": null
+      }
+    }
+  },
+  "initial": {
+    "at": "2026-10-23T14:04:59.253Z",
+    "preview": false,
+    "modelKey": "N/A",
+    "modelName": "N/A",
+    "visibleMeshes": -1,
+    "totalMeshes": -1,
+    "canvasSize": null,
+    "render": null,
+    "webglLost": null,
+    "sceneChildren": null,
+    "modelVisible": null,
+    "camera": null,
+    "target": null,
+    "cut": null,
+    "overlay": true,
+    "version": "ACADEMY-V12-INTERIOR-FURNITURE-PHASE1-REVIEW · SHA b975ace3cd12",
+    "grid": null
+  },
+  "events": [
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()",
+          "timestamp": 1792764211254.045,
+          "url": "https://lihuany635-create.github.io/favicon.ico",
+          "networkRequestId": "2264.364"
+        }
+      }
+    }
+  ],
+  "chromeStderr": "[2182:2207:1023/140325.389566:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2182:2207:1023/140325.709083:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2182:2207:1023/140325.709115:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2182:2207:1023/140325.724999:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2182:2207:1023/140325.770786:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n\nDevTools listening on ws://127.0.0.1:9225/devtools/browser/2946cac4-a335-4757-aebd-ae22978dc1e6\n[2182:2182:1023/140325.940377:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2182:2207:1023/140325.940448:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2182:2182:1023/140325.941694:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2182:2207:1023/140325.941823:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2182:2182:1023/140325.942700:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2182:2182:1023/140325.947051:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2182:2207:1023/140325.947603:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2182:2182:1023/140325.988447:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2182:2182:1023/140325.990563:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2182:2207:1023/140325.991144:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2182:2182:1023/140325.997343:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2182:2182:1023/140326.032599:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2182:2182:1023/140326.032701:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files\n[2182:2207:1023/140326.033113:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2182:2182:1023/140326.174850:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2182:2207:1023/140326.174922:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[2182:2182:1023/140326.209761:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[2182:2209:1023/140328.316603:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\nCreated TensorFlow Lite XNNPACK delegate for CPU.\n[2182:2209:1023/140355.358648:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\n[2182:2209:1023/140436.328236:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\n"
+}
