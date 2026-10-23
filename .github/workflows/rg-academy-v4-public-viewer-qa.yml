@@ -1,0 +1,54 @@
+name: RG Academy V4 Public Interactive Viewer Smoke QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v4-public-viewer-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-public-viewer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check public HTML and exact binary GLB SHA-256
+        run: |
+          set -euo pipefail
+          URL='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/academy-preview/v4'
+          mkdir -p /tmp/rg-v4-preview-qa
+          curl --fail --show-error --location --retry 8 --retry-all-errors --retry-delay 3 --max-time 120 "$URL/" -o /tmp/rg-v4-preview-qa/index.html
+          curl --fail --show-error --location --retry 8 --retry-all-errors --retry-delay 3 --max-time 120 "$URL/lahudi-academy_ALL-CORRIDORS_RB2-GOTHIC_v4.glb" -o /tmp/rg-v4-preview-qa/model.glb
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,struct
+          p=Path('/tmp/rg-v4-preview-qa')
+          h=(p/'index.html').read_text()
+          raw=(p/'model.glb').read_bytes()
+          assert "《現實遊戲》拉乎迪學院" in h
+          assert "RB2 V4" in h
+          assert "GLTFLoader" in h and "OrbitControls" in h
+          assert raw[:4]==b'glTF' and len(raw)==struct.unpack_from("<I",raw,8)[0]
+          assert len(raw)==7897432,len(raw)
+          expected="34db823260c85e77e787fc5d9fbe172996bb413ed5695820d4186a3b9c561bef"
+          assert hashlib.sha256(raw).hexdigest()==expected
+          print('VERIFIED: publicly served HTML and byte-exact V4 GLB',expected)
+          PY
+      - name: Validate interactive loader in actual Chrome (no screenshot)
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 110s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage \
+            --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl \
+            --window-size=1280,720 --virtual-time-budget=39000 \
+            --dump-dom https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/academy-preview/v4/ > /tmp/rg-v4-preview-qa/dom.html 2>/tmp/rg-v4-preview-qa/chrome.log
+          python - <<'PY'
+          from pathlib import Path
+          d=Path('/tmp/rg-v4-preview-qa/dom.html').read_text()
+          assert 'data-loaded="true"' in d, "Chrome failed to load true 3D scene; inspect logs"
+          assert 'data-scope="corridor"' in d, "Active corridor subset missing"
+          assert "已載入 V4 真實 GLB" in d, "Viewer progress never reached loaded state"
+          assert "34db823260c85e77e787fc5d9fbe172996bb413ed5695820d4186a3b9c561bef" in d
+          print("VERIFIED: actual Chrome interactive GLB load; no screenshot stored")
+          PY
