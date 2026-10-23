@@ -1,0 +1,85 @@
+name: RG EP01 S01 V7 Reverse Camera Probe
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-s01-v7-reverse-camera.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-s01-v7-reverse-camera
+  cancel-in-progress: true
+jobs:
+  compare-two-inverse-cameras:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make temporary browser test using real V7
+        run: |
+          mkdir -p candidate-output/reverse-cam
+          curl -fsSL --max-time 60 --retry 2 https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/v7/ -o candidate-output/reverse-cam/index.html
+          cp model-viewer/staged-output/ep01-s01/v7/lahudi-academy_ep01_s01_v7_vestibules_review.glb candidate-output/reverse-cam/lahudi-academy-s01-v7.glb
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          d=Path('candidate-output/reverse-cam');txt=(d/'index.html').read_text()
+          a=json.loads(Path('model-viewer/staged-output/ep01-s01/v7/report_v7.json').read_text())
+          assert hashlib.sha256((d/'lahudi-academy-s01-v7.glb').read_bytes()).hexdigest()==a['sha256']
+          assert 'pos:[-70.42,5.49,-5.2],target:[-70.43,5.40,9.0],fov:71' in txt
+          PY
+      - name: Use real Chrome to photograph both reverse-axis options
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8139 --bind 127.0.0.1 --directory candidate-output/reverse-cam > candidate-output/reverse-cam-server.log 2>&1 &
+          sleep 2
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('candidate-output/reverse-cam/index.html')
+          s=path.read_text()
+          s=s.replace('pos:[-70.42,5.49,-5.2],target:[-70.43,5.40,9.0],fov:71',
+          'pos:[-70.43,5.49,8.1],target:[-70.43,5.45,-9.0],fov:69')
+          path.write_text(s)
+          PY
+          timeout 85s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl --window-size=1440,900 --virtual-time-budget=17000 --screenshot=candidate-output/reverse-cam-01.png http://127.0.0.1:8139/
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('candidate-output/reverse-cam/index.html')
+          s=path.read_text()
+          s=s.replace('pos:[-70.43,5.49,8.1],target:[-70.43,5.45,-9.0],fov:69',
+          'pos:[-70.43,5.50,5.4],target:[-70.43,5.72,-11.3],fov:68')
+          path.write_text(s)
+          PY
+          timeout 85s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl --window-size=1440,900 --virtual-time-budget=17000 --screenshot=candidate-output/reverse-cam-02.png http://127.0.0.1:8139/
+          test "$(stat -c %s candidate-output/reverse-cam-01.png)" -gt 50000
+          test "$(stat -c %s candidate-output/reverse-cam-02.png)" -gt 50000
+      - name: Save visual evidence on stage branch
+        run: |
+          mkdir -p model-viewer/staged-output/ep01-s01/v7/camera-qa
+          cp candidate-output/reverse-cam-*.png model-viewer/staged-output/ep01-s01/v7/camera-qa/
+          python - <<'PY'
+          import json,pathlib
+          out=pathlib.Path('model-viewer/staged-output/ep01-s01/v7/camera-qa/summary.json')
+          out.write_text(json.dumps({
+            'model':'S01-V7','author_approved':False,'film_frame_match':'NOT_RUN',
+            'camera_01':{'pos':[-70.43,5.49,8.1],'target':[-70.43,5.45,-9.0],'fov':69},
+            'camera_02':{'pos':[-70.43,5.50,5.4],'target':[-70.43,5.72,-11.3],'fov':68},
+            'render':'Chrome WebGL headless real V7 GLB',
+            'inspection':'VISUAL_REVIEW_REQUIRED',
+            'S06_modified':False
+          },ensure_ascii=False,indent=2)+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/v7/camera-qa
+          git commit -m 'qa(S01 V7): preserve two reverse-axis camera screenshot candidates'
+          git pull --rebase origin rg-ep01-s01-stage-20261023
+          git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ep01-s01-v7-reverse-camera-evidence
+          path: candidate-output/reverse-cam-*.png
+          retention-days: 30
