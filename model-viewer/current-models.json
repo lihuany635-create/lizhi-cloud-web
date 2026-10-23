@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-academy-gothic-exterior-v11-20261023",
+  "version": "mixed-current-academy-v12-interior-phase1-20261023",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -57,16 +57,16 @@
     },
     {
       "model": "lahudi-academy.glb",
-      "version": "ACADEMY-LOCKED-PLAN-GOTHIC-EXTERIOR-FINISH-V11",
-      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-exterior-finish-v11/lahudi-academy_EXTERIOR-GOTHIC-FINISH_V11.glb",
-      "current_sha256": "caab8cba4cbb9af22252ea2b05a35588b9529fb4af5720b787cf96b33229a9ae",
-      "backup": "backups/pre-academy-v11-exterior-finish/lahudi-academy.glb",
-      "backup_sha256": "f2b4c82a7ea3b6625a7ffef3157c56b8e7f288bf9cd2d3bbf699c7ca67ef1b5c",
+      "version": "ACADEMY-V12-INTERIOR-FURNITURE-PHASE1-REVIEW",
+      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-interior-furniture-v12/lahudi-academy_INTERIOR-FURNITURE-V12.glb",
+      "current_sha256": "b975ace3cd12744621688f4f5a0a8aa27f5dff1fbed4beb7ae5b9306dbbd3a66",
+      "backup": "backups/pre-academy-v12-interior-furniture/lahudi-academy.glb",
+      "backup_sha256": "caab8cba4cbb9af22252ea2b05a35588b9529fb4af5720b787cf96b33229a9ae",
       "git_blob_sha": "fa1eded139fcd7dff0794208067550db71d05344",
-      "integrated_contents": "Official single GLB Gothic exterior only: 3505 decorative shapes in 96 combined standard meshes; 274 second-floor blue lancet glass bays, carved stone frames and tracery, 62 roof dormers, copper gutters, gable crests and finials, clocktower cornices and clock panel, glowing lamps, courtyard stone paths and shrubs. Existing V10 geometry / doors / stair / classrooms and locked 8-district campus coords unchanged.",
+      "integrated_contents": "V12 provisional first stage: 44 newly divided rooms and 1734 interior furniture placements in B/C teaching, D entry, E academic, G assembly, H archives; 2 north teaching-wing switchback staircases with 26 risers each; original A01/CROOM and main library untouched; exterior V11 all unchanged. 62 catalog furniture types are available as separate standalone GLBs, but 30 types are represented by procedural low-poly geometrical equivalents in this single official GLB. Not all 102 planned rooms furnished.",
       "author_full_item_approval": "PENDING",
       "static_geometry_qa": "PASS: 10 1F routes + 3 stair/upper walk centerline radius-0.4m clearance checks, 26 3D stair treads obstacle-free AABB, 3.55m modeled roof headroom",
-      "visual_qa": "PENDING_REAL_MOBILE_PREVIEW",
+      "visual_qa": "NOT_YET_COMPLETED_FOR_V12",
       "wing_interiors": "NOT_MODELED: only exterior architectural shell and connected campus ground paths",
       "mobile_performance_note": "Reduced new campus mesh draws by 5068; device FPS unverified",
       "design_book": "https://docs.google.com/document/d/1seSK9uMrnNV2_Mh1RwmG50JtjFgXqJzHOQoCqiNFTPQ/edit?usp=drivesdk",
@@ -75,7 +75,13 @@
       "open_followups": "A01 source corridor 4.5m outer span vs 5.2m proposed net width, unbuilt 3F slab/vault relation, detailed roof intersections, character animation acceptance",
       "collision_book": "https://docs.google.com/document/d/1UlrxFUNmu6-3u3vPwPkSDj7EOJcXICY74ms1m34wUNc/edit?usp=drivesdk",
       "exterior_decoration_qa": "PASS - geometric source checks, batched material groups, GLB roundtrip, 3505 shapes",
-      "character_collision": "SKIPPED_BY_USER_REQUEST"
+      "character_collision": "NOT_REQUIRED_BY_USER",
+      "interior_furniture_count": 1734,
+      "interior_rooms_provisional": 44,
+      "interior_furniture_types_used": 30,
+      "original_62_standalone_furniture_GLBS_directly_embedded": false,
+      "furniture_generation": "PROCEDURAL_LOW_POLY_BY_DESIGN_ITEM_DIMENSIONS",
+      "B_C_second_floor_access": "TWO_PROVISIONAL_26_RISER_STAIRCORES_PRESENT"
     }
   ]
 }
