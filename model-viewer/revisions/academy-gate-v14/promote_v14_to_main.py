@@ -58,7 +58,7 @@ manifest["version"]="mixed-current-academy-v14-anime-gate-20261023"
 manifest_file.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n")
 viewer=repo/"index.html"
 html=viewer.read_text()
-old='"file": "lahudi-academy.glb?v=rb2-campus-gate-v13-20261023"'
+old='"file": "lahudi-academy.glb?v=rb2-gothic-entrance-v13-20261023"'
 new='"file": "lahudi-academy.glb?v=rb2-campus-gate-animation-v14-20261023"'
 assert html.count(old)==1,("Expected V13 file name",html.count(old))
 html=html.replace(old,new)
