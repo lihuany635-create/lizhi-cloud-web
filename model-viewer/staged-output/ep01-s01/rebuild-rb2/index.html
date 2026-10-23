@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>現實遊戲｜S01 拉乎迪學院重建模型 RB2</title>
+<style>
+html,body{margin:0;background:#111722;color:#fff;font:14px system-ui;height:100%;overflow:hidden}
+#c{display:block;width:100%;height:100%}
+header{position:absolute;z-index:2;left:20px;top:18px;padding:12px 16px;
+background:#101923e6;border:1px solid #87919b66;border-radius:10px;max-width:460px}
+header strong{font-size:16px}header p{color:#b9c1cc;margin:6px 0}
+#status{font-size:12px;color:#ddd}
+nav{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+button{cursor:pointer;color:#fff;background:#304457;border:1px solid #556c7c;border-radius:5px;padding:7px 12px}
+button:hover{background:#42617d}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"}}</script></head><body>
+<header><strong>《現實遊戲》S01｜拉乎迪學院重建 RB2</strong>
+<p>新建築結構：左木門／右高窗／尖拱石頂／石地／中央上行樓梯／冬季景</p>
+<div id="status">正在讀取獨立 GLB；本版尚未合併正式學院。</div>
+<nav><button id="shot">原動畫方向</button><button id="side">柱廊側視</button><button id="top">建築俯視</button></nav>
+</header>
+<canvas id="c"></canvas>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const canvas=document.getElementById('c'), status=document.getElementById('status');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.setClearColor(0xb4c7d9,1);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xb4c7d9);
+const camera=new THREE.PerspectiveCamera(68,1,.1,400);
+camera.position.set(-.3,2.25,12.8);camera.lookAt(0,3.6,-13.5);
+const controls=new OrbitControls(camera,canvas);
+controls.target.set(0,3.6,-13.5);controls.enableDamping=true;
+controls.minDistance=.4;controls.maxDistance=120;
+scene.add(new THREE.HemisphereLight(0xeaf2ff,0x8b7a6b,1.22));
+scene.add(new THREE.AmbientLight(0xffffff,.23));
+const sun=new THREE.DirectionalLight(0xffdab4,2.25);
+sun.position.set(18,25,15);sun.target.position.set(0,1,-9);
+sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.left=-35;sun.shadow.camera.right=35;
+sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;
+sun.shadow.camera.near=1;sun.shadow.camera.far=90;
+scene.add(sun,sun.target);
+const warm=new THREE.PointLight(0xffc38d,38,23,2);warm.position.set(2.5,8.2,-1);scene.add(warm);
+function resize(){let w=canvas.clientWidth,h=canvas.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+function toCamera(pos,target,fov=68){camera.position.set(...pos);controls.target.set(...target);camera.fov=fov;camera.updateProjectionMatrix();controls.update()}
+document.getElementById('shot').onclick=()=>toCamera([-.3,2.25,12.8],[0,3.6,-13.5],68);
+document.getElementById('side').onclick=()=>toCamera([-1.5,4.8,4.2],[3.6,5.5,-4.4],77);
+document.getElementById('top').onclick=()=>toCamera([-.7,25,0],[0,0,-1],60);
+new GLTFLoader().load('./lahudi-academy_ep01_s01_REBUILT_v2.glb',(g)=>{
+ scene.add(g.scene);let meshes=0,triangles=0;
+ g.scene.traverse(o=>{if(o.isMesh){meshes++;const pos=o.geometry.attributes.position;
+ triangles+=o.geometry.index?o.geometry.index.count/3:pos.count/3;
+ o.castShadow=true;o.receiveShadow=true;}});
+ status.textContent='獨立 GLB 已載入｜'+meshes+' mesh｜'+Math.round(triangles)+' triangles｜尚待原片鏡位驗收';
+ document.body.dataset.loaded='true';
+},undefined,(e)=>{status.textContent='GLB 載入失敗：'+e.message;document.body.dataset.loaded='error';});
+function frame(){requestAnimationFrame(frame);resize();controls.update();renderer.render(scene,camera)}frame();
+</script></body></html>
