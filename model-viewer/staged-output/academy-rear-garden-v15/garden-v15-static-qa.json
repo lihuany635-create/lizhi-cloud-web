@@ -1,0 +1,29 @@
+{
+  "version": "ACADEMY-V15-VITTI-REAR-GARDEN-REVIEW",
+  "sha256": "e269a295159f0f7d3e82df864376579e66f4b92be204ce66667a3c78b9d3ea41",
+  "status": "PASS_STAGED_GARDEN_STATIC_PATH_AND_LIBRARY_PORTAL",
+  "checks": {
+    "LIBRARY_TRUE_2p2M_CLEAR_DOOR": 0,
+    "LIBRARY_TO_GARDEN_AXIS": 0,
+    "LAWN_LOOP_SOUTH": 0,
+    "LAWN_LOOP_NORTH": 0,
+    "LAWN_LOOP_WEST": 0,
+    "LAWN_LOOP_EAST": 0,
+    "BESSIE_PLANT_VIEWPOINT": 0
+  },
+  "garden_36x28_site_m2": 1008,
+  "library_f_north_wall_true_portal_width_m": 3,
+  "prior_school_V14_preserved_except_original_solid_north_wall": true,
+  "V14_gate_and_44_room_1734_furniture_nodes_preserved": true,
+  "added_pieces": 261,
+  "batch_nodes": 27,
+  "characters_collision": "NOT_REQUESTED",
+  "visual_look": "REQUIRES_PUBLIC_SCREENSHOT_AND_AUTHOR_REVIEW",
+  "real_libraries_floor_story": "Old interior remains, only north wall 3m passage rebuilt",
+  "limitations": [
+    "No avatar or camera physics collision; test is based on new boxes only",
+    "Existing buried terrain/old paths outside library door not fully triangulated",
+    "Garden adjacency to library is art direction inference, not explicit in chapter 07",
+    "No animated opening of rear oak doors; leaves modelled propped open"
+  ]
+}

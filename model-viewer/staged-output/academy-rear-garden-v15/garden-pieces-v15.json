@@ -1,0 +1,4703 @@
+{
+  "design_version": "ACADEMY-V15-VITTI-REAR-GARDEN-REVIEW",
+  "pieces": [
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__REAR_SITE_GRAVEL",
+      "region": "GARDEN_GROUND",
+      "material": "soil",
+      "center": [
+        -26.0,
+        -0.11,
+        -198.0
+      ],
+      "size": [
+        36.0,
+        0.18,
+        28.0
+      ],
+      "kind": "garden_ground",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__QUIET_WINTER_LAWN",
+      "region": "GARDEN_GROUND",
+      "material": "lawn_winter",
+      "center": [
+        -26.0,
+        0.035,
+        -197.5
+      ],
+      "size": [
+        16.0,
+        0.055,
+        13.0
+      ],
+      "kind": "central_lawn",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOOP_WEST",
+      "region": "GARDEN_PATH",
+      "material": "paving",
+      "center": [
+        -35.9,
+        0.065,
+        -197.2
+      ],
+      "size": [
+        2.2,
+        0.12,
+        18.2
+      ],
+      "kind": "loop_west",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOOP_WEST_EDGE",
+      "region": "GARDEN_PATH",
+      "material": "paving_join",
+      "center": [
+        -35.9,
+        0.137,
+        -197.2
+      ],
+      "size": [
+        2.15,
+        0.013,
+        18.15
+      ],
+      "kind": "paving_joint_subtle",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOOP_EAST",
+      "region": "GARDEN_PATH",
+      "material": "paving",
+      "center": [
+        -16.1,
+        0.065,
+        -197.2
+      ],
+      "size": [
+        2.2,
+        0.12,
+        18.2
+      ],
+      "kind": "loop_east",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOOP_EAST_EDGE",
+      "region": "GARDEN_PATH",
+      "material": "paving_join",
+      "center": [
+        -16.1,
+        0.137,
+        -197.2
+      ],
+      "size": [
+        2.15,
+        0.013,
+        18.15
+      ],
+      "kind": "paving_joint_subtle",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOOP_NORTH",
+      "region": "GARDEN_PATH",
+      "material": "paving",
+      "center": [
+        -26.0,
+        0.065,
+        -206.7
+      ],
+      "size": [
+        21.9,
+        0.12,
+        2.2
+      ],
+      "kind": "loop_north",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOOP_NORTH_EDGE",
+      "region": "GARDEN_PATH",
+      "material": "paving_join",
+      "center": [
+        -26.0,
+        0.137,
+        -206.7
+      ],
+      "size": [
+        21.85,
+        0.013,
+        2.15
+      ],
+      "kind": "paving_joint_subtle",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOOP_SOUTH",
+      "region": "GARDEN_PATH",
+      "material": "paving",
+      "center": [
+        -26.0,
+        0.065,
+        -188.4
+      ],
+      "size": [
+        21.9,
+        0.12,
+        2.2
+      ],
+      "kind": "loop_south",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOOP_SOUTH_EDGE",
+      "region": "GARDEN_PATH",
+      "material": "paving_join",
+      "center": [
+        -26.0,
+        0.137,
+        -188.4
+      ],
+      "size": [
+        21.85,
+        0.013,
+        2.15
+      ],
+      "kind": "paving_joint_subtle",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__REAR_DOOR_MAIN_WALK",
+      "region": "GARDEN_PATH",
+      "material": "paving",
+      "center": [
+        -25.7,
+        0.065,
+        -185.98
+      ],
+      "size": [
+        2.8,
+        0.12,
+        6.1
+      ],
+      "kind": "entry_walk",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__REAR_DOOR_MAIN_WALK_EDGE",
+      "region": "GARDEN_PATH",
+      "material": "paving_join",
+      "center": [
+        -25.7,
+        0.137,
+        -185.98
+      ],
+      "size": [
+        2.75,
+        0.013,
+        6.05
+      ],
+      "kind": "paving_joint_subtle",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__TRANSVERSE_TO_HERO_PLANT",
+      "region": "GARDEN_PATH",
+      "material": "paving",
+      "center": [
+        -38.15,
+        0.065,
+        -206.7
+      ],
+      "size": [
+        3.1,
+        0.12,
+        1.65
+      ],
+      "kind": "quiet_spur",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__TRANSVERSE_TO_HERO_PLANT_EDGE",
+      "region": "GARDEN_PATH",
+      "material": "paving_join",
+      "center": [
+        -38.15,
+        0.137,
+        -206.7
+      ],
+      "size": [
+        3.05,
+        0.013,
+        1.6
+      ],
+      "kind": "paving_joint_subtle",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LIBRARY_REAR_TERRACE",
+      "region": "GARDEN_PATH",
+      "material": "paving",
+      "center": [
+        -25.7,
+        0.085,
+        -184.55
+      ],
+      "size": [
+        8.9,
+        0.17,
+        2.75
+      ],
+      "kind": "entry_terrace",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LIBRARY_REAR_THRESHOLD",
+      "region": "GARDEN_PATH",
+      "material": "limestone",
+      "center": [
+        -25.7,
+        0.11,
+        -183.45
+      ],
+      "size": [
+        3.0,
+        0.19,
+        0.75
+      ],
+      "kind": "entry_threshold",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__TRUE_REAR_ENDWALL_WEST",
+      "region": "LIBRARY_BACKDOOR",
+      "material": "old_stone",
+      "center": [
+        -38.2,
+        5.5,
+        -183.2
+      ],
+      "size": [
+        22.0,
+        11.0,
+        0.41
+      ],
+      "kind": "library_wing_wall_replacement",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__TRUE_REAR_ENDWALL_EAST",
+      "region": "LIBRARY_BACKDOOR",
+      "material": "old_stone",
+      "center": [
+        -13.2,
+        5.5,
+        -183.2
+      ],
+      "size": [
+        22.0,
+        11.0,
+        0.41
+      ],
+      "kind": "library_wing_wall_replacement",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__TRUE_REAR_ENDWALL_ABOVE_DOOR",
+      "region": "LIBRARY_BACKDOOR",
+      "material": "old_stone",
+      "center": [
+        -25.7,
+        7.3,
+        -183.2
+      ],
+      "size": [
+        3.0,
+        7.4,
+        0.41
+      ],
+      "kind": "library_north_lintel_wall",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BACK_DOOR_JAMB_0",
+      "region": "LIBRARY_BACKDOOR",
+      "material": "limestone",
+      "center": [
+        -27.37,
+        1.86,
+        -183.36
+      ],
+      "size": [
+        0.32,
+        3.72,
+        0.52
+      ],
+      "kind": "stone_door_jamb",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BACK_DOOR_JAMB_1",
+      "region": "LIBRARY_BACKDOOR",
+      "material": "limestone",
+      "center": [
+        -24.03,
+        1.86,
+        -183.36
+      ],
+      "size": [
+        0.32,
+        3.72,
+        0.52
+      ],
+      "kind": "stone_door_jamb",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BACK_DOOR_STONE_TOP",
+      "region": "LIBRARY_BACKDOOR",
+      "material": "limestone",
+      "center": [
+        -25.7,
+        3.68,
+        -183.35
+      ],
+      "size": [
+        3.6,
+        0.22,
+        0.58
+      ],
+      "kind": "stone_door_lintel",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BACK_OAK_LEAF_OPEN_W",
+      "region": "LIBRARY_BACKDOOR",
+      "material": "dark_walnut",
+      "center": [
+        -27.74,
+        1.57,
+        -183.78
+      ],
+      "size": [
+        0.62,
+        3.15,
+        0.11
+      ],
+      "kind": "open_oak_door",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BACK_DOOR_BRASS_W",
+      "region": "LIBRARY_BACKDOOR",
+      "material": "wood_edge",
+      "center": [
+        -27.74,
+        1.58,
+        -183.85
+      ],
+      "size": [
+        0.09,
+        2.6,
+        0.04
+      ],
+      "kind": "oak_rail",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BACK_OAK_LEAF_OPEN_E",
+      "region": "LIBRARY_BACKDOOR",
+      "material": "dark_walnut",
+      "center": [
+        -23.66,
+        1.57,
+        -183.78
+      ],
+      "size": [
+        0.62,
+        3.15,
+        0.11
+      ],
+      "kind": "open_oak_door",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BACK_DOOR_BRASS_E",
+      "region": "LIBRARY_BACKDOOR",
+      "material": "wood_edge",
+      "center": [
+        -23.66,
+        1.58,
+        -183.85
+      ],
+      "size": [
+        0.09,
+        2.6,
+        0.04
+      ],
+      "kind": "oak_rail",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__MAIN_TALK_BENCH_seat",
+      "region": "GARDEN_FURNITURE",
+      "material": "dark_walnut",
+      "center": [
+        -12.4,
+        0.51,
+        -196.8
+      ],
+      "size": [
+        0.61,
+        0.11,
+        2.3
+      ],
+      "kind": "bench_seat",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__MAIN_TALK_BENCH_back",
+      "region": "GARDEN_FURNITURE",
+      "material": "wood_edge",
+      "center": [
+        -12.1,
+        0.76,
+        -196.8
+      ],
+      "size": [
+        0.065,
+        0.51,
+        2.3
+      ],
+      "kind": "bench_back",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__MAIN_TALK_BENCH_leg_-1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -12.4,
+        0.25,
+        -197.789
+      ],
+      "size": [
+        0.1,
+        0.5,
+        0.1
+      ],
+      "kind": "bench_leg",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__MAIN_TALK_BENCH_arm_-1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -12.4,
+        0.69,
+        -197.789
+      ],
+      "size": [
+        0.52,
+        0.07,
+        0.11
+      ],
+      "kind": "bench_arm",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__MAIN_TALK_BENCH_leg_1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -12.4,
+        0.25,
+        -195.811
+      ],
+      "size": [
+        0.1,
+        0.5,
+        0.1
+      ],
+      "kind": "bench_leg",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__MAIN_TALK_BENCH_arm_1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -12.4,
+        0.69,
+        -195.811
+      ],
+      "size": [
+        0.52,
+        0.07,
+        0.11
+      ],
+      "kind": "bench_arm",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__QUIET_LEFT_BENCH_seat",
+      "region": "GARDEN_FURNITURE",
+      "material": "dark_walnut",
+      "center": [
+        -40.4,
+        0.51,
+        -197.9
+      ],
+      "size": [
+        0.61,
+        0.11,
+        1.85
+      ],
+      "kind": "bench_seat",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__QUIET_LEFT_BENCH_back",
+      "region": "GARDEN_FURNITURE",
+      "material": "wood_edge",
+      "center": [
+        -40.1,
+        0.76,
+        -197.9
+      ],
+      "size": [
+        0.065,
+        0.51,
+        1.85
+      ],
+      "kind": "bench_back",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__QUIET_LEFT_BENCH_leg_-1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -40.4,
+        0.25,
+        -198.6955
+      ],
+      "size": [
+        0.1,
+        0.5,
+        0.1
+      ],
+      "kind": "bench_leg",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__QUIET_LEFT_BENCH_arm_-1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -40.4,
+        0.69,
+        -198.6955
+      ],
+      "size": [
+        0.52,
+        0.07,
+        0.11
+      ],
+      "kind": "bench_arm",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__QUIET_LEFT_BENCH_leg_1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -40.4,
+        0.25,
+        -197.1045
+      ],
+      "size": [
+        0.1,
+        0.5,
+        0.1
+      ],
+      "kind": "bench_leg",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__QUIET_LEFT_BENCH_arm_1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -40.4,
+        0.69,
+        -197.1045
+      ],
+      "size": [
+        0.52,
+        0.07,
+        0.11
+      ],
+      "kind": "bench_arm",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_CORNER_BENCH_seat",
+      "region": "GARDEN_FURNITURE",
+      "material": "dark_walnut",
+      "center": [
+        -13.0,
+        0.51,
+        -209.3
+      ],
+      "size": [
+        1.85,
+        0.11,
+        0.61
+      ],
+      "kind": "bench_seat",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_CORNER_BENCH_back",
+      "region": "GARDEN_FURNITURE",
+      "material": "wood_edge",
+      "center": [
+        -13.0,
+        0.76,
+        -209.0
+      ],
+      "size": [
+        1.85,
+        0.51,
+        0.07
+      ],
+      "kind": "bench_back",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_CORNER_BENCH_leg_-1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -13.7955,
+        0.25,
+        -209.3
+      ],
+      "size": [
+        0.1,
+        0.5,
+        0.1
+      ],
+      "kind": "bench_leg",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_CORNER_BENCH_arm_-1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -13.7955,
+        0.69,
+        -209.3
+      ],
+      "size": [
+        0.52,
+        0.07,
+        0.11
+      ],
+      "kind": "bench_arm",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_CORNER_BENCH_leg_1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -12.2045,
+        0.25,
+        -209.3
+      ],
+      "size": [
+        0.1,
+        0.5,
+        0.1
+      ],
+      "kind": "bench_leg",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_CORNER_BENCH_arm_1",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -12.2045,
+        0.69,
+        -209.3
+      ],
+      "size": [
+        0.52,
+        0.07,
+        0.11
+      ],
+      "kind": "bench_arm",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BESSIE_CORNER_PLANT_stone_pot",
+      "region": "GARDEN_PLANTING",
+      "material": "old_stone",
+      "center": [
+        -40.1,
+        0.43,
+        -208.5
+      ],
+      "size": [
+        1.25,
+        0.82,
+        1.25
+      ],
+      "kind": "hero_plant_pot",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BESSIE_CORNER_PLANT_rim",
+      "region": "GARDEN_PLANTING",
+      "material": "limestone",
+      "center": [
+        -40.1,
+        0.85,
+        -208.5
+      ],
+      "size": [
+        1.39,
+        0.12,
+        1.37
+      ],
+      "kind": "pot_rim",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BESSIE_CORNER_PLANT_earth",
+      "region": "GARDEN_PLANTING",
+      "material": "soil",
+      "center": [
+        -40.1,
+        0.91,
+        -208.5
+      ],
+      "size": [
+        1.0125,
+        0.07,
+        1.0125
+      ],
+      "kind": "pot_earth",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BESSIE_CORNER_PLANT_leaf_0",
+      "region": "GARDEN_PLANTING",
+      "material": "evergreen",
+      "center": [
+        -40.475,
+        1.34,
+        -208.65
+      ],
+      "size": [
+        0.3,
+        0.83,
+        0.36
+      ],
+      "kind": "hero_plant_leaf",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BESSIE_CORNER_PLANT_leaf_1",
+      "region": "GARDEN_PLANTING",
+      "material": "evergreen",
+      "center": [
+        -40.225,
+        1.51,
+        -208.5
+      ],
+      "size": [
+        0.3,
+        0.83,
+        0.36
+      ],
+      "kind": "hero_plant_leaf",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BESSIE_CORNER_PLANT_leaf_2",
+      "region": "GARDEN_PLANTING",
+      "material": "evergreen",
+      "center": [
+        -39.975,
+        1.34,
+        -208.35
+      ],
+      "size": [
+        0.3,
+        0.83,
+        0.36
+      ],
+      "kind": "hero_plant_leaf",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BESSIE_CORNER_PLANT_leaf_3",
+      "region": "GARDEN_PLANTING",
+      "material": "evergreen",
+      "center": [
+        -39.725,
+        1.51,
+        -208.65
+      ],
+      "size": [
+        0.3,
+        0.83,
+        0.36
+      ],
+      "kind": "hero_plant_leaf",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_border",
+      "region": "GARDEN_PLANTING",
+      "material": "old_stone",
+      "center": [
+        -40.8,
+        0.25,
+        -191.9
+      ],
+      "size": [
+        2.5,
+        0.42,
+        4.0
+      ],
+      "kind": "bed_stone_border",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_soil",
+      "region": "GARDEN_PLANTING",
+      "material": "soil",
+      "center": [
+        -40.8,
+        0.48,
+        -191.9
+      ],
+      "size": [
+        2.25,
+        0.11,
+        3.75
+      ],
+      "kind": "bed_soil",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_hardy_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -41.8,
+        0.67,
+        -192.86
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_flower_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -41.8,
+        0.9,
+        -192.86
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_hardy_0_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -41.8,
+        0.67,
+        -190.94
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_hardy_1_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -41.3,
+        0.67,
+        -192.86
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_hardy_1_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -41.3,
+        0.67,
+        -190.94
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_hardy_2_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -40.8,
+        0.67,
+        -192.86
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_hardy_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -40.8,
+        0.67,
+        -190.94
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_flower_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -40.8,
+        0.9,
+        -190.94
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_hardy_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -40.3,
+        0.67,
+        -192.86
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_flower_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -40.3,
+        0.9,
+        -192.86
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_hardy_3_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -40.3,
+        0.67,
+        -190.94
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_hardy_4_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -39.8,
+        0.67,
+        -192.86
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_hardy_4_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -39.8,
+        0.67,
+        -190.94
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_0_snow_cap",
+      "region": "GARDEN_PLANTING",
+      "material": "snow",
+      "center": [
+        -40.8,
+        0.55,
+        -190.5
+      ],
+      "size": [
+        0.75,
+        0.06,
+        0.6
+      ],
+      "kind": "bed_snow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_border",
+      "region": "GARDEN_PLANTING",
+      "material": "old_stone",
+      "center": [
+        -12.3,
+        0.25,
+        -191.9
+      ],
+      "size": [
+        2.5,
+        0.42,
+        4.0
+      ],
+      "kind": "bed_stone_border",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_soil",
+      "region": "GARDEN_PLANTING",
+      "material": "soil",
+      "center": [
+        -12.3,
+        0.48,
+        -191.9
+      ],
+      "size": [
+        2.25,
+        0.11,
+        3.75
+      ],
+      "kind": "bed_soil",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_hardy_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -13.3,
+        0.67,
+        -192.86
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_flower_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -13.3,
+        0.9,
+        -192.86
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_hardy_0_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -13.3,
+        0.67,
+        -190.94
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_hardy_1_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -12.8,
+        0.67,
+        -192.86
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_hardy_1_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -12.8,
+        0.67,
+        -190.94
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_hardy_2_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -12.3,
+        0.67,
+        -192.86
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_hardy_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -12.3,
+        0.67,
+        -190.94
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_flower_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -12.3,
+        0.9,
+        -190.94
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_hardy_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -11.8,
+        0.67,
+        -192.86
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_flower_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -11.8,
+        0.9,
+        -192.86
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_hardy_3_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -11.8,
+        0.67,
+        -190.94
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_hardy_4_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -11.3,
+        0.67,
+        -192.86
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_1_hardy_4_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -11.3,
+        0.67,
+        -190.94
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_border",
+      "region": "GARDEN_PLANTING",
+      "material": "old_stone",
+      "center": [
+        -40.6,
+        0.25,
+        -203.5
+      ],
+      "size": [
+        2.7,
+        0.42,
+        2.9
+      ],
+      "kind": "bed_stone_border",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_soil",
+      "region": "GARDEN_PLANTING",
+      "material": "soil",
+      "center": [
+        -40.6,
+        0.48,
+        -203.5
+      ],
+      "size": [
+        2.45,
+        0.11,
+        2.65
+      ],
+      "kind": "bed_soil",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_hardy_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -41.68,
+        0.67,
+        -204.196
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_flower_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -41.68,
+        0.9,
+        -204.196
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_hardy_0_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -41.68,
+        0.67,
+        -202.804
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_hardy_1_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -41.14,
+        0.67,
+        -204.196
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_hardy_1_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -41.14,
+        0.67,
+        -202.804
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_hardy_2_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -40.6,
+        0.67,
+        -204.196
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_hardy_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -40.6,
+        0.67,
+        -202.804
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_flower_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -40.6,
+        0.9,
+        -202.804
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_hardy_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -40.06,
+        0.67,
+        -204.196
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_flower_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -40.06,
+        0.9,
+        -204.196
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_hardy_3_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -40.06,
+        0.67,
+        -202.804
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_hardy_4_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -39.52,
+        0.67,
+        -204.196
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_hardy_4_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -39.52,
+        0.67,
+        -202.804
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_2_snow_cap",
+      "region": "GARDEN_PLANTING",
+      "material": "snow",
+      "center": [
+        -40.6,
+        0.55,
+        -202.485
+      ],
+      "size": [
+        0.81,
+        0.06,
+        0.435
+      ],
+      "kind": "bed_snow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_border",
+      "region": "GARDEN_PLANTING",
+      "material": "old_stone",
+      "center": [
+        -11.7,
+        0.25,
+        -204.1
+      ],
+      "size": [
+        2.6,
+        0.42,
+        2.8
+      ],
+      "kind": "bed_stone_border",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_soil",
+      "region": "GARDEN_PLANTING",
+      "material": "soil",
+      "center": [
+        -11.7,
+        0.48,
+        -204.1
+      ],
+      "size": [
+        2.35,
+        0.11,
+        2.55
+      ],
+      "kind": "bed_soil",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_hardy_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -12.74,
+        0.67,
+        -204.772
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_flower_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -12.74,
+        0.9,
+        -204.772
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_hardy_0_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -12.74,
+        0.67,
+        -203.428
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_hardy_1_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -12.22,
+        0.67,
+        -204.772
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_hardy_1_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -12.22,
+        0.67,
+        -203.428
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_hardy_2_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -11.7,
+        0.67,
+        -204.772
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_hardy_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -11.7,
+        0.67,
+        -203.428
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_flower_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -11.7,
+        0.9,
+        -203.428
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_hardy_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -11.18,
+        0.67,
+        -204.772
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_flower_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -11.18,
+        0.9,
+        -204.772
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_hardy_3_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -11.18,
+        0.67,
+        -203.428
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_hardy_4_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -10.66,
+        0.67,
+        -204.772
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_3_hardy_4_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -10.66,
+        0.67,
+        -203.428
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_border",
+      "region": "GARDEN_PLANTING",
+      "material": "old_stone",
+      "center": [
+        -30.0,
+        0.25,
+        -209.6
+      ],
+      "size": [
+        3.5,
+        0.42,
+        1.8
+      ],
+      "kind": "bed_stone_border",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_soil",
+      "region": "GARDEN_PLANTING",
+      "material": "soil",
+      "center": [
+        -30.0,
+        0.48,
+        -209.6
+      ],
+      "size": [
+        3.25,
+        0.11,
+        1.55
+      ],
+      "kind": "bed_soil",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_hardy_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -31.4,
+        0.67,
+        -210.032
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_flower_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -31.4,
+        0.9,
+        -210.032
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_hardy_0_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -31.4,
+        0.67,
+        -209.168
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_hardy_1_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -30.7,
+        0.67,
+        -210.032
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_hardy_1_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -30.7,
+        0.67,
+        -209.168
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_hardy_2_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -30.0,
+        0.67,
+        -210.032
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_hardy_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -30.0,
+        0.67,
+        -209.168
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_flower_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -30.0,
+        0.9,
+        -209.168
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_hardy_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -29.3,
+        0.67,
+        -210.032
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_flower_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -29.3,
+        0.9,
+        -210.032
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_hardy_3_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -29.3,
+        0.67,
+        -209.168
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_hardy_4_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -28.6,
+        0.67,
+        -210.032
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_hardy_4_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -28.6,
+        0.67,
+        -209.168
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_4_snow_cap",
+      "region": "GARDEN_PLANTING",
+      "material": "snow",
+      "center": [
+        -30.0,
+        0.55,
+        -208.97
+      ],
+      "size": [
+        1.05,
+        0.06,
+        0.27
+      ],
+      "kind": "bed_snow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_border",
+      "region": "GARDEN_PLANTING",
+      "material": "old_stone",
+      "center": [
+        -20.0,
+        0.25,
+        -209.6
+      ],
+      "size": [
+        3.5,
+        0.42,
+        1.8
+      ],
+      "kind": "bed_stone_border",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_soil",
+      "region": "GARDEN_PLANTING",
+      "material": "soil",
+      "center": [
+        -20.0,
+        0.48,
+        -209.6
+      ],
+      "size": [
+        3.25,
+        0.11,
+        1.55
+      ],
+      "kind": "bed_soil",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_hardy_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -21.4,
+        0.67,
+        -210.032
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_flower_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -21.4,
+        0.9,
+        -210.032
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_hardy_0_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -21.4,
+        0.67,
+        -209.168
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_hardy_1_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -20.7,
+        0.67,
+        -210.032
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_hardy_1_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -20.7,
+        0.67,
+        -209.168
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_hardy_2_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -20.0,
+        0.67,
+        -210.032
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_hardy_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -20.0,
+        0.67,
+        -209.168
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_flower_2_1",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -20.0,
+        0.9,
+        -209.168
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_hardy_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -19.3,
+        0.67,
+        -210.032
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_flower_3_0",
+      "region": "GARDEN_PLANTING",
+      "material": "winter_flower",
+      "center": [
+        -19.3,
+        0.9,
+        -210.032
+      ],
+      "size": [
+        0.17,
+        0.15,
+        0.14
+      ],
+      "kind": "winter_bloom",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_hardy_3_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -19.3,
+        0.67,
+        -209.168
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_hardy_4_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -18.6,
+        0.67,
+        -210.032
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__COLD_SEASON_BED_5_hardy_4_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hardy_leaf",
+      "center": [
+        -18.6,
+        0.67,
+        -209.168
+      ],
+      "size": [
+        0.43,
+        0.38,
+        0.38
+      ],
+      "kind": "winter_perennial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOW_HEDGE_0",
+      "region": "GARDEN_PLANTING",
+      "material": "hedge",
+      "center": [
+        -41.8,
+        0.64,
+        -196.0
+      ],
+      "size": [
+        1.35,
+        1.06,
+        1.25
+      ],
+      "kind": "garden_shrub",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOW_HEDGE_1",
+      "region": "GARDEN_PLANTING",
+      "material": "hedge",
+      "center": [
+        -10.6,
+        0.64,
+        -196.0
+      ],
+      "size": [
+        1.35,
+        1.06,
+        1.25
+      ],
+      "kind": "garden_shrub",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOW_HEDGE_2",
+      "region": "GARDEN_PLANTING",
+      "material": "hedge",
+      "center": [
+        -39.6,
+        0.64,
+        -210.0
+      ],
+      "size": [
+        1.35,
+        1.06,
+        1.25
+      ],
+      "kind": "garden_shrub",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__LOW_HEDGE_3",
+      "region": "GARDEN_PLANTING",
+      "material": "hedge",
+      "center": [
+        -12.1,
+        0.64,
+        -210.0
+      ],
+      "size": [
+        1.35,
+        1.06,
+        1.25
+      ],
+      "kind": "garden_shrub",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_plinth",
+      "region": "GARDEN_BOUNDARY",
+      "material": "old_stone",
+      "center": [
+        -26.0,
+        0.45,
+        -212.0
+      ],
+      "size": [
+        36.0,
+        0.9,
+        0.36
+      ],
+      "kind": "edge_low_stone",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_rail",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -26.0,
+        1.65,
+        -212.0
+      ],
+      "size": [
+        36.0,
+        0.09,
+        0.18
+      ],
+      "kind": "edge_iron_rail",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_0",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_stone_cap_0",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -44.0,
+        1.77,
+        -212.0
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_1",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -41.75,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_2",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -39.5,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_3",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -37.25,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_stone_cap_3",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -37.25,
+        1.77,
+        -212.0
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_4",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -35.0,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_5",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -32.75,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_6",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -30.5,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_stone_cap_6",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -30.5,
+        1.77,
+        -212.0
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_7",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -28.25,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_8",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -26.0,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_9",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -23.75,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_stone_cap_9",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -23.75,
+        1.77,
+        -212.0
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_10",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -21.5,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_11",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -19.25,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_12",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -17.0,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_stone_cap_12",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -17.0,
+        1.77,
+        -212.0
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_13",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -14.75,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_14",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -12.5,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_15",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -10.25,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_stone_cap_15",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -10.25,
+        1.77,
+        -212.0
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__NORTH_EDGE_iron_post_16",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -212.0
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_plinth",
+      "region": "GARDEN_BOUNDARY",
+      "material": "old_stone",
+      "center": [
+        -44.0,
+        0.45,
+        -198.55
+      ],
+      "size": [
+        0.36,
+        0.9,
+        26.3
+      ],
+      "kind": "edge_low_stone",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_rail",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.65,
+        -198.55
+      ],
+      "size": [
+        0.18,
+        0.09,
+        26.3
+      ],
+      "kind": "edge_iron_rail",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_0",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -211.7
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_stone_cap_0",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -44.0,
+        1.77,
+        -211.7
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_1",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -209.30909
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_2",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -206.91818
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_3",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -204.52727
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_stone_cap_3",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -44.0,
+        1.77,
+        -204.52727
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_4",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -202.13636
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_5",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -199.74545
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_6",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -197.35455
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_stone_cap_6",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -44.0,
+        1.77,
+        -197.35455
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_7",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -194.96364
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_8",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -192.57273
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_9",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -190.18182
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_stone_cap_9",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -44.0,
+        1.77,
+        -190.18182
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_10",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -187.79091
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WEST_EDGE_iron_post_11",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -44.0,
+        1.31,
+        -185.4
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_plinth",
+      "region": "GARDEN_BOUNDARY",
+      "material": "old_stone",
+      "center": [
+        -8.0,
+        0.45,
+        -198.55
+      ],
+      "size": [
+        0.36,
+        0.9,
+        26.3
+      ],
+      "kind": "edge_low_stone",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_rail",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.65,
+        -198.55
+      ],
+      "size": [
+        0.18,
+        0.09,
+        26.3
+      ],
+      "kind": "edge_iron_rail",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_0",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -211.7
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_stone_cap_0",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -8.0,
+        1.77,
+        -211.7
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_1",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -209.30909
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_2",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -206.91818
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_3",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -204.52727
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_stone_cap_3",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -8.0,
+        1.77,
+        -204.52727
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_4",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -202.13636
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_5",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -199.74545
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_6",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -197.35455
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_stone_cap_6",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -8.0,
+        1.77,
+        -197.35455
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_7",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -194.96364
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_8",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -192.57273
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_9",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -190.18182
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_stone_cap_9",
+      "region": "GARDEN_BOUNDARY",
+      "material": "limestone",
+      "center": [
+        -8.0,
+        1.77,
+        -190.18182
+      ],
+      "size": [
+        0.3,
+        0.24,
+        0.3
+      ],
+      "kind": "edge_finial",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_10",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -187.79091
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EAST_EDGE_iron_post_11",
+      "region": "GARDEN_BOUNDARY",
+      "material": "wrought_iron",
+      "center": [
+        -8.0,
+        1.31,
+        -185.4
+      ],
+      "size": [
+        0.075,
+        1.38,
+        0.075
+      ],
+      "kind": "edge_iron_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_0_tree_trunk",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -41.9,
+        2.85,
+        -209.1
+      ],
+      "size": [
+        0.42,
+        5.7,
+        0.39
+      ],
+      "kind": "bare_tree_trunk",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_0_branch_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -42.48,
+        3.7,
+        -209.22
+      ],
+      "size": [
+        1.48,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.24
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_0_branch_0_1",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -42.7,
+        4.48,
+        -209.0
+      ],
+      "size": [
+        1.78,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.29
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_0_branch_0_2",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -42.92,
+        5.26,
+        -209.22
+      ],
+      "size": [
+        2.08,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.33999999999999997
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_0_branch_1_0",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -41.32,
+        3.7,
+        -209.22
+      ],
+      "size": [
+        1.48,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.24
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_0_branch_1_1",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -41.1,
+        4.48,
+        -209.0
+      ],
+      "size": [
+        1.78,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.29
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_0_branch_1_2",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -40.88,
+        5.26,
+        -209.22
+      ],
+      "size": [
+        2.08,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.33999999999999997
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_0_trunk_snow",
+      "region": "GARDEN_PLANTING",
+      "material": "snow",
+      "center": [
+        -41.9,
+        0.17,
+        -209.1
+      ],
+      "size": [
+        1.12,
+        0.13,
+        1.08
+      ],
+      "kind": "tree_base_snow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_1_tree_trunk",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -10.9,
+        2.223,
+        -209.1
+      ],
+      "size": [
+        0.3276,
+        4.446,
+        0.3042
+      ],
+      "kind": "bare_tree_trunk",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_1_branch_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -11.3524,
+        2.886,
+        -209.1936
+      ],
+      "size": [
+        1.1544,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.24
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_1_branch_0_1",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -11.524,
+        3.4944,
+        -209.022
+      ],
+      "size": [
+        1.3884,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.29
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_1_branch_0_2",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -11.6956,
+        4.1028,
+        -209.1936
+      ],
+      "size": [
+        1.6224,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.33999999999999997
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_1_branch_1_0",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -10.4476,
+        2.886,
+        -209.1936
+      ],
+      "size": [
+        1.1544,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.24
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_1_branch_1_1",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -10.276,
+        3.4944,
+        -209.022
+      ],
+      "size": [
+        1.3884,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.29
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_1_branch_1_2",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -10.1044,
+        4.1028,
+        -209.1936
+      ],
+      "size": [
+        1.6224,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.33999999999999997
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_1_trunk_snow",
+      "region": "GARDEN_PLANTING",
+      "material": "snow",
+      "center": [
+        -10.9,
+        0.17,
+        -209.1
+      ],
+      "size": [
+        1.12,
+        0.13,
+        1.08
+      ],
+      "kind": "tree_base_snow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_2_tree_trunk",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -41.8,
+        2.85,
+        -188.4
+      ],
+      "size": [
+        0.42,
+        5.7,
+        0.39
+      ],
+      "kind": "bare_tree_trunk",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_2_branch_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -42.38,
+        3.7,
+        -188.52
+      ],
+      "size": [
+        1.48,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.24
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_2_branch_0_1",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -42.6,
+        4.48,
+        -188.3
+      ],
+      "size": [
+        1.78,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.29
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_2_branch_0_2",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -42.82,
+        5.26,
+        -188.52
+      ],
+      "size": [
+        2.08,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.33999999999999997
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_2_branch_1_0",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -41.22,
+        3.7,
+        -188.52
+      ],
+      "size": [
+        1.48,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.24
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_2_branch_1_1",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -41.0,
+        4.48,
+        -188.3
+      ],
+      "size": [
+        1.78,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.29
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_2_branch_1_2",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -40.78,
+        5.26,
+        -188.52
+      ],
+      "size": [
+        2.08,
+        0.16,
+        0.16
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.33999999999999997
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_2_trunk_snow",
+      "region": "GARDEN_PLANTING",
+      "material": "snow",
+      "center": [
+        -41.8,
+        0.17,
+        -188.4
+      ],
+      "size": [
+        1.12,
+        0.13,
+        1.08
+      ],
+      "kind": "tree_base_snow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_3_tree_trunk",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -10.8,
+        2.223,
+        -188.6
+      ],
+      "size": [
+        0.3276,
+        4.446,
+        0.3042
+      ],
+      "kind": "bare_tree_trunk",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_3_branch_0_0",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -11.2524,
+        2.886,
+        -188.6936
+      ],
+      "size": [
+        1.1544,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.24
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_3_branch_0_1",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -11.424,
+        3.4944,
+        -188.522
+      ],
+      "size": [
+        1.3884,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.29
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_3_branch_0_2",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -11.5956,
+        4.1028,
+        -188.6936
+      ],
+      "size": [
+        1.6224,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": -0.33999999999999997
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_3_branch_1_0",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -10.3476,
+        2.886,
+        -188.6936
+      ],
+      "size": [
+        1.1544,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.24
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_3_branch_1_1",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -10.176,
+        3.4944,
+        -188.522
+      ],
+      "size": [
+        1.3884,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.29
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_3_branch_1_2",
+      "region": "GARDEN_PLANTING",
+      "material": "bark",
+      "center": [
+        -10.0044,
+        4.1028,
+        -188.6936
+      ],
+      "size": [
+        1.6224,
+        0.1248,
+        0.1248
+      ],
+      "kind": "bare_tree_branch",
+      "yaw": 0,
+      "pitch": 0.33999999999999997
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__BARE_WINTER_TREE_3_trunk_snow",
+      "region": "GARDEN_PLANTING",
+      "material": "snow",
+      "center": [
+        -10.8,
+        0.17,
+        -188.6
+      ],
+      "size": [
+        1.12,
+        0.13,
+        1.08
+      ],
+      "kind": "tree_base_snow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_0_base",
+      "region": "GARDEN_FURNITURE",
+      "material": "old_stone",
+      "center": [
+        -39.0,
+        0.21,
+        -187.7
+      ],
+      "size": [
+        0.48,
+        0.42,
+        0.48
+      ],
+      "kind": "lamp_base",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_0_shaft",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -39.0,
+        1.536,
+        -187.7
+      ],
+      "size": [
+        0.14,
+        2.72,
+        0.14
+      ],
+      "kind": "lamp_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_0_light",
+      "region": "GARDEN_FURNITURE",
+      "material": "warm_lamp",
+      "center": [
+        -39.0,
+        3.2,
+        -187.7
+      ],
+      "size": [
+        0.38,
+        0.48,
+        0.35
+      ],
+      "kind": "lamp_glow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_0_cap",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -39.0,
+        3.54,
+        -187.7
+      ],
+      "size": [
+        0.51,
+        0.22,
+        0.48
+      ],
+      "kind": "lamp_cap",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_1_base",
+      "region": "GARDEN_FURNITURE",
+      "material": "old_stone",
+      "center": [
+        -13.0,
+        0.21,
+        -187.7
+      ],
+      "size": [
+        0.48,
+        0.42,
+        0.48
+      ],
+      "kind": "lamp_base",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_1_shaft",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -13.0,
+        1.536,
+        -187.7
+      ],
+      "size": [
+        0.14,
+        2.72,
+        0.14
+      ],
+      "kind": "lamp_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_1_light",
+      "region": "GARDEN_FURNITURE",
+      "material": "warm_lamp",
+      "center": [
+        -13.0,
+        3.2,
+        -187.7
+      ],
+      "size": [
+        0.38,
+        0.48,
+        0.35
+      ],
+      "kind": "lamp_glow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_1_cap",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -13.0,
+        3.54,
+        -187.7
+      ],
+      "size": [
+        0.51,
+        0.22,
+        0.48
+      ],
+      "kind": "lamp_cap",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_2_base",
+      "region": "GARDEN_FURNITURE",
+      "material": "old_stone",
+      "center": [
+        -39.0,
+        0.21,
+        -211.0
+      ],
+      "size": [
+        0.48,
+        0.42,
+        0.48
+      ],
+      "kind": "lamp_base",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_2_shaft",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -39.0,
+        1.536,
+        -211.0
+      ],
+      "size": [
+        0.14,
+        2.72,
+        0.14
+      ],
+      "kind": "lamp_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_2_light",
+      "region": "GARDEN_FURNITURE",
+      "material": "warm_lamp",
+      "center": [
+        -39.0,
+        3.2,
+        -211.0
+      ],
+      "size": [
+        0.38,
+        0.48,
+        0.35
+      ],
+      "kind": "lamp_glow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_2_cap",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -39.0,
+        3.54,
+        -211.0
+      ],
+      "size": [
+        0.51,
+        0.22,
+        0.48
+      ],
+      "kind": "lamp_cap",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_3_base",
+      "region": "GARDEN_FURNITURE",
+      "material": "old_stone",
+      "center": [
+        -13.0,
+        0.21,
+        -211.0
+      ],
+      "size": [
+        0.48,
+        0.42,
+        0.48
+      ],
+      "kind": "lamp_base",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_3_shaft",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -13.0,
+        1.536,
+        -211.0
+      ],
+      "size": [
+        0.14,
+        2.72,
+        0.14
+      ],
+      "kind": "lamp_post",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_3_light",
+      "region": "GARDEN_FURNITURE",
+      "material": "warm_lamp",
+      "center": [
+        -13.0,
+        3.2,
+        -211.0
+      ],
+      "size": [
+        0.38,
+        0.48,
+        0.35
+      ],
+      "kind": "lamp_glow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__WARM_PATH_LAMP_3_cap",
+      "region": "GARDEN_FURNITURE",
+      "material": "wrought_iron",
+      "center": [
+        -13.0,
+        3.54,
+        -211.0
+      ],
+      "size": [
+        0.51,
+        0.22,
+        0.48
+      ],
+      "kind": "lamp_cap",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EDGE_SNOW_0",
+      "region": "GARDEN_GROUND",
+      "material": "snow",
+      "center": [
+        -43.0,
+        0.015,
+        -198.0
+      ],
+      "size": [
+        0.62,
+        0.065,
+        10.0
+      ],
+      "kind": "edge_snow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EDGE_SNOW_1",
+      "region": "GARDEN_GROUND",
+      "material": "snow",
+      "center": [
+        -9.0,
+        0.015,
+        -198.0
+      ],
+      "size": [
+        0.62,
+        0.065,
+        10.0
+      ],
+      "kind": "edge_snow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EDGE_SNOW_2",
+      "region": "GARDEN_GROUND",
+      "material": "snow",
+      "center": [
+        -26.0,
+        0.015,
+        -211.55
+      ],
+      "size": [
+        25.0,
+        0.065,
+        0.64
+      ],
+      "kind": "edge_snow",
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "id": "RG-GAME-02-VITTI-GARDEN-V15__EDGE_SNOW_3",
+      "region": "GARDEN_GROUND",
+      "material": "snow",
+      "center": [
+        -24.0,
+        0.015,
+        -209.5
+      ],
+      "size": [
+        3.2,
+        0.065,
+        0.4
+      ],
+      "kind": "edge_snow",
+      "yaw": 0,
+      "pitch": 0
+    }
+  ]
+}
