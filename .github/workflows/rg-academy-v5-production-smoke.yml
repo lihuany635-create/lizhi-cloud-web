@@ -1,0 +1,59 @@
+name: RG Academy V5 Canonical Production Public Smoke QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v5-production-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify public model, current manifest, viewer metadata
+        run: |
+          set -euo pipefail
+          BASE='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer'
+          mkdir -p /tmp/academy-public
+          curl --fail --show-error -L --retry 10 --retry-all-errors --retry-delay 3 --max-time 150 "$BASE/current-models.json?v=20261023-academy-rb2-v5" -o /tmp/academy-public/current-models.json
+          curl --fail --show-error -L --retry 10 --retry-all-errors --retry-delay 3 --max-time 150 "$BASE/lahudi-academy.glb?v=rb2-exterior-rebuilt-20261023" -o /tmp/academy-public/lahudi-academy.glb
+          curl --fail --show-error -L --retry 10 --retry-all-errors --retry-delay 3 --max-time 150 "$BASE/" -o /tmp/academy-public/index.html
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,struct
+          p=Path('/tmp/academy-public')
+          j=json.loads((p/'current-models.json').read_text())
+          ent=next(x for x in j['models'] if x['model']=='lahudi-academy.glb')
+          b=(p/'lahudi-academy.glb').read_bytes()
+          h=(p/'index.html').read_text()
+          sha=hashlib.sha256(b).hexdigest()
+          assert b[:4]==b'glTF' and struct.unpack_from('<I',b,8)[0]==len(b)
+          assert len(b)==7310612
+          assert sha==ent['current_sha256']=='347ba0a423726d4a2c83e1ddc568509a5b3ac35ca99dc6019f513085053b842f'
+          assert ent['version']=='ACADEMY-RB2-EXTERIOR-REBUILT-V5'
+          assert 'lahudi-academy.glb?v=rb2-exterior-rebuilt-20261023' in h
+          assert '"cut": 1' in h
+          assert 'current-models.json?v=20261023-academy-rb2-v5' in h
+          jl=struct.unpack_from('<I',b,12)[0]
+          assert json.loads(b[20:20+jl])['asset']['version']=='2.0'
+          print('PASS: PUBLIC PRODUCTION CANONICAL SHA',sha,'bytes',len(b))
+          PY
+      - name: Actually load official school selection in Chrome without screenshot
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 135s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage \
+            --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl \
+            --window-size=1280,900 --virtual-time-budget=42000 \
+            --dump-dom 'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/#lahudi-academy' > /tmp/academy-public/dom.html 2> /tmp/academy-public/chrome.log
+          python - <<'PY'
+          from pathlib import Path
+          h=Path('/tmp/academy-public/dom.html').read_text()
+          assert 'ACADEMY-RB2-EXTERIOR-REBUILT-V5' in h, "Model revision not loaded in browser"
+          assert 'GLB 檢查紀錄' in h or '導覽' in h or 'viewerVersion' in h
+          assert 'model-viewer' not in h[-100:] or len(h)>1000
+          print('PASS: Chrome loaded canonical academy V5 revision label')
+          PY
