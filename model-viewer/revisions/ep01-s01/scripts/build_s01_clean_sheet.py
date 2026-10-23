@@ -117,7 +117,7 @@ def ceiling_mesh():
             a=k*len(xs)+j;b=a+1;c=(k+1)*len(xs)+j;d=c+1
             faces.extend([[a,c,b],[b,c,d]])
     mesh=trimesh.Trimesh(vertices=v,faces=faces,process=False)
-    mesh.fix_normals()
+    # Triangle winding is authored explicitly; avoid optional SciPy dependency.
     put(mesh,"RB_VAULT__continuous_pointed_stone_surface","limestone","vault")
 ceiling_mesh()
 # Floor and structurally related foundations: one continuous walkable axis.
