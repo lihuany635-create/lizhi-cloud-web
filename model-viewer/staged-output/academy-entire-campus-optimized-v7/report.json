@@ -1,0 +1,41 @@
+{
+  "scene": "RG-GAME-02",
+  "version": "ACADEMY-RB2-ENTIRE-CAMPUS-OPTIMIZED-V7",
+  "model": "lahudi-academy_ENTIRE-GOTHIC-CAMPUS_OPTIMIZED_v7.glb",
+  "sha256": "14f564dd0a2e85c40105d7565ad04a0bf1bb2949d15ec05f96aa45ebf31cdddf",
+  "bytes": 11111544,
+  "source_v6_sha256": "e3d2465807cba69ba52a3d1df2a9e3f84a77a970f94301bdeaecd26537d5a6bc",
+  "original_v6_scene_nodes": 16242,
+  "retained_core_node_count": 11097,
+  "original_new_campus_nodes": 5145,
+  "merged_campus_nodes": 77,
+  "eliminated_draw_call_objects": 5068,
+  "full_school_node_count": 11174,
+  "triangles_preserved_new_campus": 61740,
+  "material_and_region_batches": {
+    "CAMPUS_LINK": 2,
+    "CHAPEL_WESTERN_GALLERY": 8,
+    "COURTYARD": 7,
+    "EAST_CLASSROOM_GALLERY": 8,
+    "FRONT_GATE": 1,
+    "LIBRARY_EAST_ARCHIVE": 8,
+    "NORTH_ARCHIVE_WING": 8,
+    "NORTH_COLLEGE_LINK": 8,
+    "SOUTH_CAMPUS_GALLERY": 8,
+    "SOUTH_CAMPUS_HALL": 8,
+    "TOWERS": 3,
+    "WEST_CLASSROOM_GALLERY": 8
+  },
+  "original_core_nodes_untouched": true,
+  "native_classrooms_library_roof_stairs_unchanged": true,
+  "all_full_v6_campus_features_preserved_geometrically": true,
+  "glb_roundtrip": "PASS",
+  "rendering": "NOT_RUN",
+  "mobile_actual_frame_rate": "NOT_BENCHMARKED",
+  "author_approval": "PENDING",
+  "limits": [
+    "Baked geometry from 5145 original cubes grouped by region/material is pixel-equivalent in position/normal/triangle winding when rendered; Chrome/mobile screenshot still needed.",
+    "The 5145 individual V6 semantic nodes are replaced by compact batch nodes, but design source script remains versioned in GitHub.",
+    "Original 11097 functional-school nodes are unchanged and still potentially the next performance bottleneck."
+  ]
+}
