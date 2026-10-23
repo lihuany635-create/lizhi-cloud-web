@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-academy-v15-vitti-garden-20261023",
+  "version": "mixed-current-academy-v16-indoor-greenery-20261024",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -57,13 +57,13 @@
     },
     {
       "model": "lahudi-academy.glb",
-      "version": "ACADEMY-V15-VITTI-REAR-GARDEN-REVIEW",
-      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-rear-garden-v15/lahudi-academy_VITTI-REAR-GARDEN_V15.glb",
-      "current_sha256": "e269a295159f0f7d3e82df864376579e66f4b92be204ce66667a3c78b9d3ea41",
-      "backup": "backups/pre-academy-v15-vitti-rear-garden/lahudi-academy.glb",
-      "backup_sha256": "1d2ac5373a3ae9e276048aa647d3f65ef19bc01ada3ee0e0473b1154568c53b2",
+      "version": "ACADEMY-V16-INDOOR-GREENERY-PHASE1-REVIEW",
+      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-interior-greenery-v16/lahudi-academy_INDOOR-GREENERY-V16.glb",
+      "current_sha256": "aa1f5778f9d87672d0df1c7ba36b6202108eb14bbc4aeb4bb322504c7dbf2dc0",
+      "backup": "backups/pre-academy-v16-indoor-plants/lahudi-academy.glb",
+      "backup_sha256": "e269a295159f0f7d3e82df864376579e66f4b92be204ce66667a3c78b9d3ea41",
       "git_blob_sha": "fa1eded139fcd7dff0794208067550db71d05344",
-      "integrated_contents": "One official academy V15 GLB. All existing V14 anime gate, V12 44 provisional school rooms and 1734 procedural furniture, V11 exterior, original A01 and library furniture preserved. The former F_LIBRARY solid north-end wall is replaced by 3m actual back door, adjoining Vitti winter rear garden 36m × 28m with central lawn, loop stone walks, 3 wooden benches, 6 hardy flowerbeds, 4 leafless trees, 4 lamps, one story-marked potted plant for Bessie, and low garden perimeter stone-and-iron railings. Placement behind library is cinema-design inference, not explicitly specified by source novel.",
+      "integrated_contents": "V16 105 original Gothic indoor plant placements installed in B/C 44 provisional teaching rooms, D entrance, E northern public academic, G assembly and H archive; 10 standalone botanical reusable source GLB files on stage. 44 floor pots in classrooms, 40 actual desk tabletop pots, 21 shared-room floor pots. Original A01 and F_NATIVE_LIBRARY interior not planted yet pending native geometry/camera mapping. Old V15 Bessie garden pot, all V14 entry and 1734 prior furniture preserved; no character collision required by author. Plant models are batched low-poly matte Gothic styling, not story-canonical species and not final photoreal assets.",
       "author_full_item_approval": "PENDING",
       "static_geometry_qa": "PASS: 10 1F routes + 3 stair/upper walk centerline radius-0.4m clearance checks, 26 3D stair treads obstacle-free AABB, 3.55m modeled roof headroom",
       "visual_qa": "PASS_PUBLIC_GARDEN_3D_PRESENT__STILL_PROVISIONAL_LOW_POLY_STYLE",
@@ -106,7 +106,23 @@
       "garden_visual_qa": "PASS_PUBLIC_REAL_SCHOOL_GLB_SCREENSHOT__ART_STYLE_NOT_FINAL",
       "garden_public_screenshot": "https://github.com/lihuany635-create/lizhi-cloud-web/blob/rg-ep01-s01-stage-20261023/model-viewer/staged-output/academy-rear-garden-v15/public-qa/garden-actual-cdp.png",
       "garden_art_followup": "Rear F facade appears flat, winter garden vegetation and stone materials are simple low-poly; next stage is detail lighting/wall Gothic relief and art-direction review against original A01 shots.",
-      "garden_browser_test_limit": "CDP lexical WebGL stats unavailable (N/A), but binary SHA, visible official model and actual screenshot verified."
+      "garden_browser_test_limit": "CDP lexical WebGL stats unavailable (N/A), but binary SHA, visible official model and actual screenshot verified.",
+      "interior_plants_version": "V16_LOW_POLY_PHASE1",
+      "interior_plants_total": 105,
+      "interior_plants_source_glb_types": 10,
+      "interior_plants_by_zone": {
+        "B": 48,
+        "C": 36,
+        "D": 6,
+        "E": 8,
+        "G": 4,
+        "H": 3
+      },
+      "interior_A01_native_F_plants_status": "NOT_INSTALLED__NATIVE_STORY_SCENE_PROTECTED",
+      "interior_greenery_registered_furniture_qa": "PASS_NO_REGISTERED_FURNITURE_OVERLAP",
+      "interior_greenery_render_qa": "PENDING_PUBLIC_SCREENSHOT",
+      "interior_plant_approval": "PENDING_AUTHOR_ANIMATION_REVIEW",
+      "V15_Bessie_back_garden_plant_preserved": true
     }
   ]
 }
