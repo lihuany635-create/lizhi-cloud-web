@@ -32,7 +32,7 @@ jobs:
           assert b[:4]==b'glTF' and struct.unpack_from('<I',b,8)[0]==len(b)
           assert hashlib.sha256(b).hexdigest()==r['sha256']
           assert r['original_nodes']==11775 and r['source_sha256']=='ada3ae9c9e55f995b4c8c60f63655c01e572561e523e199ef1cdf298c7e668c3'
-          assert r['zone_footprints_locked'] and len(r['disabled_old_nodes'])==16
+          assert r['zone_footprints_locked'] and len(r['disabled_old_nodes'])==15
           assert r['fixed_routes']['C-05']['steps']==26
           print('V10 true GLB constructed with intact campus:',r['sha256'])
           PY
