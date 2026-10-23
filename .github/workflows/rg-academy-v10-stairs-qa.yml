@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/rg-academy-v10-stairs-qa.yml'
       - 'model-viewer/revisions/academy-route-repair-v10/verify_stair_headroom.py'
+      - 'model-viewer/staged-output/academy-route-repair-v10/report.json'
   workflow_dispatch:
 permissions:
   contents: write
