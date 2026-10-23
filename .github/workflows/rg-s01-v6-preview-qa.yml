@@ -1,0 +1,84 @@
+name: RG EP01 S01 V6 Doorway 3D Preview QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-s01-v6-preview-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-s01-v6-preview-qa
+  cancel-in-progress: true
+jobs:
+  browser-render-v6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build verified temporary V6 preview without publishing to main
+        run: |
+          mkdir -p candidate-output/v6-site
+          cp model-viewer/staged-output/ep01-s01/v6/lahudi-academy_ep01_s01_v6_open_doors_review.glb candidate-output/v6-site/lahudi-academy-s01-v6.glb
+          curl -fsSL --retry 2 --connect-timeout 15 --max-time 60 https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/ -o candidate-output/v6-site/index.html
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          base=Path('candidate-output/v6-site')
+          m=json.loads(Path('model-viewer/staged-output/ep01-s01/v6/report_v6.json').read_text())
+          glb=(base/'lahudi-academy-s01-v6.glb').read_bytes()
+          assert len(glb)==m['bytes']==5520848
+          assert hashlib.sha256(glb).hexdigest()==m['sha256']
+          assert m['S06_untouched'] is True
+          html=(base/'index.html').read_text()
+          old_hash='c875ba7f00814840723615942a523e9617d55457f3943216325b61343461e66e'
+          assert html.count(old_hash)>=2
+          assert 'lahudi-academy-s01-v5.glb' in html
+          html=html.replace(old_hash,m['sha256']).replace('lahudi-academy-s01-v5.glb','lahudi-academy-s01-v6.glb')
+          html=html.replace('S01 V5','S01 V6').replace('5,508,420','5,520,848').replace('5.51 MB','5.52 MB')
+          html=html.replace('V5 測試預覽','V6 門洞候選測試預覽')
+          (base/'index.html').write_text(html)
+          print('Verified V6 GLB and temporary preview HTML',m['sha256'])
+          PY
+      - name: Screenshot V6 3D door openings with browser
+        run: |
+          set -e
+          python3 -m http.server 8123 --bind 127.0.0.1 --directory candidate-output/v6-site > candidate-output/v6-server.log 2>&1 &
+          sleep 2
+          curl -fsSI http://127.0.0.1:8123/ >/dev/null
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 90s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl --window-size=1440,900 --virtual-time-budget=16000 --screenshot=candidate-output/v6-browser.png http://127.0.0.1:8123/ || exit 1
+          test "$(stat -c %s candidate-output/v6-browser.png)" -gt 50000
+      - name: Preserve genuine V6 visual QA without replacing public V5
+        run: |
+          mkdir -p model-viewer/staged-output/ep01-s01/v6/browser-qa
+          cp candidate-output/v6-browser.png model-viewer/staged-output/ep01-s01/v6/browser-qa/default-corridor.png
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          model=Path('candidate-output/v6-site/lahudi-academy-s01-v6.glb')
+          screenshot=Path('candidate-output/v6-browser.png')
+          out=Path('model-viewer/staged-output/ep01-s01/v6/browser-qa/report.json')
+          out.write_text(json.dumps({'version':'S01-V6-OPEN-DOORS-REVIEW',
+          'model_sha256':hashlib.sha256(model.read_bytes()).hexdigest(),
+          'screenshot_bytes':screenshot.stat().st_size,
+          'render_method':'Headless Chrome Three.js WebGL (temporary local URL)',
+          'published':False,'canonical_unchanged':True,'camera_match':'NOT_RUN',
+          'door_collision':'NOT_TESTED','S06_untouched':True,'author_approval':'PENDING'},indent=2)+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/v6/browser-qa/
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(S01 V6): preview actual opening geometry through headless WebGL'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ep01-s01-v6-doorway-browser-qa
+          path: |
+            candidate-output/v6-browser.png
+            model-viewer/staged-output/ep01-s01/v6/browser-qa/report.json
+          retention-days: 30
