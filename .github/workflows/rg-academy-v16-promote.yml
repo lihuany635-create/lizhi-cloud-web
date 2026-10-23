@@ -1,0 +1,55 @@
+name: RG Academy V16 Publish Botanical Interiors To Original School
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v16-promote.yml'
+      - 'model-viewer/revisions/academy-interior-plants-v16/promote_v16_to_main.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v16-canonical
+  cancel-in-progress: true
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+          persist-credentials: false
+      - name: Strictly verify botanical binary assets, furniture positions, V15 freeze
+        run: |
+          set -euo pipefail
+          python .academy-stage/model-viewer/revisions/academy-interior-plants-v16/promote_v16_to_main.py
+      - name: Permit only canonical academy and rollback file changes
+        run: |
+          python - <<'PY'
+          import subprocess
+          allow={
+           'model-viewer/lahudi-academy.glb',
+           'model-viewer/backups/pre-academy-v16-indoor-plants/lahudi-academy.glb',
+           'model-viewer/current-models.json',
+           'model-viewer/index.html'
+          }
+          got=set()
+          for line in subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],text=True).splitlines():
+           p=line[3:]
+           if p.startswith('.academy-stage/'):continue
+           got.add(p)
+          assert got==allow,{'changed':got,'allowed':allow}
+          PY
+      - name: Commit one official V16 school model, viewer and V15 recovery
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/lahudi-academy.glb model-viewer/backups/pre-academy-v16-indoor-plants/lahudi-academy.glb model-viewer/current-models.json model-viewer/index.html
+          git commit -m 'feat(academy V16): add 105 Gothic indoor potted plants in six modeled regions'
+          git push origin HEAD:refs/heads/main
