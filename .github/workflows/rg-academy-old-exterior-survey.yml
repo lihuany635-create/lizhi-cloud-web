@@ -1,0 +1,28 @@
+name: RG Academy Old Exterior Material Survey
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-old-exterior-survey.yml'
+      - 'model-viewer/revisions/academy-all-corridors/survey_old_exterior.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  geometry-survey:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Survey original campus exterior and materials, no rendering
+        run: python model-viewer/revisions/academy-all-corridors/survey_old_exterior.py
+      - name: Save survey
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-exterior-rebuild/survey.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'audit(academy): record original campus shell and material index inventory'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
