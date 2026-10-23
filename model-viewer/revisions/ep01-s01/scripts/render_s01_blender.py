@@ -41,6 +41,7 @@ scene.display.shading.show_shadows=True
 scene.display.shading.show_cavity=True
 scene.display.shading.cavity_type="BOTH"
 scene.display.shading.background_type="WORLD"
+scene.world=bpy.data.worlds.new("S01_geometry_QA")
 scene.world.color=(0.22,0.26,0.29)
 for mat in bpy.data.materials:
  if mat.use_nodes:
