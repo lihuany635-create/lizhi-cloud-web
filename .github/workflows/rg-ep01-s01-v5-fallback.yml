@@ -1,0 +1,58 @@
+name: RG EP01 S01 V5 Bounded Blender Fallback
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - 'model-viewer/revisions/ep01-s01/scripts/render_s01_v5_fallback.py'
+      - '.github/workflows/rg-ep01-s01-v5-fallback.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-ep01-s01-v5-fallback
+  cancel-in-progress: true
+jobs:
+  geometry-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender with firm timeouts
+        run: |
+          timeout 100s sudo apt-get update -qq
+          timeout 150s sudo apt-get install -y -qq blender python3-numpy libegl1 libgl1-mesa-dri libgbm1 xvfb
+          blender --version | head -n 3
+      - name: Render the ALREADY SAVED V5 GLB in Blender Workbench
+        run: |
+          timeout 150s env LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a blender --background --python-exit-code 17 --python model-viewer/revisions/ep01-s01/scripts/render_s01_v5_fallback.py -- model-viewer/staged-output/ep01-s01/v5/lahudi-academy_ep01_s01_corridor_v5_art_review.glb
+      - name: Validate and archive 3 pictures
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("candidate-output/blender_v5_fallback")
+          j=json.loads((p/"render_report.json").read_text())
+          assert j["corridor_meshes_rendered"]>10,j
+          assert len(j["image_files"])==3,j
+          assert all(Path(f).stat().st_size>10000 for f in j["image_files"])
+          assert j["reference_camera_match"]=="NOT_RUN"
+          print("V5 Workbench QA renders complete:",j["image_files"])
+          PY
+          mkdir -p model-viewer/staged-output/ep01-s01/v5/blender-fallback
+          cp candidate-output/blender_v5_fallback/*.png model-viewer/staged-output/ep01-s01/v5/blender-fallback/
+          cp candidate-output/blender_v5_fallback/render_report.json model-viewer/staged-output/ep01-s01/v5/blender-fallback/
+      - name: Commit only QA images to isolated branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/v5/blender-fallback/
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(S01 V5): preserve bounded Workbench geometry renders'
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ep01-s01-v5-bounded-qa
+          path: candidate-output/blender_v5_fallback/
+          retention-days: 30
