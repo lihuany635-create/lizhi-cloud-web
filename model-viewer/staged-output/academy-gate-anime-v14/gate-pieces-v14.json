@@ -1622,24 +1622,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_2",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -142.1625,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_4",
       "group": "BOUNDARY",
       "material": "iron",
@@ -1690,24 +1672,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_6",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -137.6225,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -1766,24 +1730,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_10",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -133.0825,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_12",
       "group": "BOUNDARY",
       "material": "iron",
@@ -1834,24 +1780,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_14",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -128.5425,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -1910,24 +1838,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_18",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -124.0025,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_20",
       "group": "BOUNDARY",
       "material": "iron",
@@ -1978,24 +1888,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_22",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -119.4625,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -2054,24 +1946,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_26",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -114.9225,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_28",
       "group": "BOUNDARY",
       "material": "iron",
@@ -2122,24 +1996,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_30",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -110.3825,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -2198,24 +2054,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_34",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -105.8425,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_36",
       "group": "BOUNDARY",
       "material": "iron",
@@ -2266,24 +2104,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_38",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -101.3025,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -2342,24 +2162,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_42",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -96.76249999999999,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_44",
       "group": "BOUNDARY",
       "material": "iron",
@@ -2414,24 +2216,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_46",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -92.2225,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_IRON_BAR_48",
       "group": "BOUNDARY",
       "material": "iron",
@@ -2482,24 +2266,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__WEST_LONG_BRASS_TIP_50",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -87.68249999999999,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -2972,24 +2738,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_2",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -53.65654320987654,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_4",
       "group": "BOUNDARY",
       "material": "iron",
@@ -3040,24 +2788,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_6",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -49.13901234567901,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -3116,24 +2846,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_10",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -44.62148148148148,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_12",
       "group": "BOUNDARY",
       "material": "iron",
@@ -3184,24 +2896,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_14",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -40.10395061728395,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -3260,24 +2954,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_18",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -35.58641975308642,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_20",
       "group": "BOUNDARY",
       "material": "iron",
@@ -3328,24 +3004,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_22",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -31.06888888888889,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -3404,24 +3062,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_26",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -26.551358024691357,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_28",
       "group": "BOUNDARY",
       "material": "iron",
@@ -3472,24 +3112,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_30",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -22.03382716049383,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -3548,24 +3170,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_34",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -17.516296296296296,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_36",
       "group": "BOUNDARY",
       "material": "iron",
@@ -3616,24 +3220,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_38",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -12.998765432098764,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -3692,24 +3278,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_42",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -8.481234567901232,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_44",
       "group": "BOUNDARY",
       "material": "iron",
@@ -3760,24 +3328,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_46",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        -3.9637037037037075,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -3836,24 +3386,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_50",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        0.5538271604938245,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_52",
       "group": "BOUNDARY",
       "material": "iron",
@@ -3904,24 +3436,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_54",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        5.0713580246913565,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -3980,24 +3494,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_58",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        9.588888888888881,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_60",
       "group": "BOUNDARY",
       "material": "iron",
@@ -4048,24 +3544,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_62",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        14.106419753086406,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -4124,24 +3602,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_66",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        18.623950617283946,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_68",
       "group": "BOUNDARY",
       "material": "iron",
@@ -4192,24 +3652,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_70",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        23.14148148148147,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },
@@ -4268,24 +3710,6 @@
       "roll_rad": 0
     },
     {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_74",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        27.65901234567901,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
       "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_IRON_BAR_76",
       "group": "BOUNDARY",
       "material": "iron",
@@ -4336,24 +3760,6 @@
         0.1
       ],
       "kind": "perimeter_iron_grille",
-      "yaw_rad": 0,
-      "roll_rad": 0
-    },
-    {
-      "name": "RG-GAME-02-GATE-ANIME-V14__EAST_LONG_BRASS_TIP_78",
-      "group": "BOUNDARY",
-      "material": "brass",
-      "center": [
-        32.176543209876534,
-        2.36,
-        79
-      ],
-      "dimensions": [
-        0.09,
-        0.22,
-        0.09
-      ],
-      "kind": "perimeter_spike",
       "yaw_rad": 0,
       "roll_rad": 0
     },

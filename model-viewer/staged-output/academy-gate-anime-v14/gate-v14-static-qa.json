@@ -1,6 +1,6 @@
 {
   "status": "PASS_STATIC_V14_GATE_ACCESS",
-  "candidate_sha256": "a190034201be4867b6ebe0856be2765e7f2851d6cb96fbc1d74c7954afefcd51",
+  "candidate_sha256": "1d2ac5373a3ae9e276048aa647d3f65ef19bc01ada3ee0e0473b1154568c53b2",
   "furniture_source_sha256": "580e8b4bc0a1a9c1bb070074de539bf225286f12219460d6af3365cc3060c9d2",
   "gate_center_x_m": -70.1,
   "gate_z_m": 79,
