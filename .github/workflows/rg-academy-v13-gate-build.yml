@@ -1,0 +1,69 @@
+name: RG Academy V13 Gothic Main Gate Build
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v13-gate-build.yml'
+      - 'model-viewer/revisions/academy-gate-v13/build_v13_gate.py'
+      - 'model-viewer/revisions/academy-gate-v13/gate-masterplan-v13.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-v13-gate-build
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+      - name: Build staged V13 school from actual official V12 GLB
+        run: |
+          set -euo pipefail
+          cp .academy-stage/model-viewer/revisions/academy-gate-v13/build_v13_gate.py model-viewer/revisions/academy-locked-plan-v9/tmp_v13_build.py
+          cp .academy-stage/model-viewer/revisions/academy-gate-v13/gate-masterplan-v13.json model-viewer/revisions/academy-locked-plan-v9/tmp_gate_plan.json
+          mkdir -p model-viewer/revisions/academy-gate-v13
+          cp .academy-stage/model-viewer/revisions/academy-gate-v13/{build_v13_gate.py,gate-masterplan-v13.json} model-viewer/revisions/academy-gate-v13/
+          python model-viewer/revisions/academy-gate-v13/build_v13_gate.py
+      - name: Ensure glTF scene and existing original scene are preserved
+        run: |
+          python - <<'PY'
+          import json,hashlib,struct
+          from pathlib import Path
+          out=Path('candidate-output/academy-gate-v13')
+          r=json.loads((out/'report.json').read_text())
+          p=out/r['file']; b=p.read_bytes()
+          assert b[:4]==b'glTF' and struct.unpack_from('<I',b,8)[0]==len(b)
+          assert hashlib.sha256(b).hexdigest()==r['sha256']
+          assert r['prior_nodes_preserved']==11983
+          assert r['new_batched_nodes']<=65
+          assert r['new_mesh_pieces']>300
+          assert r['gate_line_z_m']==79
+          assert r['entry_axis_x_m']==-70.1
+          assert r['building_8_district_footprints_unchanged']
+          assert r['protect_V12_furniture_and_2_staircores']
+          assert r['primary_clearance_between_piers_m']>=10.50
+          print('V13 constructed actual binary GLB, only gate and courtyards added:',r['sha256'])
+          PY
+      - name: Copy only candidate output to stage branch
+        run: |
+          set -euo pipefail
+          dst=.academy-stage/model-viewer/staged-output/academy-gate-v13
+          mkdir -p "$dst"
+          cp candidate-output/academy-gate-v13/* "$dst/"
+          cd .academy-stage
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-gate-v13
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V13): real Gothic gate campus forecourt and geometry inventory'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
