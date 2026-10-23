@@ -1,0 +1,361 @@
+{
+  "test": "S01 V7 actual glTF triangle-ray inspection",
+  "version": "S01-V7",
+  "method": "Three.js Raycaster against actual scene meshes at two standing heights and three door Z offsets",
+  "scope_limit": "SAMPLED RAYS ONLY: not full body swept volume, continuous collision, or actor animation",
+  "result": "SAMPLED_GEOMETRY_PASS",
+  "rays": [
+    {
+      "door": 1,
+      "z": -5.71,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 1,
+      "z": -5.71,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 1,
+      "z": -5.53,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 1,
+      "z": -5.53,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 1,
+      "z": -5.3500000000000005,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 1,
+      "z": -5.3500000000000005,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 2,
+      "z": -2.71,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 2,
+      "z": -2.71,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 2,
+      "z": -2.53,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 2,
+      "z": -2.53,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 2,
+      "z": -2.3499999999999996,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 2,
+      "z": -2.3499999999999996,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 3,
+      "z": 0.29,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 3,
+      "z": 0.29,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 3,
+      "z": 0.47,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 3,
+      "z": 0.47,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 3,
+      "z": 0.6499999999999999,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 3,
+      "z": 0.6499999999999999,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 4,
+      "z": 3.29,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 4,
+      "z": 3.29,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 4,
+      "z": 3.47,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 4,
+      "z": 3.47,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 4,
+      "z": 3.6500000000000004,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 4,
+      "z": 3.6500000000000004,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 5,
+      "z": 6.29,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 5,
+      "z": 6.29,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 5,
+      "z": 6.47,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 5,
+      "z": 6.47,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 5,
+      "z": 6.6499999999999995,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 5,
+      "z": 6.6499999999999995,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 6,
+      "z": 9.290000000000001,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 6,
+      "z": 9.290000000000001,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 6,
+      "z": 9.47,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 6,
+      "z": 9.47,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 6,
+      "z": 9.65,
+      "eye_y": 4.92,
+      "passed": true,
+      "obstruction": null
+    },
+    {
+      "door": 6,
+      "z": 9.65,
+      "eye_y": 5.8,
+      "passed": true,
+      "obstruction": null
+    }
+  ],
+  "stair_samples": [
+    {
+      "step": 1,
+      "z": -8.325,
+      "top_y": 4.165,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_00"
+    },
+    {
+      "step": 2,
+      "z": -8.615,
+      "top_y": 4.33,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_01"
+    },
+    {
+      "step": 3,
+      "z": -8.905,
+      "top_y": 4.495,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_02"
+    },
+    {
+      "step": 4,
+      "z": -9.195,
+      "top_y": 4.66,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_03"
+    },
+    {
+      "step": 5,
+      "z": -9.485,
+      "top_y": 4.825,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_04"
+    },
+    {
+      "step": 6,
+      "z": -9.775,
+      "top_y": 4.99,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_05"
+    },
+    {
+      "step": 7,
+      "z": -10.065,
+      "top_y": 5.155,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_06"
+    },
+    {
+      "step": 8,
+      "z": -10.355,
+      "top_y": 5.32,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_07"
+    },
+    {
+      "step": 9,
+      "z": -10.645,
+      "top_y": 5.485,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_08"
+    },
+    {
+      "step": 10,
+      "z": -10.935,
+      "top_y": 5.65,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_09"
+    },
+    {
+      "step": 11,
+      "z": -11.225,
+      "top_y": 5.815,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_10"
+    },
+    {
+      "step": 12,
+      "z": -11.515,
+      "top_y": 5.98,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_11"
+    },
+    {
+      "step": 13,
+      "z": -11.805,
+      "top_y": 6.145,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_12"
+    },
+    {
+      "step": 14,
+      "z": -12.095,
+      "top_y": 6.31,
+      "mesh": "RG-GAME-02-EP01-S01-REV4__ascending_tread_13"
+    }
+  ],
+  "summary": {
+    "doorway_rays_tested": 36,
+    "doorways_any_blocked": [],
+    "blocked_ray_count": 0,
+    "stair_samples_tested": 14,
+    "rising_stair_samples": true,
+    "physical_actor_collision_certified": false,
+    "source_GLBCollisionData": "V7 binary GLB loaded into Three.js in headless Chrome"
+  },
+  "meshes": 8209,
+  "author_stair_meshes_found": 14,
+  "status": "REAL_TRIANGLE_RAY_QA_RECORDED",
+  "film_camera_match": "NOT_RUN",
+  "full_swept_actor_collision": "NOT_RUN"
+}
