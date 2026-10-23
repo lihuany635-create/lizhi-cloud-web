@@ -53,3 +53,22 @@
 .phone-agent-state{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
 .phone-agent-screen{max-width:360px;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;display:block}
 .phone-agent-ui{width:100%;min-height:110px;max-height:380px;overflow:auto;white-space:pre-wrap;font-size:12px;word-break:break-word;background:#f8f7f4;padding:12px;border-radius:8px}
+
+/* Mobile agent v2: readable split dashboard, no raw JSON wall. */
+.route-phoneagent .phone-agent-card{width:100%;max-width:none;box-sizing:border-box;gap:14px}
+.route-phoneagent .phone-agent-controls{align-items:center}
+.route-phoneagent .phone-agent-controls .button{min-height:42px}
+.route-phoneagent .phone-agent-controls .button:disabled{opacity:.45;cursor:not-allowed}
+.route-phoneagent .phone-agent-columns{display:grid;grid-template-columns:minmax(250px,360px) minmax(0,1fr);gap:18px;align-items:start}
+.route-phoneagent .phone-agent-display,.route-phoneagent .phone-agent-inspector{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fffaf1;min-width:0}
+.route-phoneagent .phone-agent-display h2,.route-phoneagent .phone-agent-inspector h2{margin:0 0 10px;font-size:17px}
+.route-phoneagent .phone-agent-screen{display:block;width:100%;max-width:none;height:auto;border-radius:12px}
+.route-phoneagent .phone-agent-screen-empty{min-height:260px;border:1px dashed #c4ae90;border-radius:12px;display:grid;align-content:center;justify-items:center;gap:10px;padding:18px;text-align:center;font-size:14px}
+.route-phoneagent .phone-agent-screen-empty small{font-size:12px;color:#6c6359}
+.route-phoneagent .phone-agent-inspector>p{margin:4px 0 9px;color:#605849;overflow-wrap:anywhere;font-size:13px}
+.route-phoneagent .phone-agent-elements{margin:0;padding:0;list-style:none;max-height:67vh;overflow:auto;display:grid;gap:6px}
+.route-phoneagent .phone-agent-element{display:grid;gap:4px;border:1px solid #e7dac5;border-radius:8px;padding:8px 10px;background:#fff}
+.route-phoneagent .phone-agent-element strong{font-size:13px;white-space:normal;overflow-wrap:anywhere;font-weight:600}
+.route-phoneagent .phone-agent-element small{font-size:11px;color:#776d60;overflow-wrap:anywhere}
+.route-phoneagent .phone-agent-safety{font-size:12px;line-height:1.8;color:#6e6153}
+@media(max-width:720px){.route-phoneagent .phone-agent-columns{grid-template-columns:1fr}.route-phoneagent .phone-agent-display{max-width:380px}.route-phoneagent .phone-agent-controls .button{flex:1 1 135px}.route-phoneagent .phone-agent-elements{max-height:340px}}
