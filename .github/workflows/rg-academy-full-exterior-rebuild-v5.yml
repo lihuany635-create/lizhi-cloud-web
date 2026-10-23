@@ -1,0 +1,70 @@
+name: RG Academy Entire Exterior Rebuild and Color V5
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-full-exterior-rebuild-v5.yml'
+      - 'model-viewer/revisions/academy-all-corridors/rebuild_whole_academy_exterior_v5.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: academy-entire-exterior-v5-build
+  cancel-in-progress: true
+jobs:
+  geometry-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Rebuild entire academy facade around verified interiors
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-all-corridors/rebuild_whole_academy_exterior_v5.py
+      - name: Gate GLB bytes geometry integrity and color palette
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,struct
+          d=Path('candidate-output/academy-rebuilt-exterior')
+          r=json.loads((d/'report.json').read_text())
+          data=(d/r['model']).read_bytes()
+          assert data[:4]==b'glTF'
+          assert len(data)==r['bytes']==struct.unpack_from('<I',data,8)[0]
+          assert hashlib.sha256(data).hexdigest()==r['sha256']
+          assert r['old_exterior_meshes_deactivated']>6500
+          assert r['old_v4_fake_facade_nodes_removed']==5115
+          assert r['added_nodes']>1150
+          assert r['fully_connected_cloister_floor'] and r['stair_meshes_preserved']
+          assert r['classroom_entrances_preserved'] and r['library_furniture_preserved']
+          assert r['real_open_air_window_spans_on_exterior']
+          assert 'roof' in r['material_palette'] and 'oak' in r['material_palette']
+          assert r['structural_reparse']=='PASS'
+          print('VALID REBUILT SCHOOL GLB AND PBR COLORS: ',r['sha256'])
+          PY
+      - name: Save true rebuilt whole academy GLB to construction branch
+        run: |
+          set -euo pipefail
+          dst=model-viewer/staged-output/academy-exterior-rebuild-v5
+          mkdir -p "$dst"
+          cp candidate-output/academy-rebuilt-exterior/*.glb "$dst/"
+          cp candidate-output/academy-rebuilt-exterior/report.json "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V5): full rebuilt Gothic Academy with strong PBR colors'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: academy-full-exterior-rebuild-colored-v5
+          path: |
+            candidate-output/academy-rebuilt-exterior/*.glb
+            candidate-output/academy-rebuilt-exterior/report.json
+          retention-days: 30
