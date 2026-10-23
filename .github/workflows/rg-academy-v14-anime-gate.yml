@@ -1,0 +1,56 @@
+name: RG Academy V14 Anime Gate Build QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v14-anime-gate.yml'
+      - 'model-viewer/revisions/academy-gate-v14/build_v14_animation_gate.py'
+      - 'model-viewer/revisions/academy-gate-v14/verify_v14_gate.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v14-build
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+      - name: Import staged source, 8-zone plan and original GLB helper
+        run: |
+          set -euo pipefail
+          mkdir -p model-viewer/revisions/academy-gate-v14 model-viewer/revisions/ep01-s01/scripts model-viewer/revisions/academy-locked-plan-v9
+          cp .academy-stage/model-viewer/revisions/ep01-s01/scripts/build_s01_candidate.py model-viewer/revisions/ep01-s01/scripts/
+          cp .academy-stage/model-viewer/revisions/academy-locked-plan-v9/masterplan-v1.json model-viewer/revisions/academy-locked-plan-v9/
+          cp .academy-stage/model-viewer/revisions/academy-gate-v14/{build_v14_animation_gate.py,verify_v14_gate.py} model-viewer/revisions/academy-gate-v14/
+      - name: Build V14 animation style gate from live official V13 school
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-gate-v14/build_v14_animation_gate.py
+      - name: Validate true V14 GLB and clear paths
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-gate-v14/verify_v14_gate.py
+      - name: Stage real GLB, editable pieces and checks without touching canonical yet
+        run: |
+          set -euo pipefail
+          dst=.academy-stage/model-viewer/staged-output/academy-gate-anime-v14
+          mkdir -p "$dst"
+          cp candidate-output/academy-gate-anime-v14/* "$dst/"
+          cd .academy-stage
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-gate-anime-v14
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V14): anime school gate GLB with accessible paths and winter staging'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
