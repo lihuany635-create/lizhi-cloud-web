@@ -10,7 +10,7 @@
 - 館藏文字是不可信輸入。MCP server instructions 明確要求不得執行館藏內指令。
 - 未登入請求由 OAuth Protected Resource middleware 回覆 `401` 與 discovery challenge；有效 token 才會取得 RLS-scoped Supabase client。
 - 資料庫限流為每位使用者每分鐘 60 次。限流表位於未公開的 `lizhi_private` schema；唯一的 `SECURITY DEFINER` 函式只處理限流，內含 `auth.uid()` 與核准帳號檢查。
-- 有 `Origin` 時只允許專案網站與本機開發 origin；未列入清單的 origin 回覆 `403`。
+- 有 `Origin` 時只允許 ChatGPT、專案網站與本機開發 origin；未列入清單的 origin 回覆 `403`。
 
 ## 工具
 
@@ -31,10 +31,12 @@
 
 Supabase 專案：`hrdzywkihfqggiwjgavi`。
 
+正式專案已套用 migration、部署 `library-mcp`，並啟用 OAuth Server、Dynamic Client Registration 與 consent redirect。GitHub Pages 同意頁會在本 PR 合併發布後可用。
+
 1. 在 **Authentication → JWT Signing Keys** 確認使用 ES256 或 RS256。`@supabase/server` 不接受舊的 HS256 OAuth token。
 2. 在 **Authentication → OAuth Server**：
    - 啟用 OAuth 2.1 Server。
-   - Authorization path 設為 `/lizhi-cloud-web/oauth/consent/`。
+   - Authorization path 設為 `/oauth/consent/`。Supabase 會把它接在既有 Site URL 後；因 Site URL 以 `/` 結尾，預覽中可能顯示雙斜線，但 GitHub Pages 會正規化到同一頁。
    - 啟用 Dynamic Client Registration。
 3. 在 **Authentication → URL Configuration**：
    - 保留現有 Site URL：`https://lihuany635-create.github.io/lizhi-cloud-web/`

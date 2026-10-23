@@ -12,6 +12,8 @@ if (!SUPABASE_URL) throw new Error("SUPABASE_URL is required");
 const RESOURCE_SERVER = Deno.env.get("MCP_RESOURCE_SERVER") || `${SUPABASE_URL}/functions/v1/library-mcp`;
 const DEFAULT_ALLOWED_ORIGINS = [
   "https://lihuany635-create.github.io",
+  "https://chatgpt.com",
+  "https://chat.openai.com",
   "http://127.0.0.1:54321",
   "http://localhost:54321",
 ];

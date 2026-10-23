@@ -15,6 +15,8 @@ create table if not exists lizhi_private.lizhi_library_mcp_rate_limits (
   primary key (user_id, window_start)
 );
 
+alter table lizhi_private.lizhi_library_mcp_rate_limits enable row level security;
+
 revoke all on table lizhi_private.lizhi_library_mcp_rate_limits from public, anon, authenticated;
 
 create or replace function public.lizhi_library_mcp_take_rate_limit(

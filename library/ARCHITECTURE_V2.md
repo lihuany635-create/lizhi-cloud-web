@@ -96,7 +96,7 @@ create table public.lizhi_library_chunks (
 
 **檢索策略**：精確檔名、GUID、影格代號（如 `F089`）優先；中文全文以字元子串／特殊分詞補充；語意召回補足同義詞。融合排名可用 Reciprocal Rank Fusion，來源/標籤/時間作過濾，回傳不超過必要片段，不能將其它使用者的向量混入搜尋。
 
-## 4. ChatGPT／AI 契約（唯讀 MCP 已建置，待正式專案啟用 OAuth／部署）
+## 4. ChatGPT／AI 契約（唯讀 MCP 與 OAuth 已部署；同意頁隨本 PR 發布）
 
 透過可稽核的 MCP 工具，而不是授權 AI 查詢所有 Supabase 表或直接讀取整顆硬碟。實作與接入方式見 [MCP.md](MCP.md)：
 

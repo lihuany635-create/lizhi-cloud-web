@@ -9,7 +9,7 @@ additional_redirect_urls = [
 
 [auth.oauth_server]
 enabled = true
-authorization_url_path = "/lizhi-cloud-web/oauth/consent/"
+authorization_url_path = "/oauth/consent/"
 allow_dynamic_registration = true
 
 [functions.library-mcp]
