@@ -203,7 +203,7 @@ def main():
        .68,12.0,.68,"party_wall_pier","E_NORTH_ACADEMY")
  # G high roof
  wing("G_ASSEMBLY",-123,-95,-170,-125,12.5,19.5,
-      north_doors=[(-107,-103)],mat="cold_stone",roofmat="copper_roof")
+      south_doors=[(-107,-103)],mat="cold_stone",roofmat="copper_roof")
  wing("H_ARCHIVE",4,28,-174,-143,10.8,14.8,
       west_doors=[(-154,-149)],mat="warm_stone")
  # Building count physical sub-masses D=two and E=three, but eight locked project districts.
