@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-academy-rb2-campus-v7-mobile-20261023",
+  "version": "mixed-current-academy-rb2-v8-contrast-20261023",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -57,16 +57,16 @@
     },
     {
       "model": "lahudi-academy.glb",
-      "version": "ACADEMY-RB2-ENTIRE-CAMPUS-MOBILE-OPTIMIZED-V7",
-      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-entire-campus-optimized-v7/lahudi-academy_ENTIRE-GOTHIC-CAMPUS_OPTIMIZED_v7.glb",
-      "current_sha256": "14f564dd0a2e85c40105d7565ad04a0bf1bb2949d15ec05f96aa45ebf31cdddf",
-      "backup": "backups/pre-academy-mobile-optimized-v7/lahudi-academy.glb",
-      "backup_sha256": "e3d2465807cba69ba52a3d1df2a9e3f84a77a970f94301bdeaecd26537d5a6bc",
+      "version": "ACADEMY-RB2-ENTIRE-CAMPUS-OPTIMIZED-CONTRAST-V8",
+      "source_candidate": "rg-ep01-s01-stage-20261023:model-viewer/staged-output/academy-entire-campus-contrast-v8/lahudi-academy_ENTIRE-GOTHIC-CAMPUS_CONTRAST_v8.glb",
+      "current_sha256": "07392e83c165854c00f13fb39687253fbd185a1a5aa0d134264651a626af8c8f",
+      "backup": "backups/pre-academy-v8-color-contrast/lahudi-academy.glb",
+      "backup_sha256": "14f564dd0a2e85c40105d7565ad04a0bf1bb2949d15ec05f96aa45ebf31cdddf",
       "git_blob_sha": "fa1eded139fcd7dff0794208067550db71d05344",
-      "integrated_contents": "Same official 8-wing entire Gothic school V6 geometry and palette, preserving all native classrooms/stairs/library; 5145 new campus details baked into 77 region/material batches for mobile draw efficiency; kilometer-sized old terrain stays disabled.",
+      "integrated_contents": "Eight-wing complete external Gothic school, original 85m corridor and library/classrooms/stairs preserved; 77 mobile batches for new campus; darkened charcoal courtyard, sandstone facades, blue-gray main school and slate roofs to address white-out.",
       "author_full_item_approval": "PENDING",
       "static_geometry_qa": "PASS: 5145 source cube surfaces baked into 77 region/material meshes, original school core geometry unchanged",
-      "visual_qa": "NOT_RUN_BY_USER_REQUEST",
+      "visual_qa": "DARK_CAMPUS_MOBILE_FIT_V7_PASS; V8_MATERIAL_CONTRAST_EXACT_VALIDATION_PASS; V8_SCREENSHOT_PENDING",
       "wing_interiors": "NOT_MODELED: only exterior architectural shell and connected campus ground paths",
       "mobile_performance_note": "Reduced new campus mesh draws by 5068; device FPS unverified"
     }
