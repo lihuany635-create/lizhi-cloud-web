@@ -1,0 +1,61 @@
+name: RG Academy V11 Gothic Exterior Decor Build
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v11-exterior-build.yml'
+      - 'model-viewer/revisions/academy-exterior-finish-v11/build_v11_exterior.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: academy-v11-exterior
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Actually decorate full academy exterior into GLB
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-exterior-finish-v11/build_v11_exterior.py
+      - name: Validate geometry bytes, preserving all V10 core and usable cache
+        run: |
+          python - <<'PY'
+          import json,hashlib,struct
+          from pathlib import Path
+          d=Path('candidate-output/academy-exterior-finish-v11')
+          j=json.loads((d/'report.json').read_text())
+          b=(d/j['file']).read_bytes()
+          assert b[:4]==b'glTF'
+          assert struct.unpack_from('<I',b,8)[0]==len(b)==j['bytes']
+          assert hashlib.sha256(b).hexdigest()==j['sha256']
+          assert j['source_nodes']==11827
+          assert j['all_previous_V10_nodes_and_access_routes_unchanged']
+          assert j['eight_district_locked_positions_preserved']
+          assert j['A01_original_interior_and_stairs_preserved']
+          assert j['baked_decorative_shapes']>=3000
+          assert j['batched_decorative_nodes']<165
+          assert j['character_collision']=='SKIPPED_AS_USER_REQUESTED'
+          print('PASS: fully decorated school outside in same one GLB',j['sha256'])
+          PY
+      - name: Preserve built V11 GLB and QA report on stage
+        run: |
+          set -euo pipefail
+          dst=model-viewer/staged-output/academy-exterior-finish-v11
+          mkdir -p "$dst"
+          cp candidate-output/academy-exterior-finish-v11/*.glb "$dst/"
+          cp candidate-output/academy-exterior-finish-v11/report.json "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(academy V11): batch-built Gothic exterior decorations'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
