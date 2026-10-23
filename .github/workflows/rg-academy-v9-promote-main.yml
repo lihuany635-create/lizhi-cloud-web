@@ -1,0 +1,53 @@
+name: RG Promote Academy V9 Locked Structural Shell To Original GLB
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v9-promote-main.yml'
+      - 'model-viewer/revisions/academy-locked-plan-v9/promote_structural_shell_to_main.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-academy-v9-canonical-shell
+  cancel-in-progress: true
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+          persist-credentials: false
+      - name: Verify source hashes and replace the SAME academy GLB
+        run: |
+          set -euo pipefail
+          python .academy-stage/model-viewer/revisions/academy-locked-plan-v9/promote_structural_shell_to_main.py
+      - name: Confirm scope limited to the one school
+        run: |
+          python - <<'PY'
+          import subprocess
+          allowed={'model-viewer/lahudi-academy.glb',
+             'model-viewer/current-models.json',
+             'model-viewer/index.html',
+             'model-viewer/backups/pre-academy-locked-plan-v9/lahudi-academy.glb'}
+          actual=set()
+          for line in subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],text=True).splitlines():
+             path=line[3:]
+             if path.startswith('.academy-stage/'):continue
+             actual.add(path)
+          assert actual==allowed,{'actual':actual,'wanted':allowed}
+          PY
+      - name: Commit canonical V9 updated school, backup and viewer cache
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/lahudi-academy.glb model-viewer/current-models.json model-viewer/index.html model-viewer/backups/pre-academy-locked-plan-v9/lahudi-academy.glb
+          git commit -m 'feat(academy V9): locked architectural exterior shells, valid walls roofs and covered walks'
+          git push origin HEAD:refs/heads/main
