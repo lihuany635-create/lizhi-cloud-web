@@ -1,0 +1,55 @@
+name: RG EP01 S01 V6 Door Openings
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - 'model-viewer/revisions/ep01-s01/scripts/enhance_s01_v6_open_doors.py'
+      - '.github/workflows/rg-ep01-s01-v6-openings.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build actual S01 V6 GLB using audited V5 base
+        run: |
+          python model-viewer/revisions/ep01-s01/scripts/enhance_s01_v6_open_doors.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('candidate-output/report_v6.json').read_text())
+          assert d['geometry_checks']=='PASS'
+          assert d['source_wall_node_id']==7675
+          assert d['original_wall_render_disabled'] is True
+          assert len(d['functional_open_door_apertures'])==6
+          assert d['disabled_decorative_leaf_and_panel_nodes']==42
+          assert d['original_side_stair_treads_preserved']>=20
+          assert d['S06_untouched'] is True
+          assert d['original_canonical_model_untouched'] is True
+          assert d['film_camera_match']=='NOT_RUN'
+          print('V6 geometry OK; SHA=',d['sha256'])
+          PY
+      - name: Preserve review candidate, no deployment or canonical replace
+        run: |
+          mkdir -p model-viewer/staged-output/ep01-s01/v6
+          cp candidate-output/lahudi-academy_ep01_s01_v6_open_doors_review.glb model-viewer/staged-output/ep01-s01/v6/
+          cp candidate-output/report_v6.json model-viewer/staged-output/ep01-s01/v6/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/v6/
+          if ! git diff --cached --quiet; then
+            git commit -m 'candidate(S01 V6): store GLB with actual openings for six corridor doors'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ep01-s01-v6-open-door-candidate
+          path: |
+            candidate-output/lahudi-academy_ep01_s01_v6_open_doors_review.glb
+            candidate-output/report_v6.json
+          retention-days: 30
