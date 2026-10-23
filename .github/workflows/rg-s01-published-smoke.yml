@@ -6,7 +6,7 @@ on:
       - '.github/workflows/rg-s01-published-smoke.yml'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   verify-live-preview:
     runs-on: ubuntu-latest
@@ -50,6 +50,21 @@ jobs:
           command -v google-chrome || command -v chromium || exit 0
           CHROME="$(command -v google-chrome || command -v chromium)"
           timeout 80s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl --window-size=1440,900 --virtual-time-budget=20000 --screenshot=candidate-output/s01-live-smoke/live-preview.png https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/ || true
+      - name: Persist live preview verification report and browser screenshot
+        run: |
+          mkdir -p model-viewer/staged-output/ep01-s01/live-preview-qa
+          cp candidate-output/s01-live-smoke/test_report.json model-viewer/staged-output/ep01-s01/live-preview-qa/
+          if test -s candidate-output/s01-live-smoke/live-preview.png; then
+            cp candidate-output/s01-live-smoke/live-preview.png model-viewer/staged-output/ep01-s01/live-preview-qa/
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/live-preview-qa/
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(S01): archive live published preview hash report and browser screenshot'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: rg-ep01-s01-preview-live-publish-qa
