@@ -4,6 +4,8 @@ on:
     branches: [rg-ep01-s01-stage-20261023]
     paths:
       - 'model-viewer/staged-output/academy-locked-plan-v9/report.json'
+      - '.github/workflows/rg-academy-v9-static-architecture-qa.yml'
+      - 'model-viewer/revisions/academy-locked-plan-v9/verify_structural_shell_v9.py'
   workflow_dispatch:
 permissions:
   contents: write
