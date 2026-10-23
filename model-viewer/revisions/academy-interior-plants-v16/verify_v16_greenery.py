@@ -31,7 +31,6 @@ assert m["new_plant_glb_assets"]==10 and m["source_plant_names_are_design_famili
 # each classroom pot stays on 1F or 2F and inside its mapped room
 source=json.loads(Path(".academy-stage/model-viewer/staged-output/academy-interior-furniture-v12/furniture-placements.json").read_text())
 rs={a["id"]:a for a in source["rooms"]}
-tables={x["room"]:[] for x in source["rooms"]}
 furn=collections.defaultdict(list)
 for x in source["placements"]:furn[x["room"]].append(x)
 seen=set();problems=[]
