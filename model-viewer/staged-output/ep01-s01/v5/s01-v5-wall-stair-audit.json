@@ -5,7 +5,54 @@
   "original_node_count": 7725,
   "inspected_total_nodes": 8121,
   "aabb_note": "Bounds are an aid only: rotation/parent hierarchy not included. Do not derive reliable collision from these numbers.",
-  "original_corridor_wall_or_door_nodes": [],
+  "original_corridor_wall_or_door_nodes": [
+    {
+      "id": 7674,
+      "name": "RG-GAME-02-CONFESS-005__end_wall",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -72.5,
+        4.0,
+        12.51,
+        -69.4,
+        7.3,
+        12.69
+      ]
+    },
+    {
+      "id": 7675,
+      "name": "RG-GAME-02-CONFESS-005__occlusion_wall",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -72.64,
+        4.0,
+        -8.2,
+        -72.46,
+        7.3,
+        10.2
+      ]
+    }
+  ],
   "original_stair_nodes": [
     {
       "id": 7720,
@@ -1576,6 +1623,121 @@
   ],
   "original_corridor_other_sample": [
     {
+      "id": 6598,
+      "name": "RG-GAME-02-ACOR-002__floor",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -72.5,
+        3.9,
+        -67.5,
+        -68.0,
+        4.0,
+        17.92
+      ]
+    },
+    {
+      "id": 7119,
+      "name": "RG-GAME-02-CONFESS-001__window_sill",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -68.8,
+        4.79,
+        3.0,
+        -68.6,
+        4.91,
+        9.0
+      ]
+    },
+    {
+      "id": 7120,
+      "name": "RG-GAME-02-CONFESS-001__frame",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -68.76,
+        4.85,
+        2.96,
+        -68.64,
+        6.95,
+        3.04
+      ]
+    },
+    {
+      "id": 7121,
+      "name": "RG-GAME-02-CONFESS-001__frame",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -68.76,
+        4.85,
+        5.96,
+        -68.64,
+        6.95,
+        6.04
+      ]
+    },
+    {
+      "id": 7122,
+      "name": "RG-GAME-02-CONFESS-001__frame",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -68.76,
+        4.85,
+        8.96,
+        -68.64,
+        6.95,
+        9.04
+      ]
+    },
+    {
       "id": 7637,
       "name": "RG-GAME-02-ACOR-002__light",
       "original": true,
@@ -1590,6 +1752,29 @@
         1
       ],
       "aabb_ignoring_rotation": null
+    },
+    {
+      "id": 7638,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -70.475,
+        7.11,
+        -8.275,
+        -69.925,
+        7.19,
+        -7.725
+      ]
     },
     {
       "id": 7639,
@@ -1608,6 +1793,29 @@
       "aabb_ignoring_rotation": null
     },
     {
+      "id": 7640,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -70.475,
+        7.11,
+        -0.275,
+        -69.925,
+        7.19,
+        0.275
+      ]
+    },
+    {
       "id": 7641,
       "name": "RG-GAME-02-ACOR-002__light",
       "original": true,
@@ -1624,6 +1832,29 @@
       "aabb_ignoring_rotation": null
     },
     {
+      "id": 7642,
+      "name": "RG-GAME-02-ACOR-002__light_fixture",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -70.475,
+        7.11,
+        7.725,
+        -69.925,
+        7.19,
+        8.275
+      ]
+    },
+    {
       "id": 7643,
       "name": "RG-GAME-02-ACOR-002__light",
       "original": true,
@@ -1638,6 +1869,121 @@
         1
       ],
       "aabb_ignoring_rotation": null
+    },
+    {
+      "id": 7674,
+      "name": "RG-GAME-02-CONFESS-005__end_wall",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -72.5,
+        4.0,
+        12.51,
+        -69.4,
+        7.3,
+        12.69
+      ]
+    },
+    {
+      "id": 7675,
+      "name": "RG-GAME-02-CONFESS-005__occlusion_wall",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -72.64,
+        4.0,
+        -8.2,
+        -72.46,
+        7.3,
+        10.2
+      ]
+    },
+    {
+      "id": 7676,
+      "name": "RG-GAME-02-CONFESS-005__side_header",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -72.64,
+        6.7,
+        10.2,
+        -72.46,
+        7.3,
+        12.5
+      ]
+    },
+    {
+      "id": 7677,
+      "name": "RG-GAME-02-CONFESS-005__turn_landing",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -74.5,
+        3.9,
+        10.2,
+        -72.45,
+        4.0,
+        12.5
+      ]
+    },
+    {
+      "id": 7721,
+      "name": "RG-GAME-02-CONFESS-005__ceiling",
+      "original": true,
+      "t": [
+        0,
+        0,
+        0
+      ],
+      "s": [
+        1,
+        1,
+        1
+      ],
+      "aabb_ignoring_rotation": [
+        -82.65,
+        7.3,
+        10.0,
+        -72.55,
+        7.42,
+        12.7
+      ]
     },
     {
       "id": 7722,
@@ -1688,6 +2034,7 @@
       "aabb_ignoring_rotation": null
     }
   ],
+  "search_method": "GLB mesh accessor world-coordinate AABB; original nodes often have translation=[0,0,0], so local-origin filtering alone is INVALID",
   "non_destructive": true,
   "decision": "DOOR_OPENING_UNVERIFIED_AND_ORIGINAL_SIDE_STAIR_REMAINS",
   "required_next": "Check world transforms and parent graph, then replace only targeted corridor wall geometry, or make scene-specific non-destructive visibility variants."
