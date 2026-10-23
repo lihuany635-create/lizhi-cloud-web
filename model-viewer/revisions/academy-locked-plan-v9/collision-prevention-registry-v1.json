@@ -1,0 +1,296 @@
+{
+  "schema": "rg-academy-clash-registry-v1",
+  "project": "現實遊戲",
+  "scene": "RG-GAME-02",
+  "model_version": "ACADEMY-LOCKED-PLAN-EXTERIOR-SHELL-V9",
+  "model_sha256": "ada3ae9c9e55f995b4c8c60f63655c01e572561e523e199ef1cdf298c7e668c3",
+  "audit_source": "model-viewer/staged-output/academy-locked-plan-v9/collision-audit-v1.json",
+  "reference_document": "https://docs.google.com/document/d/1UlrxFUNmu6-3u3vPwPkSDj7EOJcXICY74ms1m34wUNc/edit",
+  "collision_method": "GLB mesh AABB / static route clearance; no avatar capsule or triangle-level clash",
+  "status": "OPEN_BLOCKERS_REMAIN",
+  "release_policy": {
+    "no_canonical_upgrade_while_p0_open": true,
+    "preserve_locked_footprints": true,
+    "no_animation_clearance_claim_without_capsule_test": true,
+    "tolerance_aabb_m": 0.045,
+    "character_capsule_test_assumption": {
+      "height_m": 1.9,
+      "radius_m": 0.4,
+      "step_m": 0.25
+    },
+    "character_dimensions_are_provisional": true,
+    "pass_definitions": {
+      "P0": "Structural wall/portal/route level blocker verified repaired and re-audited",
+      "P1": "Design clearance dimensions validated and new geometry guarded",
+      "P2": "visual sections and exception joints documented; AABB false positives resolved"
+    }
+  },
+  "issues": [
+    {
+      "id": "C-01",
+      "priority": "P0",
+      "status": "OPEN",
+      "location": {
+        "x": -98,
+        "y": 1.5,
+        "z": 38
+      },
+      "route": "WEST_TO_D_WEST_X",
+      "kind": "SOLID_WALL",
+      "proposed": "Cut D west wall at Z36..40 while preserving pier, then swept-capsule check"
+    },
+    {
+      "id": "C-02",
+      "priority": "P0",
+      "status": "OPEN",
+      "location": {
+        "x": -33.5,
+        "y": 1.5,
+        "z": 24
+      },
+      "route": "EAST_TO_D_EAST",
+      "kind": "PORTAL_MISALIGNMENT",
+      "proposed": "Re-align C south door to corridor X[-34,-29] or build verified turning vestibule"
+    },
+    {
+      "id": "C-03",
+      "priority": "P0",
+      "status": "OPEN",
+      "location": {
+        "x": -105,
+        "y": 1.5,
+        "z": -112
+      },
+      "route": "E_TO_G_CHAPEL",
+      "kind": "DOOR_AXIS_OFFSET",
+      "proposed": "Match E opening and connector with genuine turn near G; 1m axis discrepancy"
+    },
+    {
+      "id": "C-04",
+      "priority": "P0",
+      "status": "OPEN",
+      "location": {
+        "x": -84,
+        "y": 1.5,
+        "z": -67.85
+      },
+      "route": "MAIN_TO_E_SOUTH",
+      "kind": "NARROW_EXISTING_DOOR",
+      "proposed": "North 3.2m vs 4m floor and south 2.66m vs4m; neck down gracefully or actually remodel door opening"
+    },
+    {
+      "id": "C-05",
+      "priority": "P0",
+      "status": "OPEN",
+      "location": {
+        "x": -84,
+        "y": 2,
+        "z": -67.85
+      },
+      "route": "MAIN_TO_E_SOUTH",
+      "kind": "LEVEL_MISMATCH_DESIGN",
+      "proposed": "Keep 1F ground link distinct from Y4 upper corridor; model real stairs and landings"
+    },
+    {
+      "id": "C-06",
+      "priority": "P1",
+      "status": "OPEN",
+      "location": {
+        "x": -70.25,
+        "y": 8,
+        "z": -25
+      },
+      "kind": "PROPOSED_FLOOR_VAULT_CONFLICT",
+      "proposed": "Do not span future Y8 third floor slab over candidate Y13.2 high A01 vault"
+    },
+    {
+      "id": "C-07",
+      "priority": "P1",
+      "status": "OPEN",
+      "location": {
+        "x": -70.25,
+        "y": 4,
+        "z": -25
+      },
+      "kind": "WIDTH_SOURCE_CONFLICT",
+      "proposed": "Resolve modeled X span 4.5m vs animation candidate net width 5.2m with keyframe scaling"
+    },
+    {
+      "id": "C-08",
+      "priority": "P1",
+      "status": "OPEN",
+      "location": {
+        "x": -2.2,
+        "y": 1.5,
+        "z": -151
+      },
+      "route": "F_TO_H_ARCHIVE",
+      "kind": "DOOR_FRAME_EDGE_CONTACT",
+      "proposed": "Measure door clear width after jambs and ensure turning capsule does not hit library furniture"
+    },
+    {
+      "id": "C-09",
+      "priority": "P1",
+      "status": "OPEN",
+      "location": {
+        "x": -121,
+        "y": 1.6,
+        "z": 38
+      },
+      "route": "WEST_TO_D_WEST_X",
+      "kind": "CORNER_PIER_INTRUSION",
+      "proposed": "Pull arcade piers outside agreed walkway protection envelope; scan both intersecting links"
+    },
+    {
+      "id": "C-10",
+      "priority": "P2",
+      "status": "OPEN",
+      "location": {
+        "x": -70.1,
+        "y": 14,
+        "z": 35
+      },
+      "kind": "TOWER_SIDE_CLEARANCE",
+      "proposed": "Keep existing tower axis and test 0.8m between tower and D wings in roof/waterproof joint sections"
+    },
+    {
+      "id": "C-11",
+      "priority": "P2",
+      "status": "OPEN",
+      "location": {
+        "x": -94,
+        "y": 12,
+        "z": -97
+      },
+      "kind": "ADJACENT_ROOF_AABB_CONTACT",
+      "proposed": "Check real E north roof/party wall intersections at X -94 and -62; distinguish expected structural joints"
+    },
+    {
+      "id": "C-12",
+      "priority": "P2",
+      "status": "BASELINE_PASS_RETEST_AFTER_MODIFICATION",
+      "location": {
+        "x": -88,
+        "y": 1.6,
+        "z": -10
+      },
+      "route": "WEST_TO_MAIN",
+      "kind": "REGRESSION_PREVENTION",
+      "proposed": "Preserve both east/west 1F courtyard access routes; rerun AABB+capsule after adding any decoration"
+    }
+  ],
+  "route_baseline": [
+    {
+      "route": "WEST_TO_MAIN",
+      "nominal_rect": [
+        -114,
+        -87.95,
+        -12,
+        -8.4
+      ],
+      "nominal_width_m": 3.6,
+      "aabb_candidate_count": 0
+    },
+    {
+      "route": "EAST_TO_MAIN",
+      "nominal_rect": [
+        -67.18,
+        -35,
+        -12,
+        -8.4
+      ],
+      "nominal_width_m": 3.6,
+      "aabb_candidate_count": 0
+    },
+    {
+      "route": "MAIN_TO_E_SOUTH",
+      "nominal_rect": [
+        -86,
+        -82,
+        -82,
+        -67.85
+      ],
+      "nominal_width_m": 4,
+      "aabb_candidate_count": 4
+    },
+    {
+      "route": "E_NORTH_TO_LIBRARY",
+      "nominal_rect": [
+        -47,
+        -43.4,
+        -142.75,
+        -112
+      ],
+      "nominal_width_m": 3.6,
+      "aabb_candidate_count": 3
+    },
+    {
+      "route": "E_TO_G_CHAPEL",
+      "nominal_rect": [
+        -107,
+        -103,
+        -125,
+        -112
+      ],
+      "nominal_width_m": 4,
+      "aabb_candidate_count": 6
+    },
+    {
+      "route": "F_TO_H_ARCHIVE",
+      "nominal_rect": [
+        -2.2,
+        4,
+        -154,
+        -149
+      ],
+      "nominal_width_m": 5,
+      "aabb_candidate_count": 4
+    },
+    {
+      "route": "WEST_TO_D_WEST_Z",
+      "nominal_rect": [
+        -125,
+        -121,
+        24,
+        40
+      ],
+      "nominal_width_m": 4,
+      "aabb_candidate_count": 3
+    },
+    {
+      "route": "WEST_TO_D_WEST_X",
+      "nominal_rect": [
+        -125,
+        -90,
+        36,
+        40
+      ],
+      "nominal_width_m": 4,
+      "aabb_candidate_count": 4
+    },
+    {
+      "route": "EAST_TO_D_EAST",
+      "nominal_rect": [
+        -34,
+        -29,
+        24,
+        36
+      ],
+      "nominal_width_m": 5,
+      "aabb_candidate_count": 4
+    },
+    {
+      "route": "MAIN_TO_ENTRANCE",
+      "nominal_rect": [
+        -72,
+        -68,
+        26.14,
+        40
+      ],
+      "nominal_width_m": 4,
+      "aabb_candidate_count": 4
+    }
+  ],
+  "locked_plan": "model-viewer/revisions/academy-locked-plan-v9/masterplan-v1.json",
+  "final_status": "V9_MODEL_NOT_MODIFIED_BY_AUDIT; CURRENT P0 ISSUES UNRESOLVED"
+}
