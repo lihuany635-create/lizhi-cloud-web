@@ -48,7 +48,8 @@ jobs:
           for line in raw.splitlines():
             value=line[3:]
             if ' -> ' in value:value=value.split(' -> ')[-1]
-            changed.add(value)
+            if value.startswith('.academy-stage/'):continue  # checkout of source artifacts is not a main change
+  changed.add(value)
           assert changed==allowed,{'got':changed,'wanted':allowed}
           PY
       - name: Commit whole academy replacement + viewer fix in one atomic main commit
