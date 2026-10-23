@@ -16,7 +16,7 @@ old,_,_=glb.load_glb(src)
 m,_,_=glb.load_glb(file)
 assert len(old["nodes"])==11174
 assert len(m["nodes"])==j["nodes"]
-assert m["nodes"][:11097] != old["nodes"][:11097]  # exactly 4 intentional wall openings
+assert m["nodes"][:11097] != old["nodes"][:11097]  # exactly 5 intentional wall openings
 cuts=set(j["actual_wall_portal_core_cuts"])
 changed=set()
 for idx in range(11097):
@@ -25,7 +25,7 @@ for idx in range(11097):
   assert a["name"]==b["name"] and "mesh" in a and "mesh" not in b
   assert b["extras"]["passage_original_mesh"]==a["mesh"]
   changed.add(a["name"])
-assert changed==cuts and len(changed)==4
+assert changed==cuts and len(changed)==5
 assert not any(n.get("name","").startswith("RG-GAME-02-CAMPUS-OPTIMIZED-V7__") for n in m["nodes"])
 new=[n for n in m["nodes"][11097:] if n["name"].startswith("RG-GAME-02-PLAN-LOCK-V9__")]
 assert len(new)==j["new_structure_nodes"] and len(new)>=620
@@ -79,8 +79,8 @@ def check_void(zone,axis,coordinate,opening_lo,opening_hi):
   part=(t[param]-s[param]/2,t[param]+s[param]/2)
   if min(part[1],opening_hi)-max(part[0],opening_lo)>.02:bad.append(n["name"])
  assert not bad,("Portal blocked",zone,axis,coordinate,opening_lo,opening_hi,bad[:4])
-check_void("B_WEST","x",-114,-14,-9)
-check_void("C_EAST","x",-35,-14,-9)
+check_void("B_WEST","x",-114,-12.2,-8.2)
+check_void("C_EAST","x",-35,-12.2,-8.2)
 check_void("E_CENTER_HALL","z",-82,-86,-82)
 check_void("E_CENTER_HALL","z",-112,-86,-82)
 check_void("E_EAST_LINK","z",-112,-47,-43)
@@ -95,7 +95,7 @@ re={"version":j["version"],"sha256":j["output_sha256"],
  "review_status":"STRUCTURAL_STATIC_PASS_VISUAL_PENDING",
  "locked_8_district_plan":True,"built_nine_submasses":True,
  "main_and_library_core_protected":True,
- "four_only_authorized_original_outer_wall_cuts":True,
+ "five_only_authorized_original_outer_wall_cuts":True,
  "actual_passage_lowerwall_voids_verified":True,
  "new_connector_slabs":10,"covered_connector_roofs":9,
  "shared_north_piers":8,"building_shell_gabled_roofs":9,
