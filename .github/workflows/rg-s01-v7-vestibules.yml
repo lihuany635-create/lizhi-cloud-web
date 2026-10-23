@@ -1,0 +1,100 @@
+name: RG EP01 S01 V7 Doorway Interiors
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-s01-v7-vestibules.yml'
+      - 'model-viewer/revisions/ep01-s01/scripts/enhance_s01_v7_vestibules.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-s01-v7-vestibules
+  cancel-in-progress: true
+jobs:
+  build-and-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build V7 real GLB from SHA-pinned V6
+        run: |
+          python model-viewer/revisions/ep01-s01/scripts/enhance_s01_v7_vestibules.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('candidate-output/report_v7.json')
+          x=json.loads(p.read_text())
+          assert x['added_nodes']>=80
+          assert len(x['vestibules'])==6
+          assert x['validation']['V6_node_graph_unchanged'] is True
+          assert x['validation']['six_openings_preserved'] is True
+          assert x['validation']['no_new_geometry_in_S06'] is True
+          assert x['validation']['glb_reparse']=='PASS'
+          print('V7 GLB gates PASS',x['sha256'],'nodes',x['added_nodes'])
+          PY
+      - name: Prepare actual WebGL V7 preview from public V5 UI without changing public site
+        run: |
+          mkdir -p candidate-output/v7-preview
+          cp candidate-output/lahudi-academy_ep01_s01_v7_vestibules_review.glb candidate-output/v7-preview/lahudi-academy-s01-v7.glb
+          curl -fsSL --connect-timeout 12 --max-time 60 --retry 2 https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/ -o candidate-output/v7-preview/index.html
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('candidate-output/v7-preview')
+          x=json.loads(Path('candidate-output/report_v7.json').read_text())
+          s=(root/'index.html').read_text()
+          old='c875ba7f00814840723615942a523e9617d55457f3943216325b61343461e66e'
+          assert old in s and 'lahudi-academy-s01-v5.glb' in s
+          s=s.replace(old,x['sha256']).replace('lahudi-academy-s01-v5.glb','lahudi-academy-s01-v7.glb')
+          s=s.replace('S01 V5','S01 V7').replace('5,508,420',f"{x['bytes']:,}").replace('5.51 MB',f"{x['bytes']/1000000:.2f} MB")
+          s=s.replace('本頁顯示真正的 S01 V5 GLB','本頁顯示真正的 S01 V7 GLB')
+          (root/'index.html').write_text(s)
+          print('V7 WebGL local test page configured')
+          PY
+      - name: Render real GLB in browser and verify image
+        run: |
+          set -e
+          python3 -m http.server 8127 --bind 127.0.0.1 --directory candidate-output/v7-preview > candidate-output/v7-http.log 2>&1 &
+          sleep 2
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 90s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl --window-size=1440,900 --virtual-time-budget=16000 --screenshot=candidate-output/v7-corridor.png http://127.0.0.1:8127/
+          test "$(stat -c %s candidate-output/v7-corridor.png)" -gt 50000
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('candidate-output/v7-preview')
+          s=(root/'index.html').read_text()
+          old='pos:[-70.42,5.49,-5.2],target:[-70.43,5.40,9.0],fov:71'
+          assert old in s,'Preview camera changed - revisit side-shot calibration'
+          s=s.replace(old,'pos:[-70.25,5.65,-2.1],target:[-74.35,5.36,-2.1],fov:73')
+          (root/'index.html').write_text(s)
+          PY
+          timeout 90s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl --window-size=1440,900 --virtual-time-budget=18000 --screenshot=candidate-output/v7-doorway-side.png http://127.0.0.1:8127/
+          test "$(stat -c %s candidate-output/v7-doorway-side.png)" -gt 50000
+      - name: Save V7 candidate model and QA frames on isolated branch only
+        run: |
+          mkdir -p model-viewer/staged-output/ep01-s01/v7
+          cp candidate-output/lahudi-academy_ep01_s01_v7_vestibules_review.glb model-viewer/staged-output/ep01-s01/v7/
+          cp candidate-output/report_v7.json model-viewer/staged-output/ep01-s01/v7/
+          cp candidate-output/v7-corridor.png model-viewer/staged-output/ep01-s01/v7/
+          cp candidate-output/v7-doorway-side.png model-viewer/staged-output/ep01-s01/v7/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/v7/
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(S01): preserve V7 vestibule GLB and two real WebGL QA images'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rg-ep01-s01-v7-glb-browser-qa
+          path: |
+            candidate-output/report_v7.json
+            candidate-output/v7-corridor.png
+            candidate-output/v7-doorway-side.png
+          retention-days: 30
