@@ -1,0 +1,62 @@
+name: RG Promote Completed Academy V5 To Canonical Main
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-promote-academy-v5-to-main.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-promote-academy-v5-to-main
+  cancel-in-progress: true
+jobs:
+  atomic-promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - name: Checkout latest canonical main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - name: Read completed academy V5 artifact from stage branch
+        uses: actions/checkout@v4
+        with:
+          ref: rg-ep01-s01-stage-20261023
+          path: .academy-stage
+          persist-credentials: false
+      - name: Promote with exact hashes and durable backup
+        run: |
+          set -euo pipefail
+          python .academy-stage/model-viewer/revisions/academy-all-corridors/promote_rebuilt_academy_to_main.py
+      - name: Fail closed if any other main scene file changed
+        run: |
+          set -euo pipefail
+          echo 'Changed paths:'
+          git status --short
+          python - <<'PY'
+          import subprocess
+          allowed={
+            'model-viewer/lahudi-academy.glb',
+            'model-viewer/index.html',
+            'model-viewer/current-models.json',
+            'model-viewer/backups/pre-academy-rb2-exterior-v5/lahudi-academy.glb'
+          }
+          raw=subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],text=True)
+          changed=set()
+          for line in raw.splitlines():
+            value=line[3:]
+            if ' -> ' in value:value=value.split(' -> ')[-1]
+            changed.add(value)
+          assert changed==allowed,{'got':changed,'wanted':allowed}
+          PY
+      - name: Commit whole academy replacement + viewer fix in one atomic main commit
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/lahudi-academy.glb model-viewer/index.html model-viewer/current-models.json model-viewer/backups/pre-academy-rb2-exterior-v5/lahudi-academy.glb
+          git commit -m 'feat(academy): replace old oversized exterior with fully colored RB2 Gothic school in canonical GLB'
+          git push origin HEAD:refs/heads/main
+          echo 'CANONICAL MAIN PROMOTED'
