@@ -1,0 +1,30 @@
+name: RG Academy All Corridor Geometry Audit
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-corridor-audit.yml'
+      - 'model-viewer/revisions/academy-all-corridors/audit_academy.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inventory true GLB without rendering
+        run: |
+          set -euo pipefail
+          python model-viewer/revisions/academy-all-corridors/audit_academy.py
+      - name: Save evidence in staging branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/academy-corridor-audit/inventory.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'audit(academy): preserve actual full school node map'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
