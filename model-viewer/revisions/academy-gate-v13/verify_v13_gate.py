@@ -17,11 +17,11 @@ def bb(piece):
  for x in (-.5,.5):
   for y in (-.5,.5):
    for z in (-.5,.5):
-    x*=sx;y*=sy;z*=sz
-    X=math.cos(a)*x+math.sin(a)*z
-    Z=-math.sin(a)*x+math.cos(a)*z
-    xx=math.cos(b)*X-math.sin(b)*y
-    yy=math.sin(b)*X+math.cos(b)*y
+    xp=x*sx;yp=y*sy;zp=z*sz
+    X=math.cos(a)*xp+math.sin(a)*zp
+    Z=-math.sin(a)*xp+math.cos(a)*zp
+    xx=math.cos(b)*X-math.sin(b)*yp
+    yy=math.sin(b)*X+math.cos(b)*yp
     ans.append((cx+xx,cy+yy,cz+Z))
  return [(min(v[k] for v in ans),max(v[k] for v in ans)) for k in range(3)]
 def hit(p,volume,thresh=.01):
