@@ -235,9 +235,9 @@ roofrise=1.30
 roofspan=math.hypot(3.4,roofrise)
 pitch=math.atan2(roofrise,3.4)
 box("GATEHOUSE","GUARD_SLOPE_WEST","roof",-101.57,4.15,71.5,
-     roofspan,.20,8.55,"gatehouse_roof_slope",roll=-pitch)
-box("GATEHOUSE","GUARD_SLOPE_EAST","roof",-98.43,4.15,71.5,
      roofspan,.20,8.55,"gatehouse_roof_slope",roll=pitch)
+box("GATEHOUSE","GUARD_SLOPE_EAST","roof",-98.43,4.15,71.5,
+     roofspan,.20,8.55,"gatehouse_roof_slope",roll=-pitch)
 box("GATEHOUSE","GUARD_RIDGE","iron",-100,4.82,71.5,.22,.28,8.60,"gatehouse_ridge")
 # Interior simple check-in desk, not a blocking route
 box("GATEHOUSE","GUARD_DESK","oak",-100.8,.79,70.5,1.40,.13,.74,
