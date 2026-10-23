@@ -1,0 +1,81 @@
+name: RG EP01 S01 V4 Stair and Camera QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - 'model-viewer/revisions/ep01-s01/scripts/enhance_s01_v4.py'
+      - 'model-viewer/revisions/ep01-s01/scripts/render_s01_blender_v4.py'
+      - '.github/workflows/rg-ep01-s01-v4.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: rg-s01-v4-staged
+  cancel-in-progress: true
+jobs:
+  build-and-render-v4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build V4 without touching original GLB
+        run: |
+          python model-viewer/revisions/ep01-s01/scripts/enhance_s01_v4.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path("candidate-output/report_v4.json").read_text())
+          assert j["validation"]["glb_reparse"]=="PASS"
+          assert j["validation"]["preexisting_nodes_untouched"]=="PASS"
+          assert j["validation"]["S06_untouched"] is True
+          assert j["left_doors_right_windows_view"]=="+Z looking -Z"
+          assert j["tread_count"]==14
+          print("S01_V4_GLTF_OK",j["output_sha256"],j["added_nodes_stage4"])
+          PY
+      - name: Install Blender for real GLB camera QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq blender python3-numpy libegl1 libgl1-mesa-dri libgbm1 xvfb
+          blender --version | head -n 3
+      - name: Render three V4 engineering cameras
+        run: |
+          LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a blender --background --python-exit-code 17 --python model-viewer/revisions/ep01-s01/scripts/render_s01_blender_v4.py -- candidate-output/lahudi-academy_ep01_s01_corridor_v4_stair_review.glb
+      - name: Check and stage GLB and PNGs
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("candidate-output/blender_v4")
+          r=json.loads((p/"render_report.json").read_text())
+          assert r["corridor_meshes_rendered"]>10,r
+          assert len(r["image_files"])==3,r
+          for name in r["image_files"]:
+            assert Path(name).stat().st_size>10000,name
+          print("S01_V4_BLENDER_QA_IMAGES",r["corridor_meshes_rendered"],r["image_files"])
+          PY
+          mkdir -p model-viewer/staged-output/ep01-s01/v4/blender
+          cp candidate-output/lahudi-academy_ep01_s01_corridor_v4_stair_review.glb model-viewer/staged-output/ep01-s01/v4/
+          cp candidate-output/report_v4.json model-viewer/staged-output/ep01-s01/v4/
+          cp candidate-output/blender_v4/*.png model-viewer/staged-output/ep01-s01/v4/blender/
+          cp candidate-output/blender_v4/render_report.json model-viewer/staged-output/ep01-s01/v4/blender/
+      - name: Commit revision artifacts only to isolated branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/v4/
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(S01): V4 far stair and correct-hand camera real Blender QA'
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rg-ep01-s01-v4-candidate-and-three-blender-renders
+          path: |
+            candidate-output/lahudi-academy_ep01_s01_corridor_v4_stair_review.glb
+            candidate-output/report_v4.json
+            candidate-output/blender_v4/
+          retention-days: 30
