@@ -1,0 +1,53 @@
+name: RG EP01 S01 V5 GLB Delivery
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-ep01-s01-v5-delivery.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build-archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Build and validate S01 V5 without installing Blender
+        run: |
+          python model-viewer/revisions/ep01-s01/scripts/enhance_s01_v5.py
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          p=Path("candidate-output/lahudi-academy_ep01_s01_corridor_v5_art_review.glb")
+          j=json.loads(Path("candidate-output/report_v5.json").read_text())
+          assert p.is_file() and p.stat().st_size>5400000
+          assert hashlib.sha256(p.read_bytes()).hexdigest()==j["sha256"]
+          assert j["source_7725_nodes_unchanged"] is True
+          assert j["S06_untouched"] is True
+          assert j["author_acceptance"]=="PENDING"
+          print("V5 DELIVERABLE SHA256",j["sha256"],"size",p.stat().st_size)
+          PY
+      - name: Save candidate and provenance to isolated branch
+        run: |
+          mkdir -p model-viewer/staged-output/ep01-s01/v5/
+          cp candidate-output/lahudi-academy_ep01_s01_corridor_v5_art_review.glb model-viewer/staged-output/ep01-s01/v5/
+          cp candidate-output/report_v5.json model-viewer/staged-output/ep01-s01/v5/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add model-viewer/staged-output/ep01-s01/v5/
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifact(S01): preserve v5 review GLB even when Blender renderer unavailable'
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rg-s01-v5-glb-independent-of-render
+          path: |
+            candidate-output/lahudi-academy_ep01_s01_corridor_v5_art_review.glb
+            candidate-output/report_v5.json
+          retention-days: 30
