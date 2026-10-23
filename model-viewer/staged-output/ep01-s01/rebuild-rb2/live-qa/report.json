@@ -1,0 +1,16 @@
+{
+  "site": "https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/s01-preview/rebuild-rb2/",
+  "sha256": "225415dfdf0721db9acb744d20f5276af7136b6bc718f807032dbb1614e2ee17",
+  "bytes": 843444,
+  "checks": {
+    "html_ok": true,
+    "rb2_header": true,
+    "model_name_correct": true,
+    "glb_magic": true,
+    "glb_bytes": true,
+    "glb_sha256": true,
+    "canonical_not_overwritten": true
+  },
+  "author_accepted": false,
+  "film_overlay": "NOT_RUN"
+}
