@@ -1,0 +1,76 @@
+name: RG Academy V6 Live Mobile Viewer Visual QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v6-mobile-viewer-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  check-live-site:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm public V6 official GLB and manifest
+        run: |
+          set -euo pipefail
+          mkdir -p candidate-output/academy-v6-live
+          URL=https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer
+          curl --fail --show-error -L --retry 12 --retry-delay 4 --retry-all-errors --max-time 150 "$URL/" -o candidate-output/academy-v6-live/index.html
+          curl --fail --show-error -L --retry 12 --retry-delay 4 --retry-all-errors --max-time 150 "$URL/current-models.json?v=20261023-academy-rb2-v6" -o candidate-output/academy-v6-live/manifest.json
+          curl --fail --show-error -L --retry 12 --retry-delay 4 --retry-all-errors --max-time 150 "$URL/lahudi-academy.glb?v=rb2-entire-campus-20261023" -o candidate-output/academy-v6-live/model.glb
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,struct,json
+          p=Path('candidate-output/academy-v6-live')
+          raw=(p/'model.glb').read_bytes()
+          j=json.loads((p/'manifest.json').read_text())
+          m=next(x for x in j['models'] if x['model']=='lahudi-academy.glb')
+          sha=hashlib.sha256(raw).hexdigest()
+          assert raw[:4]==b'glTF' and struct.unpack_from('<I',raw,8)[0]==len(raw)
+          assert len(raw)==9315360 and sha=='e3d2465807cba69ba52a3d1df2a9e3f84a77a970f94301bdeaecd26537d5a6bc'
+          assert m['current_sha256']==sha and m['version']=='ACADEMY-RB2-ENTIRE-CAMPUS-V6'
+          html=(p/'index.html').read_text()
+          assert 'id="academyViews"' in html
+          assert '主教學樓' in html and '整座學院' in html
+          assert 'lahudi-academy.glb?v=rb2-entire-campus-20261023' in html
+          print('PUBLIC V6 MODEL AND MOBILE SCHOOL CONTROLS VERIFIED',sha)
+          PY
+      - name: Real mobile-ratio Chrome WebGL viewer and screenshot for QA
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 145s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage \
+            --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl \
+            --force-device-scale-factor=1 --window-size=720,1440 --virtual-time-budget=60000 \
+            --screenshot=candidate-output/academy-v6-live/official-academy-mobile.png \
+            'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/#lahudi-academy'
+          test "$(stat -c %s candidate-output/academy-v6-live/official-academy-mobile.png)" -gt 50000
+          timeout 145s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage \
+            --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl \
+            --force-device-scale-factor=1 --window-size=720,1440 --virtual-time-budget=60000 \
+            --dump-dom 'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/#lahudi-academy' > candidate-output/academy-v6-live/dom.html
+          python - <<'PY'
+          from pathlib import Path
+          dom=Path('candidate-output/academy-v6-live/dom.html').read_text()
+          assert 'ACADEMY-RB2-ENTIRE-CAMPUS-V6' in dom, "No V6 model version in Chrome DOM"
+          assert 'id="academyViews"' in dom
+          assert 'id="viewerVersion"' in dom
+          print('OFFICIAL V6 VIEWER CHROME PASS')
+          PY
+      - name: Save V6 evidence without separate public viewer
+        run: |
+          set -euo pipefail
+          p=model-viewer/staged-output/academy-entire-campus-v6/live-mobile-qa
+          mkdir -p "$p"
+          cp candidate-output/academy-v6-live/official-academy-mobile.png "$p/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$p"
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy V6): archive true public official-school mobile Chrome screenshot'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
