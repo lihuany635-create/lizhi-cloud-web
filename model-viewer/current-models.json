@@ -66,7 +66,7 @@
       "integrated_contents": "One official academy V15 GLB. All existing V14 anime gate, V12 44 provisional school rooms and 1734 procedural furniture, V11 exterior, original A01 and library furniture preserved. The former F_LIBRARY solid north-end wall is replaced by 3m actual back door, adjoining Vitti winter rear garden 36m × 28m with central lawn, loop stone walks, 3 wooden benches, 6 hardy flowerbeds, 4 leafless trees, 4 lamps, one story-marked potted plant for Bessie, and low garden perimeter stone-and-iron railings. Placement behind library is cinema-design inference, not explicitly specified by source novel.",
       "author_full_item_approval": "PENDING",
       "static_geometry_qa": "PASS: 10 1F routes + 3 stair/upper walk centerline radius-0.4m clearance checks, 26 3D stair treads obstacle-free AABB, 3.55m modeled roof headroom",
-      "visual_qa": "V15_STATIC_GEOMETRY_QA_PASS__PUBLIC_VISUAL_PENDING",
+      "visual_qa": "PASS_PUBLIC_GARDEN_3D_PRESENT__STILL_PROVISIONAL_LOW_POLY_STYLE",
       "wing_interiors": "PARTIALLY_MODELED_44_PROVISIONAL_BC_ROOMS_AND_SELECTED_SHARED_SPACES",
       "mobile_performance_note": "Reduced new campus mesh draws by 5068; device FPS unverified",
       "design_book": "https://docs.google.com/document/d/1seSK9uMrnNV2_Mh1RwmG50JtjFgXqJzHOQoCqiNFTPQ/edit?usp=drivesdk",
@@ -97,13 +97,16 @@
       "garden_footprint_rect_m2": 1008,
       "garden_built_mesh_components": 261,
       "library_true_rear_exit_portal_m": [
-        3.0,
+        3,
         3.6
       ],
       "garden_path_qa": "PASS_STATIC_7_APPROACHES_ZERO_BLOCKERS",
       "garden_story_grounding": "NOVEL_CH07 winter garden, isolated corner pot, hardy plants, solitary Bessie",
       "garden_library_adjacency": "DESIGN_INFERENCE_PENDING_AUTHOR_APPROVAL",
-      "garden_visual_qa": "PENDING_PUBLIC_RENDER"
+      "garden_visual_qa": "PASS_PUBLIC_REAL_SCHOOL_GLB_SCREENSHOT__ART_STYLE_NOT_FINAL",
+      "garden_public_screenshot": "https://github.com/lihuany635-create/lizhi-cloud-web/blob/rg-ep01-s01-stage-20261023/model-viewer/staged-output/academy-rear-garden-v15/public-qa/garden-actual-cdp.png",
+      "garden_art_followup": "Rear F facade appears flat, winter garden vegetation and stone materials are simple low-poly; next stage is detail lighting/wall Gothic relief and art-direction review against original A01 shots.",
+      "garden_browser_test_limit": "CDP lexical WebGL stats unavailable (N/A), but binary SHA, visible official model and actual screenshot verified."
     }
   ]
 }
