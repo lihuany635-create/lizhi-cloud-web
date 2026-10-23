@@ -1,0 +1,459 @@
+{
+  "sha256": "f1177cd51f89f6a5ba1176951d2a94d2f80d68f45460ce166e1f0814d6b69ba6",
+  "version": "ACADEMY-LOCKED-PLAN-COLLISION-REPAIR-V10",
+  "stair_tread_count": 26,
+  "riser_m": 0.149,
+  "full_rise_m": 3.874,
+  "upper_walkway_y_m": 4.0,
+  "headroom_under_repaired_north_link_roof_m": 3.55,
+  "treads": [
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_00",
+      "step": 1,
+      "top_y": 0.275,
+      "center_xz": [
+        -92.4,
+        -78.675
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_01",
+      "step": 2,
+      "top_y": 0.424,
+      "center_xz": [
+        -92.4,
+        -78.325
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_02",
+      "step": 3,
+      "top_y": 0.573,
+      "center_xz": [
+        -92.4,
+        -77.975
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_03",
+      "step": 4,
+      "top_y": 0.722,
+      "center_xz": [
+        -92.4,
+        -77.625
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_04",
+      "step": 5,
+      "top_y": 0.871,
+      "center_xz": [
+        -92.4,
+        -77.275
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_05",
+      "step": 6,
+      "top_y": 1.02,
+      "center_xz": [
+        -92.4,
+        -76.925
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_06",
+      "step": 7,
+      "top_y": 1.169,
+      "center_xz": [
+        -92.4,
+        -76.575
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_07",
+      "step": 8,
+      "top_y": 1.318,
+      "center_xz": [
+        -92.4,
+        -76.225
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_08",
+      "step": 9,
+      "top_y": 1.467,
+      "center_xz": [
+        -92.4,
+        -75.875
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_09",
+      "step": 10,
+      "top_y": 1.616,
+      "center_xz": [
+        -92.4,
+        -75.525
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_10",
+      "step": 11,
+      "top_y": 1.765,
+      "center_xz": [
+        -92.4,
+        -75.175
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_11",
+      "step": 12,
+      "top_y": 1.914,
+      "center_xz": [
+        -92.4,
+        -74.825
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_0_12",
+      "step": 13,
+      "top_y": 2.063,
+      "center_xz": [
+        -92.4,
+        -74.475
+      ],
+      "blocking_shell_meshes": []
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_00",
+      "step": 14,
+      "top_y": 2.212,
+      "center_xz": [
+        -89.95,
+        -74.475
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_01",
+      "step": 15,
+      "top_y": 2.361,
+      "center_xz": [
+        -89.95,
+        -74.825
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_02",
+      "step": 16,
+      "top_y": 2.51,
+      "center_xz": [
+        -89.95,
+        -75.175
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_03",
+      "step": 17,
+      "top_y": 2.659,
+      "center_xz": [
+        -89.95,
+        -75.525
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_04",
+      "step": 18,
+      "top_y": 2.808,
+      "center_xz": [
+        -89.95,
+        -75.875
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_05",
+      "step": 19,
+      "top_y": 2.957,
+      "center_xz": [
+        -89.95,
+        -76.225
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_06",
+      "step": 20,
+      "top_y": 3.106,
+      "center_xz": [
+        -89.95,
+        -76.575
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_07",
+      "step": 21,
+      "top_y": 3.255,
+      "center_xz": [
+        -89.95,
+        -76.925
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_08",
+      "step": 22,
+      "top_y": 3.404,
+      "center_xz": [
+        -89.95,
+        -77.275
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_09",
+      "step": 23,
+      "top_y": 3.553,
+      "center_xz": [
+        -89.95,
+        -77.625
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_10",
+      "step": 24,
+      "top_y": 3.702,
+      "center_xz": [
+        -89.95,
+        -77.975
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_11",
+      "step": 25,
+      "top_y": 3.851,
+      "center_xz": [
+        -89.95,
+        -78.325
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_12",
+      "step": 26,
+      "top_y": 4.0,
+      "center_xz": [
+        -89.95,
+        -78.675
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    }
+  ],
+  "obstructed_tread_count": 13,
+  "obstructed_treads": [
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_00",
+      "step": 14,
+      "top_y": 2.212,
+      "center_xz": [
+        -89.95,
+        -74.475
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_01",
+      "step": 15,
+      "top_y": 2.361,
+      "center_xz": [
+        -89.95,
+        -74.825
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_02",
+      "step": 16,
+      "top_y": 2.51,
+      "center_xz": [
+        -89.95,
+        -75.175
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_03",
+      "step": 17,
+      "top_y": 2.659,
+      "center_xz": [
+        -89.95,
+        -75.525
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_04",
+      "step": 18,
+      "top_y": 2.808,
+      "center_xz": [
+        -89.95,
+        -75.875
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_05",
+      "step": 19,
+      "top_y": 2.957,
+      "center_xz": [
+        -89.95,
+        -76.225
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_06",
+      "step": 20,
+      "top_y": 3.106,
+      "center_xz": [
+        -89.95,
+        -76.575
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_07",
+      "step": 21,
+      "top_y": 3.255,
+      "center_xz": [
+        -89.95,
+        -76.925
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_08",
+      "step": 22,
+      "top_y": 3.404,
+      "center_xz": [
+        -89.95,
+        -77.275
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_09",
+      "step": 23,
+      "top_y": 3.553,
+      "center_xz": [
+        -89.95,
+        -77.625
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_10",
+      "step": 24,
+      "top_y": 3.702,
+      "center_xz": [
+        -89.95,
+        -77.975
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_11",
+      "step": 25,
+      "top_y": 3.851,
+      "center_xz": [
+        -89.95,
+        -78.325
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    },
+    {
+      "tread": "RG-GAME-02-P0-FIX-V10__STAIR_1_12",
+      "step": 26,
+      "top_y": 4.0,
+      "center_xz": [
+        -89.95,
+        -78.675
+      ],
+      "blocking_shell_meshes": [
+        "RG-GAME-02-P0-FIX-V10__UPPER_SKYWALK_RAIL_left"
+      ]
+    }
+  ],
+  "geometry_stair_and_headroom_gate": "FAIL",
+  "scope": "visible AABB of structural walls/guardrails at all 26 tread centers; not physical-body articulation or stair building-code compliance",
+  "fixed_plan_coordinates_still_authoritative": true
+}
