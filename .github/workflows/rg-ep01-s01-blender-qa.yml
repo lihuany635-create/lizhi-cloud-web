@@ -17,8 +17,9 @@ jobs:
       - name: Install Blender
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq blender
+          sudo apt-get install -y -qq blender python3-numpy
           blender --version | head -n 3
+          blender --background --python-exit-code 17 --python-expr 'import numpy; print("Blender NumPy", numpy.__version__)'
       - name: Inspect S01 GLB from staged output, do not regenerate the base
         run: |
           blender --background --python-exit-code 17 --python model-viewer/revisions/ep01-s01/scripts/render_s01_blender.py -- model-viewer/staged-output/ep01-s01/lahudi-academy_ep01_s01_corridor_v3_review.glb
