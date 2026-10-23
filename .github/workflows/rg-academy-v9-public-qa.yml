@@ -1,0 +1,42 @@
+name: RG Academy V9 Official School Public GLB QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v9-public-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-glb:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate exact live official school V9 and book crosslink
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/academy-v9-live
+          B='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer'
+          curl -fSL --retry 10 --retry-all-errors --retry-delay 3 --max-time 145 "$B/" -o /tmp/academy-v9-live/index.html
+          curl -fSL --retry 10 --retry-all-errors --retry-delay 3 --max-time 145 "$B/current-models.json?v=20261023-academy-rb2-v9" -o /tmp/academy-v9-live/manifest.json
+          curl -fSL --retry 10 --retry-all-errors --retry-delay 3 --max-time 145 "$B/lahudi-academy.glb?v=rb2-locked-plan-shell-v9-20261023" -o /tmp/academy-v9-live/school.glb
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,struct,json
+          d=Path('/tmp/academy-v9-live')
+          html=(d/'index.html').read_text()
+          m=json.loads((d/'manifest.json').read_text())
+          school=next(s for s in m['models'] if s['model']=='lahudi-academy.glb')
+          raw=(d/'school.glb').read_bytes()
+          sha=hashlib.sha256(raw).hexdigest()
+          assert raw[:4]==b'glTF' and struct.unpack_from('<I',raw,8)[0]==len(raw)
+          assert len(raw)==11290536
+          assert sha=='ada3ae9c9e55f995b4c8c60f63655c01e572561e523e199ef1cdf298c7e668c3'
+          assert school['version']=='ACADEMY-LOCKED-PLAN-EXTERIOR-SHELL-V9'
+          assert school['current_sha256']==sha
+          assert 'rb2-locked-plan-shell-v9-20261023' in html
+          assert 'current-models.json?v=20261023-academy-rb2-v9' in html
+          assert 'id="academyViews"' in html
+          print('PASS: exact public V9 official whole school and manifest:',sha)
+          PY
