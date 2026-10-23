@@ -1,0 +1,51 @@
+{
+  "pass": true,
+  "model_sha256": "347ba0a423726d4a2c83e1ddc568509a5b3ac35ca99dc6019f513085053b842f",
+  "model_bytes": 7310612,
+  "original_academic_interior_saved": true,
+  "old_oversized_exterior_meshes_disabled": 6586,
+  "fake_V4_facade_decorations_removed": 5115,
+  "new_whole_school_geometry_nodes": 1852,
+  "preserved_classroom_and_library_meshed_anchors": 6,
+  "new_material_contrast_validated": true,
+  "explicit_color_examples": {
+    "roof_rgba": [
+      0.085,
+      0.125,
+      0.19,
+      1
+    ],
+    "stone_rgba": [
+      0.4,
+      0.46,
+      0.56,
+      1
+    ],
+    "oak_rgba": [
+      0.25,
+      0.11,
+      0.062,
+      1
+    ],
+    "glass_rgba": [
+      0.3,
+      0.56,
+      0.77,
+      0.72
+    ],
+    "gold_rgba": [
+      0.74,
+      0.49,
+      0.19,
+      1
+    ]
+  },
+  "actual_main_school_envelope_bounds_validated": true,
+  "actual_library_furniture_envelope_bounds_validated": true,
+  "continuous_cloister_floor_AABB_validated": true,
+  "native_rooftop_and_entrance_stairs_not_removed": true,
+  "contains_existing_RB2_full_corridor": true,
+  "render": "NOT_RUN",
+  "actor_walk_and_visual_verification": "PENDING",
+  "note": "No visual claim from numeric color factors. PBR checks prove materials are not pure-white, not how final illumination appears."
+}
