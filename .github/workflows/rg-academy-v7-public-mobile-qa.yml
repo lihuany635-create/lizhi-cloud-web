@@ -47,20 +47,20 @@ jobs:
             --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl \
             --force-device-scale-factor=1 --window-size=720,1380 \
             --virtual-time-budget=10000 \
-            --screenshot=candidate-output/academy-v7-public-mobile/mobile-quickview.png \
+            --screenshot=candidate-output/academy-v7-public-mobile/mobile-quickview-framed.png \
             'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/#lahudi-academy'
-          test "$(stat -c %s candidate-output/academy-v7-public-mobile/mobile-quickview.png)" -gt 45000
+          test "$(stat -c %s candidate-output/academy-v7-public-mobile/mobile-quickview-framed.png)" -gt 45000
           echo 'mobile-sized production screenshot exists'
       - name: Archive short Chrome inspection evidence (not a separate model)
         run: |
           dst=model-viewer/staged-output/academy-entire-campus-optimized-v7/mobile-qa
           mkdir -p "$dst"
-          cp candidate-output/academy-v7-public-mobile/mobile-quickview.png "$dst/"
+          cp candidate-output/academy-v7-public-mobile/mobile-quickview-framed.png "$dst/"
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$dst"
           if ! git diff --cached --quiet; then
-            git commit -m 'qa(academy V7): public official school mobile Chrome quickview'
+            git commit -m 'qa(academy V7): public official school corrected instant-camera mobile view'
             git pull --rebase origin rg-ep01-s01-stage-20261023
             git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
           fi
