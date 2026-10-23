@@ -1,103 +1,93 @@
-(function () {
-  "use strict";
-
-  const ALLOWED_EMAIL = "lihuany635@gmail.com";
-  const params = new URLSearchParams(location.search);
-  const authorizationId = params.get("authorization_id");
-  const message = document.querySelector("#message");
-  const approveButton = document.querySelector("#approve");
-  const denyButton = document.querySelector("#deny");
-  const clientName = document.querySelector("#client-name");
-  const clientDetail = document.querySelector("#client-detail");
-  const client = window.supabase.createClient(
-    window.LIZHI_SUPABASE_URL,
-    window.LIZHI_SUPABASE_PUBLISHABLE_KEY,
-    { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } },
-  );
-
-  function setBusy(busy) {
-    approveButton.disabled = busy;
-    denyButton.disabled = busy;
+/* Isolated OAuth 2.1 consent UI; never autoforwards approval.
+ * Browser client uses public Supabase publishable key and existing website auth session.
+ * Supabase OAuth Server must be enabled separately in the Dashboard.
+ */
+(function(){
+'use strict';
+const OWNER_EMAIL='lihuany635@gmail.com';
+const PENDING_KEY='lizhi_mobile_pending_oauth_authorization_v1';
+const id=new URL(location.href).searchParams.get('authorization_id');
+const notice=document.querySelector('#notice');
+const details=document.querySelector('#details');
+const login=document.querySelector('#login');
+const approve=document.querySelector('#approve');
+const deny=document.querySelector('#deny');
+let currentRequest=null;
+let busy=false;
+function msg(s){notice.textContent=s;}
+function toggle(open) {approve.disabled=!open;deny.disabled=!open;}
+function text(selector,value){document.querySelector(selector).textContent=String(value??'');}
+function validId(x){return typeof x==='string'&&x.length>=12&&x.length<=256&&/^[a-zA-Z0-9_-]+$/.test(x);}
+function client(){
+ return window.supabase.createClient(window.LIZHI_SUPABASE_URL,window.LIZHI_SUPABASE_PUBLISHABLE_KEY,{
+   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+ });
+}
+const db=client();
+function trustedRedirect(url){
+ try{
+  const dest=new URL(url);
+  return dest.protocol==='https:' && !!dest.hostname && !dest.username && !dest.password;
+ }catch{return false;}
+}
+async function load(){
+ if(!validId(id)){msg('授權請求缺少有效的 authorization_id。請從 AI 用戶端重新啟動授權。');return;}
+ try{
+  const {data:{user},error:userError}=await db.auth.getUser();
+  if(userError||!user){
+   login.hidden=false;
+   details.hidden=true;
+   msg('尚未登入立之雲端庫。');
+   return;
   }
-
-  function fail(text) {
-    message.textContent = text;
-    setBusy(false);
+  if(String(user.email||'').toLowerCase()!==OWNER_EMAIL || !user.email_confirmed_at) {
+   msg('這個帳號沒有手機代理授權資格。請切換為已核准的 Google 帳號。');
+   return;
   }
-
-  function consentURL() {
-    const url = new URL(location.href);
-    url.hash = "";
-    url.search = "";
-    url.searchParams.set("authorization_id", authorizationId);
-    return url.href;
+  const {data,error}=await db.auth.oauth.getAuthorizationDetails(id);
+  if(error||!data)throw new Error(error?.message||'無法取得授權資料');
+  // Already-approved requests may redirect automatically according to Supabase protocol.
+  // Fail closed instead: require explicit reauthorization from client if details are absent.
+  if(!('authorization_id' in data)) {
+   msg('這個用戶端可能已取得授權。如需確認授權，請到 Supabase 後台檢視已連線的應用程式；本頁不會自動重新核發。');
+   return;
   }
-
-  async function signIn() {
-    setBusy(true);
-    const { error } = await client.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: consentURL() },
-    });
-    if (error) fail(`無法開始登入：${error.message}`);
-  }
-
-  async function initialize() {
-    if (!authorizationId) {
-      fail("缺少 OAuth 授權識別碼。請從 ChatGPT 重新開始連線。");
-      return;
-    }
-
-    setBusy(true);
-    const { data: sessionData, error: sessionError } = await client.auth.getSession();
-    if (sessionError) {
-      fail(`無法確認登入狀態：${sessionError.message}`);
-      return;
-    }
-    const user = sessionData.session?.user;
-    if (!user) {
-      clientName.textContent = "請先使用核准的 Google 帳號登入";
-      clientDetail.textContent = "登入後會回到這個授權畫面。";
-      approveButton.textContent = "使用 Google 登入";
-      approveButton.onclick = signIn;
-      denyButton.hidden = true;
-      setBusy(false);
-      return;
-    }
-    if (String(user.email || "").toLowerCase() !== ALLOWED_EMAIL) {
-      await client.auth.signOut();
-      fail("這個 Google 帳號未被核准使用立之圖書館。");
-      return;
-    }
-
-    const { data, error } = await client.auth.oauth.getAuthorizationDetails(authorizationId);
-    if (error) {
-      fail(`無法載入授權內容：${error.message}`);
-      return;
-    }
-    if (!data.authorization_id && data.redirect_url) {
-      location.assign(data.redirect_url);
-      return;
-    }
-    clientName.textContent = data.client?.name || "未命名的 MCP 用戶端";
-    const scopes = String(data.scope || "email").split(/\s+/).filter(Boolean).join("、");
-    clientDetail.textContent = `要求權限：${scopes || "email"}`;
-    approveButton.onclick = async () => {
-      setBusy(true);
-      const result = await client.auth.oauth.approveAuthorization(authorizationId);
-      if (result.error) fail(`授權失敗：${result.error.message}`);
-      else if (result.data?.redirect_url) location.assign(result.data.redirect_url);
-      else fail("授權已完成，但服務沒有提供返回網址。");
-    };
-    denyButton.onclick = async () => {
-      setBusy(true);
-      const result = await client.auth.oauth.denyAuthorization(authorizationId);
-      if (result.error) fail(`無法拒絕授權：${result.error.message}`);
-      else if (result.data?.redirect_url) location.assign(result.data.redirect_url);
-      else fail("已拒絕授權，但服務沒有提供返回網址。");
-    };
-    setBusy(false);
-  }
-
-  initialize().catch((error) => fail(`授權頁發生錯誤：${error.message}`));
+  const dest=String(data.redirect_uri||'');
+  if(!trustedRedirect(dest)) throw new Error('不安全或無法辨認的回呼網址，拒絕繼續');
+  currentRequest=id;
+  text('#client-name',data.client?.name||'未提供名稱的應用程式（請謹慎）');
+  text('#redirect-uri',dest);
+  text('#requested-scopes',String(data.scope||'(未提出身分範圍)'));
+  text('#signed-in-user',String(user.email||''));
+  login.hidden=true;
+  details.hidden=false;
+  msg('請核對應用程式名稱、回呼網址與授權範圍，再決定是否允許。');
+  toggle(true);
+ }catch(e){msg('無法驗證授權要求：'+String(e?.message||'未知錯誤'));}
+}
+async function decide(allow){
+ if(busy||!currentRequest)return;
+ busy=true;toggle(false);msg('正在向 Supabase 提交你的決定…');
+ try{
+  const result=allow?await db.auth.oauth.approveAuthorization(currentRequest):await db.auth.oauth.denyAuthorization(currentRequest);
+  if(result.error)throw result.error;
+  if(!trustedRedirect(result.data?.redirect_url))throw new Error('Supabase 未提供有效的安全重新導向網址');
+  sessionStorage.removeItem(PENDING_KEY);
+  location.assign(result.data.redirect_url);
+ }catch(e){msg('授權操作失敗：'+String(e?.message||'未知錯誤'));toggle(true);}
+ finally{busy=false;}
+}
+document.querySelector('#google-login').addEventListener('click',async()=>{
+ if(!validId(id))return;
+ sessionStorage.setItem(PENDING_KEY,id);
+ msg('即將轉往 Google 登入；登入後返回授權確認畫面。');
+ try{
+  const target=new URL('../../',location.href);
+  const {error}=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:target.href}});
+  if(error)throw error;
+ }catch(e){msg('Google 登入未開始：'+String(e?.message||'未知錯誤'));}
+});
+approve.addEventListener('click',()=>decide(true));
+deny.addEventListener('click',()=>decide(false));
+load();
 })();

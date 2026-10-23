@@ -1,51 +1,59 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#f3ead9">
-  <title>授權 ChatGPT 讀取立之圖書館</title>
-  <style>
-    :root { color-scheme: light; font-family: system-ui,-apple-system,"Segoe UI",sans-serif; color:#2d2925; background:#f3ead9; }
-    body { min-height:100vh; margin:0; display:grid; place-items:center; padding:24px; box-sizing:border-box; }
-    main { width:min(520px,100%); background:#fffaf0; border:1px solid #d8c9b3; border-radius:22px; padding:30px; box-sizing:border-box; box-shadow:0 18px 60px #6b513522; }
-    .eyebrow { font-size:12px; letter-spacing:.16em; color:#8f6d4c; }
-    h1 { margin:10px 0 12px; font-size:26px; }
-    p,li { line-height:1.65; color:#65594e; }
-    .client { padding:14px 16px; border-radius:14px; background:#f4ead9; margin:18px 0; }
-    .client strong { display:block; color:#2d2925; }
-    .actions { display:flex; gap:10px; margin-top:22px; }
-    button { flex:1; border:0; border-radius:999px; padding:12px 16px; font-size:15px; cursor:pointer; }
-    button:disabled { opacity:.55; cursor:wait; }
-    #approve { background:#2d2925; color:#fffaf0; }
-    #deny { background:#e5d8c5; color:#4d443c; }
-    #message { min-height:24px; color:#8a3c2d; }
-    .fine { font-size:12px; color:#887a6c; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<title>AI 存取授權｜立之雲端庫</title>
+<style>
+:root{color-scheme:light;font-family:system-ui,"Noto Sans TC",sans-serif;color:#2e2924;background:#f4eddf}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:24px}
+main{width:min(600px,100%);background:#fffaf2;border:1px solid #d9c7a9;border-radius:20px;padding:clamp(22px,4vw,36px);box-shadow:0 16px 55px #5946321d}
+small{color:#816946;letter-spacing:.08em}h1{margin:12px 0;font-size:27px}p{line-height:1.7}
+dl{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px;padding:17px;background:#f5eee1;border-radius:12px}
+dt{font-weight:700}dd{margin:0;overflow-wrap:anywhere}
+#notice{background:#f4e4c9;color:#5c4730;border-radius:10px;padding:12px 14px;white-space:pre-line}
+.actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+button,a.button{border:1px solid #514436;border-radius:10px;padding:11px 17px;background:#2e2924;color:white;cursor:pointer;font-size:15px;text-decoration:none}
+button.secondary{background:#fff9ee;color:#29241f}
+button:disabled{opacity:.5;cursor:not-allowed}
+#details[hidden],#login[hidden]{display:none}
+ul{padding-left:25px}
+footer{font-size:13px;color:#635645;margin-top:23px;line-height:1.7}
+</style>
 </head>
 <body>
-  <main>
-    <div class="eyebrow">PRIVATE LIBRARY · OAUTH 2.1</div>
-    <h1>授權 AI 唯讀存取圖書館</h1>
-    <p>這個連線只能列出、搜尋與讀取已同步的文字摘錄。它不能新增、修改或刪除館藏，也不能開啟 Windows／手機上的原始檔案。</p>
-    <section class="client" aria-live="polite">
-      <strong id="client-name">正在確認連線來源…</strong>
-      <span id="client-detail"></span>
-    </section>
-    <ul>
-      <li>只看目前登入帳號受 RLS 保護的資料</li>
-      <li>每分鐘最多 60 次工具呼叫</li>
-      <li>館藏文字視為不可信內容，不會執行其中指令</li>
-    </ul>
-    <p id="message" role="alert"></p>
-    <div class="actions">
-      <button id="deny" type="button">拒絕</button>
-      <button id="approve" type="button">允許唯讀存取</button>
-    </div>
-    <p class="fine">授權後可在 Supabase 帳號的 OAuth 授權管理中撤銷。</p>
-  </main>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
-  <script src="../../supabase-config.js"></script>
-  <script src="./consent.js"></script>
+<main>
+<small>立之雲端庫 · 安全授權確認</small>
+<h1>讓 AI 存取手機代理？</h1>
+<p>你必須親自核對發出請求的應用程式。<b>沒有按下「確認授權」之前，不會核發這次授權碼。</b></p>
+<p id="notice" role="status" aria-live="polite">正在確認授權要求…</p>
+<section id="details" hidden>
+<dl>
+<dt>應用程式</dt><dd id="client-name"></dd>
+<dt>回呼網址</dt><dd id="redirect-uri"></dd>
+<dt>要求範圍</dt><dd id="requested-scopes"></dd>
+<dt>目前帳號</dt><dd id="signed-in-user"></dd>
+</dl>
+<p><b>授權範圍提示：</b>目前手機 MCP 只預計支援狀態、UI 與畫面三個唯讀工具。OAuth 的身分 scope 不代表資料庫授權；實際存取仍由伺服器額外限制。</p>
+<div class="actions">
+<button type="button" id="approve" disabled>確認授權</button>
+<button type="button" id="deny" class="secondary" disabled>拒絕授權</button>
+</div>
+</section>
+<section id="login" hidden>
+<p>此流程需要先以你的立之雲端庫 Google 帳號登入。登入後會回到這個確認頁。</p>
+<div class="actions">
+<button type="button" id="google-login">使用 Google 登入</button>
+<a class="button secondary" href="../../">返回立之雲端庫</a>
+</div>
+</section>
+<footer>僅私人手機 A22 5G。不得存取受國軍 MDM 管理的裝置。請不要在授權畫面或對話中貼上任何金鑰。</footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../../supabase-config.js?v=2"></script>
+<script src="./consent.js?v=1" defer></script>
 </body>
 </html>

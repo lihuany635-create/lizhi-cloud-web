@@ -51,6 +51,16 @@
       return null;
     }
     currentUser = user;
+    // Resume a pending OAuth consent only after an authenticated session exists.
+    // The target path is fixed to this site's consent page (never user-controlled).
+    const pending=sessionStorage.getItem('lizhi_mobile_pending_oauth_authorization_v1');
+    if(pending && /^[a-zA-Z0-9_-]{12,256}$/.test(pending)) {
+      sessionStorage.removeItem('lizhi_mobile_pending_oauth_authorization_v1');
+      const target=new URL('./oauth/consent/',location.origin+location.pathname);
+      target.searchParams.set('authorization_id',pending);
+      location.replace(target.href);
+      return null;
+    }
     return user;
   }
 
