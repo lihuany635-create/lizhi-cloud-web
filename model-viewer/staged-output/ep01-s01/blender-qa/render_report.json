@@ -1,0 +1,16 @@
+{
+  "source": "model-viewer/staged-output/ep01-s01/lahudi-academy_ep01_s01_corridor_v3_review.glb",
+  "source_sha256": "706de654733f4509d9ea433eaae8b19d07561b9a61c0c8e1296febec77ff7855",
+  "renderer": "Blender Workbench / studio material color",
+  "scene_meshes": 8024,
+  "corridor_meshes_rendered": 340,
+  "reference_camera_match": "NOT_RUN",
+  "original_EP01_footage_overlay": "NOT_RUN",
+  "source_annotation": "A01/A02/A03 are engineering cameras, not exact film cameras",
+  "S06_touched": false,
+  "image_files": [
+    "candidate-output/blender/S01_A01_corridor_look_forward.png",
+    "candidate-output/blender/S01_A02_window_right.png",
+    "candidate-output/blender/S01_A03_stair_end.png"
+  ]
+}
