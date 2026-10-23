@@ -1,0 +1,26 @@
+{
+  "version": "ACADEMY-RB2-GOTHIC-ALL-CORRIDORS-V4",
+  "v4_sha256": "34db823260c85e77e787fc5d9fbe172996bb413ed5695820d4186a3b9c561bef",
+  "source_v3_first_9245_nodes_unchanged": true,
+  "source_materials_and_meshes_unchanged": true,
+  "source_mesh_binary_bytes_unchanged": true,
+  "hall_shells_dressed": 28,
+  "new_nodes": 5115,
+  "minimum_new_geometry_y_m": 3.695,
+  "all_new_geometry_above_y_3_49_m": true,
+  "new_types": {
+    "high_glazed_facade_panel": 325,
+    "high_window_stone_mullion": 975,
+    "window_sill": 325,
+    "facade_gothic_window_arch": 2600,
+    "facade_upper_pilaster": 325,
+    "facade_upper_capital": 325,
+    "facade_brass_wall_lamp": 106,
+    "facade_amber_lamp": 106,
+    "upper_facade_cornice": 28
+  },
+  "render": "NOT_RUN",
+  "interior_corridor_validation": "NOT_RUN",
+  "facade_GLASS_THROUGH_MASONRY": "NO_DECOY_PANEL_ONLY",
+  "author_approved": false
+}
