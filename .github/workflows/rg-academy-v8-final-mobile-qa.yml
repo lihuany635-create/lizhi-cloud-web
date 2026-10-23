@@ -1,0 +1,55 @@
+name: RG Academy V8 Final High Contrast Mobile Visual QA
+on:
+  push:
+    branches: [rg-ep01-s01-stage-20261023]
+    paths:
+      - '.github/workflows/rg-academy-v8-final-mobile-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm production viewer requests high contrast V8
+        run: |
+          set -euo pipefail
+          mkdir -p candidate-output/academy-v8-mobile
+          curl -fSL --retry 8 --retry-all-errors --retry-delay 2 \
+            'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/' \
+            -o candidate-output/academy-v8-mobile/index.html
+          python - <<'PY'
+          from pathlib import Path
+          h=Path('candidate-output/academy-v8-mobile/index.html').read_text()
+          assert 'rb2-entire-campus-contrast-v8-20261023' in h
+          assert 'camera.position.copy(anim.p)' in h and '連線重試 ' in h
+          assert 'id="academyViews"' in h
+          print('PUBLIC VIEWER UPDATED TO V8')
+          PY
+      - name: Actual dark-theme mobile-ratio Chrome V8 screenshot
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          timeout 125s "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage \
+            --disable-background-networking --disable-extensions \
+            --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader --enable-webgl \
+            --force-dark-mode --force-device-scale-factor=1 \
+            --window-size=720,1380 --virtual-time-budget=16000 \
+            --screenshot=candidate-output/academy-v8-mobile/academy-v8-complete-dark-mobile.png \
+            'https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/#lahudi-academy'
+          test "$(stat -c %s candidate-output/academy-v8-mobile/academy-v8-complete-dark-mobile.png)" -gt 45000
+      - name: Archive mobile visual evidence
+        run: |
+          dst=model-viewer/staged-output/academy-entire-campus-contrast-v8/mobile-qa
+          mkdir -p "$dst"
+          cp candidate-output/academy-v8-mobile/academy-v8-complete-dark-mobile.png "$dst/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dst"
+          if ! git diff --cached --quiet; then
+            git commit -m 'qa(academy V8): actual dark-themed mobile whole-school screenshot'
+            git pull --rebase origin rg-ep01-s01-stage-20261023
+            git push origin HEAD:refs/heads/rg-ep01-s01-stage-20261023
+          fi
