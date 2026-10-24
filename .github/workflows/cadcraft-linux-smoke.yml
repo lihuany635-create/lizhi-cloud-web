@@ -1,0 +1,59 @@
+name: CADCraft Linux Headless Smoke
+on:
+  push:
+    branches:
+      - feature/cad-m2-spec-v1-20261024
+    paths:
+      - '.github/workflows/cadcraft-linux-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-cadcraft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Fetch and verify official CADCraft 0.12.0 Linux release
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://github.com/storytold/cadcraft/releases/download/v0.12.0'
+          asset='cadcraft-0.12.0-linux-x86_64.tar.gz'
+          curl --fail --location --retry 3 --silent --show-error "$base/$asset" -o "$asset"
+          curl --fail --location --retry 3 --silent --show-error "$base/SHA256SUMS.txt" -o SHA256SUMS.txt
+          awk -v f="$asset" '$2 == f || $2 == ("*" f) { print $1 "  " f }' SHA256SUMS.txt > expected.sha256
+          test "$(wc -l < expected.sha256)" -eq 1
+          sha256sum --check expected.sha256
+          mkdir -p cadcraft-install
+          tar -xzf "$asset" -C cadcraft-install
+          find cadcraft-install -name cadcraft-cli -type f -print
+          bin="$(find cadcraft-install -name cadcraft-cli -type f | head -n 1)"
+          test -n "$bin"
+          chmod +x "$bin"
+          echo "CADCRAFT_BIN=$(realpath "$bin")" >> "$GITHUB_ENV"
+      - name: Run headless drawing and reopen original DXF
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p cad-evidence
+          "$CADCRAFT_BIN" run --metric --script $'CIRCLE 22,3 1\n' --save cad-evidence/rev1.dxf
+          test -s cad-evidence/rev1.dxf
+          "$CADCRAFT_BIN" info cad-evidence/rev1.dxf | tee cad-evidence/rev1-info.txt
+          "$CADCRAFT_BIN" run cad-evidence/rev1.dxf --script $'CIRCLE 88,25 5\n' --save cad-evidence/rev2.dxf
+          test -s cad-evidence/rev2.dxf
+          "$CADCRAFT_BIN" info cad-evidence/rev2.dxf | tee cad-evidence/rev2-info.txt
+          "$CADCRAFT_BIN" convert cad-evidence/rev2.dxf cad-evidence/rev2.svg
+          "$CADCRAFT_BIN" convert cad-evidence/rev2.dxf cad-evidence/rev2.png
+          test -s cad-evidence/rev2.svg
+          test -s cad-evidence/rev2.png
+          sha256sum cad-evidence/rev*.dxf cad-evidence/rev2.svg cad-evidence/rev2.png | tee cad-evidence/SHA256SUMS.txt
+          file cad-evidence/rev2.dxf cad-evidence/rev2.svg cad-evidence/rev2.png
+      - name: Preserve private acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cadcraft-linux-v0120-evidence
+          path: cad-evidence/
+          if-no-files-found: warn
