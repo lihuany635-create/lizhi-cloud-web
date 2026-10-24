@@ -15,6 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Fetch and verify official CADCraft 0.12.0 Linux release
         shell: bash
         run: |
@@ -67,6 +71,8 @@ jobs:
           test -s cad-evidence/rev2.png
           sha256sum cad-evidence/rev*.dxf cad-evidence/rev2.svg cad-evidence/rev2.png | tee cad-evidence/SHA256SUMS.txt
           file cad-evidence/rev2.dxf cad-evidence/rev2.svg cad-evidence/rev2.png
+      - name: Verify compiled CAD bridge with actual Linux CADCraft
+        run: node engineering/cad/cadcraft-live-smoke.cjs
       - name: Preserve private acceptance evidence
         if: always()
         uses: actions/upload-artifact@v4
