@@ -10,6 +10,8 @@ git clone --filter=blob:none --no-checkout "$CAD_REPO" "$TEMP_DIR/source"
 git -C "$TEMP_DIR/source" fetch --depth 1 origin "$CAD_REF"
 git -C "$TEMP_DIR/source" checkout --detach "$CAD_REF"
 test "$(git -C "$TEMP_DIR/source" rev-parse HEAD)" = "$CAD_REF"
+# The source lives outside the checkout's rustup override; pin its build toolchain explicitly.
+export RUSTUP_TOOLCHAIN=1.95.0
 (cd "$TEMP_DIR/source/apps/cadcraft-web" && trunk build --release)
 WEB="$TEMP_DIR/source/dist/web"
 test -s "$WEB/index.html"
