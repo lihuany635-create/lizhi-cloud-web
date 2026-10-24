@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS public.lizhi_cad_cloud_jobs (
  owner_id uuid NOT NULL,
  idempotency_key text NOT NULL,
  job_data jsonb NOT NULL,
+ lease_until timestamptz,
  created_at timestamptz NOT NULL DEFAULT now(),
  updated_at timestamptz NOT NULL DEFAULT now(),
  CONSTRAINT lizhi_cad_cloud_jobs_pk PRIMARY KEY(owner_id,idempotency_key),
