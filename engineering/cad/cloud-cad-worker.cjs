@@ -27,7 +27,10 @@ function createWorker({queue,ports,workerId}){
    // commit a new immutable revision and retain authorization within that same transaction.
    const published=await ports.publishRevision({job:original,artifact,inspection});
    if(!published||!Number.isSafeInteger(published.revision)||published.revision<=original.expected_revision)throw new CadWorkerError("CAD_PUBLISH_INVALID","Invalid published revision");
-   await queue.change(jobKey,"completed",{workerId,outputRevision:published.revision});
+   // The durable PostgreSQL publisher may atomically advance the drawing and
+   // mark the job completed within the same transaction. Never issue a second
+   // status transition in that case (and never mark a committed drawing failed).
+   if(published.job_committed!==true)await queue.change(jobKey,"completed",{workerId,outputRevision:published.revision});
    return Object.freeze({job_key:jobKey,status:"completed",revision:published.revision,sha256:artifact.sha256});
   }catch(error){
    if(claimed){
