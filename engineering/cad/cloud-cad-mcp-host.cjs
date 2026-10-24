@@ -5,6 +5,7 @@ const http=require("node:http");
 const {createJwksVerifier}=require("./cloud-cad-jwks-auth.cjs");
 const {createCadOauthAcl}=require("./cloud-cad-oauth-acl.cjs");
 const {createCadReadService}=require("./cloud-cad-read-service.cjs");
+const {createCadJobHistory}=require("./cloud-cad-job-history.cjs");
 const {createCadMcpService}=require("./cloud-cad-mcp-service.cjs");
 const {createCadMcpHttpHandler}=require("./cloud-cad-mcp-http.cjs");
 const {createCadPostgresIntents}=require("./cloud-cad-postgres-intents.cjs");
@@ -27,7 +28,8 @@ function createCadMcpHost({db,resourceUrl,authorizationServer,jwksFetchImpl=fetc
   queueForOwner:ownerId=>createQueue(createPostgresStorage({db,ownerId}))
  });
  const reads=objects?createCadReadService({db,objects,authorizeDrawing:acl.authorizeDrawing}):null;
- const service=reads?Object.freeze({...primary,listRevisions:reads.list,previewPng:reads.preview}):primary;
+ const history=createCadJobHistory({db,authorizeDrawing:acl.authorizeDrawing});
+ const service=Object.freeze({...primary,listJobs:history.list,...(reads?{listRevisions:reads.list,previewPng:reads.preview}:{})});
  return createCadMcpHttpHandler({
   service,verifyBearer:verifier,allowedOrigins,resourceUrl,authorizationServer
  });
