@@ -15,10 +15,10 @@ function createObjectRevisionStore({db,ownerId,authorizeDrawing,objects}={}){
     typeof authorizeDrawing!=="function"||!UUID.test(ownerId||"")||
     !objects||typeof objects.put!=="function"||typeof objects.get!=="function")
   throw new CadObjectRevisionError("CAD_OBJECT_PORT_INVALID","Verified owner, database, ACL and object store required");
- async function authorized(projectId,drawingId,mode){
+ async function authorized(projectId,drawingId,mode,transactionClient=null){
   if(typeof projectId!=="string"||!ID.test(projectId)||typeof drawingId!=="string"||!ID.test(drawingId))
    throw new CadObjectRevisionError("CAD_OBJECT_ID_INVALID","Invalid drawing location");
-  if(await authorizeDrawing({ownerId,projectId,drawingId,mode})!==true)
+  if(await authorizeDrawing({ownerId,projectId,drawingId,mode,transactionClient})!==true)
    throw new CadObjectRevisionError("CAD_OBJECT_ACCESS_DENIED","Drawing access denied");
  }
  const validateJob=(job,workerId,leaseToken)=>{
@@ -98,6 +98,9 @@ function createObjectRevisionStore({db,ownerId,authorizeDrawing,objects}={}){
    );
    if(found.rowCount!==1)throw new CadObjectRevisionError("CAD_OBJECT_JOB_NOT_FOUND","Queue job disappeared");
    owned(found.rows[0].job_data,job,workerId,leaseToken,found.rows[0].lease_active);
+   // A grant may be revoked during S3 upload. Lock and re-check the original
+   // OAuth client authorization INSIDE this same publish transaction.
+   await authorized(projectId,drawingId,"write",client);
    await client.query(
     "INSERT INTO public.lizhi_cad_cloud_drawings(owner_id,project_id,drawing_id,current_revision) VALUES ($1::uuid,$2,$3,0) ON CONFLICT(owner_id,drawing_id) DO NOTHING",
     [ownerId,projectId,drawingId]
