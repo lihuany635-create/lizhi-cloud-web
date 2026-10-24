@@ -44,6 +44,23 @@ jobs:
           "$CADCRAFT_BIN" run cad-evidence/rev1.dxf --script $'CIRCLE 88,25 5\n' --save cad-evidence/rev2.dxf
           test -s cad-evidence/rev2.dxf
           "$CADCRAFT_BIN" info cad-evidence/rev2.dxf | tee cad-evidence/rev2-info.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('cad-evidence/rev1-info.txt').read_text())
+          b=json.loads(Path('cad-evidence/rev2-info.txt').read_text())
+          assert a['entityCount'] == 1 and a['counts'].get('Circle') == 1, a
+          assert b['entityCount'] == 2 and b['counts'].get('Circle') == 2, b
+          assert a['extents'] == [[21.0, 2.0], [23.0, 4.0]], a['extents']
+          assert b['extents'] == [[21.0, 2.0], [93.0, 30.0]], b['extents']
+          print('CADCRAFT_GEOMETRY_ROUNDTRIP_PASS: 1 -> 2 circles, extents preserved and expanded')
+          Path('cad-evidence/verification.json').write_text(json.dumps({
+            'engine':'cadcraft','version':'0.12.0','platform':'linux-x86_64',
+            'source_entity_count':a['entityCount'],'result_entity_count':b['entityCount'],
+            'source_extents':a['extents'],'result_extents':b['extents'],
+            'geometry_roundtrip':'PASS'
+          },indent=2))
+          PY
           "$CADCRAFT_BIN" convert cad-evidence/rev2.dxf cad-evidence/rev2.svg
           "$CADCRAFT_BIN" convert cad-evidence/rev2.dxf cad-evidence/rev2.png
           test -s cad-evidence/rev2.svg
