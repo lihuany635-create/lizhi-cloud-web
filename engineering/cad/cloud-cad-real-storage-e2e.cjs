@@ -147,7 +147,7 @@ async function main(){
    spec:spec([[1100,1100],[1200,1100],[1200,1200],[1100,1200]])
   });
   await db.query("UPDATE public.lizhi_cad_oauth_project_grants SET revoked_at=now() WHERE owner_id=$1::uuid AND project_id=$2 AND oauth_client_id=$3",[OWNER,PROJECT,CLIENT]);
-  await assert.rejects(workerHost.runOnce(),{code:"CAD_ACCESS_REVOKED"});
+  await assert.rejects(daemon.runOnce(),{code:"CAD_ACCESS_REVOKED"});
   assert.equal((await queue.read(revokedJob.job_key)).status,"failed");
   const latest=await db.query("SELECT current_revision FROM public.lizhi_cad_cloud_drawings WHERE owner_id=$1::uuid AND drawing_id=$2",[OWNER,DRAWING]);
   assert.equal(latest.rows[0].current_revision,2);
