@@ -6,6 +6,7 @@ const {createQueue}=require("./cloud-cad-queue.cjs");
 const {createWorker}=require("./cloud-cad-worker.cjs");
 const {createPostgresStorage}=require("./cloud-cad-postgres-storage.cjs");
 const {createPostgresLeaseManager}=require("./cloud-cad-postgres-lease.cjs");
+const {createLeasedCadRunner}=require("./cloud-cad-lease-runner.cjs");
 const {createPostgresRevisionStore}=require("./cloud-cad-postgres-revisions.cjs");
 // Separate owner prevents intentional stale rows from preceding integration tests being claimed.
 const OWNER="ccccdddd-1234-4abc-8abc-abc123456789";
@@ -78,11 +79,38 @@ async function main(){
   assert.equal(done.revision,2);
   assert.equal((await q.read(next.idempotency_key)).status,"completed");
   assert.equal((await revision.read({projectId:"leaseP",drawingId:"leaseD",revision:2})).dxf.toString(),bytes.toString()+"0\nLINE\n");
+  // Long-running job with real PostgreSQL heartbeat while CAD execution is
+  // still in flight; not a mere timer mock.
+  const third=await q.enqueue({...args,baseRevision:2,operation:"modify",requestId:"lease03"});
+  const thirdClaim=await leaseB.claimNext({workerId:secondOwner,leaseSeconds:5});
+  assert.equal(thirdClaim.job.idempotency_key,third.idempotency_key);
+  let renewals=0;
+  const slowWorker=createWorker({queue:q,workerId:secondOwner,ports:{
+   authorize:async()=>{},
+   loadRevision:async j=>revision.read({projectId:j.project_id,drawingId:j.drawing_id,revision:j.expected_revision}),
+   execute:async({source,signal})=>{
+    await new Promise(resolve=>setTimeout(resolve,170));
+    assert.equal(signal.aborted,false);
+    return {bytes:Buffer.concat([source.dxf,Buffer.from("0\nLINE\n")])};
+   },
+   inspect:async()=>({valid:true,entityCount:3}),
+   storeImmutable:async({output})=>({sha256:sha(output.bytes),artifacts:{dxf:{bytes:output.bytes}}}),
+   publishRevision:async({job,artifact,inspection,leaseToken})=>
+    revision.publish({job,artifact,inspection,workerId:secondOwner,leaseToken})
+  }});
+  const activeRunner=createLeasedCadRunner({
+   worker:slowWorker,workerId:secondOwner,leaseSeconds:5,heartbeatIntervalMs:30,
+   leaseManager:{heartbeat:async opts=>{renewals++;return leaseB.heartbeat(opts);}}
+  });
+  const thirdDone=await activeRunner.runClaim(thirdClaim);
+  assert.equal(thirdDone.revision,3);
+  assert.ok(renewals>=2, "Lease should be renewed while geometry is executing");
+  assert.equal((await q.read(third.idempotency_key)).status,"completed");
   const nothing=await leaseA.claimNext({workerId:"anotherWorker",leaseSeconds:60});
   assert.equal(nothing,null);
   console.log("CAD_POSTGRES_LEASE_RECOVERY_PASS",JSON.stringify({
    concurrent_claims:1,attempt_after_crash:2,old_token:"rejected",
-   reclaimed_by:secondOwner,immutable_revision:2,job_status:"completed",leased_worker_run:"PASS",
+   reclaimed_by:secondOwner,immutable_revision:3,job_status:"completed",leased_worker_run:"PASS",heartbeats_during_execution:renewals,
    healthy_lease_renewed:true
   }));
  }finally{await a.end();await b.end();}
