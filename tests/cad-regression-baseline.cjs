@@ -4,10 +4,12 @@ const fs=require("node:fs");
 const path=require("node:path");
 const cp=require("node:child_process");
 const current=path.resolve(__dirname,"..");
+const group=process.argv[2] || "engineering";
+assert.ok(["engineering","finance"].includes(group),"unsupported test group");
 const baseline=path.resolve(process.env.CAD_BASELINE_ROOT||path.join(current,"_cad-baseline-main"));
 function run(root,tag) {
-  const dir=path.join(root,"engineering","tests");
-  const files=fs.readdirSync(dir).filter(name=>name.endsWith(".test.mjs")).sort().map(name=>path.join(dir,name));
+  const dir=path.join(root,group,"tests");
+  const files=fs.readdirSync(dir).filter(name=>name.endsWith(".test.mjs") || name.endsWith(".test.js")).sort().map(name=>path.join(dir,name));
   const child=cp.spawnSync(process.execPath,["--test","--test-reporter=tap",...files],{cwd:root,encoding:"utf8",maxBuffer:32*1024*1024,timeout:180000});
   if(child.error)throw child.error;
   const output=(child.stdout||"")+"\n"+(child.stderr||"");
@@ -24,7 +26,7 @@ function run(root,tag) {
 }
 const a=run(baseline,"main");
 const b=run(current,"cad-candidate");
-console.log("CAD_ENGINEERING_REGRESSION_BASELINE",JSON.stringify({baseline:a,candidate:b}));
-assert.equal(b.tests,a.tests,"Changed Engineering test total");
-assert.deepEqual(b.failures,a.failures,"CAD candidate introduced or removed an Engineering regression");
-console.log("CAD_ENGINEERING_NO_NEW_FAILURES_PASS");
+console.log("CAD_CROSS_MODULE_REGRESSION_BASELINE",JSON.stringify({baseline:a,candidate:b}));
+assert.equal(b.tests,a.tests,"Changed "+group+" test total");
+assert.deepEqual(b.failures,a.failures,"CAD candidate introduced or removed a "+group+" regression");
+console.log("CAD_"+group.toUpperCase()+"_NO_NEW_FAILURES_PASS");
