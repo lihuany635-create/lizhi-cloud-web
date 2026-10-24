@@ -42,8 +42,8 @@ REVOKE ALL ON TABLE public.lizhi_cad_cloud_intents FROM PUBLIC,anon,authenticate
 -- immutable object storage while retaining the same atomic revision metadata.
 CREATE TABLE IF NOT EXISTS public.lizhi_cad_cloud_drawings (
  owner_id uuid NOT NULL,
- project_id text NOT NULL CHECK(project_id ~ '^[A-Za-z0-9_-]{1,128}),
- drawing_id text NOT NULL CHECK(drawing_id ~ '^[A-Za-z0-9_-]{1,128}),
+ project_id text NOT NULL CHECK(length(project_id) BETWEEN 1 AND 128 AND project_id !~ '[^A-Za-z0-9_-]'),
+ drawing_id text NOT NULL CHECK(length(drawing_id) BETWEEN 1 AND 128 AND drawing_id !~ '[^A-Za-z0-9_-]'),
  current_revision integer NOT NULL DEFAULT 0 CHECK(current_revision>=0),
  created_at timestamptz NOT NULL DEFAULT now(),
  updated_at timestamptz NOT NULL DEFAULT now(),
@@ -53,8 +53,8 @@ CREATE TABLE IF NOT EXISTS public.lizhi_cad_cloud_revisions (
  owner_id uuid NOT NULL,
  drawing_id text NOT NULL,
  revision integer NOT NULL CHECK(revision>=1),
- job_key text NOT NULL CHECK(job_key ~ '^[a-f0-9]{64}),
- sha256 text NOT NULL CHECK(sha256 ~ '^[a-f0-9]{64}),
+ job_key text NOT NULL CHECK(length(job_key)=64 AND job_key !~ '[^a-f0-9]'),
+ sha256 text NOT NULL CHECK(length(sha256)=64 AND sha256 !~ '[^a-f0-9]'),
  dxf_bytes bytea NOT NULL,
  byte_size integer NOT NULL CHECK(byte_size>0 AND byte_size<=16777216 AND byte_size=octet_length(dxf_bytes)),
  inspection jsonb NOT NULL CHECK(inspection->>'valid'='true'),
