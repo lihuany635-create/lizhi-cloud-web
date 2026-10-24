@@ -8,7 +8,7 @@ function createCadMcpService({authorizeDrawing,queueForOwner,intents}={}){
  if(typeof authorizeDrawing!=="function"||typeof queueForOwner!=="function"||!intents||typeof intents.putIfAbsent!=="function"||typeof intents.get!=="function")
   throw new CadMcpError("CAD_MCP_PORT_INVALID","Missing authorization, queue or immutable intent store");
  const authorized=async(ownerId,projectId,drawingId,action)=>{
-  if(typeof ownerId!=="string"||!/^[0-9a-f]{8}-[0-9a-f-]{27,28}$/i.test(ownerId))throw new CadMcpError("CAD_UNAUTHENTICATED","Authenticated subject required");
+  if(typeof ownerId!=="string"||!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(ownerId))throw new CadMcpError("CAD_UNAUTHENTICATED","Authenticated subject required");
   if(await authorizeDrawing({ownerId,projectId,drawingId,action})!==true)throw new CadMcpError("CAD_ACCESS_DENIED","CAD drawing access denied");
  };
  return Object.freeze({
@@ -30,7 +30,7 @@ function createCadMcpService({authorizeDrawing,queueForOwner,intents}={}){
    if(!queue||typeof queue.enqueue!=="function")throw new CadMcpError("CAD_QUEUE_INVALID","Queue unavailable");
    const result=await queue.enqueue({projectId,drawingId,baseRevision,requestId,operation});
    if(result?.idempotency_key!==cloudJob.idempotency_key)throw new CadMcpError("CAD_QUEUE_INVALID","Job identity mismatch");
-   return Object.freeze({job_key:result.idempotency_key,status:result.status,project_id:projectId,drawing_id:drawingId,expected_revision:baseRevision,reused:result.status!=="queued"});
+   return Object.freeze({job_key:result.idempotency_key,status:result.status,project_id:projectId,drawing_id:drawingId,expected_revision:baseRevision});
   },
   async status(ownerId,{projectId,drawingId,jobKey}={}){
    // Don't let a guessed job key disclose an unauthenticated owner's job.
