@@ -1,3 +1,4 @@
+import {MANAGED_OPS} from '../lib/project-management.ts';
 declare const Deno:{env:{get(name:string):string|undefined};serve(handler:(req:Request)=>Promise<Response>):void};
 import {operate,type State} from './state.ts';
 import {FlowError,episodeSettings} from '../lib/workflow.ts';
@@ -28,6 +29,9 @@ export async function handler(req:Request){
   const text=req.method==='POST'?await req.text():'';if(text.length>(isBridge?24000000:1800000))throw new FlowError('資料超過大小限制',413);const b=text?JSON.parse(text):{};
   if(part==='bridge'){
    if(!isBridge)throw new FlowError('此介面僅供已授權的 AI 工具使用',403);op=String(b.op);args=Array.isArray(b.args)?b.args:[];
+  }else if(part==='workspace'){
+   if(req.method==='GET'){op=url.searchParams.get('view')==='managed'?(url.searchParams.has('id')?'getManagedProject':'listManagedProjects'):(url.searchParams.has('id')?'getWorkspaceProject':'listWorkspaceProjects');args=url.searchParams.has('id')?[url.searchParams.get('id')]:[];}
+   else {const allowed=[...MANAGED_OPS,'createWorkspaceProject','updateWorkspaceProject','appendWorkspaceRecord','saveWorkspaceTask'];if(!allowed.includes(b.action))throw new FlowError('未知專案操作');op=b.action;args=['createWorkspaceProject','createManagedProject'].includes(op)?[b.args??{}]:[b.id,b.revision,b.args??{}];}
   }else if(part==='projects'){
    if(req.method==='GET'){op=url.searchParams.get('id')?(url.searchParams.get('view')==='brief'?'readEpisodeBrief':'getProject'):'listProjects';args=url.searchParams.get('id')?[url.searchParams.get('id')]:[];}
    else {op=b.action==='create_project'?'createProject':'mutate';args=op==='createProject'?[b.title,b.episode]:[b.projectId,b.revision,b.action,b.args??{}];}
@@ -46,6 +50,7 @@ export async function handler(req:Request){
    const data={rows,migration:{sourceOwner,digest:hash,at:new Date().toISOString()}};await db('lizhi_production_state',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({owner_id:owner,revision:1,data})});return json({migrated:true,count:rows.length,digest:hash});
   }
   if(existing.length!==1)throw new FlowError('製作資料尚未搬移完成，請稍後重新整理',503);
+  if(op==='registerProjectSource'){const a=(args[2]??{}) as any;if(a.readStatus==='read'&&await digest(String(a.snapshot??''))!==a.sha256)throw new FlowError('來源內容雜湊不符');}
   const record=existing[0],next=operate(record.data as State,op,args,actor);
   if(next.changed){const updated=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&revision=eq.'+record.revision+'&select=revision',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({revision:record.revision+1,data:next.state,updated_at:new Date().toISOString()})});if(updated.length!==1)throw new FlowError('其他裝置或 AI 已更新，請重新讀取後再儲存',409);}
   return json(part==='projects'&&req.method==='GET'&&url.searchParams.get('view')==='settings'?episodeSettings(next.result as any):next.result);

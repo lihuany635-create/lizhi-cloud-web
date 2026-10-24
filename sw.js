@@ -1,6 +1,6 @@
-const CACHE="lizhi-cloud-v141";
+const CACHE="lizhi-cloud-v142";
 const FILES=[
-  "production/production-workspace.js?v=6",
+  "production/production-workspace.js?v=7",
   // BEGIN IMAGE GRAPH ASSETS
   "image-graph/?v=36",
   "image-graph/account-ui.mjs?v=28",
