@@ -1,0 +1,45 @@
+name: CAD Staging S3 Object Storage
+on:
+  push:
+    branches: [feature/cad-m2-spec-v1-20261024]
+    paths:
+      - 'engineering/cad/cloud-cad-s3-*'
+      - 'engineering/cad/cad-artifact-manifest.cjs'
+      - '.github/workflows/cad-minio-s3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  minio-s3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Start isolated local MinIO S3
+        run: |
+          docker run -d --rm --name cad-ci-minio \
+            -p 127.0.0.1:9000:9000 \
+            -e MINIO_ROOT_USER=cad_ci_only \
+            -e MINIO_ROOT_PASSWORD=cad_ci_only_password \
+            quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z \
+            server /data --address :9000
+          for i in $(seq 1 40); do
+            if curl --fail --silent http://127.0.0.1:9000/minio/health/ready >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          docker logs cad-ci-minio
+          exit 1
+      - name: Install temporary S3 SDK for tests only
+        run: npm install --prefix "$RUNNER_TEMP/cad-s3-test" --no-audit --no-fund --ignore-scripts @aws-sdk/client-s3@3.800.0
+      - name: Run actual S3 immutable version validation
+        env:
+          CAD_TEST_S3_ENDPOINT: http://127.0.0.1:9000
+        run: NODE_PATH="$RUNNER_TEMP/cad-s3-test/node_modules" node engineering/cad/cloud-cad-s3-live.integration.cjs
+      - name: Remove isolated MinIO
+        if: always()
+        run: docker rm -f cad-ci-minio || true
