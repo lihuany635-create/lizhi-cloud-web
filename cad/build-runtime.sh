@@ -21,7 +21,7 @@ grep -q "立之 CAD" "$WEB/index.html"
 mkdir -p cad/runtime
 find cad/runtime -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
 cp -a "$WEB"/. cad/runtime/
-printf '{"repository":"lihuany635-create/lizhi-cad","sourceSha":"%s","build":"trunk build --release","mode":"same-origin-static-wasm","remoteCadWorker":false}\n' "$CAD_REF" > cad/runtime/build-source.json
+printf '{"repository":"lihuany635-create/lizhi-cad","sourceSha":"%s","build":"trunk build --release","mode":"same-origin-static-wasm","remoteCadWorker":false,"saveAckProtocol":1}\n' "$CAD_REF" > cad/runtime/build-source.json
 test -s cad/runtime/build-source.json
 du -sh cad/runtime
-echo "LiZhi CAD WASM compiled from pinned source $CAD_REF"
+echo "LiZhi CAD WASM + correlated save-ack compiled from pinned source $CAD_REF"
