@@ -19,6 +19,14 @@ ChatGPT → private HTTPS MCP gateway (OAuth identity) → project-scoped author
 - Staging revision storage retains bounded 16 MiB DXF bytea snapshots with transactionally committed metadata and job state; production should move binary payloads to immutable object storage.
 - Staging worker leases use atomic row locking (FOR UPDATE SKIP LOCKED), heartbeat, lease expiry reclamation and fencing tokens; for preclaimed jobs use runClaimed(key, leaseToken). The production host must renew leases regularly throughout CADCraft execution and refuse stale publication.
 
+## Joined PostgreSQL + object storage staging (2026-10-24)
+
+- `cloud-cad-object-revisions.cjs` coordinates an auditable upload attempt, immutable S3 object PUTs keyed by owner/project/drawing/revision/**job key**/format, and one PostgreSQL transaction committing object hashes, drawing head, job completion and the upload's published marker.
+- `cloud-cad-object-worker-ports.cjs` connects the existing Worker to an owner-scoped compiled intent store and retrieves old DXF versions from the S3-compatible store; testing publishes revisions 1 through 4. The joined CI runner executes simulated geometry for this portion; the separate Linux CADCraft binary smoke test still covers actual CADCraft rendering.
+- Staging integration: PostgreSQL 16 Docker service plus Moto S3 HTTP emulator; Actions run 40091058125 PASS. Verified edit races, rollback after partial S3 failure, immutable historical revisions, and two orphan **candidates** kept for manual review. **No automatic object deletion**.
+- S3 PUTs are outside the PostgreSQL transaction: metadata publication is atomic **within PostgreSQL only**. Upload crash can leave unreferenced objects. Do not claim a distributed ACID transaction or production recovery. A separate authorized cleanup and quota/retention policy remain required.
+- Neither production Supabase Storage, user-specific project ACL, always-on worker, public TLS MCP OAuth connection nor integration with the live Engineering Center UI is deployed.
+
 ## New staging integrations (2026-10-24)
 
 - **Lease heartbeat during execution:** `cloud-cad-lease-runner.cjs` renews a preclaimed job's lease throughout execution, propagates a lost-lease AbortSignal to `cloud-cad-worker.cjs`, and terminates the child CADCraft CLI through `cadcraft-cli-runner.cjs`. The PostgreSQL transaction uses the **database clock** to reject expired lease tokens. Tested on Node 20/22 and actual ephemeral PostgreSQL 16 (Actions run 40088145037). This does **not** by itself provide a continuously deployed host or forced cancellation for any separate MCP stdio process.
