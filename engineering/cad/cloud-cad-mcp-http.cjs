@@ -13,22 +13,31 @@ const send=(res,status,payload,headers={})=>{
  const txt=payload===null?"":JSON.stringify(payload);
  res.writeHead(status,{"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff","content-length":Buffer.byteLength(txt),...headers});res.end(txt);
 };
-function createCadMcpHttpHandler({verifyBearer,service,allowedOrigins=[]}={}){
+function createCadMcpHttpHandler({verifyBearer,service,allowedOrigins=[],resourceUrl=null,authorizationServer=null}={}){
  if(typeof verifyBearer!=="function"||!service||typeof service.submit!=="function"||typeof service.status!=="function"||!Array.isArray(allowedOrigins))
   throw new TypeError("CAD MCP requires an authenticated token verifier, service and origin allowlist");
+ if((resourceUrl===null)!==(authorizationServer===null)||
+    (resourceUrl!==null&&(!/^https:\/\/[^\s]+\/mcp$/.test(resourceUrl)||!/^https:\/\/[^\s]+\/auth\/v1$/.test(authorizationServer))))
+  throw new TypeError("OAuth discovery requires trusted HTTPS MCP resource and Supabase issuer URLs");
+ const resourceMetadataUrl=resourceUrl?new URL("/.well-known/oauth-protected-resource",resourceUrl).toString():null;
+ const authHeader=resourceMetadataUrl?`Bearer resource_metadata="${resourceMetadataUrl}"`:"Bearer";
  return async function handle(req,res){
   try{
+   if(resourceMetadataUrl&&["/.well-known/oauth-protected-resource","/.well-known/oauth-protected-resource/mcp"].includes(req.url)){
+    if(req.method!=="GET"){send(res,405,{error:"METHOD_NOT_ALLOWED"},{allow:"GET"});return;}
+    send(res,200,{resource:resourceUrl,authorization_servers:[authorizationServer],scopes_supported:["openid","email"]});return;
+   }
    if(req.url!=="/mcp"){send(res,404,{error:"NOT_FOUND"});return;}
    if(req.method!=="POST"){send(res,405,{error:"METHOD_NOT_ALLOWED"},{allow:"POST"});return;}
    const origin=req.headers.origin;
    if(origin&&!allowedOrigins.includes(origin)){send(res,403,{error:"ORIGIN_DENIED"});return;}
    if(!/^application\/json(?:;|$)/i.test(req.headers["content-type"]||"")){send(res,415,{error:"CONTENT_TYPE_INVALID"});return;}
    const auth=/^Bearer ([A-Za-z0-9._~+/-]+={0,2})$/i.exec(req.headers.authorization||"");
-   if(!auth){send(res,401,{error:"UNAUTHORIZED"},{"www-authenticate":"Bearer"});return;}
+   if(!auth){send(res,401,{error:"UNAUTHORIZED"},{"www-authenticate":authHeader});return;}
    // verifyBearer must cryptographically verify expiry, signature, audience,
    // and issuer. The returned subject MUST NOT derive from client arguments.
-   const subject=await verifyBearer(auth[1]);
-   if(!subject||typeof subject.userId!=="string"){send(res,401,{error:"UNAUTHORIZED"},{"www-authenticate":"Bearer"});return;}
+   let subject;try{subject=await verifyBearer(auth[1]);}catch{send(res,401,{error:"UNAUTHORIZED"},{"www-authenticate":authHeader});return;}
+   if(!subject||typeof subject.userId!=="string"){send(res,401,{error:"UNAUTHORIZED"},{"www-authenticate":authHeader});return;}
    let size=0,chunks=[];
    for await(const chunk of req){
     size+=chunk.length;
@@ -51,8 +60,8 @@ function createCadMcpHttpHandler({verifyBearer,service,allowedOrigins=[]}={}){
    const name=msg.params?.name,args=msg.params?.arguments;
    if(!args||typeof args!=="object"||Array.isArray(args)){fail(-32602,"Tool arguments must be an object");return;}
    try{
-    const result=name==="cad_submit_drawing"?await service.submit(subject.userId,args)
-      :name==="cad_job_status"?await service.status(subject.userId,args):null;
+    const result=name==="cad_submit_drawing"?await service.submit(subject.userId,args,{clientId:subject.clientId??null})
+      :name==="cad_job_status"?await service.status(subject.userId,args,{clientId:subject.clientId??null}):null;
     if(result===null){fail(-32602,"Unknown CAD tool");return;}
     respond({content:[{type:"text",text:JSON.stringify(result)}],isError:false});
    }catch(error){
