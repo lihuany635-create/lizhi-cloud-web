@@ -153,7 +153,7 @@ async function main(){
     const downloaded=await downloadPromise;
     await downloaded.saveAs(path.join(evidence,"cad-permission-denied-fallback.dxf"));
     assert.equal(await page.evaluate(()=>window.__cadE2E.files.size),1);
-    assert.match(await page.locator("#cad-status").text(),/已下載|未建立本機歷史版本/);
+    assert.match(await page.locator("#cad-status").textContent(),/已下載|未建立本機歷史版本/);
     assert.ok((await fs.stat(path.join(evidence,"cad-permission-denied-fallback.dxf"))).size>250);
     report.steps.push("Permission revoked -> original revisions unchanged; DXF download fallback");
     report.passed=true;
