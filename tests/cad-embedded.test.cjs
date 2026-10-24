@@ -25,7 +25,7 @@ test('native pinned WASM build is part of existing Pages deployment', () => {
   assert.match(workflow, /bash cad\/setup-build-toolchain\.sh/);
   assert.match(workflow, /bash cad\/build-runtime\.sh/);
   assert.match(builder, /trunk build --release/);
-  assert.match(builder, /19e09447345750eaedd33db7a86fbeff3af1210f/);
+  assert.match(builder, /98ceeca360ba920666af075be6c08fb4bb63d2ee/);
   assert.match(builder, /cad\/runtime/);
   assert.doesNotMatch(builder, /docker build|supabase|AWS_SECRET|service.role|remote worker/i);
 });
