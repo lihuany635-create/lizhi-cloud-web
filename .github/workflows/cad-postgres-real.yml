@@ -6,6 +6,7 @@ on:
       - 'engineering/cad/cloud-cad-postgres-*.cjs'
       - 'engineering/cad/cloud-cad-postgres-live.integration.cjs'
       - 'engineering/cad/sql/**'
+      - 'engineering/cad/cloud-cad-postgres-publish-acl.integration.cjs'
       - 'engineering/cad/cloud-cad-oauth-acl*.cjs'
       - 'engineering/cad/cloud-cad-oauth-acl.integration.cjs'
       - 'engineering/cad/cloud-cad-oauth-host.integration.cjs'
@@ -61,3 +62,7 @@ jobs:
         env:
           DATABASE_URL: postgres://postgres:cad_ci_only@127.0.0.1:5432/cad_ci
         run: NODE_PATH="$RUNNER_TEMP/cad-pg-test/node_modules" node engineering/cad/cloud-cad-oauth-host.integration.cjs
+      - name: Verify OAuth revocation during S3 upload blocks committed CAD revision
+        env:
+          DATABASE_URL: postgres://postgres:cad_ci_only@127.0.0.1:5432/cad_ci
+        run: NODE_PATH="$RUNNER_TEMP/cad-pg-test/node_modules" node engineering/cad/cloud-cad-postgres-publish-acl.integration.cjs
