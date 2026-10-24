@@ -1,3 +1,5 @@
+> **產品路線 v2.1 更正（2026-10-25；後續開發以此為準）**：使用者已要求移除獨立雲端 CAD 運算、Windows 關機遠端繪圖及為 CAD 新建雲端 DB/Worker 作為必要功能。已查核立之圖書館 `library/library-computer.js`、`library/library-device.js`、`library/MCP.md` 與 `supabase/functions/library-mcp/index.ts`：其做法是「原檔可留裝置、只同步使用者授權的索引／摘錄，ChatGPT 透過 OAuth MCP 查詢」，不是雲端 CAD 運算。立之 CAD 現改成 **Fork 本機／瀏覽器 WebAssembly 引擎 + 使用者授權本機 DXF + 原生 MCP + 選擇性圖書館式索引／指令草稿**；裝置離線時不得假裝已實際修改原圖。開發主文件： [自有 Fork 的 LOCAL-FIRST v2.1](https://github.com/lihuany635-create/lizhi-cad/blob/feature/lizhi-native-mcp-v0120/docs/lizhi/LIBRARY_PATTERN_LOCAL_FIRST_V21.md)；正式 Google Docs 原位修訂 v2.1：[Google 計畫](https://docs.google.com/document/d/1sG3epjnOYpwVS55YOZA1d5bVFT4T71GHs9VJQi7_8QU/edit)。以下 v2.0 表格中的 cloud-first P5/P6 敘述**已作廢，只供歷史追溯，不得繼續當 active TODO／部署要求**。
+
 # CADCraft 自有原始碼改造 × ChatGPT 原生 MCP 整合計畫 v2.0
 
 更新：2026-10-24。**本文件優先於此分支舊有 cloud-first 開發方向**，代表產品範圍修正，不表示已完成 Fork、部署或使用者驗收。
