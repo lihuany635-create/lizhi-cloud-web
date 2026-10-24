@@ -77,13 +77,13 @@ function renderWorkspace() {
   }
   if(state.route === 'animationflow' && !panel.dataset.productionMounted) {
     panel.dataset.productionMounted = 'loading';
-    import('./production/production-workspace.js?v=5').then(module => {
+    import('./production/production-workspace.js?v=6').then(module => {
       const host = panel.querySelector('#production-root');
-      if(!host) throw new Error('製作工作台容器不存在');
+      if(!host) throw new Error('專案工作台容器不存在');
       module.mount(host); panel.dataset.productionMounted = 'ready';
     }).catch(error => {
       const host = panel.querySelector('#production-root');
-      if(host) { host.replaceChildren(); const message=document.createElement('p'); message.className='production-loading'; message.textContent='製作工作台載入失敗，請重新整理。'+error.message; host.append(message); }
+      if(host) { host.replaceChildren(); const message=document.createElement('p'); message.className='production-loading'; message.textContent='專案工作台載入失敗，請重新整理。'+error.message; host.append(message); }
       delete panel.dataset.productionMounted;
     });
   }
