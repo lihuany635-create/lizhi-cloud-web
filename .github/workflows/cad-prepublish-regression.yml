@@ -1,0 +1,31 @@
+name: LiZhi CAD Prepublish Cross-Module Regression (no deployment)
+on:
+  push:
+    branches: [feature/embed-lizhi-cad-local-v1]
+    paths:
+      - '.github/workflows/cad-prepublish-regression.yml'
+      - 'app.js'
+      - 'workspace-ui.js'
+      - 'index.html'
+      - 'cad/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  web-modules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax check modified standalone browser bundles
+        run: |
+          node --check app.js
+          node --check workspace-ui.js
+          node --check cad/cad-host.js
+          node --test tests/cad-embedded.test.cjs
+      - name: Engineering Center existing tests
+        run: node --test engineering/tests/*.test.mjs
+      - name: Finance existing tests
+        run: node --test finance/tests/*.test.mjs finance/tests/*.test.js
+      - name: Library read-only MCP contract
+        run: node --test tests/library-mcp-contract.test.mjs
