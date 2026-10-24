@@ -1,0 +1,28 @@
+name: CAD Cloud Contract Checks
+on:
+  push:
+    branches:
+      - feature/cad-m2-spec-v1-20261024
+    paths:
+      - 'engineering/cad/**'
+      - '.github/workflows/cad-cloud-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cad-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run isolated CAD cloud contracts
+        run: node --test engineering/cad/*.test.cjs
