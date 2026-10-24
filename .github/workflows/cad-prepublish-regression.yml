@@ -8,6 +8,7 @@ on:
       - 'workspace-ui.js'
       - 'index.html'
       - 'cad/**'
+      - 'tests/cad-regression-baseline.cjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -23,8 +24,15 @@ jobs:
           node --check workspace-ui.js
           node --check cad/cad-host.js
           node --test tests/cad-embedded.test.cjs
-      - name: Engineering Center existing tests
-        run: node --test engineering/tests/*.test.mjs
+      - name: Checkout unchanged main separately for regression baseline
+        uses: actions/checkout@v4
+        with:
+          repository: lihuany635-create/lizhi-cloud-web
+          ref: b67bf9f34e001894793d7c7332bbb7a1e86aa177
+          path: _cad-baseline-main
+          persist-credentials: false
+      - name: Engineering Center comparative baseline (same tests, no new failures)
+        run: node tests/cad-regression-baseline.cjs
       - name: Finance existing tests
         run: node --test finance/tests/*.test.mjs finance/tests/*.test.js
       - name: Library read-only MCP contract
