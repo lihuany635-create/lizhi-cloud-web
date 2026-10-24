@@ -3,11 +3,12 @@
 // rate limiting and persistent DB stores MUST be supplied by the host.
 const {createCadMcpService}=require("./cloud-cad-mcp-service.cjs");
 const MAX_BODY=512*1024;
+const OAUTH_SCHEME=Object.freeze([{type:"oauth2",scopes:["openid","email"]}]);
 const TOOLS=Object.freeze([
- Object.freeze({name:"cad_submit_drawing",description:"Create or modify a versioned CAD drawing in the remote cloud CADCraft queue. Does not directly execute commands.",inputSchema:{type:"object",additionalProperties:false,required:["projectId","drawingId","baseRevision","requestId","operation","spec"],properties:{
+ Object.freeze({name:"cad_submit_drawing",securitySchemes:OAUTH_SCHEME,description:"Create or modify a versioned CAD drawing in the remote cloud CADCraft queue. Does not directly execute commands.",inputSchema:{type:"object",additionalProperties:false,required:["projectId","drawingId","baseRevision","requestId","operation","spec"],properties:{
   projectId:{type:"string"},drawingId:{type:"string"},baseRevision:{type:"integer",minimum:0},requestId:{type:"string"},operation:{type:"string",enum:["create","modify"]},spec:{type:"object",description:"Validated cad-drawing-spec@1 closed-polyline drawing contract"}
  }}}),
- Object.freeze({name:"cad_job_status",description:"Read only the status of a CAD job belonging to an authorized project and drawing.",inputSchema:{type:"object",additionalProperties:false,required:["projectId","drawingId","jobKey"],properties:{projectId:{type:"string"},drawingId:{type:"string"},jobKey:{type:"string",pattern:"^[0-9a-f]{64}$"}}}})
+ Object.freeze({name:"cad_job_status",securitySchemes:OAUTH_SCHEME,description:"Read only the status of a CAD job belonging to an authorized project and drawing.",inputSchema:{type:"object",additionalProperties:false,required:["projectId","drawingId","jobKey"],properties:{projectId:{type:"string"},drawingId:{type:"string"},jobKey:{type:"string",pattern:"^[0-9a-f]{64}$"}}}})
 ]);
 const send=(res,status,payload,headers={})=>{
  const txt=payload===null?"":JSON.stringify(payload);
