@@ -10,6 +10,17 @@ const TOOLS=Object.freeze([
  }}}),
  Object.freeze({name:"cad_job_status",securitySchemes:OAUTH_SCHEME,description:"Read only the status of a CAD job belonging to an authorized project and drawing.",inputSchema:{type:"object",additionalProperties:false,required:["projectId","drawingId","jobKey"],properties:{projectId:{type:"string"},drawingId:{type:"string"},jobKey:{type:"string",pattern:"^[0-9a-f]{64}$"}}}})
 ]);
+
+const READ_TOOLS=Object.freeze([
+ Object.freeze({name:"cad_list_revisions",securitySchemes:OAUTH_SCHEME,
+  description:"List published CAD drawing revisions after checking OAuth project read permission.",
+  inputSchema:{type:"object",additionalProperties:false,required:["projectId","drawingId"],
+   properties:{projectId:{type:"string"},drawingId:{type:"string"},limit:{type:"integer",minimum:1,maximum:50}}}}),
+ Object.freeze({name:"cad_preview_png",securitySchemes:OAUTH_SCHEME,
+  description:"Return a checksum-verified PNG preview of one CAD revision, capped at 1 MiB.",
+  inputSchema:{type:"object",additionalProperties:false,required:["projectId","drawingId","revision"],
+   properties:{projectId:{type:"string"},drawingId:{type:"string"},revision:{type:"integer",minimum:1}}}})
+]);
 const send=(res,status,payload,headers={})=>{
  const txt=payload===null?"":JSON.stringify(payload);
  res.writeHead(status,{"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff","content-length":Buffer.byteLength(txt),...headers});res.end(txt);
@@ -22,6 +33,7 @@ function createCadMcpHttpHandler({verifyBearer,service,allowedOrigins=[],resourc
   throw new TypeError("OAuth discovery requires trusted HTTPS MCP resource and Supabase issuer URLs");
  const resourceMetadataUrl=resourceUrl?new URL("/.well-known/oauth-protected-resource",resourceUrl).toString():null;
  const authHeader=resourceMetadataUrl?`Bearer resource_metadata="${resourceMetadataUrl}"`:"Bearer";
+ const allTools=typeof service.listRevisions==="function"&&typeof service.previewPng==="function"?[...TOOLS,...READ_TOOLS]:TOOLS;
  return async function handle(req,res){
   try{
    if(resourceMetadataUrl&&["/.well-known/oauth-protected-resource","/.well-known/oauth-protected-resource/mcp"].includes(req.url)){
@@ -56,13 +68,20 @@ function createCadMcpHttpHandler({verifyBearer,service,allowedOrigins=[],resourc
     respond({protocolVersion:"2025-03-26",capabilities:{tools:{listChanged:false}},serverInfo:{name:"lizhi-cloud-cad",version:"0.1.0"}});return;
    }
    if(msg.method==="ping"){respond({});return;}
-   if(msg.method==="tools/list"){respond({tools:TOOLS});return;}
+   if(msg.method==="tools/list"){respond({tools:allTools});return;}
    if(msg.method!=="tools/call"){fail(-32601,"Method not found");return;}
    const name=msg.params?.name,args=msg.params?.arguments;
    if(!args||typeof args!=="object"||Array.isArray(args)){fail(-32602,"Tool arguments must be an object");return;}
    try{
-    const result=name==="cad_submit_drawing"?await service.submit(subject.userId,args,{clientId:subject.clientId??null})
-      :name==="cad_job_status"?await service.status(subject.userId,args,{clientId:subject.clientId??null}):null;
+    const context={clientId:subject.clientId??null};
+    if(name==="cad_preview_png"&&allTools!==TOOLS){
+      const preview=await service.previewPng(subject.userId,args,context);
+      if(!preview||!Buffer.isBuffer(preview.bytes)){fail(-32603,"Preview unavailable");return;}
+      respond({content:[{type:"image",mimeType:"image/png",data:preview.bytes.toString("base64")}],isError:false});return;
+    }
+    const result=name==="cad_submit_drawing"?await service.submit(subject.userId,args,context)
+      :name==="cad_job_status"?await service.status(subject.userId,args,context)
+      :name==="cad_list_revisions"&&allTools!==TOOLS?await service.listRevisions(subject.userId,args,context):null;
     if(result===null){fail(-32602,"Unknown CAD tool");return;}
     respond({content:[{type:"text",text:JSON.stringify(result)}],isError:false});
    }catch(error){
