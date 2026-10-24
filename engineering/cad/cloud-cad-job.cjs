@@ -16,7 +16,7 @@ function transition(job,to,{workerId=null,expectedStatus,outputRevision=null}={}
  if(!job||!STATUS.includes(job.status)||!STATUS.includes(to))throw new CadJobError("CAD_STATUS_INVALID","Bad job state");
  if(expectedStatus!==job.status)throw new CadJobError("CAD_JOB_CONFLICT","Stale job status");
  if(!allowed[job.status].includes(to))throw new CadJobError("CAD_TRANSITION_DENIED","Illegal state transition");
- if(["claimed","running","completed"].includes(to)){
+ if(["claimed","running","completed","failed"].includes(to)||(to==="queued"&&job.status==="claimed")){
   assertId(workerId);
   if(job.status!=="queued"&&job.worker_id!==workerId)throw new CadJobError("CAD_WORKER_MISMATCH","Worker does not own job");
  }
