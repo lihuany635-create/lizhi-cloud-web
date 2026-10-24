@@ -59,11 +59,30 @@ async function main(){
   assert.equal(output.revision,1);assert.equal(output.job_committed,true);
   assert.equal((await q.read(job.idempotency_key)).status,"completed");
   assert.equal((await revision.read({projectId:"leaseP",drawingId:"leaseD",revision:1})).dxf.toString(),bytes.toString());
+  // Production-style path: scheduler has already claimed a lease, so Worker
+  // must accept it without claiming twice and publish with its fence token.
+  const next=await q.enqueue({...args,baseRevision:1,operation:"modify",requestId:"lease02"});
+  const claim=await secondLease.claimNext({workerId:secondOwner,leaseSeconds:60});
+  assert.equal(claim.job.idempotency_key,next.idempotency_key);
+  const worker=createWorker({queue:q,workerId:secondOwner,ports:{
+   authorize:async()=>{},
+   loadRevision:async j=>revision.read({projectId:j.project_id,drawingId:j.drawing_id,revision:j.expected_revision}),
+   execute:async({source})=>({bytes:Buffer.concat([source.dxf,Buffer.from("0\nLINE\n")])}),
+   inspect:async()=>({valid:true,entityCount:2}),
+   storeImmutable:async({output})=>({sha256:sha(output.bytes),artifacts:{dxf:{bytes:output.bytes}}}),
+   publishRevision:async({job,artifact,inspection,leaseToken})=>
+    revision.publish({job,artifact,inspection,workerId:secondOwner,leaseToken})
+  }});
+  await assert.rejects(worker.runClaimed(next.idempotency_key,firstToken),{code:"CAD_LEASE_LOST"});
+  const done=await worker.runClaimed(next.idempotency_key,claim.lease_token);
+  assert.equal(done.revision,2);
+  assert.equal((await q.read(next.idempotency_key)).status,"completed");
+  assert.equal((await revision.read({projectId:"leaseP",drawingId:"leaseD",revision:2})).dxf.toString(),bytes.toString()+"0\nLINE\n");
   const nothing=await leaseA.claimNext({workerId:"anotherWorker",leaseSeconds:60});
   assert.equal(nothing,null);
   console.log("CAD_POSTGRES_LEASE_RECOVERY_PASS",JSON.stringify({
    concurrent_claims:1,attempt_after_crash:2,old_token:"rejected",
-   reclaimed_by:secondOwner,immutable_revision:1,job_status:"completed",
+   reclaimed_by:secondOwner,immutable_revision:2,job_status:"completed",leased_worker_run:"PASS",
    healthy_lease_renewed:true
   }));
  }finally{await a.end();await b.end();}
