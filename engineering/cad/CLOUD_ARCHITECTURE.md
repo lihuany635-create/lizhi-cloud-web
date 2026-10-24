@@ -31,7 +31,7 @@ ChatGPT → private HTTPS MCP gateway (OAuth identity) → project-scoped author
 
 - **Lease heartbeat during execution:** `cloud-cad-lease-runner.cjs` renews a preclaimed job's lease throughout execution, propagates a lost-lease AbortSignal to `cloud-cad-worker.cjs`, and terminates the child CADCraft CLI through `cadcraft-cli-runner.cjs`. The PostgreSQL transaction uses the **database clock** to reject expired lease tokens. Tested on Node 20/22 and actual ephemeral PostgreSQL 16 (Actions run 40088145037). This does **not** by itself provide a continuously deployed host or forced cancellation for any separate MCP stdio process.
 - **S3-compatible immutable artifact adapter:** `cloud-cad-s3-store.cjs` uses SDK v3 conditional `PutObject If-None-Match: *`, owner/project/drawing/revision-scoped keys, content-signature checks, and SHA-256 verification on read. The same bytes are idempotent and different bytes cannot overwrite a revision. Live S3 **protocol** interactions were tested against an ephemeral Moto HTTP emulator (Actions run 40088705852). This is **not** proof of AWS S3, Supabase Storage, or MinIO production behavior; the official MinIO image/archived binary was unavailable to CI.
-- **Integration not yet complete:** PostgreSQL revision publication currently retains a staging DXF bytea payload up to 16 MiB; S3 artifact storage is an independent tested adapter, not yet referenced from the atomic PostgreSQL publication or connected to live Storage credentials. The final cloud service needs S3 object upload → metadata transaction → recovery of orphaned uploads, project ACL, signed URL retrieval, quotas/backups and a real TLS-hosted worker.
+- **Historical note (superseded later on 2026-10-24):** the first isolated S3 adapter was not yet joined to PostgreSQL publication. The subsequent 'Joined PostgreSQL + object storage staging' implementation described above now publishes S3-backed revisions through PostgreSQL transactions. This remains **disposable CI only**; orphan recovery, production storage, signed download links, quotas/backups and a publicly reachable TLS-hosted worker remain unfinished.
 
 ## Required staging acceptance
 1. In Linux container, verify official CADCraft binary hash and license; run CLI and stdio MCP tests.
@@ -42,3 +42,17 @@ ChatGPT → private HTTPS MCP gateway (OAuth identity) → project-scoped author
 6. Show versioned result in the Engineering Center; run regression tests; only then consider production review.
 
 **Never silently deploy or incur paid cloud charges** without explicit user approval.
+
+
+## Recovering prior CAD tasks from ordinary ChatGPT conversations (2026-10-24)
+
+- The staging OAuth-protected MCP now advertises `cad_list_jobs` in addition to drawing submission, status, revision history and PNG preview.
+- This tool accepts a project ID and a **bounded** 1–25 item limit. The server derives owner UUID and OAuth client ID from the verified bearer token, queries only that owner's project, and independently checks the read grant before returning each drawing.
+- Results contain only job key, drawing ID, operation, state, input/output revision and creation time. No CAD script, user prompt, object storage key, object URL, bearer token or internal database credentials are returned.
+- Its use case is reopening a new conversation and locating a previous job without depending on the previous chat or ChatGPT Work. Recent-result pagination across very large projects is **not yet implemented**.
+- `cloud-cad-job-history.test.cjs` validates owner/project filtering, revoked clients, strict limits and RPC identity binding. The staging SQL includes a supporting owner/project/recent-time index.
+- This is a **code/CI capability**; until OAuth, public HTTPS gateway, cloud runtime and private ChatGPT plugin are live, `cad_list_jobs` is **not yet available** in normal chats.
+
+## Current deployment truth
+
+The repository contains a containerized staging MCP API, independent single-owner Linux CADCraft Worker, PostgreSQL queue/OAuth grant model, and immutable S3-compatible artifact publication. Passing GitHub Actions is not equivalent to an always-on cloud CAD service. The connected Supabase account was found to expose only the existing production project at review time; no disposable staging project was found. Do not apply staging migrations to the production project, open public ingress, or incur a paid host without separate explicit authorization. Ordinary CAD usage must not require ChatGPT Work.
