@@ -4,7 +4,7 @@
 const {prepare}=require("./cloud-cad-job.cjs");
 const {prepareJob}=require("./cadcraft-export-job.cjs");
 class CadMcpError extends Error{constructor(code,message){super(message);this.name="CadMcpError";this.code=code;}}
-function createCadMcpService({authorizeDrawing,queueForOwner,intents}={}){
+function createCadMcpService({authorizeDrawing,queueForOwner,intents,requireOAuthClient=false}={}){
  if(typeof authorizeDrawing!=="function"||typeof queueForOwner!=="function"||!intents||typeof intents.putIfAbsent!=="function"||typeof intents.get!=="function")
   throw new CadMcpError("CAD_MCP_PORT_INVALID","Missing authorization, queue or immutable intent store");
  const authorized=async(ownerId,projectId,drawingId,action,context={})=>{
@@ -19,13 +19,19 @@ function createCadMcpService({authorizeDrawing,queueForOwner,intents}={}){
    const cloudJob=prepare({projectId,drawingId,baseRevision,requestId,operation});
    if(operation==="create"&&baseRevision!==0)throw new CadMcpError("CAD_CREATE_REVISION","New drawing requires base revision 0");
    if(operation==="modify"&&baseRevision<1)throw new CadMcpError("CAD_MODIFY_REVISION","Modified drawings require an existing revision");
+   if(requireOAuthClient&&(!context||typeof context.clientId!=="string"||!/^[A-Za-z0-9_.:-]{1,256}$/.test(context.clientId)))
+    throw new CadMcpError("CAD_OAUTH_CLIENT_REQUIRED","An authenticated OAuth client grant is required");
    await authorized(ownerId,projectId,drawingId,operation,context);
-   const compiled=prepareJob(spec,{projectId,drawingId,cloudJobKey:cloudJob.idempotency_key,drawingRevision:baseRevision});
+   const original=prepareJob(spec,{projectId,drawingId,cloudJobKey:cloudJob.idempotency_key,drawingRevision:baseRevision});
+   // Persist the verified OAuth client ID alongside the immutable compiled
+   // intent, so a different client cannot replay the same requestId and the
+   // worker can verify the client grant again *at execution time*.
+   const compiled=Object.freeze({...original,...(requireOAuthClient?{oauth_client_id:context.clientId}:{})});
    // The intent store MUST perform one atomic compare-if-absent operation.
    // A reused request_id with different geometry MUST cause a conflict,
    // never silently return the prior drawing job.
    const intent=await intents.putIfAbsent({ownerId,key:cloudJob.idempotency_key,value:compiled});
-   if(!intent||intent.job_key!==compiled.job_key)throw new CadMcpError("CAD_INTENT_CONFLICT","Request ID was previously used with different CAD geometry");
+   if(!intent||intent.job_key!==compiled.job_key||intent.oauth_client_id!==compiled.oauth_client_id)throw new CadMcpError("CAD_INTENT_CONFLICT","Request ID was previously used with different CAD geometry or OAuth client");
    const queue=queueForOwner(ownerId);
    if(!queue||typeof queue.enqueue!=="function")throw new CadMcpError("CAD_QUEUE_INVALID","Queue unavailable");
    const result=await queue.enqueue({projectId,drawingId,baseRevision,requestId,operation});
@@ -36,6 +42,8 @@ function createCadMcpService({authorizeDrawing,queueForOwner,intents}={}){
    // Don't let a guessed job key disclose an unauthenticated owner's job.
    prepare({projectId,drawingId,baseRevision:0,requestId:"validate",operation:"inspect"});
    if(typeof jobKey!=="string"||!/^[0-9a-f]{64}$/.test(jobKey))throw new CadMcpError("CAD_JOB_KEY_INVALID","Invalid job key");
+   if(requireOAuthClient&&(!context||typeof context.clientId!=="string"||!/^[A-Za-z0-9_.:-]{1,256}$/.test(context.clientId)))
+    throw new CadMcpError("CAD_OAUTH_CLIENT_REQUIRED","An authenticated OAuth client grant is required");
    await authorized(ownerId,projectId,drawingId,"read",context);
    const q=queueForOwner(ownerId);
    const job=await q.read(jobKey);
