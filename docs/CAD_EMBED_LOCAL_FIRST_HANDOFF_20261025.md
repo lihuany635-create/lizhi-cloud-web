@@ -59,3 +59,11 @@
 - **關鍵限定**：CI 使用 Chromium 中模擬的 `showDirectoryPicker` handle（獨立記憶體目錄），非實際 Windows/Android 檔案選擇器。真實 OS 資料夾選取、授權跨重載持久化、使用者操作手勢、手機 fallback、真實存檔與重開仍須另做人工／實機測試，不能把這次 6/6 說成全產品上線。
 - 另已將相同 Chromium E2E 納入預覽 CI `browser-e2e` job（必須在當次 source-build artifact 成功後才運行）；`cad-embedded-browser-fast.yml` 僅為加速迭代重用上一份明確固定來源 SHA 的 WASM，不應作為日後新引擎 commit 的驗收替代。
 - 主線依然 **Draft PR #6**、未合併 `main`、未發布 GitHub Pages、未修改 Supabase 或工程中心。ChatGPT 一般對話 CAD MCP 授權寫入也仍未連通。
+
+### 完整單輪 source-build → browser E2E 最新確認
+
+- [CI 40120106720](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40120106720) **三個 job 全部 completed success**：host-contract、wasm-preview、browser-e2e。確認同一輪已將 Rust Fork 編成 WebAssembly，直接在真正立之雲端庫頁面載入與驗證。
+- Browser job `120951210849` 的實際 console `LIZHI_CAD_PORTAL_E2E passed:true`、六個步驟與 `[0,0]-[800,900]` DXF geometry，與快速 CI 獨立得到相同結果。
+- 同一輪產物：真 WASM bundle artifact `12570214924`（ZIP SHA256 `0c53ce5c99ecaaf615c2b35e7bb37e94bf65ace096a9c15165c5f680f864b1d7`）；Chromium 證據 artifact `12571041874`（ZIP SHA256 `89d04fb0eb43e9aa7b251dbe73e8929d35227762a87b3e8daeafefd510246f4c`）。這些 SHA256 是各**ZIP 包**的雜湊，不是圖檔或源碼的雜湊。
+- 之前較舊的 [40119960763](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40119960763) 在 browser-e2e 失敗，原因僅是測試程式誤用 Playwright `locator.text()`；已修為 `locator.textContent()` 後，40120106720 全數成功；不可在驗收表上把舊失敗留作未修復問題。
+- **仍保留 Draft PR #6 未合併**。真實 OS File System Access picker、Windows/Android 真正檔案落盤、IndexedDB handle 重新開啟、PWA offline、手機 UX 和 ChatGPT OAuth MCP 仍為開放驗收。
