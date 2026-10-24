@@ -107,6 +107,28 @@ async function main(){
     report.steps.push("Reload recovers saved directory permission handle and original DXF, then new immutable revision");
     report.secondName=final.find(f=>f.name!==first[0].name).name;
     report.savedRevisions=2;
+    // Reopen the installed PWA while NETWORK OFFLINE, from actual service-worker caches.
+    // Do not fake navigator.onLine or intercept requests: context.setOffline cuts the network.
+    await page.waitForFunction(()=>!!navigator.serviceWorker?.controller,null,{timeout:45000});
+    await page.waitForFunction(async()=>{
+      const cacheNames=await caches.keys();
+      const names=[];
+      for(const cacheName of cacheNames){
+        const keys=await(await caches.open(cacheName)).keys();
+        names.push(...keys.map(key=>key.url));
+      }
+      return names.some(url=>url.includes("/cad/runtime/") && url.includes(".wasm"))
+        && names.some(url=>url.includes("/cad/runtime/index.html?host=parent"))
+        && names.some(url=>url.includes("/cad/cad-host.js?v=2"));
+    },null,{timeout:45000});
+    await context.setOffline(true);
+    await page.reload({waitUntil:"domcontentloaded",timeout:30000});
+    await page.waitForFunction(()=>document.querySelector("#cad-status")?.textContent?.includes("已就緒"),null,{timeout:35000});
+    await page.locator('[data-cad-action="versions"]').click();
+    await page.waitForFunction(()=>document.querySelector("#cad-status")?.textContent?.includes("已列出最近 2 個版本"),null,{timeout:18000});
+    assert.equal(await page.locator("[data-cad-revision]").count(),2);
+    report.steps.push("After online warm-up, actual service worker reloads native WASM offline and reads two OPFS revisions");
+    report.offlineRestart=true;
     report.passed=true;
   }catch(e){
     report.passed=false;report.error=String(e.stack||e);
