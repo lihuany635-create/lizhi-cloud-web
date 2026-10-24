@@ -45,3 +45,7 @@ jobs:
         env:
           DATABASE_URL: postgres://postgres:cad_ci_only@127.0.0.1:5432/cad_ci
         run: NODE_PATH="$RUNNER_TEMP/cad-pg-test/node_modules" node engineering/cad/cloud-cad-postgres-revisions.integration.cjs
+      - name: Verify expired lease reclaim and worker fencing
+        env:
+          DATABASE_URL: postgres://postgres:cad_ci_only@127.0.0.1:5432/cad_ci
+        run: NODE_PATH="$RUNNER_TEMP/cad-pg-test/node_modules" node engineering/cad/cloud-cad-postgres-lease.integration.cjs
