@@ -21,6 +21,12 @@ const READ_TOOLS=Object.freeze([
   inputSchema:{type:"object",additionalProperties:false,required:["projectId","drawingId","revision"],
    properties:{projectId:{type:"string"},drawingId:{type:"string"},revision:{type:"integer",minimum:1}}}})
 ]);
+const HISTORY_TOOLS=Object.freeze([
+ Object.freeze({name:"cad_list_jobs",securitySchemes:OAUTH_SCHEME,
+  description:"Find your recent cloud CAD jobs after a ChatGPT conversation ends. Returns metadata only for drawings this authenticated OAuth client may read.",
+  inputSchema:{type:"object",additionalProperties:false,required:["projectId"],
+   properties:{projectId:{type:"string",pattern:"^[A-Za-z0-9_-]{1,128}$"},limit:{type:"integer",minimum:1,maximum:25}}}})
+]);
 const send=(res,status,payload,headers={})=>{
  const txt=payload===null?"":JSON.stringify(payload);
  res.writeHead(status,{"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff","content-length":Buffer.byteLength(txt),...headers});res.end(txt);
@@ -33,7 +39,9 @@ function createCadMcpHttpHandler({verifyBearer,service,allowedOrigins=[],resourc
   throw new TypeError("OAuth discovery requires trusted HTTPS MCP resource and Supabase issuer URLs");
  const resourceMetadataUrl=resourceUrl?new URL("/.well-known/oauth-protected-resource",resourceUrl).toString():null;
  const authHeader=resourceMetadataUrl?`Bearer resource_metadata="${resourceMetadataUrl}"`:"Bearer";
- const allTools=typeof service.listRevisions==="function"&&typeof service.previewPng==="function"?[...TOOLS,...READ_TOOLS]:TOOLS;
+ const hasReadTools=typeof service.listRevisions==="function"&&typeof service.previewPng==="function";
+ const hasJobHistory=typeof service.listJobs==="function";
+ const allTools=[...TOOLS,...(hasReadTools?READ_TOOLS:[]),...(hasJobHistory?HISTORY_TOOLS:[])];
  return async function handle(req,res){
   try{
    if(resourceMetadataUrl&&["/.well-known/oauth-protected-resource","/.well-known/oauth-protected-resource/mcp"].includes(req.url)){
@@ -74,14 +82,15 @@ function createCadMcpHttpHandler({verifyBearer,service,allowedOrigins=[],resourc
    if(!args||typeof args!=="object"||Array.isArray(args)){fail(-32602,"Tool arguments must be an object");return;}
    try{
     const context={clientId:subject.clientId??null};
-    if(name==="cad_preview_png"&&allTools!==TOOLS){
+    if(name==="cad_preview_png"&&hasReadTools){
       const preview=await service.previewPng(subject.userId,args,context);
       if(!preview||!Buffer.isBuffer(preview.bytes)){fail(-32603,"Preview unavailable");return;}
       respond({content:[{type:"image",mimeType:"image/png",data:preview.bytes.toString("base64")}],isError:false});return;
     }
     const result=name==="cad_submit_drawing"?await service.submit(subject.userId,args,context)
       :name==="cad_job_status"?await service.status(subject.userId,args,context)
-      :name==="cad_list_revisions"&&allTools!==TOOLS?await service.listRevisions(subject.userId,args,context):null;
+      :name==="cad_list_revisions"&&hasReadTools?await service.listRevisions(subject.userId,args,context)
+      :name==="cad_list_jobs"&&hasJobHistory?await service.listJobs(subject.userId,args,context):null;
     if(result===null){fail(-32602,"Unknown CAD tool");return;}
     respond({content:[{type:"text",text:JSON.stringify(result)}],isError:false});
    }catch(error){
