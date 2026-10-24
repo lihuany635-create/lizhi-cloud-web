@@ -1,0 +1,55 @@
+name: CAD Staging OCI Packaging
+on:
+  push:
+    branches: [feature/cad-m2-spec-v1-20261024]
+    paths:
+      - 'engineering/cad/deploy/**'
+      - 'engineering/cad/cloud-cad-mcp-server.cjs'
+      - 'engineering/cad/cloud-cad-worker-server.cjs'
+      - '.github/workflows/cad-oci-staging.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate staging compose and deny-by-default runtime config
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker compose -f engineering/cad/deploy/compose.staging.yml --env-file engineering/cad/deploy/.env.example config --quiet
+          test -f engineering/cad/deploy/Caddyfile.staging
+          node --test engineering/cad/cloud-cad-worker-server.test.cjs engineering/cad/cloud-cad-mcp-server.test.cjs
+      - name: Build actual OCI image with upstream SHA256-verified CADCraft
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -f engineering/cad/deploy/Dockerfile --tag lizhi-cad-staging:test .
+      - name: Exercise packaged runtime and executable
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --network none lizhi-cad-staging:test node -e 'const {Pool}=require("pg"); const {S3Client}=require("@aws-sdk/client-s3"); const {parseWorkerConfig}=require("./engineering/cad/cloud-cad-worker-server.cjs"); const {parseConfig}=require("./engineering/cad/cloud-cad-mcp-server.cjs"); if(!Pool||!S3Client||!parseWorkerConfig||!parseConfig) process.exit(2); console.log("CAD_PACKAGED_NODE_DEPS_PASS")'
+          docker run --rm --network none lizhi-cad-staging:test /opt/lizhi/bin/cadcraft-cli --help > cadcraft-container-help.txt
+          test -s cadcraft-container-help.txt
+          echo "CAD_STAGING_OCI_RUNTIME_PASS"
+      - name: Record image digest and offline deployment metadata
+        shell: bash
+        run: |
+          docker image inspect --format '{{.Id}}' lizhi-cad-staging:test > cad-container-image-digest.txt
+          test -s cad-container-image-digest.txt
+          sha256sum engineering/cad/deploy/Dockerfile > cad-dockerfile.sha256
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: cad-staging-oci-build-evidence
+          path: |
+            cadcraft-container-help.txt
+            cad-container-image-digest.txt
+            cad-dockerfile.sha256
+          if-no-files-found: error
