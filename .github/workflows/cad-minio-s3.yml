@@ -20,19 +20,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Start isolated local MinIO S3
+      - name: Start official pinned MinIO binary in isolated staging
         run: |
-          docker run -d --rm --name cad-ci-minio \
-            -p 127.0.0.1:9000:9000 \
-            -e MINIO_ROOT_USER=cad_ci_only \
-            -e MINIO_ROOT_PASSWORD=cad_ci_only_password \
-            quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z \
-            server /data --address :9000
-          for i in $(seq 1 40); do
+          set -euo pipefail
+          base='https://dl.min.io/server/minio/release/linux-amd64/archive'
+          binary='minio.RELEASE.2025-09-07T16-13-09Z'
+          curl --fail --location --retry 3 --silent --show-error "$base/$binary" -o minio
+          curl --fail --location --retry 3 --silent --show-error "$base/$binary.sha256sum" -o minio.sha256sum
+          expected="$(awk 'NR==1 {print $1}' minio.sha256sum)"
+          test "${#expected}" -eq 64
+          echo "$expected  minio" | sha256sum --check -
+          chmod +x minio
+          mkdir -p "$RUNNER_TEMP/cad-minio-data"
+          MINIO_ROOT_USER=cad_ci_only MINIO_ROOT_PASSWORD=cad_ci_only_password ./minio server "$RUNNER_TEMP/cad-minio-data" --address :9000 >minio-ci.log 2>&1 &
+          echo "$!" >minio-ci.pid
+          for i in $(seq 1 45); do
             if curl --fail --silent http://127.0.0.1:9000/minio/health/ready >/dev/null; then exit 0; fi
             sleep 2
           done
-          docker logs cad-ci-minio
+          cat minio-ci.log
           exit 1
       - name: Install temporary S3 SDK for tests only
         run: npm install --prefix "$RUNNER_TEMP/cad-s3-test" --no-audit --no-fund --ignore-scripts @aws-sdk/client-s3@3.800.0
@@ -40,6 +46,8 @@ jobs:
         env:
           CAD_TEST_S3_ENDPOINT: http://127.0.0.1:9000
         run: NODE_PATH="$RUNNER_TEMP/cad-s3-test/node_modules" node engineering/cad/cloud-cad-s3-live.integration.cjs
-      - name: Remove isolated MinIO
+      - name: Stop isolated MinIO
         if: always()
-        run: docker rm -f cad-ci-minio || true
+        run: |
+          if test -f minio-ci.pid; then kill "$(cat minio-ci.pid)" || true; fi
+          if test -f minio-ci.log; then tail -n 30 minio-ci.log; fi
