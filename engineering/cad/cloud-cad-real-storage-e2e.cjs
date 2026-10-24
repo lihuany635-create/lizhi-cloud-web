@@ -22,7 +22,7 @@ const {createCadcraftExecute}=require("./cloud-cad-execute.cjs");
 const {createCadMcpService}=require("./cloud-cad-mcp-service.cjs");
 const {createCadMcpHttpHandler}=require("./cloud-cad-mcp-http.cjs");
 const {createCadOauthAcl}=require("./cloud-cad-oauth-acl.cjs");
-const {createCadWorkerHost}=require("./cloud-cad-worker-host.cjs");
+const {createCadStagingDaemon}=require("./cloud-cad-worker-server.cjs");
 
 const OWNER="feddcbaa-1234-4abc-8abc-abc123456789";
 const PROJECT="cadRealCloud",DRAWING="realCabinet",WORKER="cloudCadWorker",CLIENT="ci-oauth-granted";
@@ -56,7 +56,7 @@ async function main(){
   region:"us-east-1",forcePathStyle:true,
   credentials:{accessKeyId:"cad_ci_only",secretAccessKey:"cad_ci_only_password"}
  });
- let server=null;
+ let server=null,daemon=null;
  try{
   for(const role of ["anon","authenticated"])
    await db.query("DO $$ BEGIN CREATE ROLE "+role+" NOLOGIN; EXCEPTION WHEN duplicate_object THEN NULL; END $$;");
@@ -95,10 +95,16 @@ async function main(){
    assert.equal(payload.result?.isError,false,JSON.stringify(payload));
    return JSON.parse(payload.result.content[0].text);
   }
-  const workerHost=createCadWorkerHost({
-   db,ownerId:OWNER,workerId:WORKER,binPath:bin,objects:s3Store,
-   authorizeDrawing:acl,leaseSeconds:30,heartbeatIntervalMs:1000
-  });
+  daemon=await createCadStagingDaemon({env:{
+   CAD_DEPLOYMENT_MODE:"staging",CAD_WORKER_STAGING_CONFIRM:"isolated-only",
+   CAD_STAGING_DATABASE_URL:process.env.DATABASE_URL,
+   CAD_STAGING_S3_ENDPOINT:process.env.CAD_TEST_S3_ENDPOINT,
+   CAD_STAGING_S3_BUCKET:bucket,CAD_STAGING_S3_REGION:"us-east-1",
+   CAD_STAGING_S3_ACCESS_KEY_ID:"cad_ci_only",
+   CAD_STAGING_S3_SECRET_ACCESS_KEY:"cad_ci_only_password",
+   CAD_WORKER_OWNER_ID:OWNER,CAD_WORKER_ID:WORKER,
+   CADCRAFT_BIN:bin,CADCRAFT_BIN_SHA256:sha(fs.readFileSync(bin))
+  }});
   const request=async(baseRevision,requestId,points)=>{
    const result=await call("cad_submit_drawing",{
     projectId:PROJECT,drawingId:DRAWING,baseRevision,requestId,
@@ -107,7 +113,7 @@ async function main(){
    });
    assert.equal(result.status,"queued");
    assert.equal((await call("cad_job_status",{projectId:PROJECT,drawingId:DRAWING,jobKey:result.job_key})).status,"queued");
-   const completed=await workerHost.runOnce();
+   const completed=await daemon.runOnce();
    assert.equal(completed.revision,baseRevision+1);
    const status=await call("cad_job_status",{projectId:PROJECT,drawingId:DRAWING,jobKey:result.job_key});
    assert.equal(status.output_revision,baseRevision+1);
@@ -145,7 +151,7 @@ async function main(){
   assert.equal((await queue.read(revokedJob.job_key)).status,"failed");
   const latest=await db.query("SELECT current_revision FROM public.lizhi_cad_cloud_drawings WHERE owner_id=$1::uuid AND drawing_id=$2",[OWNER,DRAWING]);
   assert.equal(latest.rows[0].current_revision,2);
-  assert.equal(await workerHost.runOnce(),null);
+  assert.equal(await daemon.runOnce(),null);
   const evidence=path.resolve("cad-real-storage-evidence");
   fs.mkdirSync(evidence,{recursive:true});
   for(const [name,bytes] of [
@@ -161,13 +167,14 @@ async function main(){
    revision_sha256:[rev1.sha256,rev2.sha256],
    preview_sha256:{svg:rev2svg.sha256,png:rev2png.sha256},
    oauth_client_bound_intent:true,worker_rechecks_revoked_client:true,
-   worker_lease_claim_and_publish:true,queued_revoked_job:"DENIED_AND_FAILED",
+   worker_lease_claim_and_publish:true,standalone_worker_staging_daemon:true,queued_revoked_job:"DENIED_AND_FAILED",
    persistent_cloud_service_deployed:false,production_supabase_connected:false
   };
   fs.writeFileSync(path.join(evidence,"verification.json"),JSON.stringify(proof,null,2));
   console.log("CAD_REAL_ENGINE_POSTGRES_S3_MCP_E2E_PASS",JSON.stringify(proof));
  }finally{
   if(server)await new Promise(resolve=>server.close(resolve));
+  if(daemon)await daemon.close();
   await db.end();s3.destroy();
  }
 }
