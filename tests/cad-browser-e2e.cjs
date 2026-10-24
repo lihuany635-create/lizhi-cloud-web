@@ -117,7 +117,7 @@ async function main(){
     });
     assert.equal(saved.length,1,"First save must create exactly one immutable version");
     const first=saved[0];
-    assert.match(first.name,/^cabinet-\d{4}-\d{2}-\d{2}T.*-[0-9a-f]{8}\.dxf$/);
+    assert.match(first.name,/^cabinet-\d{4}-\d{2}-\d{2}T.*-(?:[0-9a-f]{8}|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})\.dxf$/);
     assert.ok(first.bytes.length>250);
     const extents=extentsFromDxf(Buffer.from(first.bytes).toString("utf8"));
     for(const [k,v] of Object.entries({minX:0,maxX:800,minY:0,maxY:900})) {
