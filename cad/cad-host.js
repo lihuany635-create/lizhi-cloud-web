@@ -6,6 +6,7 @@
   const RECOVERY_STORE = "recovery";
   let saveQueue = Promise.resolve();
   let pendingSaves = 0;
+  let dirtyDrawing = false;
   const MAX_BYTES = 32 * 1024 * 1024;
   let panel = null;
   let frame = null;
@@ -255,7 +256,8 @@
       ready = true;
       status("CADCraft 繪圖引擎已就緒。可使用 CAD 內「新建」或開啟 DXF；本機繪圖不經過遠端伺服器。");
     } else if (msg.type === "cadcraft:dirty") {
-      if (msg.dirty === true) status("CAD 圖面有尚未儲存的修改。請在 CAD 內使用儲存指令。");
+      dirtyDrawing = msg.dirty === true;
+      if (dirtyDrawing && pendingSaves===0) status("CAD 有未完成保存的變更，請先在 CAD 內執行儲存並確認成功。", true);
     } else if (msg.type === "cadcraft:save") {
       const bytes = msg.bytes;
       if (!(bytes instanceof ArrayBuffer) || bytes.byteLength === 0 || bytes.byteLength > MAX_BYTES) {
@@ -372,6 +374,7 @@
       panel = target;
       frame = panel.querySelector("#cad-frame");
       ready = false;
+      dirtyDrawing = false;
       if (!frame) return;
       frame.addEventListener("load", () => {
         if (!ready) status("CAD 框架已載入，等待 CADCraft WebAssembly 就緒；若一直無回應，請確認網站已安裝引擎。");
@@ -381,7 +384,7 @@
       if (!listening) {
         window.addEventListener("message", handleMessage);
         window.addEventListener("beforeunload", event => {
-          if (pendingSaves > 0) { event.preventDefault(); event.returnValue = ""; }
+          if (pendingSaves > 0 || dirtyDrawing) { event.preventDefault(); event.returnValue = ""; }
         });
         listening = true;
       }
