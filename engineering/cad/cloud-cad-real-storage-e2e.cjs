@@ -22,6 +22,7 @@ const {createCadcraftExecute}=require("./cloud-cad-execute.cjs");
 const {createCadMcpService}=require("./cloud-cad-mcp-service.cjs");
 const {createCadMcpHttpHandler}=require("./cloud-cad-mcp-http.cjs");
 const {createCadOauthAcl}=require("./cloud-cad-oauth-acl.cjs");
+const {createCadReadService}=require("./cloud-cad-read-service.cjs");
 const {createCadStagingDaemon}=require("./cloud-cad-worker-server.cjs");
 
 const OWNER="feddcbaa-1234-4abc-8abc-abc123456789";
@@ -74,9 +75,11 @@ async function main(){
   });
   const intents=createCadPostgresIntents({db});
   const queue=createQueue(createPostgresStorage({db,ownerId:OWNER}));
-  const service=createCadMcpService({
+  const primaryService=createCadMcpService({
    authorizeDrawing:acl,queueForOwner:()=>queue,intents,requireOAuthClient:true
   });
+  const reads=createCadReadService({db,objects:s3Store,authorizeDrawing:acl});
+  const service=Object.freeze({...primaryService,listRevisions:reads.list,previewPng:reads.preview});
   server=http.createServer(createCadMcpHttpHandler({
    service,verifyBearer:async(token)=>token==="CI_STUB_ONLY"?{userId:OWNER,clientId:CLIENT}:null
   }));
@@ -141,6 +144,24 @@ async function main(){
   assert.deepEqual(rows.rows.map(r=>r.revision),[1,2]);
   assert.deepEqual(rows.rows.map(r=>r.job_key),[firstKey,secondKey]);
   assert.notEqual(rows.rows[0].artifacts.dxf.object_key,rows.rows[1].artifacts.dxf.object_key);
+  const history=await call("cad_list_revisions",{projectId:PROJECT,drawingId:DRAWING});
+  assert.deepEqual(history.revisions.map(r=>r.revision),[2,1]);
+  assert.equal(history.revisions[0].entity_count,2);
+  const previewReply=await fetch(address,{
+   method:"POST",
+   headers:{"content-type":"application/json","authorization":"Bearer CI_STUB_ONLY"},
+   body:JSON.stringify({jsonrpc:"2.0",id:99,method:"tools/call",
+    params:{name:"cad_preview_png",arguments:{projectId:PROJECT,drawingId:DRAWING,revision:2}}})
+  });
+  const previewMessage=await previewReply.json();
+  assert.equal(previewMessage.result?.isError,false,JSON.stringify(previewMessage));
+  const previewContent=previewMessage.result.content[0];
+  assert.equal(previewContent.type,"image");
+  assert.equal(previewContent.mimeType,"image/png");
+  assert.ok(Buffer.from(previewContent.data,"base64").equals(rev2png.bytes));
+  const forgedHistory=await call("cad_list_revisions",{projectId:PROJECT,drawingId:DRAWING});
+  assert.equal(forgedHistory.project_id,PROJECT);
+
   const revokedJob=await call("cad_submit_drawing",{
    projectId:PROJECT,drawingId:DRAWING,baseRevision:2,
    requestId:"queued-before-revocation",operation:"modify",
@@ -166,6 +187,7 @@ async function main(){
    geometry_extents:[firstInfo.extents,secondInfo.extents],
    revision_sha256:[rev1.sha256,rev2.sha256],
    preview_sha256:{svg:rev2svg.sha256,png:rev2png.sha256},
+   mcp_revision_history:true,mcp_verified_png_preview:true,
    oauth_client_bound_intent:true,worker_rechecks_revoked_client:true,
    worker_lease_claim_and_publish:true,standalone_worker_staging_daemon:true,queued_revoked_job:"DENIED_AND_FAILED",
    persistent_cloud_service_deployed:false,production_supabase_connected:false
