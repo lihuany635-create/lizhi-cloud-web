@@ -3,6 +3,12 @@ on:
   push:
     branches: [feature/embed-lizhi-cad-local-v1]
     paths:
+      - 'app.js'
+      - 'workspace-ui.js'
+      - 'index.html'
+      - 'cad/cad-host.js'
+      - 'cad/cad.css'
+      - 'tests/cad-embedded.test.cjs'
       - 'tests/cad-browser-e2e.cjs'
       - 'tests/cad-opfs-persistence-e2e.cjs'
       - '.github/workflows/cad-embedded-browser-fast.yml'
@@ -47,6 +53,7 @@ jobs:
           CAD_BROWSER_EVIDENCE: cad-browser-evidence
         run: |
           set -euo pipefail
+          node --test tests/cad-embedded.test.cjs
           node --check tests/cad-browser-e2e.cjs
           python3 -m http.server 8771 --bind 127.0.0.1 --directory . > /tmp/cad-portal-http.log 2>&1 &
           pid=$!
