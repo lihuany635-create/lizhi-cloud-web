@@ -14,7 +14,10 @@ ChatGPT → private HTTPS MCP gateway (OAuth identity) → project-scoped author
 - Binary source and outputs belong in dedicated object storage (not legacy Engineering's 10 MiB attachment store). Save by immutable key, SHA-256 and MIME; URLs must be authorized and expiry-scoped.
 - A CAD session's in-memory state is ephemeral: save editable revisions to storage after every approved update. Resume by reopening pinned version, never by relying on a running desktop session.
 - SVG generated or imported from untrusted sources must not be directly inline-rendered. Prefer isolated PNG preview plus download; process external SVG with a trusted sanitizer where required.
-- Cloud runtime support, persistence, RLS, authentication and host costs remain **UNTESTED**. The previous v0.12.0 end-to-end run was on Windows only.
+- **Verified in disposable CI:** official CADCraft v0.12.0 Linux headless (DXF reopen/edit, SVG/PNG); test-authenticated HTTP MCP -> Worker -> CADCraft integration; PostgreSQL 16 atomic job completion, immutable DXF, independent-connection readback, worker lease reclamation and fencing; JWT JWKS validator contract tests. See Actions runs 40084771969 and 40087021888.
+- **NOT verified/deployed:** a persistent public cloud service, actual Supabase OAuth/JWKS/project ACL, production RLS, durable object storage, periodic heartbeat runner, interrupt-during-upload recovery, actual mobile ChatGPT MCP connection or UI. CI uses disposable Linux/Postgres. Host cost and availability remain unknown.
+- Staging revision storage retains bounded 16 MiB DXF bytea snapshots with transactionally committed metadata and job state; production should move binary payloads to immutable object storage.
+- Staging worker leases use atomic row locking (FOR UPDATE SKIP LOCKED), heartbeat, lease expiry reclamation and fencing tokens; for preclaimed jobs use runClaimed(key, leaseToken). The production host must renew leases regularly throughout CADCraft execution and refuse stale publication.
 
 ## Required staging acceptance
 1. In Linux container, verify official CADCraft binary hash and license; run CLI and stdio MCP tests.
