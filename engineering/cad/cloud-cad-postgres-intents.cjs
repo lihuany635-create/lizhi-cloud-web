@@ -21,13 +21,14 @@ function createCadPostgresIntents({db}={}){
  }
  async function putIfAbsent({ownerId,key,value}={}){
   checked(ownerId,key);
-  if(!value||value.cloud_job_key!==key||value.status!=="prepared_not_executed"||typeof value.job_key!=="string"||!HASH.test(value.job_key)||typeof value.script!=="string"||value.script.length>300000)
+  if(!value||value.cloud_job_key!==key||value.status!=="prepared_not_executed"||typeof value.job_key!=="string"||!HASH.test(value.job_key)||typeof value.script!=="string"||value.script.length>300000||
+     (value.oauth_client_id!==undefined&&(typeof value.oauth_client_id!=="string"||!/^[A-Za-z0-9_.:-]{1,256}$/.test(value.oauth_client_id))))
    throw new CadIntentStorageError("CAD_INTENT_INVALID","Invalid compiled CAD intent");
   const saved=await db.query(SQL.insert,[ownerId,key,JSON.stringify(value)]);
   if(saved.rowCount===1)return value;
   const previous=await get({ownerId,key});
   if(!previous)throw new CadIntentStorageError("CAD_INTENT_RACE","Intents changed concurrently");
-  if(previous.job_key!==value.job_key)throw new CadIntentStorageError("CAD_INTENT_CONFLICT","Duplicate request with changed CAD geometry");
+  if(previous.job_key!==value.job_key||previous.oauth_client_id!==value.oauth_client_id)throw new CadIntentStorageError("CAD_INTENT_CONFLICT","Duplicate request with changed CAD geometry or OAuth client");
   return previous;
  }
  return Object.freeze({putIfAbsent,get});
