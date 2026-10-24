@@ -23,3 +23,10 @@
  .cad-notice{font-size:.75rem;padding:6px}
  .cad-frame-wrap,.cad-frame-wrap iframe{min-height:280px}
 }
+/* Emergency browser-local save receipts; not a cloud backup. */
+.cad-recovery-list{max-height:165px;overflow:auto;border:1px solid #a66e4b;border-radius:8px;padding:8px;background:var(--paper)}
+.cad-recovery-list[hidden]{display:none}
+.cad-recovery-item{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-bottom:6px}
+.cad-recovery-item:last-child{margin-bottom:0}
+.cad-recovery-item span{font-size:.82rem;word-break:break-word;flex:1;min-width:150px}
+.cad-recovery-item button{font-size:.76rem}
