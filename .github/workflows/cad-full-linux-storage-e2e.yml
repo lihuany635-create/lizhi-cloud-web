@@ -1,0 +1,89 @@
+name: CAD Full Linux Storage E2E
+on:
+  push:
+    branches:
+      - feature/cad-m2-spec-v1-20261024
+    paths:
+      - 'engineering/cad/cloud-cad-real-storage-e2e.cjs'
+      - '.github/workflows/cad-full-linux-storage-e2e.yml'
+      - 'engineering/cad/cloud-cad-object-*.cjs'
+      - 'engineering/cad/cloud-cad-execute.cjs'
+      - 'engineering/cad/cadcraft-cli-runner.cjs'
+      - 'engineering/cad/cloud-cad-mcp-*.cjs'
+      - 'engineering/cad/cloud-cad-postgres-*.cjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-real-cad-chain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: cad_ci_only
+          POSTGRES_DB: cad_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d cad_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch SHA256-verified official Linux CADCraft v0.12.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://github.com/storytold/cadcraft/releases/download/v0.12.0'
+          asset='cadcraft-0.12.0-linux-x86_64.tar.gz'
+          curl --fail --location --retry 3 --silent --show-error "$base/$asset" -o "$asset"
+          curl --fail --location --retry 3 --silent --show-error "$base/SHA256SUMS.txt" -o SHA256SUMS.txt
+          awk -v f="$asset" '$2 == f || $2 == ("*" f) { print $1 "  " f }' SHA256SUMS.txt > expected.sha256
+          test "$(wc -l < expected.sha256)" -eq 1
+          sha256sum --check expected.sha256
+          mkdir -p cadcraft-install
+          tar -xzf "$asset" -C cadcraft-install
+          bin="$(find cadcraft-install -name cadcraft-cli -type f | head -n 1)"
+          test -n "$bin"
+          chmod +x "$bin"
+          echo "CADCRAFT_BIN=$(realpath "$bin")" >> "$GITHUB_ENV"
+      - name: Start test-only S3 HTTP server
+        run: |
+          python3 -m venv "$RUNNER_TEMP/cad-moto"
+          "$RUNNER_TEMP/cad-moto/bin/pip" install --quiet "moto[server]==5.1.16"
+          "$RUNNER_TEMP/cad-moto/bin/moto_server" -H 127.0.0.1 -p 9000 >s3-e2e.log 2>&1 &
+          echo "$!" >s3-e2e.pid
+          for i in $(seq 1 40); do
+            if curl --fail --silent http://127.0.0.1:9000/ >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          tail -n 40 s3-e2e.log
+          exit 1
+      - name: Install isolated Postgres/S3 test clients
+        run: npm install --prefix "$RUNNER_TEMP/cad-clients" --no-audit --no-fund --ignore-scripts pg@8.16.3 @aws-sdk/client-s3@3.800.0
+      - name: Execute actual CADCraft through authenticated test MCP, Worker, S3 and PostgreSQL
+        env:
+          CAD_TEST_S3_ENDPOINT: http://127.0.0.1:9000
+          DATABASE_URL: postgres://postgres:cad_ci_only@127.0.0.1:5432/cad_ci
+        run: NODE_PATH="$RUNNER_TEMP/cad-clients/node_modules" node engineering/cad/cloud-cad-real-storage-e2e.cjs
+      - name: Preserve actual CAD results and verification
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cad-full-linux-storage-e2e-proof
+          path: cad-real-storage-evidence/
+          if-no-files-found: error
+      - name: Shutdown isolated S3 service
+        if: always()
+        run: |
+          if test -f s3-e2e.pid; then kill "$(cat s3-e2e.pid)" || true; fi
+          if test -f s3-e2e.log; then tail -n 25 s3-e2e.log; fi
