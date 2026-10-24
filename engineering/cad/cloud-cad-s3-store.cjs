@@ -25,7 +25,7 @@ function createCadS3Store({client,sdk,bucket,prefix="cad-v1"}={}){
   e?.name==="PreconditionFailed"||e?.name==="ConditionalRequestConflict";
  async function put({ownerId,projectId,drawingId,revision,format,bytes,job}={}){
   const key=build(ownerId,projectId,drawingId,revision,format);
-  if(!job||job.project_id!==projectId)throw new CadObjectStoreError("CAD_S3_JOB_MISMATCH","Artifact project and job mismatch");
+  if(!job||job.project_id!==projectId||job.drawing_id!==drawingId)throw new CadObjectStoreError("CAD_S3_JOB_MISMATCH","Artifact project/drawing and job mismatch");
   const manifest=verifyAndRecord({job,format,bytes,revision});
   const basic={bucket,object_key:key,format,sha256:manifest.sha256,byte_size:manifest.byte_size,mime_type:manifest.mime_type};
   try{
