@@ -361,8 +361,8 @@
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
-    if (!/\.(dxf|dwg|svg)$/i.test(file.name) || file.size > MAX_BYTES || file.size === 0) {
-      status("僅接受 CADCraft 支援的 DXF／DWG／SVG，且大小須在 32 MiB 以內。", true);
+    if (!/\.(dxf|dwg)$/i.test(file.name) || file.size > MAX_BYTES || file.size === 0) {
+      status("僅接受 CADCraft 支援的 DXF／DWG，且大小須在 32 MiB 以內。", true);
       return;
     }
     try { openDrawing(file.name, await file.arrayBuffer()); }
