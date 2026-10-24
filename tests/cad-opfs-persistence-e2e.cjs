@@ -34,6 +34,8 @@ async function main(){
   const browser=await chromium.launch({headless:true,args:["--enable-webgl","--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader","--disable-dev-shm-usage","--no-sandbox"]});
   const context=await browser.newContext({viewport:{width:1366,height:900},acceptDownloads:true});
   const page=await context.newPage();
+  // Human-facing restore confirmation must be explicitly accepted during automated E2E.
+  page.on("dialog",dialog=>dialog.accept());
   try{
     await page.addInitScript(()=>{
       window.showDirectoryPicker=async()=>navigator.storage.getDirectory();
