@@ -31,19 +31,25 @@ function validateScript(script) {
   if (polygons === 0) throw new CadCliError("CAD_SCRIPT_DENIED", "No geometry");
   return polygons;
 }
-function subprocess(bin, args, { cwd, timeoutMs, spawnImpl }) {
+function subprocess(bin, args, { cwd, timeoutMs, spawnImpl, signal }) {
+  if(signal?.aborted)return Promise.reject(new CadCliError("CAD_LEASE_LOST","CAD job cancelled before launching CADCraft"));
   return new Promise((resolve, reject) => {
     const child = spawnImpl(bin, args, { cwd, shell: false, stdio: ["ignore", "pipe", "pipe"], env: { PATH: process.env.PATH || "", HOME: cwd, CADCRAFT_CONFIG_DIR: cwd } });
     let settled = false, stderr = "";
     const timeout = setTimeout(() => { child.kill("SIGKILL"); finish(new CadCliError("CAD_CLI_TIMEOUT", "CADCraft operation timed out")); }, timeoutMs);
-    const finish = (error) => { if (settled) return; settled = true; clearTimeout(timeout); error ? reject(error) : resolve(); };
+    const finish = (error) => { if (settled) return; settled = true; clearTimeout(timeout); signal?.removeEventListener("abort", onAbort); error ? reject(error) : resolve(); };
+    const onAbort = () => {child.kill("SIGKILL");finish(new CadCliError("CAD_LEASE_LOST","CADCraft cancelled because worker lease was lost"));};
+    signal?.addEventListener("abort",onAbort,{once:true});
+    if(signal?.aborted)onAbort();
     child.on("error", error => finish(new CadCliError("CAD_CLI_LAUNCH", error.message)));
     child.stderr?.on("data", chunk => { stderr = (stderr + chunk.toString("utf8")).slice(-4096); });
     child.stdout?.on("data", () => {});
     child.on("close", (code, signal) => finish(code === 0 ? null : new CadCliError("CAD_CLI_FAILED", "CADCraft exit=" + code + " signal=" + signal + ": " + stderr.slice(-200))));
   });
 }
-async function runPreparedExport({ job, sourceDxf = null, binPath = "cadcraft-cli", timeoutMs = 60000, spawnImpl = spawn } = {}) {
+async function runPreparedExport({ job, sourceDxf = null, binPath = "cadcraft-cli", timeoutMs = 60000, spawnImpl = spawn, signal = null } = {}) {
+  const assertLive=()=>{if(signal?.aborted)throw new CadCliError("CAD_LEASE_LOST","CAD job lease is no longer active");};
+  assertLive();
   if (!job || typeof job.job_key !== "string" || !/^[a-f0-9]{64}$/.test(job.job_key) || job.status !== "prepared_not_executed")
     throw new CadCliError("CAD_JOB_INVALID", "Invalid prepared export job");
   const count = validateScript(job.script);
@@ -59,17 +65,21 @@ async function runPreparedExport({ job, sourceDxf = null, binPath = "cadcraft-cl
     if (sourceDxf) { const input = path.join(dir, "source.dxf"); await fs.writeFile(input, sourceDxf, { mode: 0o600 }); args.push(input); }
     else args.push("--metric");
     args.push("--script", job.script, "--save", target);
-    await subprocess(binPath, args, { cwd: dir, timeoutMs, spawnImpl });
+    await subprocess(binPath, args, { cwd: dir, timeoutMs, spawnImpl, signal });
+    assertLive();
     const dxf = await fs.readFile(target);
     if (!dxf.length || dxf.length > MAX_BYTES) throw new CadCliError("CAD_OUTPUT_INVALID", "Invalid DXF output size");
     const outputs = { dxf };
     for (const format of ["svg", "png"]) {
       const output = path.join(dir, "drawing." + format);
-      await subprocess(binPath, ["convert", target, output], { cwd: dir, timeoutMs, spawnImpl });
+      assertLive();
+      await subprocess(binPath, ["convert", target, output], { cwd: dir, timeoutMs, spawnImpl, signal });
+      assertLive();
       const bytes = await fs.readFile(output);
       if (!bytes.length || bytes.length > MAX_BYTES) throw new CadCliError("CAD_OUTPUT_INVALID", "Invalid " + format + " output size");
       outputs[format] = bytes;
     }
+    assertLive();
     for (const [format, bytes] of Object.entries(outputs)) verifyAndRecord({job,format,bytes,revision:Math.max(1,job.source_identity?.revision||0)});
     return Object.freeze({ job_key: job.job_key, entity_count: count,
       artifacts: Object.freeze(Object.fromEntries(Object.entries(outputs).map(([format, bytes]) => [format, Object.freeze({ bytes, sha256: crypto.createHash("sha256").update(bytes).digest("hex"), byte_size: bytes.length })]))),
