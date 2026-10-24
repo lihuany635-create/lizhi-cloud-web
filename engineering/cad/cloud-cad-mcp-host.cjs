@@ -29,7 +29,7 @@ function createCadMcpHost({db,resourceUrl,authorizationServer,jwksFetchImpl=fetc
  });
 }
 async function startCadMcpHost({db,resourceUrl,authorizationServer,jwksFetchImpl,allowedOrigins,port}={}){
- if(!Number.isSafeInteger(port)||port<1||port>65535)
+ if(!Number.isSafeInteger(port)||port<0||port>65535)
   throw new CadHostError("CAD_HOST_PORT_INVALID","An explicit TCP port is required");
  const handler=createCadMcpHost({db,resourceUrl,authorizationServer,jwksFetchImpl,allowedOrigins});
  const server=http.createServer(handler);
