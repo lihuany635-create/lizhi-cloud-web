@@ -14,7 +14,7 @@ const builder = fs.readFileSync(path.join(root, 'cad/build-runtime.sh'), 'utf8')
 test('CAD route, menu, persistent iframe and same-origin host are wired', () => {
   assert.match(app, /"cad","圖","立之 CAD"/);
   assert.match(app, /function renderCad\(\)/);
-  assert.match(app, /id=\\"cad-frame\\"/);
+  assert.match(app, /id="cad-frame"/);
   assert.match(app, /cad\/runtime\/index\.html\?host=parent/);
   assert.match(ui, /state\.route === 'cad'/);
   assert.match(ui, /LizhiCadHost\?\.mount\(panel\)/);
