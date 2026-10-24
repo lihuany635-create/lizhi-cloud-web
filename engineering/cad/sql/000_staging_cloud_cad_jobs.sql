@@ -37,4 +37,35 @@ ALTER TABLE public.lizhi_cad_cloud_intents ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.lizhi_cad_cloud_intents FROM PUBLIC,anon,authenticated;
 -- No browser-facing RLS policies. A server-only trusted worker must enforce
 -- verified owner and project ACL before using a privileged DB connection.
+
+-- Staging-only bounded DXF bytea snapshots. Production should use dedicated
+-- immutable object storage while retaining the same atomic revision metadata.
+CREATE TABLE IF NOT EXISTS public.lizhi_cad_cloud_drawings (
+ owner_id uuid NOT NULL,
+ project_id text NOT NULL CHECK(project_id ~ '^[A-Za-z0-9_-]{1,128}),
+ drawing_id text NOT NULL CHECK(drawing_id ~ '^[A-Za-z0-9_-]{1,128}),
+ current_revision integer NOT NULL DEFAULT 0 CHECK(current_revision>=0),
+ created_at timestamptz NOT NULL DEFAULT now(),
+ updated_at timestamptz NOT NULL DEFAULT now(),
+ CONSTRAINT lizhi_cad_cloud_drawings_pk PRIMARY KEY(owner_id,drawing_id)
+);
+CREATE TABLE IF NOT EXISTS public.lizhi_cad_cloud_revisions (
+ owner_id uuid NOT NULL,
+ drawing_id text NOT NULL,
+ revision integer NOT NULL CHECK(revision>=1),
+ job_key text NOT NULL CHECK(job_key ~ '^[a-f0-9]{64}),
+ sha256 text NOT NULL CHECK(sha256 ~ '^[a-f0-9]{64}),
+ dxf_bytes bytea NOT NULL,
+ byte_size integer NOT NULL CHECK(byte_size>0 AND byte_size<=16777216 AND byte_size=octet_length(dxf_bytes)),
+ inspection jsonb NOT NULL CHECK(inspection->>'valid'='true'),
+ created_at timestamptz NOT NULL DEFAULT now(),
+ CONSTRAINT lizhi_cad_cloud_revisions_pk PRIMARY KEY(owner_id,drawing_id,revision),
+ CONSTRAINT lizhi_cad_cloud_revisions_drawing_fk FOREIGN KEY(owner_id,drawing_id)
+   REFERENCES public.lizhi_cad_cloud_drawings(owner_id,drawing_id) ON DELETE RESTRICT,
+ CONSTRAINT lizhi_cad_cloud_revisions_job_unique UNIQUE(owner_id,job_key)
+);
+ALTER TABLE public.lizhi_cad_cloud_drawings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.lizhi_cad_cloud_revisions ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON TABLE public.lizhi_cad_cloud_drawings FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON TABLE public.lizhi_cad_cloud_revisions FROM PUBLIC,anon,authenticated;
 COMMIT;
