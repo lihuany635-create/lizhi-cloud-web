@@ -85,6 +85,8 @@ async function main(){
     await page.locator('[data-cad-action="versions"]').click();
     const button=page.locator("[data-cad-revision]");
     await button.first().waitFor({timeout:15000});
+    // The list is inserted before its async handler updates the status; avoid racing an older status write.
+    await page.waitForFunction(()=>document.querySelector("#cad-status")?.textContent?.includes("已列出最近 1 個版本"),null,{timeout:15000});
     assert.equal(await button.count(),1);
     assert.equal(await button.first().textContent(),first[0].name);
     await button.first().click();
