@@ -139,6 +139,25 @@ async function main(){
     [OWNER]
   );
   assert.equal(publishedCount.rows[0].n,4);
+  // Evidence bundle contains actual retrieved DXF bytes and the observed
+  // PostgreSQL/S3 test state, not credentials or production user data.
+  const evidence=path.resolve("cad-object-evidence");
+  fs.mkdirSync(evidence,{recursive:true});
+  fs.writeFileSync(path.join(evidence,"rev1.dxf"),bytes1.bytes);
+  const rev4=await revisionStore.read({projectId:PROJECT,drawingId:DRAWING,revision:4});
+  fs.writeFileSync(path.join(evidence,"rev4.dxf"),rev4.bytes);
+  fs.writeFileSync(path.join(evidence,"inspection.json"),JSON.stringify({
+   scope:"DISPOSABLE_POSTGRES16_AND_MOTO_S3_HTTP",
+   actual_engine_in_this_run:false,
+   revisions:[1,2,3,4],
+   first_sha256:sha(bytes1.bytes),
+   fourth_sha256:sha(rev4.bytes),
+   conflict_rejected:true,
+   failed_upload_no_revision:true,
+   orphan_candidates:orphan.map(x=>({job_key:x.job_key,action:x.action})),
+   cleanup:"REVIEW_ONLY_NO_DELETE",
+   auth:"STAGING_STUB_NOT_PRODUCTION"
+  },null,2));
   console.log("CAD_POSTGRES_S3_ATOMIC_PUBLICATION_PASS",JSON.stringify({
    published:[1,2,3,4],object_backed_worker:"PASS",old_revision_preserved:true,
    distinct_job_object_keys:true,concurrent_conflict:"blocked",
