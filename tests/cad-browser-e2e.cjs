@@ -110,6 +110,7 @@ async function main(){
     await canvas.click({position:{x:Math.min(300,bounds.width/3),y:Math.min(280,bounds.height/3)}});
     await page.keyboard.press("Control+s");
     await page.waitForFunction(()=>window.__cadE2E?.files.size>0,null,{timeout:25000});
+    await page.waitForFunction(()=>document.querySelector("#cad-status")?.textContent?.includes("已驗證本機 DXF"),null,{timeout:25000});
     const saved=await page.evaluate(()=>{
       const entries=[...window.__cadE2E.files.entries()];
       return entries.map(([name,bytes])=>({name,bytes:[...bytes]}));
@@ -155,7 +156,17 @@ async function main(){
     assert.equal(await page.evaluate(()=>window.__cadE2E.files.size),1);
     assert.match(await page.locator("#cad-status").textContent(),/已下載|未建立本機歷史版本/);
     assert.ok((await fs.stat(path.join(evidence,"cad-permission-denied-fallback.dxf"))).size>250);
-    report.steps.push("Permission revoked -> original revisions unchanged; DXF download fallback");
+    // Persisted browser-only rescue stays after a failed OS-directory save.
+    await page.waitForFunction(()=>document.querySelector('[data-cad-action="recovery"]')?.textContent?.includes("（1）"),null,{timeout:10000});
+    await page.locator('[data-cad-action="recovery"]').click();
+    await page.locator("[data-cad-recovery-download]").first().waitFor();
+    const recoveryDownload=page.waitForEvent("download",{timeout:15000});
+    await page.locator("[data-cad-recovery-download]").first().click();
+    const emergency=await recoveryDownload;
+    await emergency.saveAs(path.join(evidence,"cad-rescued-from-indexeddb.dxf"));
+    assert.ok((await fs.stat(path.join(evidence,"cad-rescued-from-indexeddb.dxf"))).size>250);
+    report.steps.push("Emergency IndexedDB snapshot survives failed filesystem save; manual recovery downloads real CADCraft DXF");
+        report.steps.push("Permission revoked -> original revisions unchanged; DXF download fallback");
     report.passed=true;
     await page.screenshot({path:path.join(evidence,"cad-embedded-complete.png")});
   }catch(err) {
