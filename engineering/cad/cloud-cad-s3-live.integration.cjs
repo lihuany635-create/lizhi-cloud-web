@@ -27,10 +27,10 @@ async function main(){
   const a=await store.put({...root,revision:1,format:"dxf",bytes:dxf});
   assert.equal(a.reused,false);assert.equal(a.sha256,sha(dxf));
   assert.equal((await store.put({...root,revision:1,format:"dxf",bytes:dxf})).reused,true);
-  await assert.rejects(store.put({...root,revision:1,format:"dxf",bytes:Buffer.concat([dxf,Buffer.from("0\nLINE\n")])}),{code:"CAD_S3_IMMUTABLE_CONFLICT"});
+  await assert.rejects(store.put({...root,revision:1,format:"dxf",bytes:Buffer.from("0\nSECTION\n2\nENTITIES\n0\nLINE\n8\n0\n0\nENDSEC\n0\nEOF\n")}),{code:"CAD_S3_IMMUTABLE_CONFLICT"});
   const loaded=await store.get({...root,revision:1,format:"dxf",expectedSha256:a.sha256});
   assert.ok(loaded.bytes.equals(dxf));
-  const second=await store.put({...root,revision:2,format:"dxf",bytes:Buffer.concat([dxf,Buffer.from("0\nLINE\n")])});
+  const second=await store.put({...root,revision:2,format:"dxf",bytes:Buffer.from("0\nSECTION\n2\nENTITIES\n0\nLINE\n8\n0\n0\nENDSEC\n0\nEOF\n")});
   assert.notEqual(a.object_key,second.object_key);
   assert.equal((await store.get({...root,revision:2,format:"dxf",expectedSha256:second.sha256})).sha256,second.sha256);
   const preview=await store.put({...root,revision:2,format:"svg",bytes:svg});
