@@ -46,6 +46,19 @@ function createPostgresLeaseManager({db,ownerId}={}){
   if(row.rowCount!==1)throw new CadLeaseError("CAD_LEASE_LOST","Lease expired or belongs to another worker");
   return row.rows[0].lease_until;
  }
- return Object.freeze({claimNext,heartbeat});
+ async function failClaim({jobKey,workerId,leaseToken}={}){
+  if(typeof jobKey!=="string"||!KEY.test(jobKey)||typeof workerId!=="string"||!WORKER.test(workerId)||
+     typeof leaseToken!=="string"||!UUID.test(leaseToken))
+   throw new CadLeaseError("CAD_LEASE_INVALID","Invalid failed-job fencing identity");
+  // Only the currently leased worker may terminally fail a job. An expired
+  // worker cannot mark a newly reclaimed job failed or cancel its output.
+  const r=await db.query(
+   "UPDATE public.lizhi_cad_cloud_jobs SET job_data=jsonb_set(job_data,'{status}','\"failed\"'::jsonb),lease_until=NULL,updated_at=now() WHERE owner_id=$1::uuid AND idempotency_key=$2 AND job_data->>'worker_id'=$3 AND job_data->>'lease_token'=$4 AND job_data->>'status' IN ('claimed','running') AND lease_until>now() RETURNING idempotency_key",
+   [ownerId,jobKey,workerId,leaseToken]
+  );
+  if(r.rowCount!==1)throw new CadLeaseError("CAD_LEASE_LOST","No valid lease to fail job");
+  return Object.freeze({job_key:jobKey,status:"failed"});
+ }
+ return Object.freeze({claimNext,heartbeat,failClaim});
 }
 module.exports=Object.freeze({createPostgresLeaseManager,CadLeaseError});
