@@ -49,7 +49,7 @@ test("duplicate same bytes is safe, different bytes cannot replace revision",asy
  const first=await store.put(input);
  const second=await store.put(input);
  assert.equal(second.reused,true);assert.equal(second.sha256,first.sha256);
- await assert.rejects(store.put({...input,bytes:Buffer.concat([dxf,Buffer.from("new")])}),{code:"CAD_S3_IMMUTABLE_CONFLICT"});
+ await assert.rejects(store.put({...input,bytes:Buffer.from("0\nSECTION\n2\nENTITIES\n0\nLINE\n8\n0\n0\nENDSEC\n0\nEOF\n")}),{code:"CAD_S3_IMMUTABLE_CONFLICT"});
 });
 test("wrong owner, project and invalid format are rejected",async()=>{
  const store=createCadS3Store({client:fakeS3(),sdk,bucket:"cad-staging"});
