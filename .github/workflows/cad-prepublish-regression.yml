@@ -1,0 +1,39 @@
+name: LiZhi CAD Prepublish Cross-Module Regression (no deployment)
+on:
+  push:
+    branches: [feature/embed-lizhi-cad-local-v1]
+    paths:
+      - '.github/workflows/cad-prepublish-regression.yml'
+      - 'app.js'
+      - 'workspace-ui.js'
+      - 'index.html'
+      - 'cad/**'
+      - 'tests/cad-regression-baseline.cjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  web-modules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax check modified standalone browser bundles
+        run: |
+          node --check app.js
+          node --check workspace-ui.js
+          node --check cad/cad-host.js
+          node --test tests/cad-embedded.test.cjs
+      - name: Checkout unchanged main separately for regression baseline
+        uses: actions/checkout@v4
+        with:
+          repository: lihuany635-create/lizhi-cloud-web
+          ref: b67bf9f34e001894793d7c7332bbb7a1e86aa177
+          path: _cad-baseline-main
+          persist-credentials: false
+      - name: Engineering Center comparative baseline (same tests, no new failures)
+        run: node tests/cad-regression-baseline.cjs
+      - name: Finance comparative baseline (same tests, no new failures)
+        run: node tests/cad-regression-baseline.cjs finance
+      - name: Library read-only MCP contract
+        run: node --test tests/library-mcp-contract.test.mjs

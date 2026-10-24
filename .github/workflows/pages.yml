@@ -128,6 +128,25 @@ jobs:
           print('S01 V7 TEST preview ready:',len(data),'bytes')
           PY
           rm -rf _rg_s01_v7
+      # Native CADCraft compiles into this SAME Pages website; it is not a CAD cloud server.
+      - name: Validate embedded LiZhi CAD integration
+        run: node --test tests/cad-embedded.test.cjs
+      - name: Install pinned CADCraft WebAssembly toolchain
+        run: bash cad/setup-build-toolchain.sh
+      - name: Cache CADCraft cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: lizhi-cad-cargo-19e09447345750ea-v1
+      - name: Compile CADCraft into existing portal
+        env:
+          CARGO_INCREMENTAL: '0'
+          CARGO_BUILD_JOBS: '2'
+          RUSTFLAGS: '-C debuginfo=0'
+        run: bash cad/build-runtime.sh
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,0 +1,106 @@
+name: LiZhi CAD Portal Integration Preview (no deployment)
+on:
+  push:
+    branches: [feature/embed-lizhi-cad-local-v1]
+    paths:
+      # Recompile Rust/WASM only when pinned build inputs change.
+      # Host and E2E test edits use cad-embedded-browser-fast.yml instead.
+      - 'cad/build-runtime.sh'
+      - 'cad/setup-build-toolchain.sh'
+      - '.github/workflows/cad-integration-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check CAD integration and local security contract
+        run: node --test tests/cad-embedded.test.cjs
+  wasm-preview:
+    needs: host-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUSTFLAGS: '-C debuginfo=0'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up pinned WASM toolchain
+        run: bash cad/setup-build-toolchain.sh
+      - name: Cache cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: lizhi-cad-cargo-19e09447345750ea-v1
+      - name: Build Rust CADCraft into integrated runtime
+        run: bash cad/build-runtime.sh
+      - name: Assert browser bundle links and provenance
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,re
+          cad = Path('cad/runtime')
+          html = (cad/'index.html').read_text(encoding='utf-8')
+          assert '<canvas' in html
+          assert list(cad.glob('*.wasm'))
+          assert list(cad.glob('*.js'))
+          manifest = json.loads((cad/'build-source.json').read_text())
+          assert manifest['remoteCadWorker'] is False
+          assert manifest['sourceSha'] == '98ceeca360ba920666af075be6c08fb4bb63d2ee'
+          print('Verified CAD runtime bundle:',len(list(cad.iterdir())),'files')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: lizhi-cad-integrated-runtime-candidate
+          path: cad/runtime/
+          retention-days: 14
+          if-no-files-found: error
+
+  browser-e2e:
+    needs: wasm-preview
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download this run's compiled native CADCraft WASM bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: lizhi-cad-integrated-runtime-candidate
+          path: cad/runtime
+      - name: Verify bundle present (no fallback to a dummy viewer)
+        run: |
+          test -s cad/runtime/index.html
+          test "$(find cad/runtime -maxdepth 1 -name '*.wasm' -type f | wc -l)" -ge 1
+      - name: Install Chromium Playwright for real E2E
+        run: |
+          npm install --prefix tests/cad-browser-deps --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          tests/cad-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+      - name: Serve original portal and run Chromium with real Rust WASM
+        env:
+          NODE_PATH: ${{ github.workspace }}/tests/cad-browser-deps/node_modules
+          CAD_TEST_ORIGIN: http://127.0.0.1:8771
+          CAD_BROWSER_EVIDENCE: cad-browser-evidence
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8771 --bind 127.0.0.1 --directory . > /tmp/cad-portal-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8771/index.html > /dev/null; then break; fi
+            sleep 1
+          done
+          node tests/cad-browser-e2e.cjs
+      - name: Preserve browser screenshots and DXF fallback evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lizhi-cad-embedded-chromium-e2e-evidence
+          path: cad-browser-evidence/
+          retention-days: 14
+          if-no-files-found: warn
