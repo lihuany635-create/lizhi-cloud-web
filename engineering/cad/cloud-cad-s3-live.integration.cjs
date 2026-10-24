@@ -1,5 +1,5 @@
 "use strict";
-// STAGING ONLY: real S3-compatible service (local ephemeral MinIO).
+// STAGING ONLY: S3-compatible HTTP integration (ephemeral Moto emulator).
 // No production credentials or paid buckets.
 const assert=require("node:assert/strict");
 const crypto=require("node:crypto");
@@ -37,7 +37,7 @@ async function main(){
   const readPreview=await store.get({...root,revision:2,format:"svg",expectedSha256:preview.sha256});
   assert.ok(readPreview.bytes.equals(svg));
   await assert.rejects(store.get({...root,revision:2,format:"dxf",expectedSha256:a.sha256}),{code:"CAD_S3_CHECKSUM_MISMATCH"});
-  console.log("CAD_REAL_MINIO_IMMUTABLE_STORE_PASS",JSON.stringify({
+  console.log("CAD_S3_HTTP_EMULATOR_IMMUTABLE_STORE_PASS",JSON.stringify({
    version1_sha256:a.sha256,version2_sha256:second.sha256,
    svg_sha256:preview.sha256,old_revision_preserved:true,
    conflicting_overwrite:"blocked",cross_revision_retrieval:"PASS"
