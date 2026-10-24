@@ -1,6 +1,10 @@
+import {MANAGED_OPS,operateManaged} from '../lib/project-management.ts';
+import {operatePortfolio,PORTFOLIO_OPS,type WorkspaceProject} from '../lib/portfolio.ts';
 import {applyAction,makeProject,summary,FlowError,makeWork,workSummary,applyWorkAction,normalizeEpisode,pinSharedAsset,episodeBrief,normalizeEpisodeWorkflow,type Actor,type Project,type Work} from '../lib/workflow.ts';
-export type State={rows:(Project|Work)[];migration?:{sourceOwner:string;digest:string;at:string}};
+export type State={portfolio?:WorkspaceProject[];rows:(Project|Work)[];migration?:{sourceOwner:string;digest:string;at:string}};
 export function operate(input:State,op:string,args:unknown[],actor:Actor){
+ if(MANAGED_OPS.includes(op))return operateManaged(input,op,args,actor);
+ if(PORTFOLIO_OPS.includes(op))return operatePortfolio(input,op,args,actor);
  const state:State=structuredClone(input);let changed=false;
  const project=(id:unknown)=>{const p=state.rows.find(x=>x.id===id);if(!p||p.entityType==='work')throw new FlowError('找不到集數',404);return normalizeEpisodeWorkflow(p);};
  const work=(id:unknown)=>{const w=state.rows.find(x=>x.id===id);if(!w||w.entityType!=='work')throw new FlowError('找不到作品專案',404);return w;};

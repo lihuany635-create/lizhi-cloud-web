@@ -1,0 +1,12 @@
+'use client';
+import {useState} from 'react';
+import {Check,Copy,Link2,RefreshCw} from 'lucide-react';
+import type {Project} from '@/lib/workflow';
+export default function ConnectionPanel({project:p,check}:{project:Project;check:()=>Promise<unknown>}){
+ const [checking,setChecking]=useState(false),[result,setResult]=useState(''),[copied,setCopied]=useState('');
+ const prompt=`請使用「立之雲端庫｜動畫製作流程」外掛，先呼叫 read_animation_workspace，projectId 為 ${p.id}，確認 ${p.episode} 的目前進度、採用版本、未解問題與下一步。請重新讀取最新資料，不從聊天推定完成。若本集已由作者告知完成，先做資料補登。確認範圍後取得新的工作資料包，實際讀取參考素材，最後回報已做內容、成果位置、未完成項及下一步。若本對話沒有工具，請明確告知未連接。`;
+ return <section className="connection-simple">
+  <article className="wide-card"><div className="eyebrow">與你共用同一份進度</div><h2>讓 ChatGPT 讀懂並接續工作</h2><p className="stage-description">你在雲端庫管理作品；已連接的 ChatGPT 可以查資料、補紀錄、登記問題和回報成果。</p><ol className="connect-steps"><li><b>在 ChatGPT 選用流程工作台</b><p>在對話輸入 @，選擇「立之雲端庫｜動畫製作流程」。若已安裝卻找不到，請開新對話再選。</p></li><li><b>告訴它這次要做什麼</b><p>複製下方指令，再補上你的任務，例如「整理這集還缺什麼」或「接手主角家的模型」。</p></li><li><b>完成後回來看紀錄</b><p>ChatGPT 回報後，這裡會顯示工作結果與下一步。正式採用版本由你確認。</p></li></ol><button className="btn primary" onClick={async()=>{try{await navigator.clipboard.writeText(prompt);setCopied('已複製，請貼到選用工作台的對話。');}catch{setCopied('請展開完整指令後手動複製。');}}}><Copy size={16}/>複製本集接手指令</button><p role="status">{copied}</p><details><summary>查看完整指令</summary><textarea aria-label="本集接手指令" readOnly rows={7} value={prompt}/></details></article>
+  <article className="wide-card"><h2><Link2 size={20}/> 連線與最近更新</h2><p>網頁連線與對話工具是兩個檢查項目；這個按鈕會檢查網頁能否讀取共用資料。</p><button className="btn" disabled={checking} onClick={async()=>{setChecking(true);setResult('');try{await check();setResult('共用資料讀取成功。對話是否已選用外掛，仍需由 ChatGPT 實際呼叫工具確認。');}catch(e){setResult('讀取失敗：'+(e instanceof Error?e.message:String(e)));}finally{setChecking(false);}}}><RefreshCw size={15} className={checking?'spin':''}/>{checking?'檢查中…':'檢查資料連線'}</button><p role="status">{result}</p><div className="connection-state"><div><b>{p.lastMcpAt?'已有 ChatGPT 回報紀錄':'尚無 ChatGPT 寫入紀錄'}</b><small>{p.lastMcpAt?new Date(p.lastMcpAt).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'首次回報後會顯示時間'}</small></div></div><small>這是最近寫入時間，不代表 AI 正在執行。</small><details><summary>連接與權限詳情</summary><p>MCP：https://lizhi-animation-flow.lihuany635.chatgpt.site/mcp</p><p>每次更新先讀取最新版本。AI 可補充紀錄、提出問題與回報工作；作者核定及正式採用由網頁確認。</p><p>只填檔案位置不會上傳檔案；ChatGPT 必須能實際取得素材，才能檢查內容。</p></details></article>
+ </section>;
+}
