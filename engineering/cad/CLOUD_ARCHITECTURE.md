@@ -19,6 +19,12 @@ ChatGPT → private HTTPS MCP gateway (OAuth identity) → project-scoped author
 - Staging revision storage retains bounded 16 MiB DXF bytea snapshots with transactionally committed metadata and job state; production should move binary payloads to immutable object storage.
 - Staging worker leases use atomic row locking (FOR UPDATE SKIP LOCKED), heartbeat, lease expiry reclamation and fencing tokens; for preclaimed jobs use runClaimed(key, leaseToken). The production host must renew leases regularly throughout CADCraft execution and refuse stale publication.
 
+## New staging integrations (2026-10-24)
+
+- **Lease heartbeat during execution:** `cloud-cad-lease-runner.cjs` renews a preclaimed job's lease throughout execution, propagates a lost-lease AbortSignal to `cloud-cad-worker.cjs`, and terminates the child CADCraft CLI through `cadcraft-cli-runner.cjs`. The PostgreSQL transaction uses the **database clock** to reject expired lease tokens. Tested on Node 20/22 and actual ephemeral PostgreSQL 16 (Actions run 40088145037). This does **not** by itself provide a continuously deployed host or forced cancellation for any separate MCP stdio process.
+- **S3-compatible immutable artifact adapter:** `cloud-cad-s3-store.cjs` uses SDK v3 conditional `PutObject If-None-Match: *`, owner/project/drawing/revision-scoped keys, content-signature checks, and SHA-256 verification on read. The same bytes are idempotent and different bytes cannot overwrite a revision. Live S3 **protocol** interactions were tested against an ephemeral Moto HTTP emulator (Actions run 40088705852). This is **not** proof of AWS S3, Supabase Storage, or MinIO production behavior; the official MinIO image/archived binary was unavailable to CI.
+- **Integration not yet complete:** PostgreSQL revision publication currently retains a staging DXF bytea payload up to 16 MiB; S3 artifact storage is an independent tested adapter, not yet referenced from the atomic PostgreSQL publication or connected to live Storage credentials. The final cloud service needs S3 object upload → metadata transaction → recovery of orphaned uploads, project ACL, signed URL retrieval, quotas/backups and a real TLS-hosted worker.
+
 ## Required staging acceptance
 1. In Linux container, verify official CADCraft binary hash and license; run CLI and stdio MCP tests.
 2. Submit new drawing while the user's Windows machine is off; poll until job completion.
