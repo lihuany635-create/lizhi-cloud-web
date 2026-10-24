@@ -67,3 +67,20 @@
 - 同一輪產物：真 WASM bundle artifact `12570214924`（ZIP SHA256 `0c53ce5c99ecaaf615c2b35e7bb37e94bf65ace096a9c15165c5f680f864b1d7`）；Chromium 證據 artifact `12571041874`（ZIP SHA256 `89d04fb0eb43e9aa7b251dbe73e8929d35227762a87b3e8daeafefd510246f4c`）。這些 SHA256 是各**ZIP 包**的雜湊，不是圖檔或源碼的雜湊。
 - 之前較舊的 [40119960763](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40119960763) 在 browser-e2e 失敗，原因僅是測試程式誤用 Playwright `locator.text()`；已修為 `locator.textContent()` 後，40120106720 全數成功；不可在驗收表上把舊失敗留作未修復問題。
 - **仍保留 Draft PR #6 未合併**。真實 OS File System Access picker、Windows/Android 真正檔案落盤、IndexedDB handle 重新開啟、PWA offline、手機 UX 和 ChatGPT OAuth MCP 仍為開放驗收。
+
+## 本機檔案可靠性與離線 E2E 驗證新增（2026-10-25）
+
+- 本機宿主 `cad/cad-host.js` 現已做 **DXF 寫入完成後重新讀取、檔案大小與完整 SHA-256 比對**，才會顯示「已驗證本機 DXF」。先前僅收到 `postMessage` 就報成功的父頁存檔狀態已取消。
+- 為減少寫入權限失效造成的資料損失，父頁先將每次輸出的資料建立**瀏覽器本機 IndexedDB 救援副本（DB v2，recovery store）**；檔案驗證成功後移除救援副本，驗證失敗時保留，並提供「救援存檔→再次下載／確認已有備份後刪除」。救援副本絕不傳至 Supabase 或遠端伺服器。
+- `cadcraft:save` 父頁採 Promise 串列執行，頁面正在儲存時會啟用 beforeunload 警告。未取得可驗證檔案時，文案只會說「已要求下載」，不可把觸發下載當作完成保存。
+- 修改版本檔名為完整 UUID 防碰撞，並同時支援舊版短 UUID 名稱解碼，避免打開歷史版後意外帶著時間戳再次存檔。
+- 真 Chromium 自動回歸 [40122252623](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40122252623) **PASS**：800×900 mm DXF 真實 CADCraft save→本機模擬資料夾版控→拒絕權限保留 IndexedDB 救援檔→手動再次下載，以及另外的 **真實 Chromium OPFS** / IndexedDB native directory handle 寫入兩個版本、重載後恢復均 PASS。
+- 真 Chromium 離線回歸 [40122385606](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40122385606) **PASS**：在線快取真正 Rust/CADCraft WASM 後，用 Chromium `context.setOffline(true)` 斷網再載入同一個雲端庫 CAD 頁面，CAD 繪圖引擎仍成功初始化，並可列出真正 OPFS 的兩個 DXF 版本。所有通過狀態來自實際 GitHub job 日誌。佐證 artifact `12571139886`，ZIP SHA256 `039e7969da466ea0ed1ba60936ba5f5e059c087fa929cbb1b25dacf895967a11`。
+- 新增 Windows 原生目錄選取器操作手冊 `docs/CAD_WINDOWS_DEVICE_ACCEPTANCE_20261025.md`。**仍未做 Windows/Android 真正 OS picker、真磁碟資料夾、真手機的 E2E**；OPFS 是真瀏覽器本機儲存，並非使用者指定的 Windows 目錄。
+- 已拆開 GitHub Actions 頻率：Rust/source-build 只在固定 source build 設定變更時重跑，宿主與測試程式更新則走重用經核實 WASM 的 Chromium/contract 快速 CI，避免每一筆 HTML 修改都重編 Rust。
+
+### 仍待排除的底層保存語意
+
+CADCraft 目前在 iframe host mode 的 Rust `deliver()` 只要成功 `postMessage` 就讓 CAD 引擎把圖面視為已保存；父頁真正磁碟/IndexedDB 的寫入是**之後**才完成。這次父頁已加入緊急備份與雜湊驗證，但極短時間內頁面／程序崩潰的窗口仍然存在。正式版若要求 **CAD 引擎自身的未存檔狀態也必須以磁碟提交成功為準**，後續要修改 CADCraft Rust 檔案交付契約，加入有界且同源的 `save-ack` 以及 pending／失敗提示；不能宣稱這項引擎級 ack 已完成。此項屬 M4/P8 發布阻礙，應先在隔離分支做相容 E2E，再變更正式源碼。
+
+**正式站/main／Supabase／工程中心仍未更新；Draft PR #6 不合併。**
