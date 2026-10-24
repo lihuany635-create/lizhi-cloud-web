@@ -15,11 +15,20 @@ function createObjectWorkerPorts({
     typeof revisionStore.read!=="function"||typeof revisionStore.stageAndPublish!=="function"||
     !intents||typeof intents.get!=="function"||typeof execute!=="function"||typeof inspect!=="function")
   throw new CadObjectPortsError("CAD_OBJECT_PORTS_INVALID","Missing trusted worker dependencies");
- const authorize=async job=>{
-  if(!job||await authorizeDrawing({
-   ownerId,projectId:job.project_id,drawingId:job.drawing_id,mode:"write"
+ async function authorize(job){
+  if(!job)throw new CadObjectPortsError("CAD_OBJECT_ACCESS_DENIED","Worker job missing");
+  const intent=await intents.get({ownerId,key:job.idempotency_key});
+  if(!intent||intent.cloud_job_key!==job.idempotency_key||
+     intent.project_id!==job.project_id||intent.drawing_id!==job.drawing_id||
+     intent.drawing_revision!==job.expected_revision)
+   throw new CadObjectPortsError("CAD_OBJECT_INTENT_MISMATCH","Worker lacks a matching immutable drawing intent");
+  // The grant can be revoked while a job sits in the queue. Always re-check
+  // the original verified client, never accept a fresh client ID from the job.
+  const clientId=intent.oauth_client_id??null;
+  if(await authorizeDrawing({
+   ownerId,projectId:job.project_id,drawingId:job.drawing_id,mode:"write",clientId
   })!==true)throw new CadObjectPortsError("CAD_OBJECT_ACCESS_DENIED","Worker project authorization failed");
- };
+ }
  async function loadRevision(job){
   if(job.expected_revision===0)return null;
   const r=await revisionStore.read({
