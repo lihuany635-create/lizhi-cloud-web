@@ -8,6 +8,8 @@ on:
       - 'engineering/cad/sql/**'
       - 'engineering/cad/cloud-cad-oauth-acl*.cjs'
       - 'engineering/cad/cloud-cad-oauth-acl.integration.cjs'
+      - 'engineering/cad/cloud-cad-oauth-host.integration.cjs'
+      - 'engineering/cad/cloud-cad-mcp-host.cjs'
       - '.github/workflows/cad-postgres-real.yml'
   workflow_dispatch:
 
@@ -55,3 +57,7 @@ jobs:
         env:
           DATABASE_URL: postgres://postgres:cad_ci_only@127.0.0.1:5432/cad_ci
         run: NODE_PATH="$RUNNER_TEMP/cad-pg-test/node_modules" node engineering/cad/cloud-cad-oauth-acl.integration.cjs
+      - name: Verify actual signed OAuth JWT through MCP host and project ACL
+        env:
+          DATABASE_URL: postgres://postgres:cad_ci_only@127.0.0.1:5432/cad_ci
+        run: NODE_PATH="$RUNNER_TEMP/cad-pg-test/node_modules" node engineering/cad/cloud-cad-oauth-host.integration.cjs
