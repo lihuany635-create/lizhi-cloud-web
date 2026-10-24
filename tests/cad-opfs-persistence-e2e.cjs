@@ -59,7 +59,7 @@ async function main(){
     await canvas.waitFor({state:"visible"});
     await canvas.click({position:{x:200,y:180}});
     await page.keyboard.press("Control+s");
-    await page.waitForFunction(()=>document.querySelector("#cad-status")?.textContent?.includes("已儲存在所選資料夾"),null,{timeout:25000});
+    await page.waitForFunction(()=>document.querySelector("#cad-status")?.textContent?.includes("已驗證本機 DXF"),null,{timeout:25000});
     const first=await revisions(page);
     assert.equal(first.length,1);
     assert.ok(Buffer.from(first[0].bytes).toString("utf8").includes("LWPOLYLINE"));
@@ -99,7 +99,7 @@ async function main(){
     await page.keyboard.press("Control+s");
     await page.waitForFunction(async()=>{
       const message=document.querySelector("#cad-status")?.textContent||"";
-      if(!message.includes("已儲存在所選資料夾"))return false;
+      if(!message.includes("已驗證本機 DXF"))return false;
       const dir=await(await navigator.storage.getDirectory()).getDirectoryHandle("revisions");
       let n=0;for await(const [,h] of dir.entries())if(h.kind==="file")n++;
       return n===2;
