@@ -7,6 +7,9 @@ const {createQueue}=require("./cloud-cad-queue.cjs");
 const {createPostgresStorage}=require("./cloud-cad-postgres-storage.cjs");
 const {createCadS3Store}=require("./cloud-cad-s3-store.cjs");
 const {createObjectRevisionStore}=require("./cloud-cad-object-revisions.cjs");
+const {createCadPostgresIntents}=require("./cloud-cad-postgres-intents.cjs");
+const {createObjectWorkerPorts}=require("./cloud-cad-object-worker-ports.cjs");
+const {createWorker}=require("./cloud-cad-worker.cjs");
 const OWNER="aabbccdd-1234-4abc-8abc-abc123456789";
 const PROJECT="joinedP",DRAWING="joinedD",WORKER="joinWorker";
 const dxfA=Buffer.from("0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n");
@@ -97,8 +100,47 @@ async function main(){
   // Metadata and owner ACL guard against accidentally fetching foreign assets.
   const forbidden=createObjectRevisionStore({db,ownerId:OWNER,authorizeDrawing:async()=>false,objects:objectStore});
   await assert.rejects(forbidden.read({projectId:PROJECT,drawingId:DRAWING,revision:1}),{code:"CAD_OBJECT_ACCESS_DENIED"});
+  // Final bridging check: a real cloud Worker loads the previously committed
+  // DXF from S3, retrieves its compiled intent from PostgreSQL, and atomically
+  // publishes revision 4 in S3 + PostgreSQL.
+  const fourth=await q.enqueue({projectId:PROJECT,drawingId:DRAWING,baseRevision:3,
+    operation:"modify",requestId:"joined-worker-rev4"});
+  const intents=createCadPostgresIntents({db});
+  const preparedFourth={
+    job_key:sha(Buffer.from("compiled-joined-worker-rev4")),
+    cloud_job_key:fourth.idempotency_key,
+    status:"prepared_not_executed",
+    project_id:PROJECT,drawing_id:DRAWING,drawing_revision:3,
+    script:"_PLINE\n0,0\n10,0\n10,10\n0,10\n_C\n",
+    source_identity:{design_id:"cad-model",revision:11},
+    view:"front",exporter_version:"cadcraft-0.12.0"
+  };
+  await intents.putIfAbsent({ownerId:OWNER,key:fourth.idempotency_key,value:preparedFourth});
+  let sourceActuallyRead=false;
+  const ports=createObjectWorkerPorts({
+    ownerId:OWNER,workerId:WORKER,authorizeDrawing:acl,revisionStore,intents,
+    execute:async({job,source})=>{
+      assert.equal(job.expected_revision,3);
+      assert.ok(source.dxf.equals(dxfC));
+      sourceActuallyRead=true;
+      return {artifacts:{dxf:{bytes:dxfB,sha256:sha(dxfB)},svg:{bytes:svg}}};
+    },
+    inspect:async()=>({valid:true,entityCount:4,extents:[[0,0],[50,50]]})
+  });
+  const worker=createWorker({queue:q,ports,workerId:WORKER});
+  const step4=await worker.run(fourth.idempotency_key);
+  assert.equal(step4.revision,4);
+  assert.equal(sourceActuallyRead,true);
+  assert.equal((await q.read(fourth.idempotency_key)).status,"completed");
+  assert.ok((await revisionStore.read({projectId:PROJECT,drawingId:DRAWING,revision:4})).bytes.equals(dxfB));
+  assert.ok((await revisionStore.read({projectId:PROJECT,drawingId:DRAWING,revision:3})).bytes.equals(dxfC));
+  const publishedCount=await db.query(
+    "SELECT COUNT(*)::int AS n FROM lizhi_cad_cloud_object_revisions WHERE owner_id=$1::uuid",
+    [OWNER]
+  );
+  assert.equal(publishedCount.rows[0].n,4);
   console.log("CAD_POSTGRES_S3_ATOMIC_PUBLICATION_PASS",JSON.stringify({
-   published:[1,2,3],old_revision_preserved:true,
+   published:[1,2,3,4],object_backed_worker:"PASS",old_revision_preserved:true,
    distinct_job_object_keys:true,concurrent_conflict:"blocked",
    upload_failure_db_revision_unchanged:true,pending_orphan_candidates:orphan.length,
    gc:"REVIEW_ONLY_NO_DELETE",postgres_and_s3:"REAL_HTTP_TEST_SERVICES"
