@@ -301,7 +301,7 @@
       const file = await (await dir.getFileHandle(name)).getFile();
       if (file.size > MAX_BYTES || !file.size) throw Error("size");
       // Restore only into the editor. Never overwrite the version being restored.
-      const original = name.replace(/-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z-[0-9a-f]{8}\.dxf$/i, ".dxf");
+      const original = name.replace(/-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z-(?:[0-9a-f]{8}|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})\.dxf$/i, ".dxf");
       openDrawing(original, await file.arrayBuffer());
     } catch {
       status("歷史版本無法開啟；請檢查本機資料夾授權及檔案。", true);
