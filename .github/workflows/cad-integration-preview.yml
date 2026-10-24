@@ -1,0 +1,65 @@
+name: LiZhi CAD Portal Integration Preview (no deployment)
+on:
+  push:
+    branches: [feature/embed-lizhi-cad-local-v1]
+    paths:
+      - 'app.js'
+      - 'workspace-ui.js'
+      - 'index.html'
+      - 'cad/**'
+      - 'tests/cad-embedded.test.cjs'
+      - '.github/workflows/cad-integration-preview.yml'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check CAD integration and local security contract
+        run: node --test tests/cad-embedded.test.cjs
+  wasm-preview:
+    needs: host-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUSTFLAGS: '-C debuginfo=0'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up pinned WASM toolchain
+        run: bash cad/setup-build-toolchain.sh
+      - name: Cache cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: lizhi-cad-cargo-19e09447345750ea-v1
+      - name: Build Rust CADCraft into integrated runtime
+        run: bash cad/build-runtime.sh
+      - name: Assert browser bundle links and provenance
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,re
+          cad = Path('cad/runtime')
+          html = (cad/'index.html').read_text(encoding='utf-8')
+          assert '<canvas' in html
+          assert list(cad.glob('*.wasm'))
+          assert list(cad.glob('*.js'))
+          manifest = json.loads((cad/'build-source.json').read_text())
+          assert manifest['remoteCadWorker'] is False
+          assert manifest['sourceSha'] == '19e09447345750eaedd33db7a86fbeff3af1210f'
+          print('Verified CAD runtime bundle:',len(list(cad.iterdir())),'files')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: lizhi-cad-integrated-runtime-candidate
+          path: cad/runtime/
+          retention-days: 14
+          if-no-files-found: error
