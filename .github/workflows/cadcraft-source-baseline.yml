@@ -1,0 +1,133 @@
+name: CADCraft Source Baseline (Pinned Rust Upstream)
+on:
+  push:
+    branches:
+      - feature/cad-m2-spec-v1-20261024
+    paths:
+      - '.github/workflows/cadcraft-source-baseline.yml'
+      - 'engineering/cad/CADCRAFT_SOURCE_FORK_PLAN_V2.md'
+      - 'engineering/cad/source-baseline/**'
+  workflow_dispatch:
+
+# Read-only: NEVER push upstream source into lizhi-cloud-web, create forks,
+# access private drawings, or use repository/org secrets in upstream build code.
+permissions:
+  contents: read
+
+concurrency:
+  group: cadcraft-source-baseline-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  upstream-source-and-native-mcp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      UPSTREAM_REPO: https://github.com/storytold/cadcraft.git
+      UPSTREAM_TAG: v0.12.0
+      UPSTREAM_COMMIT: bad1073fdf10a521949f6b542837b564719d0023
+      CARGO_BUILD_JOBS: '2'
+      CARGO_INCREMENTAL: '0'
+      RUSTFLAGS: '-C debuginfo=0'
+    steps:
+      - name: Checkout isolated integration branch (read-only)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check out COMPLETE pinned CADCraft upstream source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch "$UPSTREAM_TAG" "$UPSTREAM_REPO" upstream-cadcraft
+          test "$(git -C upstream-cadcraft rev-parse HEAD)" = "$UPSTREAM_COMMIT"
+          test -f upstream-cadcraft/Cargo.lock
+          test -f upstream-cadcraft/Cargo.toml
+          test -f upstream-cadcraft/LICENSE-MIT
+          test -f upstream-cadcraft/LICENSE-APACHE
+          test -f upstream-cadcraft/NOTICE
+          test -f upstream-cadcraft/docs/brand/LICENSE-brand.txt
+          test -f upstream-cadcraft/apps/cadcraft-cli/Cargo.toml
+          test -f upstream-cadcraft/apps/cadcraft-web/Cargo.toml
+          test -f upstream-cadcraft/apps/cadcraft/Cargo.toml
+          test -f upstream-cadcraft/crates/mcp/Cargo.toml
+          count="$(git -C upstream-cadcraft ls-files | wc -l)"
+          echo "Pinned complete upstream source: $UPSTREAM_COMMIT; files=$count"
+          test "$count" -ge 300
+          git -C upstream-cadcraft status --porcelain
+          mkdir -p cad-source-evidence
+          cat > cad-source-evidence/BASELINE.txt <<EOF
+          CADCraft original source inspection only. This is NOT a user's fork or a deployed CAD App.
+          Official: https://github.com/storytold/cadcraft
+          tag: $UPSTREAM_TAG
+          commit: $UPSTREAM_COMMIT
+          git tracked file count: $count
+          license: MIT OR Apache-2.0 (see LICENSE-MIT/LICENSE-APACHE/NOTICE)
+          branding: docs/brand/LICENSE-brand.txt restricts ArtCraft marks on modified distributions.
+          EOF
+          # Source snapshot is unchanged, and intended for temporary verification only.
+          git -C upstream-cadcraft archive --format=tar --prefix=cadcraft-v0.12.0/ HEAD | gzip -9 > cad-source-evidence/cadcraft-v0.12.0-source.tar.gz
+          sha256sum cad-source-evidence/cadcraft-v0.12.0-source.tar.gz > cad-source-evidence/SHA256SUMS.txt
+          test -s cad-source-evidence/cadcraft-v0.12.0-source.tar.gz
+      - name: Install pinned Rust toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.95.0 --profile minimal --component rustfmt
+          rustup override set 1.95.0
+          rustc --version | tee cad-source-evidence/rust-version.txt
+          cargo --version | tee -a cad-source-evidence/rust-version.txt
+      - name: Verify Rust workspace and native MCP sources
+        working-directory: upstream-cadcraft
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo metadata --locked --offline --no-deps --format-version 1 > ../cad-source-evidence/cargo-metadata.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('../cad-source-evidence/cargo-metadata.json'))
+          names={x['name'] for x in d['packages']}
+          needed={'cadcraft-cli','cadcraft','cadcraft-web','cadcraft-mcp','cadcraft-engine'}
+          assert needed.issubset(names),(needed-names)
+          print('CADCRAFT_PINNED_SOURCE_WORKSPACE_PASS',sorted(needed))
+          PY
+          grep -R --include='*.rs' -l 'inspect_drawing' crates/mcp apps/cadcraft-cli | head -n 8
+          grep -R --include='*.rs' -l 'query_entities' crates/mcp apps/cadcraft-cli | head -n 8
+      - name: Build native CADCraft CLI FROM SOURCE (not release binary)
+        working-directory: upstream-cadcraft
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo build --locked --release --package cadcraft-cli
+          test -x target/release/cadcraft-cli
+          target/release/cadcraft-cli --version | tee ../cad-source-evidence/source-cli-version.txt
+          sha256sum target/release/cadcraft-cli > ../cad-source-evidence/source-cli-SHA256SUMS.txt
+      - name: Run native MCP and geometry smoke with SOURCE-BUILT binary
+        working-directory: upstream-cadcraft
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked --package cadcraft-mcp --lib
+          mkdir -p ../cad-source-evidence/drawing
+          target/release/cadcraft-cli run --metric --script $'CIRCLE 22,3 1\n' --save ../cad-source-evidence/drawing/rev1.dxf
+          target/release/cadcraft-cli run ../cad-source-evidence/drawing/rev1.dxf --script $'CIRCLE 88,25 5\n' --save ../cad-source-evidence/drawing/rev2.dxf
+          target/release/cadcraft-cli info ../cad-source-evidence/drawing/rev2.dxf > ../cad-source-evidence/drawing/rev2-info.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('../cad-source-evidence/drawing/rev2-info.json'))
+          assert d['entityCount']==2,d
+          assert d['counts'].get('Circle')==2,d
+          print('CADCRAFT_SOURCE_BUILT_GEOMETRY_PASS')
+          PY
+          target/release/cadcraft-cli convert ../cad-source-evidence/drawing/rev2.dxf ../cad-source-evidence/drawing/rev2.svg
+          target/release/cadcraft-cli convert ../cad-source-evidence/drawing/rev2.dxf ../cad-source-evidence/drawing/rev2.png
+          test -s ../cad-source-evidence/drawing/rev2.svg
+          test -s ../cad-source-evidence/drawing/rev2.png
+          sha256sum ../cad-source-evidence/drawing/* >> ../cad-source-evidence/SHA256SUMS.txt
+      - name: Export source baseline and test evidence (no private drawings)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cadcraft-source-built-baseline-v0120
+          path: cad-source-evidence/
+          retention-days: 14
+          if-no-files-found: warn
