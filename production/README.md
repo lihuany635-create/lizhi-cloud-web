@@ -14,4 +14,4 @@ v7 通用專案：在既有 portfolio 上新增 schemaVersion 2，保留原動�
 
 寫入先讀最新revision，每次使用唯一key，最後get_project讀回。PASS只適用附證據的scope及mode；simulation不等於actual，無證據自動轉NOT_TESTED。舊completed紀錄不直接當PASS。作者才能回復同專案備份，回復保留歷史且不改動畫模型專業資料。
 
-相容測試111/111通過；桌面／手機瀏覽器預覽連線不可用，新通用工具在目前對話尚未重新載入，這兩項端對端維持NOT_TESTED。部署成功不代表這兩項已通過。
+相容測試112/112通過；桌面／手機瀏覽器預覽連線不可用，新通用工具在目前對話尚未重新載入，這兩項端對端維持NOT_TESTED。部署成功不代表這兩項已通過。
