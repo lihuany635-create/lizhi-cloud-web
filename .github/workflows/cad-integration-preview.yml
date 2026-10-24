@@ -51,7 +51,7 @@ jobs:
           assert list(cad.glob('*.js'))
           manifest = json.loads((cad/'build-source.json').read_text())
           assert manifest['remoteCadWorker'] is False
-          assert manifest['sourceSha'] == '19e09447345750eaedd33db7a86fbeff3af1210f'
+          assert manifest['sourceSha'] == '98ceeca360ba920666af075be6c08fb4bb63d2ee'
           print('Verified CAD runtime bundle:',len(list(cad.iterdir())),'files')
           PY
       - uses: actions/upload-artifact@v4
