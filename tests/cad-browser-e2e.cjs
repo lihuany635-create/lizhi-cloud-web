@@ -55,7 +55,11 @@ async function main(){
     await page.addInitScript(() => {
       // Mock only the File System Access picker. The portal and CAD iframe are real production source.
       const data=new Map();
-      window.__cadE2E={files:data,deny:false};
+      window.__cadE2E={files:data,deny:false,dirtyEvents:[]};
+      window.addEventListener("message", event => {
+        if(event.origin===location.origin && event.source===document.querySelector("#cad-frame")?.contentWindow && event.data?.type==="cadcraft:dirty")
+          window.__cadE2E.dirtyEvents.push(event.data.dirty);
+      });
       const revisionDirectory={
         kind:"directory",
         async getFileHandle(name,{create=false}={}) {
@@ -111,6 +115,8 @@ async function main(){
     await page.keyboard.press("Control+s");
     await page.waitForFunction(()=>window.__cadE2E?.files.size>0,null,{timeout:25000});
     await page.waitForFunction(()=>document.querySelector("#cad-status")?.textContent?.includes("已驗證本機 DXF"),null,{timeout:25000});
+    await page.waitForFunction(()=>window.__cadE2E.dirtyEvents.at(-1)===false,null,{timeout:15000});
+    report.steps.push("Native save-ack only confirms CAD durability after filesystem SHA-256 verification");
     const saved=await page.evaluate(()=>{
       const entries=[...window.__cadE2E.files.entries()];
       return entries.map(([name,bytes])=>({name,bytes:[...bytes]}));
@@ -165,6 +171,8 @@ async function main(){
     const emergency=await recoveryDownload;
     await emergency.saveAs(path.join(evidence,"cad-rescued-from-indexeddb.dxf"));
     assert.ok((await fs.stat(path.join(evidence,"cad-rescued-from-indexeddb.dxf"))).size>250);
+    await page.waitForFunction(()=>window.__cadE2E.dirtyEvents.at(-1)===true,null,{timeout:15000});
+    report.steps.push("Native failed save-ack reports dirty after download fallback");
     report.steps.push("Emergency IndexedDB snapshot survives failed filesystem save; manual recovery downloads real CADCraft DXF");
         report.steps.push("Permission revoked -> original revisions unchanged; DXF download fallback");
     report.passed=true;
