@@ -58,3 +58,38 @@ References:
 - https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication
 - https://supabase.com/docs/guides/auth/oauth-server/oauth-flows
 - https://supabase.com/docs/guides/auth/jwts
+
+
+## Independent CADCraft staging worker and revocation fencing (verified 2026-10-24)
+
+Staging MCP only submits/reads jobs. A separate CADCraft worker process now exists; it has no inbound HTTP port.
+
+- cloud-cad-worker-host.cjs obtains an atomic PostgreSQL job lease, loads an immutable compiled drawing intent (including verified OAuth client_id), re-checks that client's project grant, runs the official CADCraft CLI, renews its lease, stores DXF/SVG/PNG via immutable S3 keys, and commits the new revision transactionally.
+- cloud-cad-worker-server.cjs is an executable, single-owner staging daemon with a validated and SHA-256-pinned CADCraft binary, looped polling, explicit shutdown, and a guard against a known production DB URL. This is not a multi-tenant production scheduler.
+- cloud-cad-postgres-lease.cjs supports fenced failure: stale/expired workers cannot mark a newly claimed task failed.
+- cloud-cad-object-revisions.cjs and cloud-cad-oauth-acl.cjs check the original OAuth grant again inside the PostgreSQL publishing transaction, using row locking. Revocation during S3 upload prevents the final database commit.
+
+Required staging environment (provide actual values from a separate staging secret manager, NEVER commit keys):
+    CAD_DEPLOYMENT_MODE=staging
+    CAD_WORKER_STAGING_CONFIRM=isolated-only
+    CAD_WORKER_OWNER_ID=STAGING_USER_UUID
+    CAD_WORKER_ID=unique_worker_1
+    CADCRAFT_BIN=/absolute/path/to/cadcraft-cli
+    CADCRAFT_BIN_SHA256=64_HEX_HASH_OF_BINARY
+    CAD_STAGING_DATABASE_URL=SERVER_ONLY_STAGING_DB_URL
+    CAD_STAGING_S3_ENDPOINT=https://STAGING_S3_ENDPOINT
+    CAD_STAGING_S3_BUCKET=staging-only-cad-bucket
+    CAD_STAGING_S3_REGION=us-east-1
+    CAD_STAGING_S3_ACCESS_KEY_ID=STAGING_SECRET
+    CAD_STAGING_S3_SECRET_ACCESS_KEY=STAGING_SECRET
+    CAD_WORKER_POLL_MS=5000
+
+After installing pinned pg and @aws-sdk/client-s3 runtime dependencies in an isolated runtime:
+    node engineering/cad/cloud-cad-worker-server.cjs
+
+CI results:
+- GitHub Actions run 40097069018: PASS, official Linux CADCraft v0.12.0, independent staging worker daemon, loopback test MCP, ephemeral PostgreSQL 16 and Moto S3 HTTP. Revisions 1 and 2 passed; already-queued job blocked after grant revocation.
+- GitHub Actions run 40097150310: PASS, real PostgreSQL 16, grant revoked in the middle of object upload; DB refuses publication and retains an uncommitted upload audit attempt.
+- Node 20/22 contracts cover fail-closed worker config and OAuth client binding. This does NOT confirm real Supabase OAuth consent, production storage, uptime, or the personal-PC-off ChatGPT usage requirement.
+
+Remaining blockers: isolated Supabase OAuth staging, real PKCE + client registration/consent, TLS MCP URL, worker supervision, quotas/backups, storage lifecycle, complete live user/ChatGPT E2E, and project-specific ACL provisioning. Never deploy to production without explicit authorization.
