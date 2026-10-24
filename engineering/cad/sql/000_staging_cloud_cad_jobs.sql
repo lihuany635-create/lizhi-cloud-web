@@ -69,4 +69,44 @@ ALTER TABLE public.lizhi_cad_cloud_drawings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.lizhi_cad_cloud_revisions ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.lizhi_cad_cloud_drawings FROM PUBLIC,anon,authenticated;
 REVOKE ALL ON TABLE public.lizhi_cad_cloud_revisions FROM PUBLIC,anon,authenticated;
+
+-- Object-backed revisions are a staging alternative to legacy DXF bytea.
+-- Binary content remains in immutable S3-style keys; job metadata and the
+-- drawing head advance transactionally only after successful object upload.
+CREATE TABLE IF NOT EXISTS public.lizhi_cad_cloud_object_revisions (
+ owner_id uuid NOT NULL,
+ drawing_id text NOT NULL,
+ revision integer NOT NULL CHECK(revision>=1),
+ job_key text NOT NULL CHECK(length(job_key)=64 AND job_key !~ '[^a-f0-9]'),
+ artifacts jsonb NOT NULL CHECK(
+   jsonb_typeof(artifacts)='object'
+   AND jsonb_typeof(artifacts->'dxf')='object'
+   AND length(artifacts->'dxf'->>'sha256')=64
+ ),
+ inspection jsonb NOT NULL CHECK(inspection->>'valid'='true'),
+ created_at timestamptz NOT NULL DEFAULT now(),
+ CONSTRAINT lizhi_cad_cloud_object_revision_pk PRIMARY KEY(owner_id,drawing_id,revision),
+ CONSTRAINT lizhi_cad_cloud_object_revision_job_unique UNIQUE(owner_id,job_key),
+ CONSTRAINT lizhi_cad_cloud_object_revision_drawing_fk FOREIGN KEY(owner_id,drawing_id)
+   REFERENCES public.lizhi_cad_cloud_drawings(owner_id,drawing_id) ON DELETE RESTRICT
+);
+-- Every attempted S3 upload has an audit record created BEFORE network IO.
+-- Pending rows make orphaned staging objects discoverable, not automatically
+-- deletable: cleanup requires a separately reviewed and authorized process.
+CREATE TABLE IF NOT EXISTS public.lizhi_cad_cloud_upload_attempts (
+ owner_id uuid NOT NULL,
+ job_key text NOT NULL CHECK(length(job_key)=64 AND job_key !~ '[^a-f0-9]'),
+ project_id text NOT NULL,
+ drawing_id text NOT NULL,
+ target_revision integer NOT NULL CHECK(target_revision>=1),
+ created_at timestamptz NOT NULL DEFAULT now(),
+ published_at timestamptz,
+ CONSTRAINT lizhi_cad_cloud_upload_attempt_pk PRIMARY KEY(owner_id,job_key)
+);
+CREATE INDEX IF NOT EXISTS lizhi_cad_cloud_upload_pending_idx
+ ON public.lizhi_cad_cloud_upload_attempts(created_at) WHERE published_at IS NULL;
+ALTER TABLE public.lizhi_cad_cloud_object_revisions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.lizhi_cad_cloud_upload_attempts ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON TABLE public.lizhi_cad_cloud_object_revisions FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON TABLE public.lizhi_cad_cloud_upload_attempts FROM PUBLIC,anon,authenticated;
 COMMIT;
