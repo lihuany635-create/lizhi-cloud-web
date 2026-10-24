@@ -46,7 +46,8 @@ test('host rejects foreign origin and fake frame while receiving legitimate CAD 
   sandbox.window.window = sandbox.window;
   vm.runInNewContext(host, sandbox, { filename: 'cad-host.js' });
   sandbox.window.LizhiCadHost.mount(panel);
-  await Promise.resolve();
+  // Finish asynchronous permission-restore fallback before testing origin filtering.
+  await new Promise(resolve => setImmediate(resolve));
   status.textContent = 'original';
   await handlers.message({ source: {}, origin: 'https://example.test', data: { type: 'cadcraft:ready' } });
   assert.equal(status.textContent, 'original');
