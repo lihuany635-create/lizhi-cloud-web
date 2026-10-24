@@ -123,6 +123,11 @@ jobs:
           test -s ../cad-source-evidence/drawing/rev2.svg
           test -s ../cad-source-evidence/drawing/rev2.png
           sha256sum ../cad-source-evidence/drawing/* >> ../cad-source-evidence/SHA256SUMS.txt
+      - name: Native stdio MCP end-to-end from SOURCE-BUILT CADCraft
+        shell: bash
+        run: |
+          set -euo pipefail
+          node engineering/cad/source-baseline/native-mcp-smoke.cjs "$PWD/upstream-cadcraft/target/release/cadcraft-cli" "$PWD/cad-source-evidence/drawing"
       - name: Export source baseline and test evidence (no private drawings)
         if: always()
         uses: actions/upload-artifact@v4
