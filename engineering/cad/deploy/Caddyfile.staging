@@ -1,0 +1,21 @@
+:8443 {
+  tls /run/secrets/cad.crt /run/secrets/cad.key
+  @wrong_host not host {$CAD_STAGING_FQDN}
+  respond @wrong_host 404
+  header {
+    X-Content-Type-Options nosniff
+    X-Frame-Options DENY
+    Referrer-Policy no-referrer
+    Cache-Control no-store
+    -Server
+  }
+  request_body {
+    max_size 512KB
+  }
+  reverse_proxy 127.0.0.1:9876 {
+    transport http {
+      dial_timeout 5s
+      response_header_timeout 60s
+    }
+  }
+}
