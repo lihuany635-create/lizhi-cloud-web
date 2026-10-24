@@ -3,6 +3,9 @@
   "use strict";
   const DB_NAME = "lizhi-cad-local";
   const DB_STORE = "permissions";
+  const RECOVERY_STORE = "recovery";
+  let saveQueue = Promise.resolve();
+  let pendingSaves = 0;
   const MAX_BYTES = 32 * 1024 * 1024;
   let panel = null;
   let frame = null;
@@ -38,8 +41,12 @@
   }
   function database() {
     return new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, 1);
-      req.onupgradeneeded = () => req.result.createObjectStore(DB_STORE);
+      const req = indexedDB.open(DB_NAME, 2);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
+        if (!db.objectStoreNames.contains(RECOVERY_STORE)) db.createObjectStore(RECOVERY_STORE, { keyPath: "id" });
+      };
       req.onerror = () => reject(req.error);
       req.onsuccess = () => resolve(req.result);
     });
@@ -57,6 +64,78 @@
       db.close();
     }
   }
+
+  // A save message marks the Rust engine clean before the parent can finish disk I/O.
+  // Persist an emergency browser-local copy first, and retain it until verified disk write.
+  async function recoveryTx(mode, operation) {
+    const db = await database();
+    try {
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(RECOVERY_STORE, mode);
+        let result;
+        tx.oncomplete = () => resolve(result);
+        tx.onerror = () => reject(tx.error || new Error("recovery transaction failed"));
+        tx.onabort = () => reject(tx.error || new Error("recovery transaction aborted"));
+        const request = operation(tx.objectStore(RECOVERY_STORE));
+        request.onsuccess = () => { result = request.result; };
+      });
+    } finally {
+      db.close();
+    }
+  }
+  async function storeRecovery(filename, bytes) {
+    const id = crypto.randomUUID();
+    await recoveryTx("readwrite", store => store.put({
+      id, name: filename, at: new Date().toISOString(),
+      data: new Blob([bytes], { type: "application/octet-stream" })
+    }));
+    return id;
+  }
+  const getRecoveries = () => recoveryTx("readonly", store => store.getAll());
+  const clearRecovery = id => recoveryTx("readwrite", store => store.delete(id));
+  async function refreshRecoveryButton() {
+    try {
+      const entries = await getRecoveries();
+      const button = panel?.querySelector('[data-cad-action="recovery"]');
+      if (button) button.textContent = entries.length ? "救援存檔（" + entries.length + "）" : "救援存檔";
+    } catch {
+      // Browser storage can be disabled or full; the drawing engine remains usable.
+    }
+  }
+  async function showRecoveries() {
+    const container = panel?.querySelector("#cad-recovery-list");
+    if (!container) return;
+    container.replaceChildren();
+    let entries;
+    try { entries = await getRecoveries(); }
+    catch {
+      status("無法讀取本機救援檔案，請檢查瀏覽器儲存權限。", true);
+      return;
+    }
+    entries.sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    if (!entries.length) {
+      container.textContent = "沒有待救援的存檔。";
+    }
+    for (const entry of entries) {
+      const line = document.createElement("div");
+      line.className = "cad-recovery-item";
+      const caption = document.createElement("span");
+      caption.textContent = safeName(entry.name) + " · " + String(entry.at).slice(0, 19);
+      const restore = document.createElement("button");
+      restore.type = "button"; restore.className = "button";
+      restore.textContent = "再次下載";
+      restore.dataset.cadRecoveryDownload = entry.id;
+      const discard = document.createElement("button");
+      discard.type = "button"; discard.className = "button danger";
+      discard.textContent = "確認已有備份後刪除";
+      discard.dataset.cadRecoveryDelete = entry.id;
+      line.append(caption, restore, discard);
+      container.append(line);
+    }
+    container.hidden = false;
+    await refreshRecoveryButton();
+  }
+
   async function permitted(mode) {
     if (!folder || typeof folder.queryPermission !== "function") return false;
     return (await folder.queryPermission({ mode })) === "granted";
@@ -103,35 +182,58 @@
   }
   async function saveRevision(name, bytes) {
     const filename = safeName(name);
-    if (!/\.dxf$/i.test(filename)) {
-      download(filename, bytes);
-      status("已下載匯出檔「" + filename + "」。");
-      return;
-    }
-    if (!await permitted("readwrite")) {
-      download(filename, bytes);
-      status("DXF 已下載。資料夾未授權或授權已失效，未建立本機歷史版本。", true);
-      return;
+    let recoveryId = null;
+    try {
+      // Durable before filesystem write: browser-only IndexedDB, never uploaded to an API.
+      recoveryId = await storeRecovery(filename, bytes);
+    } catch {
+      status("瀏覽器緊急備份不可用，正在嘗試正常寫入／下載。請勿關閉頁面。", true);
     }
     try {
-      const directory = await folder.getDirectoryHandle("revisions", { create: true });
-      const prefix = filename.replace(/\.dxf$/i, "");
-      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const revision = prefix + "-" + stamp + "-" + crypto.randomUUID().slice(0, 8) + ".dxf";
-      const file = await directory.getFileHandle(revision, { create: true });
-      const writer = await file.createWritable({ keepExistingData: false });
-      try {
-        await writer.write(bytes);
-        await writer.close();
-      } catch (error) {
-        try { await writer.abort(); } catch {}
-        throw error;
+      if (/\.dxf$/i.test(filename) && await permitted("readwrite")) {
+        const directory = await folder.getDirectoryHandle("revisions", { create: true });
+        const prefix = filename.replace(/\.dxf$/i, "");
+        const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const revision = prefix + "-" + stamp + "-" + crypto.randomUUID() + ".dxf";
+        const handle = await directory.getFileHandle(revision, { create: true });
+        const writer = await handle.createWritable({ keepExistingData: false });
+        try {
+          await writer.write(bytes);
+          await writer.close();
+        } catch (error) {
+          try { await writer.abort(); } catch {}
+          throw error;
+        }
+        // Do not mark success just because createWritable()/postMessage returned:
+        // read the actual file back and compare the complete content digest.
+        const diskFile = await handle.getFile();
+        if (diskFile.size !== bytes.byteLength) throw new Error("DXF size mismatch after write");
+        const [expected, actual] = await Promise.all([
+          crypto.subtle.digest("SHA-256", bytes),
+          diskFile.arrayBuffer().then(data => crypto.subtle.digest("SHA-256", data))
+        ]);
+        const x = new Uint8Array(expected), y = new Uint8Array(actual);
+        if (x.some((value, i) => value !== y[i])) throw new Error("DXF SHA-256 mismatch after write");
+        currentName = filename;
+        if (recoveryId) {
+          try { await clearRecovery(recoveryId); } catch { /* keep an extra emergency copy */ }
+        }
+        await refreshRecoveryButton();
+        status("已驗證本機 DXF：revisions/" + revision + "（大小與 SHA-256 一致，舊版保留）。");
+        return;
       }
-      currentName = filename;
-      status("已儲存在所選資料夾的 revisions/" + revision + "（保留舊版、不覆蓋）。");
-    } catch {
       download(filename, bytes);
-      status("本機版本寫入失敗，已提供 DXF 下載備份；請檢查容量與資料夾權限。", true);
+      await refreshRecoveryButton();
+      status(recoveryId
+        ? "已要求瀏覽器下載「" + filename + "」，另有本機救援存檔。未建立本機歷史版本，請確認下載成功。"
+        : "已要求瀏覽器下載「" + filename + "」，但無救援副本；未建立本機歷史版本，請立即確認下載成功。", true);
+    } catch {
+      let downloadAttempted = false;
+      try { download(filename, bytes); downloadAttempted = true; } catch {}
+      await refreshRecoveryButton();
+      status("DXF／匯出檔未通過本機持久化驗證。"
+        + (downloadAttempted ? "已要求備援下載，請檢查瀏覽器下載清單。" : "下載亦失敗，請勿關閉頁面。")
+        + (recoveryId ? "可由「救援存檔」重新下載。" : "瀏覽器也未保存救援副本，請重新嘗試存檔。"), true);
     }
   }
   async function handleMessage(event) {
@@ -149,7 +251,10 @@
         status("CAD 匯出的檔案無效或超過 32 MiB；未寫入資料夾。", true);
         return;
       }
-      await saveRevision(msg.name, bytes);
+      pendingSaves++;
+      saveQueue = saveQueue.then(() => saveRevision(msg.name, bytes))
+        .catch(() => status("儲存流程發生未預期錯誤；請立刻檢查本機版本與救援檔案。", true))
+        .finally(() => { pendingSaves--; });
     } else if (msg.type === "cadcraft:failed") {
       ready = false;
       status("CAD 繪圖引擎載入失敗；" + String(msg.error || "請檢查瀏覽器 WebAssembly 支援。").slice(0, 180), true);
@@ -205,10 +310,21 @@
   async function onClick(event) {
     const action = event.target.closest("[data-cad-action]")?.dataset.cadAction;
     const revision = event.target.closest("[data-cad-revision]")?.dataset.cadRevision;
-    if (!action && !revision) return;
+    const recoveryDownload = event.target.closest("[data-cad-recovery-download]")?.dataset.cadRecoveryDownload;
+    const recoveryDelete = event.target.closest("[data-cad-recovery-delete]")?.dataset.cadRecoveryDelete;
+    if (!action && !revision && !recoveryDownload && !recoveryDelete) return;
     if (action === "folder") await selectFolder();
     else if (action === "open") panel?.querySelector("#cad-open-file")?.click();
     else if (action === "versions") await listVersions();
+    else if (action === "recovery") await showRecoveries();
+    else if (recoveryDownload) {
+      const item = (await getRecoveries()).find(row => row.id === recoveryDownload);
+      if (item) { download(item.name, item.data); status("已要求再次下載救援存檔，請確認瀏覽器下載成功；救援副本尚未刪除。"); }
+    } else if (recoveryDelete) {
+      if (!confirm("只有確認外部備份已完成，才能刪除此本機救援副本。確定刪除嗎？")) return;
+      await clearRecovery(recoveryDelete);
+      await showRecoveries();
+    }
     else if (action === "reload" && frame) {
       if (!confirm("重新載入 CAD 將放棄尚未儲存的圖面變更，確定繼續？")) return;
       ready = false;
@@ -245,9 +361,13 @@
       panel.addEventListener("change", onFile);
       if (!listening) {
         window.addEventListener("message", handleMessage);
+        window.addEventListener("beforeunload", event => {
+          if (pendingSaves > 0) { event.preventDefault(); event.returnValue = ""; }
+        });
         listening = true;
       }
       restoreFolder();
+      refreshRecoveryButton();
     }
   };
 })();
