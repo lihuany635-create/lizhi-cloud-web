@@ -220,13 +220,14 @@
         }
         await refreshRecoveryButton();
         status("已驗證本機 DXF：revisions/" + revision + "（大小與 SHA-256 一致，舊版保留）。");
-        return;
+        return true;
       }
       download(filename, bytes);
       await refreshRecoveryButton();
       status(recoveryId
         ? "已要求瀏覽器下載「" + filename + "」，另有本機救援存檔。未建立本機歷史版本，請確認下載成功。"
         : "已要求瀏覽器下載「" + filename + "」，但無救援副本；未建立本機歷史版本，請立即確認下載成功。", true);
+      return false;
     } catch {
       let downloadAttempted = false;
       try { download(filename, bytes); downloadAttempted = true; } catch {}
@@ -234,6 +235,16 @@
       status("DXF／匯出檔未通過本機持久化驗證。"
         + (downloadAttempted ? "已要求備援下載，請檢查瀏覽器下載清單。" : "下載亦失敗，請勿關閉頁面。")
         + (recoveryId ? "可由「救援存檔」重新下載。" : "瀏覽器也未保存救援副本，請重新嘗試存檔。"), true);
+      return false;
+    }
+  }
+  function acknowledgeSave(requestId, persisted) {
+    // An acknowledgement never means that merely starting a download was durable.
+    if (typeof requestId !== "string" || !/^cad-save-\\d{1,18}$/.test(requestId)) return;
+    if (frame?.contentWindow) {
+      frame.contentWindow.postMessage({
+        type: "cadcraft:save-ack", requestId, ok: persisted === true
+      }, location.origin);
     }
   }
   async function handleMessage(event) {
@@ -249,11 +260,19 @@
       const bytes = msg.bytes;
       if (!(bytes instanceof ArrayBuffer) || bytes.byteLength === 0 || bytes.byteLength > MAX_BYTES) {
         status("CAD 匯出的檔案無效或超過 32 MiB；未寫入資料夾。", true);
+        acknowledgeSave(msg.requestId, false);
         return;
       }
       pendingSaves++;
-      saveQueue = saveQueue.then(() => saveRevision(msg.name, bytes))
-        .catch(() => status("儲存流程發生未預期錯誤；請立刻檢查本機版本與救援檔案。", true))
+      saveQueue = saveQueue
+        .then(async () => {
+          const persisted = await saveRevision(msg.name, bytes);
+          acknowledgeSave(msg.requestId, persisted === true);
+        })
+        .catch(() => {
+          acknowledgeSave(msg.requestId, false);
+          status("儲存流程發生未預期錯誤；請立刻檢查本機版本與救援檔案。", true);
+        })
         .finally(() => { pendingSaves--; });
     } else if (msg.type === "cadcraft:failed") {
       ready = false;
