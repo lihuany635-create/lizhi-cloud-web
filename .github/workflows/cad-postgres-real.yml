@@ -1,0 +1,43 @@
+name: CAD Staging Postgres Integration
+on:
+  push:
+    branches: [feature/cad-m2-spec-v1-20261024]
+    paths:
+      - 'engineering/cad/cloud-cad-postgres-*.cjs'
+      - 'engineering/cad/cloud-cad-postgres-live.integration.cjs'
+      - 'engineering/cad/sql/**'
+      - '.github/workflows/cad-postgres-real.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  postgres-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: cad_ci_only
+          POSTGRES_DB: cad_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d cad_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install temporary Postgres client for test only
+        run: npm install --prefix "$RUNNER_TEMP/cad-pg-test" --no-audit --no-fund --ignore-scripts pg@8.16.3
+      - name: Verify migrations and real transaction semantics
+        env:
+          DATABASE_URL: postgres://postgres:cad_ci_only@127.0.0.1:5432/cad_ci
+        run: NODE_PATH="$RUNNER_TEMP/cad-pg-test/node_modules" node engineering/cad/cloud-cad-postgres-live.integration.cjs
