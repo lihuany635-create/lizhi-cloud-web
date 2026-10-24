@@ -57,13 +57,7 @@ async function main(){
     await canvas.waitFor({state:"visible"});
     await canvas.click({position:{x:200,y:180}});
     await page.keyboard.press("Control+s");
-    await page.waitForFunction(async()=>{
-      try{
-        const dir=await(await navigator.storage.getDirectory()).getDirectoryHandle("revisions");
-        for await(const [name,handle] of dir.entries()) if(handle.kind==="file" && (await(await handle.getFile()).size)>300)return true;
-      }catch{}
-      return false;
-    },null,{timeout:25000});
+    await page.waitForFunction(()=>document.querySelector("#cad-status")?.textContent?.includes("已儲存在所選資料夾"),null,{timeout:25000});
     const first=await revisions(page);
     assert.equal(first.length,1);
     assert.ok(Buffer.from(first[0].bytes).toString("utf8").includes("LWPOLYLINE"));
@@ -100,6 +94,8 @@ async function main(){
     await loadedCanvas.click({position:{x:200,y:180}});
     await page.keyboard.press("Control+s");
     await page.waitForFunction(async()=>{
+      const message=document.querySelector("#cad-status")?.textContent||"";
+      if(!message.includes("已儲存在所選資料夾"))return false;
       const dir=await(await navigator.storage.getDirectory()).getDirectoryHandle("revisions");
       let n=0;for await(const [,h] of dir.entries())if(h.kind==="file")n++;
       return n===2;
@@ -114,6 +110,21 @@ async function main(){
     report.passed=true;
   }catch(e){
     report.passed=false;report.error=String(e.stack||e);
+    report.diagnostics=await page.evaluate(async()=>{
+      const out={status:document.querySelector("#cad-status")?.textContent,origin:location.origin};
+      try {
+        const root=await navigator.storage.getDirectory();
+        out.rootEntries=[];
+        for await (const [name,handle] of root.entries())out.rootEntries.push({name,kind:handle.kind});
+        const rev=await root.getDirectoryHandle("revisions");
+        out.revisions=[];
+        for await (const [name,handle] of rev.entries()){
+          let size;try{size=(await handle.getFile()).size;}catch(err){size=String(err);}
+          out.revisions.push({name,size});
+        }
+      }catch(err){out.directoryError=String(err);}
+      return out;
+    }).catch(err=>({diagnosticError:String(err)}));
     await page.screenshot({path:path.join(evidence,"cad-opfs-failure.png")}).catch(()=>{});
   }finally{
     await fs.writeFile(path.join(evidence,"cad-opfs-persistence-e2e.json"),JSON.stringify(report,null,2));
