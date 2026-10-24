@@ -7,7 +7,8 @@ const {createWorker}=require("./cloud-cad-worker.cjs");
 const {createPostgresStorage}=require("./cloud-cad-postgres-storage.cjs");
 const {createPostgresLeaseManager}=require("./cloud-cad-postgres-lease.cjs");
 const {createPostgresRevisionStore}=require("./cloud-cad-postgres-revisions.cjs");
-const OWNER="aabbccdd-1234-4abc-8abc-abc123456789";
+// Separate owner prevents intentional stale rows from preceding integration tests being claimed.
+const OWNER="ccccdddd-1234-4abc-8abc-abc123456789";
 const args={projectId:"leaseP",drawingId:"leaseD",baseRevision:0,operation:"create",requestId:"lease01"};
 const bytes=Buffer.from("0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n");
 const sha=b=>crypto.createHash("sha256").update(b).digest("hex");
