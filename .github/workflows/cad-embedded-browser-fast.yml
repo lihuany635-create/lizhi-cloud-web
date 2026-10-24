@@ -1,4 +1,4 @@
-name: LiZhi CAD Fast Browser Smoke (prior pinned WASM artifact)
+name: LiZhi CAD Browser QA (pinned native save ACK runtime)
 on:
   push:
     branches: [feature/embed-lizhi-cad-local-v1]
@@ -11,6 +11,7 @@ on:
       - 'tests/cad-embedded.test.cjs'
       - 'tests/cad-browser-e2e.cjs'
       - 'tests/cad-opfs-persistence-e2e.cjs'
+      - 'tests/cad-mobile-e2e.cjs'
       - '.github/workflows/cad-embedded-browser-fast.yml'
   workflow_dispatch:
 permissions:
@@ -27,7 +28,7 @@ jobs:
         with:
           name: lizhi-cad-integrated-runtime-candidate
           repository: lihuany635-create/lizhi-cloud-web
-          run-id: 40119011236
+          run-id: 40124642246
           github-token: ${{ github.token }}
           path: cad/runtime
       - name: Verify pinned source manifest and JS/WASM
@@ -38,7 +39,7 @@ jobs:
           assert (p/"index.html").is_file()
           assert list(p.glob("*.js")) and list(p.glob("*.wasm"))
           m=json.loads((p/"build-source.json").read_text())
-          assert m["sourceSha"] == "19e09447345750eaedd33db7a86fbeff3af1210f"
+          assert m["sourceSha"] == "98ceeca360ba920666af075be6c08fb4bb63d2ee"
           assert m["remoteCadWorker"] is False
           print("Cached WASM is source-verified. Portal host code is tested from the current branch.")
           PY
@@ -64,6 +65,7 @@ jobs:
           done
           node tests/cad-browser-e2e.cjs
           node tests/cad-opfs-persistence-e2e.cjs
+          node tests/cad-mobile-e2e.cjs
       - name: Upload Chromium real-engine acceptance evidence
         if: always()
         uses: actions/upload-artifact@v4
