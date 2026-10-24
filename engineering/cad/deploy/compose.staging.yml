@@ -25,6 +25,12 @@ services:
       CAD_OAUTH_ISSUER: ${CAD_OAUTH_ISSUER:?Staging issuer required}
       CAD_STAGING_DATABASE_URL: ${CAD_STAGING_DATABASE_URL:?Staging DB required}
       CAD_ALLOWED_ORIGINS: ${CAD_ALLOWED_ORIGINS:-https://chatgpt.com}
+      # Use a separate S3 principal with read-only permissions for the API.
+      CAD_READ_S3_ENDPOINT: ${CAD_READ_S3_ENDPOINT:-}
+      CAD_READ_S3_BUCKET: ${CAD_READ_S3_BUCKET:-}
+      CAD_READ_S3_REGION: ${CAD_READ_S3_REGION:-}
+      CAD_READ_S3_ACCESS_KEY_ID: ${CAD_READ_S3_ACCESS_KEY_ID:-}
+      CAD_READ_S3_SECRET_ACCESS_KEY: ${CAD_READ_S3_SECRET_ACCESS_KEY:-}
     ports:
       # Deliberately host-local. Change ONLY after completing staging OAuth,
       # project ACL, egress, rate limit and TLS reviews.
