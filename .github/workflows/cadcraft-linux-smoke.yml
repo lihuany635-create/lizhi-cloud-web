@@ -73,6 +73,8 @@ jobs:
           file cad-evidence/rev2.dxf cad-evidence/rev2.svg cad-evidence/rev2.png
       - name: Verify compiled CAD bridge with actual Linux CADCraft
         run: node engineering/cad/cadcraft-live-smoke.cjs
+      - name: End-to-end HTTP MCP through cloud worker and real CADCraft
+        run: node engineering/cad/cloud-cad-live-e2e.cjs
       - name: Preserve private acceptance evidence
         if: always()
         uses: actions/upload-artifact@v4
