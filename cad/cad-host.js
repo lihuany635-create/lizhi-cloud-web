@@ -241,7 +241,7 @@
   }
   function acknowledgeSave(requestId, persisted) {
     // An acknowledgement never means that merely starting a download was durable.
-    if (typeof requestId !== "string" || !/^cad-save-\\d{1,18}$/.test(requestId)) return;
+    if (typeof requestId !== "string" || !/^cad-save-\d{1,18}$/.test(requestId)) return;
     if (frame?.contentWindow) {
       frame.contentWindow.postMessage({
         type: "cadcraft:save-ack", requestId, ok: persisted === true
