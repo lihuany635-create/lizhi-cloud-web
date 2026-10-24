@@ -34,7 +34,7 @@ function createPostgresRevisionStore({db,ownerId,authorizeDrawing}={}){
   if(!Buffer.isBuffer(bytes)||sha(bytes)!==row.sha256)throw new CadRevisionError("CAD_REVISION_CORRUPT","Stored geometry checksum mismatch");
   return Object.freeze({drawing_id:drawingId,revision:Number(row.revision),dxf:bytes,sha256:row.sha256});
  }
- async function publish({job,artifact,inspection,workerId}={}){
+ async function publish({job,artifact,inspection,workerId,leaseToken=null}={}){
   if(!job||typeof job!=="object")throw new CadRevisionError("CAD_JOB_INVALID","Missing job");
   const {project_id:projectId,drawing_id:drawingId,idempotency_key:jobKey,expected_revision:expectedRevision}=job;
   await permitted(projectId,drawingId,"write");
@@ -48,7 +48,7 @@ function createPostgresRevisionStore({db,ownerId,authorizeDrawing}={}){
   try{
    await client.query("BEGIN");started=true;
    // Lock owner-specific job first, then the drawing to avoid deadlocks.
-   const found=await client.query("SELECT job_data FROM public.lizhi_cad_cloud_jobs WHERE owner_id=$1::uuid AND idempotency_key=$2 FOR UPDATE",[ownerId,jobKey]);
+   const found=await client.query("SELECT job_data,lease_until FROM public.lizhi_cad_cloud_jobs WHERE owner_id=$1::uuid AND idempotency_key=$2 FOR UPDATE",[ownerId,jobKey]);
    if(found.rowCount!==1)throw new CadRevisionError("CAD_JOB_NOT_FOUND","CAD job unavailable");
    const state=found.rows[0].job_data;
    if(state.project_id!==projectId||state.drawing_id!==drawingId||state.expected_revision!==expectedRevision)
@@ -64,6 +64,11 @@ function createPostgresRevisionStore({db,ownerId,authorizeDrawing}={}){
    }
    if(state.status!=="running"||state.worker_id!==workerId)
     throw new CadRevisionError("CAD_JOB_NOT_OWNED","Only active worker may publish");
+   if(state.lease_token!==undefined){
+    const until=found.rows[0].lease_until;
+    if(typeof leaseToken!=="string"||leaseToken!==state.lease_token||!until||new Date(until).getTime()<=Date.now())
+     throw new CadRevisionError("CAD_LEASE_LOST","Old worker cannot publish a stolen or expired lease");
+   }
    await client.query("INSERT INTO public.lizhi_cad_cloud_drawings(owner_id,project_id,drawing_id,current_revision) VALUES ($1::uuid,$2,$3,0) ON CONFLICT (owner_id,drawing_id) DO NOTHING",[ownerId,projectId,drawingId]);
    const h=await client.query("SELECT project_id,current_revision FROM public.lizhi_cad_cloud_drawings WHERE owner_id=$1::uuid AND drawing_id=$2 FOR UPDATE",[ownerId,drawingId]);
    if(h.rowCount!==1||h.rows[0].project_id!==projectId)throw new CadRevisionError("CAD_DRAWING_CONFLICT","Drawing belongs to another project");
