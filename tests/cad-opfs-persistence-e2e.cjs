@@ -97,13 +97,9 @@ async function main(){
     const loadedCanvas=page.frameLocator("#cad-frame").locator("#cadcraft_canvas");
     await loadedCanvas.click({position:{x:200,y:180}});
     await page.keyboard.press("Control+s");
-    await page.waitForFunction(async()=>{
-      const message=document.querySelector("#cad-status")?.textContent||"";
-      if(!message.includes("已驗證本機 DXF"))return false;
-      const dir=await(await navigator.storage.getDirectory()).getDirectoryHandle("revisions");
-      let n=0;for await(const [,h] of dir.entries())if(h.kind==="file")n++;
-      return n===2;
-    },null,{timeout:25000});
+    // Close+SHA256 read-back must be finished before asserting stable OPFS revision count;
+    // observing a new directory entry alone can race Chromium's atomic writer commit.
+    await page.waitForFunction(()=>document.querySelector("#cad-status")?.textContent?.includes("已驗證本機 DXF"),null,{timeout:25000});
     const final=await revisions(page);
     assert.equal(final.length,2);
     assert.notEqual(final[0].name,final[1].name);
