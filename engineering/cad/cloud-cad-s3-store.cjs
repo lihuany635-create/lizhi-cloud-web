@@ -15,17 +15,19 @@ function createCadS3Store({client,sdk,bucket,prefix="cad-v1"}={}){
   typeof bucket!=="string"||!/^[a-z0-9.-]{3,63}$/.test(bucket)||
   typeof prefix!=="string"||!ID.test(prefix))
   throw new CadObjectStoreError("CAD_S3_CONFIG_INVALID","S3 client, SDK, bucket and safe prefix required");
- const build=(ownerId,projectId,drawingId,revision,format)=>{
+ const build=(ownerId,projectId,drawingId,revision,format,jobKey=null)=>{
   if(typeof ownerId!=="string"||!UUID.test(ownerId)||!ID.test(projectId)||!ID.test(drawingId)||
     !Number.isSafeInteger(revision)||revision<1||revision>2147483647||!["dxf","svg","png"].includes(format))
    throw new CadObjectStoreError("CAD_S3_ID_INVALID","Invalid authorized artifact identity");
-  return [prefix,ownerId,projectId,drawingId,String(revision),format].join("/");
+  if(jobKey!==null&&(typeof jobKey!=="string"||!HASH.test(jobKey)))
+   throw new CadObjectStoreError("CAD_S3_ID_INVALID","Invalid immutable job identity");
+  return [prefix,ownerId,projectId,drawingId,String(revision),...(jobKey===null?[]:[jobKey]),format].join("/");
  };
  const isAlreadyThere=e=>e?.$metadata?.httpStatusCode===412||e?.$metadata?.httpStatusCode===409||
   e?.name==="PreconditionFailed"||e?.name==="ConditionalRequestConflict";
- async function put({ownerId,projectId,drawingId,revision,format,bytes,job}={}){
-  const key=build(ownerId,projectId,drawingId,revision,format);
-  if(!job||job.project_id!==projectId||job.drawing_id!==drawingId)throw new CadObjectStoreError("CAD_S3_JOB_MISMATCH","Artifact project/drawing and job mismatch");
+ async function put({ownerId,projectId,drawingId,revision,format,bytes,job,jobKey=null}={}){
+  const key=build(ownerId,projectId,drawingId,revision,format,jobKey);
+  if(!job||job.project_id!==projectId||job.drawing_id!==drawingId||(jobKey!==null&&job.cloud_job_key!==jobKey))throw new CadObjectStoreError("CAD_S3_JOB_MISMATCH","Artifact project/drawing/job and request mismatch");
   const manifest=verifyAndRecord({job,format,bytes,revision});
   const basic={bucket,object_key:key,format,sha256:manifest.sha256,byte_size:manifest.byte_size,mime_type:manifest.mime_type};
   try{
@@ -43,8 +45,8 @@ function createCadS3Store({client,sdk,bucket,prefix="cad-v1"}={}){
    return Object.freeze({...basic,reused:true});
   }
  }
- async function get({ownerId,projectId,drawingId,revision,format,expectedSha256}={}){
-  const key=build(ownerId,projectId,drawingId,revision,format);
+ async function get({ownerId,projectId,drawingId,revision,format,expectedSha256,jobKey=null}={}){
+  const key=build(ownerId,projectId,drawingId,revision,format,jobKey);
   if(typeof expectedSha256!=="string"||!HASH.test(expectedSha256))
    throw new CadObjectStoreError("CAD_S3_DIGEST_REQUIRED","Expected immutable artifact digest required");
   const result=await client.send(new sdk.GetObjectCommand({Bucket:bucket,Key:key}));
