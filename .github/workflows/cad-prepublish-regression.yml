@@ -33,7 +33,7 @@ jobs:
           persist-credentials: false
       - name: Engineering Center comparative baseline (same tests, no new failures)
         run: node tests/cad-regression-baseline.cjs
-      - name: Finance existing tests
-        run: node --test finance/tests/*.test.mjs finance/tests/*.test.js
+      - name: Finance comparative baseline (same tests, no new failures)
+        run: node tests/cad-regression-baseline.cjs finance
       - name: Library read-only MCP contract
         run: node --test tests/library-mcp-contract.test.mjs
