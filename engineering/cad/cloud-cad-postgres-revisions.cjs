@@ -48,7 +48,7 @@ function createPostgresRevisionStore({db,ownerId,authorizeDrawing}={}){
   try{
    await client.query("BEGIN");started=true;
    // Lock owner-specific job first, then the drawing to avoid deadlocks.
-   const found=await client.query("SELECT job_data,lease_until FROM public.lizhi_cad_cloud_jobs WHERE owner_id=$1::uuid AND idempotency_key=$2 FOR UPDATE",[ownerId,jobKey]);
+   const found=await client.query("SELECT job_data,lease_until,lease_until>now() AS lease_active FROM public.lizhi_cad_cloud_jobs WHERE owner_id=$1::uuid AND idempotency_key=$2 FOR UPDATE",[ownerId,jobKey]);
    if(found.rowCount!==1)throw new CadRevisionError("CAD_JOB_NOT_FOUND","CAD job unavailable");
    const state=found.rows[0].job_data;
    if(state.project_id!==projectId||state.drawing_id!==drawingId||state.expected_revision!==expectedRevision)
@@ -66,7 +66,7 @@ function createPostgresRevisionStore({db,ownerId,authorizeDrawing}={}){
     throw new CadRevisionError("CAD_JOB_NOT_OWNED","Only active worker may publish");
    if(state.lease_token!==undefined){
     const until=found.rows[0].lease_until;
-    if(typeof leaseToken!=="string"||leaseToken!==state.lease_token||!until||new Date(until).getTime()<=Date.now())
+    if(typeof leaseToken!=="string"||leaseToken!==state.lease_token||!until||found.rows[0].lease_active!==true)
      throw new CadRevisionError("CAD_LEASE_LOST","Old worker cannot publish a stolen or expired lease");
    }
    await client.query("INSERT INTO public.lizhi_cad_cloud_drawings(owner_id,project_id,drawing_id,current_revision) VALUES ($1::uuid,$2,$3,0) ON CONFLICT (owner_id,drawing_id) DO NOTHING",[ownerId,projectId,drawingId]);
