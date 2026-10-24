@@ -3,14 +3,11 @@ on:
   push:
     branches: [feature/embed-lizhi-cad-local-v1]
     paths:
-      - 'app.js'
-      - 'workspace-ui.js'
-      - 'index.html'
-      - 'cad/**'
-      - 'tests/cad-embedded.test.cjs'
-      - 'tests/cad-browser-e2e.cjs'
+      # Recompile Rust/WASM only when pinned build inputs change.
+      # Host and E2E test edits use cad-embedded-browser-fast.yml instead.
+      - 'cad/build-runtime.sh'
+      - 'cad/setup-build-toolchain.sh'
       - '.github/workflows/cad-integration-preview.yml'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
 permissions:
   contents: read
