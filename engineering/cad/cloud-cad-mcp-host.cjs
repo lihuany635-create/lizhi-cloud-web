@@ -22,6 +22,7 @@ function createCadMcpHost({db,resourceUrl,authorizationServer,jwksFetchImpl=fetc
  const service=createCadMcpService({
   authorizeDrawing:acl.authorizeDrawing,
   intents:createCadPostgresIntents({db}),
+  requireOAuthClient:true,
   queueForOwner:ownerId=>createQueue(createPostgresStorage({db,ownerId}))
  });
  return createCadMcpHttpHandler({
