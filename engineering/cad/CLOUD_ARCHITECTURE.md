@@ -1,3 +1,5 @@
+> **產品方向更正（2026-10-24）**：本文件記錄歷史雲端 CAD 執行與隔離 CI 的技術成果，**不是目前產品開發主線**。新版正規計畫是先 Fork 官方 CADCraft 完整 Rust 原始碼、保留原生 CAD／MCP，整合使用者已發布的 ChatGPT CAD App，再處理持久儲存、Windows 關機雲端執行與工程中心。請優先閱讀 [CADCRAFT_SOURCE_FORK_PLAN_V2.md](./CADCRAFT_SOURCE_FORK_PLAN_V2.md)。以下原有的 Worker／S3／OAuth 描述是可再利用的歷史技術資料，不代表 Fork 已完成或已部署。
+
 # Cloud CAD worker architecture (development contract)
 
 **Goal:** The user's computer may be powered off. ChatGPT's normal conversation uses a private authenticated remote MCP to submit CAD operations. CADCraft runs in a separate cloud worker/container, not localhost, browser code, or Supabase Edge Functions.
