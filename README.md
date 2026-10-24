@@ -23,6 +23,12 @@
 
 本機開發可使用 `啟動立之雲端庫.cmd` 啟動 `server.mjs`。
 
+## 工程中心 CAD（本機）
+
+工程中心可把已保存的家具設計交給 CADCraft v0.12.0，經 MCP 產生 DXF，再由 CLI 重讀並轉成 SVG／PNG。CAD 產物只寫入 `.local-data/engineering-cad`，不會寫入 Supabase 或公開網站目錄。
+
+啟動前請設定 `CADCRAFT_CLI_PATH` 為已驗證的 `cadcraft-cli.exe` 絕對路徑；也可把執行檔放在 `tools/cadcraft/cadcraft-cli.exe`。啟動本機站後，於工程中心的已保存家具設計按「產生 CAD 圖」。每個 Design Revision 都有獨立 job key、SHA-256、CADCraft 版本、MCP／CLI inspection 與 DXF／SVG／PNG 版本記錄。
+
 家中電腦要提供 Finance AI 時，可直接點兩下專案根目錄的 `啟動理財AI.cmd`。啟動檔會依序確認 Ollama、啟動僅綁定 `127.0.0.1:4181` 的 Finance AI Gateway、執行健康檢查，並開啟家中 AI Host 頁面；完成後會以 Windows 對話框明確顯示「已連線」或錯誤原因。
 
 ## 動畫與模型流程入口

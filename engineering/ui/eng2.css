@@ -193,3 +193,8 @@
 .eng2 .eng2-body .eng2-steps li.next button svg{color:var(--amber)}
 .eng2 .eng2-body .eng2-empty{border:1px dashed #C9BCA2}
 .eng2 .eng2-body .eng2-row>summary,.eng2 .eng2-body .eng2-row-text b{color:var(--text)}
+.engineering-cad-version{display:block;margin-top:.35rem;color:var(--muted,#667085)}
+.engineering-cad-downloads{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.65rem}
+.engineering-cad-downloads .button{font-size:.78rem;padding:.35rem .55rem}
+.engineering-cad-history{margin-top:.75rem;padding-top:.65rem;border-top:1px solid color-mix(in srgb,currentColor 12%,transparent)}
+.engineering-cad-history p{margin:.35rem 0;font-size:.82rem;color:var(--muted,#667085)}

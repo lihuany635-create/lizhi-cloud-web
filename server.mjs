@@ -3,16 +3,22 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createProposalInbox } from "./proposal-inbox-store.mjs";
+import { createCadApi } from "./engineering/cad/cad-api.mjs";
+import { createCadJobStore } from "./engineering/cad/cad-job-store.mjs";
+import { createCadcraftRunner } from "./engineering/cad/cadcraft-runner.mjs";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 4180);
 const mime = {".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".mjs":"text/javascript; charset=utf-8",".json":"application/json; charset=utf-8",".webmanifest":"application/manifest+json",".svg":"image/svg+xml",".png":"image/png",".ico":"image/x-icon"};
 const proposalInbox=createProposalInbox({dataDir:process.env.WEAVING_DATA_DIR||path.join(root,".local-data","knowledge-weaving")});
+const cadcraftCli=process.env.CADCRAFT_CLI_PATH||path.join(root,"tools","cadcraft","cadcraft-cli.exe");
+const cadApi=createCadApi({cliPath:cadcraftCli,store:createCadJobStore({rootDir:process.env.ENGINEERING_CAD_DATA_DIR||path.join(root,".local-data","engineering-cad")}),runner:createCadcraftRunner({cliPath:cadcraftCli})});
 
 const server = http.createServer(async (req,res)=>{
   try {
     const url=new URL(req.url,"http://127.0.0.1");
     if(await proposalInbox.handleRequest(req,res,url))return;
+    if(await cadApi.handleRequest(req,res,url))return;
     const pathname = decodeURIComponent(url.pathname);
     let target = path.join(root, pathname === "/" ? "index.html" : pathname);
     if (!target.startsWith(root)) throw new Error("Invalid path");
