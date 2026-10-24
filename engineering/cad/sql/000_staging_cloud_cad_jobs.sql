@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS public.lizhi_cad_cloud_jobs (
 CREATE INDEX IF NOT EXISTS lizhi_cad_cloud_jobs_pending_idx
  ON public.lizhi_cad_cloud_jobs ((job_data->>'status'),created_at)
  WHERE job_data->>'status' IN ('queued','claimed','running');
+-- Bounded, owner/project-scoped history lookup for resuming CAD jobs in a new chat.
+CREATE INDEX IF NOT EXISTS lizhi_cad_cloud_jobs_owner_project_recent_idx
+ ON public.lizhi_cad_cloud_jobs(owner_id,(job_data->>'project_id'),created_at DESC,idempotency_key DESC);
 ALTER TABLE public.lizhi_cad_cloud_jobs ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.lizhi_cad_cloud_jobs FROM PUBLIC,anon,authenticated;
 
