@@ -50,3 +50,12 @@
 ## 目前下一步
 
 查 GitHub Actions 40119011236 → 實際 WASM output → 製作隔離的真瀏覽器 E2E → 開 Draft PR 等待驗收（不自動合併）。在製作工作台 `CADCraft × 立之雲端庫整合` 專案留下真實範圍、證據、未完成項。
+
+## 實測補記：WASM + Chromium 真正整合（2026-10-25）
+
+- GitHub Actions [40119011236](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40119011236) **completed success**。`host-contract` 4/4、`wasm-preview` Rust→WASM 實際 source-build、`index.html`/JS/WASM/來源 SHA 驗證與 candidate artifact 上傳皆 SUCCESS。候選 ZIP 8,664,978 bytes，artifact ID `12570543137`。
+- GitHub Actions [40120181763](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40120181763) **completed success**，以已核實固定 CADCraft source SHA 的前述真實 WASM 產物執行 Playwright Chromium 141/real Cloud portal。日誌記錄 `LIZHI_CAD_PORTAL_E2E {"passed":true,...}`，6 個順序驗收全部成功，DXF 實際檔案重新解析後邊界 `[0,0]-[800,900]` mm；測試佐證 ZIP artifact ID `12571285882`，sha256 `34ea88644f4ae7de3f0d1137c2b324b9c95897191002fd64cc57ba525977723a`。
+- 六項成功：雲端庫的 CAD 路由及真正 WASM iframe 初始化、800×900 mm DXF 匯入、原生 CAD save 經 postMessage 到父頁並寫入版次、解析原生 DXF 尺寸、列版次並重新開啟且保留舊版、切回其他路由後 CAD iframe 不重置，以及權限被拒絕時保留舊版並提供 DXF 下載。
+- **關鍵限定**：CI 使用 Chromium 中模擬的 `showDirectoryPicker` handle（獨立記憶體目錄），非實際 Windows/Android 檔案選擇器。真實 OS 資料夾選取、授權跨重載持久化、使用者操作手勢、手機 fallback、真實存檔與重開仍須另做人工／實機測試，不能把這次 6/6 說成全產品上線。
+- 另已將相同 Chromium E2E 納入預覽 CI `browser-e2e` job（必須在當次 source-build artifact 成功後才運行）；`cad-embedded-browser-fast.yml` 僅為加速迭代重用上一份明確固定來源 SHA 的 WASM，不應作為日後新引擎 commit 的驗收替代。
+- 主線依然 **Draft PR #6**、未合併 `main`、未發布 GitHub Pages、未修改 Supabase 或工程中心。ChatGPT 一般對話 CAD MCP 授權寫入也仍未連通。
