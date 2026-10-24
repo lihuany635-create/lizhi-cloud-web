@@ -6,7 +6,7 @@ function decode(value){
  if(typeof value!=="string"||!value||!/^[A-Za-z0-9_-]+$/.test(value))throw new CadAuthError("CAD_TOKEN_INVALID","Invalid token encoding");
  return Buffer.from(value,"base64url");
 }
-function createJwksVerifier({jwksUrl,issuer,audience="authenticated",fetchImpl=fetch,now=()=>Math.floor(Date.now()/1000),maxClockSkewSeconds=30}={}){
+function createJwksVerifier({jwksUrl,issuer,audience="authenticated",fetchImpl=fetch,now=()=>Math.floor(Date.now()/1000),maxClockSkewSeconds=30,requireOAuthClient=false}={}){
  if(typeof jwksUrl!=="string"||!jwksUrl.startsWith("https://")||typeof issuer!=="string"||!issuer.startsWith("https://")||typeof audience!=="string"||typeof fetchImpl!=="function"||typeof now!=="function")
   throw new CadAuthError("CAD_AUTH_CONFIG_INVALID","JWKS, issuer and audience must be configured");
  let cached={until:0,keys:[]};
@@ -47,7 +47,13 @@ function createJwksVerifier({jwksUrl,issuer,audience="authenticated",fetchImpl=f
      (payload.nbf!==undefined&&(!Number.isSafeInteger(payload.nbf)||payload.nbf>stamp+maxClockSkewSeconds))||
      (payload.iat!==undefined&&(!Number.isSafeInteger(payload.iat)||payload.iat>stamp+maxClockSkewSeconds)))
    throw new CadAuthError("CAD_TOKEN_DENIED","JWT claims invalid");
-  return Object.freeze({userId:payload.sub});
+  // Supabase OAuth tokens include client_id. A strict MCP deployment must
+  // refuse ordinary user session JWTs that were not issued to an approved
+  // OAuth client. The actual project/client grant is checked in PostgreSQL.
+  const clientId=payload.client_id;
+  if(requireOAuthClient&&(typeof clientId!=="string"||clientId.length<1||clientId.length>256||!/^[A-Za-z0-9_.:-]+$/.test(clientId)))
+   throw new CadAuthError("CAD_OAUTH_CLIENT_REQUIRED","MCP requires OAuth-client-bound user tokens");
+  return Object.freeze({userId:payload.sub,clientId:typeof clientId==="string"?clientId:null});
  };
 }
 module.exports=Object.freeze({CadAuthError,createJwksVerifier});
