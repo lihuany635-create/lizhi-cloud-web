@@ -1,0 +1,88 @@
+# HTTPS staging blueprint, not automatically deployed. Use dedicated staging DB/S3
+# and a trusted TLS certificate. All sensitive values are injected at runtime.
+name: lizhi-cad-staging
+services:
+  cad-api:
+    build:
+      context: ../../..
+      dockerfile: engineering/cad/deploy/Dockerfile
+    image: lizhi/cad-staging:local
+    command: ["node", "engineering/cad/cloud-cad-mcp-server.cjs"]
+    restart: unless-stopped
+    init: true
+    read_only: true
+    user: "node"
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=128m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    pids_limit: 128
+    environment:
+      CAD_DEPLOYMENT_MODE: staging
+      CAD_MCP_LOOPBACK_PORT: "9876"
+      CAD_PUBLIC_RESOURCE_URL: ${CAD_PUBLIC_RESOURCE_URL:?HTTPS MCP URL required}
+      CAD_OAUTH_ISSUER: ${CAD_OAUTH_ISSUER:?Staging issuer required}
+      CAD_STAGING_DATABASE_URL: ${CAD_STAGING_DATABASE_URL:?Staging DB required}
+      CAD_ALLOWED_ORIGINS: ${CAD_ALLOWED_ORIGINS:-https://chatgpt.com}
+    ports:
+      # Deliberately host-local. Change ONLY after completing staging OAuth,
+      # project ACL, egress, rate limit and TLS reviews.
+      - "127.0.0.1:8443:8443"
+    networks: [cad-backend]
+
+  cad-tls:
+    image: caddy:2.10.2-alpine
+    network_mode: "service:cad-api"
+    depends_on: [cad-api]
+    read_only: true
+    user: "0"
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      CAD_STAGING_FQDN: ${CAD_STAGING_FQDN:?Staging DNS name required}
+    volumes:
+      - ./Caddyfile.staging:/etc/caddy/Caddyfile:ro
+      - ${CAD_STAGING_TLS_CERT_PATH:?TLS certificate path required}:/run/secrets/cad.crt:ro
+      - ${CAD_STAGING_TLS_KEY_PATH:?TLS key path required}:/run/secrets/cad.key:ro
+    tmpfs:
+      - /tmp:rw,nosuid,size=16m
+      - /config:rw,nosuid,size=16m
+      - /data:rw,nosuid,size=16m
+    restart: unless-stopped
+
+  cad-worker:
+    image: lizhi/cad-staging:local
+    command: ["node", "engineering/cad/cloud-cad-worker-server.cjs"]
+    restart: unless-stopped
+    init: true
+    read_only: true
+    user: "node"
+    tmpfs:
+      - /tmp:rw,nosuid,size=512m
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    mem_limit: 2048m
+    cpus: "2.0"
+    environment:
+      CAD_DEPLOYMENT_MODE: staging
+      CAD_WORKER_STAGING_CONFIRM: isolated-only
+      CAD_WORKER_OWNER_ID: ${CAD_WORKER_OWNER_ID:?Staging owner UUID required}
+      CAD_WORKER_ID: ${CAD_WORKER_ID:-cad_worker_1}
+      CADCRAFT_BIN: /opt/lizhi/bin/cadcraft-cli
+      CADCRAFT_BIN_SHA256: ${CADCRAFT_BIN_SHA256:?Verified executable digest required}
+      CAD_STAGING_DATABASE_URL: ${CAD_STAGING_DATABASE_URL:?Staging DB required}
+      CAD_STAGING_S3_ENDPOINT: ${CAD_STAGING_S3_ENDPOINT:?Staging S3 URL required}
+      CAD_STAGING_S3_BUCKET: ${CAD_STAGING_S3_BUCKET:?Bucket required}
+      CAD_STAGING_S3_REGION: ${CAD_STAGING_S3_REGION:?Region required}
+      CAD_STAGING_S3_ACCESS_KEY_ID: ${CAD_STAGING_S3_ACCESS_KEY_ID:?S3 key required}
+      CAD_STAGING_S3_SECRET_ACCESS_KEY: ${CAD_STAGING_S3_SECRET_ACCESS_KEY:?S3 secret required}
+      CAD_WORKER_POLL_MS: "5000"
+    networks: [cad-backend]
+
+networks:
+  cad-backend:
+    driver: bridge
