@@ -14,6 +14,8 @@ const login=document.querySelector('#login');
 const approve=document.querySelector('#approve');
 const deny=document.querySelector('#deny');
 let currentRequest=null;
+let consentClientId=null;
+const cadConsent=document.querySelector('#cad-write-consent');
 let busy=false;
 function msg(s){notice.textContent=s;}
 function toggle(open) {approve.disabled=!open;deny.disabled=!open;}
@@ -56,6 +58,8 @@ async function load(){
   const dest=String(data.redirect_uri||'');
   if(!trustedRedirect(dest)) throw new Error('不安全或無法辨認的回呼網址，拒絕繼續');
   currentRequest=id;
+  consentClientId=typeof data.client?.id==='string'?data.client.id:null;
+  if(cadConsent)cadConsent.checked=false;
   text('#client-name',data.client?.name||'未提供名稱的應用程式（請謹慎）');
   text('#redirect-uri',dest);
   text('#requested-scopes',String(data.scope||'(未提出身分範圍)'));
@@ -70,8 +74,16 @@ async function decide(allow){
  if(busy||!currentRequest)return;
  busy=true;toggle(false);msg('正在向 Supabase 提交你的決定…');
  try{
+  const grantCad=allow && cadConsent?.checked===true;
+  if(grantCad && (!consentClientId || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(consentClientId)))
+    throw new Error('無法驗證這個 OAuth 應用程式的用戶端 ID，拒絕授予 CAD 寫入權限');
   const result=allow?await db.auth.oauth.approveAuthorization(currentRequest):await db.auth.oauth.denyAuthorization(currentRequest);
   if(result.error)throw result.error;
+  if(grantCad){
+    const {data:granted,error:grantError}=await db.rpc('lizhi_cad_grant_oauth_client',{p_client:consentClientId});
+    if(grantError || granted!==true)
+      throw new Error('OAuth 已授權，但 CAD 專用寫入許可無法登記。為安全起見，請勿嘗試繪圖並聯繫管理者。');
+  }
   if(!trustedRedirect(result.data?.redirect_url))throw new Error('Supabase 未提供有效的安全重新導向網址');
   sessionStorage.removeItem(PENDING_KEY);
   location.assign(result.data.redirect_url);
