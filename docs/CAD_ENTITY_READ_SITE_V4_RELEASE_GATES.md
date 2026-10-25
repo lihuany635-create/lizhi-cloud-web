@@ -1,6 +1,6 @@
 # 立之 CAD｜原私人 Site v3 → v4 讀圖接線發布閘門（候選，不代表已部署）
 
-> 狀態：**NOT AUTHORIZED FOR PRODUCTION**。本文件是 PR #14 的發布前檢查單；不可視為正式授權、發版完成或 ChatGPT 的九工具驗收。工作台專案：`CADCraft × 立之雲端庫整合`。
+> **2026-10-25 新進度（覆蓋下文較早的「未授權／尚未部署」歷史描述）**：使用者已授權**原私人 Site、WASM、SQL、Edge 的三項唯讀升級**；正式 Edge `lizhi-cad-site-mcp` **v2 ACTIVE**、Migration `cad_entity_read_service_only_v1` **已執行**，請勿重複部署。私人 **Site 尚停在 v3、Gate OFF、原六工具正常**。GitHub PR #14 的 Site v4 接線原始碼與 CI 是候選，**不能充當已編輯或發布 Site**。原生 WASM 尚未發布，尚無九工具正式 E2E。工作台專案：`CADCraft × 立之雲端庫整合`。
 
 ## 不變的使用者要求
 
@@ -23,6 +23,18 @@
 | 本人同意／STOP／離線 | 原生 Chromium 有隔離行為測試 | **尚未做九工具全鏈路驗收** |
 
 參考：[PR #14](https://github.com/lihuany635-create/lizhi-cloud-web/pull/14)、[候選交接](CAD_ENTITY_READ_MCP_V1_HANDOFF.md)、[原生矩形 CI](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40175639715)、[Node/Edge/PG16 CI](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40175639698)。
+
+
+## 2026-10-25｜原 Site v4 的最後交接（不新建 Site）
+
+**原站點**：`https://lizhi-cad-agent-20261025.lihuany635.chatgpt.site`，仍須在**該私人 Site 自己的編輯器**中查驗既有 v3 的工具註冊與 server-side owner middleware，保留原 Secret、不輸出密鑰、不建立新站。GitHub 候選程式無法自行操作 Sites 編輯器，故尚未私人部署 v4。
+
+- 若原 Site 使用平台的**內建 MCP 註冊器**：請綁定 `sites-migration/cad/site-native-v4.mjs` 匯出的 `getCadSiteV4Tools` / `invokeCadSiteV4Tool`；必須由站點本身注入可信登入身分及 Secret，不可從 MCP args/header 補身分；**不得掛第二個 /mcp**。
+- 若原 Site 的 MCP 路由可編輯：使用 `sites-migration/cad/site-mcp-route.mjs`，並依賴 `site-tools.mjs`、`site-entity-read.mjs` 及兩個嚴格合約 module。不要將未確認相容的 route 程式直接覆蓋已正常的正式 dispatcher。
+- 原六工具 Site adapter 已修正 **Worker 不支援 `redirect:error` 的相容性**：使用 `redirect:manual` 並拒絕 3xx、401／403、503；新讀圖 adapter 亦為 manual，不自動重試。原六工具路由不可直接複製舊版未修正檔案。
+- 兩種路由模式都必須在正式 Site 保持 **`entityReadEnabled=false`**，原 Edge 的 `LIZHI_CAD_ENTITY_READ_V1` 保持 OFF；現階段只驗收正式 **6** 工具，CI 的 Gate ON **9** 工具是隔離測試，不是正式發布。
+- CI [#40179296517](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40179296517) 在新 Site v4 native+route 回歸、原六工具 manual redirect 相容、真實 Deno Edge HTTP+假 RPC、PG16 與 Edge compile **5/5 SUCCESS**；不等於真實私人 Site 已更新。
+- 即使原 Site v4 私人發布成功，在原生 WASM 上線與本人工作階段完整驗收以前，**不可以啟用任何正式 read Gate**。
 
 ## 發布許可：全部通過才可動正式環境
 
