@@ -6,7 +6,7 @@ import {randomUUID} from "node:crypto";
 
 // Runs the real embedded CAD host in an isolated fake same-origin iframe,
 // with no Supabase, site, filesystem or native drawing mutation.
-async function setup(){
+async function setup(allowMove=true){
   const code=await readFile(new URL("../cad/cad-host.js",import.meta.url),"utf8");
   const messages=[],handlers={};
   const status={textContent:"",dataset:{}};
@@ -29,7 +29,7 @@ async function setup(){
   const context=createContext({
     window:{addEventListener(type,handler){handlers[type]=handler;}},
     location:{origin:"https://cad-test.example"},
-    confirm:()=>true,
+    confirm:()=>allowMove,
     crypto:{randomUUID},
     setTimeout,clearTimeout,Promise,queueMicrotask,
   });
@@ -67,4 +67,20 @@ test("inspection cannot request full drawing, paths, scripts, or unlimited geome
  ];
  for(const [name,args] of bad)await assert.rejects(api.command(name,args),/不支援/);
  assert.equal(messages.length,0);
+});
+
+test("a single native move is version-bound and requires actual browser confirmation",async()=>{
+ const params={handles:["1A"],delta:[100,0],expectedRevision:3,confirmed:true};
+ const yes=await setup(true);
+ const result=await yes.api.command("lizhi.move",params);
+ assert.equal(result.echo,"lizhi.move");
+ assert.equal(yes.messages.length,1);
+ const no=await setup(false);
+ await assert.rejects(no.api.command("lizhi.move",params),/取消/);
+ assert.equal(no.messages.length,0);
+ await assert.rejects(yes.api.command("lizhi.move",{...params,expectedRevision:null}),/不支援/);
+ await assert.rejects(yes.api.command("lizhi.move",{...params,handles:["1A","1B"]}),/不支援/);
+ await assert.rejects(yes.api.command("lizhi.move",{...params,delta:[0,0]}),/不支援/);
+ await assert.rejects(yes.api.command("lizhi.move",{...params,confirmed:false}),/不支援/);
+ assert.equal(yes.messages.length,1);
 });
