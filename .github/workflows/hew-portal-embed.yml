@@ -1,0 +1,36 @@
+name: Hew 3D Portal Embed Contract (no deployment)
+on:
+  push:
+    branches: [feature/hew-3d-mcp-v1-20261025]
+    paths:
+      - 'hew/portal-host.js'
+      - 'auth.js'
+      - 'app.js'
+      - 'workspace-ui.js'
+      - 'index.html'
+      - 'tests/hew-portal-embed.test.mjs'
+      - '.github/workflows/hew-portal-embed.yml'
+  pull_request:
+    paths:
+      - 'hew/portal-host.js'
+      - 'auth.js'
+      - 'app.js'
+      - 'workspace-ui.js'
+      - 'index.html'
+      - 'tests/hew-portal-embed.test.mjs'
+      - '.github/workflows/hew-portal-embed.yml'
+permissions:
+  contents: read
+jobs:
+  embed-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Hew same-origin portal auth and iframe tests
+        run: node --test tests/hew-portal-embed.test.mjs
+      - name: Syntax check
+        run: node --check hew/portal-host.js

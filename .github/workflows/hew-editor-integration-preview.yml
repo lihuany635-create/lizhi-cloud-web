@@ -1,0 +1,93 @@
+name: Hew same-origin compiled editor integration preview (no deployment)
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/hew-3d-mcp-v1-20261025]
+    paths:
+      - 'hew/build-embedded-runtime.sh'
+      - 'hew/portal-host.js'
+      - 'auth.js'
+      - 'app.js'
+      - 'workspace-ui.js'
+      - 'index.html'
+      - '.github/workflows/hew-editor-integration-preview.yml'
+permissions:
+  contents: read
+concurrency:
+  group: hew-editor-embed-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  integrated-editor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout LiZhi Cloud candidate, not production main
+        uses: actions/checkout@v4
+      - name: Checkout exactly pinned Hew fork source
+        uses: actions/checkout@v4
+        with:
+          repository: lihuany635-create/lizhi-hew
+          ref: 70c73ad001a1800984d7e67a660321341b7611a5
+          path: .hew-model-build
+          persist-credentials: false
+      - name: Verify Hew source pin before compiling
+        run: |
+          test "$(git -C .hew-model-build rev-parse HEAD)" = "70c73ad001a1800984d7e67a660321341b7611a5"
+      - name: Set up pinned Hew Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .hew-model-build/.node-version
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+      - name: Rust compile cache
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6
+        with:
+          workspaces: .hew-model-build
+      - name: Pinned wasm-pack install
+        working-directory: .hew-model-build
+        run: bash scripts/install-wasm-pack.sh
+      - name: Install Hew dependencies using frozen lock
+        working-directory: .hew-model-build
+        run: pnpm install --frozen-lockfile
+      - name: Compile real Hew WASM and TS, then relative-path browser assets
+        working-directory: .hew-model-build
+        run: |
+          pnpm --dir app build
+          pnpm --dir app exec vite build --base=./
+      - name: Assemble isolated same-origin Hew editor and enforce license provenance
+        run: bash hew/build-embedded-runtime.sh
+      - name: Check existing CAD and GLB model viewer are not replaced
+        run: |
+          test -d cad
+          test -d model-viewer
+          test -s hew-editor/AGPL-3.0.txt
+          test -s hew-editor/SOURCE.txt
+          test -s hew-editor/index.html
+          node --test tests/hew-portal-embed.test.mjs
+      - name: Prepare mock same-origin parent for Chromium (not production auth)
+        run: |
+          mkdir -p .hew-preview-root/hew-editor
+          cp -a hew-editor/. .hew-preview-root/hew-editor/
+          cp .hew-model-build/app/scripts/lizhi-embedded-production-parent.html .hew-preview-root/index.html
+      - name: Install isolated Chromium
+        working-directory: .hew-model-build
+        run: pnpm --dir app exec playwright install --with-deps chromium
+      - name: Chromium source-pinned Hew WASM + same-origin iframe model receipt smoke
+        run: |
+          python3 -m http.server 4187 --bind 127.0.0.1 --directory .hew-preview-root > /tmp/hew-portal-smoke.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for n in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:4187/index.html >/dev/null && break
+            sleep 1
+          done
+          node .hew-model-build/app/scripts/lizhi-embedded-production-e2e.mjs
+      - name: Upload checked Hew editor deploy candidate, no Pages deploy
+        uses: actions/upload-artifact@v4
+        with:
+          name: lizhi-hew-editor-approved-preview
+          path: hew-editor/
+          retention-days: 14
+          if-no-files-found: error
