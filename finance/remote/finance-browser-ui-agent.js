@@ -67,6 +67,7 @@
     handles.clear();
     if (timer) { clearTimeout(timer); timer = null; }
     renderButton();
+    root.dispatchEvent?.(new root.CustomEvent("lizhi-finance-remote-consent",{detail:{enabled:false}}));
   }
   function startFromTrustedClick(event) {
     if (!event?.isTrusted) return {ok:false,code:"USER_GESTURE_REQUIRED"};
@@ -77,6 +78,7 @@
     if (timer) clearTimeout(timer);
     timer = setTimeout(stop, LEASE_MS);
     renderButton();
+    root.dispatchEvent?.(new root.CustomEvent("lizhi-finance-remote-consent",{detail:{enabled:true}}));
     return {ok:true,enabled:true,expires_at:new Date(expires).toISOString()};
   }
   function inspect() {
