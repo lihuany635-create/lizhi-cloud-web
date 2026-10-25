@@ -126,9 +126,22 @@ begin
  exception when insufficient_privilege then null; end;
 end $$;
 
+-- A second same-revision write can be queued, but cannot be claimed
+-- concurrently and must be cancelled after the first changes revision.
+set role service_role;
+select set_config('request.jwt.claim.role','service_role',false);
+select set_config('test.model.second_job',public.lizhi_model_site_enqueue(
+ '11111111-1111-4111-8111-111111111111',
+ '33333333-3333-4333-8333-333333333333',
+ '88888888-8888-4888-8888-888888888888',
+ '44444444-4444-4444-8444-444444444444',
+ 'rev-1','create_box',
+ '{"origin_m":[2,0,0],"size_m":[1,0.5,0.5]}'::jsonb
+)::text,false);
+
 set role authenticated;
 select set_config('request.jwt.claim.sub','11111111-1111-4111-8111-111111111111',false);
-do $$
+do $
 declare job jsonb;
 begin
  job:=public.lizhi_model_claim('33333333-3333-4333-8333-333333333333');
@@ -136,7 +149,7 @@ begin
  or job->>'expected_revision'<>'rev-1'
  then raise exception 'incorrect claimed job %',job; end if;
  if public.lizhi_model_claim('33333333-3333-4333-8333-333333333333') is not null
- then raise exception 'duplicate claim';end if;
+ then raise exception 'concurrent second claim while first unacknowledged';end if;
  if not public.lizhi_model_finish(
  '33333333-3333-4333-8333-333333333333',
  current_setting('test.model.job')::uuid,true,'rev-2',
@@ -168,6 +181,10 @@ begin
  '11111111-1111-4111-8111-111111111111',
  current_setting('test.model.job')::uuid);
  if j->>'state'<>'succeeded' then raise exception 'job not succeeded %',j; end if;
+ if (public.lizhi_model_site_job(
+   '11111111-1111-4111-8111-111111111111',
+   current_setting('test.model.second_job')::uuid)->>'state') <> 'cancelled'
+ then raise exception 'queued stale second job not cancelled after revision change'; end if;
  summary:=public.lizhi_model_site_scene(
   '11111111-1111-4111-8111-111111111111',
   '33333333-3333-4333-8333-333333333333');
