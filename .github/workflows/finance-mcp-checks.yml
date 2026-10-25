@@ -20,5 +20,11 @@ jobs:
           deno-version: v2.9.6
       - name: Type check OAuth MCP endpoint
         run: deno check --node-modules-dir=auto supabase/functions/lizhi-finance-mcp/index.ts
+      - name: Reject unauthenticated live MCP traffic
+        run: |
+          set -eu
+          code=$(curl --max-time 20 -sS -o /tmp/finance-mcp-public-response -w '%{http_code}' 'https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-finance-mcp')
+          echo "Anonymous status: $code"
+          test "$code" = "401"
       - name: Check finance read-only security contract
         run: node --test tests/finance-mcp-contract.test.mjs
