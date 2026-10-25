@@ -8,8 +8,8 @@ const OWNER="84b34232-26ed-49c2-b160-e7fdbf80e8cf";
 const SESSION="6ccae67d-6393-480a-a2c5-6fd50cf53bf0";
 const REQUEST="a08265bb-a1aa-4cdf-b767-1eb7a49c3e53";
 const TOKEN="a".repeat(64);
-const URL="https://localhost.invalid/rpc";
-const call=(name,args={})=>new Request(URL,{method:"POST",headers:{
+const ENDPOINT="https://localhost.invalid/rpc";
+const call=(name,args={})=>new Request(ENDPOINT,{method:"POST",headers:{
   "Authorization":"Bearer "+TOKEN},body:JSON.stringify({jsonrpc:"2.0",id:17,method:"tools/call",params:{name,arguments:args}})});
 function fakeDb({result=[],error=null}={}){
   const calls=[];
