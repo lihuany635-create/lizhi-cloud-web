@@ -1,0 +1,24 @@
+name: Finance UI Browser Agent
+on:
+  push:
+    paths:
+      - "finance/remote/finance-browser-ui-agent.js"
+      - "tests/finance-browser-ui-agent.test.mjs"
+      - ".github/workflows/finance-browser-ui-agent.yml"
+  pull_request:
+    paths:
+      - "finance/remote/finance-browser-ui-agent.js"
+      - "tests/finance-browser-ui-agent.test.mjs"
+      - ".github/workflows/finance-browser-ui-agent.yml"
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --check finance/remote/finance-browser-ui-agent.js
+      - run: node --test tests/finance-browser-ui-agent.test.mjs
