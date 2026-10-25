@@ -9,6 +9,7 @@ import {randomUUID} from "node:crypto";
 async function setup(allowMove=true){
   const code=await readFile(new URL("../cad/cad-host.js",import.meta.url),"utf8");
   const messages=[],handlers={};
+  let confirmCalls=0;
   const status={textContent:"",dataset:{}};
   const frame={contentWindow:{postMessage(m,origin){
     messages.push({m,origin});
@@ -29,7 +30,7 @@ async function setup(allowMove=true){
   const context=createContext({
     window:{addEventListener(type,handler){handlers[type]=handler;}},
     location:{origin:"https://cad-test.example"},
-    confirm:()=>allowMove,
+    confirm:()=>++confirmCalls===1 ? true : allowMove,
     crypto:{randomUUID},
     setTimeout,clearTimeout,Promise,queueMicrotask,
   });
