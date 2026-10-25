@@ -73,10 +73,10 @@ function displayTx(t: Record<string, unknown>, entities: Map<string, string>) {
 const app = pipeline([
   withOAuthProtectedResource({ resourceServer: resource, authorizationServer: fromSupabaseUrl(url) }),
   withSupabase({ auth: "user" }),
-], async (req, { supabase }) => {
-  const { data: userResult, error: authError } = await supabase.auth.getUser();
-  const uid = userResult?.user?.id;
-  if (authError || !uid) return new Response("Authenticated owner required", { status: 401 });
+], async (req, { userClaims }) => {
+  // Verified by withSupabase({ auth: "user" }); never read a caller-supplied UID.
+  const uid = userClaims?.id;
+  if (!uid) return new Response("Authenticated owner required", { status: 401 });
   if (!admin) return new Response("MCP backend unavailable", { status: 503 });
 
   async function snapshot(): Promise<Book> {
