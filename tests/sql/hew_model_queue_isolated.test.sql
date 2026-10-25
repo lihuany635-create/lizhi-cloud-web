@@ -52,7 +52,7 @@ begin
 end $$;
 
 -- Consent is 30 minutes, not renewable by heartbeat or browser polling.
-do $
+do $$
 declare life interval; d text;
 begin
  select approved_until-created_at into life
@@ -66,7 +66,7 @@ begin
  select pg_get_functiondef('public.lizhi_model_claim(uuid)'::regprocedure) into d;
  if position('5 minutes' in d)=0 then
   raise exception 'owner claim freshness was not relaxed';end if;
-end $;
+end $$;
 
 -- Another owner cannot adopt, heartbeat, claim or close the first owner's session.
 select set_config('request.jwt.claim.sub','22222222-2222-4222-8222-222222222222',false);
