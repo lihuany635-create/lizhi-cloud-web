@@ -26,6 +26,19 @@ jobs:
           assert p.get('authorization_servers')
           print('Protected resource discovery is available, no secrets retrieved')
           PY
+          auth_url="https://hrdzywkihfqggiwjgavi.supabase.co/auth/v1/.well-known/oauth-authorization-server"
+          code="$(curl -sS --max-time 25 -o /tmp/cad-oauth-server.json -w '%{http_code}' "$auth_url")"
+          test "$code" = 200
+          python3 - <<'PY'
+          import json
+          p=json.load(open('/tmp/cad-oauth-server.json'))
+          assert p.get('issuer')
+          assert p.get('authorization_endpoint')
+          assert p.get('token_endpoint')
+          assert p.get('registration_endpoint'), 'Supabase must advertise DCR for the private ChatGPT CAD plugin'
+          assert 'S256' in p.get('code_challenge_methods_supported',[]),'PKCE S256 is required'
+          print('CAD_MCP_DCR_OAUTH_PKCE_DISCOVERY_PASS')
+          PY
           denied="$(curl -sS --max-time 25 -o /tmp/cad-mcp-denied.txt -w '%{http_code}' -X POST \
             -H 'Content-Type: application/json' \
             -H 'MCP-Protocol-Version: 2025-11-25' \
