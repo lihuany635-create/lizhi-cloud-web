@@ -12,7 +12,7 @@
   const WALK = 2.6, RUN = 5.4;
 
   // 伸展台尺寸（公尺）。角色從近端（+Z）出發，往遠端（-Z）走。
-  const TOP = 0.35, RUN_W = 5, RUN_NEAR = 8, RUN_FAR = -14, FAR_R = 4.2, NEAR_R = 3, PAD = 0.32;
+  const TOP = 0.35, RUN_W = 5, RUN_NEAR = 8, RUN_FAR = -600, FAR_R = 4.2, NEAR_R = 3, PAD = 0.32;
 
   function loadScript(src) {
     return new Promise((resolve, reject) => {
@@ -187,82 +187,216 @@
     };
   }
 
-  // ───────────────────────── 場景（夜景） ─────────────────────────
-  function buildScene(THREE, scene, quality) {
-    const std = (color, rough, extra) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: rough, metalness: 0 }, extra || {}));
-    scene.background = new THREE.Color(0x05090d);
-    scene.fog = new THREE.Fog(0x05090d, 16, 46);
+  // ───────────────────────── 場景（三種主題，600 公尺長） ─────────────────────────
+  const THEMES = {
+    night: {
+      label: "夜晚", bg: 0x05090d, fog: [0x05090d, 18, 70], sky: ["#010407", "#061018"], exposure: 1.1,
+      floor: 0x0a1419, top: [0x0e1d24, 0.28, 0.35], side: 0x102830, glow: 0x79c8d0, bulb: 0xbfeef0, mark: 0x5fb3bb,
+      crowd: [0x0f1c22], riser: 0x0c181d, tree: 0x0c1b1d, trunk: 0x0b1214, cap: false, pole: 0x18303a, lamp: 0xbfeef0,
+      hemi: [0x9fd6d9, 0x05090d, 0.45], key: [0xcfeef0, 0.55], follow: 2.2, stars: true, sun: false, flashes: true,
+      particles: { count: 160, color: 0x79c8d0, size: 0.05, fall: 0.3, drift: 0.08, opacity: 0.7 },
+    },
+    day: {
+      label: "白天", bg: 0xbcdcf0, fog: [0xd3e6f0, 40, 190], sky: ["#4f9bd6", "#dcecf5"], exposure: 1.0,
+      floor: 0x8fb46a, top: [0xf3ede2, 0.55, 0.0], side: 0xd2c4ad, glow: 0xd9a95f, bulb: 0xfff1d0, mark: 0xb07a3a,
+      crowd: [0xc8553d, 0x2f6f73, 0xd9a95f, 0x3c5a8a, 0x8a5a9a, 0xe8d6b8, 0x5a7d4f], riser: 0xe4d6bf, tree: 0x4f8a4b, trunk: 0x6b4a32, cap: false, pole: 0xe8e2d6, lamp: 0xfff7e6,
+      hemi: [0xffffff, 0x8a9a6a, 0.95], key: [0xfff2dc, 1.7], follow: 0, stars: false, sun: true, flashes: false,
+      particles: { count: 0 },
+    },
+    snow: {
+      label: "下雪", bg: 0xd6dee5, fog: [0xdfe6ec, 12, 80], sky: ["#9fb0c0", "#e8edf1"], exposure: 1.05,
+      floor: 0xf2f5f7, top: [0x36424c, 0.6, 0.1], side: 0x8796a3, glow: 0xbfe6ff, bulb: 0xffe8c0, mark: 0xdfeaf2,
+      crowd: [0x7a2f35, 0x2c4a5e, 0x5d6b4a, 0x8a6a3a, 0x3a3f58, 0xb9b2a6], riser: 0xe6ebef, tree: 0x4e6e66, trunk: 0x5a4636, cap: true, pole: 0x56626c, lamp: 0xffe8c0,
+      hemi: [0xeef4ff, 0xb7c3cc, 0.9], key: [0xf0f5ff, 0.75], follow: 1.0, stars: false, sun: false, flashes: false,
+      particles: { count: 1800, color: 0xffffff, size: 0.09, fall: 1.3, drift: 0.5, opacity: 0.95 },
+    },
+  };
+  const CHUNK = 40; // 觀眾與樹木每 40 公尺一段，只畫角色附近幾段
 
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(140, 140), std(0x0a1419, 0.95));
-    floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
-    const runMat = std(0x0e1d24, 0.28, { metalness: 0.35 }), sideMat = std(0x102830, 0.6);
+  function textSprite(THREE, text) {
+    const c = document.createElement("canvas"); c.width = 512; c.height = 256;
+    const g = c.getContext("2d"); g.fillStyle = "#fff"; g.textAlign = "center"; g.textBaseline = "middle";
+    g.font = "700 150px 'Segoe UI', 'Noto Sans TC', sans-serif"; g.fillText(text, 256, 128);
+    const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
+  }
+
+  function buildScene(THREE, scene, quality) {
+    const low = quality === "low";
+    const std = (rough, extra) => new THREE.MeshStandardMaterial(Object.assign({ color: 0xffffff, roughness: rough, metalness: 0 }, extra || {}));
+    const M = {
+      floor: std(0.95), top: std(0.3), side: std(0.6), riser: std(0.9), tree: std(0.85), trunk: std(0.9), cap: std(0.8, { color: 0xffffff }),
+      pole: std(0.5, { metalness: 0.3 }), crowd: std(0.9), glow: new THREE.MeshBasicMaterial(), bulb: new THREE.MeshBasicMaterial(), lamp: new THREE.MeshBasicMaterial(),
+    };
+    scene.background = new THREE.Color();
+    scene.fog = new THREE.Fog(0, 10, 60);
     const runLen = RUN_NEAR - RUN_FAR, midZ = (RUN_NEAR + RUN_FAR) / 2;
-    const runway = new THREE.Mesh(new THREE.BoxGeometry(RUN_W, TOP, runLen), [sideMat, sideMat, runMat, sideMat, sideMat, sideMat]);
+
+    // 天空穹頂（跟著鏡頭）
+    const skyCanvas = document.createElement("canvas"); skyCanvas.width = 2; skyCanvas.height = 256;
+    const skyTex = new THREE.CanvasTexture(skyCanvas); skyTex.encoding = THREE.sRGBEncoding;
+    const sky = new THREE.Mesh(new THREE.SphereGeometry(200, 32, 16), new THREE.MeshBasicMaterial({ map: skyTex, side: THREE.BackSide, fog: false, depthWrite: false }));
+    sky.renderOrder = -10; scene.add(sky);
+    const starPos = new Float32Array(900 * 3);
+    for (let i = 0; i < 900; i++) { const th = Math.random() * Math.PI * 2, ph = Math.acos(Math.random() * 0.95); starPos.set([Math.sin(ph) * Math.cos(th) * 190, Math.cos(ph) * 190, Math.sin(ph) * Math.sin(th) * 190], i * 3); }
+    const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute("position", new THREE.BufferAttribute(starPos, 3));
+    const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xcfe9ee, size: 1.2, sizeAttenuation: false, fog: false, transparent: true, opacity: 0.8, depthWrite: false }));
+    sky.add(stars);
+    const sunC = document.createElement("canvas"); sunC.width = sunC.height = 128;
+    { const g = sunC.getContext("2d"), r = g.createRadialGradient(64, 64, 6, 64, 64, 64); r.addColorStop(0, "#fffef6"); r.addColorStop(0.25, "#fff4cf"); r.addColorStop(1, "rgba(255,240,200,0)"); g.fillStyle = r; g.fillRect(0, 0, 128, 128); }
+    const sun = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(sunC), fog: false, depthWrite: false, transparent: true }));
+    sun.scale.set(40, 40, 1); sun.position.set(-70, 95, -120); sky.add(sun);
+
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(420, runLen + 300), M.floor);
+    floor.rotation.x = -Math.PI / 2; floor.position.z = midZ; floor.receiveShadow = true; scene.add(floor);
+    const runway = new THREE.Mesh(new THREE.BoxGeometry(RUN_W, TOP, runLen), [M.side, M.side, M.top, M.side, M.side, M.side]);
     runway.position.set(0, TOP / 2, midZ); runway.receiveShadow = true; scene.add(runway);
-    const glow = new THREE.MeshBasicMaterial({ color: 0x79c8d0 });
     for (const [r, z] of [[FAR_R, RUN_FAR], [NEAR_R, RUN_NEAR]]) {
-      const disc = new THREE.Mesh(new THREE.CylinderGeometry(r, r, TOP, 64), [sideMat, runMat, sideMat]);
+      const disc = new THREE.Mesh(new THREE.CylinderGeometry(r, r, TOP, 64), [M.side, M.top, M.side]);
       disc.position.set(0, TOP / 2, z); disc.receiveShadow = true; scene.add(disc);
-      const rim = new THREE.Mesh(new THREE.TorusGeometry(r - 0.08, 0.03, 8, 96), glow);
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(r - 0.08, 0.03, 8, 96), M.glow);
       rim.rotation.x = Math.PI / 2; rim.position.set(0, TOP + 0.01, z); scene.add(rim);
     }
-    const centre = new THREE.Mesh(new THREE.PlaneGeometry(0.04, runLen), new THREE.MeshBasicMaterial({ color: 0x2a5560 }));
+    const centre = new THREE.Mesh(new THREE.PlaneGeometry(0.04, runLen), M.glow);
     centre.rotation.x = -Math.PI / 2; centre.position.set(0, TOP + 0.003, midZ); scene.add(centre);
-    const bulbs = [];
     for (const s of [-1, 1]) {
-      const strip = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.025, runLen), glow);
+      const strip = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.025, runLen), M.glow);
       strip.position.set(s * (RUN_W / 2 - 0.08), TOP + 0.013, midZ); scene.add(strip);
-      for (let z = RUN_NEAR - 0.6; z > RUN_FAR; z -= 1.4) {
-        const b = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), new THREE.MeshBasicMaterial({ color: 0xbfeef0 }));
-        b.position.set(s * (RUN_W / 2 + 0.12), TOP * 0.55, z); scene.add(b); bulbs.push(b);
-      }
     }
-    // 遠端拱門
-    const arch = new THREE.Mesh(new THREE.TorusGeometry(3.6, 0.06, 10, 120, Math.PI), glow);
+    const dummy = new THREE.Object3D();
+    function instanced(geo, mat, list, colors) {
+      // 空的批次不建立：同材質下有顏色與沒顏色的 InstancedMesh 共用 shader 會出錯
+      if (!list.length) { const g = new THREE.Group(); scene.add(g); return g; }
+      const m = new THREE.InstancedMesh(geo, mat, list.length);
+      list.forEach((p, i) => { dummy.position.set(p[0], p[1], p[2]); dummy.rotation.set(0, p[4] || 0, 0); dummy.scale.setScalar(p[3] || 1); dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix); });
+      if (colors) list.forEach((p, i) => m.setColorAt(i, colors[i]));
+      m.frustumCulled = false; m.castShadow = false; m.receiveShadow = true; scene.add(m); return m;
+    }
+    // 走道兩側小燈
+    const bulbList = [];
+    for (const s of [-1, 1]) for (let z = RUN_NEAR - 0.6; z > RUN_FAR; z -= 1.4) bulbList.push([s * (RUN_W / 2 + 0.12), TOP * 0.55, z]);
+    instanced(new THREE.BoxGeometry(0.09, 0.09, 0.09), M.bulb, bulbList);
+    // 燈柱（每 25 公尺）
+    const poleList = [], lampList = [];
+    for (const s of [-1, 1]) for (let z = RUN_NEAR - 4; z > RUN_FAR; z -= 25) { poleList.push([s * (RUN_W / 2 + 0.9), 2, z]); lampList.push([s * (RUN_W / 2 + 0.9), 4.1, z]); }
+    instanced(new THREE.CylinderGeometry(0.05, 0.08, 4, 8), M.pole, poleList).castShadow = true;
+    instanced(new THREE.SphereGeometry(0.18, 12, 8), M.lamp, lampList);
+
+    // 距離標記（每 50 公尺）與拱門（每 100 公尺）
+    const marks = [];
+    for (let d = 50; d <= -RUN_FAR; d += 50) {
+      const z = RUN_NEAR - 1.5 - d;
+      const tex = textSprite(THREE, d + " m");
+      const mk = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.2), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }));
+      mk.rotation.x = -Math.PI / 2; mk.position.set(0, TOP + 0.006, z); scene.add(mk); marks.push(mk);
+      if (d % 100 === 0 && d < -RUN_FAR - 20) { const a = new THREE.Mesh(new THREE.TorusGeometry(3.4, 0.06, 8, 72, Math.PI), M.glow); a.position.set(0, TOP, z - 1.2); scene.add(a); }
+    }
+    const arch = new THREE.Mesh(new THREE.TorusGeometry(3.6, 0.06, 10, 120, Math.PI), M.glow);
     arch.position.set(0, TOP, RUN_FAR - FAR_R + 0.4); scene.add(arch);
-    const arch2 = new THREE.Mesh(new THREE.TorusGeometry(4.3, 0.025, 8, 120, Math.PI), new THREE.MeshBasicMaterial({ color: 0x61b69e }));
-    arch2.position.set(0, TOP, RUN_FAR - FAR_R - 0.6); scene.add(arch2);
 
-    // 觀眾席剪影 + 閃光燈
-    const crowdMat = std(0x0f1c22, 0.9);
-    const crowdGeo = new THREE.CylinderGeometry(0.2, 0.26, 0.9, 8), headGeo = new THREE.SphereGeometry(0.17, 10, 8);
-    const flashes = [], seats = quality === "low" ? 2 : 3;
-    for (const s of [-1, 1]) for (let row = 0; row < seats; row++) for (let z = RUN_NEAR - 1; z > RUN_FAR + 1; z -= 1.15) {
-      const x = s * (RUN_W / 2 + 1.6 + row * 1.1) + (Math.random() - 0.5) * 0.25, zz = z + (Math.random() - 0.5) * 0.4, y0 = row * 0.25;
-      const b = new THREE.Mesh(crowdGeo, crowdMat); b.position.set(x, 0.45 + y0, zz); scene.add(b);
-      const h = new THREE.Mesh(headGeo, crowdMat); h.position.set(x, 1.05 + y0, zz); scene.add(h);
-      if (Math.random() < 0.16) { const f = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false })); f.scale.set(0.5, 0.5, 1); f.position.set(x - s * 0.15, 1.1 + y0, zz); scene.add(f); flashes.push({ f, next: Math.random() * 6 }); }
+    // 觀眾、看台、樹木：每 CHUNK 公尺一段
+    const chunks = [], crowdGeo = new THREE.CylinderGeometry(0.2, 0.26, 0.9, 7), headGeo = new THREE.SphereGeometry(0.17, 8, 6);
+    const treeGeo = new THREE.ConeGeometry(1.1, 3.2, 7), capGeo = new THREE.ConeGeometry(0.75, 1.2, 7), trunkGeo = new THREE.CylinderGeometry(0.14, 0.18, 1, 6);
+    const seats = low ? 2 : 3, crowdSpots = [];
+    let rnd = 12345; const rand = () => ((rnd = (rnd * 16807) % 2147483647) / 2147483647);
+    for (let z0 = RUN_NEAR; z0 > RUN_FAR - CHUNK; z0 -= CHUNK) {
+      const bodies = [], heads = [], trees = [], caps = [], trunks = [];
+      for (const s of [-1, 1]) {
+        for (let row = 0; row < seats; row++) for (let z = z0 - 0.5; z > z0 - CHUNK && z > RUN_FAR + 1; z -= 1.15) {
+          if (rand() < 0.12) continue;
+          const x = s * (RUN_W / 2 + 1.9 + row * 1.1) + (rand() - 0.5) * 0.25, zz = z + (rand() - 0.5) * 0.4, y0 = row * 0.25;
+          bodies.push([x, 0.45 + y0, zz]); heads.push([x, 1.05 + y0, zz]); crowdSpots.push([x - s * 0.15, 1.1 + y0, zz]);
+        }
+        for (let z = z0 - rand() * 4; z > z0 - CHUNK; z -= (low ? 7 : 4.5) + rand() * 3) {
+          const x = s * (RUN_W / 2 + 6 + rand() * 22), k = 0.7 + rand() * 0.9;
+          trees.push([x, 2.2 * k, z, k, rand() * 6]); caps.push([x, 3.35 * k, z, k, rand() * 6]); trunks.push([x, 0.5 * k, z, k]);
+        }
+      }
+      const colorsOf = (n) => { const out = []; for (let i = 0; i < n; i++) out.push(new THREE.Color()); return out; };
+      const cb = instanced(crowdGeo, M.crowd, bodies, colorsOf(bodies.length));
+      const ch = instanced(headGeo, M.crowd, heads, colorsOf(heads.length));
+      const tr = instanced(treeGeo, M.tree, trees); tr.castShadow = true;
+      const cp = instanced(capGeo, M.cap, caps);
+      const tk = instanced(trunkGeo, M.trunk, trunks);
+      const riser = [];
+      for (const s of [-1, 1]) for (let row = 1; row < seats; row++) {
+        const r = new THREE.Mesh(new THREE.BoxGeometry(1.1, row * 0.25, CHUNK), M.riser);
+        r.position.set(s * (RUN_W / 2 + 1.9 + row * 1.1), row * 0.125, z0 - CHUNK / 2); r.receiveShadow = true; scene.add(r); riser.push(r);
+      }
+      chunks.push({ z0, z1: z0 - CHUNK, objs: [cb, ch, tr, cp, tk, ...riser], cb, ch, cp, seed: chunks.length });
     }
 
-    scene.add(new THREE.HemisphereLight(0x9fd6d9, 0x05090d, 0.45));
-    const key = new THREE.DirectionalLight(0xcfeef0, 0.55);
+    // 閃光燈池（夜晚）
+    const flashes = [];
+    for (let i = 0; i < 10; i++) { const f = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false })); f.scale.set(0.5, 0.5, 1); f.visible = false; scene.add(f); flashes.push({ f, next: Math.random() * 4 }); }
+
+    // 粒子（夜晚光點／下雪）：跟著角色附近循環
+    const PMAX = 1800, ppos = new Float32Array(PMAX * 3), pseed = new Float32Array(PMAX);
+    for (let i = 0; i < PMAX; i++) { ppos.set([(Math.random() - 0.5) * 34, Math.random() * 14, RUN_NEAR - Math.random() * 70], i * 3); pseed[i] = Math.random() * 100; }
+    const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(ppos, 3));
+    const pmat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.05, transparent: true, depthWrite: false });
+    const points = new THREE.Points(pg, pmat); points.frustumCulled = false; scene.add(points);
+
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x000000, 0.5); scene.add(hemi);
+    const key = new THREE.DirectionalLight(0xffffff, 1);
     key.position.set(6, 14, 8); key.castShadow = true;
-    const sz = quality === "low" ? 1024 : 2048; key.shadow.mapSize.set(sz, sz);
-    Object.assign(key.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 1, far: 40 });
+    const sz = low ? 1024 : 2048; key.shadow.mapSize.set(sz, sz);
+    Object.assign(key.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: 1, far: 50 });
     key.shadow.bias = -0.0008; key.shadow.normalBias = 0.02;
     scene.add(key); scene.add(key.target);
-    // 跟著角色的頂光
     const follow = new THREE.SpotLight(0xe6fbff, 2.2, 14, 0.38, 0.6, 1.4);
     follow.position.set(0, 7, RUN_NEAR); scene.add(follow); scene.add(follow.target);
-    const spots = [];
-    for (const s of [-1, 1]) { const sp = new THREE.SpotLight(0x79c8d0, 1.3, 30, 0.3, 0.55, 1.2); sp.position.set(s * 6, 8, RUN_FAR + 3); sp.target.position.set(0, TOP, RUN_FAR); scene.add(sp); scene.add(sp.target); spots.push({ sp, s }); }
 
-    const N = quality === "low" ? 70 : 150, pos = new Float32Array(N * 3);
-    for (let i = 0; i < N; i++) { pos[i * 3] = (Math.random() - 0.5) * 16; pos[i * 3 + 1] = Math.random() * 8; pos[i * 3 + 2] = RUN_FAR - 4 + Math.random() * (runLen + 8); }
-    const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    scene.add(new THREE.Points(pg, new THREE.PointsMaterial({ color: 0x79c8d0, size: 0.05, transparent: true, opacity: 0.7, depthWrite: false })));
+    const lin = (c, hex) => c.setHex(hex).convertSRGBToLinear();
+    let T = THEMES.night, theme = "night";
+    function setTheme(name, renderer) {
+      theme = THEMES[name] ? name : "night"; T = THEMES[theme];
+      lin(scene.background, T.bg); lin(scene.fog.color, T.fog[0]); scene.fog.near = T.fog[1]; scene.fog.far = T.fog[2];
+      const g = skyCanvas.getContext("2d"), grd = g.createLinearGradient(0, 0, 0, 256);
+      grd.addColorStop(0, T.sky[0]); grd.addColorStop(0.55, T.sky[1]); grd.addColorStop(1, T.sky[1]);
+      g.fillStyle = grd; g.fillRect(0, 0, 2, 256); skyTex.needsUpdate = true;
+      stars.visible = T.stars; sun.visible = T.sun;
+      lin(M.floor.color, T.floor); lin(M.top.color, T.top[0]); M.top.roughness = T.top[1]; M.top.metalness = T.top[2];
+      lin(M.side.color, T.side); lin(M.glow.color, T.glow); lin(M.bulb.color, T.bulb); lin(M.riser.color, T.riser);
+      lin(M.tree.color, T.tree); lin(M.trunk.color, T.trunk); lin(M.pole.color, T.pole); lin(M.lamp.color, T.lamp);
+      for (const mk of marks) lin(mk.material.color, T.mark);
+      for (const c of chunks) {
+        c.cp.visible = T.cap;
+        let r2 = 777 + c.seed * 31; const rr = () => ((r2 = (r2 * 16807) % 2147483647) / 2147483647);
+        const tint = new THREE.Color();
+        for (const im of [c.cb, c.ch]) { for (let i = 0; i < im.count; i++) { lin(tint, T.crowd[Math.floor(rr() * T.crowd.length)]); if (im === c.ch && T.crowd.length > 1) lin(tint, [0xf1d3b3, 0xd9b08c, 0xa77b5a, 0x2d2925][Math.floor(rr() * 4)]); im.setColorAt(i, tint); } if (im.instanceColor) im.instanceColor.needsUpdate = true; }
+      }
+      lin(hemi.color, T.hemi[0]); lin(hemi.groundColor, T.hemi[1]); hemi.intensity = T.hemi[2];
+      lin(key.color, T.key[0]); key.intensity = T.key[1];
+      follow.intensity = T.follow; follow.visible = T.follow > 0;
+      const P = T.particles; points.visible = P.count > 0;
+      if (P.count) { lin(pmat.color, P.color); pmat.size = P.size; pmat.opacity = P.opacity; pg.setDrawRange(0, low ? Math.ceil(P.count * 0.6) : P.count); }
+      for (const fl of flashes) { fl.f.visible = false; fl.f.material.opacity = 0; }
+      if (renderer) renderer.toneMappingExposure = T.exposure;
+    }
 
-    scene.traverse(toLinear);
-    scene.background.convertSRGBToLinear(); scene.fog.color.convertSRGBToLinear();
     return {
-      key, follow,
-      update(t, dt, reduced) {
-        if (!reduced) for (const { sp, s } of spots) sp.target.position.set(Math.sin(t * 0.6 + s) * 2.2, TOP, RUN_FAR + Math.cos(t * 0.45 + s) * 2.5);
-        for (const fl of flashes) { fl.next -= dt; if (fl.next <= 0 && !reduced) { fl.f.material.opacity = 1; fl.next = 2 + Math.random() * 7; } fl.f.material.opacity = Math.max(0, fl.f.material.opacity - dt * 6); }
-        for (let i = 0; i < bulbs.length; i++) bulbs[i].scale.setScalar(1 + 0.25 * Math.sin(t * 3 - i * 0.5));
-        const a = pg.attributes.position;
-        for (let i = 0; i < N; i++) { let y = a.getY(i) - dt * 0.3; if (y < 0) y = 8; a.setY(i, y); a.setX(i, a.getX(i) + Math.sin(t + i) * dt * 0.08); }
-        a.needsUpdate = true;
+      key, follow, setTheme,
+      get theme() { return theme; },
+      update(t, dt, reduced, px, pz, cam) {
+        sky.position.copy(cam.position);
+        const far = T.fog[2] + 15;
+        for (const c of chunks) { const vis = c.z1 < pz + 25 && c.z0 > pz - far; for (const o of c.objs) o.visible = vis && (o !== c.cp || T.cap); }
+        if (T.flashes && !reduced) for (const fl of flashes) {
+          fl.next -= dt;
+          if (fl.next <= 0) { const near = crowdSpots.filter((s) => s[2] < pz + 4 && s[2] > pz - 35); if (near.length) { const s = near[Math.floor(Math.random() * near.length)]; fl.f.position.set(s[0], s[1], s[2]); fl.f.visible = true; fl.f.material.opacity = 1; } fl.next = 1.5 + Math.random() * 5; }
+          fl.f.material.opacity = Math.max(0, fl.f.material.opacity - dt * 6); if (fl.f.material.opacity <= 0) fl.f.visible = false;
+        }
+        if (points.visible) {
+          const P = T.particles, a = pg.attributes.position, n = pg.drawRange.count === Infinity ? P.count : Math.min(P.count, pg.drawRange.count);
+          for (let i = 0; i < n; i++) {
+            let y = a.getY(i) - dt * P.fall * (0.7 + (pseed[i] % 1) * 0.6), x = a.getX(i) + Math.sin(t * 0.8 + pseed[i]) * dt * P.drift, z = a.getZ(i);
+            if (y < 0) { y = 14; x = px + (Math.random() - 0.5) * 34; }
+            if (z > pz + 12) z -= 70; else if (z < pz - 58) z += 70;
+            if (x > px + 17) x -= 34; else if (x < px - 17) x += 34;
+            a.setXYZ(i, x, y, z);
+          }
+          a.needsUpdate = true;
+        }
       },
     };
   }
@@ -287,8 +421,9 @@
     container.appendChild(canvas);
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 120);
+    const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 240);
     const world = buildScene(THREE, scene, quality);
+    world.setTheme(opts.theme || "night", renderer);
     let hero = makeDefaultHero(THREE); scene.add(hero.root);
 
     const state = { x: 0, z: RUN_NEAR - 1.5, vx: 0, vz: 0, yaw: Math.PI, y: 0, vy: 0, target: null, stuck: 0 };
@@ -400,7 +535,6 @@
       hero.animate(dt, planar, state.y > 0.02);
       ring.position.set(state.x, TOP + 0.012, state.z); ring.material.opacity = 0.35 + 0.2 * Math.sin(t * 3);
       if (marker.visible) { marker.userData.t += dt; marker.material.opacity = 0.8 * (0.6 + 0.4 * Math.sin(marker.userData.t * 8)); }
-      world.update(t, dt, reduced);
       world.key.position.set(state.x + 6, 14, state.z + 8); world.key.target.position.set(state.x, 0, state.z);
       world.follow.position.set(state.x, 7, state.z + 1.5); world.follow.target.position.set(state.x, TOP, state.z);
 
@@ -408,6 +542,7 @@
       camPos.lerp(tmpV.set(state.x * 0.6, (3.4 * far + 0.6) * hk, state.z + 6.8 * far * hk), damp(3.5, dt));
       camLook.lerp(tmpV.set(state.x * 0.8, 1.1 * hk, state.z - 2.2), damp(5, dt));
       camera.position.copy(camPos); camera.lookAt(camLook);
+      world.update(t, dt, reduced, state.x, state.z, camera);
       renderer.render(scene, camera);
     }
     raf = requestAnimationFrame(step);
@@ -446,12 +581,16 @@
         g.putImageData(img, 0, 0);
         return c.toDataURL("image/jpeg", 0.82);
       },
+      // 測試用：把角色移到指定距離（公尺）
+      _teleport(d) { state.z = Math.max(RUN_FAR, RUN_NEAR - 1.5 - d); state.x = 0; state.vx = state.vz = 0; state.target = null; camPos.set(0, 5, state.z + 7); camLook.set(0, 1, state.z - 2); },
+      setTheme(name) { world.setTheme(name, renderer); return world.theme; },
+      get theme() { return world.theme; },
       setPaused(v) {
         paused = !!v; keys.clear(); held = false;
         if (!paused && !raf) { last = performance.now(); raf = requestAnimationFrame(step); }
       },
       get paused() { return paused; },
-      get state() { return { x: state.x, z: state.z, y: state.y, speed: Math.hypot(state.vx, state.vz) }; },
+      get state() { return { x: state.x, z: state.z, y: state.y, speed: Math.hypot(state.vx, state.vz), distance: Math.max(0, RUN_NEAR - 1.5 - state.z), length: RUN_NEAR - 1.5 - RUN_FAR }; },
       destroy() {
         paused = true; if (raf) cancelAnimationFrame(raf);
         window.removeEventListener("keydown", onKeyDown); window.removeEventListener("keyup", onKeyUp); window.removeEventListener("blur", onBlur);
@@ -464,5 +603,5 @@
     return ctl;
   }
 
-  window.LizhiStage = { mount, loadScript };
+  window.LizhiStage = { mount, loadScript, themes: Object.keys(THEMES).map((k) => ({ id: k, label: THEMES[k].label })) };
 })();
