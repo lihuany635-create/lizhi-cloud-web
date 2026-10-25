@@ -53,3 +53,21 @@ test('Hew route is separate from the existing GLB viewer and CAD route',()=>{
  assert.match(auth,/"hew3d"/)
  assert.ok(!read('hew/portal-host.js').includes('window.postMessage('))
 })
+
+test('Pages deploy pins an immutable Hew source and preserves original CAD before adding editor',()=>{
+ const pages=read('.github/workflows/pages.yml')
+ const preview=read('.github/workflows/hew-editor-integration-preview.yml')
+ const pin='70c73ad001a1800984d7e67a660321341b7611a5'
+ assert.ok(pages.includes('ref: '+pin))
+ assert.ok(preview.includes('ref: '+pin))
+ assert.ok(pages.indexOf('Compile CADCraft into existing portal') <
+           pages.indexOf('Compile native Hew editor to relative URL subpath'))
+ assert.match(pages,/bash hew\/build-embedded-runtime\.sh/)
+ assert.match(pages,/node --test tests\/hew-portal-embed\.test\.mjs/)
+ assert.match(pages,/Remove temporary Hew source and build dependencies/)
+ const builder=read('hew/build-embedded-runtime.sh')
+ assert.match(builder,/REFUSING_TO_OVERWRITE_NONGENERATED_HEW_EDITOR/)
+ assert.match(builder,/AGPL-3\.0\.txt/)
+ assert.match(builder,/SOURCE\.txt/)
+ assert.match(builder,/LIZHI_HEW_EDITOR_ASSEMBLED/)
+})
