@@ -28,7 +28,7 @@ const ok = (body: Record<string, unknown>) => ({
   structuredContent: body
 });
 type Row = { kind: string; id: string; payload: Record<string, unknown>; updated_at: string };
-type Book = { accounts: Record<string, unknown>[]; creditCards: Record<string, unknown>[]; categories: Record<string, unknown>[]; transactions: Record<string, unknown>[]; synced_at: string | null };
+type Book = { accounts: Record<string, unknown>[]; creditCards: Record<string, unknown>[]; categories: Record<string, unknown>[]; transactions: Record<string, unknown>[]; latest_record_updated_at: string | null };
 const integer = (n: unknown): n is number => typeof n === "number" && Number.isSafeInteger(n);
 const amount = (n: unknown) => integer(n) && n > 0 ? n : 0;
 const nameOf = (n: unknown) => typeof n === "string" ? n.slice(0, 100) : "";
@@ -46,7 +46,7 @@ function accountBalance(acc: Record<string, unknown>, txs: Record<string, unknow
     if (type === "expense" && t.accountId === id) total -= v;
     if (type === "transfer" && t.fromAccountId === id) total -= v;
     if (type === "transfer" && t.toAccountId === id) total += v;
-    if (type === "credit_card_payment" && (t.fromAccountId === id || (!t.fromAccountId && t.accountId === id))) total -= v;
+    if (type === "credit_card_payment" && (t.fromAccountId === id || t.accountId === id)) total -= v;
   }
   if (!Number.isSafeInteger(total)) throw new Error("UNSAFE_BALANCE");
   return total;
@@ -96,7 +96,7 @@ const app = pipeline([
       if ((data || []).length < page) break;
       if (offset + page === max) throw new Error("CLOUD_ROW_LIMIT_EXCEEDED");
     }
-    const result: Book = { accounts: [], creditCards: [], categories: [], transactions: [], synced_at: lastStamp(rows) };
+    const result: Book = { accounts: [], creditCards: [], categories: [], transactions: [], latest_record_updated_at: lastStamp(rows) };
     for (const r of rows) {
       if (!r.payload || typeof r.payload !== "object" || Array.isArray(r.payload)) throw new Error("INVALID_CLOUD_RECORD");
       if (!["accounts", "creditCards", "categories", "transactions"].includes(r.kind)) continue;
@@ -119,8 +119,8 @@ const app = pipeline([
     }, async (args: any) => {
       try {
         const b = await snapshot();
-        return ok({ ...call(args, b), source: "supabase_synced_snapshot", synced_at: b.synced_at, read_only: true,
-          notice: "雲端同步快照；未同步的本機資料不包含在內。" });
+        return ok({ ...call(args, b), source: "supabase_synced_snapshot", latest_record_updated_at: b.latest_record_updated_at, snapshot_read_at: new Date().toISOString(), read_only: true,
+          notice: "雲端同步快照；未同步的本機資料不包含在內。latest_record_updated_at 是最近一筆紀錄修改時間，不代表成功同步時間。" });
       } catch (_err) {
         return fail("FINANCE_CLOUD_SNAPSHOT_UNAVAILABLE：無法安全查詢同步帳本，未回傳不完整的財務計算。");
       }
