@@ -64,3 +64,13 @@ test("edge request guard enforces UTF-8 byte limit with or without header",async
  await assert.rejects(readBoundedBody(make("{}",{"content-length":"16385"})),/BODY_TOO_LARGE/);
  await assert.rejects(readBoundedBody(make("{}",{"content-length":"not-a-number"})),/BODY_TOO_LARGE/);
 });
+
+test("CAD browser relay UI must use the private Site MCP entry, not obsolete Plugin OAuth",async()=>{
+ const {readFile}=await import("node:fs/promises");
+ const {fileURLToPath}=await import("node:url");
+ const {resolve,dirname}=await import("node:path");
+ const host=await readFile(resolve(dirname(fileURLToPath(import.meta.url)),"../cad/cad-host.js"),"utf8");
+ assert.ok(host.includes("私人「立之 CAD 指令代理」Site"));
+ assert.ok(host.includes("六個 MCP 工具已載入"));
+ assert.equal(host.includes("Plugin 完成 OAuth 授權"),false);
+});
