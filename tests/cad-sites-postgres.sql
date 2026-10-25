@@ -114,8 +114,7 @@ set request.jwt.claim.role='service_role';
 do $$
 declare job uuid;
 begin
- select id into job from lizhi_private.lizhi_cad_commands
-  where idempotency_key='44444444-4444-4444-8444-444444444444';
+ job:=public.lizhi_cad_site_enqueue('11111111-1111-4111-8111-111111111111','33333333-3333-4333-8333-333333333333','rectang','{"p1":[0,0],"p2":[800,900]}'::jsonb,'44444444-4444-4444-8444-444444444444');
  if public.lizhi_cad_site_job('11111111-1111-4111-8111-111111111111',job)->>'state'<>'succeeded' then
    raise exception 'Site cannot confirm native CAD success';
  end if;
