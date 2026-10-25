@@ -1,0 +1,51 @@
+name: LiZhi CAD MCP Postgres Auth/RLS and Edge Typecheck (no deployment)
+on:
+  push:
+    branches: [feature/cad-mcp-secure-relay-v1]
+    paths:
+      - 'cad/relay/schema-review.sql'
+      - 'tests/cad-mcp-relay-postgres.sql'
+      - 'supabase/functions/lizhi-cad-mcp/**'
+      - '.github/workflows/cad-mcp-relay-db-security.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-postgres-rls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client (throwaway service only)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+      - name: Execute candidate schema under real Postgres and user-impersonated JWT/RLS tests
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -euo pipefail
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1             -f tests/cad-mcp-relay-postgres.sql | tee /tmp/cad-sql-test.log
+          grep -q CAD_SQL_RLS_OAUTH_OWNER_ISOLATION_PASS /tmp/cad-sql-test.log
+  edge-deno-typecheck:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check real Supabase CAD OAuth MCP Edge source
+        run: deno check supabase/functions/lizhi-cad-mcp/index.ts
