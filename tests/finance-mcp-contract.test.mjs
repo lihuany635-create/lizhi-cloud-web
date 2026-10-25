@@ -29,7 +29,8 @@ test("FIN-MCP-04 credit card payments are not included twice in expense", () => 
 });
 test("FIN-MCP-05 minimize exposure and label snapshot freshness", () => {
   assert.match(source,/source: "supabase_synced_snapshot"/);
-  assert.match(source,/synced_at: b\.synced_at/);
+  assert.match(source,/latest_record_updated_at: b\.latest_record_updated_at/);
+  assert.match(source,/snapshot_read_at: new Date\(\)\.toISOString\(\)/);
   assert.doesNotMatch(source,/select\([^\n]*note/);
   assert.doesNotMatch(source,/SUPABASE_SERVICE_ROLE_KEY.*console/);
 });
