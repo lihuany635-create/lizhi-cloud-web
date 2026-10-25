@@ -148,7 +148,7 @@ end $$;
 
 create or replace function public.lizhi_model_claim(p_session uuid)
 returns jsonb language plpgsql volatile security definer set search_path='' as $$
-declare actor uuid:=auth.uid(); j record;
+declare actor uuid:=auth.uid(); claimed_row record;
 begin
  if actor is null or not public.lizhi_web_is_allowed() then return null; end if;
  perform 1 from lizhi_model_private.sessions s
@@ -170,11 +170,11 @@ begin
  )
  update lizhi_model_private.jobs j set state='claimed',claimed_at=statement_timestamp()
  from picked where j.id=picked.id
- returning j.id,j.request_id,j.command,j.params,j.document_id,j.expected_revision into j;
+ returning j.id,j.request_id,j.command,j.params,j.document_id,j.expected_revision into claimed_row;
  if not found then return null; end if;
- return jsonb_build_object('job_id',j.id,'request_id',j.request_id,
-  'command',j.command,'params',j.params,'document_id',j.document_id,
-  'expected_revision',j.expected_revision,'session_id',p_session);
+ return jsonb_build_object('job_id',claimed_row.id,'request_id',claimed_row.request_id,
+  'command',claimed_row.command,'params',claimed_row.params,'document_id',claimed_row.document_id,
+  'expected_revision',claimed_row.expected_revision,'session_id',p_session);
 end $$;
 
 create or replace function public.lizhi_model_finish(
