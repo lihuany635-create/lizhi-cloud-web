@@ -366,7 +366,7 @@
         await window.LizhiCadRelay.connect();
         panel?.querySelector('[data-cad-action="remote-connect"]')?.setAttribute("hidden", "");
         panel?.querySelector('[data-cad-action="remote-disconnect"]')?.removeAttribute("hidden");
-        status("已啟用本次 CAD 指令中繼。請在 ChatGPT 私人「立之 CAD」Plugin 完成 OAuth 授權；未授權前無法由對話操作。保持本頁開啟，可隨時斷開。");
+        status("本頁 CAD 指令中繼已啟用。請在一般 ChatGPT 對話連接私人「立之 CAD 指令代理」Site，確認六個 MCP 工具已載入後才能操作。本頁請保持開啟，可隨時斷開。");
       } catch (error) {
         status("ChatGPT MCP 未連線：" + String(error?.message || "登入／服務驗證失敗").slice(0,180), true);
       }
@@ -415,6 +415,27 @@
     if (!params || typeof params !== "object" || Array.isArray(params)) return false;
     if (JSON.stringify(params).length > 8192) return false;
     const keys = Object.keys(params);
+    // Browser-only native read interfaces. These are NOT advertised as Site MCP
+    // tools until the Rust/WASM engine and the relay's response contract pass
+    // isolated acceptance. Never allow a raw file read or arbitrary commands.
+    if (name === "lizhi.inspect") return keys.length === 0;
+    if (name === "lizhi.entities") return (
+      keys.every(k => ["type", "layer", "limit", "offset", "selected"].includes(k)) &&
+      (!Object.hasOwn(params, "type") || (typeof params.type === "string" && params.type.length <= 32 && !params.type.includes("\\0"))) &&
+      (!Object.hasOwn(params, "layer") || (typeof params.layer === "string" && params.layer.length <= 80 && !params.layer.includes("\\0"))) &&
+      (!Object.hasOwn(params, "limit") || (Number.isInteger(params.limit) && params.limit >= 1 && params.limit <= 8)) &&
+      (!Object.hasOwn(params, "offset") || (Number.isInteger(params.offset) && params.offset >= 0 && params.offset <= 10000)) &&
+      (!Object.hasOwn(params, "selected") || typeof params.selected === "boolean")
+    );
+    if (name === "lizhi.move") return (
+      keys.length === 4 &&
+      keys.every(k => ["handles", "delta", "expectedRevision", "confirmed"].includes(k)) &&
+      Array.isArray(params.handles) && params.handles.length === 1 &&
+      typeof params.handles[0] === "string" && /^[0-9a-f]{1,16}$/i.test(params.handles[0]) &&
+      safePoint(params.delta) && params.delta.some(n => n !== 0) &&
+      Number.isSafeInteger(params.expectedRevision) && params.expectedRevision >= 0 &&
+      params.confirmed === true
+    );
     if (name === "new") return keys.every(k => k === "metric") && (params.metric === undefined || typeof params.metric === "boolean");
     if (name === "rectang") return keys.length === 2 && keys.includes("p1") && keys.includes("p2") && safePoint(params.p1) && safePoint(params.p2);
     if (name === "line") return keys.every(k => k === "points" || k === "closed") && Array.isArray(params.points) &&
@@ -447,6 +468,7 @@
     command(name, params) {
       if (!allowAiControl || !ready || !frame?.contentWindow) return Promise.reject(new Error("CAD AI 控制未啟用或繪圖引擎離線"));
       if (!validateCadCommand(name, params)) return Promise.reject(new Error("不支援此 CAD 幾何指令或座標"));
+      if (name === "lizhi.move" && !confirm("AI 要移動目前圖面的指定物件。已確認物件 handle 與圖面版本相符嗎？按取消將不修改圖面。")) return Promise.reject(new Error("使用者取消單一物件移動"));
       if (pendingCadCommands.size >= 16) return Promise.reject(new Error("CAD 命令佇列已滿"));
       const requestId = "cad-" + crypto.randomUUID();
       return new Promise((resolve, reject) => {

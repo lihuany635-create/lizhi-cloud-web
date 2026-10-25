@@ -1,0 +1,111 @@
+name: LiZhi CAD Sites Bridge Candidate (no deployment)
+on:
+  push:
+    branches: [feature/cad-sites-bridge-v1]
+    paths:
+      - 'supabase/config.toml'
+      - 'cad/sites/**'
+      - 'sites-migration/cad/**'
+      - 'supabase/functions/lizhi-cad-site-mcp/**'
+      - 'tests/cad-sites-*'
+      - 'tests/cad-entity-local-bridge.test.mjs'
+      - 'cad/cad-host.js'
+      - '.github/workflows/cad-sites-bridge-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify Sites owner-only MCP and bounded geometry tools
+        run: node --test tests/cad-sites-contract.test.mjs
+      - name: Verify local native read access stays explicitly bounded
+        run: node --test tests/cad-entity-local-bridge.test.mjs
+      - name: Validate server-bearer Edge routing configuration
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import tomllib
+          data=tomllib.loads(Path('supabase/config.toml').read_text())
+          assert data['functions']['lizhi-cad-site-mcp']['verify_jwt'] is False
+          source=Path('supabase/functions/lizhi-cad-site-mcp/index.ts').read_text()
+          assert 'SITE_OWNER_CREDENTIAL_REQUIRED' in source
+          assert 'LIZHI_CAD_SITE_MCP_TOKEN' in source
+          assert 'SUPABASE_SERVICE_ROLE_KEY' in source
+          assert 'BROWSER_ORIGIN_NOT_ALLOWED' in source
+          print('CAD_SITES_SECRET_GUARD_CONFIG_PASS')
+          PY
+      - name: Pure Node syntax
+        run: |
+          node --check cad/sites/cad-site-contract.mjs
+          node --check sites-migration/cad/site-tools.mjs
+          node --check sites-migration/cad/site-mcp-route.mjs
+      - name: Verify private Site MCP route identity and tool dispatch
+        run: node --test tests/cad-sites-site-route.test.mjs
+          node --check supabase/functions/lizhi-cad-site-mcp/cad-site-contract.mjs
+          node --check supabase/functions/lizhi-cad-site-mcp/bounded-body.mjs
+      - name: Enforce bundle matches site contract
+        run: cmp cad/sites/cad-site-contract.mjs supabase/functions/lizhi-cad-site-mcp/cad-site-contract.mjs
+  edge-deno:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check actual Supabase Edge Site MCP gateway
+        run: deno check supabase/functions/lizhi-cad-site-mcp/index.ts
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Smoke test real Edge HTTP authentication and bounded bytes
+        env:
+          SUPABASE_URL: http://127.0.0.1:54321
+          SUPABASE_SERVICE_ROLE_KEY: ci-only-fake-service-role-key
+          LIZHI_CAD_SITE_MCP_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          LIZHI_CAD_SITE_OWNER_UID: 11111111-1111-4111-8111-111111111111
+        run: |
+          set -euo pipefail
+          deno run --allow-env --allow-net supabase/functions/lizhi-cad-site-mcp/index.ts >/tmp/cad-sites-edge-http.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          ready=0
+          for i in $(seq 1 40); do
+            if [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/ || true)" = "405" ]; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then cat /tmp/cad-sites-edge-http.log; exit 1; fi
+          node --test tests/cad-sites-edge-http.test.mjs
+  isolated-postgres:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Postgres 16 client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+      - name: Test private Site owner role, leases, exactly-once queue and native browser claim
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -euo pipefail
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f tests/cad-sites-postgres.sql | tee /tmp/cad-sites-pg.log
+          grep -q CAD_SITES_POSTGRES_ISOLATION_AND_COMMAND_PASS /tmp/cad-sites-pg.log
