@@ -5,6 +5,7 @@
 (function(){
 'use strict';
 const OWNER_EMAIL='lihuany635@gmail.com';
+// Retain the existing key so mobile OAuth flows in progress remain compatible.
 const PENDING_KEY='lizhi_mobile_pending_oauth_authorization_v1';
 const id=new URL(location.href).searchParams.get('authorization_id');
 const notice=document.querySelector('#notice');
@@ -41,7 +42,7 @@ async function load(){
    return;
   }
   if(String(user.email||'').toLowerCase()!==OWNER_EMAIL || !user.email_confirmed_at) {
-   msg('這個帳號沒有手機代理授權資格。請切換為已核准的 Google 帳號。');
+   msg('這個帳號沒有私人服務授權資格。請切換為已核准的 Google 帳號。');
    return;
   }
   const {data,error}=await db.auth.oauth.getAuthorizationDetails(id);
@@ -61,7 +62,7 @@ async function load(){
   text('#signed-in-user',String(user.email||''));
   login.hidden=true;
   details.hidden=false;
-  msg('請核對應用程式名稱、回呼網址與授權範圍，再決定是否允許。');
+  msg('此授權可能允許 AI 使用有修改能力的工具。請核對應用程式名稱、回呼網址與授權範圍，再決定是否允許。');
   toggle(true);
  }catch(e){msg('無法驗證授權要求：'+String(e?.message||'未知錯誤'));}
 }
