@@ -48,6 +48,7 @@ function accountBalance(acc: Record<string, unknown>, txs: Record<string, unknow
     if (type === "transfer" && t.toAccountId === id) total += v;
     if (type === "credit_card_payment" && (t.fromAccountId === id || (!t.fromAccountId && t.accountId === id))) total -= v;
   }
+  if (!Number.isSafeInteger(total)) throw new Error("UNSAFE_BALANCE");
   return total;
 }
 function cardDue(id: string, txs: Record<string, unknown>[]) {
@@ -57,6 +58,7 @@ function cardDue(id: string, txs: Record<string, unknown>[]) {
     if (t.type === "credit_card_purchase") due += amount(t.amount);
     if (t.type === "credit_card_payment") due -= amount(t.amount);
   }
+  if (!Number.isSafeInteger(due)) throw new Error("UNSAFE_CARD_TOTAL");
   return Math.max(0, due);
 }
 function displayTx(t: Record<string, unknown>, entities: Map<string, string>) {
@@ -167,7 +169,7 @@ const app = pipeline([
             sums.set(id, (sums.get(id) || 0) + v);
           }
         }
-        const names = new Map(b.categories.map(c => [idOf(c.id), nameOf(c.name)]));
+        const names = new Map<string, string>(b.categories.map(c => [idOf(c.id), nameOf(c.name)] as [string, string]));
         return { month, income, expense: cashExpense + cardPurchase, ordinary_expense: cashExpense,
           credit_card_purchases: cardPurchase, credit_card_payments: cardPayment,
           income_minus_expense: income - cashExpense - cardPurchase,
@@ -181,9 +183,9 @@ const app = pipeline([
         month: z.string().regex(/^20[0-9]{2}-(0[1-9]|1[0-2])$/).optional()
       }), ({ limit, month }, b) => {
         const names = new Map([
-          ...b.accounts.map(a => [idOf(a.id), nameOf(a.name)]),
-          ...b.creditCards.map(c => [idOf(c.id), nameOf(c.name)]),
-          ...b.categories.map(c => [idOf(c.id), nameOf(c.name)]),
+          ...b.accounts.map(a => [idOf(a.id), nameOf(a.name)] as [string, string]),
+          ...b.creditCards.map(c => [idOf(c.id), nameOf(c.name)] as [string, string]),
+          ...b.categories.map(c => [idOf(c.id), nameOf(c.name)] as [string, string]),
         ]);
         return { transactions: b.transactions
           .filter(t => !month || String(t.date).startsWith(month))
