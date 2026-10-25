@@ -22,9 +22,9 @@ CAD 繪圖 UI 仍使用 `https://lihuany635-create.github.io/lizhi-cloud-web/?op
 - `tests/cad-sites-contract.test.mjs`／`tests/cad-sites-postgres.sql`：隔離測試。
 - `.github/workflows/cad-sites-bridge-qa.yml`：Node 24、Deno 2、Postgres 16，一律不部署。
 
-**重要：目前 CI 第一輪顯示 Node adapter PASS，但 Deno 型別檢查與 PostgreSQL 候選驗收 FAIL，尚未達部署門檻。** 不允許使用者在這個狀態套用 REVIEW_ONLY SQL 或手動部署。
+**候選版三項隔離測試均 PASS**：[GitHub Actions 40160360069](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40160360069) — Node Site 合約 6/6、Deno Edge 型別檢查、PostgreSQL 16 service-only 權限／佇列／瀏覽器完成確認。前一輪 Deno union narrowing 與 PostgreSQL 測試誤讀私有 schema 均已修復。這不代表已建立／部署私人 Site，也不是已在真實 ChatGPT 對話讀到六工具。**新 SQL 仍是 REVIEW_ONLY，不可直接套正式 Supabase，需先完成獨立 Secret/owner UID 和 Site 部署審查。**
 
-## 建立 Site 時的嚴格要求（待 CI 修好）
+## 建立 Site 時的嚴格要求（隔離 CI 已通過，尚未部署）
 
 1. 在 ChatGPT Sites 中建立**獨立私人 Site「立之 CAD 指令代理」**。不修改手機 v9 Site、不改手機工具／Secret，也不另外建立 CAD 繪圖網站。Site 設定 **PRIVATE / 僅你可見**。
 2. Sites **伺服器端**儲存 `SITE_CAD_OWNER_EMAIL`、`LIZHI_CAD_SITE_MCP_TOKEN`，絕對不顯示其內容或放入 frontend/env-public。
