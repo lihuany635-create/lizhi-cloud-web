@@ -1,0 +1,32 @@
+name: Hew 3D MCP contract (isolated)
+on:
+  push:
+    branches: [feature/hew-3d-mcp-v1-20261025]
+    paths:
+      - 'hew/sites/**'
+      - 'sites-migration/hew/**'
+      - 'tests/hew-sites-contract.test.mjs'
+      - '.github/workflows/hew-mcp-contract.yml'
+  pull_request:
+    paths:
+      - 'hew/sites/**'
+      - 'sites-migration/hew/**'
+      - 'tests/hew-sites-contract.test.mjs'
+      - '.github/workflows/hew-mcp-contract.yml'
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Node tool contract regression
+        run: node --test tests/hew-sites-contract.test.mjs
+      - name: Syntax check
+        run: |
+          node --check hew/sites/model-site-contract.mjs
+          node --check sites-migration/hew/site-tools.mjs
