@@ -7,6 +7,9 @@ on:
       # Host and E2E test edits use cad-embedded-browser-fast.yml instead.
       - 'cad/build-runtime.sh'
       - 'cad/setup-build-toolchain.sh'
+      - 'tests/cad-command-port-e2e.cjs'
+      - 'cad/cad-host.js'
+      - 'app.js'
       - '.github/workflows/cad-integration-preview.yml'
   workflow_dispatch:
 permissions:
@@ -96,6 +99,7 @@ jobs:
             sleep 1
           done
           node tests/cad-browser-e2e.cjs
+          node tests/cad-command-port-e2e.cjs
       - name: Preserve browser screenshots and DXF fallback evidence
         if: always()
         uses: actions/upload-artifact@v4
