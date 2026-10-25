@@ -76,7 +76,7 @@ Deno.serve(async(req:Request)=>{
   // A successful tool call only queues work. The browser's existing first-party
   // heartbeat+claim+finish processes it exactly once while CAD is opt-in online.
   const {data,error}=await db.rpc("lizhi_cad_site_enqueue",{
-    p_owner:owner,p_session:checked.args.session_id,
+    p_owner:owner,p_session:(checked.args as {session_id:string}).session_id,
     p_request_id:checked.args.request_id,
     p_command:checked.command,p_params:checked.params
   });
