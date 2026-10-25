@@ -6,12 +6,16 @@ on:
       - 'hew/sites/**'
       - 'sites-migration/hew/**'
       - 'tests/hew-sites-contract.test.mjs'
+      - 'tests/hew-model-edge-upstream.test.mjs'
+      - 'supabase/functions/lizhi-model-site-mcp/**'
       - '.github/workflows/hew-mcp-contract.yml'
   pull_request:
     paths:
       - 'hew/sites/**'
       - 'sites-migration/hew/**'
       - 'tests/hew-sites-contract.test.mjs'
+      - 'tests/hew-model-edge-upstream.test.mjs'
+      - 'supabase/functions/lizhi-model-site-mcp/**'
       - '.github/workflows/hew-mcp-contract.yml'
 permissions:
   contents: read
@@ -25,8 +29,10 @@ jobs:
         with:
           node-version: '24'
       - name: Node tool contract regression
-        run: node --test tests/hew-sites-contract.test.mjs
+        run: node --test tests/hew-sites-contract.test.mjs tests/hew-model-edge-upstream.test.mjs
       - name: Syntax check
         run: |
           node --check hew/sites/model-site-contract.mjs
           node --check sites-migration/hew/site-tools.mjs
+          node --check supabase/functions/lizhi-model-site-mcp/edge-core.mjs
+          node --check supabase/functions/lizhi-model-site-mcp/model-site-contract.mjs
