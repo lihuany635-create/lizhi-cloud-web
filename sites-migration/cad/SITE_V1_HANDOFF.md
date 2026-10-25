@@ -22,7 +22,15 @@ CAD 繪圖 UI 仍使用 `https://lihuany635-create.github.io/lizhi-cloud-web/?op
 - `tests/cad-sites-contract.test.mjs`／`tests/cad-sites-postgres.sql`：隔離測試。
 - `.github/workflows/cad-sites-bridge-qa.yml`：Node 24、Deno 2、Postgres 16，一律不部署。
 
-**候選版三項隔離測試均 PASS**：[GitHub Actions 40160360069](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40160360069) — Node Site 合約 6/6、Deno Edge 型別檢查、PostgreSQL 16 service-only 權限／佇列／瀏覽器完成確認。前一輪 Deno union narrowing 與 PostgreSQL 測試誤讀私有 schema 均已修復。這不代表已建立／部署私人 Site，也不是已在真實 ChatGPT 對話讀到六工具。**新 SQL 仍是 REVIEW_ONLY，不可直接套正式 Supabase，需先完成獨立 Secret/owner UID 和 Site 部署審查。**
+**候選版三項 CI Job 均 PASS**：[GitHub Actions 40161330829](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40161330829) — Node Site 合約 7/7、Deno Edge 型別檢查與匿名／錯誤 Bearer／Origin／有效 Bearer／超大 UTF-8 位元組負載的真實 HTTP 測試、PostgreSQL 16 service-only 權限／佇列／瀏覽器完成確認。前一輪 Deno union narrowing 與 PostgreSQL 測試誤讀私有 schema 均已修復。這不代表已建立／部署私人 Site，也不是已在真實 ChatGPT 對話讀到六工具。**新 SQL 仍是 REVIEW_ONLY，不可直接套正式 Supabase，需先完成獨立 Secret/owner UID 和 Site 部署審查。**
+
+## 2026-10-25 追加防護與驗證
+
+- 最新原始碼提交 `a3c10a48dbfcd77d9f7c45222fc24025133199a9`（PR #11 仍 Draft）。
+- Edge HTTP 以 streaming 限制整個 request body 至 16 KiB **實際 UTF-8 位元組**；不信任 Content-Length，也不會先讀取無限制本文。修正了有效 Content-Length 會被錯誤判成 HTTP 413 的缺陷。
+- Node Site adapter 的合約 7/7 PASS；另新增兩項 Edge 真 HTTP smoke tests，確認匿名 401、錯誤 Secret 401、帶 Origin 403、正確測試專用 bearer tools/list 200 且正好六工具、超限 413。HTTP CI 用的假金鑰不是正式 Secret，也未呼叫正式 Supabase。
+- SQL 先辨識完全相同的 `request_id`，即使近一分鐘已達 20 筆上限，仍回原 job_id；相同 request_id 改參數會拒絕，新指令仍受限速。已由 disposable PostgreSQL 16 驗證；沒有套用正式 schema。
+- 這些安全測試只涵蓋 **GitHub Actions 臨時服務與模擬登入提供者**。並未實際驗證 ChatGPT Sites 私人 owner middleware、正式 Secret 配置或一般對話載入工具。正式發布閘門持續關閉；不得將 `verify_jwt=false` 誤當匿名公開授權。
 
 ## 建立 Site 時的嚴格要求（隔離 CI 已通過，尚未部署）
 
