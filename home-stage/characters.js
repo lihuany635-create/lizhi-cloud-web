@@ -6,7 +6,7 @@
   "use strict";
 
   const THREE_URL = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
-  const STAGE_URL = "./home-stage/stage.js?v=3";
+  const STAGE_URL = "./home-stage/stage.js?v=4";
   const BUCKET = "lizhi-stage-characters", TABLE = "lizhi_stage_characters";
   const CACHE = "lizhi-stage-characters-v1";
   const MAX_BYTES = 50 * 1024 * 1024;
@@ -26,7 +26,7 @@
     if (S.ctl) S.ctl.setAuto(on);
     document.body.classList.toggle("home-stage-auto", on);
     if (modeBtn) { modeBtn.innerHTML = on ? '<span aria-hidden="true">↻</span>自動' : '<span aria-hidden="true">✥</span>手動'; modeBtn.setAttribute("aria-pressed", String(on)); }
-    if (hint && S.on) { hint.textContent = on ? (coarse() ? "自動走秀中・再點「自動」切回手動" : "自動走秀中：走到 600 公尺終點再走回來・再點「自動」切回手動") : (coarse() ? "左下搖桿移動・點伸展台跑過去" : "WASD／方向鍵移動・Shift 衝刺・空白鍵跳・點伸展台跑過去"); hint.classList.add("show"); clearTimeout(hintTimer); hintTimer = setTimeout(() => hint.classList.remove("show"), 6000); }
+    if (hint && S.on) { hint.textContent = on ? (coarse() ? "自動走秀中・拖曳可繞著角色看・點兩下重設" : "自動走秀中・拖曳繞著角色轉、滾輪縮放、雙擊重設視角") : (coarse() ? "左下搖桿移動・點伸展台跑過去" : "WASD／方向鍵移動・Shift 衝刺・空白鍵跳・點伸展台跑過去"); hint.classList.add("show"); clearTimeout(hintTimer); hintTimer = setTimeout(() => hint.classList.remove("show"), 6000); }
   }
   const THEME_KEY = "lizhi-stage-theme-v1", THEME_ORDER = ["night", "day", "snow"], THEME_LABEL = { night: "夜晚", day: "白天", snow: "下雪" };
   const savedTheme = () => { try { const v = localStorage.getItem(THEME_KEY); return THEME_ORDER.includes(v) ? v : "night"; } catch (_) { return "night"; } };

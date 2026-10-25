@@ -467,9 +467,42 @@
       state.target = { x: tx, z: tz }; state.stuck = 0;
       marker.position.set(tx, TOP + 0.015, tz); marker.visible = true; marker.userData.t = 0;
     }
-    function onDown(e) { if (paused || auto.on) return; const a = document.activeElement; if (a && a !== document.body && a.blur) a.blur(); held = true; try { canvas.setPointerCapture(e.pointerId); } catch (_) {} aim(e); }
-    function onMove(e) { if (held) aim(e); }
-    function onUp() { held = false; }
+    // 自動模式的自由視角：拖曳繞著角色轉、滾輪／雙指縮放、雙擊（點兩下）重設
+    const ORBIT0 = { yaw: 0, pitch: 0.42, dist: 7 };
+    const orbit = Object.assign({}, ORBIT0), drag = new Map();
+    let pinch0 = 0, dist0 = 0, lastTap = 0;
+    function orbitFromCamera() {
+      const hk = Math.max(1, hero.height / 1.75), ox = camPos.x - state.x, oy = camPos.y - (TOP + 1.0 * hk), oz = camPos.z - state.z, len = Math.hypot(ox, oy, oz) || 1;
+      orbit.yaw = Math.atan2(ox, oz); orbit.pitch = Math.max(0.05, Math.min(1.25, Math.asin(oy / len))); orbit.dist = Math.max(2.2, Math.min(16, len / hk / (camera.aspect < 1 ? 1.35 : 1)));
+    }
+    function resetOrbit() { Object.assign(orbit, ORBIT0); }
+    function onDown(e) {
+      if (paused) return;
+      const a = document.activeElement; if (a && a !== document.body && a.blur) a.blur();
+      if (auto.on) {
+        try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+        drag.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (drag.size === 2) { const [p1, p2] = [...drag.values()]; pinch0 = Math.hypot(p1.x - p2.x, p1.y - p2.y); dist0 = orbit.dist; }
+        if (e.pointerType !== "mouse") { const now = performance.now(); if (now - lastTap < 300 && drag.size === 1) resetOrbit(); lastTap = now; }
+        return;
+      }
+      held = true; try { canvas.setPointerCapture(e.pointerId); } catch (_) {} aim(e);
+    }
+    function onMove(e) {
+      if (auto.on) {
+        const d = drag.get(e.pointerId); if (!d) return;
+        const dx = e.clientX - d.x, dy = e.clientY - d.y; d.x = e.clientX; d.y = e.clientY;
+        if (drag.size >= 2) { const [p1, p2] = [...drag.values()], dd = Math.hypot(p1.x - p2.x, p1.y - p2.y); if (pinch0 > 0) orbit.dist = Math.max(2.2, Math.min(16, dist0 * pinch0 / Math.max(20, dd))); return; }
+        orbit.yaw -= dx * 0.008; orbit.pitch = Math.max(0.05, Math.min(1.25, orbit.pitch + dy * 0.005));
+        return;
+      }
+      if (held) aim(e);
+    }
+    function onUp(e) { held = false; if (e && drag.has(e.pointerId)) { drag.delete(e.pointerId); if (drag.size < 2) pinch0 = 0; } }
+    function onWheel(e) { if (!auto.on || paused) return; e.preventDefault(); orbit.dist = Math.max(2.2, Math.min(16, orbit.dist * Math.exp(e.deltaY * 0.0012))); }
+    function onDbl() { if (auto.on) resetOrbit(); }
+    canvas.addEventListener("wheel", onWheel, { passive: false });
+    canvas.addEventListener("dblclick", onDbl);
     canvas.addEventListener("pointerdown", onDown); canvas.addEventListener("pointermove", onMove);
     canvas.addEventListener("pointerup", onUp); canvas.addEventListener("pointercancel", onUp);
 
@@ -549,8 +582,15 @@
       world.follow.position.set(state.x, 7, state.z + 1.5); world.follow.target.position.set(state.x, TOP, state.z);
 
       const far = camera.aspect < 1 ? 1.5 : 1, hk = Math.max(1, hero.height / 1.75);
-      camPos.lerp(tmpV.set(state.x * 0.6, (3.4 * far + 0.6) * hk, state.z + 6.8 * far * hk), damp(3.5, dt));
-      camLook.lerp(tmpV.set(state.x * 0.8, 1.1 * hk, state.z - 2.2), damp(5, dt));
+      if (auto.on) {
+        const ty = TOP + 1.0 * hk, d = orbit.dist * hk * (camera.aspect < 1 ? 1.35 : 1), cp = Math.cos(orbit.pitch);
+        tmpV.set(state.x + Math.sin(orbit.yaw) * cp * d, Math.max(0.5, ty + Math.sin(orbit.pitch) * d), state.z + Math.cos(orbit.yaw) * cp * d);
+        camPos.lerp(tmpV, damp(drag.size ? 14 : 6, dt));
+        camLook.lerp(tmpV.set(state.x, ty, state.z), damp(10, dt));
+      } else {
+        camPos.lerp(tmpV.set(state.x * 0.6, (3.4 * far + 0.6) * hk, state.z + 6.8 * far * hk), damp(3.5, dt));
+        camLook.lerp(tmpV.set(state.x * 0.8, 1.1 * hk, state.z - 2.2), damp(5, dt));
+      }
       camera.position.copy(camPos); camera.lookAt(camLook);
       world.update(t, dt, reduced, state.x, state.z, camera);
       renderer.render(scene, camera);
@@ -598,10 +638,13 @@
         joy.on = false; joy.x = joy.y = 0;
         if (joyEl) joyEl.style.display = auto.on ? "none" : "";
         // 從目前位置往比較遠的那一端走
-        if (auto.on) { auto.wait = 0; auto.dir = (state.z - RUN_FAR) > (RUN_NEAR - state.z) ? -1 : 1; }
+        if (auto.on) { auto.wait = 0; auto.dir = (state.z - RUN_FAR) > (RUN_NEAR - state.z) ? -1 : 1; orbitFromCamera(); }
+        drag.clear(); pinch0 = 0;
         return auto.on;
       },
       get auto() { return auto.on; },
+      resetView() { resetOrbit(); },
+      get view() { return { yaw: orbit.yaw, pitch: orbit.pitch, dist: orbit.dist, cam: camPos.toArray().map((v) => +v.toFixed(2)) }; },
       setTheme(name) { world.setTheme(name, renderer); return world.theme; },
       get theme() { return world.theme; },
       setPaused(v) {
