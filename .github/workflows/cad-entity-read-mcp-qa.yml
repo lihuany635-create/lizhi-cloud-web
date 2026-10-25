@@ -1,0 +1,56 @@
+name: LiZhi CAD Entity Read MCP Candidate (no deployment)
+on:
+  push:
+    branches: [feature/cad-entity-read-mcp-v1]
+    paths:
+      - 'cad/sites/cad-entity-read-v1.mjs'
+      - 'cad/sites/sql/002_entity_read_jobs.REVIEW_ONLY.sql'
+      - 'tests/cad-entity-read-contract.test.mjs'
+      - 'tests/cad-entity-read-postgres.sql'
+      - '.github/workflows/cad-entity-read-mcp-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Strict read tool input projection tests
+        run: |
+          node --check cad/sites/cad-entity-read-v1.mjs
+          node --test tests/cad-entity-read-contract.test.mjs
+      - name: Existing six CAD Site tools unaffected
+        run: node --test tests/cad-sites-contract.test.mjs
+  read-postgres:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports: [5432:5432]
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+      - name: Test read-only jobs using disposable isolated database
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -euo pipefail
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f tests/cad-sites-postgres.sql
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f tests/cad-entity-read-postgres.sql | tee /tmp/cad-entity-read-pg.log
+          grep -q CAD_ENTITY_READ_POSTGRES_PRIVILEGES_AND_JOB_PASS /tmp/cad-entity-read-pg.log
+  no-deployment:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo "Candidate only. Do not publish to Pages, Supabase or ChatGPT Sites."
