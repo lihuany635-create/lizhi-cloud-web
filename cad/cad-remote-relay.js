@@ -8,6 +8,7 @@
   let lastError = null;
   let active = false;
   let executingJob = null;
+  let consentEpoch = 0;
   const POLL_MS = 2200;
   const LEASE_REFRESH_MS = 10000;
 
@@ -70,9 +71,14 @@
     if(!commandHost()?.commandStatus?.enabled || !commandHost()?.commandStatus?.ready)
       throw new Error("請先在 CAD 頁面手動按下「允許 AI 操作」");
     if(!window.LizhiAuth?.user) throw new Error("立之 CAD MCP 需要登入自己的 Google 帳號");
+    const epoch=consentEpoch;
     const id=crypto.randomUUID();
     const opened=await rpc("lizhi_cad_begin_session",{p_session:id});
     if(opened!==true)throw new Error("無法建立已授權的 CAD MCP 工作階段");
+    if(epoch!==consentEpoch || !commandHost()?.commandStatus?.enabled) {
+      try{await rpc("lizhi_cad_close_session",{p_session:id});}catch{}
+      throw new Error("使用者已撤銷 CAD AI 操作，連線取消");
+    }
     sessionId=id;
     active=true;
     heartbeatDue=0;
@@ -82,6 +88,7 @@
     return state();
   }
   async function disconnect(){
+    consentEpoch++;
     const previous=sessionId;
     active=false;
     sessionId=null;
