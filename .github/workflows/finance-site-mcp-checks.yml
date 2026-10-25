@@ -1,0 +1,31 @@
+name: Finance Sites MCP checks
+on:
+  push:
+    paths:
+      - "supabase/functions/lizhi-finance-site-mcp/**"
+      - "finance/sites/**"
+      - "tests/finance-site-mcp.test.mjs"
+      - ".github/workflows/finance-site-mcp-checks.yml"
+  pull_request:
+    paths:
+      - "supabase/functions/lizhi-finance-site-mcp/**"
+      - "finance/sites/**"
+      - "tests/finance-site-mcp.test.mjs"
+      - ".github/workflows/finance-site-mcp-checks.yml"
+permissions:
+  contents: read
+jobs:
+  finance-site-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check Sites Edge TypeScript
+        run: deno check --node-modules-dir=auto supabase/functions/lizhi-finance-site-mcp/index.ts
+      - name: Check Finance Sites security and accounting
+        run: node --test tests/finance-site-mcp.test.mjs
