@@ -41,6 +41,7 @@ jobs:
           node --check cad/sites/cad-site-contract.mjs
           node --check sites-migration/cad/site-tools.mjs
           node --check supabase/functions/lizhi-cad-site-mcp/cad-site-contract.mjs
+          node --check supabase/functions/lizhi-cad-site-mcp/bounded-body.mjs
       - name: Enforce bundle matches site contract
         run: cmp cad/sites/cad-site-contract.mjs supabase/functions/lizhi-cad-site-mcp/cad-site-contract.mjs
   edge-deno:

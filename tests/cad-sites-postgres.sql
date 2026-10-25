@@ -84,6 +84,41 @@ begin
  end if;
 end $$;
 
+-- At the rate cap, a duplicate request must still return the original job ID.
+-- A different command with the same request ID must still fail.
+do $
+declare
+ owner uuid:='11111111-1111-4111-8111-111111111111';
+ session uuid:='33333333-3333-4333-8333-333333333333';
+ req uuid:='44444444-4444-4444-8444-444444444444';
+ original uuid;
+ refused boolean:=false;
+ conflict_found boolean:=false;
+begin
+ original:=public.lizhi_cad_site_enqueue(owner,session,'rectang',
+  '{"p1":[0,0],"p2":[800,900]}'::jsonb,req);
+ for i in 1..19 loop
+   perform public.lizhi_cad_site_enqueue(owner,session,'rectang',
+    '{"p1":[0,0],"p2":[800,900]}'::jsonb,gen_random_uuid());
+ end loop;
+ if public.lizhi_cad_site_enqueue(owner,session,'rectang',
+  '{"p1":[0,0],"p2":[800,900]}'::jsonb,req) is distinct from original then
+   raise exception 'idempotent retry failed at rate cap';
+ end if;
+ begin
+   perform public.lizhi_cad_site_enqueue(owner,session,'rectang',
+    '{"p1":[0,0],"p2":[800,901]}'::jsonb,req);
+ exception when unique_violation then conflict_found:=true;
+ end;
+ if not conflict_found then raise exception 'conflicting request ID accepted'; end if;
+ begin
+   perform public.lizhi_cad_site_enqueue(owner,session,'rectang',
+    '{"p1":[0,0],"p2":[800,900]}'::jsonb,gen_random_uuid());
+ exception when raise_exception then refused:=true;
+ end;
+ if not refused then raise exception 'rate cap bypassed'; end if;
+end $;
+
 -- Other credentials cannot spoof service_role by only being signed into Site.
 set request.jwt.claim.role='authenticated';
 do $$

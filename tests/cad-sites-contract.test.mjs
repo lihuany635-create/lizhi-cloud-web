@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {CAD_SITE_TOOLS,validateCadSiteTool,SITE_CAD_ENDPOINT} from "../cad/sites/cad-site-contract.mjs";
 import {handleCadSiteTool} from "../sites-migration/cad/site-tools.mjs";
+import {readBoundedBody} from "../supabase/functions/lizhi-cad-site-mcp/bounded-body.mjs";
 const owner={signedIn:true,verifiedUserEmail:"owner@example.test"};
 const secrets={ownerEmail:"owner@example.test",siteMcpToken:"a".repeat(64)};
 const sid="11111111-1111-4111-8111-111111111111";
@@ -53,4 +54,12 @@ test("job completion verified separately",async()=>{
 test("unknown upstream result never retries a mutation",async()=>{
  let n=0;const r=await handleCadSiteTool("cad_draw_rectangle",rectangle,owner,secrets,async()=>{n++;throw Error("lost")});
  assert.equal(r.isError,true);assert.equal(n,1);assert.match(r.content[0].text,/DO_NOT_RETRY/);
+});
+
+test("edge request guard enforces UTF-8 byte limit with or without header",async()=>{
+ const make=(body,headers={})=>new Request("https://cad.invalid/mcp",{method:"POST",headers,body});
+ assert.equal(await readBoundedBody(make('{"ping":true}')),'{"ping":true}');
+ await assert.rejects(readBoundedBody(make("字".repeat(6000))),/BODY_TOO_LARGE/);
+ await assert.rejects(readBoundedBody(make("{}",{"content-length":"16385"})),/BODY_TOO_LARGE/);
+ await assert.rejects(readBoundedBody(make("{}",{"content-length":"not-a-number"})),/BODY_TOO_LARGE/);
 });

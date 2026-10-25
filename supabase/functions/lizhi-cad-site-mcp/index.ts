@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "npm:@supabase/supabase-js@2.75.0";
 import {CAD_SITE_TOOLS,validateCadSiteTool} from "./cad-site-contract.mjs";
+import {readBoundedBody} from "./bounded-body.mjs";
 
 // Dedicated Sites *UPSTREAM* endpoint, not ChatGPT OAuth and not a public CAD
 // workstation. A private ChatGPT Site verifies its own owner BEFORE forwarding
@@ -36,14 +37,15 @@ Deno.serve(async(req:Request)=>{
   const bearer=req.headers.get("authorization")||"";
   if(!bearer.startsWith("Bearer ")||!await eq(bearer.slice(7),secret))
     return json({error:"SITE_OWNER_CREDENTIAL_REQUIRED"},401);
-  if(Number(req.headers.get("content-length")||"0")>16384)return json({error:"TOO_LARGE"},413);
   let p:Record<string,unknown>;
   try{
-    const raw=await req.text();
-    if(raw.length>16384)throw new Error("BODY_TOO_LARGE");
+    const raw=await readBoundedBody(req);
     p=JSON.parse(raw);
     if(!p||typeof p!=="object"||Array.isArray(p))throw new Error("INVALID_BODY");
-  }catch{return rpcError(null,-32700,"Malformed bounded JSON");}
+  }catch(e){
+    if(e instanceof Error&&e.message==="BODY_TOO_LARGE")return json({error:"TOO_LARGE"},413);
+    return rpcError(null,-32700,"Malformed bounded JSON");
+  }
   const id=typeof p.id==="string"||typeof p.id==="number"?p.id:null;
   if(p.jsonrpc!=="2.0"||typeof p.method!=="string")return rpcError(id,-32600,"Invalid Request");
   if(p.method==="notifications/initialized"||id===null)return new Response(null,{status:202,headers});

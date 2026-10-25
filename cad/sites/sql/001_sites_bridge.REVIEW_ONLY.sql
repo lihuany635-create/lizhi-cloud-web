@@ -42,6 +42,17 @@ begin
       and s.expires_at>statement_timestamp()
       and s.last_seen>statement_timestamp()-interval '30 seconds';
   if not found then raise exception 'CAD not connected or local user approval expired' using errcode='42501'; end if;
+  -- Reusing a request_id is a read of the existing receipt, not a new write.
+  -- Resolve idempotency before throttling; otherwise the 20th command makes
+  -- its own status-confirmation retry appear to fail spuriously.
+  select c.id into job_id from lizhi_private.lizhi_cad_commands c
+    where c.user_id=p_owner and c.idempotency_key=p_request_id
+      and c.session_id=p_session and c.command=p_command and c.params=p_params;
+  if job_id is not null then return job_id; end if;
+  if exists (select 1 from lizhi_private.lizhi_cad_commands c
+      where c.user_id=p_owner and c.idempotency_key=p_request_id) then
+    raise exception 'CAD request ID already used for other parameters' using errcode='23505';
+  end if;
   if (select count(*) from lizhi_private.lizhi_cad_commands c
       where c.user_id=p_owner and c.created_at>statement_timestamp()-interval '60 seconds')>=20 then
     raise exception 'CAD command rate limited' using errcode='P0001';
