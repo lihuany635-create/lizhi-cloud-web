@@ -8,6 +8,8 @@ on:
       - 'sites-migration/cad/**'
       - 'supabase/functions/lizhi-cad-site-mcp/**'
       - 'tests/cad-sites-*'
+      - 'tests/cad-entity-local-bridge.test.mjs'
+      - 'cad/cad-host.js'
       - '.github/workflows/cad-sites-bridge-qa.yml'
   workflow_dispatch:
 permissions:
@@ -22,6 +24,8 @@ jobs:
           node-version: '24'
       - name: Verify Sites owner-only MCP and bounded geometry tools
         run: node --test tests/cad-sites-contract.test.mjs
+      - name: Verify local native read access stays explicitly bounded
+        run: node --test tests/cad-entity-local-bridge.test.mjs
       - name: Validate server-bearer Edge routing configuration
         run: |
           python3 - <<'PY'
