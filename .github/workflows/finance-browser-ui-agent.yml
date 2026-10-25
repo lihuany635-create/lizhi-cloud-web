@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - "finance/remote/finance-browser-ui-agent.js"
+      - "finance/remote/finance-browser-relay.js"
       - "tests/finance-browser-ui-agent.test.mjs"
       - ".github/workflows/finance-browser-ui-agent.yml"
   pull_request:
@@ -21,4 +22,5 @@ jobs:
         with:
           node-version: "22"
       - run: node --check finance/remote/finance-browser-ui-agent.js
+      - run: node --check finance/remote/finance-browser-relay.js
       - run: node --test tests/finance-browser-ui-agent.test.mjs
