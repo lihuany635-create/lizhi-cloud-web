@@ -19,13 +19,13 @@ test("unverified or different owner cannot enumerate any CAD tools",async()=>{
  assert.equal((await handle(call(message("tools/call",{name:"cad_status"})),null,secrets,fetcher)).status,401);
  assert.equal(invoked,0);
 });
-test("authenticated owner sees exactly the intended six tools",async()=>{
+test("authenticated owner sees exactly the intended eight tools",async()=>{
  const r=await handle(call(message("tools/list")),owner,secrets);
  assert.equal(r.status,200);
  const b=await r.json();
- assert.equal(b.result.tools.length,6);
+ assert.equal(b.result.tools.length,8);
  assert.deepEqual(b.result.tools.map(x=>x.name).sort(),
-  ["cad_status","cad_draw_rectangle","cad_draw_line","cad_draw_circle","cad_new_drawing","cad_job_status"].sort());
+  ["cad_status","cad_draw_rectangle","cad_draw_line","cad_draw_circle","cad_new_drawing","cad_job_status","cad_inspect_drawing","cad_list_entities"].sort());
  assert.equal(r.headers.get("cache-control"),"no-store, private");
 });
 test("tool invocation is owner checked and forwards one bounded job",async()=>{

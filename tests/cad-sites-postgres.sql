@@ -22,6 +22,7 @@ create function public.lizhi_web_is_allowed() returns boolean language sql stabl
 $$;
 \i supabase/migrations/20261025023119_lizhi_cad_mcp_secure_relay_v1.sql
 \i cad/sites/sql/001_sites_bridge.REVIEW_ONLY.sql
+\i cad/sites/sql/002_entity_read_queue.REVIEW_ONLY.sql
 
 -- Anonymous and regular authenticated clients cannot invoke Sites-only RPCs.
 do $$
@@ -155,4 +156,72 @@ begin
  end if;
 end $$;
 reset role;
+-- Strictly isolated read-job queue acceptance and native browser claim.
+-- Existing rate-limit test has filled this disposable job table; clear only
+-- disposable queued CI rows so the new read test can verify its own work.
+delete from lizhi_private.lizhi_cad_commands where state='queued';
+set role service_role;
+set request.jwt.claim.role='service_role';
+do $entity$
+declare
+ owner uuid:='11111111-1111-4111-8111-111111111111';
+ session uuid:='33333333-3333-4333-8333-333333333333';
+ job uuid;
+begin
+ if has_function_privilege('anon','public.lizhi_cad_site_enqueue_read(uuid,uuid,text,jsonb,uuid)','EXECUTE') then
+  raise exception 'anon can enqueue CAD entity reads';
+ end if;
+ if has_function_privilege('authenticated','public.lizhi_cad_site_enqueue_read(uuid,uuid,text,jsonb,uuid)','EXECUTE') then
+  raise exception 'regular authenticated can enqueue CAD entity reads';
+ end if;
+ begin
+  perform public.lizhi_cad_site_enqueue_read(owner,session,'lizhi.entities',
+    '{"limit":1000}'::jsonb,gen_random_uuid());
+  raise exception 'oversized entity query accepted';
+ exception when invalid_parameter_value then null;
+ end;
+ begin
+  perform public.lizhi_cad_site_enqueue_read(owner,session,'lizhi.entities',
+    '{"path":"local.dxf"}'::jsonb,gen_random_uuid());
+  raise exception 'path filter was accepted';
+ exception when invalid_parameter_value then null;
+ end;
+ job:=public.lizhi_cad_site_enqueue_read(owner,session,'lizhi.entities',
+   '{"type":"Line","limit":8,"offset":0}'::jsonb,'88888888-8888-4888-8888-888888888888');
+ if job is distinct from public.lizhi_cad_site_enqueue_read(owner,session,'lizhi.entities',
+   '{"type":"Line","limit":8,"offset":0}'::jsonb,'88888888-8888-4888-8888-888888888888') then
+   raise exception 'read job idempotency violated';
+ end if;
+end $entity$;
+reset role;
+set role authenticated;
+set request.jwt.claim.role='authenticated';
+set request.jwt.claim.sub='11111111-1111-4111-8111-111111111111';
+set request.jwt.claim.allowed='true';
+do $entity$
+declare job jsonb;
+begin
+ job:=public.lizhi_cad_claim_next('33333333-3333-4333-8333-333333333333');
+ if job->>'command'<>'lizhi.entities' then
+   raise exception 'native browser cannot claim read work';
+ end if;
+ if not public.lizhi_cad_finish('33333333-3333-4333-8333-333333333333',
+  (job->>'id')::uuid,true,
+  '{"revision":1,"count":1,"offset":0,"entities":[{"handle":"1A","type":"Line"}]}'::jsonb,null)
+ then raise exception 'native read work finish failed'; end if;
+end $entity$;
+reset role;
+set role service_role;
+set request.jwt.claim.role='service_role';
+do $entity$
+declare rec jsonb;
+begin
+ rec:=public.lizhi_cad_site_job('11111111-1111-4111-8111-111111111111',
+     (select id from lizhi_private.lizhi_cad_commands where idempotency_key='88888888-8888-4888-8888-888888888888'));
+ if rec->>'state'<>'succeeded' or rec->'result'->>'count'<>'1' then
+  raise exception 'read result receipt missing';
+ end if;
+end $entity$;
+reset role;
+
 select 'CAD_SITES_POSTGRES_ISOLATION_AND_COMMAND_PASS' as result;

@@ -10,7 +10,7 @@ const request_id="22222222-2222-4222-8222-222222222222";
 const job_id="33333333-3333-4333-8333-333333333333";
 const rectangle={session_id:sid,request_id,p1:[0,0],p2:[800,900]};
 test("tool schemas and geometry restrictions",()=>{
- assert.equal(CAD_SITE_TOOLS.length,6);
+ assert.equal(CAD_SITE_TOOLS.length,8);
  assert.equal(validateCadSiteTool("cad_draw_rectangle",rectangle).ok,true);
  assert.equal(validateCadSiteTool("cad_draw_rectangle",{...rectangle,p2:[Infinity,900]}).ok,false);
  assert.equal(validateCadSiteTool("cad_draw_circle",{session_id:sid,request_id,center:[0,0],radius:-1}).ok,false);
@@ -28,7 +28,7 @@ function mockedServer(value,onCall=()=>{}){
  return async(url,options)=>{
   assert.equal(url,SITE_CAD_ENDPOINT);
   assert.equal(options.method,"POST");
-  assert.equal(options.redirect,"error");
+  assert.equal(options.redirect,"manual");
   assert.equal(options.headers.Authorization,"Bearer "+secrets.siteMcpToken);
   const p=JSON.parse(options.body);onCall(p);
   return Response.json({jsonrpc:"2.0",id:p.id,result:{isError:false,content:[{type:"text",text:JSON.stringify(value)}]}});
@@ -73,4 +73,29 @@ test("CAD browser relay UI must use the private Site MCP entry, not obsolete Plu
  assert.ok(host.includes("私人「立之 CAD 指令代理」Site"));
  assert.ok(host.includes("六個 MCP 工具已載入"));
  assert.equal(host.includes("Plugin 完成 OAuth 授權"),false);
+});
+
+test("native entity tools reject arbitrary paths, unbounded offsets and unknown fields",()=>{
+ const base={session_id:sid,request_id};
+ assert.deepEqual(validateCadSiteTool("cad_inspect_drawing",base).params,{});
+ assert.equal(validateCadSiteTool("cad_inspect_drawing",{...base,filename:"Drawing1.dxf"}).ok,false);
+ const valid=validateCadSiteTool("cad_list_entities",{...base,type:"Line",offset:0});
+ assert.equal(valid.ok,true);assert.equal(valid.command,"lizhi.entities");assert.equal(valid.params.limit,8);
+ for(const filter of [{limit:999},{offset:10001},{path:"/etc/passwd"},{selected:"yes"},{type:6},{limit:-1}]){
+  assert.equal(validateCadSiteTool("cad_list_entities",{...base,...filter}).ok,false);
+ }
+});
+test("read-only native geometry result is projected into cad_job_status",async()=>{
+ const result={revision:1,count:1,returned:1,offset:0,entities:[{
+  handle:"1A",type:"Line",layer:"0",geometry:{Line:{start:[0,0],end:[800,0]}},
+  path:"/private/never-send.dxf",xdata:"secret"
+ }]};
+ const mock=mockedServer({ok:true,job:{job_id,state:"succeeded",result,error:null}});
+ const r=await handleCadSiteTool("cad_job_status",{job_id},owner,secrets,mock);
+ assert.equal(r.isError,false);
+ const obj=JSON.parse(r.content[0].text);
+ assert.equal(obj.state,"succeeded");
+ assert.equal(obj.readResult.entities[0].handle,"1A");
+ assert.ok(!JSON.stringify(obj).includes("/private"));
+ assert.ok(!JSON.stringify(obj).includes("secret"));
 });
