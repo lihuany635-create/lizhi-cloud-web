@@ -1,7 +1,7 @@
 name: LiZhi CAD Sites Bridge Candidate (no deployment)
 on:
   push:
-    branches: [feature/cad-sites-bridge-v1]
+    branches: [feature/cad-sites-bridge-v1, feature/cad-entity-inspect-v1]
     paths:
       - 'supabase/config.toml'
       - 'cad/sites/**'

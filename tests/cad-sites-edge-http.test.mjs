@@ -16,9 +16,9 @@ test("actual Edge HTTP rejects anonymous, bad Site secret and browser Origin",as
  const allowed=await call({bearer:token});
  assert.equal(allowed.status,200);
  const envelope=await allowed.json();
- assert.equal(envelope.result.tools.length,6);
+ assert.equal(envelope.result.tools.length,8);
  assert.deepEqual(envelope.result.tools.map(x=>x.name).sort(),
-   ["cad_status","cad_draw_rectangle","cad_draw_line","cad_draw_circle","cad_new_drawing","cad_job_status"].sort());
+   ["cad_status","cad_draw_rectangle","cad_draw_line","cad_draw_circle","cad_new_drawing","cad_job_status","cad_inspect_drawing","cad_list_entities"].sort());
 });
 test("actual Edge HTTP rejects oversized authenticated payload by bytes",async()=>{
  const body=JSON.stringify({...rpc,padding:"字".repeat(6000)});

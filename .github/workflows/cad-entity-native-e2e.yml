@@ -1,0 +1,63 @@
+name: LiZhi CAD Native Entity Read and Guarded Move Browser QA (no deployment)
+on:
+  push:
+    branches: [feature/cad-entity-inspect-v1]
+    paths:
+      - 'cad/build-runtime.sh'
+      - 'cad/cad-host.js'
+      - 'tests/cad-entity-native-e2e.cjs'
+      - '.github/workflows/cad-entity-native-e2e.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-native-entity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUSTFLAGS: '-C debuginfo=0'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Rust and authenticated Trunk toolchain
+        run: bash cad/setup-build-toolchain.sh
+      - name: Build candidate real native CADCraft WebAssembly (never deploy)
+        run: bash cad/build-runtime.sh
+      - name: Check source provenance and local-only nature
+        run: |
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('cad/runtime')
+          m=json.loads((p/'build-source.json').read_text())
+          assert m['sourceSha']=='cb256cf8a383c422482e8a455e3013887fa39a74'
+          assert m['remoteCadWorker'] is False
+          assert list(p.glob('*.wasm')) and list(p.glob('*.js'))
+          PY
+      - name: Install real Chromium and Playwright
+        run: |
+          npm install --prefix tests/cad-browser-deps --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          tests/cad-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+      - name: Run actual embedded CAD entity inspect, move and stale revision rejection
+        env:
+          NODE_PATH: ${{ github.workspace }}/tests/cad-browser-deps/node_modules
+          CAD_TEST_ORIGIN: http://127.0.0.1:8771
+          CAD_BROWSER_EVIDENCE: cad-entity-browser-evidence
+        run: |
+          set -euo pipefail
+          node --check tests/cad-entity-native-e2e.cjs
+          python3 -m http.server 8771 --bind 127.0.0.1 --directory . >/tmp/cad-entity-http.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8771/index.html >/dev/null; then break; fi
+            sleep 1
+          done
+          node tests/cad-entity-native-e2e.cjs
+      - name: Preserve isolated browser screenshot and geometry assertions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lizhi-cad-native-entity-e2e
+          path: cad-entity-browser-evidence/
+          retention-days: 14
