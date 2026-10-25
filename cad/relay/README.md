@@ -1,6 +1,6 @@
 # 立之 CAD × 一般 ChatGPT｜MCP 安全中繼交接（隔離候選版）
 
-**狀態：尚未部署；未接入此 ChatGPT 對話。** 此分支基於 `feature/cad-command-port-v1`。它不是新增 CAD 運算伺服器，也不讓 AI 取得 Windows 路徑或原圖。CADCraft Rust/WASM 仍在瀏覽器內執行。
+**狀態（2026-10-25）：Supabase 指令中繼已上線；正式網站本分支尚未發布；ChatGPT 私人 Plugin 已建立但尚未完成 OAuth 連線。** 此分支基於 `feature/cad-command-port-v1`。它不是新增 CAD 運算伺服器，也不讓 AI 取得 Windows 路徑或原圖。CADCraft Rust/WASM 仍在瀏覽器內執行。
 
 ## 完成程式
 
@@ -18,12 +18,16 @@
 4. 同一請求 ID 只入列一次，不因網路逾時自行重建第二次畫圖命令；須先 `get_command_result` 查原工作。
 5. 受理 `queued` 不等於已畫、`claimed` 不等於已存；同一工作有執行結果，存 DXF 仍依靠本機 CAD 內的動作及磁碟 SHA-256 驗證。
 
-## 發布阻礙與接續順序
+## 部署結果與剩餘連線障礙
 
-- **資料庫**：先以 Supabase CLI `supabase migration new lizhi_cad_mcp_relay` 正式生成 migration 檔，再把通過安全審查的 `schema-review.sql` 搬入；獨立 PostgreSQL/RLS 測試通過後才能套用正式專案。禁止 `db push` 重跑現有 001～006，也不得改 Finance/Engineering 表。
-- **Edge Function**：在授權資料表啟用後，部署 `lizhi-cad-mcp`；`verify_jwt=false` 只容許 OAuth discovery，middleware 仍須驗證 Bearer JWT，並且必須實際跑 unauthenticated 401、跨帳號 403、同帳號工具清單／入列／撤權／超時。
-- **網站**：測試實際 Chrome／Android 目錄授權以及目前 AI 開關後，才將本分支合併到已部署主站。站點關閉或裝置離線時，**無 CAD 引擎可接指令**；用戶先前要求不新增雲端繪圖主機，因此此限制為設計刻意保留。
-- **ChatGPT App/MCP**：使用者需在 ChatGPT 的 Plugins / Apps 連接 OAuth MCP URL `https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-cad-mcp`（此網址目前**未部署，不能連**）；先讀取 `status` 確認登入與目前允許中的 CAD session，再畫圖並查原 job。是否可建立與呼叫 write 類工具取決於當下 ChatGPT 帳號／工作區授權，要以實際可見 MCP 清單為準，不能保證。
+- **已套用正式 Supabase migration**：版本 `20261025023119`，名稱 `lizhi_cad_mcp_secure_relay_v1`。GitHub 原始碼為 `supabase/migrations/20261025023119_lizhi_cad_mcp_secure_relay_v1.sql`。只新增 `lizhi_private.lizhi_cad_sessions` 與 `lizhi_private.lizhi_cad_commands` 和 8 個 CAD 專用 RPC；未更動 Finance/Engineering 等舊資料表。
+- **已部署**：`lizhi-cad-mcp` Edge Function v1 ACTIVE、`verify_jwt=false` 僅為 OAuth discovery，`withSupabase({auth:'user'})` 必須驗證 Bearer；未授權 `tools/list` 實際 **HTTP 401**，OAuth protected resource **HTTP 200**，證據 GitHub Actions 40154885550。
+- **隔離測試通過**：PostgreSQL16 RLS、owner isolation、重複命令、撤權與 Deno 型別 GitHub Actions 40154623586；真 Chromium CAD WASM＋模擬 OAuth RPC 40155024156；完整 Finance／Engineering／Library 對比 40155042637；原生 CAD command DXF 800x900 尺寸 40153797800。
+- **私人 ChatGPT Plugin 已建立**：`https://chatgpt.com/plugins/plugins_6add6b97056481918c458b7898fcc9c5`（需要使用者明確安裝／OAuth 連線）。不會自動替使用者同意 OAuth。
+- **現有阻礙**：正式 Supabase Auth OAuth 2.1 discovery 尚未提供 `registration_endpoint`（[40155305041](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40155305041) FAIL，非假測試）。私人 Plugin 使用 `client.mode=dcr`，必須由有權限的人在 **Supabase Dashboard → Authentication → OAuth Server → Enable dynamic client registration** 開啟。GitHub `supabase/config.toml` 已設定本機 `allow_dynamic_registration=true`，**不代表遠端正式設定也生效**。
+- **尚待驗收**：正式立之雲端庫網頁發布本分支與真 Windows/Android File System Access picker，OAuth 有效使用者從 ChatGPT 授權後 `status` → `draw_rectangle` → `get_command_result` E2E。使用者的 CAD 分頁必須開啟並手動按兩個允許按鈕；頁面關閉或設備離線時沒有 CAD 運算主機。
+
+**絕不可因 Database／Edge／Plugin 都存在，就宣稱一般 ChatGPT 對話已經能操作 CAD。工具必須在新對話中真正載入且以有效 OAuth token 端到端驗收才算 PASS。**
 
 ## 驗收狀態
 
@@ -33,7 +37,7 @@
 | AI 自動畫出的 DXF 800×900 座標驗證 | PASS（GitHub Actions 40153797800） |
 | 本瀏覽器 Supabase RPC 模擬端到端 | CI 待確認 |
 | 真實 PostgreSQL RLS／跨帳號測試 | 未執行 |
-| Supabase 產品資料庫 schema/Edge deployment | 未執行 |
-| ChatGPT 一般對話直接操作工具 | 未接通 |
+| Supabase 產品資料庫 schema/Edge deployment | 已上線，schema 與 Edge v1 驗證存在 |
+| ChatGPT 一般對話直接操作工具 | 私人 Plugin 已建立，OAuth DCR 設定尚未完成，未接通 |
 
 **請勿將此分支、SQL 草稿或測試結果標為正式完成。**
