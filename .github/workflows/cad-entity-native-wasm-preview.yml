@@ -5,6 +5,9 @@ on:
     paths:
       - 'tests/cad-entity-native-browser-e2e.cjs'
       - 'tests/cad-embedded.test.cjs'
+      - 'tests/cad-browser-e2e.cjs'
+      - 'tests/cad-opfs-persistence-e2e.cjs'
+      - 'tests/cad-mobile-e2e.cjs'
       - 'cad/cad-host.js'
       - 'cad/build-runtime.sh'
       - '.github/workflows/cad-entity-native-wasm-preview.yml'
@@ -108,5 +111,55 @@ jobs:
         with:
           name: lizhi-cad-entity-read-real-wasm-evidence
           path: cad-entity-preview-evidence/
+          retention-days: 14
+          if-no-files-found: warn
+
+  legacy-cad-regression:
+    needs: build-native-wasm
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: lizhi-cad-entity-wasm-preview-candidate
+          path: cad/runtime
+      - name: Verify preview is source-pinned native WASM, not mock CAD
+        run: |
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path("cad/runtime")
+          meta=json.loads((p/"build-source.json").read_text())
+          assert meta["sourceSha"]=="cb256cf8a383c422482e8a455e3013887fa39a74"
+          assert meta["deployed"] is False and meta["remoteCadWorker"] is False
+          assert list(p.glob("*.wasm")) and list(p.glob("*.js"))
+          PY
+      - name: Install pinned Chromium Playwright for legacy portal regressions
+        run: |
+          npm install --prefix tests/cad-browser-deps --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          tests/cad-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+      - name: Validate original DXF save, OPFS offline recovery and mobile layout with new native WASM
+        env:
+          NODE_PATH: ${{ github.workspace }}/tests/cad-browser-deps/node_modules
+          CAD_TEST_ORIGIN: http://127.0.0.1:8771
+          CAD_BROWSER_EVIDENCE: cad-legacy-preview-evidence
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8771 --bind 127.0.0.1 --directory . >/tmp/cad-legacy-preview-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8771/index.html >/dev/null; then break; fi
+            sleep 1
+          done
+          node tests/cad-browser-e2e.cjs
+          node tests/cad-opfs-persistence-e2e.cjs
+          node tests/cad-mobile-e2e.cjs
+      - name: Upload offline/DXF/mobile regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lizhi-cad-native-read-legacy-regression-evidence
+          path: cad-legacy-preview-evidence/
           retention-days: 14
           if-no-files-found: warn
