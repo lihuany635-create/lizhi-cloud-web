@@ -4,6 +4,7 @@ on:
     branches: [release/cad-native-read-v1]
     paths:
       - 'tests/cad-entity-native-browser-e2e.cjs'
+      - 'tests/cad-embedded.test.cjs'
       - 'cad/cad-host.js'
       - 'cad/build-runtime.sh'
       - '.github/workflows/cad-entity-native-wasm-preview.yml'
