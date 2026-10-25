@@ -21,3 +21,5 @@ Backend: `supabase/functions/lizhi-finance-mcp/index.ts`
 ## Tests
 
 `node --test tests/finance-mcp-contract.test.mjs` and `deno check --node-modules-dir=auto supabase/functions/lizhi-finance-mcp/index.ts`.
+
+Timestamp note: `latest_record_updated_at` is the most recent *record edit*, not proof that device sync succeeded; `snapshot_read_at` is the server query time.
