@@ -57,9 +57,9 @@ begin
   if p ? 'confirm' and jsonb_typeof(p->'confirm') <> 'boolean' then return false; end if;
   if p->>'action' in ('fill','select') then
     return p ? 'value' and jsonb_typeof(p->'value')='string' and
-      length(p->>'value')<=300 and not p ? 'confirm';
+      length(p->>'value')<=300 and not (p ? 'confirm');
   end if;
-  return not p ? 'value';
+  return not (p ? 'value');
 exception when others then return false;
 end; $$;
 
