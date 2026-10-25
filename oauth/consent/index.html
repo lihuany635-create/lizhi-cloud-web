@@ -27,7 +27,7 @@ footer{font-size:13px;color:#635645;margin-top:23px;line-height:1.7}
 <body>
 <main>
 <small>立之雲端庫 · 安全授權確認</small>
-<h1>讓 AI 存取手機代理？</h1>
+<h1>授權 ChatGPT App 存取立之服務？</h1>
 <p>你必須親自核對發出請求的應用程式。<b>沒有按下「確認授權」之前，不會核發這次授權碼。</b></p>
 <p id="notice" role="status" aria-live="polite">正在確認授權要求…</p>
 <section id="details" hidden>
@@ -37,7 +37,7 @@ footer{font-size:13px;color:#635645;margin-top:23px;line-height:1.7}
 <dt>要求範圍</dt><dd id="requested-scopes"></dd>
 <dt>目前帳號</dt><dd id="signed-in-user"></dd>
 </dl>
-<p><b>授權範圍提示：</b>目前手機 MCP 只預計支援狀態、UI 與畫面三個唯讀工具。OAuth 的身分 scope 不代表資料庫授權；實際存取仍由伺服器額外限制。</p>
+<p><b>操作權限提醒：</b>立之手機代理可能提供本人授權後的觸控，立之 CAD 可能提供新增或修改圖形。畫面顯示的 OAuth 身分範圍（例如 email）<b>不是唯讀承諾</b>。請確認上方應用程式及回呼網址是你預期連接的私人 Plugin，再按「確認授權」。手機觸控與 CAD 繪圖另外還需你在裝置／CAD 頁面開啟操作許可。</p>
 <div class="actions">
 <button type="button" id="approve" disabled>確認授權</button>
 <button type="button" id="deny" class="secondary" disabled>拒絕授權</button>
@@ -50,10 +50,10 @@ footer{font-size:13px;color:#635645;margin-top:23px;line-height:1.7}
 <a class="button secondary" href="../../">返回立之雲端庫</a>
 </div>
 </section>
-<footer>僅私人手機 A22 5G。不得存取受國軍 MDM 管理的裝置。請不要在授權畫面或對話中貼上任何金鑰。</footer>
+<footer>僅供本人控制的私人服務。手機代理不能越過裝置當下的觸控許可；CAD MCP 不能要求任意腳本、讀取本機路徑或上傳 DXF 原圖。未確認應用程式來源時請按「拒絕授權」，也不要貼出金鑰。</footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../../supabase-config.js?v=2"></script>
-<script src="./consent.js?v=1" defer></script>
+<script src="./consent.js?v=2" defer></script>
 </body>
 </html>
