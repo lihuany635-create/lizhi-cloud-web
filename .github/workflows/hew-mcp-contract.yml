@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: '24'
       - name: Node tool contract regression
-        run: node --test tests/hew-sites-contract.test.mjs tests/hew-model-edge-upstream.test.mjs tests/hew-site-edge-chain.test.mjs
+        run: node --test tests/hew-sites-contract.test.mjs tests/hew-model-edge-upstream.test.mjs tests/hew-site-edge-chain.test.mjs tests/hew-site-mcp-route.test.mjs
       - name: Syntax check
         run: |
           node --check hew/sites/model-site-contract.mjs
