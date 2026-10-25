@@ -366,7 +366,7 @@
         await window.LizhiCadRelay.connect();
         panel?.querySelector('[data-cad-action="remote-connect"]')?.setAttribute("hidden", "");
         panel?.querySelector('[data-cad-action="remote-disconnect"]')?.removeAttribute("hidden");
-        status("已建立本次登入者的 ChatGPT MCP CAD 指令中繼；請保持頁面開啟，可隨時斷開。");
+        status("已啟用本次 CAD 指令中繼。請在 ChatGPT 私人「立之 CAD」Plugin 完成 OAuth 授權；未授權前無法由對話操作。保持本頁開啟，可隨時斷開。");
       } catch (error) {
         status("ChatGPT MCP 未連線：" + String(error?.message || "登入／服務驗證失敗").slice(0,180), true);
       }
