@@ -40,3 +40,12 @@
 - 實際測試判定：無 AI 授權不能讀圖；限量讀取成功；兩次 read 之間 revision 不變；原始路徑、檔案、文字資料不得被意外回傳；無界 read / 任意路徑 / erase 拒絕；按 STOP 後再次讀圖必須拒絕。GitHub artifact `lizhi-cad-entity-read-real-wasm-evidence` 留存 JSON 與 Chromium 畫面。
 - 這項成功代表**瀏覽器本機 CAD 原生讀圖功能真實可執行**；它不是正式 ChatGPT MCP 7–9 工具的 E2E。後者仍須同一新版 WASM、正式 SQL、Edge Feature Gate、Site MCP 授權與配置整條路徑發布後才能驗收。
 - 後續再修正候選 `cad/cad-host.js` 的人工同意對話，明確告知「限量讀取圖元」及移動需二次確認，測試檔 `tests/cad-entity-local-bridge.test.mjs` 加入回歸。維持使用者控制與 local-first。
+
+## 2026-10-25｜原生精確改線條（隔離 Chromium）驗收
+
+- 新增 `tests/cad-entity-native-move-e2e.cjs` 與 `.github/workflows/cad-entity-native-move-qa.yml`，**沿用上一個已通過源碼驗證的 WASM artifact**（同一固定原生 Rust SHA，不重新下載不明二進位）。
+- GitHub Actions [#40174310191](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40174310191)：`native-move-chromium` **SUCCESS**。
+- 測試具體順序：新公制圖面 → 原生畫直線 (0,0)–(800,900) → `lizhi.inspect/entities` 取 handle+revision → 以錯誤 revision 請求移動遭 `CAD_REVISION_CONFLICT` 拒絕且不改座標 → 人工確認按「取消」後 revision 不變 → 正確 revision 配合瀏覽器人工確認將直線向右移 100mm → 重新讀取線條座標是 (100,0)–(900,900)，同一 handle，revision 增加 → 使用舊 revision 再移動被拒絕、無重複修改。
+- 以 GitHub Actions artifact `lizhi-cad-native-move-chromium-evidence` 保存隔離測試畫面與 JSON；沒有修改使用者現有 `Drawing1` 或正式 DXF。
+- `cad/cad-host.js` 本地許可提示同步更正，**明確揭露會限量讀取圖面圖元幾何**及修改需二次確認。Node 同源宿主回歸 + Deno/PG16 CI [#40174036159](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40174036159)：4/4 PASS。
+- **能力界線**：只能確認候選新版 Native WASM 在隔離瀏覽器可精確改線；ChatGPT v3 Site 正式工具仍六個，沒有 `cad_move_entity` MCP API、正式 SQL 写入/工具曝光或正式改圖驗收。必須經過明確授權、API 安全審查及人工確認，才可接遠端編輯，且不可自行重新發送結果不明的移動指令。
