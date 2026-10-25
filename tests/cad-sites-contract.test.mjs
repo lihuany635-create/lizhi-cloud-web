@@ -59,6 +59,7 @@ test("unknown upstream result never retries a mutation",async()=>{
 test("edge request guard enforces UTF-8 byte limit with or without header",async()=>{
  const make=(body,headers={})=>new Request("https://cad.invalid/mcp",{method:"POST",headers,body});
  assert.equal(await readBoundedBody(make('{"ping":true}')),'{"ping":true}');
+ assert.equal(await readBoundedBody(make("{}",{"content-length":"2"})),"{}");
  await assert.rejects(readBoundedBody(make("字".repeat(6000))),/BODY_TOO_LARGE/);
  await assert.rejects(readBoundedBody(make("{}",{"content-length":"16385"})),/BODY_TOO_LARGE/);
  await assert.rejects(readBoundedBody(make("{}",{"content-length":"not-a-number"})),/BODY_TOO_LARGE/);

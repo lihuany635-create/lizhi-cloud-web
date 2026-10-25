@@ -2,7 +2,7 @@
 // The size guard is intentionally independent of Content-Length (which can be omitted).
 export async function readBoundedBody(request,maxBytes=16384){
   const header=request.headers.get("content-length");
-  if(header!==null&&(!/^\\d+$/.test(header)||Number(header)>maxBytes))
+  if(header!==null&&(!/^[0-9]+$/.test(header)||Number(header)>maxBytes))
     throw new Error("BODY_TOO_LARGE");
   if(!request.body)return "";
   const reader=request.body.getReader();
