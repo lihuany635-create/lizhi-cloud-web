@@ -217,7 +217,10 @@ do $entity$
 declare rec jsonb;
 begin
  rec:=public.lizhi_cad_site_job('11111111-1111-4111-8111-111111111111',
-     (select id from lizhi_private.lizhi_cad_commands where idempotency_key='88888888-8888-4888-8888-888888888888'));
+     public.lizhi_cad_site_enqueue_read('11111111-1111-4111-8111-111111111111',
+      '33333333-3333-4333-8333-333333333333','lizhi.entities',
+      '{"type":"Line","limit":8,"offset":0}'::jsonb,
+      '88888888-8888-4888-8888-888888888888'));
  if rec->>'state'<>'succeeded' or rec->'result'->>'count'<>'1' then
   raise exception 'read result receipt missing';
  end if;
