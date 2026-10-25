@@ -38,6 +38,7 @@ footer{font-size:13px;color:#635645;margin-top:23px;line-height:1.7}
 <dt>目前帳號</dt><dd id="signed-in-user"></dd>
 </dl>
 <p><b>操作權限提醒：</b>立之手機代理可能提供本人授權後的觸控，立之 CAD 可能提供新增或修改圖形。畫面顯示的 OAuth 身分範圍（例如 email）<b>不是唯讀承諾</b>。請確認上方應用程式及回呼網址是你預期連接的私人 Plugin，再按「確認授權」。手機觸控與 CAD 繪圖另外還需你在裝置／CAD 頁面開啟操作許可。</p>
+<label style="display:flex;gap:12px;align-items:flex-start;margin-top:15px;padding:15px;background:#fff0df;border:1px solid #dfbf9a;border-radius:12px"><input id="cad-write-consent" type="checkbox" style="margin-top:5px"><span><b>額外允許此 OAuth 應用程式控制立之 CAD 幾何圖形</b><span style="display:block;margin-top:5px;font-size:13px;line-height:1.65">不勾選則只有原本的 OAuth 身分授權，無法呼叫立之 CAD 畫圖。勾選後，此 App 可以在你另外打開 CAD 網頁且按下「允許 AI 操作」與「連線 ChatGPT MCP」期間，新增或修改圖形。此權限獨立於手機代理、圖書館與其他 App，請只在確認 App 名稱及回呼網址後勾選。</span></span></label>
 <div class="actions">
 <button type="button" id="approve" disabled>確認授權</button>
 <button type="button" id="deny" class="secondary" disabled>拒絕授權</button>
@@ -54,6 +55,6 @@ footer{font-size:13px;color:#635645;margin-top:23px;line-height:1.7}
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../../supabase-config.js?v=2"></script>
-<script src="./consent.js?v=2" defer></script>
+<script src="./consent.js?v=3" defer></script>
 </body>
 </html>
