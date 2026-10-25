@@ -20,3 +20,13 @@ v7 通用專案：在既有 portfolio 上新增 schemaVersion 2，保留原動�
 ## AI 員工守則（2026-10-25）
 
 所有處理本工作台資料的 ChatGPT、Claude、Codex、Gemini 或其他代理，接手前先閱讀 [AI 員工守則 v1.0](../docs/AI_EMPLOYEE_HANDBOOK_v1.0.md)（LIZHI-AI-RULES 1.0.0）。須按最新有效專案上下文、revision 和範圍證據回報；`queued`、`executed`、`saved`、`owner-approved` 分開。此處為文件入口，**並不代表現行 MCP 已自動注入規則或其他 AI 已閱讀**；相關自動載入與回條另列在共用工作台待辦。
+
+
+## 員工必知（App 訪談與 AI 工作守則）
+
+製作工作台首頁、專案頁與動畫／模型流程的返回列新增「員工必知」。它提供兩份共用文件的卡片、同源 Markdown 全文與原始文件連結：
+
+- [AI 員工守則 v1.0](../docs/AI_EMPLOYEE_HANDBOOK_v1.0.md)：任務接手、授權、驗證與交接。
+- [App 開發需求訪談規範與問題模板 v1.0](../docs/APP_REQUIREMENTS_INTERVIEW_v1.0.md)：開發前分輪提問、36 題標準模板與需求確認單。
+
+這兩份文件也已在「立之雲端庫｜專案工作台」的通用成果引用登記。網站正式發布時，由 Pages workflow 安裝 production/source 依賴、執行測試、編譯原生製作工作台並替換正式 Pages 成品；GitHub 原始碼更新不等於瀏覽器驗收完成。
