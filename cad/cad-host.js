@@ -427,6 +427,15 @@
       (!Object.hasOwn(params, "offset") || (Number.isInteger(params.offset) && params.offset >= 0 && params.offset <= 10000)) &&
       (!Object.hasOwn(params, "selected") || typeof params.selected === "boolean")
     );
+    if (name === "lizhi.move") return (
+      keys.length === 4 &&
+      keys.every(k => ["handles", "delta", "expectedRevision", "confirmed"].includes(k)) &&
+      Array.isArray(params.handles) && params.handles.length === 1 &&
+      typeof params.handles[0] === "string" && /^[0-9a-f]{1,16}$/i.test(params.handles[0]) &&
+      safePoint(params.delta) && params.delta.some(n => n !== 0) &&
+      Number.isSafeInteger(params.expectedRevision) && params.expectedRevision >= 0 &&
+      params.confirmed === true
+    );
     if (name === "new") return keys.every(k => k === "metric") && (params.metric === undefined || typeof params.metric === "boolean");
     if (name === "rectang") return keys.length === 2 && keys.includes("p1") && keys.includes("p2") && safePoint(params.p1) && safePoint(params.p2);
     if (name === "line") return keys.every(k => k === "points" || k === "closed") && Array.isArray(params.points) &&
@@ -459,6 +468,7 @@
     command(name, params) {
       if (!allowAiControl || !ready || !frame?.contentWindow) return Promise.reject(new Error("CAD AI 控制未啟用或繪圖引擎離線"));
       if (!validateCadCommand(name, params)) return Promise.reject(new Error("不支援此 CAD 幾何指令或座標"));
+      if (name === "lizhi.move" && !confirm("AI 要移動目前圖面的指定物件。已確認物件 handle 與圖面版本相符嗎？按取消將不修改圖面。")) return Promise.reject(new Error("使用者取消單一物件移動"));
       if (pendingCadCommands.size >= 16) return Promise.reject(new Error("CAD 命令佇列已滿"));
       const requestId = "cad-" + crypto.randomUUID();
       return new Promise((resolve, reject) => {
