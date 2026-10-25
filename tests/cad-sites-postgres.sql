@@ -86,7 +86,7 @@ end $$;
 
 -- At the rate cap, a duplicate request must still return the original job ID.
 -- A different command with the same request ID must still fail.
-do $
+do $cad$
 declare
  owner uuid:='11111111-1111-4111-8111-111111111111';
  session uuid:='33333333-3333-4333-8333-333333333333';
@@ -117,7 +117,7 @@ begin
  exception when raise_exception then refused:=true;
  end;
  if not refused then raise exception 'rate cap bypassed'; end if;
-end $;
+end $cad$;
 
 -- Other credentials cannot spoof service_role by only being signed into Site.
 set request.jwt.claim.role='authenticated';
