@@ -24,3 +24,8 @@ from auth.users where email = 'lihuany635@gmail.com';
 - `kind`：daily（排程）、manual（對話中手動）、command、fix …
 - `status`：ok / warning（有略過或部分失敗）/ error
 - `title` 一句話、`detail` 補充，都用繁體中文；沒做任何事（例如沒有新書）就不用寫。
+
+
+## 跨 AI 共通工作規則
+
+各類自動化工作紀錄依 [立之雲端庫 AI 員工守則 v1.0](../docs/AI_EMPLOYEE_HANDBOOK_v1.0.md) 統一表述：實際完成內容、驗證範圍、待確認／失敗、下一步及是否須使用者操作。現有 `lizhi_ai_runs` 只記錄執行事件，不代表其他 AI 已實際讀取守則或接受工作交接；未來已讀確認需獨立實作。
