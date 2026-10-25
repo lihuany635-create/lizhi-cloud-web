@@ -98,6 +98,27 @@ async function main(){
   const noRepeat=await page.evaluate(()=>window.LizhiCadHost.command("lizhi.entities",{type:"Line",limit:8}));
   assert.ok(Math.abs(noRepeat.entities[0].geometry.a.x-100)<1e-8,"stale move was silently replayed");
   proof.steps.push("Original revision cannot be reused to move the line twice");
+  // The real user's first CAD primitive is a rectangle (native LWPOLYLINE),
+  // not four separate LINE entities. Confirm its original four vertices remain inspectable.
+  const nativeRectangle=await page.evaluate(async()=>{
+   await window.LizhiCadHost.command("rectang",{p1:[0,0],p2:[800,900]});
+   return window.LizhiCadHost.command("lizhi.entities",{type:"Polyline",limit:8,offset:0});
+  });
+  assert.equal(nativeRectangle.count,1,"native rectangle must be one Polyline");
+  assert.equal(nativeRectangle.entities.length,1);
+  const rect=nativeRectangle.entities[0];
+  assert.match(rect.handle,/^[0-9a-f]{1,16}$/i);
+  assert.equal(rect.geometryAvailable,true,"native rectangle vertices must be visible");
+  assert.equal(rect.geometry.type,"lwPolyline");
+  assert.equal(rect.geometry.closed,true);
+  const vertices=rect.geometry.vertices.map(v=>[v.p.x,v.p.y]);
+  assert.equal(vertices.length,4,"expected four native polyline vertices");
+  assert.deepEqual(
+   vertices.slice().sort((x,y)=>x[0]-y[0]||x[1]-y[1]),
+   [[0,0],[0,900],[800,0],[800,900]]
+  );
+  proof.rectangle={handle:rect.handle,vertices};
+  proof.steps.push("Actual native 800x900 rectangle read as closed four-vertex Polyline");
   assert.ok(dialogs.some(x=>x.includes("移動")),"move not explicitly confirmed");
   await page.screenshot({path:path.join(evidence,"native-entity-line-moved.png")});
   proof.result={handle:result.handle,revisionBefore:revision,revisionAfter:moved.revisionAfter,

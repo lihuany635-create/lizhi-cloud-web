@@ -54,3 +54,22 @@ test("real CADCraft native serde geometry survives sanitization, unknown data do
  }]}});
  assert.equal(unsafe.data.entities[0].geometryAvailable,false);
 });
+
+test("CADCraft native closed rectangle polyline keeps four numeric vertices",()=>{
+ const vertices=[[0,0],[800,0],[800,900],[0,900]].map(([x,y])=>({
+  p:{x,y},bulge:0,start_width:0,end_width:0
+ }));
+ const entity={handle:"BC",type:"Polyline",layer:"0",geometry:{
+  type:"lwPolyline",vertices,closed:true,const_width:0,elevation:0,plinegen:false
+ }};
+ const out=projectEntityReadReceipt({job_id,kind:"lizhi.entities",state:"succeeded",
+  data:{revision:15,count:1,offset:0,entities:[entity]}});
+ assert.equal(out.ok,true);
+ assert.equal(out.data.entities[0].geometryAvailable,true);
+ assert.equal(out.data.entities[0].geometry.vertices.length,4);
+ assert.deepEqual(out.data.entities[0].geometry.vertices.map(x=>x.p),vertices.map(x=>x.p));
+ const bad=projectEntityReadReceipt({job_id,kind:"lizhi.entities",state:"succeeded",
+  data:{revision:15,count:1,entities:[{...entity,geometry:{
+   ...entity.geometry,vertices:[{...vertices[0],path:"/private/secret.dxf"}]}}]}});
+ assert.equal(bad.data.entities[0].geometryAvailable,false);
+});
