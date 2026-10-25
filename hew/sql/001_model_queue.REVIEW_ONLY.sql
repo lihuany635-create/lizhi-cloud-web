@@ -44,6 +44,9 @@ create table if not exists lizhi_model_private.jobs (
   constraint model_job_result_size check(result is null or octet_length(result::text)<=4096)
 );
 create index if not exists lizhi_model_jobs_claim on lizhi_model_private.jobs(session_id,state,created_at);
+-- Hard database invariant: never dispatch two competing edits to one model session.
+create unique index if not exists lizhi_model_one_active_claim_per_session
+ on lizhi_model_private.jobs(session_id) where state='claimed';
 alter table lizhi_model_private.jobs enable row level security;
 revoke all on lizhi_model_private.jobs from PUBLIC,anon,authenticated;
 
@@ -154,8 +157,14 @@ begin
  perform 1 from lizhi_model_private.sessions s
  where s.id=p_session and s.owner_uid=actor and s.enabled
    and s.last_seen>statement_timestamp()-interval '30 seconds'
-   and s.approved_until>statement_timestamp();
+   and s.approved_until>statement_timestamp()
+ for update of s;
  if not found then return null; end if;
+ -- Serialize all claims for the same session; a first claim must be ACKed
+ -- or manually reconciled before any later job may be picked.
+ if exists (select 1 from lizhi_model_private.jobs j
+   where j.session_id=p_session and j.owner_uid=actor and j.state='claimed')
+ then return null; end if;
  update lizhi_model_private.jobs
  set state='expired',completed_at=statement_timestamp()
  where session_id=p_session and owner_uid=actor and state='queued'
@@ -206,6 +215,12 @@ begin
  where j.id=p_job;
  if p_success then
   update lizhi_model_private.sessions s set revision=p_new_revision where s.id=p_session;
+  -- All pending commands refer to a now-stale revision; do not replay them.
+  update lizhi_model_private.jobs j
+  set state='cancelled',completed_at=statement_timestamp(),
+      error='MODEL_STALE_DOCUMENT_REVISION'
+  where j.session_id=p_session and j.owner_uid=actor
+    and j.state='queued';
  end if;
  return true;
 end $$;
