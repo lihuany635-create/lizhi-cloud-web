@@ -5,6 +5,7 @@ on:
       - "supabase/functions/lizhi-finance-site-mcp/**"
       - "finance/sites/**"
       - "tests/finance-site-mcp.test.mjs"
+      - "tests/finance-ui-site-contract.test.mjs"
       - ".github/workflows/finance-site-mcp-checks.yml"
   pull_request:
     paths:
@@ -28,4 +29,4 @@ jobs:
       - name: Check Sites Edge TypeScript
         run: deno check --node-modules-dir=auto supabase/functions/lizhi-finance-site-mcp/index.ts
       - name: Check Finance Sites security and accounting
-        run: node --test tests/finance-site-mcp.test.mjs
+        run: node --test tests/finance-site-mcp.test.mjs tests/finance-ui-site-contract.test.mjs

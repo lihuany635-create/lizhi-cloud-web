@@ -29,3 +29,43 @@ export function validateFinanceSiteTool(name,args) {
     return {ok:false,code:"FINANCE_INVALID_LIMIT"};
   return {ok:true,args:{limit:args.limit??10,...(args.month?{month:args.month}:{})}};
 }
+
+// General browser-hosted UI control. Not arbitrary JavaScript or SQL.
+// All commands only go to an explicitly enabled, short-lived first-party session.
+const uuid={type:"string",format:"uuid"};
+const uiref={type:"string",pattern:"^u[0-9]{1,3}$"};
+export const FINANCE_UI_SITE_TOOLS=Object.freeze([
+  {name:"finance_ui_sessions",description:"List browser Finance workspaces that explicitly enabled AI control. Read only; no remote browser without opt-in.",inputSchema:schema(),annotations:{readOnlyHint:true}},
+  {name:"finance_ui_inspect",description:"Queue a bounded snapshot of visible Finance UI controls; call finance_ui_job to retrieve the result. Does not return passwords or record payloads.",inputSchema:schema({session_id:uuid,request_id:uuid},["session_id","request_id"]),annotations:{readOnlyHint:true}},
+  {name:"finance_ui_action",description:"Queue one click/fill/select on the previously inspected Finance webpage. Any financial write/delete requires native owner confirmation in the open browser; do not assume queued means completed.",inputSchema:schema({session_id:uuid,request_id:uuid,revision:{type:"string"},ref:uiref,action:{type:"string",enum:["click","fill","select"]},value:{type:"string",maxLength:300},confirm:{type:"boolean"}},["session_id","request_id","revision","ref","action"]),annotations:{readOnlyHint:false,destructiveHint:true}},
+  {name:"finance_ui_job",description:"Read job receipt for a previously queued UI inspect/action. The receipt may report rejected, succeeded or expired; succeeded only means UI event dispatched, not ledger committed.",inputSchema:schema({job_id:uuid},["job_id"]),annotations:{readOnlyHint:true}}
+]);
+const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+export function validateFinanceUiTool(name,args) {
+  if(!FINANCE_UI_SITE_TOOLS.some(t=>t.name===name)||!obj(args))return {ok:false,code:"UNKNOWN_FINANCE_UI_TOOL"};
+  const keys=Object.keys(args);
+  const exact=(must,allowed=must)=>must.every(k=>Object.hasOwn(args,k))&&keys.every(k=>allowed.includes(k));
+  const isid=x=>typeof x==="string"&&UUID_RE.test(x);
+  if(name==="finance_ui_sessions")
+    return keys.length===0?{ok:true,args:{}}:{ok:false,code:"INVALID_UI_ARGS"};
+  if(name==="finance_ui_job")
+    return exact(["job_id"])&&isid(args.job_id)?{ok:true,args:{job_id:args.job_id}}:{ok:false,code:"INVALID_UI_JOB"};
+  if(!isid(args.session_id)||!isid(args.request_id))
+    return {ok:false,code:"INVALID_UI_SESSION_OR_REQUEST"};
+  if(name==="finance_ui_inspect")
+    return exact(["session_id","request_id"])?{ok:true,args:{session_id:args.session_id,request_id:args.request_id,operation:"inspect",params:{}}}:{ok:false,code:"INVALID_UI_ARGS"};
+  if(!exact(["session_id","request_id","revision","ref","action"],["session_id","request_id","revision","ref","action","value","confirm"]))
+    return {ok:false,code:"INVALID_UI_ARGS"};
+  if(typeof args.revision!=="string"||args.revision.length<1||args.revision.length>96||
+      typeof args.ref!=="string"||!/^u[0-9]{1,3}$/.test(args.ref)||
+      !["click","fill","select"].includes(args.action))
+    return {ok:false,code:"INVALID_UI_ACTION"};
+  if(args.action==="click"&&(Object.hasOwn(args,"value")||Object.hasOwn(args,"confirm")&&typeof args.confirm!=="boolean"))
+    return {ok:false,code:"INVALID_UI_ACTION"};
+  if(args.action!=="click"&&(typeof args.value!=="string"||args.value.length>300||Object.hasOwn(args,"confirm")))
+    return {ok:false,code:"INVALID_UI_FIELD"};
+  return {ok:true,args:{session_id:args.session_id,request_id:args.request_id,
+    operation:"interact",params:{revision:args.revision,ref:args.ref,action:args.action,
+      ...(args.action==="click"&&args.confirm===true?{confirm:true}:{}),
+      ...(args.action!=="click"?{value:args.value}:{})}}};
+}
