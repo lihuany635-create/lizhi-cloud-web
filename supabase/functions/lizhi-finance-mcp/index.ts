@@ -1,5 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.75.0";
+import { createClient } from "npm:@supabase/supabase-js@2.109.0";
 import { createMcpHandler, McpServer } from "npm:@modelcontextprotocol/server@2.3.1";
 import { pipeline } from "npm:@supabase/middleware@1.0.0";
 import { fromSupabaseUrl, withOAuthProtectedResource, withSupabase } from "npm:@supabase/server@1.9.2";
