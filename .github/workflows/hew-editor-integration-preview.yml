@@ -11,6 +11,8 @@ on:
       - 'workspace-ui.js'
       - 'index.html'
       - '.github/workflows/hew-editor-integration-preview.yml'
+      - '.github/workflows/pages.yml'
+      - 'tests/hew-portal-embed.test.mjs'
       - 'hew/sql/002_model_one_button_30min.sql'
 permissions:
   contents: read
