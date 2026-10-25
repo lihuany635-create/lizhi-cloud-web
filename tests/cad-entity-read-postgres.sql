@@ -72,7 +72,8 @@ begin
  then raise exception 'native bounded read finish failed'; end if;
 end $test$;
 reset role;
-set role service_role;
+-- The test harness must be postgres for direct private-table assertions;
+-- service_role itself has deliberately NO SELECT on lizhi_private.
 set request.jwt.claim.role='service_role';
 do $test$
 declare job jsonb;
