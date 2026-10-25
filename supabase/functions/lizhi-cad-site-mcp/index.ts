@@ -67,7 +67,7 @@ Deno.serve(async(req:Request)=>{
   // enabled on the server AFTER the corresponding native build and SQL migration.
   if(entityReadEnabled&&ENTITY_READ_TOOLS.some(t=>t.name===params.name)){
     const read=await executeEntityReadTool(db,owner,params.name,params.arguments??{});
-    if(!read.ok)return fail(id,read.code||"CAD_READ_UNAVAILABLE");
+    if(!read.ok)return fail(id,("code" in read && typeof read.code==="string")?read.code:"CAD_READ_UNAVAILABLE");
     return success(id,read);
   }
   const checked=validateCadSiteTool(params.name,params.arguments??{});
