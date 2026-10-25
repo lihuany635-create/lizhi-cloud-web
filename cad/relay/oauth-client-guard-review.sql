@@ -24,14 +24,14 @@ revoke all on function lizhi_private.lizhi_cad_client_allowed() from public,anon
 
 create or replace function public.lizhi_cad_grant_oauth_client(p_client uuid)
 returns boolean language plpgsql volatile security definer set search_path='' as $$
-declare user_id uuid:=auth.uid();
+declare caller_id uuid:=auth.uid();
 begin
-  if user_id is null or p_client is null or not public.lizhi_web_is_allowed()
+  if caller_id is null or p_client is null or not public.lizhi_web_is_allowed()
     or nullif(auth.jwt()->>'client_id','') is not null then
     raise exception 'First-party browser consent required' using errcode='42501';
   end if;
   insert into lizhi_private.lizhi_cad_authorized_oauth_clients(user_id,client_id)
-    values(user_id,p_client)
+    values(caller_id,p_client)
     on conflict(user_id,client_id) do update set approved_at=statement_timestamp();
   return true;
 end $$;
@@ -40,9 +40,9 @@ grant execute on function public.lizhi_cad_grant_oauth_client(uuid) to authentic
 
 create or replace function public.lizhi_cad_revoke_oauth_client(p_client uuid)
 returns boolean language plpgsql volatile security definer set search_path='' as $$
-declare user_id uuid:=auth.uid(); deleted integer;
+declare caller_id uuid:=auth.uid(); deleted integer;
 begin
-  if user_id is null or p_client is null or not public.lizhi_web_is_allowed()
+  if caller_id is null or p_client is null or not public.lizhi_web_is_allowed()
     or nullif(auth.jwt()->>'client_id','') is not null then
     raise exception 'First-party browser revocation required' using errcode='42501';
   end if;
