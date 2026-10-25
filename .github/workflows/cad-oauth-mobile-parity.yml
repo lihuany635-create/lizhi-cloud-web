@@ -27,7 +27,7 @@ jobs:
           --health-interval=5s --health-timeout=5s --health-retries=20
     steps:
       - uses: actions/checkout@v4
-      - name: Static scope gate: repair only three CAD OAuth RPCs
+      - name: 'Static scope gate: repair only three CAD OAuth RPCs'
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -38,7 +38,7 @@ jobs:
           assert s.lower().count('create or replace function')==3
           assert 'drop table' not in s.lower() and 'truncate ' not in s.lower()
           assert 'lizhi_cad_client_allowed()' in s
-          assert 'public.lizhi_web_is_allowed()' not in s.split('create or replace function')[1:]
+          assert all('public.lizhi_web_is_allowed()' not in function_sql for function_sql in s.split('create or replace function')[1:])
           print('CAD_SQL_LIMITED_THREE_RPC_GUARD_PASS')
           PY
       - name: Install PostgreSQL client
