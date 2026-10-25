@@ -9,6 +9,9 @@ on:
       - 'supabase/config.toml'
       - 'app.js'
       - 'index.html'
+      - 'auth.js'
+      - 'sw.js'
+      - 'tests/cad-opfs-persistence-e2e.cjs'
       - '.github/workflows/cad-mcp-relay-staging.yml'
   workflow_dispatch:
 permissions:
@@ -23,6 +26,8 @@ jobs:
       - name: Static syntax and principle checks
         run: |
           node --check cad/cad-host.js
+          node --check auth.js
+          node --test tests/cad-embedded.test.cjs
           node --check cad/cad-remote-relay.js
           node --check tests/cad-mcp-relay-mock-e2e.cjs
           python3 - <<'PY'
@@ -36,6 +41,8 @@ jobs:
           assert "create or replace function public.lizhi_cad_claim_next" in sql
           assert "lizhi_cad_command_valid" in sql
           assert "withSupabase({auth:\"user\"})" in edge
+          assert '\"a4\",\"licut\",\"cad\"' in Path('auth.js').read_text()
+          assert 'cad/cad-remote-relay.js?v=1' in Path('sw.js').read_text()
           assert "readOnlyHint:false" in edge
           assert "get_command_result" in edge
           assert not Path('supabase/migrations/20261025_lizhi_cad_mcp.sql').exists()
@@ -79,6 +86,7 @@ jobs:
             sleep 1
           done
           node tests/cad-command-port-e2e.cjs
+          node tests/cad-opfs-persistence-e2e.cjs
           node tests/cad-mcp-relay-mock-e2e.cjs
       - name: Retain offline QA report (no user files)
         if: always()
