@@ -23,6 +23,7 @@ insert into auth.users(id) values
  ('22222222-2222-4222-8222-222222222222')
 on conflict do nothing;
 \i hew/sql/001_model_queue.REVIEW_ONLY.sql
+\i hew/sql/002_model_one_button_30min.sql
 
 -- Least privilege / private schema inaccessible to client roles.
 do $$
@@ -49,6 +50,23 @@ begin
   '44444444-4444-4444-8444-444444444444','rev-1')
  then raise exception 'owner heartbeat failed';end if;
 end $$;
+
+-- Consent is 30 minutes, not renewable by heartbeat or browser polling.
+do $
+declare life interval; d text;
+begin
+ select approved_until-created_at into life
+ from lizhi_model_private.sessions
+ where id='33333333-3333-4333-8333-333333333333';
+ if life<interval '29 minutes' or life>interval '31 minutes'
+ then raise exception 'expected bounded 30-minute consent, found %',life; end if;
+ select pg_get_functiondef('public.lizhi_model_site_enqueue(uuid,uuid,uuid,uuid,text,text,jsonb)'::regprocedure) into d;
+ if position('5 minutes' in d)=0 then
+  raise exception 'site enqueue freshness was not relaxed for background polls';end if;
+ select pg_get_functiondef('public.lizhi_model_claim(uuid)'::regprocedure) into d;
+ if position('5 minutes' in d)=0 then
+  raise exception 'owner claim freshness was not relaxed';end if;
+end $;
 
 -- Another owner cannot adopt, heartbeat, claim or close the first owner's session.
 select set_config('request.jwt.claim.sub','22222222-2222-4222-8222-222222222222',false);
