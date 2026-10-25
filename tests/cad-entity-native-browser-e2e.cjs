@@ -65,6 +65,32 @@ async function main(){
    entityType:entity.type,geometryAvailable:entity.geometryAvailable};
   report.steps.push("Native WASM returned exact numeric line geometry, handle and revision");
   report.steps.push("Multiple inspect calls left drawing revision unchanged");
+  // A second actual CADCraft entity type must survive the same native read path.
+  // This verifies center/radius rather than relying only on schema mocks.
+  const circleRead=await page.evaluate(async()=>{
+   await window.LizhiCadHost.command("circle",{center:[120,250],radius:35});
+   const overview=await window.LizhiCadHost.command("lizhi.inspect",{});
+   const circles=await window.LizhiCadHost.command("lizhi.entities",{type:"Circle",limit:8,offset:0});
+   const again=await window.LizhiCadHost.command("lizhi.inspect",{});
+   return {overview,circles,again};
+  });
+  assert.equal(circleRead.overview.revision,circleRead.circles.revision);
+  assert.equal(circleRead.overview.revision,circleRead.again.revision);
+  assert.equal(circleRead.circles.count,1,"native circle filter must return one entity");
+  assert.equal(circleRead.circles.entities.length,1);
+  const circleEntity=circleRead.circles.entities[0];
+  assert.equal(circleEntity.type,"Circle");
+  assert.equal(circleEntity.geometryAvailable,true);
+  assert.equal(circleEntity.geometry.type,"circle");
+  close(circleEntity.geometry.center.x,120);
+  close(circleEntity.geometry.center.y,250);
+  close(circleEntity.geometry.radius,35);
+  assert.equal(Object.hasOwn(circleEntity,"path"),false);
+  assert.equal(Object.hasOwn(circleEntity,"text"),false);
+  report.circle={handle:circleEntity.handle,center:[circleEntity.geometry.center.x,
+    circleEntity.geometry.center.y],radius:circleEntity.geometry.radius};
+  report.steps.push("Native WASM returned exact numeric circle center and radius without changing revision during read");
+
   const block=await page.evaluate(async()=>{
    const bad=[["lizhi.entities",{limit:99}],["lizhi.entities",{path:"C:/private.dxf"}],["erase",{handles:["1"]}]];
    const status=[];
