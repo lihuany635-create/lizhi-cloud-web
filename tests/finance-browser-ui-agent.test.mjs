@@ -42,6 +42,8 @@ function mount({authenticated=true,confirm=false}={}) {
     document,Math,Date,setTimeout:()=>42,clearTimeout:()=>{},
     MutationObserver:class { observe(){} },
     Event:class {constructor(name,opts){this.name=name;this.bubbles=opts.bubbles}},
+    CustomEvent:class {constructor(name,opts){this.name=name;this.detail=opts.detail}},
+    dispatchEvent:()=>{},
     getComputedStyle:()=>({visibility:"visible",display:"block"}),
     LizhiAuth:{user:authenticated?{id:"owner"}:null,client:{}},
     crypto:{randomUUID:()=>"inspection-1"},
