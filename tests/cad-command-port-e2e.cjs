@@ -12,6 +12,10 @@ async function main(){
   const page=await context.newPage();
   const report={kind:"real-Rust-CADCraft-command-port-browser-e2e",remoteOAuth:false,requiresExplicitUserOptIn:true,steps:[]};
   page.on("dialog",d=>d.accept());
+  // Real Chromium Origin Private File System; replace ONLY the OS chooser UI.
+  await page.addInitScript(() => {
+    window.showDirectoryPicker=async()=>navigator.storage.getDirectory();
+  });
   try{
     const res=await page.goto(origin+"/?open=cad",{waitUntil:"domcontentloaded"});
     assert.equal(res.status(),200);
@@ -44,6 +48,44 @@ async function main(){
     assert.ok(result.session.enabled);
     report.result=result;
     report.steps.push("Same-origin request ID sends NEW and RECTANG into REAL Rust CAD engine");
+
+    // Verify the commands actually changed the native drawing geometry, not just returned OK.
+    await page.locator('[data-cad-action="folder"]').click();
+    await page.waitForFunction(()=>document.querySelector("#cad-status")?.textContent?.includes("已授權"),null,{timeout:15000});
+    const canvas=page.frameLocator("#cad-frame").locator("#cadcraft_canvas");
+    await canvas.click({position:{x:180,y:160}});
+    await page.keyboard.press("Control+s");
+    await page.waitForFunction(()=>document.querySelector("#cad-status")?.textContent?.includes("已驗證本機 DXF"),null,{timeout:30000});
+    const saved=await page.evaluate(async()=>{
+      const root=await navigator.storage.getDirectory();
+      const dir=await root.getDirectoryHandle("revisions");
+      for await(const [name,handle] of dir.entries()){
+        if(!name.endsWith(".dxf")) continue;
+        const file=await handle.getFile();
+        return {name,text:await file.text(),size:file.size};
+      }
+      return null;
+    });
+    assert.ok(saved && saved.size>500,"Real CAD command did not produce a saved DXF");
+    const pairs=saved.text.replace(/\r/g,"").split("\n");
+    const coords=[];let reading=false;let x=null;
+    for(let i=0;i<pairs.length-1;i+=2){
+      const k=pairs[i].trim(),v=pairs[i+1].trim();
+      if(k==="0"&&v==="LWPOLYLINE"){reading=true;continue;}
+      if(!reading)continue;
+      if(k==="0")break;
+      if(k==="10")x=Number(v);
+      if(k==="20"&&x!==null){coords.push([x,Number(v)]);x=null;}
+    }
+    assert.ok(coords.length>=4,"No native rectangle polyline vertices in command-generated DXF");
+    const xs=coords.map(p=>p[0]),ys=coords.map(p=>p[1]);
+    const extents={minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys)};
+    for(const [key,value] of Object.entries({minX:0,maxX:800,minY:0,maxY:900}))
+      assert.ok(Math.abs(extents[key]-value)<.0001,"Command rectangle DXF geometry mismatch "+JSON.stringify(extents));
+    report.savedGeometry=extents;
+    report.savedBytes=saved.size;
+    report.steps.push("AI RECTANG command persisted REAL 800x900mm DXF through native SHA-256 durable save ACK");
+
     const replay=await page.evaluate(async()=>{
       try{await window.LizhiCadHost.command("circle",{center:[0,0],radius:-1});return false;}
       catch(e){return /不支援/.test(String(e.message));}
