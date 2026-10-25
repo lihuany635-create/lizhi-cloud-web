@@ -55,7 +55,7 @@ test("unsigned and nonowner Site invocations never call upstream",async()=>{
 function mocked(reply,onCall=()=>{},code=200){
  return async(url,init)=>{
   assert.equal(url,MODEL_UPSTREAM);assert.equal(init.method,"POST");
-  assert.equal(init.redirect,"error");
+  assert.equal(init.redirect,"manual");
   assert.equal(init.headers.Authorization,"Bearer "+secrets.siteMcpToken);
   const req=JSON.parse(init.body);onCall(req);
   return Response.json({jsonrpc:"2.0",id:req.id,
@@ -96,4 +96,12 @@ test("bounded response and strict scene projection",async()=>{
  const big=await handleModelSiteTool("model_status",{},owner,secrets,
   async()=>new Response("x".repeat(33000),{status:200}));
  assert.equal(big.isError,true);assert.match(big.content[0].text,/DO_NOT_RETRY/);
+});
+
+test("upstream redirect 302 is rejected without following or sending twice",async()=>{
+ let count=0;
+ const res=await handleModelSiteTool("model_create_box",box,owner,secrets,
+  async()=>{count++;return new Response(null,{status:302,headers:{location:"https://untrusted.example"}})});
+ assert.equal(count,1);assert.equal(res.isError,true);
+ assert.match(res.content[0].text,/REDIRECT_REFUSED_DO_NOT_RETRY/);
 });
