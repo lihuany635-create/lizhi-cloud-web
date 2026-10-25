@@ -29,8 +29,6 @@ const error=(message:string)=>({
   isError:true,content:[{type:"text" as const,text:message}],
 });
 type ServiceResult=ReturnType<typeof json>|ReturnType<typeof error>;
-type ToolArgs=Record<string,unknown>;
-
 const app=pipeline(
   [
     withOAuthProtectedResource({
@@ -40,7 +38,7 @@ const app=pipeline(
     withSupabase({auth:"user"}),
   ],
   async(req,{supabase})=>{
-    const run=async<T extends ToolArgs>(fn:()=>Promise<{data:unknown,error:unknown}>,
+    const run=async(fn:()=>PromiseLike<{data:unknown,error:unknown}>,
       success:(data:unknown)=>ServiceResult):Promise<ServiceResult>=>{
       try{
         const {data,error:problem}=await fn();
