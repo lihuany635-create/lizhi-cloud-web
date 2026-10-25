@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 7
     steps:
-      - name: Check OAuth discovery and unauthenticated write rejection (no tokens, no data)
+      - name: Recheck live OAuth DCR registration and unauthenticated MCP denial after user enables Dynamic OAuth Apps
         run: |
           set -euo pipefail
           base="https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-cad-mcp"
