@@ -14,6 +14,8 @@
   let ready = false;
   let listening = false;
   let currentName = "Drawing.dxf";
+  let allowAiControl = false;
+  const pendingCadCommands = new Map();
 
   function status(message, error) {
     const element = panel?.querySelector("#cad-status");
@@ -252,6 +254,15 @@
     if (!frame || event.source !== frame.contentWindow || event.origin !== location.origin) return;
     const msg = event.data;
     if (!msg || typeof msg !== "object" || typeof msg.type !== "string") return;
+    if (msg.type === "cadcraft:command-result") {
+      const job = pendingCadCommands.get(msg.requestId);
+      if (!job) return;
+      pendingCadCommands.delete(msg.requestId);
+      clearTimeout(job.timer);
+      if (msg.ok === true) job.resolve(msg.result ?? null);
+      else job.reject(new Error(String(msg.error || "CAD 命令失敗").slice(0, 300)));
+      return;
+    }
     if (msg.type === "cadcraft:ready") {
       ready = true;
       status("CADCraft 繪圖引擎已就緒。可使用 CAD 內「新建」或開啟 DXF；本機繪圖不經過遠端伺服器。");
@@ -338,6 +349,33 @@
     else if (action === "open") panel?.querySelector("#cad-open-file")?.click();
     else if (action === "versions") await listVersions();
     else if (action === "recovery") await showRecoveries();
+    else if (action === "ai-enable") {
+      if (!ready) { status("請先載入 CADCraft，才能允許 AI 操作。", true); return; }
+      if (!confirm("允許此分頁接收已授權的 AI CAD 幾何指令？只能新建、直線、矩形和圓，不能讀取本機路徑；關閉分頁即失效。")) return;
+      allowAiControl = true;
+      panel?.querySelector('[data-cad-action="ai-enable"]')?.setAttribute("hidden", "");
+      panel?.querySelector('[data-cad-action="ai-disable"]')?.removeAttribute("hidden");
+      panel?.querySelector('[data-cad-action="remote-connect"]')?.removeAttribute("hidden");
+      status("此分頁已允許 AI CAD 幾何指令，關閉頁面自動撤銷。");
+    } else if (action === "ai-disable") {
+      revokeAiControl("使用者已停止 AI CAD 操作。");
+    } else if (action === "remote-connect") {
+      try {
+        if (!allowAiControl) throw new Error("請先允許本頁 CAD AI 操作");
+        if (!window.LizhiCadRelay) throw new Error("CAD MCP 中繼模組尚未載入");
+        await window.LizhiCadRelay.connect();
+        panel?.querySelector('[data-cad-action="remote-connect"]')?.setAttribute("hidden", "");
+        panel?.querySelector('[data-cad-action="remote-disconnect"]')?.removeAttribute("hidden");
+        status("已啟用本次 CAD 指令中繼。請在 ChatGPT 私人「立之 CAD」Plugin 完成 OAuth 授權；未授權前無法由對話操作。保持本頁開啟，可隨時斷開。");
+      } catch (error) {
+        status("ChatGPT MCP 未連線：" + String(error?.message || "登入／服務驗證失敗").slice(0,180), true);
+      }
+    } else if (action === "remote-disconnect") {
+      await window.LizhiCadRelay?.disconnect?.();
+      panel?.querySelector('[data-cad-action="remote-connect"]')?.removeAttribute("hidden");
+      panel?.querySelector('[data-cad-action="remote-disconnect"]')?.setAttribute("hidden", "");
+      status("已停止向 ChatGPT MCP 中繼領取新的 CAD 指令。");
+    }
     else if (recoveryDownload) {
       const item = (await getRecoveries()).find(row => row.id === recoveryDownload);
       if (item) { download(item.name, item.data); status("已要求再次下載救援存檔，請確認瀏覽器下載成功；救援副本尚未刪除。"); }
@@ -349,6 +387,7 @@
     else if (action === "reload" && frame) {
       if (!confirm("重新載入 CAD 將放棄尚未儲存的圖面變更，確定繼續？")) return;
       ready = false;
+      revokeAiControl("重新載入 CAD 前已關閉 AI 操作權限。");
       frame.src = frame.src;
       status("正在重新載入 CAD 繪圖引擎…");
     } else if (revision) {
@@ -368,13 +407,68 @@
     try { openDrawing(file.name, await file.arrayBuffer()); }
     catch { status("無法讀取本機圖檔。", true); }
   }
+  function safePoint(value) {
+    return Array.isArray(value) && value.length === 2 &&
+      value.every(n => typeof n === "number" && Number.isFinite(n) && Math.abs(n) <= 1000000);
+  }
+  function validateCadCommand(name, params) {
+    if (!params || typeof params !== "object" || Array.isArray(params)) return false;
+    if (JSON.stringify(params).length > 8192) return false;
+    const keys = Object.keys(params);
+    if (name === "new") return keys.every(k => k === "metric") && (params.metric === undefined || typeof params.metric === "boolean");
+    if (name === "rectang") return keys.length === 2 && keys.includes("p1") && keys.includes("p2") && safePoint(params.p1) && safePoint(params.p2);
+    if (name === "line") return keys.every(k => k === "points" || k === "closed") && Array.isArray(params.points) &&
+      params.points.length >= 2 && params.points.length <= 64 && params.points.every(safePoint) &&
+      (params.closed === undefined || typeof params.closed === "boolean");
+    if (name === "circle") return keys.every(k => ["center", "radius", "diameter"].includes(k)) &&
+      safePoint(params.center) && Number(keys.includes("radius")) + Number(keys.includes("diameter")) === 1 &&
+      [params.radius ?? params.diameter].every(n => typeof n === "number" && Number.isFinite(n) && n > 0 && n <= 1000000);
+    return false;
+  }
+  function revokeAiControl(message) {
+    allowAiControl = false;
+    void window.LizhiCadRelay?.disconnect?.();
+    panel?.querySelector('[data-cad-action="remote-connect"]')?.setAttribute("hidden", "");
+    panel?.querySelector('[data-cad-action="remote-disconnect"]')?.setAttribute("hidden", "");
+    panel?.querySelector('[data-cad-action="ai-enable"]')?.removeAttribute("hidden");
+    panel?.querySelector('[data-cad-action="ai-disable"]')?.setAttribute("hidden", "");
+    for (const [, job] of pendingCadCommands) {
+      clearTimeout(job.timer);
+      job.reject(new Error(message || "CAD 操作權限已被撤銷"));
+    }
+    pendingCadCommands.clear();
+    if (message) status(message, true);
+  }
+
   window.LizhiCadHost = {
+    get commandStatus() { return { ready, enabled: allowAiControl, dirty: dirtyDrawing, pending: pendingCadCommands.size }; },
+    // Not a network endpoint: must be invoked by an authenticated per-session
+    // broker after explicit opt-in. This layer is also safe for local manual QA.
+    command(name, params) {
+      if (!allowAiControl || !ready || !frame?.contentWindow) return Promise.reject(new Error("CAD AI 控制未啟用或繪圖引擎離線"));
+      if (!validateCadCommand(name, params)) return Promise.reject(new Error("不支援此 CAD 幾何指令或座標"));
+      if (pendingCadCommands.size >= 16) return Promise.reject(new Error("CAD 命令佇列已滿"));
+      const requestId = "cad-" + crypto.randomUUID();
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingCadCommands.delete(requestId);
+          reject(new Error("CAD 指令逾時，未自動重試以避免重複畫圖"));
+        }, 25000);
+        pendingCadCommands.set(requestId, { resolve, reject, timer });
+        try {
+          frame.contentWindow.postMessage({ type: "cadcraft:command", requestId, command: name, params }, location.origin);
+        } catch (e) {
+          clearTimeout(timer); pendingCadCommands.delete(requestId); reject(e);
+        }
+      });
+    },
     mount(target) {
       if (panel === target) return;
       panel = target;
       frame = panel.querySelector("#cad-frame");
       ready = false;
       dirtyDrawing = false;
+      allowAiControl = false;
       if (!frame) return;
       frame.addEventListener("load", () => {
         if (!ready) status("CAD 框架已載入，等待 CADCraft WebAssembly 就緒；若一直無回應，請確認網站已安裝引擎。");

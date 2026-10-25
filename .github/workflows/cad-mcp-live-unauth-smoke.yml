@@ -1,0 +1,50 @@
+name: LiZhi CAD Live MCP Public Auth Surface (read-only smoke)
+on:
+  push:
+    branches: [feature/cad-mcp-secure-relay-v1]
+    paths:
+      - '.github/workflows/cad-mcp-live-unauth-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  auth-public-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - name: Check OAuth discovery and unauthenticated write rejection (no tokens, no data)
+        run: |
+          set -euo pipefail
+          base="https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-cad-mcp"
+          auth_http="$(curl -sS -L --max-time 25 -o /tmp/cad-mcp-public.json -w '%{http_code}' "$base/oauth-protected-resource")"
+          printf 'OAuth resource metadata HTTP %s\n' "$auth_http"
+          test "$auth_http" = 200
+          python3 - <<'PY'
+          import json
+          p=json.load(open('/tmp/cad-mcp-public.json'))
+          assert 'lizhi-cad-mcp' in p.get('resource','')
+          assert p.get('authorization_servers')
+          print('Protected resource discovery is available, no secrets retrieved')
+          PY
+          auth_url="https://hrdzywkihfqggiwjgavi.supabase.co/.well-known/oauth-authorization-server/auth/v1"
+          code="$(curl -sS --max-time 25 -o /tmp/cad-oauth-server.json -w '%{http_code}' "$auth_url")"
+          test "$code" = 200
+          python3 - <<'PY'
+          import json
+          p=json.load(open('/tmp/cad-oauth-server.json'))
+          assert p.get('issuer')
+          assert p.get('authorization_endpoint')
+          assert p.get('token_endpoint')
+          assert p.get('registration_endpoint'), 'Supabase must advertise DCR for the private ChatGPT CAD plugin'
+          assert 'S256' in p.get('code_challenge_methods_supported',[]),'PKCE S256 is required'
+          print('CAD_MCP_DCR_OAUTH_PKCE_DISCOVERY_PASS')
+          PY
+          denied="$(curl -sS --max-time 25 -o /tmp/cad-mcp-denied.txt -w '%{http_code}' -X POST \
+            -H 'Content-Type: application/json' \
+            -H 'MCP-Protocol-Version: 2025-11-25' \
+            --data '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' "$base")"
+          printf 'Unauthenticated tools/list HTTP %s\n' "$denied"
+          case "$denied" in
+            401|403) echo 'CAD_MCP_UNAUTHENTICATED_DENIAL_PASS' ;;
+            *) echo 'SECURITY FAILURE: the CAD MCP endpoint did not refuse unauthenticated access' >&2; exit 1 ;;
+          esac

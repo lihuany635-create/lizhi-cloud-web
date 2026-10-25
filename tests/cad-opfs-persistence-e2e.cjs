@@ -119,7 +119,8 @@ async function main(){
       }
       return names.some(url=>url.includes("/cad/runtime/") && url.includes(".wasm"))
         && names.some(url=>url.includes("/cad/runtime/index.html?host=parent"))
-        && names.some(url=>url.includes("/cad/cad-host.js?v=2"));
+        && names.some(url=>url.includes("/cad/cad-host.js?v=4"))
+        && names.some(url=>url.includes("/cad/cad-remote-relay.js?v=1"));
     },null,{timeout:45000});
     await context.setOffline(true);
     await page.reload({waitUntil:"domcontentloaded",timeout:30000});
