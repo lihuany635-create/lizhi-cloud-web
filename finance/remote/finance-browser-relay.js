@@ -100,4 +100,6 @@
   root.addEventListener("pagehide",()=>{if(enabled)void disconnect();});
   root.addEventListener("lizhi-account-logout",()=>{if(enabled)void disconnect();});
   root.LizhiFinanceUIRelay=Object.freeze({get state(){return getState();},disconnect});
+  if(root.document?.readyState==="loading")root.document.addEventListener("DOMContentLoaded",()=>driver()?.install(),{once:true});
+  else driver()?.install();
 })(typeof globalThis !== "undefined" ? globalThis : this);
