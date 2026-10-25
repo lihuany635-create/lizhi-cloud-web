@@ -78,7 +78,8 @@ const app=pipeline(
         title:"建立空白 CAD 圖面",
         description:"建立新的空白 CAD 圖面；可能替換目前工作圖面，請先確認已儲存。",
         inputSchema:z.object({session_id:uuid,request_id:uuid,metric:z.boolean().default(true)}),
-        _meta:{securitySchemes:security},annotations:writeAnnotations,
+        _meta:{securitySchemes:security},
+        annotations:{...writeAnnotations,destructiveHint:true},
       },async({session_id,request_id,metric})=>enqueue(session_id,"new",{metric},request_id));
       server.registerTool("get_command_result",{
         title:"檢查 CAD 指令是否真的完成",
