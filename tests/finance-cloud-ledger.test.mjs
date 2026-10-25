@@ -41,7 +41,7 @@ test("FIN-CLOUD-03 reject wrong date, missing references, unknown keys, payment 
     {...base,transaction:txn("expense",{amount:2.7})},
     {...base,transaction:txn("expense",{categoryId:undefined})},
     {...base,transaction:txn("expense",{evil_sql:"DELETE"})},
-    {...base,transaction:transaction:txn("expense",{user_id:OWNER})},
+    {...base,transaction:txn("expense",{user_id:OWNER})},
     {...base,transaction:txn("credit_card_payment",{categoryId:"food"})},
     {...base,transaction:txn("credit_card_payment",{accountId:"bank-1"})},
     {...base,transaction:txn("transfer",{toAccountId:"bank-1"})},
