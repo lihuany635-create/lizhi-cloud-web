@@ -1,12 +1,15 @@
 name: LiZhi CAD Portal Integration Preview (no deployment)
 on:
   push:
-    branches: [feature/embed-lizhi-cad-local-v1, feature/cad-durable-commit-v2]
+    branches: [feature/embed-lizhi-cad-local-v1, feature/cad-durable-commit-v2, feature/cad-command-port-v1]
     paths:
       # Recompile Rust/WASM only when pinned build inputs change.
       # Host and E2E test edits use cad-embedded-browser-fast.yml instead.
       - 'cad/build-runtime.sh'
       - 'cad/setup-build-toolchain.sh'
+      - 'tests/cad-command-port-e2e.cjs'
+      - 'cad/cad-host.js'
+      - 'app.js'
       - '.github/workflows/cad-integration-preview.yml'
   workflow_dispatch:
 permissions:
@@ -51,7 +54,7 @@ jobs:
           assert list(cad.glob('*.js'))
           manifest = json.loads((cad/'build-source.json').read_text())
           assert manifest['remoteCadWorker'] is False
-          assert manifest['sourceSha'] == '6873f47bfc5228c91d4b59bf869c5cb2b1c1ea1d'
+          assert manifest['sourceSha'] == '47cb518c96877bb479c8fb45d4ced214cf843f65'
           print('Verified CAD runtime bundle:',len(list(cad.iterdir())),'files')
           PY
       - uses: actions/upload-artifact@v4
@@ -96,6 +99,7 @@ jobs:
             sleep 1
           done
           node tests/cad-browser-e2e.cjs
+          node tests/cad-command-port-e2e.cjs
       - name: Preserve browser screenshots and DXF fallback evidence
         if: always()
         uses: actions/upload-artifact@v4

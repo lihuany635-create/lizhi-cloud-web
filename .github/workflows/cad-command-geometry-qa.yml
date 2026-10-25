@@ -1,0 +1,63 @@
+name: LiZhi CAD Command Geometry QA (pinned WASM, no deployment)
+on:
+  push:
+    branches: [feature/cad-command-port-v1]
+    paths:
+      - 'tests/cad-command-port-e2e.cjs'
+      - '.github/workflows/cad-command-geometry-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real-geometry:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download source-built CADCraft command WASM from passing build
+        uses: actions/download-artifact@v4
+        with:
+          name: lizhi-cad-integrated-runtime-candidate
+          repository: lihuany635-create/lizhi-cloud-web
+          run-id: 40153194288
+          github-token: ${{ github.token }}
+          path: cad/runtime
+      - name: Pin CAD command runtime source and safety
+        run: |
+          python3 - <<'PY'
+          import pathlib,json
+          p=pathlib.Path('cad/runtime')
+          j=json.loads((p/'build-source.json').read_text())
+          assert j['sourceSha']=='47cb518c96877bb479c8fb45d4ced214cf843f65'
+          assert j['remoteCadWorker'] is False
+          assert list(p.glob('*.wasm')) and list(p.glob('*.js'))
+          print('Verified actual WASM source SHA',j['sourceSha'])
+          PY
+      - name: Install Chromium
+        run: |
+          npm install --prefix tests/cad-browser-deps --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          tests/cad-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+      - name: Run real generated DXF geometry and opt-in E2E
+        env:
+          NODE_PATH: ${{ github.workspace }}/tests/cad-browser-deps/node_modules
+          CAD_TEST_ORIGIN: http://127.0.0.1:8771
+          CAD_BROWSER_EVIDENCE: cad-browser-evidence
+        run: |
+          set -euo pipefail
+          node --check tests/cad-command-port-e2e.cjs
+          python3 -m http.server 8771 --bind 127.0.0.1 --directory . > /tmp/cad-command-http.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8771/index.html > /dev/null; then break; fi
+            sleep 1
+          done
+          node tests/cad-command-port-e2e.cjs
+      - name: Save screenshots and geometry report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lizhi-cad-command-generated-dxf-evidence
+          path: cad-browser-evidence/
+          retention-days: 14
