@@ -3,6 +3,7 @@ on:
   push:
     branches: [feature/cad-sites-bridge-v1]
     paths:
+      - 'supabase/config.toml'
       - 'cad/sites/**'
       - 'sites-migration/cad/**'
       - 'supabase/functions/lizhi-cad-site-mcp/**'
@@ -21,6 +22,20 @@ jobs:
           node-version: '24'
       - name: Verify Sites owner-only MCP and bounded geometry tools
         run: node --test tests/cad-sites-contract.test.mjs
+      - name: Validate server-bearer Edge routing configuration
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import tomllib
+          data=tomllib.loads(Path('supabase/config.toml').read_text())
+          assert data['functions']['lizhi-cad-site-mcp']['verify_jwt'] is False
+          source=Path('supabase/functions/lizhi-cad-site-mcp/index.ts').read_text()
+          assert 'SITE_OWNER_CREDENTIAL_REQUIRED' in source
+          assert 'LIZHI_CAD_SITE_MCP_TOKEN' in source
+          assert 'SUPABASE_SERVICE_ROLE_KEY' in source
+          assert 'BROWSER_ORIGIN_NOT_ALLOWED' in source
+          print('CAD_SITES_SECRET_GUARD_CONFIG_PASS')
+          PY
       - name: Pure Node syntax
         run: |
           node --check cad/sites/cad-site-contract.mjs
