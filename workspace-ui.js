@@ -52,10 +52,11 @@ function renderWorkspace() {
   for(const [route, el] of workspacePanels) el.hidden = route !== state.route;
   if(state.route === 'media') updateMediaPanel(panel);
   else if(state.route === 'chat') updateChatPanel(panel);
-  else if(state.route === 'study' || state.route === 'cad' || state.route === 'a4' || state.route === 'licut' || state.route === 'imagegraph' || state.route === 'model3d' || state.route === 'animationflow') {
+  else if(state.route === 'study' || state.route === 'cad' || state.route === 'a4' || state.route === 'licut' || state.route === 'imagegraph' || state.route === 'model3d' || state.route === 'hew3d' || state.route === 'animationflow') {
     if(!panel.hasChildNodes()) {
-      panel.innerHTML = state.route === 'study' ? renderStudy() : state.route === 'cad' ? renderCad() : state.route === 'licut' ? renderLicut() : state.route === 'imagegraph' ? renderImageGraph() : state.route === 'model3d' ? renderModel3d() : state.route === 'animationflow' ? renderAnimationFlow() : renderA4Editor();
+      panel.innerHTML = state.route === 'study' ? renderStudy() : state.route === 'cad' ? renderCad() : state.route === 'licut' ? renderLicut() : state.route === 'imagegraph' ? renderImageGraph() : state.route === 'model3d' ? renderModel3d() : state.route === 'hew3d' ? renderHew3d() : state.route === 'animationflow' ? renderAnimationFlow() : renderA4Editor();
       if(state.route === 'cad') window.LizhiCadHost?.mount(panel);
+      if(state.route === 'hew3d') window.LizhiHewEditor?.mount(panel);
       if(state.route === 'study') {
         const label = panel.querySelector('.study-online');
         label.textContent = '讀書室載入中';
