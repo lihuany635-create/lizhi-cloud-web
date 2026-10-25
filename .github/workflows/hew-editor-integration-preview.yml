@@ -2,7 +2,7 @@ name: Hew same-origin compiled editor integration preview (no deployment)
 on:
   workflow_dispatch:
   push:
-    branches: [feature/hew-3d-mcp-v1-20261025]
+    branches: [feature/hew-3d-mcp-v1-20261025, feature/hew-one-button-30min-20261025]
     paths:
       - 'hew/build-embedded-runtime.sh'
       - 'hew/portal-host.js'
@@ -11,6 +11,7 @@ on:
       - 'workspace-ui.js'
       - 'index.html'
       - '.github/workflows/hew-editor-integration-preview.yml'
+      - 'hew/sql/002_model_one_button_30min.sql'
 permissions:
   contents: read
 concurrency:
@@ -27,12 +28,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: lihuany635-create/lizhi-hew
-          ref: 70c73ad001a1800984d7e67a660321341b7611a5
+          ref: 0e4e16061f8d15ec1e5eeb4570d760bedbe2d5b5
           path: .hew-model-build
           persist-credentials: false
       - name: Verify Hew source pin before compiling
         run: |
-          test "$(git -C .hew-model-build rev-parse HEAD)" = "70c73ad001a1800984d7e67a660321341b7611a5"
+          test "$(git -C .hew-model-build rev-parse HEAD)" = "0e4e16061f8d15ec1e5eeb4570d760bedbe2d5b5"
       - name: Set up pinned Hew Node
         uses: actions/setup-node@v4
         with:

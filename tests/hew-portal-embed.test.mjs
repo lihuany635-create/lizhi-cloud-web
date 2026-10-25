@@ -57,7 +57,7 @@ test('Hew route is separate from the existing GLB viewer and CAD route',()=>{
 test('Pages deploy pins an immutable Hew source and preserves original CAD before adding editor',()=>{
  const pages=read('.github/workflows/pages.yml')
  const preview=read('.github/workflows/hew-editor-integration-preview.yml')
- const pin='70c73ad001a1800984d7e67a660321341b7611a5'
+ const pin='0e4e16061f8d15ec1e5eeb4570d760bedbe2d5b5'
  assert.ok(pages.includes('ref: '+pin))
  assert.ok(preview.includes('ref: '+pin))
  assert.ok(pages.indexOf('Compile CADCraft into existing portal') <

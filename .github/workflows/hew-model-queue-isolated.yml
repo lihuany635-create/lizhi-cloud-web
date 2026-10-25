@@ -3,7 +3,7 @@
 name: Hew 3D isolated PostgreSQL queue
 on:
   push:
-    branches: [feature/hew-3d-mcp-v1-20261025]
+    branches: [feature/hew-3d-mcp-v1-20261025, feature/hew-one-button-30min-20261025]
     paths:
       - 'hew/sql/**'
       - 'tests/sql/hew_model_queue_isolated.test.sql'
