@@ -7,7 +7,7 @@
   );
 
   let currentUser = null;
-  const allowedRoutes = new Set(["home","knowledge","weave","finance","engineering","media","chat","study","a4","licut","imagegraph","animationflow","phoneagent","trash","settings","uploads","library","ai"]);
+  const allowedRoutes = new Set(["home","knowledge","weave","finance","engineering","media","chat","study","a4","licut","cad","imagegraph","animationflow","phoneagent","trash","settings","uploads","library","ai"]);
   function returnURL() {
     const target = new URL(location.origin + location.pathname), requested = new URLSearchParams(location.search).get("open");
     if (allowedRoutes.has(requested)) target.searchParams.set("open", requested);
