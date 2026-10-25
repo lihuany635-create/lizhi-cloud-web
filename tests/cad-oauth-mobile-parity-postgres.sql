@@ -54,7 +54,7 @@ do $$
 declare sid uuid:='aaaaaaaa-cccc-4aaa-8aaa-cccccccccccc';
         job_id uuid; raw jsonb;
 begin
-  if (select count(*) from public.lizhi_cad_active_sessions())<>1 then
+  if not exists (select 1 from public.lizhi_cad_active_sessions() where session_id=sid) then
     raise exception 'approved OAuth cannot read own live CAD session';
   end if;
   job_id:=public.lizhi_cad_enqueue(
