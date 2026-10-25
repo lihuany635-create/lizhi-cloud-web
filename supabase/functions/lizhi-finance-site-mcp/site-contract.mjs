@@ -69,3 +69,53 @@ export function validateFinanceUiTool(name,args) {
       ...(args.action==="click"&&args.confirm===true?{confirm:true}:{}),
       ...(args.action!=="click"?{value:args.value}:{})}}};
 }
+
+
+// Cloud-first Finance: operates with the owner-scoped Supabase ledger even if all
+// user browsers/computers are offline. Does not require Finance UI sessions.
+const financeId={type:"string",minLength:1,maxLength:160};
+const transactionFields={
+  type:{type:"string",enum:["income","expense","transfer","credit_card_purchase","credit_card_payment"]},
+  amount:{type:"integer",minimum:1,maximum:9007199254740991},
+  date:{type:"string",pattern:"^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"},
+  accountId:financeId,fromAccountId:financeId,toAccountId:financeId,
+  creditCardId:financeId,categoryId:financeId,
+  note:{type:"string",maxLength:240}
+};
+export const FINANCE_CLOUD_TOOLS=Object.freeze([
+  {name:"finance_references",description:"List active account, card and category IDs and names from the owner-owned synced ledger; use before creating a transaction. No PIN/card numbers/notes.",inputSchema:schema(),annotations:{readOnlyHint:true}},
+  {name:"finance_create_transaction",description:"Immediately create one owner-owned transaction in the persistent cloud ledger, independent of browser or PC. User must have explicitly requested the entry. Supply a new UUID request_id for each distinct intent; retry same UUID only to resolve uncertain receipt. Five types: income, expense, transfer, credit_card_purchase, credit_card_payment. Payment is not an expense; overpayments are rejected.",inputSchema:schema({request_id:{type:"string",format:"uuid"},transaction:schema(transactionFields,["type","amount","date"])},["request_id","transaction"]),annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true}}
+]);
+const CLOUD_UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+function validCloudDate(value) {
+  if(typeof value!=="string"||!/^20[0-9]{2}-[0-9]{2}-[0-9]{2}$/.test(value))return false;
+  const [y,m,d]=value.split("-").map(Number);
+  return m>=1&&m<=12&&d>=1&&d<=new Date(Date.UTC(y,m,0)).getUTCDate();
+}
+export function validateFinanceCloudTool(name,args) {
+  if(!FINANCE_CLOUD_TOOLS.some(t=>t.name===name)||!obj(args))return {ok:false,code:"FINANCE_CLOUD_UNKNOWN_TOOL"};
+  if(name==="finance_references")return Object.keys(args).length===0?{ok:true,args:{}}:{ok:false,code:"FINANCE_CLOUD_INVALID_ARGS"};
+  if(Object.keys(args).sort().join(",")!=="request_id,transaction"||
+    typeof args.request_id!=="string"||!CLOUD_UUID.test(args.request_id)||
+    !obj(args.transaction))return {ok:false,code:"FINANCE_CLOUD_INVALID_ARGS"};
+  const tx=args.transaction;
+  if(Object.keys(tx).some(k=>!Object.hasOwn(transactionFields,k)))return {ok:false,code:"FINANCE_CLOUD_UNKNOWN_FIELD"};
+  if(!["income","expense","transfer","credit_card_purchase","credit_card_payment"].includes(tx.type)||
+    !Number.isSafeInteger(tx.amount)||tx.amount<=0||!validCloudDate(tx.date))
+    return {ok:false,code:"FINANCE_CLOUD_INVALID_TRANSACTION"};
+  for(const k of ["accountId","fromAccountId","toAccountId","creditCardId","categoryId"])
+    if(Object.hasOwn(tx,k)&&(typeof tx[k]!=="string"||!tx[k].trim()||tx[k].length>160))
+      return {ok:false,code:"FINANCE_CLOUD_INVALID_REFERENCE"};
+  if(Object.hasOwn(tx,"note")&&(typeof tx.note!=="string"||tx.note.length>240))
+    return {ok:false,code:"FINANCE_CLOUD_INVALID_NOTE"};
+  const has=k=>Object.hasOwn(tx,k);
+  const valid=(
+    (["income","expense"].includes(tx.type)&&has("accountId")&&has("categoryId")&&!has("fromAccountId")&&!has("toAccountId")&&!has("creditCardId"))||
+    (tx.type==="transfer"&&has("fromAccountId")&&has("toAccountId")&&tx.fromAccountId!==tx.toAccountId&&
+      !has("accountId")&&!has("categoryId")&&!has("creditCardId"))||
+    (tx.type==="credit_card_purchase"&&has("creditCardId")&&has("categoryId")&&!has("accountId")&&!has("fromAccountId")&&!has("toAccountId"))||
+    (tx.type==="credit_card_payment"&&has("creditCardId")&&(has("fromAccountId")!==has("accountId"))&&
+      !has("categoryId")&&!has("toAccountId"))
+  );
+  return valid?{ok:true,args:{request_id:args.request_id,transaction:{...tx}}}:{ok:false,code:"FINANCE_CLOUD_REFERENCE_FIELDS"};
+}
