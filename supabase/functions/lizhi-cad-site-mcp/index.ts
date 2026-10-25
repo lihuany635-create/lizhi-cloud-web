@@ -2,6 +2,8 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "npm:@supabase/supabase-js@2.75.0";
 import {CAD_SITE_TOOLS,validateCadSiteTool} from "./cad-site-contract.mjs";
 import {readBoundedBody} from "./bounded-body.mjs";
+import {ENTITY_READ_TOOLS} from "./cad-entity-read-v1.mjs";
+import {executeEntityReadTool} from "./entity-read-handler.mjs";
 
 // Dedicated Sites *UPSTREAM* endpoint, not ChatGPT OAuth and not a public CAD
 // workstation. A private ChatGPT Site verifies its own owner BEFORE forwarding
@@ -13,6 +15,8 @@ const key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
 const secret=Deno.env.get("LIZHI_CAD_SITE_MCP_TOKEN")||"";
 const owner=Deno.env.get("LIZHI_CAD_SITE_OWNER_UID")||"";
 const ready=!!root&&!!key&&hex.test(secret)&&uuid.test(owner);
+// Default OFF: leave the six production tools unchanged until all read layers are deployed.
+const entityReadEnabled=Deno.env.get("LIZHI_CAD_ENTITY_READ_V1")==="true";
 const db=ready?createClient(root,key,{auth:{persistSession:false,autoRefreshToken:false}}):null;
 const headers={"Cache-Control":"no-store, private","Pragma":"no-cache","X-Content-Type-Options":"nosniff"};
 const json=(data:unknown,status=200)=>Response.json(data,{status,headers});
@@ -54,11 +58,18 @@ Deno.serve(async(req:Request)=>{
     serverInfo:{name:"lizhi-cad-private-site-relay",version:"0.1.0"}
   });
   if(p.method==="ping")return result(id,{});
-  if(p.method==="tools/list")return result(id,{tools:CAD_SITE_TOOLS});
+  if(p.method==="tools/list")return result(id,{tools:entityReadEnabled?[...CAD_SITE_TOOLS,...ENTITY_READ_TOOLS]:CAD_SITE_TOOLS});
   if(p.method!=="tools/call")return rpcError(id,-32601,"Unknown method");
   const params=p.params as Record<string,unknown>|null;
   if(!params||typeof params!=="object"||Array.isArray(params)||typeof params.name!=="string")
     return rpcError(id,-32602,"Invalid tool call");
+  // Dedicated read tool path. Always absent from tool discovery unless explicitly
+  // enabled on the server AFTER the corresponding native build and SQL migration.
+  if(entityReadEnabled&&ENTITY_READ_TOOLS.some(t=>t.name===params.name)){
+    const read=await executeEntityReadTool(db,owner,params.name,params.arguments??{});
+    if(!read.ok)return fail(id,read.code||"CAD_READ_UNAVAILABLE");
+    return success(id,read);
+  }
   const checked=validateCadSiteTool(params.name,params.arguments??{});
   if(!checked.ok)return fail(id,checked.code||"CAD_INVALID_ARGUMENTS");
   // Read-only status is itself scoped to one hardcoded owner UID.

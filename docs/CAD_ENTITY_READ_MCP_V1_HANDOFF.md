@@ -12,6 +12,12 @@
 - `cad/sites/sql/002_entity_read_jobs.REVIEW_ONLY.sql`：只候選 schema，在原有 `lizhi_private.lizhi_cad_commands` CHECK 擴充 `lizhi.inspect/entities` 兩個讀取命令；新的 `lizhi_cad_site_read_enqueue`、`lizhi_cad_site_read_job` 僅 `service_role`，查 owner+session+心跳，舊 OAuth `lizhi_cad_enqueue` 的 command validator 仍維持舊四種幾何操作。read_job 不返回任何寫入工作的 result。
 - Node／PG16 隔離測試檔驗證訊息約束、越權、去敏、單筆入列、claim→finish→受限回執。
 
+## 額外完成：具備 Feature Flag 的遠端讀取候選
+- `supabase/functions/lizhi-cad-site-mcp/index.ts` 提供預設關閉的 `LIZHI_CAD_ENTITY_READ_V1` Gate。沒啟用時 **仍只有六項工具**；只有明確啟用才會把三項讀取候選列入工具清單。
+- `entity-read-handler.mjs`：根據受限參數只呼叫 `lizhi_cad_site_read_enqueue` 或 `lizhi_cad_site_read_job`，不重送、不直連 DXF，讀回結果由純數值白名單投影。
+- `sites-migration/cad/site-entity-read.mjs`：可攜式私人 Sites 端候選，使用真實 owner session 與 server-only token，`redirect:manual` 並拒絕轉址；在 `entityReadEnabled===true` 前拒絕讀圖。**不是已經更新的 Site Worker**，也不會自行註冊工具。
+- 新增 Node stub Edge/Site 間單次呼叫、登入權限、去敏與轉址拒絕測試，以及 Deno Edge 編譯 CI；這些仍須真正原生 WASM/正式 Private Site 適配後才能實機驗收。
+
 ## 不可提前部署的原因
 現有正式 CAD 網頁仍使用舊編譯的 CADCraft WASM，不認識新增 `lizhi.inspect/entities`；Site v3 與 Edge 仍只有六項工具。**以上只完成候選合約與 SQL，尚不代表 ChatGPT 已能讀取現有線條。**
 
