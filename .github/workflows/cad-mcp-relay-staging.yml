@@ -5,11 +5,13 @@ on:
     paths:
       - 'cad/**'
       - 'tests/cad-mcp-relay-mock-e2e.cjs'
+      - 'tests/cad-oauth-consent-e2e.cjs'
       - 'supabase/functions/lizhi-cad-mcp/**'
       - 'supabase/config.toml'
       - 'app.js'
       - 'index.html'
       - 'auth.js'
+      - 'oauth/consent/**'
       - 'sw.js'
       - 'tests/cad-opfs-persistence-e2e.cjs'
       - '.github/workflows/cad-mcp-relay-staging.yml'
@@ -88,6 +90,7 @@ jobs:
           node tests/cad-command-port-e2e.cjs
           node tests/cad-opfs-persistence-e2e.cjs
           node tests/cad-mcp-relay-mock-e2e.cjs
+          node tests/cad-oauth-consent-e2e.cjs
       - name: Retain offline QA report (no user files)
         if: always()
         uses: actions/upload-artifact@v4
