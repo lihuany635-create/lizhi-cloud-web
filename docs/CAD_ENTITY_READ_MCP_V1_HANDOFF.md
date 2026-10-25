@@ -31,3 +31,12 @@
 - 在實際 CADCraft 開啟且本人授權後，ChatGPT 讀回一筆已知矩形/線條：`cad_inspect_drawing` 入列 → `cad_read_job` succeeded → `cad_list_entities` 入列 → `cad_read_job` succeeded。
 - 單頁最多 8 筆、最多 2.8–3.5KiB 受限資料，無 DXF bytes；反向 ID／越權拒絕；逾時不自動重送；關頁/STOP 撤銷。
 - 圖面已變更必須修訂 `revision`；修改命令只允許針對事先讀取的版本和穩定 handle，先二次確認才可更動。
+
+## 2026-10-25｜固定來源真實 WASM／Chromium 隔離驗收
+
+- GitHub Actions [#40173654439](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40173654439)：`build-native-wasm`、`native-browser-e2e` **兩項均 success**。
+- 不是模擬畫布：在 runner 使用 Rust 1.95.0 + Trunk 0.22.0 重新編譯真正 CADCraft fork 固定提交 `cb256cf8a383c422482e8a455e3013887fa39a74`，產出 GitHub Actions artifact `lizhi-cad-entity-wasm-preview-candidate`（無正式部署，保留 7 天）。
+- Chromium 開啟同源的原始「立之雲端庫 CAD」工作檯，使用真實 WASM；在取得人工 AI 授權後，原生 new / line 指令畫出線條 `(0,0) → (800,900)`，再以 `lizhi.inspect`、`lizhi.entities` 讀回唯一 LINE 的 `handle`、`revision` 和精確 `geometry.a/b` 座標。
+- 實際測試判定：無 AI 授權不能讀圖；限量讀取成功；兩次 read 之間 revision 不變；原始路徑、檔案、文字資料不得被意外回傳；無界 read / 任意路徑 / erase 拒絕；按 STOP 後再次讀圖必須拒絕。GitHub artifact `lizhi-cad-entity-read-real-wasm-evidence` 留存 JSON 與 Chromium 畫面。
+- 這項成功代表**瀏覽器本機 CAD 原生讀圖功能真實可執行**；它不是正式 ChatGPT MCP 7–9 工具的 E2E。後者仍須同一新版 WASM、正式 SQL、Edge Feature Gate、Site MCP 授權與配置整條路徑發布後才能驗收。
+- 後續再修正候選 `cad/cad-host.js` 的人工同意對話，明確告知「限量讀取圖元」及移動需二次確認，測試檔 `tests/cad-entity-local-bridge.test.mjs` 加入回歸。維持使用者控制與 local-first。
