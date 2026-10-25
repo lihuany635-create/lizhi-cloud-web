@@ -12,8 +12,8 @@
   else root.LizhiFinanceUIAgent = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (root) {
   "use strict";
-  const MAX_CONTROLS = 120;
-  const MAX_TEXT = 140;
+  const MAX_CONTROLS = 60;
+  const MAX_TEXT = 100;
   const MAX_VALUE = 300;
   const LEASE_MS = 30 * 60 * 1000;
   const SENSITIVE = /(?:delete|remove|archive|clear|reset|confirm|commit|import|save|submit|wipe|revoke|刪|清除|重置|封存|匯入|確認|儲存)/i;
@@ -93,7 +93,7 @@
       const item = {ref,kind:kind(node),label:label(node),
         sensitive:isSensitive(node),disabled:!!node.disabled};
       if (kind(node) === "select")
-        item.options = [...node.options].slice(0, 40).map(o=>({value:clean(o.value),label:clean(o.text)}));
+        item.options = [...node.options].slice(0, 12).map(o=>({value:clean(o.value),label:clean(o.text)}));
       return item;
     });
     // Never return HTML, hidden controls, free-form transaction notes,
