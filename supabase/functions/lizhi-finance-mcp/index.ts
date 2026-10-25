@@ -100,7 +100,7 @@ const app = pipeline([
     for (const r of rows) {
       if (!r.payload || typeof r.payload !== "object" || Array.isArray(r.payload)) throw new Error("INVALID_CLOUD_RECORD");
       if (!["accounts", "creditCards", "categories", "transactions"].includes(r.kind)) continue;
-      const data = { ...r.payload, id: r.id };
+      const data: Record<string, unknown> = { ...r.payload, id: r.id };
       if (data.deletedAt) continue;
       result[r.kind as keyof Pick<Book, "accounts" | "creditCards" | "categories" | "transactions">].push(data);
     }
