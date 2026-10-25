@@ -49,3 +49,12 @@
 - 以 GitHub Actions artifact `lizhi-cad-native-move-chromium-evidence` 保存隔離測試畫面與 JSON；沒有修改使用者現有 `Drawing1` 或正式 DXF。
 - `cad/cad-host.js` 本地許可提示同步更正，**明確揭露會限量讀取圖面圖元幾何**及修改需二次確認。Node 同源宿主回歸 + Deno/PG16 CI [#40174036159](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40174036159)：4/4 PASS。
 - **能力界線**：只能確認候選新版 Native WASM 在隔離瀏覽器可精確改線；ChatGPT v3 Site 正式工具仍六個，沒有 `cad_move_entity` MCP API、正式 SQL 写入/工具曝光或正式改圖驗收。必須經過明確授權、API 安全審查及人工確認，才可接遠端編輯，且不可自行重新發送結果不明的移動指令。
+
+
+## 2026-10-25｜私有 Site → Deno Edge → 隔離 Supabase RPC 綜合驗證
+
+- [GitHub Actions #40175228806](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40175228806)：**5/5 PASS**，工作包括 `read-site-to-edge-to-rpc`、`read-contract`、`edge-check`、`read-postgres`、`no-deployment`。
+- 新增 `tests/cad-entity-read-fake-postgrest.mjs` 與 `tests/cad-entity-read-full-loopback.test.mjs`。在 CI runner 真正啟動 `site-entity-read.mjs` 呼叫 Deno Edge HTTP，Edge 透過 Supabase JS Client 向**本地假 PostgREST** 送出獨立 `lizhi_cad_site_read_enqueue/read_job` RPC。驗證逐筆入列與結果查詢各發送一次，原生樣式 LINE 的 handle/revision/幾何座標 (0,0)-(800,900) 正確回傳，檔名與任意 text/path 欄位移除；非本人、未設定 Secret、Gate OFF 均不發出上游請求。正式 Supabase 無變更。
+- SQL 002 候選 `lizhi_cad_site_read_job` 已追加**再次檢查 owner session 是否 enabled、租約與 30 秒心跳**的條件，已完成的幾何讀取結果在使用者 STOP/會話逾期後也無法再讀。隔離 PostgreSQL 新測試驗證 STOP 之後完成回執取回是 NULL、入列拒絕，未放寬使用者角色權限。
+- 上述實測的真正 Rust/WASM 是另一段 [#40173654439](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40173654439) 的獨立 Chromium；本次全鏈路 HTTP 到**模擬 PostgREST**，仍不能宣稱正式九項工具已部署或生產端 CAD 圖元已可被 ChatGPT 查詢。
+- 正式發布閘門：須審核 source-pinned WASM 相容更新及原 CAD 使用者授權、僅在使用者另行同意新資料庫變更後套用 002 SQL、部署預設關閉新讀取 Gate 的 Edge，原私人 Site 於同一專案完成新工具真實註冊與本人授權，再開 Gate 做真正 ChatGPT→Supabase→本機 WASM 讀圖/STOP E2E。移動/刪除/修剪仍不在此釋出範圍。
