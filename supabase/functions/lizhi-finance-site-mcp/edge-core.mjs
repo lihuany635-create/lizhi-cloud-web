@@ -1,4 +1,4 @@
-import {FINANCE_SITE_TOOLS,validateFinanceSiteTool,FINANCE_UI_SITE_TOOLS,validateFinanceUiTool} from "./site-contract.mjs";
+import {FINANCE_SITE_TOOLS,validateFinanceSiteTool,FINANCE_UI_SITE_TOOLS,validateFinanceUiTool,FINANCE_CLOUD_TOOLS,validateFinanceCloudTool} from "./site-contract.mjs";
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const HEX=/^[0-9a-f]{64,128}$/i;
@@ -149,10 +149,45 @@ export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBear
   if(frame.method==="initialize")return rpc(requestId,{protocolVersion:"2025-06-18",
     capabilities:{tools:{listChanged:false}},serverInfo:{name:"lizhi-finance-private-site",version:"0.1.0"}});
   if(frame.method==="ping")return rpc(requestId,{});
-  if(frame.method==="tools/list")return rpc(requestId,{tools:[...FINANCE_SITE_TOOLS,...FINANCE_UI_SITE_TOOLS]});
+  if(frame.method==="tools/list")return rpc(requestId,{tools:[...FINANCE_SITE_TOOLS,...FINANCE_UI_SITE_TOOLS,...FINANCE_CLOUD_TOOLS]});
   if(frame.method!=="tools/call")return err(requestId,-32601,"Method unavailable");
   const p=frame.params;
   if(!obj(p)||typeof p.name!=="string")return err(requestId,-32602,"Invalid tool call");
+  if(FINANCE_CLOUD_TOOLS.some(t=>t.name===p.name)) {
+    const v=validateFinanceCloudTool(p.name,p.arguments??{});
+    if(!v.ok)return fail(requestId,v.code);
+    if(p.name==="finance_references"){
+      try{
+        const b=await snapshot(db,ownerUid);
+        const listed=items=>items.filter(active).map(x=>({id:id(x.id),name:str(x.name)}));
+        return success(requestId,{source:"supabase_synced_snapshot",accounts:listed(b.accounts),
+          credit_cards:listed(b.creditCards),categories:b.categories.filter(active).map(x=>({
+            id:id(x.id),name:str(x.name),type:str(x.type)})),
+          notice:"僅限雲端已同步參照資料；不含本機尚未同步的帳戶或分類。"});
+      }catch{return fail(requestId,"FINANCE_CLOUD_REFERENCES_UNAVAILABLE")}
+    }
+    if(!db?.rpc)return fail(requestId,"FINANCE_CLOUD_COMMIT_UNAVAILABLE");
+    try{
+      const {data,error}=await db.rpc("lizhi_finance_cloud_create_transaction",{
+        p_owner:ownerUid,p_request_id:v.args.request_id,p_data:v.args.transaction});
+      if(error){
+        const safeCodes=[
+          "FINANCE_CLOUD_FORBIDDEN","FINANCE_CLOUD_INVALID_PAYLOAD","FINANCE_CLOUD_UNKNOWN_FIELD",
+          "FINANCE_CLOUD_INVALID_TYPE","FINANCE_CLOUD_INVALID_AMOUNT","FINANCE_CLOUD_INVALID_DATE",
+          "FINANCE_CLOUD_INVALID_NOTE","FINANCE_CLOUD_INVALID_REFERENCE",
+          "FINANCE_CLOUD_REFERENCE_FIELDS","FINANCE_CLOUD_ACCOUNT_NOT_FOUND",
+          "FINANCE_CLOUD_FROM_ACCOUNT_NOT_FOUND","FINANCE_CLOUD_TO_ACCOUNT_NOT_FOUND",
+          "FINANCE_CLOUD_CARD_NOT_FOUND","FINANCE_CLOUD_CATEGORY_NOT_FOUND",
+          "FINANCE_CLOUD_CARD_OVERPAYMENT","FINANCE_CLOUD_REQUEST_ID_CONFLICT"];
+        const code=safeCodes.find(x=>String(error.message||"").includes(x))||"FINANCE_CLOUD_COMMIT_REJECTED";
+        return fail(requestId,code);
+      }
+      if(!obj(data)||!["created","already_created"].includes(data.status)||typeof data.id!=="string")
+        return fail(requestId,"FINANCE_CLOUD_RECEIPT_INVALID");
+      return success(requestId,{...data,committed:true,source:"supabase_cloud_ledger",
+        note:"已寫入雲端帳本。開啟理財網站後需執行同步；不代表未同步的本機資料已更新。"});
+    }catch{return fail(requestId,"FINANCE_CLOUD_COMMIT_UNCERTAIN_RETRY_SAME_REQUEST_ID")}
+  }
   if(FINANCE_UI_SITE_TOOLS.some(t=>t.name===p.name)) {
     const v=validateFinanceUiTool(p.name,p.arguments??{});
     if(!v.ok)return fail(requestId,v.code);
