@@ -40,6 +40,9 @@ jobs:
         run: |
           node --check cad/sites/cad-site-contract.mjs
           node --check sites-migration/cad/site-tools.mjs
+          node --check sites-migration/cad/site-mcp-route.mjs
+      - name: Verify private Site MCP route identity and tool dispatch
+        run: node --test tests/cad-sites-site-route.test.mjs
           node --check supabase/functions/lizhi-cad-site-mcp/cad-site-contract.mjs
           node --check supabase/functions/lizhi-cad-site-mcp/bounded-body.mjs
       - name: Enforce bundle matches site contract

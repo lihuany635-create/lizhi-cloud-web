@@ -32,6 +32,14 @@ CAD 繪圖 UI 仍使用 `https://lihuany635-create.github.io/lizhi-cloud-web/?op
 - SQL 先辨識完全相同的 `request_id`，即使近一分鐘已達 20 筆上限，仍回原 job_id；相同 request_id 改參數會拒絕，新指令仍受限速。已由 disposable PostgreSQL 16 驗證；沒有套用正式 schema。
 - 這些安全測試只涵蓋 **GitHub Actions 臨時服務與模擬登入提供者**。並未實際驗證 ChatGPT Sites 私人 owner middleware、正式 Secret 配置或一般對話載入工具。正式發布閘門持續關閉；不得將 `verify_jwt=false` 誤當匿名公開授權。
 
+## Site /mcp 伺服器註冊候選（不是已部署）
+
+- 新增 `sites-migration/cad/site-mcp-route.mjs`，提供 `handleSiteCadMcpRequest(request,trustedSiteAuth,serverOnlySecrets)`。僅支援 `POST /mcp`、JSON-RPC `initialize/ping/tools/list/tools/call`，server-side 驗證本人後才列六工具或轉呼叫上游。假冒 Header、工具參數均不能作身份來源。
+- 這是無法直接變更 Sites 編輯器時的 **可攜式處理器**，不是完整 ChatGPT Sites 平台部署程式。Sites 原生 MCP runtime 若已提供工具註冊 API，優先直接註冊 `cadSiteTools`，再將每個工具綁至 `handleCadSiteTool`，不建立第二個並行 MCP server；確切整合方式需以實際私人 Site runtime 驗證。
+- 若採用 portable handler，Sites 伺服器必須將 `POST /mcp` route 映射到它，並從可信 session middleware 取得 `signedIn` 和 `verifiedUserEmail`；不能傳 HTTP header 代替。Site /mcp 在未登入時 HTTP 401、非本人 403、帶瀏覽器 Origin 403、超長 body 413；這些在 Node mock Site Request 環境有測試，正式 Site 平台仍待獨立驗收。
+- Site 的 `serverOnlySecrets` 只能由 server secure environment 注入：`{ownerEmail: SITE_CAD_OWNER_EMAIL,siteMcpToken:LIZHI_CAD_SITE_MCP_TOKEN}`。不要在公開頁面、bundle 或 log 內出現內容。
+- JSON-only handler 是否與正式 ChatGPT Sites 的 MCP 傳輸要求相容，仍須在 Site 編輯器以真實 `tools/list` 與 `tools/call` E2E 驗證；不能以 Node 測試通過推定相容。
+
 ## 建立 Site 時的嚴格要求（隔離 CI 已通過，尚未部署）
 
 1. 在 ChatGPT Sites 中建立**獨立私人 Site「立之 CAD 指令代理」**。不修改手機 v9 Site、不改手機工具／Secret，也不另外建立 CAD 繪圖網站。Site 設定 **PRIVATE / 僅你可見**。
