@@ -88,5 +88,39 @@ begin
  (select id from lizhi_private.lizhi_cad_commands where command='rectang' limit 1)) is not null then
   raise exception 'write job result exposed';end if;
 end $test$;
+
+-- A valid browser user STOP must revoke even a previously SUCCEEDED read
+-- job; no server-side geometry receipt survives that opt-out.
+set role authenticated;
+set request.jwt.claim.role='authenticated';
+set request.jwt.claim.sub='22222222-2222-4222-8222-222222222222';
+set request.jwt.claim.allowed='true';
+do $test$
+begin
+ if public.lizhi_cad_close_session('55555555-5555-4555-8555-555555555555') is distinct from true then
+   raise exception 'test browser STOP did not close active session';
+ end if;
+end $test$;
+reset role;
+set request.jwt.claim.role='service_role';
+do $test$
+declare
+ job uuid;
+ owner uuid:='22222222-2222-4222-8222-222222222222';
+ session uuid:='55555555-5555-4555-8555-555555555555';
+begin
+ select id into job from lizhi_private.lizhi_cad_commands
+ where user_id=owner and idempotency_key='66666666-6666-4666-8666-666666666666';
+ if job is null then raise exception 'test fixture lost read job'; end if;
+ if public.lizhi_cad_site_read_job(owner,job) is not null then
+   raise exception 'STOP leaked previously successful entity read receipt';
+ end if;
+ begin
+  perform public.lizhi_cad_site_read_enqueue(owner,session,'lizhi.entities',
+     '{"limit":4,"offset":0}'::jsonb,gen_random_uuid());
+  raise exception 'STOP still permits new entity read jobs';
+ exception when insufficient_privilege then null;
+ end;
+end $test$;
 reset role;
 select 'CAD_ENTITY_READ_POSTGRES_PRIVILEGES_AND_JOB_PASS' as result;

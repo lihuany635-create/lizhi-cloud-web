@@ -98,7 +98,15 @@ returns jsonb language sql stable security definer set search_path='' as $read$
  from lizhi_private.lizhi_cad_commands c
  where auth.role()='service_role' and p_owner is not null
    and c.user_id=p_owner and c.id=p_job
-   and c.command in ('lizhi.inspect','lizhi.entities');
+   and c.command in ('lizhi.inspect','lizhi.entities')
+   -- Revocation must also apply to previously completed read snapshots.
+   -- A closed/expired browser session must not reveal its old entity receipts.
+   and exists (
+     select 1 from lizhi_private.lizhi_cad_sessions s
+     where s.id=c.session_id and s.user_id=c.user_id
+       and s.enabled and s.expires_at>now()
+       and s.last_seen>now()-interval '30 seconds'
+   );
 $read$;
 
 revoke all on function public.lizhi_cad_site_read_enqueue(uuid,uuid,text,jsonb,uuid)
