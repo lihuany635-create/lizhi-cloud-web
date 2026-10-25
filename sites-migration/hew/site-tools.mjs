@@ -39,11 +39,12 @@ export async function handleModelSiteTool(name,args,trustedAuth,serverSecrets,fe
  try{
   const rpcId=crypto.randomUUID();
   const response=await fetcher(MODEL_UPSTREAM,{
-   method:"POST",redirect:"error",signal:controller.signal,
+   method:"POST",redirect:"manual",signal:controller.signal,
    headers:{Authorization:"Bearer "+serverSecrets.siteMcpToken,
      "Content-Type":"application/json",Accept:"application/json"},
    body:JSON.stringify({jsonrpc:"2.0",id:rpcId,method:"tools/call",params:{name,arguments:args}})
   });
+  if(response.status>=300&&response.status<400)return fail("MODEL_UPSTREAM_REDIRECT_REFUSED_DO_NOT_RETRY");
   if(response.status===401)return fail("MODEL_UPSTREAM_UNAUTHORIZED");
   if(response.status===403)return fail("MODEL_UPSTREAM_FORBIDDEN");
   if(response.status===503)return fail("MODEL_ENGINE_UNAVAILABLE");
