@@ -44,6 +44,8 @@
       let ok=false,result=null,error=null;
       try {
         if(!commandHost()?.commandStatus?.enabled)throw new Error("使用者已停止 CAD AI 操作");
+        if(job.command==="new" && commandHost()?.commandStatus?.dirty)
+          throw new Error("目前 CAD 圖面尚未保存，請先儲存後再允許遠端新建");
         result=await commandHost().command(job.command,job.params);
         ok=true;
       }catch(e){error=String(e?.message||"CAD 指令執行失敗").slice(0,300);}
