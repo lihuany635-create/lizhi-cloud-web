@@ -1,12 +1,14 @@
 name: LiZhi CAD Prepublish Cross-Module Regression (no deployment)
 on:
   push:
-    branches: [feature/embed-lizhi-cad-local-v1]
+    branches: [feature/embed-lizhi-cad-local-v1, feature/cad-mcp-secure-relay-v1]
     paths:
       - '.github/workflows/cad-prepublish-regression.yml'
       - 'app.js'
       - 'workspace-ui.js'
       - 'index.html'
+      - 'auth.js'
+      - 'sw.js'
       - 'cad/**'
       - 'tests/cad-regression-baseline.cjs'
   workflow_dispatch:
@@ -28,7 +30,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: lihuany635-create/lizhi-cloud-web
-          ref: b67bf9f34e001894793d7c7332bbb7a1e86aa177
+          ref: 58c6735d1586182081e3df2aa46a870a589b0025
           path: _cad-baseline-main
           persist-credentials: false
       - name: Engineering Center comparative baseline (same tests, no new failures)
