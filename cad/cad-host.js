@@ -351,7 +351,7 @@
     else if (action === "recovery") await showRecoveries();
     else if (action === "ai-enable") {
       if (!ready) { status("請先載入 CADCraft，才能允許 AI 操作。", true); return; }
-      if (!confirm("允許此分頁接收已授權的 AI CAD 幾何指令？只能新建、直線、矩形和圓，不能讀取本機路徑；關閉分頁即失效。")) return;
+      if (!confirm("允許 AI 操作目前 CAD 畫布？除了繪製，還可在短效授權期間限量讀取圖元幾何座標。不能存取完整 DXF、路徑或任意文字，也不開放移動、刪除、修剪。按停止或關閉即撤權。")) return;
       allowAiControl = true;
       panel?.querySelector('[data-cad-action="ai-enable"]')?.setAttribute("hidden", "");
       panel?.querySelector('[data-cad-action="ai-disable"]')?.removeAttribute("hidden");
@@ -415,6 +415,16 @@
     if (!params || typeof params !== "object" || Array.isArray(params)) return false;
     if (JSON.stringify(params).length > 8192) return false;
     const keys = Object.keys(params);
+    // Explicitly bounded native geometry read; remote exposure remains gated.
+    if (name === "lizhi.inspect") return keys.length === 0;
+    if (name === "lizhi.entities") return (
+      keys.every(k => ["type","layer","limit","offset","selected"].includes(k)) &&
+      (!Object.hasOwn(params,"type") || (typeof params.type === "string" && params.type.length <= 32)) &&
+      (!Object.hasOwn(params,"layer") || (typeof params.layer === "string" && params.layer.length <= 80)) &&
+      (!Object.hasOwn(params,"limit") || (Number.isInteger(params.limit) && params.limit >= 1 && params.limit <= 8)) &&
+      (!Object.hasOwn(params,"offset") || (Number.isInteger(params.offset) && params.offset >= 0 && params.offset <= 10000)) &&
+      (!Object.hasOwn(params,"selected") || typeof params.selected === "boolean")
+    );
     if (name === "new") return keys.every(k => k === "metric") && (params.metric === undefined || typeof params.metric === "boolean");
     if (name === "rectang") return keys.length === 2 && keys.includes("p1") && keys.includes("p2") && safePoint(params.p1) && safePoint(params.p2);
     if (name === "line") return keys.every(k => k === "points" || k === "closed") && Array.isArray(params.points) &&
