@@ -1,0 +1,111 @@
+name: LiZhi CAD Source-Built Entity Read WASM + Chromium Preview (no deployment)
+on:
+  push:
+    branches: [release/cad-native-read-v1]
+    paths:
+      - 'tests/cad-entity-native-browser-e2e.cjs'
+      - 'cad/cad-host.js'
+      - 'cad/build-runtime.sh'
+      - '.github/workflows/cad-entity-native-wasm-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-native-wasm:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_BUILD_JOBS: '2'
+      RUSTFLAGS: '-C debuginfo=0'
+      CARGO_PROFILE_RELEASE_DEBUG: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm this release only enables bounded reads
+        run: |
+          node --check cad/cad-host.js
+          node --test tests/cad-embedded.test.cjs
+          grep -q 'CAD_REF="cb256cf8a383c422482e8a455e3013887fa39a74"' cad/build-runtime.sh
+          grep -q 'name === "lizhi.inspect"' cad/cad-host.js
+          grep -q 'name === "lizhi.entities"' cad/cad-host.js
+          if grep -q 'name === "lizhi.move"' cad/cad-host.js; then echo 'MOVE unexpectedly enabled'; exit 1; fi
+      - name: Set up pinned Rust 1.95 WASM and verified Trunk
+        run: bash cad/setup-build-toolchain.sh
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: lizhi-cad-entity-wasm-rust195-v1
+      - name: Compile exact native fork entity branch commit into ephemeral preview
+        run: |
+          set -euo pipefail
+          CAD_SHA=cb256cf8a383c422482e8a455e3013887fa39a74
+          git clone --filter=blob:none --no-checkout https://github.com/lihuany635-create/lizhi-cad.git /tmp/lizhi-cad-native
+          git -C /tmp/lizhi-cad-native fetch --depth 1 origin "$CAD_SHA"
+          git -C /tmp/lizhi-cad-native checkout --detach "$CAD_SHA"
+          test "$(git -C /tmp/lizhi-cad-native rev-parse HEAD)" = "$CAD_SHA"
+          export RUSTUP_TOOLCHAIN=1.95.0
+          (cd /tmp/lizhi-cad-native/apps/cadcraft-web && trunk build --release)
+          test -s /tmp/lizhi-cad-native/dist/web/index.html
+          test "$(find /tmp/lizhi-cad-native/dist/web -maxdepth 1 -name '*.wasm' -type f | wc -l)" -ge 1
+          mkdir -p cad/runtime
+          cp -a /tmp/lizhi-cad-native/dist/web/. cad/runtime/
+          printf '{"repository":"lihuany635-create/lizhi-cad","sourceSha":"%s","mode":"ephemeral-native-entity-read-WASM","remoteCadWorker":false,"deployed":false}\n' "$CAD_SHA" > cad/runtime/build-source.json
+          grep -q '立之 CAD' cad/runtime/index.html
+          du -sh cad/runtime
+      - name: Upload source-pinned native WASM preview for separate Chromium job
+        uses: actions/upload-artifact@v4
+        with:
+          name: lizhi-cad-entity-wasm-preview-candidate
+          path: cad/runtime/
+          retention-days: 7
+          if-no-files-found: error
+  native-browser-e2e:
+    needs: build-native-wasm
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: lizhi-cad-entity-wasm-preview-candidate
+          path: cad/runtime
+      - name: Verify source SHA and presence of actual Rust WebAssembly
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path("cad/runtime")
+          assert list(p.glob("*.wasm")) and list(p.glob("*.js"))
+          m=json.loads((p/"build-source.json").read_text())
+          assert m["sourceSha"]=="cb256cf8a383c422482e8a455e3013887fa39a74"
+          assert m["deployed"] is False and m["remoteCadWorker"] is False
+          PY
+      - name: Install actual Chromium Playwright
+        run: |
+          npm install --prefix tests/cad-browser-deps --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          tests/cad-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+      - name: Start isolated loopback portal with real CADCraft and test native entity read
+        env:
+          NODE_PATH: ${{ github.workspace }}/tests/cad-browser-deps/node_modules
+          CAD_TEST_ORIGIN: http://127.0.0.1:8771
+          CAD_BROWSER_EVIDENCE: cad-entity-preview-evidence
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8771 --bind 127.0.0.1 --directory . >/tmp/cad-entity-preview-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8771/index.html >/dev/null; then break; fi
+            sleep 1
+          done
+          node tests/cad-entity-native-browser-e2e.cjs
+      - name: Preserve real native read proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lizhi-cad-entity-read-real-wasm-evidence
+          path: cad-entity-preview-evidence/
+          retention-days: 14
+          if-no-files-found: warn
