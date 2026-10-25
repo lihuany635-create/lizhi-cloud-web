@@ -5,6 +5,8 @@ on:
     paths:
       - 'cad/relay/schema-review.sql'
       - 'tests/cad-mcp-relay-postgres.sql'
+      - 'cad/relay/oauth-client-guard-review.sql'
+      - 'tests/cad-mcp-oauth-clients-postgres.sql'
       - 'supabase/functions/lizhi-cad-mcp/**'
       - '.github/workflows/cad-mcp-relay-db-security.yml'
   workflow_dispatch:
@@ -39,6 +41,9 @@ jobs:
           set -euo pipefail
           psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1             -f tests/cad-mcp-relay-postgres.sql | tee /tmp/cad-sql-test.log
           grep -q CAD_SQL_RLS_OAUTH_OWNER_ISOLATION_PASS /tmp/cad-sql-test.log
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            -f tests/cad-mcp-oauth-clients-postgres.sql | tee /tmp/cad-oauth-clients.log
+          grep -q CAD_OAUTH_CLIENT_SEGREGATION_AND_REVOCATION_PASS /tmp/cad-oauth-clients.log
   edge-deno-typecheck:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
