@@ -67,7 +67,7 @@ Deno.serve(async(req:Request)=>{
     return success(id,{ok:true,online:sessions.length>0,sessions,engine:"local-browser",requiresPageOpen:true});
   }
   if(params.name==="cad_job_status"){
-    const {data,error}=await db.rpc("lizhi_cad_site_job",{p_owner:owner,p_job:checked.args.job_id});
+    const {data,error}=await db.rpc("lizhi_cad_site_job",{p_owner:owner,p_job:(checked.args as {job_id:string}).job_id});
     if(error)return fail(id,"CAD_JOB_STATUS_UNAVAILABLE");
     if(!data)return fail(id,"CAD_JOB_NOT_FOUND");
     // No DXF/file contents returned: only a bounded status/geometry receipt.
