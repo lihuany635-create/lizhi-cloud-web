@@ -16,7 +16,7 @@
   const MAX_TEXT = 140;
   const MAX_VALUE = 300;
   const LEASE_MS = 30 * 60 * 1000;
-  const SENSITIVE = /(?:delete|remove|archive|clear|reset|confirm|commit|import|save|submit|pay|transfer|wipe|revoke|刪|清除|重置|封存|匯入|確認|建立|新增|儲存|付款|繳款|轉帳)/i;
+  const SENSITIVE = /(?:delete|remove|archive|clear|reset|confirm|commit|import|save|submit|wipe|revoke|刪|清除|重置|封存|匯入|確認|儲存)/i;
   const SECRET = /(?:password|passwd|token|secret|auth|credential|api.?key|card.?number|cvv|cvc|密碼|金鑰|完整卡號|驗證碼)/i;
   const CONTROL = "button,input:not([type=hidden]),textarea,select,[role=button],[data-finance-view]";
   let permitted = false, expires = 0, revision = "", handles = new Map(), active = false;
