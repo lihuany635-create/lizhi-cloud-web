@@ -45,7 +45,7 @@ set request.jwt.claim.allowed='true';
 set request.jwt.claim.client_id='cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 select auth.uid() as oauth_user, auth.jwt()->>'client_id' as oauth_client,
   public.lizhi_web_is_allowed() as firstparty;
-do $
+do $$
 declare sid uuid:='aaaaaaaa-cccc-4aaa-8aaa-cccccccccccc';
         job_id uuid; raw jsonb;
 begin
