@@ -27,6 +27,41 @@ async function boundedJson(response,max=32768){
   let at=0;for(const a of chunks){out.set(a,at);at+=a.length}
   return JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(out));
 }
+// Native read-only job results: never forward a full document or filename.
+function safeReadReceipt(value){
+  if(!obj(value))return null;
+  const unsigned=v=>Number.isSafeInteger(v)&&v>=0?v:null;
+  if(Array.isArray(value.entities)){
+    const simple=new Set(["line","circle","arc","lwpolyline","polyline"]);
+    const entities=value.entities.slice(0,8).filter(obj).map(e=>{
+      const type=typeof e.type==="string"?e.type.slice(0,32):"";
+      const layer=typeof e.layer==="string"?e.layer.slice(0,80):"";
+      const handle=typeof e.handle==="string"&&/^[0-9a-f]{1,16}$/i.test(e.handle)?e.handle:null;
+      let geometry=null;
+      if(simple.has(type.toLowerCase())&&obj(e.geometry)&&JSON.stringify(e.geometry).length<=640)
+        geometry=e.geometry;
+      return {handle,type,layer,geometry};
+    });
+    const output={revision:unsigned(value.revision),count:unsigned(value.count),
+      returned:entities.length,offset:unsigned(value.offset),entities,
+      hasMore:value.hasMore===true};
+    return JSON.stringify(output).length<=3800?output:null;
+  }
+  if(unsigned(value.entityCount)!==null){
+    const validBounds=Array.isArray(value.extents)&&value.extents.length===2&&
+      value.extents.every(p=>Array.isArray(p)&&p.length===2&&p.every(n=>typeof n==="number"&&Number.isFinite(n)));
+    const entries=obj(value.counts)?Object.entries(value.counts)
+      .filter(([key,n])=>key.length<=40&&unsigned(n)!==null).slice(0,30):[];
+    const output={revision:unsigned(value.revision),entityCount:unsigned(value.entityCount),
+      counts:Object.fromEntries(entries),
+      extents:validBounds?value.extents:null,
+      currentLayer:typeof value.currentLayer==="string"?value.currentLayer.slice(0,80):null,
+      dirty:value.dirty===true,
+      selectionCount:unsigned(value.selectionCount)};
+    return JSON.stringify(output).length<=3800?output:null;
+  }
+  return null;
+}
 export async function handleCadSiteTool(
   name,args,auth,secrets,fetcher=fetch
 ){
@@ -46,12 +81,13 @@ export async function handleCadSiteTool(
     // Local user's CAD page must separately have enabled both AI consent and
     // its own Supabase first-party session lease before accepting geometry.
     const response=await fetcher(SITE_CAD_ENDPOINT,{
-      method:"POST",redirect:"error",signal:controller.signal,
+      method:"POST",redirect:"manual",signal:controller.signal,
       headers:{Authorization:"Bearer "+secrets.siteMcpToken,
         "Content-Type":"application/json",Accept:"application/json"},
       body:JSON.stringify({jsonrpc:"2.0",id,method:"tools/call",
         params:{name,arguments:args}})
     });
+    if(response.status>=300&&response.status<400)return error("CAD_UPSTREAM_REDIRECT_REJECTED");
     if(!response.ok)return error("CAD_UPSTREAM_REJECTED_OR_UNAVAILABLE");
     const body=await boundedJson(response);
     if(!obj(body)||body.jsonrpc!=="2.0"||body.id!==id||!obj(body.result) ||
@@ -81,7 +117,7 @@ export async function handleCadSiteTool(
       return {isError:false,content:[{type:"text",text:JSON.stringify({
         ok:true,job_id:job.job_id,state:job.state,
         completed:job.state==="succeeded",error:typeof job.error==="string"?job.error.slice(0,200):null,
-        automaticRetryAllowed:false})}]};
+        automaticRetryAllowed:false,...(job.state==="succeeded"&&job.result?{readResult:safeReadReceipt(job.result)}:{})})}]};
     }
     if(typeof value.job_id!=="string"||value.queued!==true||value.completed!==false)
       return error("CAD_UNCONFIRMED_DO_NOT_RETRY");
