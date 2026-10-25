@@ -20,3 +20,8 @@ verify_jwt = false
 [functions.lizhi-cad-mcp]
 # OAuth discovery must reach endpoint before bearer token; @supabase/server verifies user JWT.
 verify_jwt = false
+
+[functions.lizhi-cad-site-mcp]
+# Private Sites server authenticates via its own bearer. Supabase JWT gateway
+# must not pre-reject a non-JWT token; this Edge function checks it server-side.
+verify_jwt = false
