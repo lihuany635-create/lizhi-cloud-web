@@ -37,3 +37,20 @@ test("never return data from non-read or unfinished jobs",()=>{
  assert.equal(projectEntityReadReceipt({job_id,state:"claimed",kind:"lizhi.entities",data:{secret:"yes"}}).data,undefined);
  assert.equal(projectEntityReadReceipt({job_id,state:"succeeded",kind:"lizhi.inspect",data:{revision:7,entityCount:5,selectionCount:0,dirty:true,counts:{LINE:4,SECRET:"no"}}}).data.revision,7);
 });
+
+test("real CADCraft native serde geometry survives sanitization, unknown data does not",()=>{
+ const native={job_id,kind:"lizhi.entities",state:"succeeded",data:{
+ revision:13,count:2,offset:0,entities:[
+  {handle:"AF",type:"Line",layer:"0",geometry:{type:"line",a:{x:0,y:0,z:0},b:{x:800,y:900,z:0}}},
+  {handle:"B0",type:"Circle",layer:"0",geometry:{type:"circle",center:{x:40,y:50,z:0},radius:12}}
+ ]}};
+ const result=projectEntityReadReceipt(native);
+ assert.equal(result.ok,true);
+ assert.equal(result.data.entities[0].geometryAvailable,true);
+ assert.equal(result.data.entities[0].geometry.b.y,900);
+ assert.equal(result.data.entities[1].geometry.radius,12);
+ const unsafe=projectEntityReadReceipt({...native,data:{...native.data,entities:[{
+  ...native.data.entities[0],geometry:{type:"line",a:{x:0,y:0,z:0},b:{x:800,y:900,z:0},text:"classified"}
+ }]}});
+ assert.equal(unsafe.data.entities[0].geometryAvailable,false);
+});

@@ -42,7 +42,8 @@ const finite=v=>typeof v==="number"&&Number.isFinite(v)&&Math.abs(v)<=1e6;
 const integer=(v,max=10000000)=>Number.isSafeInteger(v)&&v>=0&&v<=max;
 const sane=s=>typeof s==="string"&&s.length<=80&&!/[\u0000-\u001f]/.test(s)?s:"";
 const cleanScalar=v=>finite(v)?v:typeof v==="boolean"?v:undefined;
-const COORD_KEYS=new Set(["x","y","z","start","end","center","radius","diameter","points","vertices","closed","bulge","startAngle","endAngle","angle","min","max","width","height"]);
+const COORD_KEYS=new Set(["x","y","z","start","end","center","radius","diameter","points","vertices","closed","bulge","startAngle","endAngle","angle","min","max","width","height","a","b","p","const_width","elevation","plinegen","pt","start_width","end_width"]);
+const NATIVE_TYPES=new Set(["line","circle","arc","lwPolyline","polyline3d"]);
 function cleanGeometry(data,depth=0){
  if(depth>4)return undefined;
  const scalar=cleanScalar(data);if(scalar!==undefined)return scalar;
@@ -54,6 +55,11 @@ function cleanGeometry(data,depth=0){
   if(Object.keys(data).length>12)return undefined;
   const clean={};
   for(const [k,v] of Object.entries(data)){
+   if(k==="type"){
+    if(typeof v!=="string"||!NATIVE_TYPES.has(v))return undefined;
+    clean.type=v;
+    continue;
+   }
    if(!COORD_KEYS.has(k))return undefined;
    const item=cleanGeometry(v,depth+1);
    if(item===undefined)return undefined;
