@@ -355,9 +355,26 @@
       allowAiControl = true;
       panel?.querySelector('[data-cad-action="ai-enable"]')?.setAttribute("hidden", "");
       panel?.querySelector('[data-cad-action="ai-disable"]')?.removeAttribute("hidden");
+      panel?.querySelector('[data-cad-action="remote-connect"]')?.removeAttribute("hidden");
       status("此分頁已允許 AI CAD 幾何指令，關閉頁面自動撤銷。");
     } else if (action === "ai-disable") {
       revokeAiControl("使用者已停止 AI CAD 操作。");
+    } else if (action === "remote-connect") {
+      try {
+        if (!allowAiControl) throw new Error("請先允許本頁 CAD AI 操作");
+        if (!window.LizhiCadRelay) throw new Error("CAD MCP 中繼模組尚未載入");
+        await window.LizhiCadRelay.connect();
+        panel?.querySelector('[data-cad-action="remote-connect"]')?.setAttribute("hidden", "");
+        panel?.querySelector('[data-cad-action="remote-disconnect"]')?.removeAttribute("hidden");
+        status("已建立本次登入者的 ChatGPT MCP CAD 指令中繼；請保持頁面開啟，可隨時斷開。");
+      } catch (error) {
+        status("ChatGPT MCP 未連線：" + String(error?.message || "登入／服務驗證失敗").slice(0,180), true);
+      }
+    } else if (action === "remote-disconnect") {
+      await window.LizhiCadRelay?.disconnect?.();
+      panel?.querySelector('[data-cad-action="remote-connect"]')?.removeAttribute("hidden");
+      panel?.querySelector('[data-cad-action="remote-disconnect"]')?.setAttribute("hidden", "");
+      status("已停止向 ChatGPT MCP 中繼領取新的 CAD 指令。");
     }
     else if (recoveryDownload) {
       const item = (await getRecoveries()).find(row => row.id === recoveryDownload);
@@ -410,6 +427,9 @@
   }
   function revokeAiControl(message) {
     allowAiControl = false;
+    void window.LizhiCadRelay?.disconnect?.();
+    panel?.querySelector('[data-cad-action="remote-connect"]')?.setAttribute("hidden", "");
+    panel?.querySelector('[data-cad-action="remote-disconnect"]')?.setAttribute("hidden", "");
     panel?.querySelector('[data-cad-action="ai-enable"]')?.removeAttribute("hidden");
     panel?.querySelector('[data-cad-action="ai-disable"]')?.setAttribute("hidden", "");
     for (const [, job] of pendingCadCommands) {
