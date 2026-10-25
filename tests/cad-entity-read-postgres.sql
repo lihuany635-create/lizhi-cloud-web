@@ -123,4 +123,71 @@ begin
  end;
 end $test$;
 reset role;
+-- Expiry regression: STOP is not the only way to revoke data.
+-- A STALE heartbeat or EXPIRED session must hide an already queued read receipt
+-- and refuse another read enqueue, without relying on the caller to opt out.
+set role authenticated;
+set request.jwt.claim.role='authenticated';
+set request.jwt.claim.sub='22222222-2222-4222-8222-222222222222';
+set request.jwt.claim.allowed='true';
+select public.lizhi_cad_begin_session('77777777-7777-4777-8777-777777777777');
+reset role;
+set role service_role;
+set request.jwt.claim.role='service_role';
+do $test$
+declare job uuid;
+begin
+ job:=public.lizhi_cad_site_read_enqueue(
+  '22222222-2222-4222-8222-222222222222',
+  '77777777-7777-4777-8777-777777777777',
+  'lizhi.inspect','{}'::jsonb,'88888888-8888-4888-8888-888888888888');
+ if job is null then raise exception 'expiry fixture read not queued'; end if;
+ perform set_config('lizhi.cad_expiry_fixture_job',job::text,false);
+end $test$;
+reset role;
+update lizhi_private.lizhi_cad_sessions
+ set last_seen=statement_timestamp()-interval '31 seconds'
+ where id='77777777-7777-4777-8777-777777777777';
+set role service_role;
+set request.jwt.claim.role='service_role';
+do $test$
+declare
+ owner uuid:='22222222-2222-4222-8222-222222222222';
+ session uuid:='77777777-7777-4777-8777-777777777777';
+ job uuid:=current_setting('lizhi.cad_expiry_fixture_job')::uuid;
+begin
+ if public.lizhi_cad_site_read_job(owner,job) is not null then
+  raise exception 'stale heartbeat leaked read receipt';
+ end if;
+ begin
+  perform public.lizhi_cad_site_read_enqueue(owner,session,'lizhi.inspect','{}',gen_random_uuid());
+  raise exception 'stale heartbeat permitted read enqueue';
+ exception when insufficient_privilege then null;
+ end;
+end $test$;
+reset role;
+-- Fresh heartbeat does not override an expired consent lease.
+update lizhi_private.lizhi_cad_sessions
+ set last_seen=statement_timestamp(),
+     expires_at=statement_timestamp()-interval '1 second'
+ where id='77777777-7777-4777-8777-777777777777';
+set role service_role;
+set request.jwt.claim.role='service_role';
+do $test$
+declare
+ owner uuid:='22222222-2222-4222-8222-222222222222';
+ session uuid:='77777777-7777-4777-8777-777777777777';
+ job uuid:=current_setting('lizhi.cad_expiry_fixture_job')::uuid;
+begin
+ if public.lizhi_cad_site_read_job(owner,job) is not null then
+  raise exception 'expired lease leaked read receipt';
+ end if;
+ begin
+  perform public.lizhi_cad_site_read_enqueue(owner,session,'lizhi.inspect','{}',gen_random_uuid());
+  raise exception 'expired lease permitted read enqueue';
+ exception when insufficient_privilege then null;
+ end;
+end $test$;
+reset role;
+select 'CAD_ENTITY_READ_HEARTBEAT_AND_LEASE_REVOCATION_PASS' as result;
 select 'CAD_ENTITY_READ_POSTGRES_PRIVILEGES_AND_JOB_PASS' as result;
