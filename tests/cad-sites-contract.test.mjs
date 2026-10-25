@@ -28,7 +28,7 @@ function mockedServer(value,onCall=()=>{}){
  return async(url,options)=>{
   assert.equal(url,SITE_CAD_ENDPOINT);
   assert.equal(options.method,"POST");
-  assert.equal(options.redirect,"error");
+  assert.equal(options.redirect,"manual");
   assert.equal(options.headers.Authorization,"Bearer "+secrets.siteMcpToken);
   const p=JSON.parse(options.body);onCall(p);
   return Response.json({jsonrpc:"2.0",id:p.id,result:{isError:false,content:[{type:"text",text:JSON.stringify(value)}]}});
@@ -73,4 +73,24 @@ test("CAD browser relay UI must use the private Site MCP entry, not obsolete Plu
  assert.ok(host.includes("私人「立之 CAD 指令代理」Site"));
  assert.ok(host.includes("六個 MCP 工具已載入"));
  assert.equal(host.includes("Plugin 完成 OAuth 授權"),false);
+});
+
+test("original six-tool Site adapter rejects Worker redirects and keeps one POST",async()=>{
+  const states=[
+    {status:302,code:"CAD_UPSTREAM_REDIRECT_REJECTED"},
+    {status:401,code:"CAD_UPSTREAM_AUTH_DENIED"},
+    {status:403,code:"CAD_UPSTREAM_AUTH_DENIED"},
+    {status:503,code:"CAD_UPSTREAM_UNAVAILABLE"}
+  ];
+  for(const {status,code} of states){
+    let count=0;
+    const r=await handleCadSiteTool("cad_draw_rectangle",rectangle,owner,secrets,async(_url,opts)=>{
+      count++;
+      assert.equal(opts.redirect,"manual","Site Worker may not support redirect:error");
+      return new Response("",{status,headers:status===302?{Location:"https://other.invalid"}:{}});
+    });
+    assert.equal(r.isError,true);
+    assert.equal(r.content[0].text,code);
+    assert.equal(count,1,"uncertain write must never retry");
+  }
 });
