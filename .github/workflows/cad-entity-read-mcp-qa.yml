@@ -6,6 +6,8 @@ on:
       - 'cad/sites/cad-entity-read-v1.mjs'
       - 'supabase/functions/lizhi-cad-site-mcp/**'
       - 'sites-migration/cad/site-entity-read.mjs'
+      - 'sites-migration/cad/site-mcp-route.mjs'
+      - 'tests/cad-site-v4-route.test.mjs'
       - 'cad/sites/sql/002_entity_read_jobs.REVIEW_ONLY.sql'
       - 'tests/cad-entity-read-contract.test.mjs'
       - 'cad/cad-host.js'
@@ -31,6 +33,7 @@ jobs:
         run: |
           node --check cad/sites/cad-entity-read-v1.mjs
           node --test tests/cad-entity-read-contract.test.mjs tests/cad-entity-read-edge-site.test.mjs
+          node --test tests/cad-site-v4-route.test.mjs tests/cad-sites-site-route.test.mjs
           node --test tests/cad-entity-local-bridge.test.mjs
           cmp cad/sites/cad-entity-read-v1.mjs supabase/functions/lizhi-cad-site-mcp/cad-entity-read-v1.mjs
       - name: Existing six CAD Site tools unaffected
