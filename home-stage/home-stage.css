@@ -92,3 +92,10 @@ body[data-stage-theme="day"].home-stage-on .route-home .library-menu-button,body
   .home-stage-hud,.home-stage-hint{left:67%;transition:left .32s cubic-bezier(.2,.8,.2,1),opacity .5s,transform .5s}
   body.home-stage-drawer .home-stage-hud,body.home-stage-drawer .home-stage-hint{left:calc((134vw - min(390px,92vw)) / 2)}
 }
+/* 手動／自動切換 */
+.home-stage-mode{right:224px}
+.home-stage-mode[aria-pressed="true"]{border-color:#79c8d0;color:#cfeef0}
+body.home-stage-drawer .home-stage-mode{right:calc(min(390px,92vw) + 224px)}
+@media (max-width:680px){
+  .home-stage-mode,body.home-stage-drawer .home-stage-mode{right:16px;bottom:calc(84px + env(safe-area-inset-bottom))}
+}

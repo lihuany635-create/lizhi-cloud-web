@@ -429,10 +429,12 @@
     const state = { x: 0, z: RUN_NEAR - 1.5, vx: 0, vz: 0, yaw: Math.PI, y: 0, vy: 0, target: null, stuck: 0 };
     const keys = new Set(), joy = { x: 0, y: 0, on: false };
     let paused = false;
+    // 自動走：沿中線走到終點、停一下、轉身走回起點，一直循環
+    const auto = { on: !!opts.auto, dir: -1, wait: 0 };
 
     const KEYMAP = { KeyW: "f", ArrowUp: "f", KeyS: "b", ArrowDown: "b", KeyA: "l", ArrowLeft: "l", KeyD: "r", ArrowRight: "r", ShiftLeft: "run", ShiftRight: "run", Space: "jump" };
     function blocked(e) {
-      if (paused || (opts.isBlocked && opts.isBlocked())) return true;
+      if (paused || auto.on || (opts.isBlocked && opts.isBlocked())) return true;
       const el = e && e.target, tag = (el && el.tagName) || "";
       if (/INPUT|TEXTAREA|SELECT/.test(tag) || (el && el.isContentEditable)) return true;
       if (e && e.code === "Space" && tag === "BUTTON") return true;
@@ -465,7 +467,7 @@
       state.target = { x: tx, z: tz }; state.stuck = 0;
       marker.position.set(tx, TOP + 0.015, tz); marker.visible = true; marker.userData.t = 0;
     }
-    function onDown(e) { if (paused) return; const a = document.activeElement; if (a && a !== document.body && a.blur) a.blur(); held = true; try { canvas.setPointerCapture(e.pointerId); } catch (_) {} aim(e); }
+    function onDown(e) { if (paused || auto.on) return; const a = document.activeElement; if (a && a !== document.body && a.blur) a.blur(); held = true; try { canvas.setPointerCapture(e.pointerId); } catch (_) {} aim(e); }
     function onMove(e) { if (held) aim(e); }
     function onUp() { held = false; }
     canvas.addEventListener("pointerdown", onDown); canvas.addEventListener("pointermove", onMove);
@@ -483,6 +485,7 @@
       const end = () => { joy.on = false; joy.x = joy.y = 0; knob.style.transform = ""; };
       joyEl.addEventListener("pointerup", end); joyEl.addEventListener("pointercancel", end);
       container.appendChild(joyEl);
+      if (auto.on) joyEl.style.display = "none";
     }
 
     // 直式（手機）把畫面往下推，讓角色避開上方的大標題；桌機由 CSS 讓畫布只佔標題右側
@@ -512,6 +515,13 @@
       let ix = 0, iz = 0, sprint = keys.has("run");
       if (keys.has("f")) iz -= 1; if (keys.has("b")) iz += 1; if (keys.has("l")) ix -= 1; if (keys.has("r")) ix += 1;
       if (joy.on) { ix += joy.x; iz += joy.y; if (Math.hypot(joy.x, joy.y) > 0.85) sprint = true; }
+      if (auto.on) {
+        ix = 0; iz = 0; sprint = false; state.target = null;
+        const endZ = auto.dir < 0 ? RUN_FAR + 1.2 : RUN_NEAR - 1.5;
+        if (auto.wait > 0) { auto.wait -= dt; if (auto.wait <= 0) auto.dir *= -1; }
+        else if (Math.abs(endZ - state.z) < 0.35) auto.wait = 2.5;
+        else { iz = Math.sign(endZ - state.z); ix = Math.max(-0.5, Math.min(0.5, -state.x * 0.8)); }
+      }
       let mag = Math.hypot(ix, iz);
       if (mag < 0.12 && state.target) {
         const dx = state.target.x - state.x, dz = state.target.z - state.z, d = Math.hypot(dx, dz);
@@ -583,6 +593,15 @@
       },
       // 測試用：把角色移到指定距離（公尺）
       _teleport(d) { state.z = Math.max(RUN_FAR, RUN_NEAR - 1.5 - d); state.x = 0; state.vx = state.vz = 0; state.target = null; camPos.set(0, 5, state.z + 7); camLook.set(0, 1, state.z - 2); },
+      setAuto(v) {
+        auto.on = !!v; keys.clear(); held = false; state.target = null; marker.visible = false;
+        joy.on = false; joy.x = joy.y = 0;
+        if (joyEl) joyEl.style.display = auto.on ? "none" : "";
+        // 從目前位置往比較遠的那一端走
+        if (auto.on) { auto.wait = 0; auto.dir = (state.z - RUN_FAR) > (RUN_NEAR - state.z) ? -1 : 1; }
+        return auto.on;
+      },
+      get auto() { return auto.on; },
       setTheme(name) { world.setTheme(name, renderer); return world.theme; },
       get theme() { return world.theme; },
       setPaused(v) {

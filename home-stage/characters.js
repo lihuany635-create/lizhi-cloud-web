@@ -6,7 +6,7 @@
   "use strict";
 
   const THREE_URL = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
-  const STAGE_URL = "./home-stage/stage.js?v=2";
+  const STAGE_URL = "./home-stage/stage.js?v=3";
   const BUCKET = "lizhi-stage-characters", TABLE = "lizhi_stage_characters";
   const CACHE = "lizhi-stage-characters-v1";
   const MAX_BYTES = 50 * 1024 * 1024;
@@ -18,7 +18,16 @@
     session: [], // 未登入雲端時，本次匯入只存在這次瀏覽
     busy: "", msg: "", msgKind: "", editing: null, panelOpen: false,
   };
-  let layer, stageBox, btn, panel, hint, fileInput, sceneBtn, hud;
+  let layer, stageBox, btn, panel, hint, fileInput, sceneBtn, hud, modeBtn;
+  const MODE_KEY = "lizhi-stage-mode-v1";
+  const savedAuto = () => { try { return localStorage.getItem(MODE_KEY) === "auto"; } catch (_) { return false; } };
+  function setAuto(on) {
+    try { localStorage.setItem(MODE_KEY, on ? "auto" : "manual"); } catch (_) {}
+    if (S.ctl) S.ctl.setAuto(on);
+    document.body.classList.toggle("home-stage-auto", on);
+    if (modeBtn) { modeBtn.innerHTML = on ? '<span aria-hidden="true">↻</span>自動' : '<span aria-hidden="true">✥</span>手動'; modeBtn.setAttribute("aria-pressed", String(on)); }
+    if (hint && S.on) { hint.textContent = on ? (coarse() ? "自動走秀中・再點「自動」切回手動" : "自動走秀中：走到 600 公尺終點再走回來・再點「自動」切回手動") : (coarse() ? "左下搖桿移動・點伸展台跑過去" : "WASD／方向鍵移動・Shift 衝刺・空白鍵跳・點伸展台跑過去"); hint.classList.add("show"); clearTimeout(hintTimer); hintTimer = setTimeout(() => hint.classList.remove("show"), 6000); }
+  }
   const THEME_KEY = "lizhi-stage-theme-v1", THEME_ORDER = ["night", "day", "snow"], THEME_LABEL = { night: "夜晚", day: "白天", snow: "下雪" };
   const savedTheme = () => { try { const v = localStorage.getItem(THEME_KEY); return THEME_ORDER.includes(v) ? v : "night"; } catch (_) { return "night"; } };
   function setTheme(name) {
@@ -287,8 +296,11 @@
     sceneBtn = document.createElement("button"); sceneBtn.type = "button"; sceneBtn.className = "home-stage-btn home-stage-scene"; sceneBtn.hidden = true;
     sceneBtn.title = "切換伸展台場景（夜晚／白天／下雪）";
     sceneBtn.addEventListener("click", cycleTheme);
+    modeBtn = document.createElement("button"); modeBtn.type = "button"; modeBtn.className = "home-stage-btn home-stage-mode"; modeBtn.hidden = true;
+    modeBtn.title = "切換手動操控／自動走秀";
+    modeBtn.addEventListener("click", () => { setAuto(!(S.ctl && S.ctl.auto)); modeBtn.blur(); });
     hud = document.createElement("div"); hud.className = "home-stage-hud"; hud.hidden = true;
-    document.body.append(layer, hint, sceneBtn, btn, panel, hud, fileInput);
+    document.body.append(layer, hint, modeBtn, sceneBtn, btn, panel, hud, fileInput);
   }
 
   // ───────────── 啟動與首頁偵測 ─────────────
@@ -296,10 +308,11 @@
     if (!webglOK()) throw new Error("此裝置不支援 WebGL");
     if (!window.THREE) await loadScript(THREE_URL);
     if (!window.LizhiStage) await loadScript(STAGE_URL);
-    S.ctl = window.LizhiStage.mount(stageBox, { theme: savedTheme(), isBlocked: () => !!document.querySelector(".sidebar.open, .modal-backdrop") || (S.panelOpen && panel.contains(document.activeElement) && document.activeElement !== panel) });
+    S.ctl = window.LizhiStage.mount(stageBox, { theme: savedTheme(), auto: savedAuto(), isBlocked: () => !!document.querySelector(".sidebar.open, .modal-backdrop") || (S.panelOpen && panel.contains(document.activeElement) && document.activeElement !== panel) });
     S.ctl.setPaused(!S.on);
     document.body.classList.add("home-stage-ready");
-    btn.hidden = false; sceneBtn.hidden = false; hud.hidden = false; setTheme(savedTheme());
+    btn.hidden = false; sceneBtn.hidden = false; modeBtn.hidden = false; hud.hidden = false; setTheme(savedTheme());
+    if (modeBtn) { const on = savedAuto(); document.body.classList.toggle("home-stage-auto", on); modeBtn.innerHTML = on ? '<span aria-hidden="true">↻</span>自動' : '<span aria-hidden="true">✥</span>手動'; modeBtn.setAttribute("aria-pressed", String(on)); }
     let lastHud = "";
     setInterval(() => { if (!S.on || !S.ctl) return; const st = S.ctl.state, txt = `${Math.round(st.distance)} m ／ ${Math.round(st.length)} m`; if (txt !== lastHud) { hud.textContent = txt; lastHud = txt; } }, 250);
     try { await refreshList(); } catch (e) { console.warn("[home-stage] list", e); S.msg = friendly(e); S.msgKind = "err"; }
@@ -320,7 +333,7 @@
     if (on && !S.booting) S.booting = boot().catch((e) => {
       console.warn("[home-stage] 未啟用：", e && e.message);
       S.failed = true; document.body.classList.remove("home-stage-on", "home-stage-ready");
-      if (layer) layer.hidden = true; if (btn) btn.hidden = true; if (sceneBtn) sceneBtn.hidden = true; if (hud) hud.hidden = true; if (hint) hint.classList.remove("show");
+      if (layer) layer.hidden = true; if (btn) btn.hidden = true; if (sceneBtn) sceneBtn.hidden = true; if (modeBtn) modeBtn.hidden = true; if (hud) hud.hidden = true; if (hint) hint.classList.remove("show");
     });
   }
 
@@ -340,5 +353,5 @@
 
   if (window.LIZHI_DISABLE_HOME_STAGE) return;
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", watch); else watch();
-  window.LizhiHomeStage = { get state() { return S; }, togglePanel, importFile, choose, setTheme };
+  window.LizhiHomeStage = { get state() { return S; }, togglePanel, importFile, choose, setTheme, setAuto };
 })();
