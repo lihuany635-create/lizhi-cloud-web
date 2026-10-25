@@ -147,6 +147,54 @@ jobs:
           RUSTFLAGS: '-C debuginfo=0'
         run: bash cad/build-runtime.sh
 
+      # Hew is built into the SAME GitHub Pages origin as the authenticated
+      # cloud portal. No extra website, token or remote 3D engine is required.
+      # Source pin is reviewed separately in hew-editor-integration-preview.yml.
+      - name: Checkout reviewed public Hew WASM fork at immutable SHA
+        uses: actions/checkout@v4
+        with:
+          repository: lihuany635-create/lizhi-hew
+          ref: 70c73ad001a1800984d7e67a660321341b7611a5
+          path: .hew-model-build
+          persist-credentials: false
+      - name: Verify Hew source pin
+        run: test "$(git -C .hew-model-build rev-parse HEAD)" = "70c73ad001a1800984d7e67a660321341b7611a5"
+      - name: Pinned Hew Node version
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .hew-model-build/.node-version
+      - name: Hew pnpm package manager
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+      - name: Hew Rust compile cache
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6
+        with:
+          workspaces: .hew-model-build
+      - name: Hew pinned wasm-pack
+        working-directory: .hew-model-build
+        run: bash scripts/install-wasm-pack.sh
+      - name: Hew frozen dependencies
+        working-directory: .hew-model-build
+        run: pnpm install --frozen-lockfile
+      - name: Compile native Hew editor to relative URL subpath
+        working-directory: .hew-model-build
+        run: |
+          pnpm --dir app build
+          pnpm --dir app exec vite build --base=./
+      - name: Stage Hew React/WASM inside original portal with license and source provenance
+        run: bash hew/build-embedded-runtime.sh
+      - name: Verify isolated Hew editor route without damaging original portal
+        run: |
+          node --test tests/hew-portal-embed.test.mjs
+          test -s hew-editor/index.html
+          test -s hew-editor/SOURCE.txt
+          test -s hew-editor/AGPL-3.0.txt
+          test -s cad/runtime/index.html
+          test -d model-viewer
+      - name: Remove temporary Hew source and build dependencies from Pages payload
+        run: rm -rf .hew-model-build
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
