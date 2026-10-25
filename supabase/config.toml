@@ -16,3 +16,7 @@ allow_dynamic_registration = true
 # OAuth discovery must reach the function before a user token exists. The
 # function validates the OAuth access token itself with @supabase/server.
 verify_jwt = false
+
+[functions.lizhi-cad-mcp]
+# OAuth discovery must reach endpoint before bearer token; @supabase/server verifies user JWT.
+verify_jwt = false
