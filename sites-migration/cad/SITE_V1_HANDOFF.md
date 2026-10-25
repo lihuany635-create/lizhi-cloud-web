@@ -1,6 +1,6 @@
 # 立之 CAD｜比照 A22 v9 私人 Site 的 MCP 接線交接
 
-**狀態：隔離候選版。Site 尚未建立／部署，Supabase 新服務尚未部署。不得將本專案標成已連線。**
+**狀態（2026-10-25）：使用者已建立私人 Site v1 並儲存，尚未發布；正式 Supabase 專用三個 RPC 與 Edge 已部署。但一般 ChatGPT 六工具、正式 Sites identity／Token 及實機 CAD 繪圖尚未完成端到端驗收。不得標成『ChatGPT 已連線／已繪圖』。**
 
 ## 已驗證的手機路徑
 
@@ -57,3 +57,18 @@ CAD 繪圖 UI 仍使用 `https://lihuany635-create.github.io/lizhi-cloud-web/?op
 - 不因使用者「手機可離線」就聲稱「CAD Browser 關閉後可繪圖」：本架構 CAD 引擎在打開的瀏覽器執行。關頁後 session 會過期。
 - 原 `lizhi-cad-mcp` OAuth Edge 及私人 Plugin 保留，不刪除、不再當主連線途徑，避免中途破壞可回退資訊。
 - Site 可以顯示工作狀態，但沒有圖面渲染或 file read/write 工具，請保留 CAD DXF 本機優先與使用者明確操作許可。
+
+
+## 2026-10-25｜正式 Supabase CAD Site 專用中繼部署與核查
+
+> 本節覆蓋本文上方記錄的「SQL 尚未套用／Edge 尚未部署」歷史狀態；上方其餘測試及安全要求仍有效。
+
+- 使用者已明確授權部署專用 SQL 與 Edge Function，並回覆已完成 Sites 與 Supabase 的 CAD Secret 設定；**Secret 真實值與是否一致未能由此對話讀取，不能視為已驗證。**
+- 正式 Supabase 專案 `hrdzywkihfqggiwjgavi`：使用 `apply_migration` 成功建立 migration `20261025044952_lizhi_cad_site_bridge_v1`。SQL 來自 Draft PR #11 固定提交 `db8bf0a7` 的 `cad/sites/sql/001_sites_bridge.REVIEW_ONLY.sql`，其來源 SHA 為 `fcdab187aa2d4828f185709e56a4ad1df47f8c13`。
+- 實際 SQL 權限查核：`public.lizhi_cad_site_active(uuid)`、`lizhi_cad_site_enqueue(uuid,uuid,text,jsonb,uuid)`、`lizhi_cad_site_job(uuid,uuid)` 均成功建立；三者 `anon_execute=false`、`authenticated_execute=false`、`service_role_execute=true`。未改原有 CAD sessions/commands/claim/finish RPC，也未修改圖檔。
+- 成功部署 Edge `lizhi-cad-site-mcp` v1，狀態 ACTIVE；獨立自原本 `lizhi-cad-mcp`。由於 Edge 程式以**自己核對 Bearer Secret**，`verify_jwt=false` 是預期配置，絕非開放匿名呼叫。以 `get_edge_function` 實際讀回正式程式檔，`index.ts`、`cad-site-contract.mjs`、`bounded-body.mjs` 均與固定 GitHub 提交內容逐字相同。
+- Supabase Security Advisors 有一些既存的 RLS/definer/auth 警示；查核未觀察到命名為 `lizhi_cad_site_*` 的新函式警示。未擅自調整其他系統權限。
+- GitHub Actions 隔離 CI `40162054896`（Node Site 路由、Deno Edge HTTP、PG16）三組 PASS，但它是**模擬驗證**，非正式 HTTP 上游實測。
+- 目前環境無法從網際網路對正式 Edge 發起 POST；因此尚未完成正式匿名 401、錯誤 token 401、實際 Site token /tools/list 六工具 E2E。需由 Sites 已設定 Secret 的 server 端正式測試；不得貼出或展示金鑰。
+- 私人 Site v1 的狀態根據使用者轉交：已儲存、15/15 模擬測試 PASS、尚未發布。正式 ChatGPT 對話尚未發現六工具，CAD 頁面尚未以 `cad_job_status=succeeded` 實機驗收。
+- 下一步：在同一私人 Site 原專案中安全驗證伺服器端 Site Secret 可用與自己 Owner 身份後私人發布；由一般 ChatGPT 真正列出六工具，登入開啟 CAD 頁面並手動 AI consent，依序 `cad_status` → 一筆 800×900 mm 矩形 → `cad_job_status=succeeded`。若未成功，僅回報錯誤狀態，不自動重送繪圖指令。
