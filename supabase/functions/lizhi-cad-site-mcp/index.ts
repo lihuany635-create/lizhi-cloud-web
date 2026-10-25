@@ -77,7 +77,7 @@ Deno.serve(async(req:Request)=>{
   // heartbeat+claim+finish processes it exactly once while CAD is opt-in online.
   const {data,error}=await db.rpc("lizhi_cad_site_enqueue",{
     p_owner:owner,p_session:(checked.args as {session_id:string}).session_id,
-    p_request_id:checked.args.request_id,
+    p_request_id:(checked.args as {request_id:string}).request_id,
     p_command:checked.command,p_params:checked.params
   });
   if(error)return fail(id,"CAD_NOT_ONLINE_AUTHORIZED_OR_RATE_LIMITED");
