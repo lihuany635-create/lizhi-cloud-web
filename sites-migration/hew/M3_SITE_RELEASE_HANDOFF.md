@@ -57,3 +57,19 @@ Supabase Edge 另外需要 `LIZHI_MODEL_SITE_OWNER_UID`，值是**本人的** Su
 - 立之工作台 ID：`f1dd7512-ce86-4268-b7cb-b4edd11ce8d7`
 
 **明確限制：** 目前沒有可用工具直接在使用者 ChatGPT Sites 管理介面建立/私人發布 Site、配置 Edge secrets 或為正式 Hew 註冊 Google OAuth callback，因此此交接文件不可被當作上述管理動作已完成的證據。
+
+
+## 2026-10-25｜正式私人 Site v2 真實 MCP 連線成功
+
+- Site: `https://lizhi-model-agent-20261025.lihuany635.chatgpt.site`；使用者回報 v2 已私人發布、僅本人可見，原 CAD Site 未改。
+- 使用者回報 v1 Worker 仍採 Secret revision 1（Sites Settings 已到 revision 3）；v2 已更新並補充安全診斷。未顯示任何機密值。
+- **這不是只憑報告**：本次一般 ChatGPT 對話實際載入六項 `model_*` MCP 工具，並成功呼叫正式 `model_status({})`。工具實際回應（去識別化）為：
+
+```json
+{"ok":true,"online":false,"requiresExplicitPageConsent":true,"sessions":[],"siteConfiguration":{"release":"2.0.0","runtimeSource":"worker_env","secretPresent":true,"tokenFormatValid":true,"ownerEmailConfigured":true}}
+```
+
+- 這證明 **ChatGPT → 私人 Site v2 → Supabase Edge 的正式唯讀 MCP 查詢可用**，先前 `MODEL_SITE_NOT_CONFIGURED` 問題已解決。
+- 尚不能宣稱正式 ChatGPT 3D 幾何建立成功：`online:false` 與 `sessions:[]` 表示沒有 Hew 授權的工作階段；Hew Browser 的 `LizhiModelQueuePilotPanel.tsx` 現在仍 DEV-only， standalone Hew 未提供可信同源 `window.LizhiAuth`；文件 UUID 仍是 per-page ID； scene 摘要未實作。
+- 下一步應在 Hew Fork 建立真正可開啟的本人登入／文件識別入口，保留短時效明確人工允許後才能執行 claim；最後在已授權的模型分頁以 `model_create_box` 入列一次，回報 `model_job_status=succeeded`，並人工確認實體與 .hew 儲存／重新開啟。
+
