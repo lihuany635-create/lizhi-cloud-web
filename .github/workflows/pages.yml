@@ -195,6 +195,20 @@ jobs:
       - name: Remove temporary Hew source and build dependencies from Pages payload
         run: rm -rf .hew-model-build
 
+      # Rebuild the native production workspace from reviewed source on each Pages publish.
+      # The two policy Markdown files remain regular same-origin static documents.
+      - name: Build Employee Essentials into native production workspace
+        working-directory: production/source
+        run: |
+          npm install --no-package-lock --no-audit --no-fund
+          npm test
+          npm run build
+          test -s native-dist/production-workspace.js
+          grep -q '員工必知' native-dist/production-workspace.js
+          test -s ../../docs/AI_EMPLOYEE_HANDBOOK_v1.0.md
+          test -s ../../docs/APP_REQUIREMENTS_INTERVIEW_v1.0.md
+          cp native-dist/production-workspace.js ../production-workspace.js
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
