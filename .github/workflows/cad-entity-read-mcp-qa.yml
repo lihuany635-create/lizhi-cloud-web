@@ -13,6 +13,8 @@ on:
       - 'tests/cad-entity-read-edge-site.test.mjs'
       - 'tests/cad-entity-read-edge-http.test.mjs'
       - 'tests/cad-entity-read-postgres.sql'
+      - 'tests/cad-entity-read-fake-postgrest.mjs'
+      - 'tests/cad-entity-read-full-loopback.test.mjs'
       - '.github/workflows/cad-entity-read-mcp-qa.yml'
   workflow_dispatch:
 permissions:
@@ -68,6 +70,40 @@ jobs:
             wait "$pid" 2>/dev/null || true
             trap - EXIT
           done
+  read-site-to-edge-to-rpc:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run real private Site adapter through local Edge HTTP to fake PostgREST
+        env:
+          SUPABASE_URL: http://127.0.0.1:54321
+          SUPABASE_SERVICE_ROLE_KEY: ci-fake-service-role
+          LIZHI_CAD_SITE_MCP_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          LIZHI_CAD_SITE_OWNER_UID: 11111111-1111-4111-8111-111111111111
+          LIZHI_CAD_ENTITY_READ_V1: 'true'
+        run: |
+          set -euo pipefail
+          node tests/cad-entity-read-fake-postgrest.mjs >/tmp/cad-fake-rpc.log 2>&1 &
+          mock_pid=$!
+          deno run --allow-env --allow-net supabase/functions/lizhi-cad-site-mcp/index.ts >/tmp/cad-real-deno.log 2>&1 &
+          edge_pid=$!
+          trap 'kill "$mock_pid" "$edge_pid" 2>/dev/null || true' EXIT
+          ready=0
+          for i in $(seq 1 35); do
+            p1=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:54321/probe || true)
+            p2=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/ || true)
+            if [ "$p1" = "200" ] && [ "$p2" = "405" ]; then ready=1; break; fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then cat /tmp/cad-fake-rpc.log /tmp/cad-real-deno.log; exit 1; fi
+          node --test tests/cad-entity-read-full-loopback.test.mjs
   read-postgres:
     runs-on: ubuntu-24.04
     services:
