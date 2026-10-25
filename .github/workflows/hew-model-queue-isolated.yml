@@ -1,0 +1,50 @@
+# Isolated PostgreSQL 16 smoke/security test for proposed model_* queue.
+# Absolutely no access to the user's Supabase project/secrets.
+name: Hew 3D isolated PostgreSQL queue
+on:
+  push:
+    branches: [feature/hew-3d-mcp-v1-20261025]
+    paths:
+      - 'hew/sql/**'
+      - 'tests/sql/hew_model_queue_isolated.test.sql'
+      - '.github/workflows/hew-model-queue-isolated.yml'
+  pull_request:
+    paths:
+      - 'hew/sql/**'
+      - 'tests/sql/hew_model_queue_isolated.test.sql'
+      - '.github/workflows/hew-model-queue-isolated.yml'
+permissions:
+  contents: read
+jobs:
+  postgres-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 3s --health-timeout 3s --health-retries 15
+    steps:
+      - name: Checkout isolated SQL candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: PostgreSQL client
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y postgresql-client
+          fi
+          psql --version
+      - name: Test owner separation, document revision, idempotency, single claim and consent close
+        env:
+          PGHOST: localhost
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
+        run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/hew_model_queue_isolated.test.sql
