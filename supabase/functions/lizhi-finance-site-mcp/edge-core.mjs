@@ -1,7 +1,8 @@
-import {FINANCE_SITE_TOOLS,validateFinanceSiteTool} from "./site-contract.mjs";
+import {FINANCE_SITE_TOOLS,validateFinanceSiteTool,FINANCE_UI_SITE_TOOLS,validateFinanceUiTool} from "./site-contract.mjs";
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const HEX=/^[0-9a-f]{64,128}$/i;
+const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const HEAD={"Cache-Control":"private, no-store","Pragma":"no-cache","X-Content-Type-Options":"nosniff"};
 const obj=x=>x!==null&&typeof x==="object"&&!Array.isArray(x);
 const json=(value,status=200)=>Response.json(value,{status,headers:HEAD});
@@ -148,10 +149,38 @@ export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBear
   if(frame.method==="initialize")return rpc(requestId,{protocolVersion:"2025-06-18",
     capabilities:{tools:{listChanged:false}},serverInfo:{name:"lizhi-finance-private-site",version:"0.1.0"}});
   if(frame.method==="ping")return rpc(requestId,{});
-  if(frame.method==="tools/list")return rpc(requestId,{tools:FINANCE_SITE_TOOLS});
+  if(frame.method==="tools/list")return rpc(requestId,{tools:[...FINANCE_SITE_TOOLS,...FINANCE_UI_SITE_TOOLS]});
   if(frame.method!=="tools/call")return err(requestId,-32601,"Method unavailable");
   const p=frame.params;
   if(!obj(p)||typeof p.name!=="string")return err(requestId,-32602,"Invalid tool call");
+  if(FINANCE_UI_SITE_TOOLS.some(t=>t.name===p.name)) {
+    const v=validateFinanceUiTool(p.name,p.arguments??{});
+    if(!v.ok)return fail(requestId,v.code);
+    if(!db.rpc)return fail(requestId,"FINANCE_UI_SERVICE_NOT_READY");
+    try {
+      if(p.name==="finance_ui_sessions") {
+        const {data,error}=await db.rpc("lizhi_finance_ui_site_sessions",{p_owner:ownerUid});
+        if(error||!Array.isArray(data))return fail(requestId,"FINANCE_UI_SESSIONS_UNAVAILABLE");
+        return success(requestId,{sessions:data,engine:"authorized-open-browser",
+          note:"必須先在理財管家原網站按『允許理財 AI 操作』，且保持網頁開啟。"});
+      }
+      if(p.name==="finance_ui_job") {
+        const {data,error}=await db.rpc("lizhi_finance_ui_site_job",{p_owner:ownerUid,p_job:v.args.job_id});
+        if(error)return fail(requestId,"FINANCE_UI_JOB_UNAVAILABLE");
+        if(!data)return fail(requestId,"FINANCE_UI_JOB_NOT_FOUND");
+        return success(requestId,{job:data,completed:data.state==="succeeded",
+          note:"UI 事件成功送出不等於帳本變更已完成。"});
+      }
+      const {data,error}=await db.rpc("lizhi_finance_ui_site_enqueue",{
+        p_owner:ownerUid,p_session:v.args.session_id,p_request_id:v.args.request_id,
+        p_operation:v.args.operation,p_params:v.args.params
+      });
+      if(error||typeof data!=="string"||!UUID_RE.test(data))
+        return fail(requestId,"FINANCE_UI_NOT_AUTHORIZED_ONLINE_OR_ENQUEUE_FAILED");
+      return success(requestId,{queued:true,completed:false,job_id:data,automaticRetryAllowed:false,
+        note:"只入列，呼叫 finance_ui_job 查詢；逾時不得改 request_id 重試操作。"});
+    }catch{return fail(requestId,"FINANCE_UI_UPSTREAM_UNAVAILABLE")}
+  }
   const validated=validateFinanceSiteTool(p.name,p.arguments??{});
   if(!validated.ok)return fail(requestId,validated.code);
   try{
