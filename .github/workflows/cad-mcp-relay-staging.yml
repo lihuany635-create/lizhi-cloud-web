@@ -1,0 +1,89 @@
+name: LiZhi CAD MCP Relay Staging QA (no deployment)
+on:
+  push:
+    branches: [feature/cad-mcp-secure-relay-v1]
+    paths:
+      - 'cad/**'
+      - 'tests/cad-mcp-relay-mock-e2e.cjs'
+      - 'supabase/functions/lizhi-cad-mcp/**'
+      - 'supabase/config.toml'
+      - 'app.js'
+      - 'index.html'
+      - '.github/workflows/cad-mcp-relay-staging.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  relay-staging:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Static syntax and principle checks
+        run: |
+          node --check cad/cad-host.js
+          node --check cad/cad-remote-relay.js
+          node --check tests/cad-mcp-relay-mock-e2e.cjs
+          python3 - <<'PY'
+          from pathlib import Path
+          sql=Path('cad/relay/schema-review.sql').read_text()
+          edge=Path('supabase/functions/lizhi-cad-mcp/index.ts').read_text()
+          assert "security definer" in sql
+          assert "auth.uid()" in sql
+          assert "enable row level security" in sql
+          assert "lizhi_cad_point_valid" in sql
+          assert "create or replace function public.lizhi_cad_claim_next" in sql
+          assert "lizhi_cad_command_valid" in sql
+          assert "withSupabase({auth:\"user\"})" in edge
+          assert "readOnlyHint:false" in edge
+          assert "get_command_result" in edge
+          assert not Path('supabase/migrations/20261025_lizhi_cad_mcp.sql').exists()
+          print('Candidate-only DB code; nothing applied to production')
+          PY
+      - name: Download source-verified CADCraft WASM with geometry command port
+        uses: actions/download-artifact@v4
+        with:
+          name: lizhi-cad-integrated-runtime-candidate
+          repository: lihuany635-create/lizhi-cloud-web
+          run-id: 40153194288
+          github-token: ${{ github.token }}
+          path: cad/runtime
+      - name: Verify source SHA (not a test mock engine)
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path("cad/runtime")
+          m=json.loads((root/"build-source.json").read_text())
+          assert m["sourceSha"]=="47cb518c96877bb479c8fb45d4ced214cf843f65"
+          assert m["remoteCadWorker"] is False
+          assert list(root.glob("*.wasm")) and list(root.glob("*.js"))
+          PY
+      - name: Install real Chromium
+        run: |
+          npm install --prefix tests/cad-browser-deps --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          tests/cad-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+      - name: Real native engine + fake owner-scoped RPC service
+        env:
+          NODE_PATH: ${{ github.workspace }}/tests/cad-browser-deps/node_modules
+          CAD_BROWSER_EVIDENCE: cad-browser-evidence
+          CAD_TEST_ORIGIN: http://127.0.0.1:8771
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8771 --bind 127.0.0.1 --directory . > /tmp/cad-mcp-http.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8771/index.html > /dev/null; then break; fi
+            sleep 1
+          done
+          node tests/cad-command-port-e2e.cjs
+          node tests/cad-mcp-relay-mock-e2e.cjs
+      - name: Retain offline QA report (no user files)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cad-mcp-staged-local-wasm-relay-evidence
+          path: cad-browser-evidence/
+          retention-days: 14
