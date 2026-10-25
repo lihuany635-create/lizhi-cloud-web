@@ -351,7 +351,7 @@
     else if (action === "recovery") await showRecoveries();
     else if (action === "ai-enable") {
       if (!ready) { status("請先載入 CADCraft，才能允許 AI 操作。", true); return; }
-      if (!confirm("允許此分頁接收已授權的 AI CAD 幾何指令？只能新建、直線、矩形和圓，不能讀取本機路徑；關閉分頁即失效。")) return;
+      if (!confirm("允許此分頁接收已授權的 AI CAD 指令？可新建、繪製直線／矩形／圓，也可限量讀取目前圖面的圖元座標與統計；不開放本機檔案路徑或完整 DXF。移動既有物件須再次人工確認。關閉分頁或停止 AI 即撤權。")) return;
       allowAiControl = true;
       panel?.querySelector('[data-cad-action="ai-enable"]')?.setAttribute("hidden", "");
       panel?.querySelector('[data-cad-action="ai-disable"]')?.removeAttribute("hidden");

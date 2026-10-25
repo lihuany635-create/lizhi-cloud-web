@@ -1,0 +1,143 @@
+name: LiZhi CAD Entity Read MCP Candidate (no deployment)
+on:
+  push:
+    branches: [feature/cad-entity-read-mcp-v1]
+    paths:
+      - 'cad/sites/cad-entity-read-v1.mjs'
+      - 'supabase/functions/lizhi-cad-site-mcp/**'
+      - 'sites-migration/cad/site-entity-read.mjs'
+      - 'sites-migration/cad/site-mcp-route.mjs'
+      - 'sites-migration/cad/site-native-v4.mjs'
+      - 'sites-migration/cad/site-tools.mjs'
+      - 'tests/cad-sites-contract.test.mjs'
+      - 'tests/cad-site-v4-native.test.mjs'
+      - 'tests/cad-site-v4-route.test.mjs'
+      - 'cad/sites/sql/002_entity_read_jobs.REVIEW_ONLY.sql'
+      - 'tests/cad-entity-read-contract.test.mjs'
+      - 'cad/cad-host.js'
+      - 'tests/cad-entity-local-bridge.test.mjs'
+      - 'tests/cad-entity-read-edge-site.test.mjs'
+      - 'tests/cad-entity-read-edge-http.test.mjs'
+      - 'tests/cad-entity-read-postgres.sql'
+      - 'tests/cad-entity-read-fake-postgrest.mjs'
+      - 'tests/cad-entity-read-full-loopback.test.mjs'
+      - '.github/workflows/cad-entity-read-mcp-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Strict read tool input projection tests
+        run: |
+          node --check cad/sites/cad-entity-read-v1.mjs
+          node --test tests/cad-entity-read-contract.test.mjs tests/cad-entity-read-edge-site.test.mjs
+          node --test tests/cad-site-v4-route.test.mjs tests/cad-sites-site-route.test.mjs
+          node --test tests/cad-site-v4-native.test.mjs
+          node --test tests/cad-entity-local-bridge.test.mjs
+          cmp cad/sites/cad-entity-read-v1.mjs supabase/functions/lizhi-cad-site-mcp/cad-entity-read-v1.mjs
+      - name: Existing six CAD Site tools unaffected
+        run: node --test tests/cad-sites-contract.test.mjs
+  edge-check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Compile feature-gated Edge TypeScript (no deploy)
+        run: deno check supabase/functions/lizhi-cad-site-mcp/index.ts
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Smoke test real Edge HTTP in default-off and opt-in modes
+        env:
+          SUPABASE_URL: http://127.0.0.1:54321
+          SUPABASE_SERVICE_ROLE_KEY: ci-fake-service-role
+          LIZHI_CAD_SITE_MCP_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          LIZHI_CAD_SITE_OWNER_UID: 11111111-1111-4111-8111-111111111111
+        run: |
+          set -euo pipefail
+          for mode in false true; do
+            LIZHI_CAD_ENTITY_READ_V1="$mode" deno run --allow-env --allow-net supabase/functions/lizhi-cad-site-mcp/index.ts >/tmp/cad-entity-read-edge.log 2>&1 &
+            pid=$!
+            trap 'kill "$pid" 2>/dev/null || true' EXIT
+            ready=0
+            for i in $(seq 1 35); do
+              if [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/ || true)" = "405" ]; then ready=1; break; fi
+              sleep 1
+            done
+            if [ "$ready" -ne 1 ]; then cat /tmp/cad-entity-read-edge.log; exit 1; fi
+            CAD_READ_TEST_ENABLED="$mode" node --test tests/cad-entity-read-edge-http.test.mjs
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+            trap - EXIT
+          done
+  read-site-to-edge-to-rpc:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run real private Site adapter through local Edge HTTP to fake PostgREST
+        env:
+          SUPABASE_URL: http://127.0.0.1:54321
+          SUPABASE_SERVICE_ROLE_KEY: ci-fake-service-role
+          LIZHI_CAD_SITE_MCP_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          LIZHI_CAD_SITE_OWNER_UID: 11111111-1111-4111-8111-111111111111
+          LIZHI_CAD_ENTITY_READ_V1: 'true'
+        run: |
+          set -euo pipefail
+          node tests/cad-entity-read-fake-postgrest.mjs >/tmp/cad-fake-rpc.log 2>&1 &
+          mock_pid=$!
+          deno run --allow-env --allow-net supabase/functions/lizhi-cad-site-mcp/index.ts >/tmp/cad-real-deno.log 2>&1 &
+          edge_pid=$!
+          trap 'kill "$mock_pid" "$edge_pid" 2>/dev/null || true' EXIT
+          ready=0
+          for i in $(seq 1 35); do
+            p1=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:54321/probe || true)
+            p2=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/ || true)
+            if [ "$p1" = "200" ] && [ "$p2" = "405" ]; then ready=1; break; fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then cat /tmp/cad-fake-rpc.log /tmp/cad-real-deno.log; exit 1; fi
+          node --test tests/cad-entity-read-full-loopback.test.mjs
+  read-postgres:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports: [5432:5432]
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+      - name: Test read-only jobs using disposable isolated database
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -euo pipefail
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f tests/cad-sites-postgres.sql
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f tests/cad-entity-read-postgres.sql | tee /tmp/cad-entity-read-pg.log
+          grep -q CAD_ENTITY_READ_POSTGRES_PRIVILEGES_AND_JOB_PASS /tmp/cad-entity-read-pg.log
+  no-deployment:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo "Candidate only. Do not publish to Pages, Supabase or ChatGPT Sites."

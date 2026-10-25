@@ -10,6 +10,7 @@
  * mounting a second competing protocol handler.
  */
 import {cadSiteTools,handleCadSiteTool} from "./site-tools.mjs";
+import {cadEntityReadToolsCandidate,handleCadEntityReadSiteTool} from "./site-entity-read.mjs";
 
 const jsonHeaders={"Cache-Control":"no-store, private","Pragma":"no-cache",
   "X-Content-Type-Options":"nosniff"};
@@ -69,11 +70,22 @@ export async function handleSiteCadMcpRequest(request,trustedAuth,secrets,fetche
     result:{protocolVersion:"2025-06-18",capabilities:{tools:{listChanged:false}},
       serverInfo:{name:"lizhi-cad-private-site",version:"0.1.0"}}});
   if(rpc.method==="ping")return respond({jsonrpc:"2.0",id,result:{}});
-  if(rpc.method==="tools/list")return respond({jsonrpc:"2.0",id,result:{tools:cadSiteTools}});
+  // Site v4 read tools are invisible unless explicitly enabled server-side.
+  // The existing six-tool Site remains unchanged with the feature gate OFF.
+  if(rpc.method==="tools/list")return respond({jsonrpc:"2.0",id,result:{
+    tools:secrets?.entityReadEnabled===true?[...cadSiteTools,...cadEntityReadToolsCandidate]:cadSiteTools
+  }});
   if(rpc.method!=="tools/call")return rpcError(id,-32601,"Method not found");
   if(!isObject(rpc.params)||typeof rpc.params.name!=="string")
     return rpcError(id,-32602,"Invalid tool parameters");
-  const toolResult=await handleCadSiteTool(rpc.params.name,rpc.params.arguments??{},
-    trustedAuth,secrets,fetcher);
+  const isRead=cadEntityReadToolsCandidate.some(t=>t.name===rpc.params.name);
+  // Never fall back to a write handler for a disabled or malformed read call.
+  const toolResult=isRead
+    ? (secrets?.entityReadEnabled===true
+      ? await handleCadEntityReadSiteTool(rpc.params.name,rpc.params.arguments??{},
+          trustedAuth,secrets,fetcher)
+      : {isError:true,content:[{type:"text",text:"CAD_READ_NOT_ENABLED"}]})
+    : await handleCadSiteTool(rpc.params.name,rpc.params.arguments??{},
+        trustedAuth,secrets,fetcher);
   return respond({jsonrpc:"2.0",id,result:toolResult});
 }

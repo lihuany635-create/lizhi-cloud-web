@@ -10,6 +10,7 @@ async function setup(allowMove=true){
   const code=await readFile(new URL("../cad/cad-host.js",import.meta.url),"utf8");
   const messages=[],handlers={};
   let confirmCalls=0;
+  const prompts=[];
   const status={textContent:"",dataset:{}};
   const frame={contentWindow:{postMessage(m,origin){
     messages.push({m,origin});
@@ -30,7 +31,7 @@ async function setup(allowMove=true){
   const context=createContext({
     window:{addEventListener(type,handler){handlers[type]=handler;}},
     location:{origin:"https://cad-test.example"},
-    confirm:()=>++confirmCalls===1 ? true : allowMove,
+    confirm:message=>{prompts.push(String(message));return ++confirmCalls===1 ? true : allowMove;},
     crypto:{randomUUID},
     setTimeout,clearTimeout,Promise,queueMicrotask,
   });
@@ -41,7 +42,7 @@ async function setup(allowMove=true){
   const target={closest(selector){return selector==="[data-cad-action]"?{dataset:{cadAction:"ai-enable"}}:null;}};
   await handlers.click({target});
   assert.equal(api.commandStatus.enabled,true);
-  return {api,messages};
+  return {api,messages,prompts};
 }
 test("bounded engine-native inspection commands reach only the active same-origin iframe",async()=>{
  const {api,messages}=await setup();
@@ -84,4 +85,14 @@ test("a single native move is version-bound and requires actual browser confirma
  await assert.rejects(yes.api.command("lizhi.move",{...params,delta:[0,0]}),/不支援/);
  await assert.rejects(yes.api.command("lizhi.move",{...params,confirmed:false}),/不支援/);
  assert.equal(yes.messages.length,1);
+});
+
+test("manual consent explicitly discloses bounded CAD geometry inspection and secondary move approval",async()=>{
+ const {api,prompts}=await setup(true);
+ assert.equal(prompts.length,1);
+ assert.match(prompts[0],/限量讀取/);
+ assert.match(prompts[0],/不開放本機檔案路徑或完整 DXF/);
+ await api.command("lizhi.move",{handles:["1A"],delta:[50,0],expectedRevision:3,confirmed:true});
+ assert.equal(prompts.length,2);
+ assert.match(prompts[1],/移動/);
 });

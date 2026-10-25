@@ -1,0 +1,65 @@
+name: LiZhi CAD Native Entity Move Browser Candidate (no deployment)
+on:
+  push:
+    branches: [feature/cad-entity-read-mcp-v1]
+    paths:
+      - 'tests/cad-entity-native-move-e2e.cjs'
+      - '.github/workflows/cad-entity-native-move-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native-move-chromium:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reuse exact source-built WASM from prior completed read-only run
+        uses: actions/download-artifact@v4
+        with:
+          name: lizhi-cad-entity-wasm-preview-candidate
+          repository: lihuany635-create/lizhi-cloud-web
+          run-id: 40173654439
+          github-token: ${{ github.token }}
+          path: cad/runtime
+      - name: Verify source code provenance and actual WASM
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path("cad/runtime")
+          m=json.loads((p/"build-source.json").read_text())
+          assert m["sourceSha"]=="cb256cf8a383c422482e8a455e3013887fa39a74"
+          assert m["deployed"] is False and m["remoteCadWorker"] is False
+          assert (p/"index.html").is_file()
+          assert list(p.glob("*.wasm")) and list(p.glob("*.js"))
+          print("Verified source-built isolated native WASM artifact")
+          PY
+      - name: Install Playwright Chromium
+        run: |
+          npm install --prefix tests/cad-browser-deps --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          tests/cad-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+      - name: Execute native read → stale conflict → human deny → move → verify → no replay
+        env:
+          NODE_PATH: ${{ github.workspace }}/tests/cad-browser-deps/node_modules
+          CAD_TEST_ORIGIN: http://127.0.0.1:8771
+          CAD_BROWSER_EVIDENCE: cad-entity-move-evidence
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8771 --bind 127.0.0.1 --directory . >/tmp/cad-native-move-http.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8771/index.html >/dev/null; then break; fi
+            sleep 1
+          done
+          node tests/cad-entity-native-move-e2e.cjs
+      - name: Preserve native geometry before/after evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lizhi-cad-native-move-chromium-evidence
+          path: cad-entity-move-evidence/
+          retention-days: 14
+          if-no-files-found: warn

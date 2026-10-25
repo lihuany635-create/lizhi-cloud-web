@@ -46,12 +46,18 @@ export async function handleCadSiteTool(
     // Local user's CAD page must separately have enabled both AI consent and
     // its own Supabase first-party session lease before accepting geometry.
     const response=await fetcher(SITE_CAD_ENDPOINT,{
-      method:"POST",redirect:"error",signal:controller.signal,
+      method:"POST",redirect:"manual",signal:controller.signal,
       headers:{Authorization:"Bearer "+secrets.siteMcpToken,
         "Content-Type":"application/json",Accept:"application/json"},
       body:JSON.stringify({jsonrpc:"2.0",id,method:"tools/call",
         params:{name,arguments:args}})
     });
+    // Worker-compatible redirect handling: never follow an upstream Location.
+    if(response.type==="opaqueredirect"||(response.status>=300&&response.status<400))
+      return error("CAD_UPSTREAM_REDIRECT_REJECTED");
+    if(response.status===401||response.status===403)
+      return error("CAD_UPSTREAM_AUTH_DENIED");
+    if(response.status===503)return error("CAD_UPSTREAM_UNAVAILABLE");
     if(!response.ok)return error("CAD_UPSTREAM_REJECTED_OR_UNAVAILABLE");
     const body=await boundedJson(response);
     if(!obj(body)||body.jsonrpc!=="2.0"||body.id!==id||!obj(body.result) ||
