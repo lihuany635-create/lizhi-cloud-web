@@ -24,3 +24,14 @@
 
 ## 安全限制
 不可新增公開 CAD 引擎、不共用手機 Agent 憑證、不接收本機任意路徑、不讀取原始圖檔、不修改 `main`／正式站／Supabase schema，除非另有明確版本、隔離測試與審核。
+
+## 實際第二階段候選（2026-10-25）
+- CADCraft Fork `feature/lizhi-cad-entity-inspect-v1` 的 native Rust read/move commit `cb256cf8a383c422482e8a455e3013887fa39a74`。GitHub Actions `40169757520` 已 PASS：原生 engine query test、WASM target compile、bridge 限制檢查。這是**編譯**與引擎級單元測試，真實瀏覽器 E2E 另測。
+- 立之雲端庫獨立 `feature/cad-entity-inspect-v1`：除了 browser-local `lizhi.inspect`／`lizhi.entities`，`lizhi.move` 新增單一實體 handle、位移量、`expectedRevision` 與同步 `window.confirm` 本人確認；native 再次比對實際圖面 revision，過期拒絕。**不提供對話端 move 工具**，待實機驗收及人工復原要求。
+- 已準備候選 `cad_inspect_drawing`、`cad_list_entities` 兩個新增 MCP 工具，保留既有六工具。站端 `cad_job_status` 對 read job 的結果只投影 entity handle/type/layer/有限幾何與圖面摘要，不回傳 `path`、檔案或任意 XData。Edge 與 Sites 通道均由原 owner 身分與 server Secret 保護。
+- SQL `cad/sites/sql/002_entity_read_queue.REVIEW_ONLY.sql`：只擴充既有 CAD command CHECK 為接受 `lizhi.inspect`、`lizhi.entities`，新增獨立 `service_role`-only `lizhi_cad_site_enqueue_read`；原本 geometry enqueue RPC、手機服務、原圖檔都不修改。狀態**REVIEW_ONLY，未正式執行**。
+- CLI/Edge/PG16 隔離測試新 `eight-tool` contract 與 `cad-sites-postgres` 讀取工作回執已通過（GitHub Actions `40170349337`），但這不代表能在正式 ChatGPT 列出八工具；Site 正式仍保留 v3 六工具。
+- 獨立候選 Rust/WASM source-build + Playwright Chromium `tests/cad-entity-native-e2e.cjs` 用真正原生引擎測：前置 AI opt-in、畫矩形、原生 inspect/entities 實際 handles、單一 handle move +100 mm、圖面 revision 比對、過期 revision 再移動被拒絕。執行和截圖證據以 `cad-entity-native-e2e.yml` 當輪結果為準，成功前不能列 PASS。
+
+## 發布限制
+正式 Site 私人 v3 目前與 GitHub 中的 Sites 伺服器候選不是自動同步；想啟用第七及第八個 MCP 工具，須另行整合現有 Site 原始碼、私人發布 v4、驗證新 SQL／Edge 及 Browser WASM 版本。**不可**直接拿 GitHub 合約通過宣稱已在一般對話可用；在使用者授權新的正式 SQL/Edge 發版之前，也不得改動既有正式服務或 CAD 歷史圖檔。
