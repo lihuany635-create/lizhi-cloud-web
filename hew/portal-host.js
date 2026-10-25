@@ -12,11 +12,10 @@
   source.searchParams.set('lizhi-model-queue','1')
   const uid=(user)=>typeof user?.id==='string' && /^[0-9a-f-]{36}$/i.test(user.id)
   const error=(root,message)=>{
-    root.replaceChildren()
     const p=document.createElement('p')
     p.setAttribute('role','status')
     p.textContent=message
-    root.append(p)
+    root.replaceChildren(p)
   }
   let loading=false
   async function mount(panel) {
