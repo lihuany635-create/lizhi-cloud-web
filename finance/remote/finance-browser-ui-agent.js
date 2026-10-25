@@ -169,17 +169,20 @@
       banner.addEventListener("click", e=>{startFromTrustedClick(e);});
       root.document.body.append(banner);
     }
-    banner.hidden = !workspace();
-    banner.textContent = permitted ? "停止理財 AI 操作" : "允許理財 AI 操作";
-    banner.setAttribute("aria-pressed",permitted?"true":"false");
+    const hide = !workspace();
+    if (banner.hidden !== hide) banner.hidden = hide;
+    const label = permitted ? "停止理財 AI 操作" : "允許理財 AI 操作";
+    if (banner.textContent !== label) banner.textContent = label;
+    const pressed = permitted ? "true" : "false";
+    if (banner.getAttribute("aria-pressed") !== pressed) banner.setAttribute("aria-pressed",pressed);
   }
   function install() {
-    if (active || !root.document) return;
+    if (active || !root.document || !root.MutationObserver) return;
     active = true;
-    root.document.addEventListener("visibilitychange",()=>{if(root.document.visibilityState==="hidden")stop();});
+    // Preserve opt-in when the user switches between the Finance tab and ChatGPT.
     root.addEventListener?.("pagehide",stop);
     root.addEventListener?.("lizhi-account-logout",stop);
-    observer = new MutationObserver(()=>renderButton());
+    observer = new root.MutationObserver(()=>renderButton());
     observer.observe(root.document.body,{subtree:true,childList:true});
     renderButton();
   }
