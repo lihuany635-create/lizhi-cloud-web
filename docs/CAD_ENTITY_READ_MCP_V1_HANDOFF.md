@@ -58,3 +58,12 @@
 - SQL 002 候選 `lizhi_cad_site_read_job` 已追加**再次檢查 owner session 是否 enabled、租約與 30 秒心跳**的條件，已完成的幾何讀取結果在使用者 STOP/會話逾期後也無法再讀。隔離 PostgreSQL 新測試驗證 STOP 之後完成回執取回是 NULL、入列拒絕，未放寬使用者角色權限。
 - 上述實測的真正 Rust/WASM 是另一段 [#40173654439](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40173654439) 的獨立 Chromium；本次全鏈路 HTTP 到**模擬 PostgREST**，仍不能宣稱正式九項工具已部署或生產端 CAD 圖元已可被 ChatGPT 查詢。
 - 正式發布閘門：須審核 source-pinned WASM 相容更新及原 CAD 使用者授權、僅在使用者另行同意新資料庫變更後套用 002 SQL、部署預設關閉新讀取 Gate 的 Edge，原私人 Site 於同一專案完成新工具真實註冊與本人授權，再開 Gate 做真正 ChatGPT→Supabase→本機 WASM 讀圖/STOP E2E。移動/刪除/修剪仍不在此釋出範圍。
+
+
+## 2026-10-25｜原生矩形 Polyline 四角點讀取的隔離實機證據
+
+- 固定同一 Rust/WASM Source SHA `cb256cf8a383c422482e8a455e3013887fa39a74`，沿用可稽核的 Chromium Native runner，在真實 CAD 引擎建立 `rectang p1=[0,0],p2=[800,900]`，使用 `lizhi.entities` 查 `type:"Polyline"`，獲得 **一筆 closed=true、type=lwPolyline、vertices 數量4** 的原生幾何。
+- 實際四角點（順序不影響形狀）驗收為 `(0,0), (0,900), (800,0), (800,900)`；不把矩形誤認為四個 LINE handle。
+- Node `projectEntityReadReceipt` 去敏投影增加同型 `lwPolyline.vertices[].p.{x,y}`、`bulge`、寬度的受限回歸測試，插入非法 `path` 必須將不安全幾何標示為不可用而非外洩。
+- [#40175639715](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40175639715) 真實 Native Chromium SUCCESS；[#40175639698](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/40175639698) Node/Edge/PG16/No-deployment **5/5 SUCCESS**。
+- 這些證據可證明 Source-pinned native runtime 及服務端候選合約能辨識相同型態矩形，但**仍不表示正式 Site 已加第7～9讀取工具或能遠端改使用者現有圖元**。
