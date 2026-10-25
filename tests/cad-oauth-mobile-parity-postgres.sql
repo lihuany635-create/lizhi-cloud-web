@@ -17,6 +17,11 @@ begin
   if not public.lizhi_cad_begin_session(s) then raise exception 'first-party session failed'; end if;
   if not public.lizhi_cad_grant_oauth_client('cccccccc-cccc-4ccc-8ccc-cccccccccccc') then raise exception 'explicit OAuth grant failed'; end if;
 end $$;
+reset role;
+select
+  (select count(*) from lizhi_private.lizhi_cad_sessions where user_id='11111111-1111-4111-8111-111111111111' and enabled) as test_live_sessions,
+  (select count(*) from lizhi_private.lizhi_cad_authorized_oauth_clients where user_id='11111111-1111-4111-8111-111111111111' and client_id='cccccccc-cccc-4ccc-8ccc-cccccccccccc') as test_grants;
+set role authenticated;
 
 set request.jwt.claim.client_id='cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 -- Old contradictory implementation must be proven broken, so the regression
