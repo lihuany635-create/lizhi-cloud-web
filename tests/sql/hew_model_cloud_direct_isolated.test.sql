@@ -84,9 +84,9 @@ begin
   perform public.lizhi_model_cloud_write(owner,
    '66666666-6666-4666-8666-666666666666','create_box',doc,2,
    '{"origin_mm":[0,0,0],"width_mm":1,"depth_mm":1,"height_mm":1}'::jsonb);
- exception when others then failed:=true;
+ exception when sqlstate 'P0001' then failed:=true;
  end;
- if not failed then raise exception 'stale revision accepted';end if;
+ if not failed then raise exception 'stale revision accepted or nonretryable SQLSTATE missing';end if;
  failed:=false;
  begin
   perform public.lizhi_model_cloud_write(owner,req2,'create_box',doc,1,
