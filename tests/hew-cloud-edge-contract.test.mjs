@@ -55,6 +55,19 @@ test('write maps version, document and request to one service role-only RPC',asy
    p_args:{origin_mm:[0,0,0],width_mm:1200,depth_mm:600,height_mm:750}}
  })
 })
+test('stale revision P0001 is surfaced once as non-retryable conflict',async()=>{
+ let count=0
+ const conflictDb={rpc:async()=>{count++;return {data:null,error:{code:'P0001',message:'MODEL_REVISION_CONFLICT'}}}}
+ const args={document_id:doc,revision:1,request_id:requestId,
+  origin_mm:[0,0,0],width_mm:10,depth_mm:10,height_mm:10}
+ const response=await handler(rpc('tools/call',{name:'model_create_box',arguments:args}),
+   {db:conflictDb,ownerUid:owner,token})
+ const result=await response.json()
+ assert.equal(result.result.isError,true)
+ assert.equal(result.result.content[0].text,'MODEL_REVISION_CONFLICT')
+ assert.equal(count,1)
+})
+
 test('wrong bearer, browser origins and invalid commands never reach SQL',async()=>{
  calls.length=0
  const unauth=await handler(rpc('tools/list',null,1,'b'.repeat(64)),{db,ownerUid:owner,token})
