@@ -25,3 +25,9 @@
 ## 主要變更
 
 `app/project-images.tsx`、`app/project-workspace.tsx`、`app/globals.css`、`native/entry.tsx`、`lib/project-images.ts`、`lib/project-management.ts`、`backend/images.ts`、`backend/index.ts`、`backend/project-images-storage.sql`、兩個測試檔，及重建 native bundle／更新快取版本。
+
+## 發布依賴修復
+
+調查前次 Pages run40259051042 的真實失敗 log，確認工作台使用 Vite 8 的 `minify: esbuild`，卻沒有宣告 esbuild，導致獨立 CI 建置失敗。補列 `esbuild: 0.28.0`，與既有 Sites 的實際版本一致。移除本次測試用 node_modules 連結，從 native package.json 重新安裝後，37 項測試全部通過，正式 native build 通過。原始缺漏不是通過狀態，正式瀏覽器仍待新部署。
+
+官方依據：https://v8.vite.dev/guide/migration （esbuild 已改為可選依賴，使用 esbuild 壓縮須自行安裝）。
