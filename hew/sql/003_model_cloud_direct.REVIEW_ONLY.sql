@@ -87,7 +87,7 @@ begin
    if (select count(*) from jsonb_object_keys(p_args)) not in (4,5)
      or not(p_args ? 'origin_mm' and p_args ? 'width_mm' and
        p_args ? 'depth_mm' and p_args ? 'height_mm')
-     or (jsonb_object_length(p_args)=5 and not(p_args ? 'name'))
+     or ((select count(*) from jsonb_object_keys(p_args))=5 and not(p_args ? 'name'))
      or not lizhi_model_private.vec3(p_args->'origin_mm',100000)
      or jsonb_typeof(p_args->'width_mm')<>'number'
      or jsonb_typeof(p_args->'depth_mm')<>'number'
