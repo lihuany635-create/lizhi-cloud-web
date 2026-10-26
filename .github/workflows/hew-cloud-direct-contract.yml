@@ -27,7 +27,27 @@ jobs:
         with:
           node-version: '24'
       - name: Offline model document and Site schema safety
-        run: node --test tests/hew-cloud-direct-core.test.mjs tests/hew-cloud-site-contract.test.mjs tests/hew-cloud-edge-contract.test.mjs
+        run: node --test tests/hew-cloud-direct-core.test.mjs tests/hew-cloud-site-contract.test.mjs tests/hew-cloud-edge-contract.test.mjs tests/hew-cloud-site-edge-chain.test.mjs
+  edge-source-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Edge v3 package uses exact reviewed cloud implementation
+        run: |
+          node --input-type=module - <<'JS'
+          import fs from 'node:fs'
+          import assert from 'node:assert/strict'
+          const core=fs.readFileSync('hew/cloud-direct/model-edge-core.mjs','utf8')
+          const edge=fs.readFileSync('supabase/functions/lizhi-model-site-mcp/cloud-edge-core.mjs','utf8')
+          assert.equal(edge,core.replace("from './model-site-contract.mjs'","from './cloud-model-site-contract.mjs'"))
+          assert.equal(fs.readFileSync('hew/cloud-direct/model-site-contract.mjs','utf8'),
+            fs.readFileSync('supabase/functions/lizhi-model-site-mcp/cloud-model-site-contract.mjs','utf8'))
+          const old=fs.readFileSync('supabase/functions/lizhi-model-site-mcp/index.ts','utf8')
+          assert.match(old,/handleModelEdgeRequest/)
+          assert.match(old,/handleCloudModelEdgeRequest/)
+          assert.match(old,/searchParams.get\('cloud'\)==='1'/)
+          console.log('HEW_CLOUD_DIRECT_EDGE_SOURCE_MATCH_PASS')
+          JS
   pg16-private-cloud-document:
     runs-on: ubuntu-latest
     timeout-minutes: 10
