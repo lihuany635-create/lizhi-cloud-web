@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: '24'
       - name: Offline model document and Site schema safety
-        run: node --test tests/hew-cloud-direct-core.test.mjs tests/hew-cloud-site-contract.test.mjs tests/hew-cloud-edge-contract.test.mjs tests/hew-cloud-site-edge-chain.test.mjs
+        run: node --test tests/hew-cloud-direct-core.test.mjs tests/hew-cloud-site-contract.test.mjs tests/hew-cloud-edge-contract.test.mjs tests/hew-cloud-site-edge-chain.test.mjs tests/hew-cloud-native-bridge.test.mjs
   edge-source-integrity:
     runs-on: ubuntu-latest
     steps:
