@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-hades-v3-2-20261026",
+  "version": "mixed-current-hades-v3-3-20261026",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -20,15 +20,15 @@
     },
     {
       "model": "hades-house.glb",
-      "version": "HADES-v3.2",
-      "source_candidate": "revisions/hades-v3.2/hades-house_v3_2.glb",
-      "current_sha256": "d1673eacda40ae1256317efcc4f74086a0267bc8e7b189859dbbb1dfd3bcebe7",
-      "backup": "revisions/hades-v3.1/hades-house_v3_1.glb",
-      "backup_sha256": "8e00060940cfd00201cfbab1e98f175f261c3f7de69efea60c264f24f0320e32",
+      "version": "HADES-v3.3",
+      "source_candidate": "revisions/hades-v3.3/hades-house_v3_3.glb",
+      "current_sha256": "b86b38aa7afc2374820be289cc717a5b0f352da7593351a93ad10e3f1a40de4f",
+      "backup": "revisions/hades-v3.2/hades-house_v3_2.glb",
+      "backup_sha256": "d1673eacda40ae1256317efcc4f74086a0267bc8e7b189859dbbb1dfd3bcebe7",
       "integrated_contents": "Full rebuild from EP02 23-image package v2 (2026-10-26): 9x8 m two-storey shell per A-101/A-102 R00 SVG coordinates, R01 roof/elevations/stair/door index, 9 doors, 12 windows, U-stair 16x187.5, I-101/I-102 furniture, A-001 site with the single black car, 8 fixed cameras C01-C08.",
       "author_full_item_approval": "PENDING",
-      "review_url": "revisions/hades-v3.2/",
-      "build_script": "revisions/hades-v3.2/scripts/build_hades_v3.py",
+      "review_url": "revisions/hades-v3.3/",
+      "build_script": "revisions/hades-v3.3/scripts/build_hades_v3.py",
       "static_geometry_qa": "PASS (static only): 0 furniture/wall overlaps, 0 door-swing conflicts, 0 circulation blockers (2F stair-hall corridor, 2F hall, 1F corridor, foyer entry, protagonist entry), stair 16x187.5, V-002 sightline 4082 mm",
       "visual_qa": "HEADLESS_POV_RERENDER__AUTHOR_PHONE_RECHECK_PENDING",
       "deviations": [
@@ -37,7 +37,9 @@
       ],
       "supersedes": "HADES-v2.4 (22x14 m inferred layout)",
       "v3_1_fixes": "User phone POV review 2026-10-26: fridge against kitchen south wall + south counter; foyer mirror wall-mounted (was free-standing); umbrella stand out of entry path; corridor floor plant removed; 2F hall plant on cabinet; free-standing TV feature wall removed (TV on console stand); hall art z-fighting frame rebuilt with depth; beds with draped duvet, throw and round pillows",
-      "v3_2_fixes": "User phone review 20:21: D-06 leaf blocked 1.09 m stair-hall corridor -> hinged at north jamb, open 180 deg flat to wall; protagonist bed headboard against north wall, nightstand moved out of entry path, wardrobe against west wall; father bed proper 2.0x1.83 m with headboard on west wall; 1F corridor console removed. New circulation check: 0 blockers in 5 walk zones."
+      "v3_2_fixes": "User phone review 20:21: D-06 leaf blocked 1.09 m stair-hall corridor -> hinged at north jamb, open 180 deg flat to wall; protagonist bed headboard against north wall, nightstand moved out of entry path, wardrobe against west wall; father bed proper 2.0x1.83 m with headboard on west wall; 1F corridor console removed. New circulation check: 0 blockers in 5 walk zones.",
+      "v3_3_changes": "Exterior per author reference image (source/EXTERIOR_REFERENCE_author_20261026.png): ridge turned N-S so gable faces street (author decision, deviates from A-103 R01), dark standing-seam roof, wood soffits, beige stucco, wood slat panel at entry, flat entry canopy with downlight, stone pilaster, wood door with long handle, black window frames, dark storey line/plinth, concrete-slab driveway with gravel joints, stone path, low stone walls, horizontal slat fence, multi-stem trees, grasses, rocks. Bed clipping look fixed: hall art moved off the wall behind the protagonist bed; bed 20 mm off wall.",
+      "roof_deviation": "AUTHOR_APPROVED_IN_CHAT_20261026: gable to street (N-S ridge) replaces A-103 R01 E-W ridge; heights 6.100/7.700 kept"
     },
     {
       "model": "reality-highschool.glb",
