@@ -1,0 +1,401 @@
+{
+  "revision": "HADES-v3.0",
+  "glb": "hades-house_v3_0.glb",
+  "sha256": "c95e87cb9a35af58104da97a2a95b31505f7636af61fe27e42e91c55f3f405b9",
+  "stats": {
+    "tris": 21784,
+    "mesh_nodes": 149,
+    "bytes": 1812480,
+    "nodes": 184,
+    "materials": 48
+  },
+  "envelope_mm": [
+    9000,
+    8000
+  ],
+  "levels_mm": {
+    "1F": 0,
+    "2F": 3000,
+    "slab_underside": 2780,
+    "ceiling_2F": 5780,
+    "eaves": 6100,
+    "ridge": 7700
+  },
+  "stair": {
+    "risers": 16,
+    "riser_mm": 187.5,
+    "total_rise_mm": 3000.0,
+    "tread_mm": 260,
+    "treads_per_flight": 7,
+    "landing_net_mm": 900,
+    "run_check_mm": "7x260 + 900 = 2720 within inner 2980 (Y3160..6140); start Y=3420",
+    "flight_width_mm": 1200,
+    "headroom_flight1_first_tread_mm": 2592.5,
+    "headroom_flight2_top_mm": 2780,
+    "headroom_landing_mm": 4280,
+    "arrival_strip_2F_mm": 260,
+    "status": "GEOMETRY_STATIC_CHECK_ONLY — riser/tread/headroom arithmetic passes; arrival strip 260 mm before D-06 is too short for real use (A-402 flag kept)"
+  },
+  "black_car_sightline": {
+    "eye_window_mm": [
+      7255.0,
+      750.0,
+      4550.0
+    ],
+    "line_hits_south_wall_at_z_mm": 4082,
+    "sill_mm": 3860,
+    "head_mm": 5350,
+    "visible_from_window_eye": true,
+    "bedside_eye_mm": [
+      6500.0,
+      2500.0,
+      4150.0
+    ],
+    "bedside_hit_z_mm": 3139,
+    "visible_from_bedside": false,
+    "horizontal": "car X6600..8400 inside window X6080..8430 — aligned in plan",
+    "status": "NOT_TESTED in rendered camera beyond C02 still; matches V-002 R01 (window yes, bedside no)"
+  },
+  "furniture_wall_overlaps": [],
+  "door_swing_conflicts": [],
+  "door_swing_all": [
+    {
+      "door": "D-01",
+      "swing_zone_mm": [
+        [
+          1100,
+          0
+        ],
+        [
+          2080,
+          980
+        ]
+      ],
+      "furniture_in_zone": []
+    },
+    {
+      "door": "D-02",
+      "swing_zone_mm": [
+        [
+          370,
+          2190
+        ],
+        [
+          1280,
+          3100
+        ]
+      ],
+      "furniture_in_zone": []
+    },
+    {
+      "door": "D-03",
+      "swing_zone_mm": [
+        [
+          2020,
+          6690
+        ],
+        [
+          2900,
+          7570
+        ]
+      ],
+      "furniture_in_zone": []
+    },
+    {
+      "door": "D-04",
+      "swing_zone_mm": [
+        [
+          4050,
+          6020
+        ],
+        [
+          4930,
+          6900
+        ]
+      ],
+      "furniture_in_zone": []
+    },
+    {
+      "door": "D-05",
+      "swing_zone_mm": [
+        [
+          3030,
+          2220
+        ],
+        [
+          3910,
+          3100
+        ]
+      ],
+      "furniture_in_zone": []
+    },
+    {
+      "door": "D-06",
+      "swing_zone_mm": [
+        [
+          2900,
+          3310
+        ],
+        [
+          3780,
+          4190
+        ]
+      ],
+      "furniture_in_zone": []
+    },
+    {
+      "door": "D-07",
+      "swing_zone_mm": [
+        [
+          2020,
+          6680
+        ],
+        [
+          2900,
+          7560
+        ]
+      ],
+      "furniture_in_zone": []
+    },
+    {
+      "door": "D-08",
+      "swing_zone_mm": [
+        [
+          4560,
+          3020
+        ],
+        [
+          5440,
+          3900
+        ]
+      ],
+      "furniture_in_zone": []
+    },
+    {
+      "door": "D-09",
+      "swing_zone_mm": [
+        [
+          4750,
+          5100
+        ],
+        [
+          5630,
+          5980
+        ]
+      ],
+      "furniture_in_zone": []
+    }
+  ],
+  "cameras": [
+    {
+      "name": "C01_EXT_FRONT",
+      "eye_gltf_m": [
+        0.0,
+        3.2,
+        19.5
+      ],
+      "target_gltf_m": [
+        0.0,
+        3.6,
+        2.0
+      ],
+      "eye_plan_mm": [
+        4500,
+        -15500,
+        3200
+      ],
+      "target_plan_mm": [
+        4500,
+        2000,
+        3600
+      ],
+      "vfov_deg": 50,
+      "note": "Establishing exterior from south street"
+    },
+    {
+      "name": "C02_BLACK_CAR_WINDOW_VIEW",
+      "eye_gltf_m": [
+        2.755,
+        4.55,
+        3.25
+      ],
+      "target_gltf_m": [
+        3.0,
+        1.4,
+        8.3
+      ],
+      "eye_plan_mm": [
+        7255,
+        750,
+        4550
+      ],
+      "target_plan_mm": [
+        7500,
+        -4300,
+        1400
+      ],
+      "vfov_deg": 50,
+      "note": "V-002 R01 eye 0.75 m from south wall, +4.55 m; looks at car roof"
+    },
+    {
+      "name": "C03_ENTRY_TO_STAIRS",
+      "eye_gltf_m": [
+        -2.8,
+        1.55,
+        3.4
+      ],
+      "target_gltf_m": [
+        -3.7,
+        1.3,
+        -0.2
+      ],
+      "eye_plan_mm": [
+        1700,
+        600,
+        1550
+      ],
+      "target_plan_mm": [
+        800,
+        4200,
+        1300
+      ],
+      "vfov_deg": 60,
+      "note": "Inside D-01 looking at D-02 and stair"
+    },
+    {
+      "name": "C04_STAIR_UP",
+      "eye_gltf_m": [
+        -3.7,
+        1.55,
+        0.7
+      ],
+      "target_gltf_m": [
+        -2.3,
+        2.6,
+        -1.2
+      ],
+      "eye_plan_mm": [
+        800,
+        3300,
+        1550
+      ],
+      "target_plan_mm": [
+        2200,
+        5200,
+        2600
+      ],
+      "vfov_deg": 65,
+      "note": "Foot of flight 1 looking up to landing"
+    },
+    {
+      "name": "C05_ROOM_TO_HALL",
+      "eye_gltf_m": [
+        2.7,
+        4.2,
+        1.2
+      ],
+      "target_gltf_m": [
+        0.4,
+        4.1,
+        -0.3
+      ],
+      "eye_plan_mm": [
+        7200,
+        2800,
+        4200
+      ],
+      "target_plan_mm": [
+        4900,
+        4300,
+        4100
+      ],
+      "vfov_deg": 60,
+      "note": "Protagonist room toward D-08 / hall"
+    },
+    {
+      "name": "C06_LIVING_SOFA",
+      "eye_gltf_m": [
+        3.25,
+        1.15,
+        2.3
+      ],
+      "target_gltf_m": [
+        0.7,
+        1.05,
+        -0.3
+      ],
+      "eye_plan_mm": [
+        7750,
+        1700,
+        1150
+      ],
+      "target_plan_mm": [
+        5200,
+        4300,
+        1050
+      ],
+      "vfov_deg": 65,
+      "note": "Seated on sofa return toward TV wall and dining"
+    },
+    {
+      "name": "C07_DINING_KITCHEN",
+      "eye_gltf_m": [
+        3.95,
+        1.55,
+        -0.6
+      ],
+      "target_gltf_m": [
+        0.5,
+        1.1,
+        -3.4
+      ],
+      "eye_plan_mm": [
+        8450,
+        4600,
+        1550
+      ],
+      "target_plan_mm": [
+        5000,
+        7400,
+        1100
+      ],
+      "vfov_deg": 65,
+      "note": "Dining corner looking into kitchen"
+    },
+    {
+      "name": "C08_PROTAGONIST_DESK",
+      "eye_gltf_m": [
+        2.8,
+        4.2,
+        2.7
+      ],
+      "target_gltf_m": [
+        4.1,
+        3.8,
+        1.1
+      ],
+      "eye_plan_mm": [
+        7300,
+        1300,
+        4200
+      ],
+      "target_plan_mm": [
+        8600,
+        2900,
+        3800
+      ],
+      "vfov_deg": 60,
+      "note": "Desk with student ID / uniform"
+    }
+  ],
+  "open_issues": [
+    "Stair top arrival vs D-06 (only ~260 mm landing at +3.000 before void edge)",
+    "D-02 leaf swings over first treads of flight 1",
+    "Window IDs W-101..W-206 numbering not in package (A-402 R00 table missing) — named by location",
+    "Site/lot/road distances are A-001 R00 proposals",
+    "S-101 structure not validated; 2F slab 220 mm without beams",
+    "Attic/roof structure not modelled; flat 2F ceiling at +5.780 assumed",
+    "Interior wall thickness 120 mm and exterior 200 mm assumed (plans say 待校核)"
+  ],
+  "author_approval": "PENDING"
+}

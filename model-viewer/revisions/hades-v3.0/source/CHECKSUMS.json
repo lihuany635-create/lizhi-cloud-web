@@ -1,0 +1,305 @@
+{
+  "totalSourceImages": 23,
+  "sources": [
+    {
+      "file": "01_全部23張圖片/01_RG-GAME-HOUSE_A-101_R00_preview.png",
+      "size": 252299,
+      "sha256": "90858310c2336089d9d28df1b287c5d360673359138e5dd5470710bd4cc7b2bd"
+    },
+    {
+      "file": "01_全部23張圖片/02_RG-GAME-HOUSE_A-102_R00.png",
+      "size": 258181,
+      "sha256": "c8457f34c98e871f1be2d241dd184d8c542ca28b9fb12e66d952c25caa98af57"
+    },
+    {
+      "file": "01_全部23張圖片/03_RG-GAME-HOUSE_A-001_R00.png",
+      "size": 155888,
+      "sha256": "5f5103227a89c7c68c8dbdeec031abcc6adb7ac86c52f673bee64a570928795f"
+    },
+    {
+      "file": "01_全部23張圖片/04_RG-GAME-HOUSE_A-103_R01.png",
+      "size": 125726,
+      "sha256": "b123f81898049f567460fbf9e1df93ee4c4e404ec399efcb8ce31546a02aedcf"
+    },
+    {
+      "file": "01_全部23張圖片/05_RG-GAME-HOUSE_A-201_R01.png",
+      "size": 127654,
+      "sha256": "e6249e1ea21aef73622096833d891e183097e231f24a121f4ed167c4a779b93c"
+    },
+    {
+      "file": "01_全部23張圖片/06_RG-GAME-HOUSE_A-202_R01.png",
+      "size": 131137,
+      "sha256": "36cd0d51e9167d5ed91a87ae0f06ea9ec166e049191f317bbca69033fafd54f2"
+    },
+    {
+      "file": "01_全部23張圖片/07_RG-GAME-HOUSE_A-203_R01.png",
+      "size": 136974,
+      "sha256": "9edbf42a49c91e997b47a09c2f90412f360a68ba464b0f62e0d6de969bdb33d8"
+    },
+    {
+      "file": "01_全部23張圖片/08_RG-GAME-HOUSE_A-204_R01.png",
+      "size": 142942,
+      "sha256": "9e51e772a2ab865f674705d9c5771b6d809c78902d81bb3c96b809bbacbb00c9"
+    },
+    {
+      "file": "01_全部23張圖片/09_RG-GAME-HOUSE_A-301_R01.png",
+      "size": 131678,
+      "sha256": "6529704f2db3f78102bb168fa6e37e81c728e659d834b4e0d8ddf5128dc99c75"
+    },
+    {
+      "file": "01_全部23張圖片/10_RG-GAME-HOUSE_A-302_R00.png",
+      "size": 161761,
+      "sha256": "2252ca849b0784a05d03837192b8f65e96662abcf28ab1cf3a4950358b034cb2"
+    },
+    {
+      "file": "01_全部23張圖片/11_RG-GAME-HOUSE_A-401_R01.png",
+      "size": 131173,
+      "sha256": "a11761c596543025828c9933645f25a77ddaac1437a3c6e5bc812f6557727f97"
+    },
+    {
+      "file": "01_全部23張圖片/12_RG-GAME-HOUSE_A-402_R01.png",
+      "size": 230742,
+      "sha256": "a614a3e3e4f4f19cf3e50a84f1e9aaf8b9cc7a1200ced8d08f57a086c9529a74"
+    },
+    {
+      "file": "01_全部23張圖片/13_RG-GAME-HOUSE_S-101_R00.png",
+      "size": 147509,
+      "sha256": "e2258ed43adaa107db336bb89768ab277e980953c201e163a97a6cad6b940171"
+    },
+    {
+      "file": "01_全部23張圖片/14_RG-GAME-HOUSE_I-101_R00.png",
+      "size": 137641,
+      "sha256": "70cba1c7a7994209a6fcee8d75bf65a0433ab20687da7237104ada74619e2af8"
+    },
+    {
+      "file": "01_全部23張圖片/15_RG-GAME-HOUSE_I-102_R00.png",
+      "size": 134420,
+      "sha256": "33d6768046de542db4dbf462c930223accfaf6a9587e130ff6009406eda29976"
+    },
+    {
+      "file": "01_全部23張圖片/16_RG-GAME-HOUSE_V-001_R00.png",
+      "size": 161088,
+      "sha256": "544d4bb11b7e94807af8aa845a80edd177cdca55fe1cab20f835113c6947d426"
+    },
+    {
+      "file": "01_全部23張圖片/17_RG-GAME-HOUSE_V-002_R01.png",
+      "size": 151650,
+      "sha256": "3df3435b96bf5dc871b4bbb6c6d8fbbaba75e9998e728f2eff43de5f89f35dc4"
+    },
+    {
+      "file": "01_全部23張圖片/18_RG-GAME-HOUSE_FURN-1F_reference.png",
+      "size": 1680235,
+      "sha256": "da3ab7ef9482ae200ff292e289d21d8ca82a2af0dd3705defe8eb1bb15367af6"
+    },
+    {
+      "file": "01_全部23張圖片/19_RG-GAME-HOUSE_FURN-2F_reference.png",
+      "size": 1764425,
+      "sha256": "89e6cc9a0516301eb4d9f83f8a50e20e4eb05fdfe7bb32c8efc2cb57386eb66d"
+    },
+    {
+      "file": "01_全部23張圖片/20_RG-GAME-HOUSE_KITCHEN-MOOD_reference.png",
+      "size": 2125598,
+      "sha256": "15283d584644df200d3b6739d6f6c1d96faa08138521e5881203e09554e3bc73"
+    },
+    {
+      "file": "01_全部23張圖片/21_EP02_哈德斯家_一樓餐廳_室內立面_R00.png",
+      "size": 2727530,
+      "sha256": "914edc5ee25c4885921164d3d84f1c69e203d60ad096ac6f861babbeb27e2acf"
+    },
+    {
+      "file": "01_全部23張圖片/22_EP02_哈德斯家_一樓客廳_室內立面_R00.png",
+      "size": 2613527,
+      "sha256": "107f207ec32497b99470c553eaa0fe532e2f3b938dcd5fdb5bfdaf107d0152b6"
+    },
+    {
+      "file": "01_全部23張圖片/23_EP02_哈德斯家_一樓玄關_室內主立面_R00.png",
+      "size": 1894871,
+      "sha256": "f0e37b7774ba74be1487560c2049c16f632327a93f39453ed94e2c063d472d45"
+    },
+    {
+      "file": "02_新版R01_SVG/RG-GAME-HOUSE_A-103_R01.svg",
+      "size": 7592,
+      "sha256": "a78218a6abcc39838b2fa71a25ebed360ec4f424a4630a4bc3e2d0dc3a122ed6"
+    },
+    {
+      "file": "02_新版R01_SVG/RG-GAME-HOUSE_A-201_R01.svg",
+      "size": 8578,
+      "sha256": "43b3a33f2e24d6bccb8a2ae3ca028cc4cc4cd1985da2b1b5eaf398319d10b6d7"
+    },
+    {
+      "file": "02_新版R01_SVG/RG-GAME-HOUSE_A-202_R01.svg",
+      "size": 9102,
+      "sha256": "6c8e627a1636c607da689a2e229cd03d283680e9dd9395d9b10b64c003a312e3"
+    },
+    {
+      "file": "02_新版R01_SVG/RG-GAME-HOUSE_A-203_R01.svg",
+      "size": 6810,
+      "sha256": "d0db59b9399c6578d244adf3e3d1609d78331ee95264ed2a380dae46a2812128"
+    },
+    {
+      "file": "02_新版R01_SVG/RG-GAME-HOUSE_A-204_R01.svg",
+      "size": 8539,
+      "sha256": "e96ade03fe6153405130d6c614d7cd4633a8d7bc6ec8164eb57d74ae2fcf0258"
+    },
+    {
+      "file": "02_新版R01_SVG/RG-GAME-HOUSE_A-301_R01.svg",
+      "size": 10310,
+      "sha256": "d567de67cb7e8cf80155e64950d7048cff76686bb052c6e8e6a3f1a72ab14997"
+    },
+    {
+      "file": "02_新版R01_SVG/RG-GAME-HOUSE_A-401_R01.svg",
+      "size": 9922,
+      "sha256": "cc4a09f1de84af5e9c3f5671cd0800dee09033ea8723eb61cbb1ff12f5c2f048"
+    },
+    {
+      "file": "02_新版R01_SVG/RG-GAME-HOUSE_A-402_R01.svg",
+      "size": 14667,
+      "sha256": "e0e552db4dc4bdadf4f85c29fc867b9b8984a58a718eb7ce07e7420a5f0e16bc"
+    },
+    {
+      "file": "02_新版R01_SVG/RG-GAME-HOUSE_V-002_R01.svg",
+      "size": 11889,
+      "sha256": "f6d2dd58dcd9a6b3f08fe3c589a9940088ede21bfcb6a28f804de087e20ec8b3"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/HADES_PHASE2_R00_CONTACT_SHEET.png",
+      "size": 488036,
+      "sha256": "06158ed86e99c3334fd4276798990230b5bd91fda5acb0fda0d3cb2e04b797e6"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-001_R00.png",
+      "size": 155888,
+      "sha256": "5f5103227a89c7c68c8dbdeec031abcc6adb7ac86c52f673bee64a570928795f"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-001_R00.svg",
+      "size": 7140,
+      "sha256": "efbad9bc93fcbe21003adcaecf4581a00a9c6d248ccf3d342a4d038c9ad205aa"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-103_R00.png",
+      "size": 123210,
+      "sha256": "fa50e59e7a44fc0cceba48b33b781a1b384e9b54a4897707d5a90f954424b912"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-103_R00.svg",
+      "size": 5842,
+      "sha256": "4c0747e76fed83f14998243f7af5a27178768fe9abee2d54d8f7d9f87dd03545"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-301_R00.png",
+      "size": 146896,
+      "sha256": "8c59faad4428d1c1cb5824acbe2f0a4cfa126e107e540f63310f37215219af9f"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-301_R00.svg",
+      "size": 9226,
+      "sha256": "28b8eaa0de7cb53c679521c7ab9603b395f795655869799d78e241df6982c7dc"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-302_R00.png",
+      "size": 161761,
+      "sha256": "2252ca849b0784a05d03837192b8f65e96662abcf28ab1cf3a4950358b034cb2"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-302_R00.svg",
+      "size": 6557,
+      "sha256": "de0da795a65338e35727e7d24df75633fe9bdcf8834dbf7240f64ee760068f52"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-401_R00.png",
+      "size": 166082,
+      "sha256": "720ad654288974fc44524323e899f249394c08ec5253caa1a3b7ce4da162d252"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-401_R00.svg",
+      "size": 7592,
+      "sha256": "bf3d4dff8245a4ee4665ec2b04f7f30cfe8013cf7c0e7c65e7883442b45adcf4"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-402_R00.png",
+      "size": 225989,
+      "sha256": "774f99c4d1954c2632b8450837cff3eca90f9bc519d1f6db48f086920125e67e"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_A-402_R00.svg",
+      "size": 13927,
+      "sha256": "3c8ac2db774eb01032fbabfc99d1c570bbb53c7fdeb68530050ed5e3a2f8be4c"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_I-101_R00.png",
+      "size": 137641,
+      "sha256": "70cba1c7a7994209a6fcee8d75bf65a0433ab20687da7237104ada74619e2af8"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_I-101_R00.svg",
+      "size": 9620,
+      "sha256": "47e450f5bdfdeced58b317f5b5fd93d9cedfae860897f4c6d1725666a27fe3af"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_I-102_R00.png",
+      "size": 134420,
+      "sha256": "33d6768046de542db4dbf462c930223accfaf6a9587e130ff6009406eda29976"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_I-102_R00.svg",
+      "size": 9424,
+      "sha256": "719963d4a57ce786237aa275d79be26913d4f3c2e6dea07f9dd18c61048189ce"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_S-101_R00.png",
+      "size": 147509,
+      "sha256": "e2258ed43adaa107db336bb89768ab277e980953c201e163a97a6cad6b940171"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_S-101_R00.svg",
+      "size": 8135,
+      "sha256": "82854bbd24bbc424c1cdf0019be525d37e449ea9408de1039fec4231255bbf61"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_V-001_R00.png",
+      "size": 161088,
+      "sha256": "544d4bb11b7e94807af8aa845a80edd177cdca55fe1cab20f835113c6947d426"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_V-001_R00.svg",
+      "size": 15073,
+      "sha256": "2f371ca8b84ce71f5379d3b26012db511dec3a0683f4fb9087516fa80ac8d95e"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_V-002_R00.png",
+      "size": 158084,
+      "sha256": "4928e7954610cf7c72b600d8726428f185bd7e665d1f6d392afd03b3f2f0ee79"
+    },
+    {
+      "file": "03_歷史R00_SVG_PNG/RG-GAME-HOUSE_V-002_R00.svg",
+      "size": 6016,
+      "sha256": "007a1f1303663c85def5e6f4becb2735b0cf05441ea82b9ff4494ca72aa46e55"
+    },
+    {
+      "file": "23圖總覽.html",
+      "size": 15266,
+      "sha256": "811abdb977f3375426fb46679b50583acee8d670484b3e64e0b9a8eb9bf612ab"
+    },
+    {
+      "file": "IMAGE_MANIFEST_23.json",
+      "size": 33078,
+      "sha256": "5f31cb9826559bb3e58b99da1f45bca8e353ca0a81bba1f43e185a11ded72589"
+    },
+    {
+      "file": "README_先看這份.md",
+      "size": 9899,
+      "sha256": "2cfaa120cc1f811c0d082b23ba75958b07c7c13b49bfd9233b5fd4269cac98c0"
+    },
+    {
+      "file": "SCENE_SPEC.json",
+      "size": 1917,
+      "sha256": "f539326804fcb8c585fe50346c4135bc65a7383bdb8be18d238f62e3ba65c9f3"
+    },
+    {
+      "file": "哈德斯家_23張完整建模圖片總覽_v2.pdf",
+      "size": 13394074,
+      "sha256": "b83d0808c42e1a6f198106474bddfc78b5202a530c019fd9d6414583100799f1"
+    }
+  ]
+}
