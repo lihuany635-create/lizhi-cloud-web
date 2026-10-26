@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: '24'
       - name: Offline model document and Site schema safety
-        run: node --test tests/hew-cloud-direct-core.test.mjs tests/hew-cloud-site-contract.test.mjs
+        run: node --test tests/hew-cloud-direct-core.test.mjs tests/hew-cloud-site-contract.test.mjs tests/hew-cloud-edge-contract.test.mjs
   pg16-private-cloud-document:
     runs-on: ubuntu-latest
     timeout-minutes: 10
