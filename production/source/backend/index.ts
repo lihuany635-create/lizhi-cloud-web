@@ -1,6 +1,7 @@
 import {handleRecycle} from '../lib/recycle-bin.ts';
 import {handleProjectImages} from './images.ts';
 import {IMAGE_BUCKET} from '../lib/project-images.ts';
+import {ASSET_OPS} from '../lib/project-assets.ts';
 import {MANAGED_OPS} from '../lib/project-management.ts';
 declare const Deno:{env:{get(name:string):string|undefined};serve(handler:(req:Request)=>Promise<Response>):void};
 import {operate,type State} from './state.ts';
@@ -51,7 +52,7 @@ export async function handler(req:Request){
    if(!isBridge)throw new FlowError('此介面僅供已授權的 AI 工具使用',403);op=String(b.op);args=Array.isArray(b.args)?b.args:[];
   }else if(part==='workspace'){
    if(req.method==='GET'){op=url.searchParams.get('view')==='managed'?(url.searchParams.has('id')?'getManagedProject':'listManagedProjects'):(url.searchParams.has('id')?'getWorkspaceProject':'listWorkspaceProjects');args=url.searchParams.has('id')?[url.searchParams.get('id')]:[];}
-   else {const allowed=[...MANAGED_OPS,'createWorkspaceProject','updateWorkspaceProject','appendWorkspaceRecord','saveWorkspaceTask'];if(!allowed.includes(b.action))throw new FlowError('未知專案操作');op=b.action;args=['createWorkspaceProject','createManagedProject'].includes(op)?[b.args??{}]:[b.id,b.revision,b.args??{}];}
+   else {const allowed=[...ASSET_OPS,...MANAGED_OPS,'createWorkspaceProject','updateWorkspaceProject','appendWorkspaceRecord','saveWorkspaceTask'];if(!allowed.includes(b.action))throw new FlowError('未知專案操作');op=b.action;args=['createWorkspaceProject','createManagedProject'].includes(op)?[b.args??{}]:[b.id,b.revision,b.args??{}];}
   }else if(part==='projects'){
    if(req.method==='GET'){op=url.searchParams.get('id')?(url.searchParams.get('view')==='brief'?'readEpisodeBrief':'getProject'):'listProjects';args=url.searchParams.get('id')?[url.searchParams.get('id')]:[];}
    else {op=b.action==='create_project'?'createProject':'mutate';args=op==='createProject'?[b.title,b.episode]:[b.projectId,b.revision,b.action,b.args??{}];}
