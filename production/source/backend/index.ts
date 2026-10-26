@@ -1,3 +1,4 @@
+import {handleRecycle} from '../lib/recycle-bin.ts';
 import {handleProjectImages} from './images.ts';
 import {IMAGE_BUCKET} from '../lib/project-images.ts';
 import {MANAGED_OPS} from '../lib/project-management.ts';
@@ -28,6 +29,13 @@ export async function handler(req:Request){
    const user=await r.json() as {id?:string;email?:string;is_anonymous?:boolean};if(!user.id||!user.email||user.is_anonymous)throw new FlowError('需要已核准的雲端庫帳號',403);owner=user.id;kind='author';name=user.email;
   }
   const actor={id:owner,name,kind},url=new URL(req.url),part=url.pathname.split('/').filter(Boolean).at(-1);let op:string,args:unknown[];
+  if(part==='trash'){
+   const result=await handleRecycle(req,actor,{
+    read:async()=>{const rows=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&select=revision,data');if(rows.length!==1)throw new FlowError('找不到本人工作台資料',404);return rows[0];},
+    commit:async(revision,data)=>{const rows=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&revision=eq.'+revision+'&select=revision',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({revision:revision+1,data,updated_at:new Date().toISOString()})});if(rows.length!==1)throw new FlowError('工作台已更新，請重新整理垃圾桶',409);},
+    remove:async(path)=>{const r=await fetch(URL_BASE+'/storage/v1/object/'+IMAGE_BUCKET+'/'+path.split('/').map(encodeURIComponent).join('/'),{method:'DELETE',headers:adminHeaders});if(!r.ok&&r.status!==404)throw new FlowError('原圖清理未完成；請重新整理並重試永久刪除',503);}
+   });return json(result);
+  }
   if(part==='images'){
    const objectUrl=(path:string)=>URL_BASE+'/storage/v1/object/'+IMAGE_BUCKET+'/'+path.split('/').map(encodeURIComponent).join('/');
    const result=await handleProjectImages(req,actor,{

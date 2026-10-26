@@ -79,7 +79,7 @@ function renderWorkspace() {
   }
   if(state.route === 'animationflow' && !panel.dataset.productionMounted) {
     panel.dataset.productionMounted = 'loading';
-    import('./production/production-workspace.js?v=9').then(module => {
+    import('./production/production-workspace.js?v=10').then(module => {
       const host = panel.querySelector('#production-root');
       if(!host) throw new Error('專案工作台容器不存在');
       module.mount(host); panel.dataset.productionMounted = 'ready';
