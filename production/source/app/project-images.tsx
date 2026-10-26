@@ -1,5 +1,6 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
+import {openOriginalImage} from './image-original';
 import {ImagePlus,RefreshCw,Download,X,Link2} from 'lucide-react';
 import {MAX_IMAGE_BYTES,IMAGE_TYPES,type ProjectImage} from '@/lib/project-images';
 import type {WorkRecord,Stage} from '@/lib/project-management';
@@ -9,7 +10,7 @@ type Item={file:File;key:string;status:'waiting'|'uploading'|'saved'|'failed';er
 function Picture({image,access,onEdit,record}:{image:ProjectImage;access:(id:string)=>Promise<string>;onEdit:()=>void;record?:WorkRecord}){
  const [url,setUrl]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false);
  useEffect(()=>{let active=true;access(image.id).then(v=>{if(active)setUrl(v);}).catch(e=>{if(active)setError(e.message);});return()=>{active=false;};},[image.id,access]);
- async function original(download=false){setBusy(true);try{const current=await access(image.id);if(!download){window.open(current,'_blank','noopener,noreferrer');return;}const r=await fetch(current);if(!r.ok)throw Error('原圖下載失敗');const link=URL.createObjectURL(await r.blob()),a=document.createElement('a');a.href=link;a.download=image.name;a.click();setTimeout(()=>URL.revokeObjectURL(link),1000);}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
+ async function original(download=false){setBusy(true);try{if(!download){await openOriginalImage(()=>access(image.id));return;}const current=await access(image.id);const r=await fetch(current);if(!r.ok)throw Error('原圖下載失敗');const link=URL.createObjectURL(await r.blob()),a=document.createElement('a');a.href=link;a.download=image.name;a.click();setTimeout(()=>URL.revokeObjectURL(link),1000);}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
  return <article className="project-image-card"><button className="project-image-preview" disabled={!url||busy} onClick={()=>void original()} aria-label={'查看原圖：'+image.name}>{url?<img loading="lazy" src={url} alt={image.description||image.name} onError={()=>setError('圖片連結可能已過期，請按重新載入')}/>:<span>讀取圖片…</span>}</button><div className="project-image-info"><b>{image.name}</b><p>{image.description||'尚未填寫說明'}</p>{image.recordId&&<small><Link2 size={12}/>{record?'紀錄：'+record.summary:'原連結紀錄目前未列於此版本'}</small>}<small>{(image.size/1024/1024).toFixed(2)} MB · {new Date(image.at).toLocaleDateString('zh-TW',{timeZone:'Asia/Taipei'})}</small>{error&&<p className="red-text" role="alert">{error}</p>}<div className="project-image-actions"><button className="text-btn" onClick={onEdit}>說明／連結紀錄</button><button className="icon-btn" disabled={busy} onClick={()=>void original(true)} aria-label={'下載：'+image.name}><Download size={16}/></button></div></div></article>;
 }
 export default function ProjectImages({project,transport,onSaved,onDirty,onBusy,recordFilter}:{project:Project;transport?:Transport;onSaved:(next:any)=>void;onDirty:(value:boolean)=>void;onBusy:(value:boolean)=>void;recordFilter?:string}){
