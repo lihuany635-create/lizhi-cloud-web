@@ -2,13 +2,14 @@
   'use strict';
   const $=id=>document.getElementById(id);
   const sample=$('sampleSel'),pane=$('modelPreview'),image=$('previewImage');
-  const base='revisions/hades-v2.4/';
+  const base='revisions/hades-v3.0/';
   const scenes={
-    'hades-house':{name:'哈德斯家',file:'hades-house.glb?v=2.4-20261022',review:base,views:[
-      ['一樓俯視','H24_1F'],['二樓俯視','H24_2F'],['完整外觀','H24_EXTERIOR'],
-      ['主角房','H24_BEDROOM'],['二樓走廊','H24_HALL'],['二樓起居區','H24_LOUNGE'],
-      ['書房','H24_STUDY'],['早餐桌','H24_BREAKFAST'],['一樓客廳','H24_LIVING'],
-      ['廚房','H24_KITCHEN'],['一樓閱讀工作角','H24_DEN'],['主角書桌','H24_DESK']
+    'hades-house':{name:'哈德斯家 v3.0',file:'hades-house.glb?v=3.0-20261026',review:base,views:[
+      ['一樓俯視','V04_PLAN_1F'],['二樓俯視','V05_PLAN_2F'],['完整外觀','V01_EXT_SE'],
+      ['南向正面','V02_EXT_SOUTH'],['西北外觀','V03_EXT_NW'],['樓梯剖視','V06_STAIR_CUT'],['基地俯視','V07_SITE_TOP'],
+      ['C01 街景','C01_EXT_FRONT'],['C02 主角窗看黑車','C02_BLACK_CAR_WINDOW_VIEW'],['C03 玄關看樓梯','C03_ENTRY_TO_STAIRS'],
+      ['C04 樓梯仰視','C04_STAIR_UP'],['C05 主角房看走廊','C05_ROOM_TO_HALL'],['C06 客廳沙發','C06_LIVING_SOFA'],
+      ['C07 餐廳看廚房','C07_DINING_KITCHEN'],['C08 主角書桌','C08_PROTAGONIST_DESK']
     ]},
     'reality-home':{name:'現實主角家',file:'reality-home.glb?v=2.3-merged-20261022',hero:'HERO_reality_home'},
     'reality-highschool':{name:'現實高中',file:'reality-highschool.glb?v=2.3-merged-20261022',hero:'HERO_highschool'},

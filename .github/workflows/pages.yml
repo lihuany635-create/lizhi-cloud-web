@@ -22,20 +22,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Assemble reviewed Hades v2.4 model
+      - name: Verify Hades v3.0 model against version manifest
         run: |
           python - <<'PY'
-          import pathlib,json,gzip,hashlib
-          root=pathlib.Path('model-viewer/revisions/hades-v2.4/transfer')
-          m=json.loads((root/'manifest.json').read_text())
-          archive=b''.join((root/name).read_bytes() for name in m['parts'])
-          assert hashlib.sha256(archive).hexdigest()==m['compressed_sha256']
-          data=gzip.decompress(archive)
-          assert hashlib.sha256(data).hexdigest()==m['model_sha256']
-          target=pathlib.Path('model-viewer/hades-house.glb')
-          assert hashlib.sha256(target.read_bytes()).hexdigest() in [m['previous_sha256'],m['model_sha256']], 'Unexpected house source'
-          target.write_bytes(data)
-          print('Verified exact HADES-v2.4 deployment model:',len(data),'bytes')
+          import pathlib,json,hashlib
+          entry=[m for m in json.loads(pathlib.Path('model-viewer/current-models.json').read_text())['models'] if m['model']=='hades-house.glb'][0]
+          data=pathlib.Path('model-viewer/hades-house.glb').read_bytes()
+          assert data[:4]==b'glTF', 'hades-house.glb is not GLB'
+          assert hashlib.sha256(data).hexdigest()==entry['current_sha256'], 'Hades SHA mismatch'
+          print('Verified',entry['version'],len(data),'bytes')
           PY
       - name: Publish isolated EP01 S01 V5 preview model from stage branch
         uses: actions/checkout@v4

@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-academy-v16-indoor-greenery-20261024",
+  "version": "mixed-current-hades-v3-0-20261026",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -20,18 +20,22 @@
     },
     {
       "model": "hades-house.glb",
-      "version": "HADES-v2.4",
-      "source_candidate": "hades-house_v2_3_candidate.glb",
-      "current_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
-      "backup": "backups/pre-hades-v2.4/hades-house.glb",
-      "backup_sha256": "ff59c749ba4184d1fd74c5086f86e4c89bcc553aa6d0f6458ab89f03ecb4dccb",
-      "integrated_contents": "Complete two-storey envelope with inferred room layout, retained yard/car/stair, newly furnished household.",
+      "version": "HADES-v3.0",
+      "source_candidate": "revisions/hades-v3.0/hades-house_v3_0.glb",
+      "current_sha256": "c95e87cb9a35af58104da97a2a95b31505f7636af61fe27e42e91c55f3f405b9",
+      "backup": "revisions/hades-v2.4/transfer (exact HADES-v2.4, gz parts) + backups/pre-hades-v2.4/hades-house.glb (v2.3 repo baseline)",
+      "backup_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+      "integrated_contents": "Full rebuild from EP02 23-image package v2 (2026-10-26): 9x8 m two-storey shell per A-101/A-102 R00 SVG coordinates, R01 roof/elevations/stair/door index, 9 doors, 12 windows, U-stair 16x187.5, I-101/I-102 furniture, A-001 site with the single black car, 8 fixed cameras C01-C08.",
       "author_full_item_approval": "PENDING",
-      "review_url": "revisions/hades-v2.4/",
-      "deployment_source": "revisions/hades-v2.4/transfer/manifest.json",
-      "repository_baseline_version": "v2.3",
-      "repository_baseline_git_blob_sha": "86cd874711f620c9d4072efcfe2fe5313551d327",
-      "deployment_assembly": "Pages assembles exact v2.4 GLB from verified compressed parts before upload. Workflow permissions remain contents:read/pages:write/id-token:write; no repository write."
+      "review_url": "revisions/hades-v3.0/",
+      "build_script": "revisions/hades-v3.0/scripts/build_hades_v3.py",
+      "static_geometry_qa": "PASS (static only): 0 furniture/wall AABB overlaps, 0 door-swing conflicts, stair 16x187.5=3000, headroom >=2592 mm, V-002 car sightline 4082 mm at wall (window yes / bedside no)",
+      "visual_qa": "HEADLESS_RENDER_CAPTURED_15_VIEWS__AUTHOR_REVIEW_PENDING",
+      "deviations": [
+        "D-02 leaf swings into foyer instead of drawn stair-side swing (3D collision with flight-1 treads)",
+        "Window IDs W-101..W-206 named by location (A-402 R00 table not in package)"
+      ],
+      "supersedes": "HADES-v2.4 (22x14 m inferred layout)"
     },
     {
       "model": "reality-highschool.glb",
