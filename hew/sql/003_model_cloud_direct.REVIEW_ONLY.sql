@@ -136,7 +136,7 @@ begin
   select * into entry from lizhi_model_private.cloud_documents
    where owner_uid=p_owner and id=p_document for update;
   if not found then raise exception 'MODEL_DOCUMENT_NOT_FOUND' using errcode='P0002';end if;
-  if entry.revision<>p_revision then raise exception 'MODEL_REVISION_CONFLICT' using errcode='40001';end if;
+  if entry.revision<>p_revision then raise exception 'MODEL_REVISION_CONFLICT' using errcode='P0001';end if;
   if p_op='create_box' then
    if jsonb_array_length(entry.entities)>=1000
     then raise exception 'MODEL_ENTITY_LIMIT' using errcode='22023';end if;
