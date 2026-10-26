@@ -1,3 +1,5 @@
+import {handleProjectImages} from './images.ts';
+import {IMAGE_BUCKET} from '../lib/project-images.ts';
 import {MANAGED_OPS} from '../lib/project-management.ts';
 declare const Deno:{env:{get(name:string):string|undefined};serve(handler:(req:Request)=>Promise<Response>):void};
 import {operate,type State} from './state.ts';
@@ -26,6 +28,16 @@ export async function handler(req:Request){
    const user=await r.json() as {id?:string;email?:string;is_anonymous?:boolean};if(!user.id||!user.email||user.is_anonymous)throw new FlowError('需要已核准的雲端庫帳號',403);owner=user.id;kind='author';name=user.email;
   }
   const actor={id:owner,name,kind},url=new URL(req.url),part=url.pathname.split('/').filter(Boolean).at(-1);let op:string,args:unknown[];
+  if(part==='images'){
+   const objectUrl=(path:string)=>URL_BASE+'/storage/v1/object/'+IMAGE_BUCKET+'/'+path.split('/').map(encodeURIComponent).join('/');
+   const result=await handleProjectImages(req,actor,{
+    read:async()=>{const rows=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&select=revision,data');if(rows.length!==1)throw new FlowError('找不到本人工作台資料',404);return rows[0];},
+    commit:async(revision,data)=>{const rows=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&revision=eq.'+revision+'&select=revision',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({revision:revision+1,data,updated_at:new Date().toISOString()})});if(rows.length!==1)throw new FlowError('其他裝置或AI已更新；請重新整理再上傳',409);},
+    upload:async(path,bytes,mime)=>{const r=await fetch(objectUrl(path),{method:'POST',headers:{...adminHeaders,'Content-Type':mime,'x-upsert':'false'},body:bytes.buffer as ArrayBuffer});if(!r.ok)throw new FlowError('圖片儲存失敗，請稍後重試',503);},
+    remove:async(path)=>{const r=await fetch(objectUrl(path),{method:'DELETE',headers:adminHeaders});if(!r.ok)throw new FlowError('暫存圖片清理失敗',503);},
+    signed:async(path)=>{const r=await fetch(URL_BASE+'/storage/v1/object/sign/'+IMAGE_BUCKET+'/'+path.split('/').map(encodeURIComponent).join('/'),{method:'POST',headers:adminHeaders,body:JSON.stringify({expiresIn:300})});if(!r.ok)throw new FlowError('圖片讀取失敗',503);const b=await r.json() as {signedURL?:string};if(!b.signedURL?.startsWith('/object/sign/'+IMAGE_BUCKET+'/'))throw new FlowError('圖片網址格式錯誤',503);return URL_BASE+'/storage/v1'+b.signedURL;}
+   });return json(result);
+  }
   const text=req.method==='POST'?await req.text():'';if(text.length>(isBridge?24000000:1800000))throw new FlowError('資料超過大小限制',413);const b=text?JSON.parse(text):{};
   if(part==='bridge'){
    if(!isBridge)throw new FlowError('此介面僅供已授權的 AI 工具使用',403);op=String(b.op);args=Array.isArray(b.args)?b.args:[];

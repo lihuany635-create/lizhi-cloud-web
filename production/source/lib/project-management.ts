@@ -1,3 +1,4 @@
+import type {ProjectImage} from './project-images.ts';
 import {FlowError,type Actor} from './workflow.ts';
 import {workspaceView,workspaceProjects,operatePortfolio,PHASES,type PortfolioState,type WorkspaceProject,type ProjectKind} from './portfolio.ts';
 export const RESULT_STATES=['PLANNED','IN_PROGRESS','PASS','FAIL','BLOCKED','NOT_TESTED'] as const;
@@ -8,7 +9,7 @@ export type Source={id:string;key:string;title:string;location:string;version:st
 export type Artifact={id:string;key:string;title:string;location:string;version:string;sha256:string;inspection:string;availability:'reference'|'inspected';stageId:string;at:string};
 export type WorkRecord={id:string;key:string;stageId:string;taskId:string;status:ResultState;requestedStatus:ResultState;summary:string;mode:'actual'|'simulation'|'document'|'not_run';scope:string;method:string;result:string;evidenceIds:string[];sourceIds:string[];nextStep:string;limitations:string;at:string;by:string;actor:'author'|'ai';validationNote:string};
 export type Issue={id:string;key:string;stageId:string;taskId:string;title:string;detail:string;status:'open'|'resolved';resolution:string;at:string;by:string};
-export type ManagedProject=WorkspaceProject&{schemaVersion:2;status:'planning'|'in_progress'|'blocked'|'completed'|'archived';stages:Stage[];managedTasks:ManagedTask[];records:WorkRecord[];artifacts:Artifact[];sources:Source[];issues:Issue[];restrictions:string[];requests:{key:string;op:string;payload:string}[]};
+export type ManagedProject=WorkspaceProject&{schemaVersion:2;images:ProjectImage[];status:'planning'|'in_progress'|'blocked'|'completed'|'archived';stages:Stage[];managedTasks:ManagedTask[];records:WorkRecord[];artifacts:Artifact[];sources:Source[];issues:Issue[];restrictions:string[];requests:{key:string;op:string;payload:string}[]};
 export const MANAGED_OPS=['listManagedProjects','getManagedProject','getProjectContext','getProjectHandoff','listProjectStages','createManagedProject','updateManagedProject','createProjectStage','createProjectTask','updateProjectTask','appendWorkRecord','registerProjectArtifact','registerProjectSource','reportProjectIssue','resolveProjectIssue','restoreProjectBackup'];
 const txt=(v:unknown,max=12000,required=false)=>{if(typeof v!=='string'||v.length>max||required&&!v.trim())throw new FlowError('文字內容缺漏或過長');return v.trim();};
 const arr=(v:unknown,max=100)=>{if(!Array.isArray(v)||v.length>max||v.some(x=>typeof x!=='string'))throw new FlowError('清單格式錯誤');return v as string[];};
@@ -19,7 +20,7 @@ export function managedOf(s:PortfolioState,id:unknown):ManagedProject{
  const p=workspaceProjects(s).find(x=>x.id===id);if(!p)throw new FlowError('找不到專案',404);const old=p as ManagedProject;
  const stages=old.stages??PHASES[p.kind].map((title,i)=>({id:p.id+':stage:'+i,key:'S'+String(i+1).padStart(2,'0'),title,order:i}));
  const stageFor=(phase:string)=>stages.find(x=>x.title===phase)?.id??stages[0]?.id??'';
- return {...p,schemaVersion:2,status:p.archived?'archived':old.status??'planning',stages,managedTasks:old.managedTasks??p.tasks.map(t=>({id:t.id,key:t.id,stageId:stageFor(t.phase),title:t.title,status:({todo:'PLANNED',doing:'IN_PROGRESS',blocked:'BLOCKED',done:'NOT_TESTED'} as const)[t.status],nextAction:'',evidenceIds:[],updatedAt:t.updatedAt})),
+ return {...p,schemaVersion:2,images:old.images??[],status:p.archived?'archived':old.status??'planning',stages,managedTasks:old.managedTasks??p.tasks.map(t=>({id:t.id,key:t.id,stageId:stageFor(t.phase),title:t.title,status:({todo:'PLANNED',doing:'IN_PROGRESS',blocked:'BLOCKED',done:'NOT_TESTED'} as const)[t.status],nextAction:'',evidenceIds:[],updatedAt:t.updatedAt})),
  records:old.records??p.journal.map(r=>({id:r.id,key:r.key,stageId:stageFor(r.phase),taskId:'',status:r.status==='blocked'?'BLOCKED':r.status==='completed'?'NOT_TESTED':'IN_PROGRESS',requestedStatus:r.status==='completed'?'PASS':'IN_PROGRESS',summary:r.summary,mode:'not_run',scope:'舊版工作紀錄',method:r.verification,result:r.evidence,evidenceIds:[],sourceIds:[],nextStep:r.nextStep,limitations:r.blockers,at:r.at,by:r.by,actor:r.actor,validationNote:'舊紀錄保留，沒有結構化測試證據，不自動轉成 PASS。'})),
  artifacts:old.artifacts??[],sources:old.sources??[],issues:old.issues??[],restrictions:old.restrictions??['工作回報不等於作者驗收。','不同專案不得混用來源與成果。',...(p.kind==='animation'?['動畫與模型仍須各自有效工作資料包；通用紀錄不能核定或替換專業流程。']:[])],requests:old.requests??[]};
 }
@@ -38,7 +39,7 @@ export function operateManaged(input:PortfolioState,op:string,args:unknown[],act
  if(!MANAGED_OPS.includes(op))throw new FlowError('未知通用專案操作');let state=structuredClone(input),changed=false;
  if(op==='listManagedProjects')return {state,changed,result:workspaceProjects(state).map(p=>{const v=managedView(state,p.id),h=v.handoff;return {projectId:p.id,id:p.id,name:p.title,title:p.title,type:p.kind,kind:p.kind,status:v.status,archived:p.archived,currentStage:h.currentStage?.title??'尚未設定',recentWork:h.lastWork?.summary??'尚無通用工作紀錄',nextAction:h.nextActions[0]??'開啟專案查看進度',revision:p.revision,updatedAt:p.updatedAt};})};
  if(op==='getManagedProject')return {state,changed,result:managedView(state,args[0])};
- if(op==='getProjectContext'){const v=managedView(state,args[0]);return {state,changed,result:{projectId:v.id,name:v.title,type:v.kind,description:v.objective,revision:v.revision,status:v.status,stages:v.stages,tasks:v.managedTasks,records:v.records.slice(-10),artifacts:v.artifacts,sources:v.sources.map(({snapshot,...x})=>({...x,snapshotAvailable:!!snapshot})),issues:v.issues,handoff:v.handoff,animation:v.animation}};}
+ if(op==='getProjectContext'){const v=managedView(state,args[0]);return {state,changed,result:{projectId:v.id,name:v.title,type:v.kind,description:v.objective,revision:v.revision,status:v.status,stages:v.stages,tasks:v.managedTasks,records:v.records.slice(-10),artifacts:v.artifacts,images:v.images,sources:v.sources.map(({snapshot,...x})=>({...x,snapshotAvailable:!!snapshot})),issues:v.issues,handoff:v.handoff,animation:v.animation}};}
  if(op==='getProjectHandoff')return {state,changed,result:handoffOf(managedOf(state,args[0]))};
  if(op==='listProjectStages')return {state,changed,result:managedView(state,args[0]).stages};
  const at=new Date().toISOString();let p:ManagedProject,a:Record<string,unknown>;
@@ -87,7 +88,7 @@ export function operateManaged(input:PortfolioState,op:string,args:unknown[],act
    for(const r of backup.records){if(!backup.stages.some(s=>s.id===r.stageId)||r.taskId&&!backup.managedTasks.some(t=>t.id===r.taskId))throw new FlowError('備份紀錄引用錯誤');const verdict=proof(backup,resultStatus(r.status),r.mode,arr(r.evidenceIds),arr(r.sourceIds),r.method,r.result,r.scope);if(verdict.status!==r.status)throw new FlowError('備份含未具證據的 PASS');}
    if(backup.status==='completed'&&(!backup.managedTasks.length||backup.managedTasks.some(t=>t.status!=='PASS')||backup.issues.some(i=>i.status==='open')))throw new FlowError('備份含未完成的結案狀態');
    for(const t of backup.managedTasks){if(!backup.stages.some(s=>s.id===t.stageId)||t.status==='PASS'&&!backup.records.some(r=>r.taskId===t.id&&r.status==='PASS'))throw new FlowError('備份任務引用或證據錯誤');}
-   const prior=JSON.stringify(p);const restored=structuredClone(backup);p={...restored,journal:p.journal,tasks:p.tasks,revision:p.revision,requests:p.requests,history:[...p.history,{action:'restore_snapshot_before',at,by:actor.name,actor:actor.kind,detail:prior}]};
+   const prior=JSON.stringify(p);const restored=structuredClone(backup);p={...restored,images:p.images,journal:p.journal,tasks:p.tasks,revision:p.revision,requests:p.requests,history:[...p.history,{action:'restore_snapshot_before',at,by:actor.name,actor:actor.kind,detail:prior}]};
   }
   p.requests.push({key,op,payload:JSON.stringify(a)});p.revision++;p.updatedAt=at;
  }

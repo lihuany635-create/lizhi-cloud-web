@@ -7,7 +7,9 @@ const model=compile('lib/model-flow.ts'),domain=compile('lib/workflow.ts',[["fro
 const {makeProject,makeWork}=await import(domain),{operate}=await import(state);
 const env={SUPABASE_URL:'https://supabase.test',SUPABASE_SERVICE_ROLE_KEY:'dummy-test-server-key'};
 globalThis.__NATIVE_TEST_ENV=env;
-const {handler}=await import(compile('backend/index.ts',[["from './state.ts'",`from '${state}'`],["from '../lib/project-management.ts'",`from '${managed}'`],["from '../lib/workflow.ts'",`from '${domain}'`],["Deno.env.get(","globalThis.__NATIVE_TEST_ENV["]].slice(0,3).concat([["Deno.env.get('SUPABASE_URL')","globalThis.__NATIVE_TEST_ENV.SUPABASE_URL"],["Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')","globalThis.__NATIVE_TEST_ENV.SUPABASE_SERVICE_ROLE_KEY"],["Deno.serve(handler);",""]])));
+const imageDomain=compile('lib/project-images.ts',[["from './workflow.ts'",`from '${domain}'`],["from './project-management.ts'",`from '${managed}'`]]);
+const imageBackend=compile('backend/images.ts',[["from '../lib/workflow.ts'",`from '${domain}'`],["from '../lib/project-management.ts'",`from '${managed}'`],["from '../lib/project-images.ts'",`from '${imageDomain}'`]]);
+const {handler}=await import(compile('backend/index.ts',[["from './images.ts'",`from '${imageBackend}'`],["from '../lib/project-images.ts'",`from '${imageDomain}'`],["from './state.ts'",`from '${state}'`],["from '../lib/project-management.ts'",`from '${managed}'`],["from '../lib/workflow.ts'",`from '${domain}'`],["Deno.env.get(","globalThis.__NATIVE_TEST_ENV["]].slice(0,5).concat([["Deno.env.get('SUPABASE_URL')","globalThis.__NATIVE_TEST_ENV.SUPABASE_URL"],["Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')","globalThis.__NATIVE_TEST_ENV.SUPABASE_SERVICE_ROLE_KEY"],["Deno.serve(handler);",""]])));
 const actualFetch=globalThis.fetch,ORIGIN='https://lihuany635-create.github.io',states=new Map();let conflict=false;
 const aiKey='lzp_test-scoped-bridge',hash=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(aiKey))).toString('hex');
 const response=(v,status=200)=>Response.json(v,{status});
@@ -105,4 +107,13 @@ test('通用API寫入讀回、重新請求後仍存在，權限、CAS及來源�
 test('來源保留原文前後空白，伺服器核對的SHA256與存入快照一致',async()=>{
  let r=await handler(request('workspace',{body:{action:'createManagedProject',args:{key:'source-whitespace',type:'software',name:'來源精確性',description:''}}}));const x=await r.json(),snapshot='  原始內容\n';const digest=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(snapshot))).toString('hex');
  r=await handler(bridge('registerProjectSource',[x.id,x.revision,{key:'preserve',sourceKey:'raw',title:'原文',location:'https://example.test/source',readStatus:'read',snapshot,sha256:digest,observation:'實際原文含空白'}]));assert.equal(r.status,200);const saved=await r.json();assert.equal(saved.sources[0].snapshot,snapshot);assert.equal(Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(saved.sources[0].snapshot))).toString('hex'),saved.sources[0].sha256);
+});
+
+test('圖片入口同樣阻擋匿名、無效憑證、外部來源與跨帳號',async()=>{
+ const path='images?projectId='+p.id+'&imageId='+crypto.randomUUID();
+ assert.equal((await handler(request(path,{token:''}))).status,401);
+ assert.equal((await handler(request(path,{token:'bad'}))).status,401);
+ assert.equal((await handler(request(path,{origin:'https://evil.test'}))).status,403);
+ assert.equal((await handler(request(path,{token:'other-user'}))).status,404);
+ assert.equal((await handler(request(path,{token:aiKey}))).status,403);
 });
