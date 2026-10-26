@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-26",
+  "timezone": "Asia/Taipei",
+  "scope": "隔離測試圖之正式工作台瀏覽器驗證，不代表動畫素材或作者驗收",
+  "portal": "https://lihuany635-create.github.io/lizhi-cloud-web/?open=animationflow",
+  "sourceCommit": "20c4f85bf9ad3cad50c5ab8243d07153b984d849",
+  "mergedCommit": "71ea7b1a060695b0f90a77d06606e868999182ec",
+  "browserCases": [
+    {
+      "id": 1,
+      "name": "PNG與JPG多選逐張上傳並持久保存",
+      "status": "PASS"
+    },
+    {
+      "id": 2,
+      "name": "兩張640×360圖片實際解碼顯示",
+      "status": "PASS"
+    },
+    {
+      "id": 3,
+      "name": "修改PNG圖片說明並保存",
+      "status": "PASS"
+    },
+    {
+      "id": 4,
+      "name": "工作紀錄顯示正確圖片數量2與0",
+      "status": "PASS"
+    },
+    {
+      "id": 5,
+      "name": "不同紀錄篩選不混入圖片",
+      "status": "PASS"
+    },
+    {
+      "id": 6,
+      "name": "整頁重新整理後圖片與修改後說明仍存在",
+      "status": "PASS"
+    },
+    {
+      "id": 7,
+      "name": "PNG原檔下載與原始檔逐位元組一致",
+      "status": "PASS"
+    },
+    {
+      "id": 8,
+      "name": "JPG原檔下載與原始檔逐位元組一致",
+      "status": "PASS"
+    },
+    {
+      "id": 9,
+      "name": "點擊查看原圖同步開啟新視窗並載入正確圖片",
+      "status": "PASS",
+      "observation": "原圖按鈕同步建立新分頁，實際 img.complete=true / naturalWidth=640 / naturalHeight=360。"
+    }
+  ],
+  "previousFailure": {
+    "version": "v8",
+    "case": 9,
+    "status": "FAIL",
+    "detail": "等待雲端網址後才window.open，瀏覽器阻擋且原來沒有提示。已修正為點擊時同步開窗、移除opener後等待網址；原錯誤保留在不可覆寫工作紀錄。"
+  },
+  "files": [
+    {
+      "name": "upload-test.png",
+      "bytes": 5802,
+      "width": 640,
+      "height": 360,
+      "sha256": "3b6450a859ddd398b41796064c930a2b6d8191ecbd76a666d8f57baeae88c4e8",
+      "downloadEqualsOriginal": true
+    },
+    {
+      "name": "upload-test.jpg",
+      "bytes": 11433,
+      "width": 640,
+      "height": 360,
+      "sha256": "31ffeca6279497b563088b0398b4d17b5d6b8f421fcbe642ed6c54677f7e2e81",
+      "downloadEqualsOriginal": true
+    }
+  ],
+  "automated": {
+    "sites": {
+      "PASS": 127,
+      "FAIL": 0
+    },
+    "native": {
+      "PASS": 40,
+      "FAIL": 0
+    },
+    "overlap": true,
+    "note": "兩套測試重疊，不相加；新增3項原圖開窗時序、阻擋與失敗清理檢查。TypeScript、native與Sites build通過。"
+  },
+  "mobilePhysicalDevice": "NOT_TESTED",
+  "testProjectArchived": true,
+  "browserSummary": {
+    "PASS": 9,
+    "FAIL": 0
+  },
+  "deployment": {
+    "githubPagesRun": 40267289267,
+    "status": "success",
+    "siteVersion": 21,
+    "siteStatus": "success"
+  },
+  "archivedImagesPreserved": 2
+}
