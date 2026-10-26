@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-26",
+  "scope": "正式桌面瀏覽器工作台垃圾桶驗收；僅隔離測試資料",
+  "projectId": "aaf31001-18cd-4d7a-98a2-7a0a28aa7afc",
+  "sourceCommit": "42f58a3b0afc107248470e4207d605d52d1bf29b",
+  "mergeCommit": "532b62436db52187e47b78737f45d0bd3955c7c5",
+  "deployments": {
+    "pages": {
+      "run": 40291286270,
+      "job": 121466698680,
+      "status": "success",
+      "module": 10,
+      "cache": 151
+    },
+    "edge": {
+      "version": 18,
+      "status": "ACTIVE"
+    },
+    "site": {
+      "version": 23,
+      "deploymentId": "appgdep_6adf0c8f3f8c819198978a7bc9ab3d9c",
+      "status": "succeeded"
+    }
+  },
+  "automated": {
+    "sites": {
+      "pass": 149,
+      "fail": 0,
+      "skipped": 0
+    },
+    "native": {
+      "pass": 61,
+      "fail": 0,
+      "skipped": 0
+    },
+    "overlap": "native與Sites重疊，不相加",
+    "typecheck": "PASS",
+    "nativeBuild": "PASS",
+    "workerBuild": "PASS"
+  },
+  "desktop": {
+    "pass": 9,
+    "fail": 0,
+    "cases": [
+      {
+        "case": "圖片移入垃圾桶",
+        "result": "PASS",
+        "evidence": "網頁確認後MCP圖片列表revision4/total0，垃圾桶顯示trash-qa.png"
+      },
+      {
+        "case": "圖片還原",
+        "result": "PASS",
+        "evidence": "revision5，原圖ID、SHA256、說明及紀錄關聯相同"
+      },
+      {
+        "case": "紀錄移入垃圾桶",
+        "result": "PASS",
+        "evidence": "revision6，get_project_context.records為空且handoff.lastWork=null；圖片仍1張"
+      },
+      {
+        "case": "紀錄還原",
+        "result": "PASS",
+        "evidence": "revision7，整筆record JSON與原始完全相同"
+      },
+      {
+        "case": "專案移入垃圾桶",
+        "result": "PASS",
+        "evidence": "一般專案清單隱藏；get_project回找不到專案；網頁垃圾桶可還原"
+      },
+      {
+        "case": "專案還原",
+        "result": "PASS",
+        "evidence": "revision8，相同專案ID、所有records與images完全相同"
+      },
+      {
+        "case": "永久刪除輸入確認及取消",
+        "result": "PASS",
+        "evidence": "圖片永久刪除出現prompt，已取消；圖片仍可還原，未執行永久刪除"
+      },
+      {
+        "case": "含原圖專案永久刪除保護",
+        "result": "PASS",
+        "evidence": "垃圾桶內專案仍有原圖，永久刪除按鈕disabled，還原可用"
+      },
+      {
+        "case": "整頁重新整理後持久化",
+        "result": "PASS",
+        "evidence": "正式頁面reload再開啟專案，revision8/records1/images1；實際圖片complete=true/640x360、說明與紀錄連結仍在"
+      }
+    ]
+  },
+  "fixture": {
+    "imageId": "10453ee5-49ba-4b9d-9410-dcd0ff626789",
+    "recordId": "e244094c-de4a-4fc5-8563-12bdb739b0ff",
+    "bytes": 5802,
+    "sha256": "3b6450a859ddd398b41796064c930a2b6d8191ecbd76a666d8f57baeae88c4e8",
+    "generatedTestImage": true
+  },
+  "notTested": [
+    "實體手機操作",
+    "正式環境不可還原的永久刪除；Storage失敗／final CAS等由自動化隔離測試驗證"
+  ],
+  "observations": [
+    "圖片與工作紀錄的實際寫入均需等待保存完成；對尚在執行中的早期讀取不列作測試結論。",
+    "永久刪除保留既有備份與歷史；不表示清除所有備份。",
+    "不修改正式動畫、模型、工程圖或理財資料。"
+  ]
+}
