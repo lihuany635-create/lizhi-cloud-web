@@ -6,7 +6,10 @@ const actor={id:'7ee9b650-4b22-4c13-ba46-9ceefa9deaaa',name:'圖片驗收',kind:
 function made(){return operateManaged({rows:[]},'createManagedProject',[{key:crypto.randomUUID(),type:'general',name:'圖片隔離驗收',description:''}],actor);}
 function metadata(project,extra={}){const id=crypto.randomUUID();return {id,key:crypto.randomUUID(),name:'範例.png',mime:'image/png',size:png.length,sha256:'a'.repeat(64),objectPath:imageObjectPath(actor.id,project.id,id,'image/png'),description:'參考圖',recordId:'',stageId:'',at:new Date().toISOString(),by:actor.name,...extra};}
 const recycleModule=compile('lib/recycle-bin.ts',[["from './workflow.ts'",`from '${workflow}'`],["from './project-management.ts'",`from '${managed}'`],["from './project-images.ts'",`from '${images}'`]]);
-const {recycle,handleRecycle,trashView}=await import(recycleModule);
+const {recycle:actualRecycle,handleRecycle:actualHandleRecycle,trashView}=await import(recycleModule);
+const expire=s=>{for(const t of s.trash??[])if(t.retainUntil)t.retainUntil='2000-01-01T00:00:00.000Z';return s;};
+const recycle=(s,...args)=>actualRecycle(expire(structuredClone(s)),...args);
+const handleRecycle=(req,actor,services)=>actualHandleRecycle(req,actor,{...services,read:async()=>{const r=await services.read();expire(r.data);return r;}});
 const recycleArgs=(p,kind,targetId,key=crypto.randomUUID())=>({action:'trash',key,projectId:p.id,projectRevision:p.revision,kind,targetId});
 function saved(x){let current={revision:1,data:structuredClone(x.state)},removes=0;return {api:{read:async()=>structuredClone(current),commit:async(rev,data)=>{if(current.revision!==rev)throw new FlowError('conflict',409);current={revision:rev+1,data:structuredClone(data)};},remove:async()=>{removes++;}},get current(){return current;},get removes(){return removes;}};}
 const post=a=>new Request('https://backend.test/trash',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(a)});

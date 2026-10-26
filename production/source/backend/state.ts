@@ -1,8 +1,10 @@
+import {ASSET_OPS,operateAssets} from '../lib/project-assets.ts';
 import {MANAGED_OPS,operateManaged} from '../lib/project-management.ts';
 import {operatePortfolio,PORTFOLIO_OPS,type WorkspaceProject} from '../lib/portfolio.ts';
 import {applyAction,makeProject,summary,FlowError,makeWork,workSummary,applyWorkAction,normalizeEpisode,pinSharedAsset,episodeBrief,normalizeEpisodeWorkflow,type Actor,type Project,type Work} from '../lib/workflow.ts';
 export type State={portfolio?:WorkspaceProject[];rows:(Project|Work)[];migration?:{sourceOwner:string;digest:string;at:string}};
 export function operate(input:State,op:string,args:unknown[],actor:Actor){
+ if(ASSET_OPS.includes(op))return operateAssets(input,op,args,actor);
  if(MANAGED_OPS.includes(op))return operateManaged(input,op,args,actor);
  if(PORTFOLIO_OPS.includes(op))return operatePortfolio(input,op,args,actor);
  const state:State=structuredClone(input);let changed=false;
