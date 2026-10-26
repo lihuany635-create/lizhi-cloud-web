@@ -1,0 +1,57 @@
+name: Hew cloud direct contract (isolated, no deployment)
+on:
+  push:
+    branches:
+      - feature/hew-workbench-cloud-direct-v1-20261026
+    paths:
+      - 'hew/cloud-direct/**'
+      - 'hew/sql/003_model_cloud_direct.REVIEW_ONLY.sql'
+      - 'tests/hew-cloud-*.test.mjs'
+      - 'tests/sql/hew_model_cloud_direct_isolated.test.sql'
+      - '.github/workflows/hew-cloud-direct-contract.yml'
+  pull_request:
+    paths:
+      - 'hew/cloud-direct/**'
+      - 'hew/sql/003_model_cloud_direct.REVIEW_ONLY.sql'
+      - 'tests/hew-cloud-*.test.mjs'
+      - 'tests/sql/hew_model_cloud_direct_isolated.test.sql'
+      - '.github/workflows/hew-cloud-direct-contract.yml'
+permissions:
+  contents: read
+jobs:
+  node-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Offline model document and Site schema safety
+        run: node --test tests/hew-cloud-direct-core.test.mjs tests/hew-cloud-site-contract.test.mjs
+  pg16-private-cloud-document:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 3s --health-timeout 3s --health-retries 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: PostgreSQL client
+        run: |
+          if ! command -v psql >/dev/null; then sudo apt-get update && sudo apt-get install -y postgresql-client; fi
+      - name: Atomic owner/revision/idempotence/no-browser queue cloud tests
+        env:
+          PGHOST: localhost
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
+        run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/hew_model_cloud_direct_isolated.test.sql
