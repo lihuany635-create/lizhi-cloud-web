@@ -82,7 +82,7 @@ export async function handleCloudModelEdgeRequest(req,{token,ownerUid,db}){
   const args=op==='new_document'?{name:a.name}:
     op==='create_box'?{
       origin_mm:a.origin_mm,width_mm:a.width_mm,
-      depth_mm:a.depth_mm,height_mm:a.height_mm,...a.name?{name:a.name}:{}}
+      depth_mm:a.depth_mm,height_mm:a.height_mm,...(a.name?{name:a.name}:{})}
     :{entity_id:a.entity_id,translation_mm:a.translation_mm}
   const write=await query(db,'lizhi_model_cloud_write',{
     p_owner:ownerUid,p_request:a.request_id,p_op:op,
