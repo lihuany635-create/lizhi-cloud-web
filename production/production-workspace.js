@@ -8,7 +8,7 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
       else break e;
     }
   }
-  function k(Q) {
+  function _(Q) {
     return Q.length === 0 ? null : Q[0];
   }
   function u(Q) {
@@ -35,24 +35,24 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
       return T.now();
     };
   } else {
-    var v = Date, O = v.now();
+    var v = Date, M = v.now();
     r.unstable_now = function() {
-      return v.now() - O;
+      return v.now() - M;
     };
   }
-  var w = [], _ = [], z = 1, V = null, R = 3, re = !1, pe = !1, J = !1, W = !1, le = typeof setTimeout == "function" ? setTimeout : null, X = typeof clearTimeout == "function" ? clearTimeout : null, oe = typeof setImmediate < "u" ? setImmediate : null;
+  var w = [], k = [], z = 1, V = null, R = 3, re = !1, pe = !1, J = !1, W = !1, le = typeof setTimeout == "function" ? setTimeout : null, X = typeof clearTimeout == "function" ? clearTimeout : null, oe = typeof setImmediate < "u" ? setImmediate : null;
   function H(Q) {
-    for (var B = k(_); B !== null; ) {
-      if (B.callback === null) u(_);
-      else if (B.startTime <= Q) u(_), B.sortIndex = B.expirationTime, m(w, B);
+    for (var B = _(k); B !== null; ) {
+      if (B.callback === null) u(k);
+      else if (B.startTime <= Q) u(k), B.sortIndex = B.expirationTime, m(w, B);
       else break;
-      B = k(_);
+      B = _(k);
     }
   }
   function F(Q) {
-    if (J = !1, H(Q), !pe) if (k(w) !== null) pe = !0, te || (te = !0, ze());
+    if (J = !1, H(Q), !pe) if (_(w) !== null) pe = !0, te || (te = !0, ze());
     else {
-      var B = k(_);
+      var B = _(k);
       B !== null && ae(F, B.startTime - Q);
     }
   }
@@ -71,7 +71,7 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
           var G = R;
           try {
             t: {
-              for (H(Q), V = k(w); V !== null && !(V.expirationTime > Q && j()); ) {
+              for (H(Q), V = _(w); V !== null && !(V.expirationTime > Q && j()); ) {
                 var fe = V.callback;
                 if (typeof fe == "function") {
                   V.callback = null, R = V.priorityLevel;
@@ -80,13 +80,13 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
                     V.callback = se, H(Q), B = !0;
                     break t;
                   }
-                  V === k(w) && u(w), H(Q);
+                  V === _(w) && u(w), H(Q);
                 } else u(w);
-                V = k(w);
+                V = _(w);
               }
               if (V !== null) B = !0;
               else {
-                var Z = k(_);
+                var Z = _(k);
                 Z !== null && ae(F, Z.startTime - Q), B = !1;
               }
             }
@@ -186,7 +186,7 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
       startTime: G,
       expirationTime: se,
       sortIndex: -1
-    }, G > fe ? (Q.sortIndex = G, m(_, Q), k(w) === null && Q === k(_) && (J ? (X(ge), ge = -1) : J = !0, ae(F, G - fe))) : (Q.sortIndex = se, m(w, Q), pe || re || (pe = !0, te || (te = !0, ze()))), Q;
+    }, G > fe ? (Q.sortIndex = G, m(k, Q), _(w) === null && Q === _(k) && (J ? (X(ge), ge = -1) : J = !0, ae(F, G - fe))) : (Q.sortIndex = se, m(w, Q), pe || re || (pe = !0, te || (te = !0, ze()))), Q;
   }, r.unstable_shouldYield = j, r.unstable_wrapCallback = function(Q) {
     var B = R;
     return function() {
@@ -202,7 +202,7 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
 })), Hh = /* @__PURE__ */ ia(((r, m) => {
   m.exports = Lh();
 })), Bh = /* @__PURE__ */ ia(((r) => {
-  var m = /* @__PURE__ */ Symbol.for("react.transitional.element"), k = /* @__PURE__ */ Symbol.for("react.portal"), u = /* @__PURE__ */ Symbol.for("react.fragment"), d = /* @__PURE__ */ Symbol.for("react.strict_mode"), T = /* @__PURE__ */ Symbol.for("react.profiler"), v = /* @__PURE__ */ Symbol.for("react.consumer"), O = /* @__PURE__ */ Symbol.for("react.context"), w = /* @__PURE__ */ Symbol.for("react.forward_ref"), _ = /* @__PURE__ */ Symbol.for("react.suspense"), z = /* @__PURE__ */ Symbol.for("react.memo"), V = /* @__PURE__ */ Symbol.for("react.lazy"), R = /* @__PURE__ */ Symbol.for("react.activity"), re = Symbol.iterator;
+  var m = /* @__PURE__ */ Symbol.for("react.transitional.element"), _ = /* @__PURE__ */ Symbol.for("react.portal"), u = /* @__PURE__ */ Symbol.for("react.fragment"), d = /* @__PURE__ */ Symbol.for("react.strict_mode"), T = /* @__PURE__ */ Symbol.for("react.profiler"), v = /* @__PURE__ */ Symbol.for("react.consumer"), M = /* @__PURE__ */ Symbol.for("react.context"), w = /* @__PURE__ */ Symbol.for("react.forward_ref"), k = /* @__PURE__ */ Symbol.for("react.suspense"), z = /* @__PURE__ */ Symbol.for("react.memo"), V = /* @__PURE__ */ Symbol.for("react.lazy"), R = /* @__PURE__ */ Symbol.for("react.activity"), re = Symbol.iterator;
   function pe(f) {
     return f === null || typeof f != "object" ? null : (f = re && f[re] || f["@@iterator"], typeof f == "function" ? f : null);
   }
@@ -306,7 +306,7 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
       case "object":
         switch (f.$$typeof) {
           case m:
-          case k:
+          case _:
             je = !0;
             break;
           case V:
@@ -382,7 +382,7 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
       return f;
     }
   };
-  r.Activity = R, r.Children = Z, r.Component = X, r.Fragment = u, r.Profiler = T, r.PureComponent = H, r.StrictMode = d, r.Suspense = _, r.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ce, r.__COMPILER_RUNTIME = {
+  r.Activity = R, r.Children = Z, r.Component = X, r.Fragment = u, r.Profiler = T, r.PureComponent = H, r.StrictMode = d, r.Suspense = k, r.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ce, r.__COMPILER_RUNTIME = {
     __proto__: null,
     c: function(f) {
       return ce.H.useMemoCache(f);
@@ -406,7 +406,7 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
     return j(f.type, ne, ee);
   }, r.createContext = function(f) {
     return f = {
-      $$typeof: O,
+      $$typeof: M,
       _currentValue: f,
       _currentValue2: f,
       _threadCount: 0,
@@ -504,13 +504,13 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
   m.exports = Bh();
 })), Gh = /* @__PURE__ */ ia(((r) => {
   var m = ro();
-  function k(_) {
-    var z = "https://react.dev/errors/" + _;
+  function _(k) {
+    var z = "https://react.dev/errors/" + k;
     if (1 < arguments.length) {
       z += "?args[]=" + encodeURIComponent(arguments[1]);
       for (var V = 2; V < arguments.length; V++) z += "&args[]=" + encodeURIComponent(arguments[V]);
     }
-    return "Minified React error #" + _ + "; visit " + z + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
+    return "Minified React error #" + k + "; visit " + z + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
   }
   function u() {
   }
@@ -518,7 +518,7 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
     d: {
       f: u,
       r: function() {
-        throw Error(k(522));
+        throw Error(_(522));
       },
       D: u,
       C: u,
@@ -531,65 +531,65 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
     p: 0,
     findDOMNode: null
   }, T = /* @__PURE__ */ Symbol.for("react.portal");
-  function v(_, z, V) {
+  function v(k, z, V) {
     var R = 3 < arguments.length && arguments[3] !== void 0 ? arguments[3] : null;
     return {
       $$typeof: T,
       key: R == null ? null : "" + R,
-      children: _,
+      children: k,
       containerInfo: z,
       implementation: V
     };
   }
-  var O = m.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
-  function w(_, z) {
-    if (_ === "font") return "";
+  var M = m.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
+  function w(k, z) {
+    if (k === "font") return "";
     if (typeof z == "string") return z === "use-credentials" ? z : "";
   }
-  r.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = d, r.createPortal = function(_, z) {
+  r.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = d, r.createPortal = function(k, z) {
     var V = 2 < arguments.length && arguments[2] !== void 0 ? arguments[2] : null;
-    if (!z || z.nodeType !== 1 && z.nodeType !== 9 && z.nodeType !== 11) throw Error(k(299));
-    return v(_, z, null, V);
-  }, r.flushSync = function(_) {
-    var z = O.T, V = d.p;
+    if (!z || z.nodeType !== 1 && z.nodeType !== 9 && z.nodeType !== 11) throw Error(_(299));
+    return v(k, z, null, V);
+  }, r.flushSync = function(k) {
+    var z = M.T, V = d.p;
     try {
-      if (O.T = null, d.p = 2, _) return _();
+      if (M.T = null, d.p = 2, k) return k();
     } finally {
-      O.T = z, d.p = V, d.d.f();
+      M.T = z, d.p = V, d.d.f();
     }
-  }, r.preconnect = function(_, z) {
-    typeof _ == "string" && (z ? (z = z.crossOrigin, z = typeof z == "string" ? z === "use-credentials" ? z : "" : void 0) : z = null, d.d.C(_, z));
-  }, r.prefetchDNS = function(_) {
-    typeof _ == "string" && d.d.D(_);
-  }, r.preinit = function(_, z) {
-    if (typeof _ == "string" && z && typeof z.as == "string") {
+  }, r.preconnect = function(k, z) {
+    typeof k == "string" && (z ? (z = z.crossOrigin, z = typeof z == "string" ? z === "use-credentials" ? z : "" : void 0) : z = null, d.d.C(k, z));
+  }, r.prefetchDNS = function(k) {
+    typeof k == "string" && d.d.D(k);
+  }, r.preinit = function(k, z) {
+    if (typeof k == "string" && z && typeof z.as == "string") {
       var V = z.as, R = w(V, z.crossOrigin), re = typeof z.integrity == "string" ? z.integrity : void 0, pe = typeof z.fetchPriority == "string" ? z.fetchPriority : void 0;
-      V === "style" ? d.d.S(_, typeof z.precedence == "string" ? z.precedence : void 0, {
+      V === "style" ? d.d.S(k, typeof z.precedence == "string" ? z.precedence : void 0, {
         crossOrigin: R,
         integrity: re,
         fetchPriority: pe
-      }) : V === "script" && d.d.X(_, {
+      }) : V === "script" && d.d.X(k, {
         crossOrigin: R,
         integrity: re,
         fetchPriority: pe,
         nonce: typeof z.nonce == "string" ? z.nonce : void 0
       });
     }
-  }, r.preinitModule = function(_, z) {
-    if (typeof _ == "string") if (typeof z == "object" && z !== null) {
+  }, r.preinitModule = function(k, z) {
+    if (typeof k == "string") if (typeof z == "object" && z !== null) {
       if (z.as == null || z.as === "script") {
         var V = w(z.as, z.crossOrigin);
-        d.d.M(_, {
+        d.d.M(k, {
           crossOrigin: V,
           integrity: typeof z.integrity == "string" ? z.integrity : void 0,
           nonce: typeof z.nonce == "string" ? z.nonce : void 0
         });
       }
-    } else z ?? d.d.M(_);
-  }, r.preload = function(_, z) {
-    if (typeof _ == "string" && typeof z == "object" && z !== null && typeof z.as == "string") {
+    } else z ?? d.d.M(k);
+  }, r.preload = function(k, z) {
+    if (typeof k == "string" && typeof z == "object" && z !== null && typeof z.as == "string") {
       var V = z.as, R = w(V, z.crossOrigin);
-      d.d.L(_, V, {
+      d.d.L(k, V, {
         crossOrigin: R,
         integrity: typeof z.integrity == "string" ? z.integrity : void 0,
         nonce: typeof z.nonce == "string" ? z.nonce : void 0,
@@ -601,36 +601,36 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
         media: typeof z.media == "string" ? z.media : void 0
       });
     }
-  }, r.preloadModule = function(_, z) {
-    if (typeof _ == "string") if (z) {
+  }, r.preloadModule = function(k, z) {
+    if (typeof k == "string") if (z) {
       var V = w(z.as, z.crossOrigin);
-      d.d.m(_, {
+      d.d.m(k, {
         as: typeof z.as == "string" && z.as !== "script" ? z.as : void 0,
         crossOrigin: V,
         integrity: typeof z.integrity == "string" ? z.integrity : void 0
       });
-    } else d.d.m(_);
-  }, r.requestFormReset = function(_) {
-    d.d.r(_);
-  }, r.unstable_batchedUpdates = function(_, z) {
-    return _(z);
-  }, r.useFormState = function(_, z, V) {
-    return O.H.useFormState(_, z, V);
+    } else d.d.m(k);
+  }, r.requestFormReset = function(k) {
+    d.d.r(k);
+  }, r.unstable_batchedUpdates = function(k, z) {
+    return k(z);
+  }, r.useFormState = function(k, z, V) {
+    return M.H.useFormState(k, z, V);
   }, r.useFormStatus = function() {
-    return O.H.useHostTransitionStatus();
+    return M.H.useHostTransitionStatus();
   }, r.version = "19.2.6";
 })), Yh = /* @__PURE__ */ ia(((r, m) => {
-  function k() {
+  function _() {
     if (!(typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ > "u" || typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE != "function"))
       try {
-        __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(k);
+        __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(_);
       } catch (u) {
         console.error(u);
       }
   }
-  k(), m.exports = Gh();
+  _(), m.exports = Gh();
 })), Vh = /* @__PURE__ */ ia(((r) => {
-  var m = Hh(), k = ro(), u = Yh();
+  var m = Hh(), _ = ro(), u = Yh();
   function d(e) {
     var t = "https://react.dev/errors/" + e;
     if (1 < arguments.length) {
@@ -653,7 +653,7 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
     }
     return t.tag === 3 ? a : null;
   }
-  function O(e) {
+  function M(e) {
     if (e.tag === 13) {
       var t = e.memoizedState;
       if (t === null && (e = e.alternate, e !== null && (t = e.memoizedState)), t !== null) return t.dehydrated;
@@ -667,7 +667,7 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
     }
     return null;
   }
-  function _(e) {
+  function k(e) {
     if (v(e) !== e) throw Error(d(188));
   }
   function z(e) {
@@ -689,8 +689,8 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
       }
       if (n.child === s.child) {
         for (s = n.child; s; ) {
-          if (s === a) return _(n), e;
-          if (s === i) return _(n), t;
+          if (s === a) return k(n), e;
+          if (s === i) return k(n), t;
           s = s.sibling;
         }
         throw Error(d(188));
@@ -781,7 +781,7 @@ var ia = (r, m) => () => (m || (r((m = { exports: {} }).exports, m), r = null), 
     }
     return null;
   }
-  var Q = Array.isArray, B = k.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, G = u.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, fe = {
+  var Q = Array.isArray, B = _.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, G = u.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, fe = {
     pending: !1,
     data: null,
     method: null,
@@ -950,7 +950,7 @@ Error generating stack: ` + i.message + `
 ` + i.stack;
     }
   }
-  var jt = Object.prototype.hasOwnProperty, M = m.unstable_scheduleCallback, we = m.unstable_cancelCallback, it = m.unstable_shouldYield, Jt = m.unstable_requestPaint, et = m.unstable_now, Ja = m.unstable_getCurrentPriorityLevel, jl = m.unstable_ImmediatePriority, Ut = m.unstable_UserBlockingPriority, ea = m.unstable_NormalPriority, Ia = m.unstable_LowPriority, p = m.unstable_IdlePriority, be = m.log, ve = m.unstable_setDisableYieldValue, tt = null, Ze = null;
+  var jt = Object.prototype.hasOwnProperty, O = m.unstable_scheduleCallback, we = m.unstable_cancelCallback, it = m.unstable_shouldYield, Jt = m.unstable_requestPaint, et = m.unstable_now, Ja = m.unstable_getCurrentPriorityLevel, jl = m.unstable_ImmediatePriority, Ut = m.unstable_UserBlockingPriority, ea = m.unstable_NormalPriority, Ia = m.unstable_LowPriority, p = m.unstable_IdlePriority, be = m.log, ve = m.unstable_setDisableYieldValue, tt = null, Ze = null;
   function bt(e) {
     if (typeof be == "function" && ve(e), Ze && typeof Ze.setStrictMode == "function") try {
       Ze.setStrictMode(tt, e);
@@ -1028,7 +1028,7 @@ Error generating stack: ` + i.message + `
   function oi(e, t) {
     return (e.pendingLanes & ~(e.suspendedLanes & ~e.pingedLanes) & t) === 0;
   }
-  function Mf(e, t) {
+  function Of(e, t) {
     switch (e) {
       case 1:
       case 2:
@@ -1073,14 +1073,14 @@ Error generating stack: ` + i.message + `
     var e = on;
     return on <<= 1, (on & 62914560) === 0 && (on = 4194304), e;
   }
-  function Os(e) {
+  function Ms(e) {
     for (var t = [], a = 0; 31 > a; a++) t.push(e);
     return t;
   }
   function un(e, t) {
     e.pendingLanes |= t, t !== 268435456 && (e.suspendedLanes = 0, e.pingedLanes = 0, e.warmLanes = 0);
   }
-  function Of(e, t, a, i, n, s) {
+  function Mf(e, t, a, i, n, s) {
     var c = e.pendingLanes;
     e.pendingLanes = a, e.suspendedLanes = 0, e.pingedLanes = 0, e.warmLanes = 0, e.expiredLanes &= a, e.entangledLanes &= a, e.errorRecoveryDisabledLanes &= a, e.shellSuspendCounter = 0;
     var o = e.entanglements, x = e.expirationTimes, A = e.hiddenUpdates;
@@ -1591,7 +1591,7 @@ Error generating stack: ` + i.message + `
     Xs = !1;
   }
   var _a = null, Qs = null, xn = null;
-  function Mo() {
+  function Oo() {
     if (xn) return xn;
     var e, t = Qs, a = t.length, i, n = "value" in _a ? _a.value : _a.textContent, s = n.length;
     for (e = 0; e < a && t[e] === n[e]; e++) ;
@@ -1606,14 +1606,14 @@ Error generating stack: ` + i.message + `
   function bn() {
     return !0;
   }
-  function Oo() {
+  function Mo() {
     return !1;
   }
   function zt(e) {
     function t(a, i, n, s, c) {
       this._reactName = a, this._targetInst = n, this.type = i, this.nativeEvent = s, this.target = c, this.currentTarget = null;
       for (var o in e) e.hasOwnProperty(o) && (a = e[o], this[o] = a ? a(s) : s[o]);
-      return this.isDefaultPrevented = (s.defaultPrevented != null ? s.defaultPrevented : s.returnValue === !1) ? bn : Oo, this.isPropagationStopped = Oo, this;
+      return this.isDefaultPrevented = (s.defaultPrevented != null ? s.defaultPrevented : s.returnValue === !1) ? bn : Mo, this.isPropagationStopped = Mo, this;
     }
     return R(t.prototype, {
       preventDefault: function() {
@@ -1835,7 +1835,7 @@ Error generating stack: ` + i.message + `
     }
   }
   function n0(e, t) {
-    if (Al) return e === "compositionend" || !$s && Bo(e, t) ? (e = Mo(), xn = Qs = _a = null, Al = !1, e) : null;
+    if (Al) return e === "compositionend" || !$s && Bo(e, t) ? (e = Oo(), xn = Qs = _a = null, Al = !1, e) : null;
     switch (e) {
       case "paste":
         return null;
@@ -2042,9 +2042,9 @@ Error generating stack: ` + i.message + `
       return;
     }
     console.error(e);
-  }, Lt = [], Ml = 0, ic = 0;
+  }, Lt = [], Ol = 0, ic = 0;
   function zn() {
-    for (var e = Ml, t = ic = Ml = 0; t < e; ) {
+    for (var e = Ol, t = ic = Ol = 0; t < e; ) {
       var a = Lt[t];
       Lt[t++] = null;
       var i = Lt[t];
@@ -2060,7 +2060,7 @@ Error generating stack: ` + i.message + `
     }
   }
   function Nn(e, t, a, i) {
-    Lt[Ml++] = e, Lt[Ml++] = t, Lt[Ml++] = a, Lt[Ml++] = i, ic |= i, e.lanes |= i, e = e.alternate, e !== null && (e.lanes |= i);
+    Lt[Ol++] = e, Lt[Ol++] = t, Lt[Ol++] = a, Lt[Ol++] = i, ic |= i, e.lanes |= i, e = e.alternate, e !== null && (e.lanes |= i);
   }
   function nc(e, t, a, i) {
     return Nn(e, t, a, i), wn(e);
@@ -2080,7 +2080,7 @@ Error generating stack: ` + i.message + `
     for (var t = e.return; t !== null; ) e = t, t = e.return;
     return e.tag === 3 ? e.stateNode : null;
   }
-  var Ol = {};
+  var Ml = {};
   function g0(e, t, a, i) {
     this.tag = e, this.key = a, this.sibling = this.child = this.return = this.stateNode = this.type = this.elementType = null, this.index = 0, this.refCleanup = this.ref = null, this.pendingProps = t, this.dependencies = this.memoizedState = this.updateQueue = this.memoizedProps = null, this.mode = i, this.subtreeFlags = this.flags = 0, this.deletions = null, this.childLanes = this.lanes = 0, this.alternate = null;
   }
@@ -2204,7 +2204,7 @@ Error generating stack: ` + i.message + `
   function ud(e, t) {
     Bt[Gt++] = ta, Bt[Gt++] = aa, Bt[Gt++] = ka, ta = t.id, aa = t.overflow, ka = e;
   }
-  var ht = null, Je = null, Oe = !1, Ea = null, Yt = !1, uc = Error(d(519));
+  var ht = null, Je = null, Me = !1, Ea = null, Yt = !1, uc = Error(d(519));
   function Aa(e) {
     throw zi(Ht(Error(d(418, 1 < arguments.length && arguments[1] !== void 0 && arguments[1] ? "text" : "HTML", "")), e)), uc;
   }
@@ -2262,7 +2262,7 @@ Error generating stack: ` + i.message + `
   }
   function Rl(e) {
     if (e !== ht) return !1;
-    if (!Oe) return fd(e), Oe = !0, !1;
+    if (!Me) return fd(e), Me = !0, !1;
     var t = e.tag, a;
     if ((a = t !== 3 && t !== 27) && ((a = t === 5) && (a = e.type, a = !(a !== "form" && a !== "button") || Er(e.type, e.memoizedProps)), a = !a), a && Je && Aa(e), fd(e), t === 13) {
       if (e = e.memoizedState, e = e !== null ? e.dehydrated : null, !e) throw Error(d(317));
@@ -2270,11 +2270,11 @@ Error generating stack: ` + i.message + `
     } else if (t === 31) {
       if (e = e.memoizedState, e = e !== null ? e.dehydrated : null, !e) throw Error(d(317));
       Je = Rp(e);
-    } else t === 27 ? (t = Je, Ga(e.type) ? (e = Or, Or = null, Je = e) : Je = t) : Je = ht ? Qt(e.stateNode.nextSibling) : null;
+    } else t === 27 ? (t = Je, Ga(e.type) ? (e = Mr, Mr = null, Je = e) : Je = t) : Je = ht ? Qt(e.stateNode.nextSibling) : null;
     return !0;
   }
   function ll() {
-    Je = ht = null, Oe = !1;
+    Je = ht = null, Me = !1;
   }
   function pc() {
     var e = Ea;
@@ -2474,7 +2474,7 @@ Error generating stack: ` + i.message + `
       pool: e
     };
   }
-  var Bl = Error(d(460)), vc = Error(d(474)), Cn = Error(d(542)), Mn = { then: function() {
+  var Bl = Error(d(460)), vc = Error(d(474)), Cn = Error(d(542)), On = { then: function() {
   } };
   function bd(e) {
     return e = e.status, e === "fulfilled" || e === "rejected";
@@ -2528,7 +2528,7 @@ Error generating stack: ` + i.message + `
     if (e === Bl || e === Cn) throw Error(d(483));
   }
   var Gl = null, _i = 0;
-  function On(e) {
+  function Mn(e) {
     var t = _i;
     return _i += 1, Gl === null && (Gl = []), vd(Gl, e, t);
   }
@@ -2588,7 +2588,7 @@ Error generating stack: ` + i.message + `
             return b = cl(b), Y(S, b, E);
         }
         if (Q(b) || he(b)) return b = al(b, S.mode, E, null), b.return = S, b;
-        if (typeof b.then == "function") return Y(S, On(b), E);
+        if (typeof b.then == "function") return Y(S, Mn(b), E);
         if (b.$$typeof === H) return Y(S, An(S, b), E);
         Dn(S, b);
       }
@@ -2607,7 +2607,7 @@ Error generating stack: ` + i.message + `
             return E = cl(E), C(S, b, E, L);
         }
         if (Q(E) || he(E)) return xe !== null ? null : q(S, b, E, L, null);
-        if (typeof E.then == "function") return C(S, b, On(E), L);
+        if (typeof E.then == "function") return C(S, b, Mn(E), L);
         if (E.$$typeof === H) return C(S, b, An(S, E), L);
         Dn(S, E);
       }
@@ -2625,52 +2625,52 @@ Error generating stack: ` + i.message + `
             return L = cl(L), U(S, b, E, L, xe);
         }
         if (Q(L) || he(L)) return S = S.get(E) || null, q(b, S, L, xe, null);
-        if (typeof L.then == "function") return U(S, b, E, On(L), xe);
+        if (typeof L.then == "function") return U(S, b, E, Mn(L), xe);
         if (L.$$typeof === H) return U(S, b, E, An(b, L), xe);
         Dn(b, L);
       }
       return null;
     }
     function de(S, b, E, L) {
-      for (var xe = null, qe = null, ue = b, ke = b = 0, Me = null; ue !== null && ke < E.length; ke++) {
-        ue.index > ke ? (Me = ue, ue = null) : Me = ue.sibling;
+      for (var xe = null, qe = null, ue = b, ke = b = 0, Oe = null; ue !== null && ke < E.length; ke++) {
+        ue.index > ke ? (Oe = ue, ue = null) : Oe = ue.sibling;
         var Le = C(S, ue, E[ke], L);
         if (Le === null) {
-          ue === null && (ue = Me);
+          ue === null && (ue = Oe);
           break;
         }
-        e && ue && Le.alternate === null && t(S, ue), b = s(Le, b, ke), qe === null ? xe = Le : qe.sibling = Le, qe = Le, ue = Me;
+        e && ue && Le.alternate === null && t(S, ue), b = s(Le, b, ke), qe === null ? xe = Le : qe.sibling = Le, qe = Le, ue = Oe;
       }
-      if (ke === E.length) return a(S, ue), Oe && oa(S, ke), xe;
+      if (ke === E.length) return a(S, ue), Me && oa(S, ke), xe;
       if (ue === null) {
         for (; ke < E.length; ke++) ue = Y(S, E[ke], L), ue !== null && (b = s(ue, b, ke), qe === null ? xe = ue : qe.sibling = ue, qe = ue);
-        return Oe && oa(S, ke), xe;
+        return Me && oa(S, ke), xe;
       }
-      for (ue = i(ue); ke < E.length; ke++) Me = U(ue, S, ke, E[ke], L), Me !== null && (e && Me.alternate !== null && ue.delete(Me.key === null ? ke : Me.key), b = s(Me, b, ke), qe === null ? xe = Me : qe.sibling = Me, qe = Me);
+      for (ue = i(ue); ke < E.length; ke++) Oe = U(ue, S, ke, E[ke], L), Oe !== null && (e && Oe.alternate !== null && ue.delete(Oe.key === null ? ke : Oe.key), b = s(Oe, b, ke), qe === null ? xe = Oe : qe.sibling = Oe, qe = Oe);
       return e && ue.forEach(function(Za) {
         return t(S, Za);
-      }), Oe && oa(S, ke), xe;
+      }), Me && oa(S, ke), xe;
     }
     function ye(S, b, E, L) {
       if (E == null) throw Error(d(151));
-      for (var xe = null, qe = null, ue = b, ke = b = 0, Me = null, Le = E.next(); ue !== null && !Le.done; ke++, Le = E.next()) {
-        ue.index > ke ? (Me = ue, ue = null) : Me = ue.sibling;
+      for (var xe = null, qe = null, ue = b, ke = b = 0, Oe = null, Le = E.next(); ue !== null && !Le.done; ke++, Le = E.next()) {
+        ue.index > ke ? (Oe = ue, ue = null) : Oe = ue.sibling;
         var Za = C(S, ue, Le.value, L);
         if (Za === null) {
-          ue === null && (ue = Me);
+          ue === null && (ue = Oe);
           break;
         }
-        e && ue && Za.alternate === null && t(S, ue), b = s(Za, b, ke), qe === null ? xe = Za : qe.sibling = Za, qe = Za, ue = Me;
+        e && ue && Za.alternate === null && t(S, ue), b = s(Za, b, ke), qe === null ? xe = Za : qe.sibling = Za, qe = Za, ue = Oe;
       }
-      if (Le.done) return a(S, ue), Oe && oa(S, ke), xe;
+      if (Le.done) return a(S, ue), Me && oa(S, ke), xe;
       if (ue === null) {
         for (; !Le.done; ke++, Le = E.next()) Le = Y(S, Le.value, L), Le !== null && (b = s(Le, b, ke), qe === null ? xe = Le : qe.sibling = Le, qe = Le);
-        return Oe && oa(S, ke), xe;
+        return Me && oa(S, ke), xe;
       }
       for (ue = i(ue); !Le.done; ke++, Le = E.next()) Le = U(ue, S, ke, Le.value, L), Le !== null && (e && Le.alternate !== null && ue.delete(Le.key === null ? ke : Le.key), b = s(Le, b, ke), qe === null ? xe = Le : qe.sibling = Le, qe = Le);
       return e && ue.forEach(function(qh) {
         return t(S, qh);
-      }), Oe && oa(S, ke), xe;
+      }), Me && oa(S, ke), xe;
     }
     function Qe(S, b, E, L) {
       if (typeof E == "object" && E !== null && E.type === W && E.key === null && (E = E.props.children), typeof E == "object" && E !== null) {
@@ -2720,7 +2720,7 @@ Error generating stack: ` + i.message + `
           if (xe = he(E), typeof xe != "function") throw Error(d(150));
           return E = xe.call(E), ye(S, b, E, L);
         }
-        if (typeof E.then == "function") return Qe(S, b, On(E), L);
+        if (typeof E.then == "function") return Qe(S, b, Mn(E), L);
         if (E.$$typeof === H) return Qe(S, b, An(S, E), L);
         Dn(S, E);
       }
@@ -2902,7 +2902,7 @@ Error generating stack: ` + i.message + `
     ja = Un.current, D(Yl), D(Un);
   }
   var Ct = f(null), Vt = null;
-  function Ma(e) {
+  function Oa(e) {
     var t = e.alternate;
     K(at, at.current & 1), K(Ct, e), Vt === null && (t === null || Yl.current !== null || t.memoizedState !== null) && (Vt = e);
   }
@@ -2910,12 +2910,12 @@ Error generating stack: ` + i.message + `
     K(at, at.current), K(Ct, e), Vt === null && (Vt = e);
   }
   function kd(e) {
-    e.tag === 22 ? (K(at, at.current), K(Ct, e), Vt === null && (Vt = e)) : Oa(e);
+    e.tag === 22 ? (K(at, at.current), K(Ct, e), Vt === null && (Vt = e)) : Ma(e);
   }
-  function Oa() {
+  function Ma() {
     K(at, at.current), K(Ct, Ct.current);
   }
-  function Mt(e) {
+  function Ot(e) {
     D(Ct), Vt === e && (Vt = null), D(at);
   }
   var at = f(0);
@@ -2923,7 +2923,7 @@ Error generating stack: ` + i.message + `
     for (var t = e; t !== null; ) {
       if (t.tag === 13) {
         var a = t.memoizedState;
-        if (a !== null && (a = a.dehydrated, a === null || Cr(a) || Mr(a))) return t;
+        if (a !== null && (a = a.dehydrated, a === null || Cr(a) || Or(a))) return t;
       } else if (t.tag === 19 && (t.memoizedProps.revealOrder === "forwards" || t.memoizedProps.revealOrder === "backwards" || t.memoizedProps.revealOrder === "unstable_legacy-backwards" || t.memoizedProps.revealOrder === "together")) {
         if ((t.flags & 128) !== 0) return t;
       } else if (t.child !== null) {
@@ -2972,7 +2972,7 @@ Error generating stack: ` + i.message + `
   }
   function N0() {
     var e = B.H, t = e.useState()[0];
-    return t = typeof t.then == "function" ? Mi(t) : t, e = e.useState()[0], (Ve !== null ? Ve.memoizedState : null) !== e && (_e.flags |= 1024), t;
+    return t = typeof t.then == "function" ? Oi(t) : t, e = e.useState()[0], (Ve !== null ? Ve.memoizedState : null) !== e && (_e.flags |= 1024), t;
   }
   function Ac() {
     var e = Ln !== 0;
@@ -3029,18 +3029,18 @@ Error generating stack: ` + i.message + `
       memoCache: null
     };
   }
-  function Mi(e) {
+  function Oi(e) {
     var t = Ci;
     return Ci += 1, Xl === null && (Xl = []), e = vd(Xl, e, t), t = _e, (st === null ? t.memoizedState : st.next) === null && (t = t.alternate, B.H = t === null || t.memoizedState === null ? du : Vc), e;
   }
   function Bn(e) {
     if (e !== null && typeof e == "object") {
-      if (typeof e.then == "function") return Mi(e);
+      if (typeof e.then == "function") return Oi(e);
       if (e.$$typeof === H) return mt(e);
     }
     throw Error(d(438, String(e)));
   }
-  function Mc(e) {
+  function Oc(e) {
     var t = null, a = _e.updateQueue;
     if (a !== null && (t = a.memoCache), t == null) {
       var i = _e.alternate;
@@ -3061,9 +3061,9 @@ Error generating stack: ` + i.message + `
     return typeof t == "function" ? t(e) : t;
   }
   function Gn(e) {
-    return Oc(lt(), Ve, e);
+    return Mc(lt(), Ve, e);
   }
-  function Oc(e, t, a) {
+  function Mc(e, t, a) {
     var i = e.queue;
     if (i === null) throw Error(d(311));
     i.lastRenderedReducer = a;
@@ -3137,14 +3137,14 @@ Error generating stack: ` + i.message + `
     return [s, i];
   }
   function Td(e, t, a) {
-    var i = _e, n = lt(), s = Oe;
+    var i = _e, n = lt(), s = Me;
     if (s) {
       if (a === void 0) throw Error(d(407));
       a = a();
     } else a = t();
     var c = !At((Ve || n).memoizedState, a);
-    if (c && (n.memoizedState = a, ct = !0), n = n.queue, qc(Od.bind(null, i, n, e), [e]), n.getSnapshot !== t || c || st !== null && st.memoizedState.tag & 1) {
-      if (i.flags |= 2048, Ql(9, { destroy: void 0 }, Md.bind(null, i, n, a, t), null), Ke === null) throw Error(d(349));
+    if (c && (n.memoizedState = a, ct = !0), n = n.queue, qc(Md.bind(null, i, n, e), [e]), n.getSnapshot !== t || c || st !== null && st.memoizedState.tag & 1) {
+      if (i.flags |= 2048, Ql(9, { destroy: void 0 }, Od.bind(null, i, n, a, t), null), Ke === null) throw Error(d(349));
       s || (pa & 127) !== 0 || Cd(i, t, a);
     }
     return a;
@@ -3155,10 +3155,10 @@ Error generating stack: ` + i.message + `
       value: a
     }, t = _e.updateQueue, t === null ? (t = Hn(), _e.updateQueue = t, t.stores = [e]) : (a = t.stores, a === null ? t.stores = [e] : a.push(e));
   }
-  function Md(e, t, a, i) {
+  function Od(e, t, a, i) {
     t.value = a, t.getSnapshot = i, Dd(t) && Ud(e);
   }
-  function Od(e, t, a) {
+  function Md(e, t, a) {
     return a(function() {
       Dd(t) && Ud(e);
     });
@@ -3199,7 +3199,7 @@ Error generating stack: ` + i.message + `
     }, t;
   }
   function Rd(e, t, a, i) {
-    return e.baseState = a, Oc(e, Ve, typeof i == "function" ? i : fa);
+    return e.baseState = a, Mc(e, Ve, typeof i == "function" ? i : fa);
   }
   function w0(e, t, a, i, n) {
     if (Xn(e)) throw Error(d(485));
@@ -3267,12 +3267,12 @@ Error generating stack: ` + i.message + `
     return t;
   }
   function Yd(e, t) {
-    if (Oe) {
+    if (Me) {
       var a = Ke.formState;
       if (a !== null) {
         e: {
           var i = _e;
-          if (Oe) {
+          if (Me) {
             if (Je) {
               t: {
                 for (var n = Je, s = Yt; n.nodeType !== 8; ) {
@@ -3320,8 +3320,8 @@ Error generating stack: ` + i.message + `
     return Xd(lt(), Ve, e);
   }
   function Xd(e, t, a) {
-    if (t = Oc(e, t, Gd)[0], e = Gn(fa)[0], typeof t == "object" && t !== null && typeof t.then == "function") try {
-      var i = Mi(t);
+    if (t = Mc(e, t, Gd)[0], e = Gn(fa)[0], typeof t == "object" && t !== null && typeof t.then == "function") try {
+      var i = Oi(t);
     } catch (c) {
       throw c === Bl ? Cn : c;
     }
@@ -3452,9 +3452,9 @@ Error generating stack: ` + i.message + `
     B.T = o, Yc(e, !1, t, a);
     try {
       var x = n(), A = B.S;
-      A !== null && A(o, x), x !== null && typeof x == "object" && typeof x.then == "function" ? Oi(e, t, S0(x, i), Xt(e)) : Oi(e, t, i, Xt(e));
+      A !== null && A(o, x), x !== null && typeof x == "object" && typeof x.then == "function" ? Mi(e, t, S0(x, i), Xt(e)) : Mi(e, t, i, Xt(e));
     } catch (q) {
-      Oi(e, t, {
+      Mi(e, t, {
         then: function() {
         },
         status: "rejected",
@@ -3506,7 +3506,7 @@ Error generating stack: ` + i.message + `
   }
   function iu(e) {
     var t = lu(e);
-    t.next === null && (t = e.alternate.memoizedState), Oi(e, t.next.queue, {}, Xt());
+    t.next === null && (t = e.alternate.memoizedState), Mi(e, t.next.queue, {}, Xt());
   }
   function Gc() {
     return mt($i);
@@ -3544,9 +3544,9 @@ Error generating stack: ` + i.message + `
     }, Xn(e) ? ru(t, a) : (a = nc(e, t, a, i), a !== null && (Et(a, e, i), ou(a, t, i)));
   }
   function cu(e, t, a) {
-    Oi(e, t, a, Xt());
+    Mi(e, t, a, Xt());
   }
-  function Oi(e, t, a, i) {
+  function Mi(e, t, a, i) {
     var n = {
       lane: i,
       revertLane: 0,
@@ -3693,7 +3693,7 @@ Error generating stack: ` + i.message + `
     },
     useSyncExternalStore: function(e, t, a) {
       var i = _e, n = vt();
-      if (Oe) {
+      if (Me) {
         if (a === void 0) throw Error(d(407));
         a = a();
       } else {
@@ -3705,11 +3705,11 @@ Error generating stack: ` + i.message + `
         value: a,
         getSnapshot: t
       };
-      return n.queue = s, Kd(Od.bind(null, i, s, e), [e]), i.flags |= 2048, Ql(9, { destroy: void 0 }, Md.bind(null, i, s, a, t), null), a;
+      return n.queue = s, Kd(Md.bind(null, i, s, e), [e]), i.flags |= 2048, Ql(9, { destroy: void 0 }, Od.bind(null, i, s, a, t), null), a;
     },
     useId: function() {
       var e = vt(), t = Ke.identifierPrefix;
-      if (Oe) {
+      if (Me) {
         var a = aa, i = ta;
         a = (i & ~(1 << 32 - ot(i) - 1)).toString(32) + a, t = "_" + t + "R_" + a, a = Ln++, 0 < a && (t += "H" + a.toString(32)), t += "_";
       } else a = z0++, t = "_" + t + "r_" + a.toString(32) + "_";
@@ -3730,7 +3730,7 @@ Error generating stack: ` + i.message + `
       };
       return t.queue = a, t = Yc.bind(null, _e, !0, a), a.dispatch = t, [e, t];
     },
-    useMemoCache: Mc,
+    useMemoCache: Oc,
     useCacheRefresh: function() {
       return vt().memoizedState = A0.bind(null, _e);
     },
@@ -3762,7 +3762,7 @@ Error generating stack: ` + i.message + `
     },
     useTransition: function() {
       var e = Gn(fa)[0], t = lt().memoizedState;
-      return [typeof e == "boolean" ? e : Mi(e), t];
+      return [typeof e == "boolean" ? e : Oi(e), t];
     },
     useSyncExternalStore: Td,
     useId: nu,
@@ -3772,7 +3772,7 @@ Error generating stack: ` + i.message + `
     useOptimistic: function(e, t) {
       return Rd(lt(), Ve, e, t);
     },
-    useMemoCache: Mc,
+    useMemoCache: Oc,
     useCacheRefresh: su
   };
   Vc.useEffectEvent = Jd;
@@ -3798,7 +3798,7 @@ Error generating stack: ` + i.message + `
     },
     useTransition: function() {
       var e = Dc(fa)[0], t = lt().memoizedState;
-      return [typeof e == "boolean" ? e : Mi(e), t];
+      return [typeof e == "boolean" ? e : Oi(e), t];
     },
     useSyncExternalStore: Td,
     useId: nu,
@@ -3809,7 +3809,7 @@ Error generating stack: ` + i.message + `
       var a = lt();
       return Ve !== null ? Rd(a, Ve, e, t) : (a.baseState = e, [e, a.queue.dispatch]);
     },
-    useMemoCache: Mc,
+    useMemoCache: Oc,
     useCacheRefresh: su
   };
   uu.useEffectEvent = Jd;
@@ -3854,10 +3854,10 @@ Error generating stack: ` + i.message + `
   function C0(e) {
     Sn(e);
   }
-  function M0(e) {
+  function O0(e) {
     console.error(e);
   }
-  function O0(e) {
+  function M0(e) {
     Sn(e);
   }
   function Qn(e, t) {
@@ -3914,9 +3914,9 @@ Error generating stack: ` + i.message + `
         switch (a.tag) {
           case 31:
           case 13:
-            return Vt === null ? ls() : a.alternate === null && Pe === 0 && (Pe = 3), a.flags &= -257, a.flags |= 65536, a.lanes = n, i === Mn ? a.flags |= 16384 : (t = a.updateQueue, t === null ? a.updateQueue = /* @__PURE__ */ new Set([i]) : t.add(i), gr(e, i, n)), !1;
+            return Vt === null ? ls() : a.alternate === null && Pe === 0 && (Pe = 3), a.flags &= -257, a.flags |= 65536, a.lanes = n, i === On ? a.flags |= 16384 : (t = a.updateQueue, t === null ? a.updateQueue = /* @__PURE__ */ new Set([i]) : t.add(i), gr(e, i, n)), !1;
           case 22:
-            return a.flags |= 65536, i === Mn ? a.flags |= 16384 : (t = a.updateQueue, t === null ? (t = {
+            return a.flags |= 65536, i === On ? a.flags |= 16384 : (t = a.updateQueue, t === null ? (t = {
               transitions: null,
               markerInstances: null,
               retryQueue: /* @__PURE__ */ new Set([i])
@@ -3926,7 +3926,7 @@ Error generating stack: ` + i.message + `
       }
       return gr(e, i, n), ls(), !1;
     }
-    if (Oe) return t = Ct.current, t !== null ? ((t.flags & 65536) === 0 && (t.flags |= 256), t.flags |= 65536, t.lanes = n, i !== uc && (e = Error(d(422), { cause: i }), zi(Ht(e, a)))) : (i !== uc && (t = Error(d(423), { cause: i }), zi(Ht(t, a))), e = e.current.alternate, e.flags |= 65536, n &= -n, e.lanes |= n, i = Ht(i, a), n = Zc(e.stateNode, i, n), Sc(e, n), Pe !== 4 && (Pe = 2)), !1;
+    if (Me) return t = Ct.current, t !== null ? ((t.flags & 65536) === 0 && (t.flags |= 256), t.flags |= 65536, t.lanes = n, i !== uc && (e = Error(d(422), { cause: i }), zi(Ht(e, a)))) : (i !== uc && (t = Error(d(423), { cause: i }), zi(Ht(t, a))), e = e.current.alternate, e.flags |= 65536, n &= -n, e.lanes |= n, i = Ht(i, a), n = Zc(e.stateNode, i, n), Sc(e, n), Pe !== 4 && (Pe = 2)), !1;
     var s = Error(d(520), { cause: i });
     if (s = Ht(s, a), Yi === null ? Yi = [s] : Yi.push(s), Pe !== 4 && (Pe = 2), t === null) return !0;
     i = Ht(i, a), a = t;
@@ -3952,7 +3952,7 @@ Error generating stack: ` + i.message + `
       var c = {};
       for (var o in i) o !== "ref" && (c[o] = i[o]);
     } else c = i;
-    return nl(t), i = Ec(e, t, a, c, s, n), o = Ac(), e !== null && !ct ? (Tc(e, t, n), ha(e, t, n)) : (Oe && o && oc(t), t.flags |= 1, xt(e, t, i, n), t.child);
+    return nl(t), i = Ec(e, t, a, c, s, n), o = Ac(), e !== null && !ct ? (Tc(e, t, n), ha(e, t, n)) : (Me && o && oc(t), t.flags |= 1, xt(e, t, i, n), t.child);
   }
   function bu(e, t, a, i, n) {
     if (e === null) {
@@ -3993,7 +3993,7 @@ Error generating stack: ` + i.message + `
         cachePool: null
       }, e !== null && Tn(t, s !== null ? s.cachePool : null), s !== null ? _d(t, s) : Nc(), kd(t);
       else return i = t.lanes = 536870912, yu(e, t, s !== null ? s.baseLanes | a : a, a, i);
-    } else s !== null ? (Tn(t, s.cachePool), _d(t, s), Oa(t), t.memoizedState = null) : (e !== null && Tn(t, null), Nc(), Oa(t));
+    } else s !== null ? (Tn(t, s.cachePool), _d(t, s), Ma(t), t.memoizedState = null) : (e !== null && Tn(t, null), Nc(), Ma(t));
     return xt(e, t, n, a), t.child;
   }
   function Ui(e, t) {
@@ -4021,12 +4021,12 @@ Error generating stack: ` + i.message + `
     }, e.mode), t.ref = e.ref, e.child = t, t.return = e, t;
   }
   function Su(e, t, a) {
-    return ol(t, e.child, null, a), e = Zn(t, t.pendingProps), e.flags |= 2, Mt(t), t.memoizedState = null, e;
+    return ol(t, e.child, null, a), e = Zn(t, t.pendingProps), e.flags |= 2, Ot(t), t.memoizedState = null, e;
   }
   function U0(e, t, a) {
     var i = t.pendingProps, n = (t.flags & 128) !== 0;
     if (t.flags &= -129, e === null) {
-      if (Oe) {
+      if (Me) {
         if (i.mode === "hidden") return e = Zn(t, i), t.lanes = 536870912, Ui(null, e);
         if (_c(t), (e = Je) ? (e = Up(e, Yt), e = e !== null && e.data === "&" ? e : null, e !== null && (t.memoizedState = {
           dehydrated: e,
@@ -4050,7 +4050,7 @@ Error generating stack: ` + i.message + `
       else if (ct || ql(e, t, a, !1), n = (a & e.childLanes) !== 0, ct || n) {
         if (i = Ke, i !== null && (c = ho(i, a), c !== 0 && c !== s.retryLane)) throw s.retryLane = c, tl(e, c), Et(i, e, c), Kc;
         ls(), t = Su(e, t, a);
-      } else e = s.treeContext, Je = Qt(c.nextSibling), ht = t, Oe = !0, Ea = null, Yt = !1, e !== null && ud(t, e), t = Zn(t, i), t.flags |= 4096;
+      } else e = s.treeContext, Je = Qt(c.nextSibling), ht = t, Me = !0, Ea = null, Yt = !1, e !== null && ud(t, e), t = Zn(t, i), t.flags |= 4096;
       return t;
     }
     return e = ra(e.child, {
@@ -4067,27 +4067,27 @@ Error generating stack: ` + i.message + `
     }
   }
   function Jc(e, t, a, i, n) {
-    return nl(t), a = Ec(e, t, a, i, void 0, n), i = Ac(), e !== null && !ct ? (Tc(e, t, n), ha(e, t, n)) : (Oe && i && oc(t), t.flags |= 1, xt(e, t, a, n), t.child);
+    return nl(t), a = Ec(e, t, a, i, void 0, n), i = Ac(), e !== null && !ct ? (Tc(e, t, n), ha(e, t, n)) : (Me && i && oc(t), t.flags |= 1, xt(e, t, a, n), t.child);
   }
   function zu(e, t, a, i, n, s) {
-    return nl(t), t.updateQueue = null, a = Ad(t, i, a, n), Ed(e), i = Ac(), e !== null && !ct ? (Tc(e, t, s), ha(e, t, s)) : (Oe && i && oc(t), t.flags |= 1, xt(e, t, a, s), t.child);
+    return nl(t), t.updateQueue = null, a = Ad(t, i, a, n), Ed(e), i = Ac(), e !== null && !ct ? (Tc(e, t, s), ha(e, t, s)) : (Me && i && oc(t), t.flags |= 1, xt(e, t, a, s), t.child);
   }
   function Nu(e, t, a, i, n) {
     if (nl(t), t.stateNode === null) {
-      var s = Ol, c = a.contextType;
-      typeof c == "object" && c !== null && (s = mt(c)), s = new a(i, s), t.memoizedState = s.state !== null && s.state !== void 0 ? s.state : null, s.updater = Qc, t.stateNode = s, s._reactInternals = t, s = t.stateNode, s.props = i, s.state = t.memoizedState, s.refs = {}, jc(t), c = a.contextType, s.context = typeof c == "object" && c !== null ? mt(c) : Ol, s.state = t.memoizedState, c = a.getDerivedStateFromProps, typeof c == "function" && (Xc(t, a, c, i), s.state = t.memoizedState), typeof a.getDerivedStateFromProps == "function" || typeof s.getSnapshotBeforeUpdate == "function" || typeof s.UNSAFE_componentWillMount != "function" && typeof s.componentWillMount != "function" || (c = s.state, typeof s.componentWillMount == "function" && s.componentWillMount(), typeof s.UNSAFE_componentWillMount == "function" && s.UNSAFE_componentWillMount(), c !== s.state && Qc.enqueueReplaceState(s, s.state, null), Ti(t, i, s, n), Ai(), s.state = t.memoizedState), typeof s.componentDidMount == "function" && (t.flags |= 4194308), i = !0;
+      var s = Ml, c = a.contextType;
+      typeof c == "object" && c !== null && (s = mt(c)), s = new a(i, s), t.memoizedState = s.state !== null && s.state !== void 0 ? s.state : null, s.updater = Qc, t.stateNode = s, s._reactInternals = t, s = t.stateNode, s.props = i, s.state = t.memoizedState, s.refs = {}, jc(t), c = a.contextType, s.context = typeof c == "object" && c !== null ? mt(c) : Ml, s.state = t.memoizedState, c = a.getDerivedStateFromProps, typeof c == "function" && (Xc(t, a, c, i), s.state = t.memoizedState), typeof a.getDerivedStateFromProps == "function" || typeof s.getSnapshotBeforeUpdate == "function" || typeof s.UNSAFE_componentWillMount != "function" && typeof s.componentWillMount != "function" || (c = s.state, typeof s.componentWillMount == "function" && s.componentWillMount(), typeof s.UNSAFE_componentWillMount == "function" && s.UNSAFE_componentWillMount(), c !== s.state && Qc.enqueueReplaceState(s, s.state, null), Ti(t, i, s, n), Ai(), s.state = t.memoizedState), typeof s.componentDidMount == "function" && (t.flags |= 4194308), i = !0;
     } else if (e === null) {
       s = t.stateNode;
       var o = t.memoizedProps, x = fl(a, o);
       s.props = x;
       var A = s.context, q = a.contextType;
-      c = Ol, typeof q == "object" && q !== null && (c = mt(q));
+      c = Ml, typeof q == "object" && q !== null && (c = mt(q));
       var Y = a.getDerivedStateFromProps;
       q = typeof Y == "function" || typeof s.getSnapshotBeforeUpdate == "function", o = t.pendingProps !== o, q || typeof s.UNSAFE_componentWillReceiveProps != "function" && typeof s.componentWillReceiveProps != "function" || (o || A !== c) && fu(t, s, i, c), Ca = !1;
       var C = t.memoizedState;
       s.state = C, Ti(t, i, s, n), Ai(), A = t.memoizedState, o || C !== A || Ca ? (typeof Y == "function" && (Xc(t, a, Y, i), A = t.memoizedState), (x = Ca || pu(t, a, x, i, C, A, c)) ? (q || typeof s.UNSAFE_componentWillMount != "function" && typeof s.componentWillMount != "function" || (typeof s.componentWillMount == "function" && s.componentWillMount(), typeof s.UNSAFE_componentWillMount == "function" && s.UNSAFE_componentWillMount()), typeof s.componentDidMount == "function" && (t.flags |= 4194308)) : (typeof s.componentDidMount == "function" && (t.flags |= 4194308), t.memoizedProps = i, t.memoizedState = A), s.props = i, s.state = A, s.context = c, i = x) : (typeof s.componentDidMount == "function" && (t.flags |= 4194308), i = !1);
     } else {
-      s = t.stateNode, yc(e, t), c = t.memoizedProps, q = fl(a, c), s.props = q, Y = t.pendingProps, C = s.context, A = a.contextType, x = Ol, typeof A == "object" && A !== null && (x = mt(A)), o = a.getDerivedStateFromProps, (A = typeof o == "function" || typeof s.getSnapshotBeforeUpdate == "function") || typeof s.UNSAFE_componentWillReceiveProps != "function" && typeof s.componentWillReceiveProps != "function" || (c !== Y || C !== x) && fu(t, s, i, x), Ca = !1, C = t.memoizedState, s.state = C, Ti(t, i, s, n), Ai();
+      s = t.stateNode, yc(e, t), c = t.memoizedProps, q = fl(a, c), s.props = q, Y = t.pendingProps, C = s.context, A = a.contextType, x = Ml, typeof A == "object" && A !== null && (x = mt(A)), o = a.getDerivedStateFromProps, (A = typeof o == "function" || typeof s.getSnapshotBeforeUpdate == "function") || typeof s.UNSAFE_componentWillReceiveProps != "function" && typeof s.componentWillReceiveProps != "function" || (c !== Y || C !== x) && fu(t, s, i, x), Ca = !1, C = t.memoizedState, s.state = C, Ti(t, i, s, n), Ai();
       var U = t.memoizedState;
       c !== Y || C !== U || Ca || e !== null && e.dependencies !== null && En(e.dependencies) ? (typeof o == "function" && (Xc(t, a, o, i), U = t.memoizedState), (q = Ca || pu(t, a, q, i, C, U, x) || e !== null && e.dependencies !== null && En(e.dependencies)) ? (A || typeof s.UNSAFE_componentWillUpdate != "function" && typeof s.componentWillUpdate != "function" || (typeof s.componentWillUpdate == "function" && s.componentWillUpdate(i, U, x), typeof s.UNSAFE_componentWillUpdate == "function" && s.UNSAFE_componentWillUpdate(i, U, x)), typeof s.componentDidUpdate == "function" && (t.flags |= 4), typeof s.getSnapshotBeforeUpdate == "function" && (t.flags |= 1024)) : (typeof s.componentDidUpdate != "function" || c === e.memoizedProps && C === e.memoizedState || (t.flags |= 4), typeof s.getSnapshotBeforeUpdate != "function" || c === e.memoizedProps && C === e.memoizedState || (t.flags |= 1024), t.memoizedProps = i, t.memoizedState = U), s.props = i, s.state = U, s.context = x, i = q) : (typeof s.componentDidUpdate != "function" || c === e.memoizedProps && C === e.memoizedState || (t.flags |= 4), typeof s.getSnapshotBeforeUpdate != "function" || c === e.memoizedProps && C === e.memoizedState || (t.flags |= 1024), i = !1);
     }
@@ -4114,8 +4114,8 @@ Error generating stack: ` + i.message + `
   function _u(e, t, a) {
     var i = t.pendingProps, n = !1, s = (t.flags & 128) !== 0, c;
     if ((c = s) || (c = e !== null && e.memoizedState === null ? !1 : (at.current & 2) !== 0), c && (n = !0, t.flags &= -129), c = (t.flags & 32) !== 0, t.flags &= -33, e === null) {
-      if (Oe) {
-        if (n ? Ma(t) : Oa(t), (e = Je) ? (e = Up(e, Yt), e = e !== null && e.data !== "&" ? e : null, e !== null && (t.memoizedState = {
+      if (Me) {
+        if (n ? Oa(t) : Ma(t), (e = Je) ? (e = Up(e, Yt), e = e !== null && e.data !== "&" ? e : null, e !== null && (t.memoizedState = {
           dehydrated: e,
           treeContext: ka !== null ? {
             id: ta,
@@ -4124,21 +4124,21 @@ Error generating stack: ` + i.message + `
           retryLane: 536870912,
           hydrationErrors: null
         }, a = rd(e), a.return = t, t.child = a, ht = t, Je = null)) : e = null, e === null) throw Aa(t);
-        return Mr(e) ? t.lanes = 32 : t.lanes = 536870912, null;
+        return Or(e) ? t.lanes = 32 : t.lanes = 536870912, null;
       }
       var o = i.children;
-      return i = i.fallback, n ? (Oa(t), n = t.mode, o = Jn({
+      return i = i.fallback, n ? (Ma(t), n = t.mode, o = Jn({
         mode: "hidden",
         children: o
-      }, n), i = al(i, n, a, null), o.return = t, i.return = t, o.sibling = i, t.child = o, i = t.child, i.memoizedState = $c(a), i.childLanes = Wc(e, c, a), t.memoizedState = Ic, Ui(null, i)) : (Ma(t), Fc(t, o));
+      }, n), i = al(i, n, a, null), o.return = t, i.return = t, o.sibling = i, t.child = o, i = t.child, i.memoizedState = $c(a), i.childLanes = Wc(e, c, a), t.memoizedState = Ic, Ui(null, i)) : (Oa(t), Fc(t, o));
     }
     var x = e.memoizedState;
     if (x !== null && (o = x.dehydrated, o !== null)) {
-      if (s) t.flags & 256 ? (Ma(t), t.flags &= -257, t = Pc(e, t, a)) : t.memoizedState !== null ? (Oa(t), t.child = e.child, t.flags |= 128, t = null) : (Oa(t), o = i.fallback, n = t.mode, i = Jn({
+      if (s) t.flags & 256 ? (Oa(t), t.flags &= -257, t = Pc(e, t, a)) : t.memoizedState !== null ? (Ma(t), t.child = e.child, t.flags |= 128, t = null) : (Ma(t), o = i.fallback, n = t.mode, i = Jn({
         mode: "visible",
         children: i.children
       }, n), o = al(o, n, a, null), o.flags |= 2, i.return = t, o.return = t, i.sibling = o, t.child = i, ol(t, e.child, null, a), i = t.child, i.memoizedState = $c(a), i.childLanes = Wc(e, c, a), t.memoizedState = Ic, t = Ui(null, i));
-      else if (Ma(t), Mr(o)) {
+      else if (Oa(t), Or(o)) {
         if (c = o.nextSibling && o.nextSibling.dataset, c) var A = c.dgst;
         c = A, i = Error(d(419)), i.stack = "", i.digest = c, zi({
           value: i,
@@ -4148,10 +4148,10 @@ Error generating stack: ` + i.message + `
       } else if (ct || ql(e, t, a, !1), c = (a & e.childLanes) !== 0, ct || c) {
         if (c = Ke, c !== null && (i = ho(c, a), i !== 0 && i !== x.retryLane)) throw x.retryLane = i, tl(e, i), Et(c, e, i), Kc;
         Cr(o) || ls(), t = Pc(e, t, a);
-      } else Cr(o) ? (t.flags |= 192, t.child = e.child, t = null) : (e = x.treeContext, Je = Qt(o.nextSibling), ht = t, Oe = !0, Ea = null, Yt = !1, e !== null && ud(t, e), t = Fc(t, i.children), t.flags |= 4096);
+      } else Cr(o) ? (t.flags |= 192, t.child = e.child, t = null) : (e = x.treeContext, Je = Qt(o.nextSibling), ht = t, Me = !0, Ea = null, Yt = !1, e !== null && ud(t, e), t = Fc(t, i.children), t.flags |= 4096);
       return t;
     }
-    return n ? (Oa(t), o = i.fallback, n = t.mode, x = e.child, A = x.sibling, i = ra(x, {
+    return n ? (Ma(t), o = i.fallback, n = t.mode, x = e.child, A = x.sibling, i = ra(x, {
       mode: "hidden",
       children: i.children
     }), i.subtreeFlags = x.subtreeFlags & 65011712, A !== null ? o = ra(A, o) : (o = al(o, n, a, null), o.flags |= 2), o.return = t, i.return = t, i.sibling = o, t.child = i, Ui(null, i), i = t.child, o = e.child.memoizedState, o === null ? o = $c(a) : (n = o.cachePool, n !== null ? (x = nt._currentValue, n = n.parent !== x ? {
@@ -4160,7 +4160,7 @@ Error generating stack: ` + i.message + `
     } : n) : n = gd(), o = {
       baseLanes: o.baseLanes | a,
       cachePool: n
-    }), i.memoizedState = o, i.childLanes = Wc(e, c, a), t.memoizedState = Ic, Ui(e.child, i)) : (Ma(t), a = e.child, e = a.sibling, a = ra(a, {
+    }), i.memoizedState = o, i.childLanes = Wc(e, c, a), t.memoizedState = Ic, Ui(e.child, i)) : (Oa(t), a = e.child, e = a.sibling, a = ra(a, {
       mode: "visible",
       children: i.children
     }), a.return = t, a.sibling = null, e !== null && (c = t.deletions, c === null ? (t.deletions = [e], t.flags |= 16) : c.push(e)), t.child = a, t.memoizedState = null, a);
@@ -4198,7 +4198,7 @@ Error generating stack: ` + i.message + `
     var i = t.pendingProps, n = i.revealOrder, s = i.tail;
     i = i.children;
     var c = at.current, o = (c & 2) !== 0;
-    if (o ? (c = c & 1 | 2, t.flags |= 128) : c &= 1, K(at, c), xt(e, t, i, a), i = Oe ? Si : 0, !o && e !== null && (e.flags & 128) !== 0) e: for (e = t.child; e !== null; ) {
+    if (o ? (c = c & 1 | 2, t.flags |= 128) : c &= 1, K(at, c), xt(e, t, i, a), i = Me ? Si : 0, !o && e !== null && (e.flags & 128) !== 0) e: for (e = t.child; e !== null; ) {
       if (e.tag === 13) e.memoizedState !== null && ku(e, a, t);
       else if (e.tag === 19) ku(e, a, t);
       else if (e.child !== null) {
@@ -4271,8 +4271,8 @@ Error generating stack: ` + i.message + `
       case 13:
         var i = t.memoizedState;
         if (i !== null)
-          return i.dehydrated !== null ? (Ma(t), t.flags |= 128, null) : (a & t.child.childLanes) !== 0 ? _u(e, t, a) : (Ma(t), e = ha(e, t, a), e !== null ? e.sibling : null);
-        Ma(t);
+          return i.dehydrated !== null ? (Oa(t), t.flags |= 128, null) : (a & t.child.childLanes) !== 0 ? _u(e, t, a) : (Oa(t), e = ha(e, t, a), e !== null ? e.sibling : null);
+        Oa(t);
         break;
       case 19:
         var n = (e.flags & 128) !== 0;
@@ -4295,7 +4295,7 @@ Error generating stack: ` + i.message + `
       if (!tr(e, a) && (t.flags & 128) === 0) return ct = !1, R0(e, t, a);
       ct = (e.flags & 131072) !== 0;
     }
-    else ct = !1, Oe && (t.flags & 1048576) !== 0 && dd(t, Si, t.index);
+    else ct = !1, Me && (t.flags & 1048576) !== 0 && dd(t, Si, t.index);
     switch (t.lanes = 0, t.tag) {
       case 16:
         e: {
@@ -4338,7 +4338,7 @@ Error generating stack: ` + i.message + `
             n = Ht(Error(d(424)), t), zi(n), t = wu(e, t, i, a);
             break e;
           } else
-            for (e = t.stateNode.containerInfo, e.nodeType === 9 ? e = e.body : e = e.nodeName === "HTML" ? e.ownerDocument.body : e, Je = Qt(e.firstChild), ht = t, Oe = !0, Ea = null, Yt = !0, a = zd(t, null, i, a), t.child = a; a; ) a.flags = a.flags & -3 | 4096, a = a.sibling;
+            for (e = t.stateNode.containerInfo, e.nodeType === 9 ? e = e.body : e = e.nodeName === "HTML" ? e.ownerDocument.body : e, Je = Qt(e.firstChild), ht = t, Me = !0, Ea = null, Yt = !0, a = zd(t, null, i, a), t.child = a; a; ) a.flags = a.flags & -3 | 4096, a = a.sibling;
           else {
             if (ll(), i === n) {
               t = ha(e, t, a);
@@ -4350,13 +4350,13 @@ Error generating stack: ` + i.message + `
         }
         return t;
       case 26:
-        return Kn(e, t), e === null ? (a = Gp(t.type, null, t.pendingProps, null)) ? t.memoizedState = a : Oe || (a = t.type, e = t.pendingProps, i = ds(Se.current).createElement(a), i[ft] = t, i[St] = e, gt(i, a, e), ut(i), t.stateNode = i) : t.memoizedState = Gp(t.type, e.memoizedProps, t.pendingProps, e.memoizedState), null;
+        return Kn(e, t), e === null ? (a = Gp(t.type, null, t.pendingProps, null)) ? t.memoizedState = a : Me || (a = t.type, e = t.pendingProps, i = ds(Se.current).createElement(a), i[ft] = t, i[St] = e, gt(i, a, e), ut(i), t.stateNode = i) : t.memoizedState = Gp(t.type, e.memoizedProps, t.pendingProps, e.memoizedState), null;
       case 27:
-        return Ne(t), e === null && Oe && (i = t.stateNode = Lp(t.type, t.pendingProps, Se.current), ht = t, Yt = !0, n = Je, Ga(t.type) ? (Or = n, Je = Qt(i.firstChild)) : Je = n), xt(e, t, t.pendingProps.children, a), Kn(e, t), e === null && (t.flags |= 4194304), t.child;
+        return Ne(t), e === null && Me && (i = t.stateNode = Lp(t.type, t.pendingProps, Se.current), ht = t, Yt = !0, n = Je, Ga(t.type) ? (Mr = n, Je = Qt(i.firstChild)) : Je = n), xt(e, t, t.pendingProps.children, a), Kn(e, t), e === null && (t.flags |= 4194304), t.child;
       case 5:
-        return e === null && Oe && ((n = i = Je) && (i = dh(i, t.type, t.pendingProps, Yt), i !== null ? (t.stateNode = i, ht = t, Je = Qt(i.firstChild), Yt = !1, n = !0) : n = !1), n || Aa(t)), Ne(t), n = t.type, s = t.pendingProps, c = e !== null ? e.memoizedProps : null, i = s.children, Er(n, s) ? i = null : c !== null && Er(n, c) && (t.flags |= 32), t.memoizedState !== null && (n = Ec(e, t, N0, null, null, a), $i._currentValue = n), Kn(e, t), xt(e, t, i, a), t.child;
+        return e === null && Me && ((n = i = Je) && (i = dh(i, t.type, t.pendingProps, Yt), i !== null ? (t.stateNode = i, ht = t, Je = Qt(i.firstChild), Yt = !1, n = !0) : n = !1), n || Aa(t)), Ne(t), n = t.type, s = t.pendingProps, c = e !== null ? e.memoizedProps : null, i = s.children, Er(n, s) ? i = null : c !== null && Er(n, c) && (t.flags |= 32), t.memoizedState !== null && (n = Ec(e, t, N0, null, null, a), $i._currentValue = n), Kn(e, t), xt(e, t, i, a), t.child;
       case 6:
-        return e === null && Oe && ((e = a = Je) && (a = uh(a, t.pendingProps, Yt), a !== null ? (t.stateNode = a, ht = t, Je = null, e = !0) : e = !1), e || Aa(t)), null;
+        return e === null && Me && ((e = a = Je) && (a = uh(a, t.pendingProps, Yt), a !== null ? (t.stateNode = a, ht = t, Je = null, e = !0) : e = !1), e || Aa(t)), null;
       case 13:
         return _u(e, t, a);
       case 4:
@@ -4403,19 +4403,19 @@ Error generating stack: ` + i.message + `
     if ((t = (e.mode & 32) !== 0) && (t = !1), t) {
       if (e.flags |= 16777216, (n & 335544128) === n) if (e.stateNode.complete) e.flags |= 8192;
       else if (ap()) e.flags |= 8192;
-      else throw rl = Mn, vc;
+      else throw rl = On, vc;
     } else e.flags &= -16777217;
   }
   function Tu(e, t) {
     if (t.type !== "stylesheet" || (t.state.loading & 4) !== 0) e.flags &= -16777217;
     else if (e.flags |= 16777216, !Zp(t)) if (ap()) e.flags |= 8192;
-    else throw rl = Mn, vc;
+    else throw rl = On, vc;
   }
   function In(e, t) {
     t !== null && (e.flags |= 4), e.flags & 16384 && (t = e.tag !== 22 ? uo() : 536870912, e.lanes |= t, Il |= t);
   }
   function Ri(e, t) {
-    if (!Oe) switch (e.tailMode) {
+    if (!Me) switch (e.tailMode) {
       case "hidden":
         t = e.tail;
         for (var a = null; t !== null; ) t.alternate !== null && (a = t), t = t.sibling;
@@ -4555,7 +4555,7 @@ Error generating stack: ` + i.message + `
             Ie(t), e = !1;
           } else a = pc(), e !== null && e.memoizedState !== null && (e.memoizedState.hydrationErrors = a), e = !0;
           if (!e)
-            return t.flags & 256 ? (Mt(t), t) : (Mt(t), null);
+            return t.flags & 256 ? (Ot(t), t) : (Ot(t), null);
           if ((t.flags & 128) !== 0) throw Error(d(558));
         }
         return Ie(t), null;
@@ -4570,9 +4570,9 @@ Error generating stack: ` + i.message + `
             Ie(t), n = !1;
           } else n = pc(), e !== null && e.memoizedState !== null && (e.memoizedState.hydrationErrors = n), n = !0;
           if (!n)
-            return t.flags & 256 ? (Mt(t), t) : (Mt(t), null);
+            return t.flags & 256 ? (Ot(t), t) : (Ot(t), null);
         }
-        return Mt(t), (t.flags & 128) !== 0 ? (t.lanes = a, t) : (a = i !== null, e = e !== null && e.memoizedState !== null, a && (i = t.child, n = null, i.alternate !== null && i.alternate.memoizedState !== null && i.alternate.memoizedState.cachePool !== null && (n = i.alternate.memoizedState.cachePool.pool), s = null, i.memoizedState !== null && i.memoizedState.cachePool !== null && (s = i.memoizedState.cachePool.pool), s !== n && (i.flags |= 2048)), a !== e && a && (t.child.flags |= 8192), In(t, t.updateQueue), Ie(t), null);
+        return Ot(t), (t.flags & 128) !== 0 ? (t.lanes = a, t) : (a = i !== null, e = e !== null && e.memoizedState !== null, a && (i = t.child, n = null, i.alternate !== null && i.alternate.memoizedState !== null && i.alternate.memoizedState.cachePool !== null && (n = i.alternate.memoizedState.cachePool.pool), s = null, i.memoizedState !== null && i.memoizedState.cachePool !== null && (s = i.memoizedState.cachePool.pool), s !== n && (i.flags |= 2048)), a !== e && a && (t.child.flags |= 8192), In(t, t.updateQueue), Ie(t), null);
       case 4:
         return Ee(), e === null && zp(t.stateNode.containerInfo), Ie(t), null;
       case 10:
@@ -4584,7 +4584,7 @@ Error generating stack: ` + i.message + `
           if (Pe !== 0 || e !== null && (e.flags & 128) !== 0) for (e = t.child; e !== null; ) {
             if (s = Rn(e), s !== null) {
               for (t.flags |= 128, Ri(i, !1), e = s.updateQueue, t.updateQueue = e, In(t, e), t.subtreeFlags = 0, e = a, a = t.child; a !== null; ) cd(a, e), a = a.sibling;
-              return K(at, at.current & 1 | 2), Oe && oa(t, i.treeForkCount), t.child;
+              return K(at, at.current & 1 | 2), Me && oa(t, i.treeForkCount), t.child;
             }
             e = e.sibling;
           }
@@ -4592,14 +4592,14 @@ Error generating stack: ` + i.message + `
         }
         else {
           if (!n) if (e = Rn(s), e !== null) {
-            if (t.flags |= 128, n = !0, e = e.updateQueue, t.updateQueue = e, In(t, e), Ri(i, !0), i.tail === null && i.tailMode === "hidden" && !s.alternate && !Oe) return Ie(t), null;
+            if (t.flags |= 128, n = !0, e = e.updateQueue, t.updateQueue = e, In(t, e), Ri(i, !0), i.tail === null && i.tailMode === "hidden" && !s.alternate && !Me) return Ie(t), null;
           } else 2 * et() - i.renderingStartTime > es && a !== 536870912 && (t.flags |= 128, n = !0, Ri(i, !1), t.lanes = 4194304);
           i.isBackwards ? (s.sibling = t.child, t.child = s) : (e = i.last, e !== null ? e.sibling = s : t.child = s, i.last = s);
         }
-        return i.tail !== null ? (e = i.tail, i.rendering = e, i.tail = e.sibling, i.renderingStartTime = et(), e.sibling = null, a = at.current, K(at, n ? a & 1 | 2 : a & 1), Oe && oa(t, i.treeForkCount), e) : (Ie(t), null);
+        return i.tail !== null ? (e = i.tail, i.rendering = e, i.tail = e.sibling, i.renderingStartTime = et(), e.sibling = null, a = at.current, K(at, n ? a & 1 | 2 : a & 1), Me && oa(t, i.treeForkCount), e) : (Ie(t), null);
       case 22:
       case 23:
-        return Mt(t), wc(), i = t.memoizedState !== null, e !== null ? e.memoizedState !== null !== i && (t.flags |= 8192) : i && (t.flags |= 8192), i ? (a & 536870912) !== 0 && (t.flags & 128) === 0 && (Ie(t), t.subtreeFlags & 6 && (t.flags |= 8192)) : Ie(t), a = t.updateQueue, a !== null && In(t, a.retryQueue), a = null, e !== null && e.memoizedState !== null && e.memoizedState.cachePool !== null && (a = e.memoizedState.cachePool.pool), i = null, t.memoizedState !== null && t.memoizedState.cachePool !== null && (i = t.memoizedState.cachePool.pool), i !== a && (t.flags |= 2048), e !== null && D(sl), null;
+        return Ot(t), wc(), i = t.memoizedState !== null, e !== null ? e.memoizedState !== null !== i && (t.flags |= 8192) : i && (t.flags |= 8192), i ? (a & 536870912) !== 0 && (t.flags & 128) === 0 && (Ie(t), t.subtreeFlags & 6 && (t.flags |= 8192)) : Ie(t), a = t.updateQueue, a !== null && In(t, a.retryQueue), a = null, e !== null && e.memoizedState !== null && e.memoizedState.cachePool !== null && (a = e.memoizedState.cachePool.pool), i = null, t.memoizedState !== null && t.memoizedState.cachePool !== null && (i = t.memoizedState.cachePool.pool), i !== a && (t.flags |= 2048), e !== null && D(sl), null;
       case 24:
         return a = null, e !== null && (a = e.memoizedState.cache), t.memoizedState.cache !== a && (t.flags |= 2048), ua(nt), Ie(t), null;
       case 25:
@@ -4621,12 +4621,12 @@ Error generating stack: ` + i.message + `
         return Re(t), null;
       case 31:
         if (t.memoizedState !== null) {
-          if (Mt(t), t.alternate === null) throw Error(d(340));
+          if (Ot(t), t.alternate === null) throw Error(d(340));
           ll();
         }
         return e = t.flags, e & 65536 ? (t.flags = e & -65537 | 128, t) : null;
       case 13:
-        if (Mt(t), e = t.memoizedState, e !== null && e.dehydrated !== null) {
+        if (Ot(t), e = t.memoizedState, e !== null && e.dehydrated !== null) {
           if (t.alternate === null) throw Error(d(340));
           ll();
         }
@@ -4639,7 +4639,7 @@ Error generating stack: ` + i.message + `
         return ua(t.type), null;
       case 22:
       case 23:
-        return Mt(t), wc(), e !== null && D(sl), e = t.flags, e & 65536 ? (t.flags = e & -65537 | 128, t) : null;
+        return Ot(t), wc(), e !== null && D(sl), e = t.flags, e & 65536 ? (t.flags = e & -65537 | 128, t) : null;
       case 24:
         return ua(nt), null;
       case 25:
@@ -4662,10 +4662,10 @@ Error generating stack: ` + i.message + `
         Ee();
         break;
       case 31:
-        t.memoizedState !== null && Mt(t);
+        t.memoizedState !== null && Ot(t);
         break;
       case 13:
-        Mt(t);
+        Ot(t);
         break;
       case 19:
         D(at);
@@ -4675,7 +4675,7 @@ Error generating stack: ` + i.message + `
         break;
       case 22:
       case 23:
-        Mt(t), wc(), e !== null && D(sl);
+        Ot(t), wc(), e !== null && D(sl);
         break;
       case 24:
         ua(nt);
@@ -4726,7 +4726,7 @@ Error generating stack: ` + i.message + `
       Ye(t, t.return, q);
     }
   }
-  function Mu(e) {
+  function Ou(e) {
     var t = e.updateQueue;
     if (t !== null) {
       var a = e.stateNode;
@@ -4737,7 +4737,7 @@ Error generating stack: ` + i.message + `
       }
     }
   }
-  function Ou(e, t, a) {
+  function Mu(e, t, a) {
     a.props = fl(e.type, e.memoizedProps), a.state = e.memoizedState;
     try {
       a.componentWillUnmount();
@@ -4962,7 +4962,7 @@ Error generating stack: ` + i.message + `
             Ye(a, a.return, c);
           }
         }
-        i & 64 && Mu(a), i & 512 && Li(a, a.return);
+        i & 64 && Ou(a), i & 512 && Li(a, a.return);
         break;
       case 3:
         if (ba(e, a), i & 64 && (e = a.updateQueue, e !== null)) {
@@ -5046,7 +5046,7 @@ Error generating stack: ` + i.message + `
         }
         break;
       case 18:
-        $e !== null && (Nt ? (e = $e, Op(e.nodeType === 9 ? e.body : e.nodeName === "HTML" ? e.ownerDocument.body : e, a.stateNode), li(e)) : Op($e, a.stateNode));
+        $e !== null && (Nt ? (e = $e, Mp(e.nodeType === 9 ? e.body : e.nodeName === "HTML" ? e.ownerDocument.body : e, a.stateNode), li(e)) : Mp($e, a.stateNode));
         break;
       case 4:
         i = $e, n = Nt, $e = a.stateNode.containerInfo, Nt = !0, ga(e, t, a), $e = i, Nt = n;
@@ -5058,7 +5058,7 @@ Error generating stack: ` + i.message + `
         Da(2, a, t), rt || Da(4, a, t), ga(e, t, a);
         break;
       case 1:
-        rt || (la(a, t), i = a.stateNode, typeof i.componentWillUnmount == "function" && Ou(a, t, i)), ga(e, t, a);
+        rt || (la(a, t), i = a.stateNode, typeof i.componentWillUnmount == "function" && Mu(a, t, i)), ga(e, t, a);
         break;
       case 21:
         ga(e, t, a);
@@ -5355,7 +5355,7 @@ Error generating stack: ` + i.message + `
         case 1:
           la(t, t.return);
           var a = t.stateNode;
-          typeof a.componentWillUnmount == "function" && Ou(t, t.return, a), hl(t);
+          typeof a.componentWillUnmount == "function" && Mu(t, t.return, a), hl(t);
           break;
         case 27:
           Ki(t.stateNode);
@@ -5399,7 +5399,7 @@ Error generating stack: ` + i.message + `
               Ye(i, i.return, A);
             }
           }
-          a && c & 64 && Mu(s), Li(s, s.return);
+          a && c & 64 && Ou(s), Li(s, s.return);
           break;
         case 27:
           Ru(s);
@@ -5653,12 +5653,12 @@ Error generating stack: ` + i.message + `
     cacheSignal: function() {
       return mt(nt).controller.signal;
     }
-  }, Y0 = typeof WeakMap == "function" ? WeakMap : Map, He = 0, Ke = null, Ae = null, Ce = 0, Ge = 0, Ot = null, Ua = !1, Jl = !1, or = !1, ja = 0, Pe = 0, Ra = 0, ml = 0, dr = 0, Dt = 0, Il = 0, Yi = null, kt = null, ur = !1, Pn = 0, $u = 0, es = 1 / 0, ts = null, qa = null, dt = 0, La = null, $l = null, ya = 0, pr = 0, fr = null, Wu = null, Vi = 0, hr = null;
+  }, Y0 = typeof WeakMap == "function" ? WeakMap : Map, He = 0, Ke = null, Ae = null, Ce = 0, Ge = 0, Mt = null, Ua = !1, Jl = !1, or = !1, ja = 0, Pe = 0, Ra = 0, ml = 0, dr = 0, Dt = 0, Il = 0, Yi = null, kt = null, ur = !1, Pn = 0, $u = 0, es = 1 / 0, ts = null, qa = null, dt = 0, La = null, $l = null, ya = 0, pr = 0, fr = null, Wu = null, Vi = 0, hr = null;
   function Xt() {
     return (He & 2) !== 0 && Ce !== 0 ? Ce & -Ce : B.T !== null ? jr() : xo();
   }
   function Fu() {
-    if (Dt === 0) if ((Ce & 536870912) === 0 || Oe) {
+    if (Dt === 0) if ((Ce & 536870912) === 0 || Me) {
       var e = rn;
       rn <<= 1, (rn & 3932160) === 0 && (rn = 262144), Dt = e;
     } else Dt = 536870912;
@@ -5800,7 +5800,7 @@ Error generating stack: ` + i.message + `
   }
   function Wl(e, t) {
     var a = e.timeoutHandle;
-    a !== -1 && (e.timeoutHandle = -1, ch(a)), a = e.cancelPendingCommit, a !== null && (e.cancelPendingCommit = null, a()), ya = 0, mr(), Ke = e, Ae = a = ra(e.current, null), Ce = t, Ge = 0, Ot = null, Ua = !1, Jl = oi(e, t), or = !1, Il = Dt = dr = ml = Ra = Pe = 0, kt = Yi = null, ur = !1, (t & 8) !== 0 && (t |= t & 32);
+    a !== -1 && (e.timeoutHandle = -1, ch(a)), a = e.cancelPendingCommit, a !== null && (e.cancelPendingCommit = null, a()), ya = 0, mr(), Ke = e, Ae = a = ra(e.current, null), Ce = t, Ge = 0, Mt = null, Ua = !1, Jl = oi(e, t), or = !1, Il = Dt = dr = ml = Ra = Pe = 0, kt = Yi = null, ur = !1, (t & 8) !== 0 && (t |= t & 32);
     var i = e.entangledLanes;
     if (i !== 0) for (e = e.entanglements, i &= t; 0 < i; ) {
       var n = 31 - ot(i), s = 1 << n;
@@ -5809,7 +5809,7 @@ Error generating stack: ` + i.message + `
     return ja = t, zn(), a;
   }
   function tp(e, t) {
-    _e = null, B.H = Di, t === Bl || t === Cn ? (t = jd(), Ge = 3) : t === vc ? (t = jd(), Ge = 4) : Ge = t === Kc ? 8 : t !== null && typeof t == "object" && typeof t.then == "function" ? 6 : 1, Ot = t, Ae === null && (Pe = 1, Qn(e, Ht(t, e.current)));
+    _e = null, B.H = Di, t === Bl || t === Cn ? (t = jd(), Ge = 3) : t === vc ? (t = jd(), Ge = 4) : Ge = t === Kc ? 8 : t !== null && typeof t == "object" && typeof t.then == "function" ? 6 : 1, Mt = t, Ae === null && (Pe = 1, Qn(e, Ht(t, e.current)));
   }
   function ap() {
     var e = Ct.current;
@@ -5835,7 +5835,7 @@ Error generating stack: ` + i.message + `
     e: do
       try {
         if (Ge !== 0 && Ae !== null) {
-          var o = Ae, x = Ot;
+          var o = Ae, x = Mt;
           switch (Ge) {
             case 8:
               mr(), c = 6;
@@ -5846,13 +5846,13 @@ Error generating stack: ` + i.message + `
             case 6:
               Ct.current === null && (t = !0);
               var A = Ge;
-              if (Ge = 0, Ot = null, Fl(e, o, x, A), a && Jl) {
+              if (Ge = 0, Mt = null, Fl(e, o, x, A), a && Jl) {
                 c = 0;
                 break e;
               }
               break;
             default:
-              A = Ge, Ge = 0, Ot = null, Fl(e, o, x, A);
+              A = Ge, Ge = 0, Mt = null, Fl(e, o, x, A);
           }
         }
         X0(), c = Pe;
@@ -5875,15 +5875,15 @@ Error generating stack: ` + i.message + `
       try {
         if (Ge !== 0 && Ae !== null) {
           t = Ae;
-          var s = Ot;
+          var s = Mt;
           t: switch (Ge) {
             case 1:
-              Ge = 0, Ot = null, Fl(e, t, s, 1);
+              Ge = 0, Mt = null, Fl(e, t, s, 1);
               break;
             case 2:
             case 9:
               if (bd(s)) {
-                Ge = 0, Ot = null, sp(t);
+                Ge = 0, Mt = null, sp(t);
                 break;
               }
               t = function() {
@@ -5897,7 +5897,7 @@ Error generating stack: ` + i.message + `
               Ge = 5;
               break e;
             case 7:
-              bd(s) ? (Ge = 0, Ot = null, sp(t)) : (Ge = 0, Ot = null, Fl(e, t, s, 7));
+              bd(s) ? (Ge = 0, Mt = null, sp(t)) : (Ge = 0, Mt = null, Fl(e, t, s, 7));
               break;
             case 5:
               var c = null;
@@ -5908,7 +5908,7 @@ Error generating stack: ` + i.message + `
                 case 27:
                   var o = Ae;
                   if (c ? Zp(c) : o.stateNode.complete) {
-                    Ge = 0, Ot = null;
+                    Ge = 0, Mt = null;
                     var x = o.sibling;
                     if (x !== null) Ae = x;
                     else {
@@ -5918,10 +5918,10 @@ Error generating stack: ` + i.message + `
                     break t;
                   }
               }
-              Ge = 0, Ot = null, Fl(e, t, s, 5);
+              Ge = 0, Mt = null, Fl(e, t, s, 5);
               break;
             case 6:
-              Ge = 0, Ot = null, Fl(e, t, s, 6);
+              Ge = 0, Mt = null, Fl(e, t, s, 6);
               break;
             case 8:
               mr(), Pe = 6;
@@ -5975,7 +5975,7 @@ Error generating stack: ` + i.message + `
       Pe = 1, Qn(e, Ht(a, e.current)), Ae = null;
       return;
     }
-    t.flags & 32768 ? (Oe || i === 1 ? e = !0 : Jl || (Ce & 536870912) !== 0 ? e = !1 : (Ua = e = !0, (i === 2 || i === 9 || i === 3 || i === 6) && (i = Ct.current, i !== null && i.tag === 13 && (i.flags |= 16384))), cp(t, e)) : is(t);
+    t.flags & 32768 ? (Me || i === 1 ? e = !0 : Jl || (Ce & 536870912) !== 0 ? e = !1 : (Ua = e = !0, (i === 2 || i === 9 || i === 3 || i === 6) && (i = Ct.current, i !== null && i.tag === 13 && (i.flags |= 16384))), cp(t, e)) : is(t);
   }
   function is(e) {
     var t = e;
@@ -6021,7 +6021,7 @@ Error generating stack: ` + i.message + `
     if ((He & 6) !== 0) throw Error(d(327));
     if (t !== null) {
       if (t === e.current) throw Error(d(177));
-      if (s = t.lanes | t.childLanes, s |= ic, Of(e, a, s, c, o, x), e === Ke && (Ae = Ke = null, Ce = 0), $l = t, La = e, ya = a, pr = s, fr = n, Wu = i, (t.subtreeFlags & 10256) !== 0 || (t.flags & 10256) !== 0 ? (e.callbackNode = null, e.callbackPriority = 0, $0(ea, function() {
+      if (s = t.lanes | t.childLanes, s |= ic, Mf(e, a, s, c, o, x), e === Ke && (Ae = Ke = null, Ce = 0), $l = t, La = e, ya = a, pr = s, fr = n, Wu = i, (t.subtreeFlags & 10256) !== 0 || (t.flags & 10256) !== 0 ? (e.callbackNode = null, e.callbackPriority = 0, $0(ea, function() {
         return fp(), null;
       })) : (e.callbackNode = null, e.callbackPriority = 0), i = (t.flags & 13878) !== 0, (t.subtreeFlags & 13878) !== 0 || i) {
         i = B.T, B.T = null, n = G.p, G.p = 2, c = He, He |= 4;
@@ -6209,7 +6209,7 @@ Error generating stack: ` + i.message + `
     i !== null && i.delete(t), mp(e, a);
   }
   function $0(e, t) {
-    return M(e, t);
+    return O(e, t);
   }
   var ss = null, Pl = null, br = !1, cs = !1, vr = !1, Ba = 0;
   function Sa(e) {
@@ -6251,7 +6251,7 @@ Error generating stack: ` + i.message + `
   function gp(e, t) {
     for (var a = e.suspendedLanes, i = e.pingedLanes, n = e.expirationTimes, s = e.pendingLanes & -62914561; 0 < s; ) {
       var c = 31 - ot(s), o = 1 << c, x = n[c];
-      x === -1 ? ((o & a) === 0 || (o & i) !== 0) && (n[c] = Mf(o, t)) : x <= t && (e.expiredLanes |= o), s &= ~o;
+      x === -1 ? ((o & a) === 0 || (o & i) !== 0) && (n[c] = Of(o, t)) : x <= t && (e.expiredLanes |= o), s &= ~o;
     }
     if (t = Ke, a = Ce, a = dn(e, e === t ? a : 0, e.cancelPendingCommit !== null || e.timeoutHandle !== -1), i = e.callbackNode, a === 0 || e === t && (Ge === 2 || Ge === 9) || e.cancelPendingCommit !== null) return i !== null && i !== null && we(i), e.callbackNode = null, e.callbackPriority = 0;
     if ((a & 3) === 0 || oi(e, a)) {
@@ -6270,7 +6270,7 @@ Error generating stack: ` + i.message + `
         default:
           a = ea;
       }
-      return i = bp.bind(null, e), a = M(a, i), e.callbackPriority = t, e.callbackNode = a, t;
+      return i = bp.bind(null, e), a = O(a, i), e.callbackPriority = t, e.callbackNode = a, t;
     }
     return i !== null && i !== null && we(i), e.callbackPriority = 2, e.callbackNode = null, 2;
   }
@@ -6287,7 +6287,7 @@ Error generating stack: ` + i.message + `
   }
   function F0() {
     rh(function() {
-      (He & 6) !== 0 ? M(jl, W0) : xp();
+      (He & 6) !== 0 ? O(jl, W0) : xp();
     });
   }
   function jr() {
@@ -6598,24 +6598,24 @@ Error generating stack: ` + i.message + `
         if ($s) e: {
           switch (e) {
             case "compositionstart":
-              var Me = "onCompositionStart";
+              var Oe = "onCompositionStart";
               break e;
             case "compositionend":
-              Me = "onCompositionEnd";
+              Oe = "onCompositionEnd";
               break e;
             case "compositionupdate":
-              Me = "onCompositionUpdate";
+              Oe = "onCompositionUpdate";
               break e;
           }
-          Me = void 0;
+          Oe = void 0;
         }
-        else Al ? Bo(e, a) && (Me = "onCompositionEnd") : e === "keydown" && a.keyCode === 229 && (Me = "onCompositionStart");
-        Me && (qo && a.locale !== "ko" && (Al || Me !== "onCompositionStart" ? Me === "onCompositionEnd" && Al && (ke = Mo()) : (_a = q, Qs = "value" in _a ? _a.value : _a.textContent, Al = !0)), ue = os(A, Me), 0 < ue.length && (Me = new Uo(Me, e, null, a, q), Y.push({
-          event: Me,
+        else Al ? Bo(e, a) && (Oe = "onCompositionEnd") : e === "keydown" && a.keyCode === 229 && (Oe = "onCompositionStart");
+        Oe && (qo && a.locale !== "ko" && (Al || Oe !== "onCompositionStart" ? Oe === "onCompositionEnd" && Al && (ke = Oo()) : (_a = q, Qs = "value" in _a ? _a.value : _a.textContent, Al = !0)), ue = os(A, Oe), 0 < ue.length && (Oe = new Uo(Oe, e, null, a, q), Y.push({
+          event: Oe,
           listeners: ue
-        }), ke ? Me.data = ke : (ke = Go(a), ke !== null && (Me.data = ke)))), (ke = l0 ? i0(e, a) : n0(e, a)) && (Me = os(A, "onBeforeInput"), 0 < Me.length && (ue = new Uo("onBeforeInput", "beforeinput", null, a, q), Y.push({
+        }), ke ? Oe.data = ke : (ke = Go(a), ke !== null && (Oe.data = ke)))), (ke = l0 ? i0(e, a) : n0(e, a)) && (Oe = os(A, "onBeforeInput"), 0 < Oe.length && (ue = new Uo("onBeforeInput", "beforeinput", null, a, q), Y.push({
           event: ue,
-          listeners: Me
+          listeners: Oe
         }), ue.data = ke)), P0(Y, e, A, a, q);
       }
       Sp(Y, t);
@@ -7250,8 +7250,8 @@ Error generating stack: ` + i.message + `
     var e = window.event;
     return e && e.type === "popstate" ? e === Ar ? !1 : (Ar = e, !0) : (Ar = null, !1);
   }
-  var Cp = typeof setTimeout == "function" ? setTimeout : void 0, ch = typeof clearTimeout == "function" ? clearTimeout : void 0, Mp = typeof Promise == "function" ? Promise : void 0, rh = typeof queueMicrotask == "function" ? queueMicrotask : typeof Mp < "u" ? function(e) {
-    return Mp.resolve(null).then(e).catch(oh);
+  var Cp = typeof setTimeout == "function" ? setTimeout : void 0, ch = typeof clearTimeout == "function" ? clearTimeout : void 0, Op = typeof Promise == "function" ? Promise : void 0, rh = typeof queueMicrotask == "function" ? queueMicrotask : typeof Op < "u" ? function(e) {
+    return Op.resolve(null).then(e).catch(oh);
   } : Cp;
   function oh(e) {
     setTimeout(function() {
@@ -7261,7 +7261,7 @@ Error generating stack: ` + i.message + `
   function Ga(e) {
     return e === "head";
   }
-  function Op(e, t) {
+  function Mp(e, t) {
     var a = t, i = 0;
     do {
       var n = a.nextSibling;
@@ -7360,7 +7360,7 @@ Error generating stack: ` + i.message + `
   function Cr(e) {
     return e.data === "$?" || e.data === "$~";
   }
-  function Mr(e) {
+  function Or(e) {
     return e.data === "$!" || e.data === "$?" && e.ownerDocument.readyState !== "loading";
   }
   function ph(e, t) {
@@ -7385,7 +7385,7 @@ Error generating stack: ` + i.message + `
     }
     return e;
   }
-  var Or = null;
+  var Mr = null;
   function Rp(e) {
     e = e.nextSibling;
     for (var t = 0; e; ) {
@@ -7844,7 +7844,7 @@ Error generating stack: ` + i.message + `
     _threadCount: 0
   };
   function kh(e, t, a, i, n, s, c, o, x) {
-    this.tag = 1, this.containerInfo = e, this.pingCache = this.current = this.pendingChildren = null, this.timeoutHandle = -1, this.callbackNode = this.next = this.pendingContext = this.context = this.cancelPendingCommit = null, this.callbackPriority = 0, this.expirationTimes = Os(-1), this.entangledLanes = this.shellSuspendCounter = this.errorRecoveryDisabledLanes = this.expiredLanes = this.warmLanes = this.pingedLanes = this.suspendedLanes = this.pendingLanes = 0, this.entanglements = Os(0), this.hiddenUpdates = Os(null), this.identifierPrefix = i, this.onUncaughtError = n, this.onCaughtError = s, this.onRecoverableError = c, this.pooledCache = null, this.pooledCacheLanes = 0, this.formState = x, this.incompleteTransitions = /* @__PURE__ */ new Map();
+    this.tag = 1, this.containerInfo = e, this.pingCache = this.current = this.pendingChildren = null, this.timeoutHandle = -1, this.callbackNode = this.next = this.pendingContext = this.context = this.cancelPendingCommit = null, this.callbackPriority = 0, this.expirationTimes = Ms(-1), this.entangledLanes = this.shellSuspendCounter = this.errorRecoveryDisabledLanes = this.expiredLanes = this.warmLanes = this.pingedLanes = this.suspendedLanes = this.pendingLanes = 0, this.entanglements = Ms(0), this.hiddenUpdates = Ms(null), this.identifierPrefix = i, this.onUncaughtError = n, this.onCaughtError = s, this.onRecoverableError = c, this.pooledCache = null, this.pooledCacheLanes = 0, this.formState = x, this.incompleteTransitions = /* @__PURE__ */ new Map();
   }
   function Eh(e, t, a, i, n, s, c, o, x, A, q, Y) {
     return e = new kh(e, t, a, c, x, A, q, Y, o), t = 1, s === !0 && (t |= 24), s = Tt(3, null, null, t), e.current = s, s.stateNode = e, t = xc(), t.refCount++, e.pooledCache = t, t.refCount++, s.memoizedState = {
@@ -7854,7 +7854,7 @@ Error generating stack: ` + i.message + `
     }, jc(s), e;
   }
   function Ah(e) {
-    return e ? (e = Ol, e) : Ol;
+    return e ? (e = Ml, e) : Ml;
   }
   function Kp(e, t, a, i, n, s) {
     n = Ah(n), i.context === null ? i.context = n : i.pendingContext = n, i = dl(t), i.payload = { element: a }, s = s === void 0 ? null : s, s !== null && (i.callback = s), a = ul(e, i, t), a !== null && (Et(a, e, t), Ei(a, e, t));
@@ -7907,8 +7907,8 @@ Error generating stack: ` + i.message + `
     if (gs) {
       var n = Hr(i);
       if (n === null) Nr(e, t, i, bs, a), Fp(e, i);
-      else if (Oh(n, e, t, a, i)) i.stopPropagation();
-      else if (Fp(e, i), t & 4 && -1 < Mh.indexOf(e)) {
+      else if (Mh(n, e, t, a, i)) i.stopPropagation();
+      else if (Fp(e, i), t & 4 && -1 < Oh.indexOf(e)) {
         for (; n !== null; ) {
           var s = Sl(n);
           if (s !== null) switch (s.tag) {
@@ -7947,7 +7947,7 @@ Error generating stack: ` + i.message + `
       else {
         var a = t.tag;
         if (a === 13) {
-          if (e = O(t), e !== null) return e;
+          if (e = M(t), e !== null) return e;
           e = null;
         } else if (a === 31) {
           if (e = w(t), e !== null) return e;
@@ -8053,7 +8053,7 @@ Error generating stack: ` + i.message + `
         return 32;
     }
   }
-  var Gr = !1, Ya = null, Va = null, Xa = null, Wi = /* @__PURE__ */ new Map(), Fi = /* @__PURE__ */ new Map(), Qa = [], Mh = "mousedown mouseup touchcancel touchend touchstart auxclick dblclick pointercancel pointerdown pointerup dragend dragstart drop compositionend compositionstart keydown keypress keyup input textInput copy cut paste click change contextmenu reset".split(" ");
+  var Gr = !1, Ya = null, Va = null, Xa = null, Wi = /* @__PURE__ */ new Map(), Fi = /* @__PURE__ */ new Map(), Qa = [], Oh = "mousedown mouseup touchcancel touchend touchstart auxclick dblclick pointercancel pointerdown pointerup dragend dragstart drop compositionend compositionstart keydown keypress keyup input textInput copy cut paste click change contextmenu reset".split(" ");
   function Fp(e, t) {
     switch (e) {
       case "focusin":
@@ -8086,7 +8086,7 @@ Error generating stack: ` + i.message + `
       targetContainers: [n]
     }, t !== null && (t = Sl(t), t !== null && Ip(t)), e) : (e.eventSystemFlags |= i, t = e.targetContainers, n !== null && t.indexOf(n) === -1 && t.push(n), e);
   }
-  function Oh(e, t, a, i, n) {
+  function Mh(e, t, a, i, n) {
     switch (t) {
       case "focusin":
         return Ya = Pi(Ya, e, t, a, i, n), !0;
@@ -8108,7 +8108,7 @@ Error generating stack: ` + i.message + `
       var a = v(t);
       if (a !== null) {
         if (t = a.tag, t === 13) {
-          if (t = O(a), t !== null) {
+          if (t = M(a), t !== null) {
             e.blockedOn = t, go(e.priority, function() {
               $p(a);
             });
@@ -8257,7 +8257,7 @@ Error generating stack: ` + i.message + `
       Qa.splice(a, 0, e), a === 0 && Pp(e);
     }
   };
-  var af = k.version;
+  var af = _.version;
   if (af !== "19.2.6") throw Error(d(527, af, "19.2.6"));
   G.findDOMNode = function(e) {
     var t = e._reactInternals;
@@ -8281,20 +8281,20 @@ Error generating stack: ` + i.message + `
   }
   r.createRoot = function(e, t) {
     if (!T(e)) throw Error(d(299));
-    var a = !1, i = "", n = C0, s = M0, c = O0;
+    var a = !1, i = "", n = C0, s = O0, c = M0;
     return t != null && (t.unstable_strictMode === !0 && (a = !0), t.identifierPrefix !== void 0 && (i = t.identifierPrefix), t.onUncaughtError !== void 0 && (n = t.onUncaughtError), t.onCaughtError !== void 0 && (s = t.onCaughtError), t.onRecoverableError !== void 0 && (c = t.onRecoverableError)), t = Eh(e, 1, !1, null, null, a, i, null, n, s, c, Uh), e[di] = t.current, zp(e), new Yr(t);
   };
 })), Xh = /* @__PURE__ */ ia(((r, m) => {
-  function k() {
+  function _() {
     if (!(typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ > "u" || typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE != "function"))
       try {
-        __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(k);
+        __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(_);
       } catch (u) {
         console.error(u);
       }
   }
-  k(), m.exports = Vh();
-})), Sf = (...r) => r.filter((m, k, u) => !!m && m.trim() !== "" && u.indexOf(m) === k).join(" ").trim(), Qh = (r) => r.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase(), Zh = (r) => r.replace(/^([A-Z])|[\s-_]+(\w)/g, (m, k, u) => u ? u.toUpperCase() : k.toLowerCase()), lf = (r) => {
+  _(), m.exports = Vh();
+})), Sf = (...r) => r.filter((m, _, u) => !!m && m.trim() !== "" && u.indexOf(m) === _).join(" ").trim(), Qh = (r) => r.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase(), Zh = (r) => r.replace(/^([A-Z])|[\s-_]+(\w)/g, (m, _, u) => u ? u.toUpperCase() : _.toLowerCase()), lf = (r) => {
   const m = Zh(r);
   return m.charAt(0).toUpperCase() + m.slice(1);
 }, Xr = {
@@ -8310,27 +8310,27 @@ Error generating stack: ` + i.message + `
 }, Kh = (r) => {
   for (const m in r) if (m.startsWith("aria-") || m === "role" || m === "title") return !0;
   return !1;
-}, N = ro(), Jh = (0, N.createContext)({}), Ih = () => (0, N.useContext)(Jh), $h = (0, N.forwardRef)(({ color: r, size: m, strokeWidth: k, absoluteStrokeWidth: u, className: d = "", children: T, iconNode: v, ...O }, w) => {
-  const { size: _ = 24, strokeWidth: z = 2, absoluteStrokeWidth: V = !1, color: R = "currentColor", className: re = "" } = Ih() ?? {}, pe = u ?? V ? Number(k ?? z) * 24 / Number(m ?? _) : k ?? z;
+}, N = ro(), Jh = (0, N.createContext)({}), Ih = () => (0, N.useContext)(Jh), $h = (0, N.forwardRef)(({ color: r, size: m, strokeWidth: _, absoluteStrokeWidth: u, className: d = "", children: T, iconNode: v, ...M }, w) => {
+  const { size: k = 24, strokeWidth: z = 2, absoluteStrokeWidth: V = !1, color: R = "currentColor", className: re = "" } = Ih() ?? {}, pe = u ?? V ? Number(_ ?? z) * 24 / Number(m ?? k) : _ ?? z;
   return (0, N.createElement)("svg", {
     ref: w,
     ...Xr,
-    width: m ?? _ ?? Xr.width,
-    height: m ?? _ ?? Xr.height,
+    width: m ?? k ?? Xr.width,
+    height: m ?? k ?? Xr.height,
     stroke: r ?? R,
     strokeWidth: pe,
     className: Sf("lucide", re, d),
-    ...!T && !Kh(O) && { "aria-hidden": "true" },
-    ...O
+    ...!T && !Kh(M) && { "aria-hidden": "true" },
+    ...M
   }, [...v.map(([J, W]) => (0, N.createElement)(J, W)), ...Array.isArray(T) ? T : [T]]);
 }), De = (r, m) => {
-  const k = (0, N.forwardRef)(({ className: u, ...d }, T) => (0, N.createElement)($h, {
+  const _ = (0, N.forwardRef)(({ className: u, ...d }, T) => (0, N.createElement)($h, {
     ref: T,
     iconNode: m,
     className: Sf(`lucide-${Qh(lf(r))}`, `lucide-${r}`, u),
     ...d
   }));
-  return k.displayName = lf(r), k;
+  return _.displayName = lf(r), _;
 }, Wh = [
   ["rect", {
     width: "20",
@@ -8718,13 +8718,13 @@ Error generating stack: ` + i.message + `
 ], no = De("lock-keyhole", Tm), Cm = [["path", {
   d: "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
   key: "18887p"
-}]], Jr = De("message-square", Cm), Mm = [["path", {
+}]], Jr = De("message-square", Cm), Om = [["path", {
   d: "M5 12h14",
   key: "1ays0h"
 }], ["path", {
   d: "M12 5v14",
   key: "s699le"
-}]], Pt = De("plus", Mm), Om = [
+}]], Pt = De("plus", Om), Mm = [
   ["path", {
     d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8",
     key: "v9h5vc"
@@ -8741,7 +8741,7 @@ Error generating stack: ` + i.message + `
     d: "M8 16H3v5",
     key: "1cv678"
   }]
-], Ts = De("refresh-cw", Om), Dm = [["path", {
+], Ts = De("refresh-cw", Mm), Dm = [["path", {
   d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8",
   key: "1357e3"
 }], ["path", {
@@ -8849,6 +8849,7 @@ Error generating stack: ` + i.message + `
     ]
   }
 ], Bm = class extends Error {
+  status;
   constructor(r, m = 400) {
     super(r), this.status = m;
   }
@@ -8864,18 +8865,18 @@ function Cs(r) {
     history: []
   };
 }
-function Gm(r, m, k) {
+function Gm(r, m, _) {
   const u = Cs(r).models.find((T) => T.id === m || T.key === m);
   u || of("找不到模型");
-  const d = u.versions.find((T) => T.id === k);
+  const d = u.versions.find((T) => T.id === _);
   return d || of("找不到指定模型版本"), {
     m: u,
     v: d
   };
 }
-function Ym(r, m, k, u) {
-  const { v: d } = Gm(r, m, k), T = d.stages[u], v = Na.findIndex((w) => w.id === u), O = [];
-  return v > 0 && !d.stages[Na[v - 1].id].author && O.push("先核定 " + Na[v - 1].title), T.checks.every(Boolean) || O.push("完成本階段全部檢查"), T.evidence || O.push("填入實際產出或檢查報告位置"), (!T.summary || !T.nextStep) && O.push("填寫已做內容與接手下一步"), u === "M01" && (!d.sourceLocation || !d.sourceVersion || !d.backupLocation || !d.sha256) && O.push("補齊原檔版本、獨立備份與 SHA-256"), u === "M02" && !d.reference && O.push("補入設定及尺度來源"), v >= 3 && !d.candidateLocation && O.push("登記獨立候選 GLB"), Cs(r).issues.some((w) => w.modelId === m && w.versionId === k && w.status === "open" && (w.stageId === u || v >= 6 || w.kind === "major" && v >= 3)) && O.push("處理適用的待修或待裁定問題"), O;
+function Ym(r, m, _, u) {
+  const { v: d } = Gm(r, m, _), T = d.stages[u], v = Na.findIndex((w) => w.id === u), M = [];
+  return v > 0 && !d.stages[Na[v - 1].id].author && M.push("先核定 " + Na[v - 1].title), T.checks.every(Boolean) || M.push("完成本階段全部檢查"), T.evidence || M.push("填入實際產出或檢查報告位置"), (!T.summary || !T.nextStep) && M.push("填寫已做內容與接手下一步"), u === "M01" && (!d.sourceLocation || !d.sourceVersion || !d.backupLocation || !d.sha256) && M.push("補齊原檔版本、獨立備份與 SHA-256"), u === "M02" && !d.reference && M.push("補入設定及尺度來源"), v >= 3 && !d.candidateLocation && M.push("登記獨立候選 GLB"), Cs(r).issues.some((w) => w.modelId === m && w.versionId === _ && w.status === "open" && (w.stageId === u || v >= 6 || w.kind === "major" && v >= 3)) && M.push("處理適用的待修或待裁定問題"), M;
 }
 var Vm = [
   {
@@ -9064,15 +9065,15 @@ var Vm = [
 ], Kt = [...Vm.map((r) => ({
   ...r,
   group: "main"
-})), ...["op", "ed"].flatMap((r) => Xm.map((m, k) => ({
-  id: r + String(k + 1).padStart(2, "0"),
+})), ...["op", "ed"].flatMap((r) => Xm.map((m, _) => ({
+  id: r + String(_ + 1).padStart(2, "0"),
   title: m,
   group: r,
   phase: r.toUpperCase() + " 支線",
   description: r === "op" ? "OP 以作品印象、人物關係及主題為主。" : "ED 以情緒收束及畫面變化為主。",
   output: m === "唯一音軌" ? "由作者在有效資料中指定音軌、版本與長度" : m,
-  checks: Qm[k],
-  deps: k ? [r + String(k).padStart(2, "0")] : ["03"]
+  checks: Qm[_],
+  deps: _ ? [r + String(_).padStart(2, "0")] : ["03"]
 })))], Zm = [
   "script",
   "character",
@@ -9095,9 +9096,9 @@ function Km(r) {
     episode: r.episode,
     revision: r.revision,
     workflowSchema: r.workflowSchema ?? 1,
-    genericChecks: Ms(r).map(({ id: m, title: k, checks: u }) => ({
+    genericChecks: Os(r).map(({ id: m, title: _, checks: u }) => ({
       id: m,
-      title: k,
+      title: _,
       checks: u
     })),
     rules: ri(r.episodeRules ?? []),
@@ -9118,24 +9119,25 @@ function Jm(r) {
   };
 }
 var kf = class extends Error {
+  status;
   constructor(r, m = 400) {
     super(r), this.status = m;
   }
 };
-function Ms(r) {
+function Os(r) {
   return Kt.filter((m) => m.group === "main" || r.branches[m.group]);
 }
 function _s(r, m) {
-  const k = Kt.find((u) => u.id === m);
-  if (!k) throw new kf("找不到階段");
-  return k.deps.filter((u) => Ms(r).some((d) => d.id === u) && !r.stages[u].author).map((u) => `${u} ${Kt.find((d) => d.id === u)?.title}`);
+  const _ = Kt.find((u) => u.id === m);
+  if (!_) throw new kf("找不到階段");
+  return _.deps.filter((u) => Os(r).some((d) => d.id === u) && !r.stages[u].author).map((u) => `${u} ${Kt.find((d) => d.id === u)?.title}`);
 }
 function Ef(r, m) {
-  const k = r.stages[m], u = _s(r, m).map((T) => "先完成 " + T), d = Kt.find((T) => T.id === m).checks.length;
-  return (k.checks.length < d || !k.checks.slice(0, d).every(Boolean)) && u.push("勾選全部驗收項目"), k.evidence.trim() || u.push("填入產出連結或檔案位置"), r.issues.some((T) => T.status === "open" && T.stageId === m) && u.push("處理此階段未結問題"), vl(r).problems.some((T) => T.status === "open" && (T.scope.type === "project" || T.scope.type === "stage" && T.scope.target === m || m === "12")) && u.push("處理適用範圍內的資訊矛盾或缺件"), m === "12" && (r.issues.some((T) => T.status === "open") && u.push("結清全部退修問題"), r.shots.some((T) => T.status !== "in_timeline") && u.push("總表中所有鏡頭須通過並入片"), r.shots.length || u.push("建立實際採用鏡頭與入片紀錄")), u;
+  const _ = r.stages[m], u = _s(r, m).map((T) => "先完成 " + T), d = Kt.find((T) => T.id === m).checks.length;
+  return (_.checks.length < d || !_.checks.slice(0, d).every(Boolean)) && u.push("勾選全部驗收項目"), _.evidence.trim() || u.push("填入產出連結或檔案位置"), r.issues.some((T) => T.status === "open" && T.stageId === m) && u.push("處理此階段未結問題"), vl(r).problems.some((T) => T.status === "open" && (T.scope.type === "project" || T.scope.type === "stage" && T.scope.target === m || m === "12")) && u.push("處理適用範圍內的資訊矛盾或缺件"), m === "12" && (r.issues.some((T) => T.status === "open") && u.push("結清全部退修問題"), r.shots.some((T) => T.status !== "in_timeline") && u.push("總表中所有鏡頭須通過並入片"), r.shots.length || u.push("建立實際採用鏡頭與入片紀錄")), u;
 }
 function so(r) {
-  const m = Ms(r);
+  const m = Os(r);
   return {
     id: r.id,
     workId: r.workId ?? "",
@@ -9145,47 +9147,47 @@ function so(r) {
     archived: r.archived,
     updatedAt: r.updatedAt,
     completionReport: r.production?.completionReports?.at(-1) ?? null,
-    approved: m.filter((k) => r.stages[k.id].author).length,
+    approved: m.filter((_) => r.stages[_.id].author).length,
     total: m.length,
-    openIssues: r.issues.filter((k) => k.status === "open").length,
+    openIssues: r.issues.filter((_) => _.status === "open").length,
     shots: r.shots.length,
-    inTimeline: r.shots.filter((k) => k.status === "in_timeline").length,
+    inTimeline: r.shots.filter((_) => _.status === "in_timeline").length,
     lastMcpAt: r.lastMcpAt,
-    next: m.filter((k) => !r.stages[k.id].author && !_s(r, k.id).length).map((k) => ({
-      id: k.id,
-      title: k.title,
-      reasons: Ef(r, k.id)
+    next: m.filter((_) => !r.stages[_.id].author && !_s(r, _.id).length).map((_) => ({
+      id: _.id,
+      title: _.title,
+      reasons: Ef(r, _.id)
     }))
   };
 }
 function oo(r) {
-  const m = vl(r), k = [...new Map((r.production?.links ?? []).map((d) => [d.shotId, d])).values()], u = [...new Map((r.production?.selections ?? []).map((d) => [d.shotId, d])).values()];
+  const m = vl(r), _ = [...new Map((r.production?.links ?? []).map((d) => [d.shotId, d])).values()], u = [...new Map((r.production?.selections ?? []).map((d) => [d.shotId, d])).values()];
   return {
     project: so(r),
     settings: {
       rules: Ka(r.episodeRules ?? []).length,
-      adopted: Ka(r.baselines ?? []).map(({ key: d, title: T, category: v, version: O, recordVersion: w, externalVersion: _ }) => ({
+      adopted: Ka(r.baselines ?? []).map(({ key: d, title: T, category: v, version: M, recordVersion: w, externalVersion: k }) => ({
         key: d,
         title: T,
         category: v,
-        version: O,
+        version: M,
         recordVersion: w,
-        externalVersion: _
+        externalVersion: k
       })),
-      pending: ri(r.baselines ?? []).filter((d) => d.status === "unresolved" || d.status === "reference").map(({ key: d, title: T, status: v, note: O }) => ({
+      pending: ri(r.baselines ?? []).filter((d) => d.status === "unresolved" || d.status === "reference").map(({ key: d, title: T, status: v, note: M }) => ({
         key: d,
         title: T,
         status: v,
-        note: O
+        note: M
       }))
     },
     registration: {
       sources: m.records.length,
       acceptedSources: m.records.filter(ln).length,
       shots: r.shots.length,
-      linkedShots: k.length,
-      locatedFrames: k.filter((d) => d.references.length).length,
-      registeredSelections: (/* @__PURE__ */ new Set([...u.map((d) => d.shotId), ...k.filter((d) => d.adoptedOutput).map((d) => d.shotId)])).size,
+      linkedShots: _.length,
+      locatedFrames: _.filter((d) => d.references.length).length,
+      registeredSelections: (/* @__PURE__ */ new Set([...u.map((d) => d.shotId), ..._.filter((d) => d.adoptedOutput).map((d) => d.shotId)])).size,
       timelineRegistrations: u.filter((d) => d.editorVersion && d.inPoint && d.outPoint).length
     },
     outgoing: r.production?.handoffs?.at(-1) ?? null,
@@ -9249,11 +9251,11 @@ function ln(r) {
   return r.approval?.verdict === "source_accepted" || r.status === "effective";
 }
 function Ir(r, m) {
-  return (r.production?.sections.find((k) => k.stageId === m)?.gaps ?? []).map((k, u) => {
-    const d = [...r.production?.supplements ?? []].reverse().find((T) => T.stageId === m && T.gapIndex === u && T.gap === k);
+  return (r.production?.sections.find((_) => _.stageId === m)?.gaps ?? []).map((_, u) => {
+    const d = [...r.production?.supplements ?? []].reverse().find((T) => T.stageId === m && T.gapIndex === u && T.gap === _);
     return {
       index: u,
-      description: k,
+      description: _,
       status: d ? "filled" : "open",
       record: d ? vl(r).records.find((T) => T.id === d.recordId) ?? null : null
     };
@@ -9261,38 +9263,38 @@ function Ir(r, m) {
 }
 function $m(r, m) {
   if (r.workId && (!m || m.id !== r.workId) || m && m.id !== r.workId) throw new kf("集數與作品不相符", 400);
-  const k = oo(r), u = m ? Cs(m) : null, d = (u?.models ?? []).map((v) => {
-    const O = v.versions.at(-1), w = [...u?.history ?? []].reverse().find((V) => V.modelId === v.id && V.versionId === O.id && V.action === "save_model_stage"), _ = Na.find((V) => !O.stages[V.id].author) ?? Na[7], z = v.versions.find((V) => V.id === v.adoptedVersionId);
+  const _ = oo(r), u = m ? Cs(m) : null, d = (u?.models ?? []).map((v) => {
+    const M = v.versions.at(-1), w = [...u?.history ?? []].reverse().find((V) => V.modelId === v.id && V.versionId === M.id && V.action === "save_model_stage"), k = Na.find((V) => !M.stages[V.id].author) ?? Na[7], z = v.versions.find((V) => V.id === v.adoptedVersionId);
     return {
       modelId: v.id,
       key: v.key,
       title: v.title,
-      versionId: O.id,
-      label: O.label,
+      versionId: M.id,
+      label: M.label,
       adopted: z ? {
         versionId: z.id,
         label: z.label
       } : null,
-      sourceLocation: O.sourceLocation,
-      candidateLocation: O.candidateLocation,
-      stageId: _.id,
-      stageTitle: _.title,
-      approved: Na.filter((V) => O.stages[V.id].author).length,
+      sourceLocation: M.sourceLocation,
+      candidateLocation: M.candidateLocation,
+      stageId: k.id,
+      stageTitle: k.title,
+      approved: Na.filter((V) => M.stages[V.id].author).length,
       lastWork: w ? {
         at: w.at,
         stageId: w.stageId,
-        summary: O.stages[w.stageId].summary,
-        evidence: O.stages[w.stageId].evidence,
-        nextStep: O.stages[w.stageId].nextStep
+        summary: M.stages[w.stageId].summary,
+        evidence: M.stages[w.stageId].evidence,
+        nextStep: M.stages[w.stageId].nextStep
       } : null,
-      openIssues: u.issues.filter((V) => V.modelId === v.id && V.versionId === O.id && V.status === "open"),
-      nextStep: w ? O.stages[w.stageId].nextStep : "尚無工作回報；先讀取模型來源與指定版本，再取得任務資料包。"
+      openIssues: u.issues.filter((V) => V.modelId === v.id && V.versionId === M.id && V.status === "open"),
+      nextStep: w ? M.stages[w.stageId].nextStep : "尚無工作回報；先讀取模型來源與指定版本，再取得任務資料包。"
     };
   }), T = [...new Map((u?.pins ?? []).filter((v) => v.episodeId === r.id).map((v) => [[v.modelId, v.sceneIds].join("|"), v])).values()].map((v) => {
-    const O = u.models.find((_) => _.id === v.modelId), w = O?.versions.find((_) => _.id === v.versionId);
+    const M = u.models.find((k) => k.id === v.modelId), w = M?.versions.find((k) => k.id === v.versionId);
     return {
       ...v,
-      title: O?.title ?? v.modelId,
+      title: M?.title ?? v.modelId,
       label: w?.label ?? v.versionId
     };
   });
@@ -9304,12 +9306,12 @@ function $m(r, m) {
     projectRevision: r.revision,
     workId: m?.id ?? null,
     workRevision: m?.revision ?? null,
-    episode: k,
+    episode: _,
     models: d,
     pins: T,
     issues: {
       animation: r.issues.filter((v) => v.status === "open"),
-      context: k.openProblems,
+      context: _.openProblems,
       models: u?.issues.filter((v) => v.status === "open") ?? []
     },
     lastToolWrite: [r.lastMcpAt, ...(u?.history ?? []).filter((v) => v.actor === "ai").map((v) => v.at)].filter((v) => !!v).sort().at(-1) ?? null,
@@ -9317,31 +9319,31 @@ function $m(r, m) {
   };
 }
 var Wm = /* @__PURE__ */ ia(((r) => {
-  var m = /* @__PURE__ */ Symbol.for("react.transitional.element"), k = /* @__PURE__ */ Symbol.for("react.fragment");
+  var m = /* @__PURE__ */ Symbol.for("react.transitional.element"), _ = /* @__PURE__ */ Symbol.for("react.fragment");
   function u(d, T, v) {
-    var O = null;
-    if (v !== void 0 && (O = "" + v), T.key !== void 0 && (O = "" + T.key), "key" in T) {
+    var M = null;
+    if (v !== void 0 && (M = "" + v), T.key !== void 0 && (M = "" + T.key), "key" in T) {
       v = {};
       for (var w in T) w !== "key" && (v[w] = T[w]);
     } else v = T;
     return T = v.ref, {
       $$typeof: m,
       type: d,
-      key: O,
+      key: M,
       ref: T !== void 0 ? T : null,
       props: v
     };
   }
-  r.Fragment = k, r.jsx = u, r.jsxs = u;
+  r.Fragment = _, r.jsx = u, r.jsxs = u;
 })), Fm = /* @__PURE__ */ ia(((r, m) => {
   m.exports = Wm();
 })), l = Fm(), df = (r) => r ? new Date(r).toLocaleString("zh-TW", { timeZone: "Asia/Taipei" }) : "尚無紀錄";
 function Pm(r, m) {
-  const k = URL.createObjectURL(new Blob([m], { type: "text/plain;charset=utf-8" })), u = document.createElement("a");
-  u.href = k, u.download = r, u.click(), setTimeout(() => URL.revokeObjectURL(k), 1e3);
+  const _ = URL.createObjectURL(new Blob([m], { type: "text/plain;charset=utf-8" })), u = document.createElement("a");
+  u.href = _, u.download = r, u.click(), setTimeout(() => URL.revokeObjectURL(_), 1e3);
 }
-function ex({ project: r, work: m, busy: k, onNavigate: u, onModel: d }) {
-  const T = $m(r, m), [v, O] = (0, N.useState)(""), [w, _] = (0, N.useState)(""), [z, V] = (0, N.useState)("animation"), R = T.models.find((H) => H.versionId === z), re = T.episode.lastWork, pe = T.issues.animation.length + T.issues.context.length + T.issues.models.length, J = `請使用「立之雲端庫｜動畫製作流程」工具，接手 ${T.title}／${r.episode}。先呼叫 read_animation_workspace({projectId:${JSON.stringify(r.id)}})，重新讀取伺服器最新資料，不使用本段文字中的舊 revision。
+function ex({ project: r, work: m, busy: _, onNavigate: u, onModel: d }) {
+  const T = $m(r, m), [v, M] = (0, N.useState)(""), [w, k] = (0, N.useState)(""), [z, V] = (0, N.useState)("animation"), R = T.models.find((H) => H.versionId === z), re = T.episode.lastWork, pe = T.issues.animation.length + T.issues.context.length + T.issues.models.length, J = `請使用「立之雲端庫｜動畫製作流程」工具，接手 ${T.title}／${r.episode}。先呼叫 read_animation_workspace({projectId:${JSON.stringify(r.id)}})，重新讀取伺服器最新資料，不使用本段文字中的舊 revision。
 ${R ? `本次範圍為模型 ${R.key}（modelId=${R.modelId}），精確版本 ${R.label}（versionId=${R.versionId}），定位階段 ${R.stageId}。workId=${m.id}。用 read_animation_models 查此版本的全部來源、問題及最近回報，確認實際任務範圍後，用 acquire_animation_model_context 取得新資料包；完成後用 update_animation_model_stage 回報。最新候選不等於已採用版。` : `本次範圍為 ${r.episode} 動畫。先讀 read_animation_episode_brief 與 read_animation_episode_settings，再依最近交接確認任務。用 preview_animation_context 檢查指定範圍，acquire_animation_context 保存資料包，以 submit_animation_work 回報。作者已告知完成的集數以資料補登為主，不因紀錄空白重做。`}
 實際讀取所需素材後才執行，缺件、矛盾或過期資料包先回報受阻。寫回已做內容、產出位置與版本、未解問題及下一步。保留原檔、作者採用版本與各集固定引用，不能自行正式核定。若目前對話沒有上述工具，明確告知尚未接通，不宣稱已讀取或已回寫。`, [W, le] = (0, N.useState)(!1), X = T.episode.project.completionReport?.status === "completed", oe = [
     ...T.issues.context.map((H) => ({
@@ -9376,7 +9378,7 @@ ${R ? `本次範圍為模型 ${R.key}（modelId=${R.modelId}），精確版本 $
             className: "context-actions",
             children: [/* @__PURE__ */ (0, l.jsxs)("button", {
               className: "btn primary",
-              disabled: k,
+              disabled: _,
               onClick: () => u("context"),
               children: [
                 X ? "繼續整理資料" : "開啟製作資料",
@@ -9451,9 +9453,9 @@ ${R ? `本次範圍為模型 ${R.key}（modelId=${R.modelId}），精確版本 $
               className: "btn primary",
               onClick: async () => {
                 try {
-                  await navigator.clipboard.writeText(J), O("已複製，請貼到已連接工作台的 ChatGPT 對話。");
+                  await navigator.clipboard.writeText(J), M("已複製，請貼到已連接工作台的 ChatGPT 對話。");
                 } catch {
-                  O("無法直接複製，請展開完整指令後手動複製。");
+                  M("無法直接複製，請展開完整指令後手動複製。");
                 }
               },
               children: [/* @__PURE__ */ (0, l.jsx)(wf, { size: 15 }), "複製接手指令"]
@@ -9585,7 +9587,7 @@ ${R ? `本次範圍為模型 ${R.key}（modelId=${R.modelId}），精確版本 $
               /* @__PURE__ */ (0, l.jsx)("small", { children: H.nextStep })
             ] }), /* @__PURE__ */ (0, l.jsx)("button", {
               className: "btn",
-              disabled: k,
+              disabled: _,
               onClick: () => d({
                 modelId: H.modelId,
                 versionId: H.versionId,
@@ -9625,7 +9627,7 @@ ${R ? `本次範圍為模型 ${R.key}（modelId=${R.modelId}），精確版本 $
   });
 }
 function tx({ project: r, check: m }) {
-  const [k, u] = (0, N.useState)(!1), [d, T] = (0, N.useState)(""), [v, O] = (0, N.useState)(""), w = `請使用「立之雲端庫｜動畫製作流程」外掛，先呼叫 read_animation_workspace，projectId 為 ${r.id}，確認 ${r.episode} 的目前進度、採用版本、未解問題與下一步。請重新讀取最新資料，不從聊天推定完成。若本集已由作者告知完成，先做資料補登。確認範圍後取得新的工作資料包，實際讀取參考素材，最後回報已做內容、成果位置、未完成項及下一步。若本對話沒有工具，請明確告知未連接。`;
+  const [_, u] = (0, N.useState)(!1), [d, T] = (0, N.useState)(""), [v, M] = (0, N.useState)(""), w = `請使用「立之雲端庫｜動畫製作流程」外掛，先呼叫 read_animation_workspace，projectId 為 ${r.id}，確認 ${r.episode} 的目前進度、採用版本、未解問題與下一步。請重新讀取最新資料，不從聊天推定完成。若本集已由作者告知完成，先做資料補登。確認範圍後取得新的工作資料包，實際讀取參考素材，最後回報已做內容、成果位置、未完成項及下一步。若本對話沒有工具，請明確告知未連接。`;
   return /* @__PURE__ */ (0, l.jsxs)("section", {
     className: "connection-simple",
     children: [/* @__PURE__ */ (0, l.jsxs)("article", {
@@ -9652,9 +9654,9 @@ function tx({ project: r, check: m }) {
           className: "btn primary",
           onClick: async () => {
             try {
-              await navigator.clipboard.writeText(w), O("已複製，請貼到選用工作台的對話。");
+              await navigator.clipboard.writeText(w), M("已複製，請貼到選用工作台的對話。");
             } catch {
-              O("請展開完整指令後手動複製。");
+              M("請展開完整指令後手動複製。");
             }
           },
           children: [/* @__PURE__ */ (0, l.jsx)(wf, { size: 16 }), "複製本集接手指令"]
@@ -9677,21 +9679,21 @@ function tx({ project: r, check: m }) {
         /* @__PURE__ */ (0, l.jsx)("p", { children: "網頁連線與對話工具是兩個檢查項目；這個按鈕會檢查網頁能否讀取共用資料。" }),
         /* @__PURE__ */ (0, l.jsxs)("button", {
           className: "btn",
-          disabled: k,
+          disabled: _,
           onClick: async () => {
             u(!0), T("");
             try {
               await m(), T("共用資料讀取成功。對話是否已選用外掛，仍需由 ChatGPT 實際呼叫工具確認。");
-            } catch (_) {
-              T("讀取失敗：" + (_ instanceof Error ? _.message : String(_)));
+            } catch (k) {
+              T("讀取失敗：" + (k instanceof Error ? k.message : String(k)));
             } finally {
               u(!1);
             }
           },
           children: [/* @__PURE__ */ (0, l.jsx)(Ts, {
             size: 15,
-            className: k ? "spin" : ""
-          }), k ? "檢查中…" : "檢查資料連線"]
+            className: _ ? "spin" : ""
+          }), _ ? "檢查中…" : "檢查資料連線"]
         }),
         /* @__PURE__ */ (0, l.jsx)("p", {
           role: "status",
@@ -9720,12 +9722,12 @@ var uf = {
   audio: "聲音",
   reference: "原作／參考"
 };
-function ax({ project: r, busy: m, mutate: k }) {
-  const [u, d] = (0, N.useState)(""), [T, v] = (0, N.useState)(""), [O, w] = (0, N.useState)(""), [_, z] = (0, N.useState)(30), [V, R] = (0, N.useState)("main"), [re, pe] = (0, N.useState)(null), [J, W] = (0, N.useState)(""), [le, X] = (0, N.useState)(""), [oe, H] = (0, N.useState)({
+function ax({ project: r, busy: m, mutate: _ }) {
+  const [u, d] = (0, N.useState)(""), [T, v] = (0, N.useState)(""), [M, w] = (0, N.useState)(""), [k, z] = (0, N.useState)(30), [V, R] = (0, N.useState)("main"), [re, pe] = (0, N.useState)(null), [J, W] = (0, N.useState)(""), [le, X] = (0, N.useState)(""), [oe, H] = (0, N.useState)({
     content: "",
     source: "",
     location: ""
-  }), F = vl(r).records, te = r.production?.sections ?? [], ge = te.find((g) => g.stageId === u), ce = F.filter(ln).length, I = Ir(r, u), j = te.reduce((g, ae) => g + Ir(r, ae.stageId).filter((Q) => Q.status === "open").length, 0), $ = new Set(te.flatMap((g) => g.recordKeys)), ze = F.filter((g) => (!u || ge?.recordKeys.includes(g.key) || g.scope.type === "stage" && g.scope.target === u) && (!O || g.kind === O) && (!T || [
+  }), F = vl(r).records, te = r.production?.sections ?? [], ge = te.find((g) => g.stageId === u), ce = F.filter(ln).length, I = Ir(r, u), j = te.reduce((g, ae) => g + Ir(r, ae.stageId).filter((Q) => Q.status === "open").length, 0), $ = new Set(te.flatMap((g) => g.recordKeys)), ze = F.filter((g) => (!u || ge?.recordKeys.includes(g.key) || g.scope.type === "stage" && g.scope.target === u) && (!M || g.kind === M) && (!T || [
     g.title,
     g.key,
     g.content,
@@ -9794,7 +9796,7 @@ function ax({ project: r, busy: m, mutate: k }) {
         className: "btn primary",
         disabled: m || r.archived || !te.length,
         onClick: () => {
-          k("accept_production_data", { note: "依作者2026-10-21指示：目前先不用檢核，已完成的資料直接通過；剩餘項目開放直接補齊。" });
+          _("accept_production_data", { note: "依作者2026-10-21指示：目前先不用檢核，已完成的資料直接通過；剩餘項目開放直接補齊。" });
         },
         children: "通過現有資料並開放補齊"
       })] })
@@ -9827,7 +9829,7 @@ function ax({ project: r, busy: m, mutate: k }) {
           }, g.id))]
         })] }),
         /* @__PURE__ */ (0, l.jsxs)("label", { children: ["資料種類", /* @__PURE__ */ (0, l.jsxs)("select", {
-          value: O,
+          value: M,
           onChange: (g) => {
             w(g.target.value), z(30);
           },
@@ -9898,7 +9900,7 @@ function ax({ project: r, busy: m, mutate: k }) {
             r.production?.supplementsOpen && (le === u + ":" + g.index ? /* @__PURE__ */ (0, l.jsxs)("form", {
               className: "context-form",
               onSubmit: async (ae) => {
-                ae.preventDefault(), await k("supplement_production_data", {
+                ae.preventDefault(), await _("supplement_production_data", {
                   stageId: u,
                   gapIndex: g.index,
                   ...oe
@@ -9976,7 +9978,7 @@ function ax({ project: r, busy: m, mutate: k }) {
     }),
     /* @__PURE__ */ (0, l.jsx)("div", {
       className: "production-records",
-      children: ze.slice(0, _).map((g) => /* @__PURE__ */ (0, l.jsxs)("details", {
+      children: ze.slice(0, k).map((g) => /* @__PURE__ */ (0, l.jsxs)("details", {
         className: "production-record",
         children: [
           /* @__PURE__ */ (0, l.jsxs)("summary", { children: [
@@ -10016,9 +10018,9 @@ function ax({ project: r, busy: m, mutate: k }) {
         ]
       }, g.id))
     }),
-    ze.length > _ && /* @__PURE__ */ (0, l.jsx)("button", {
+    ze.length > k && /* @__PURE__ */ (0, l.jsx)("button", {
       className: "btn",
-      onClick: () => z(_ + 30),
+      onClick: () => z(k + 30),
       children: "再顯示 30 筆資料"
     }),
     !F.length && /* @__PURE__ */ (0, l.jsx)("p", {
@@ -10060,7 +10062,7 @@ function ax({ project: r, busy: m, mutate: k }) {
               className: "btn primary",
               disabled: m || r.archived,
               onClick: async () => {
-                await k("import_production_data", re) && (pe(null), d(""), v(""), w(""));
+                await _("import_production_data", re) && (pe(null), d(""), v(""), w(""));
               },
               children: "保存製作資料包"
             })
@@ -10082,7 +10084,7 @@ function ax({ project: r, busy: m, mutate: k }) {
     })
   ] });
 }
-function lx({ shotId: r, selection: m, disabled: k, mutate: u }) {
+function lx({ shotId: r, selection: m, disabled: _, mutate: u }) {
   const d = [
     ["output", "實際採用檔位置"],
     ["outputVersion", "採用檔版本"],
@@ -10091,48 +10093,48 @@ function lx({ shotId: r, selection: m, disabled: k, mutate: u }) {
     ["editorVersion", "剪輯工程版本"],
     ["inPoint", "工程入點"],
     ["outPoint", "工程出點"]
-  ], [T, v] = (0, N.useState)(() => Object.fromEntries(d.map(([O]) => [O, m?.[O] ?? ""])));
+  ], [T, v] = (0, N.useState)(() => Object.fromEntries(d.map(([M]) => [M, m?.[M] ?? ""])));
   return /* @__PURE__ */ (0, l.jsxs)("details", {
     className: "selection-editor",
     children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "登記採用檔與工程位置" }), /* @__PURE__ */ (0, l.jsxs)("form", {
       className: "context-form",
-      onSubmit: async (O) => {
-        O.preventDefault(), await u("register_shot_selection", {
+      onSubmit: async (M) => {
+        M.preventDefault(), await u("register_shot_selection", {
           ...T,
           shotId: r,
           baseVersion: m?.version ?? 0
         });
       },
       children: [
-        d.map(([O, w]) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [w, /* @__PURE__ */ (0, l.jsx)("input", {
+        d.map(([M, w]) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [w, /* @__PURE__ */ (0, l.jsx)("input", {
           required: [
             "output",
             "outputVersion",
             "reason",
             "source"
-          ].includes(O),
-          maxLength: O === "reason" ? 3e3 : 2e3,
-          value: T[O],
-          onChange: (_) => v({
+          ].includes(M),
+          maxLength: M === "reason" ? 3e3 : 2e3,
+          value: T[M],
+          onChange: (k) => v({
             ...T,
-            [O]: _.target.value
+            [M]: k.target.value
           })
-        })] }, O)),
+        })] }, M)),
         /* @__PURE__ */ (0, l.jsx)("p", {
           className: "muted",
           children: "工程入出點須成對填寫。保存來源與選用版本；素材實際開啟及檢視另行記錄。"
         }),
         /* @__PURE__ */ (0, l.jsx)("button", {
           className: "btn primary",
-          disabled: k,
+          disabled: _,
           children: "保存採用紀錄版本"
         })
       ]
     })]
   });
 }
-function ix({ project: r, busy: m, mutate: k }) {
-  const [u, d] = (0, N.useState)(""), [T, v] = (0, N.useState)(""), [O, w] = (0, N.useState)(""), [_, z] = (0, N.useState)(20), V = [...new Map((r.production?.selections ?? []).map((J) => [J.shotId, J])).values()], R = [...new Map((r.production?.links ?? []).map((J) => [J.shotId, J])).values()], re = vl(r).records, pe = r.shots.filter((J) => [
+function ix({ project: r, busy: m, mutate: _ }) {
+  const [u, d] = (0, N.useState)(""), [T, v] = (0, N.useState)(""), [M, w] = (0, N.useState)(""), [k, z] = (0, N.useState)(20), V = [...new Map((r.production?.selections ?? []).map((J) => [J.shotId, J])).values()], R = [...new Map((r.production?.links ?? []).map((J) => [J.shotId, J])).values()], re = vl(r).records, pe = r.shots.filter((J) => [
     J.id,
     J.scene,
     J.description,
@@ -10173,7 +10175,7 @@ function ix({ project: r, busy: m, mutate: k }) {
         placeholder: "F077、G11、S06 或鏡頭 ID"
       })]
     }),
-    pe.slice(0, _).map((J) => {
+    pe.slice(0, k).map((J) => {
       const W = R.find((X) => X.shotId === J.id), le = V.find((X) => X.shotId === J.id);
       return /* @__PURE__ */ (0, l.jsxs)("details", {
         className: "production-record",
@@ -10302,14 +10304,14 @@ function ix({ project: r, busy: m, mutate: k }) {
             shotId: J.id,
             selection: le,
             disabled: m || r.archived,
-            mutate: k
+            mutate: _
           }, le?.id ?? J.id)
         ]
       }, J.id);
     }),
-    pe.length > _ && /* @__PURE__ */ (0, l.jsx)("button", {
+    pe.length > k && /* @__PURE__ */ (0, l.jsx)("button", {
       className: "btn",
-      onClick: () => z(_ + 20),
+      onClick: () => z(k + 20),
       children: "再顯示 20 列"
     }),
     /* @__PURE__ */ (0, l.jsxs)("details", {
@@ -10324,16 +10326,16 @@ function ix({ project: r, busy: m, mutate: k }) {
             v(J.target.value), w("");
           }
         })] }),
-        O && /* @__PURE__ */ (0, l.jsx)("p", {
+        M && /* @__PURE__ */ (0, l.jsx)("p", {
           role: "alert",
-          children: O
+          children: M
         }),
         /* @__PURE__ */ (0, l.jsx)("button", {
           className: "btn primary",
           disabled: m || r.archived || !T.trim(),
           onClick: async () => {
             try {
-              await k("save_production_links", JSON.parse(T)) && v("");
+              await _("save_production_links", JSON.parse(T)) && v("");
             } catch (J) {
               w(J instanceof Error ? J.message : "格式錯誤");
             }
@@ -10383,8 +10385,8 @@ var an = {
   status: "reference",
   baseVersion: 0
 };
-function Af({ project: r, busy: m, mutate: k }) {
-  const [u, d] = (0, N.useState)(!1), [T, v] = (0, N.useState)(!1), [O, w] = (0, N.useState)(ff), [_, z] = (0, N.useState)(hf), [V, R] = (0, N.useState)(""), [re, pe] = (0, N.useState)(""), [J, W] = (0, N.useState)(""), le = Km(r), X = m || r.archived, oe = Ka(r.episodeRules ?? []), H = Ka(r.baselines ?? []), F = (j) => !V || [j.key, j.title].join(" ").toLowerCase().includes(V.toLowerCase());
+function Af({ project: r, busy: m, mutate: _ }) {
+  const [u, d] = (0, N.useState)(!1), [T, v] = (0, N.useState)(!1), [M, w] = (0, N.useState)(ff), [k, z] = (0, N.useState)(hf), [V, R] = (0, N.useState)(""), [re, pe] = (0, N.useState)(""), [J, W] = (0, N.useState)(""), le = Km(r), X = m || r.archived, oe = Ka(r.episodeRules ?? []), H = Ka(r.baselines ?? []), F = (j) => !V || [j.key, j.title].join(" ").toLowerCase().includes(V.toLowerCase());
   function te(j) {
     w({
       ...j,
@@ -10405,14 +10407,14 @@ function Af({ project: r, busy: m, mutate: k }) {
     }), v(!0);
   }
   async function ce(j, $) {
-    await k("save_episode_rule", {
+    await _("save_episode_rule", {
       ...j,
       status: $,
       baseVersion: le.rules.find((ze) => ze.key === j.key).version
     });
   }
   async function I(j, $) {
-    await k("register_episode_baseline", {
+    await _("register_episode_baseline", {
       ...j,
       status: $,
       recordKey: j.snapshot?.key ?? "",
@@ -10492,10 +10494,10 @@ function Af({ project: r, busy: m, mutate: k }) {
           u && /* @__PURE__ */ (0, l.jsxs)("form", {
             className: "context-form",
             onSubmit: async (j) => {
-              j.preventDefault(), await k("save_episode_rule", {
-                ...O,
-                stageIds: Ns(O.stageIdsText),
-                sceneIds: Ns(O.sceneIdsText)
+              j.preventDefault(), await _("save_episode_rule", {
+                ...M,
+                stageIds: Ns(M.stageIdsText),
+                sceneIds: Ns(M.sceneIdsText)
               }) && d(!1);
             },
             children: [
@@ -10503,19 +10505,19 @@ function Af({ project: r, busy: m, mutate: k }) {
                 className: "context-form-grid",
                 children: [/* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則識別鍵", /* @__PURE__ */ (0, l.jsx)("input", {
                   required: !0,
-                  readOnly: !!O.baseVersion,
+                  readOnly: !!M.baseVersion,
                   maxLength: 100,
-                  value: O.key,
+                  value: M.key,
                   onChange: (j) => w({
-                    ...O,
+                    ...M,
                     key: j.target.value
                   })
                 })] }), /* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則名稱", /* @__PURE__ */ (0, l.jsx)("input", {
                   required: !0,
                   maxLength: 200,
-                  value: O.title,
+                  value: M.title,
                   onChange: (j) => w({
-                    ...O,
+                    ...M,
                     title: j.target.value
                   })
                 })] })]
@@ -10524,43 +10526,43 @@ function Af({ project: r, busy: m, mutate: k }) {
                 required: !0,
                 rows: 4,
                 maxLength: 6e3,
-                value: O.content,
+                value: M.content,
                 onChange: (j) => w({
-                  ...O,
+                  ...M,
                   content: j.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則來源", /* @__PURE__ */ (0, l.jsx)("input", {
                 required: !0,
                 maxLength: 2e3,
-                value: O.source,
+                value: M.source,
                 onChange: (j) => w({
-                  ...O,
+                  ...M,
                   source: j.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "context-form-grid",
                 children: [/* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則適用階段", /* @__PURE__ */ (0, l.jsx)("input", {
-                  value: O.stageIdsText,
+                  value: M.stageIdsText,
                   placeholder: "逗號分隔；留空為本集共用",
                   onChange: (j) => w({
-                    ...O,
+                    ...M,
                     stageIdsText: j.target.value
                   })
                 })] }), /* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則適用場次", /* @__PURE__ */ (0, l.jsx)("input", {
-                  value: O.sceneIdsText,
+                  value: M.sceneIdsText,
                   placeholder: "逗號分隔；留空為全部場次",
                   onChange: (j) => w({
-                    ...O,
+                    ...M,
                     sceneIdsText: j.target.value
                   })
                 })] })]
               }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則狀態", /* @__PURE__ */ (0, l.jsx)("select", {
-                value: O.status,
+                value: M.status,
                 onChange: (j) => w({
-                  ...O,
+                  ...M,
                   status: j.target.value
                 }),
                 children: Object.entries(an).map(([j, $]) => /* @__PURE__ */ (0, l.jsx)("option", {
@@ -10570,9 +10572,9 @@ function Af({ project: r, busy: m, mutate: k }) {
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則備註", /* @__PURE__ */ (0, l.jsx)("textarea", {
                 rows: 2,
-                value: O.note,
+                value: M.note,
                 onChange: (j) => w({
-                  ...O,
+                  ...M,
                   note: j.target.value
                 })
               })] }),
@@ -10664,10 +10666,10 @@ function Af({ project: r, busy: m, mutate: k }) {
           T && /* @__PURE__ */ (0, l.jsxs)("form", {
             className: "context-form",
             onSubmit: async (j) => {
-              j.preventDefault(), await k("register_episode_baseline", {
-                ..._,
-                stageIds: Ns(_.stageIdsText),
-                sceneIds: Ns(_.sceneIdsText)
+              j.preventDefault(), await _("register_episode_baseline", {
+                ...k,
+                stageIds: Ns(k.stageIdsText),
+                sceneIds: Ns(k.sceneIdsText)
               }) && v(!1);
             },
             children: [
@@ -10676,27 +10678,27 @@ function Af({ project: r, busy: m, mutate: k }) {
                 children: [
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用項目識別鍵", /* @__PURE__ */ (0, l.jsx)("input", {
                     required: !0,
-                    readOnly: !!_.baseVersion,
+                    readOnly: !!k.baseVersion,
                     maxLength: 100,
-                    value: _.key,
+                    value: k.key,
                     onChange: (j) => z({
-                      ..._,
+                      ...k,
                       key: j.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用項目名稱", /* @__PURE__ */ (0, l.jsx)("input", {
                     required: !0,
                     maxLength: 200,
-                    value: _.title,
+                    value: k.title,
                     onChange: (j) => z({
-                      ..._,
+                      ...k,
                       title: j.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用種類", /* @__PURE__ */ (0, l.jsx)("select", {
-                    value: _.category,
+                    value: k.category,
                     onChange: (j) => z({
-                      ..._,
+                      ...k,
                       category: j.target.value
                     }),
                     children: Zm.map((j) => /* @__PURE__ */ (0, l.jsx)("option", {
@@ -10705,9 +10707,9 @@ function Af({ project: r, busy: m, mutate: k }) {
                     }, j))
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用項目狀態", /* @__PURE__ */ (0, l.jsx)("select", {
-                    value: _.status,
+                    value: k.status,
                     onChange: (j) => z({
-                      ..._,
+                      ...k,
                       status: j.target.value
                     }),
                     children: Object.entries(an).map(([j, $]) => /* @__PURE__ */ (0, l.jsx)("option", {
@@ -10716,10 +10718,10 @@ function Af({ project: r, busy: m, mutate: k }) {
                     }, j))
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["已有來源識別鍵", /* @__PURE__ */ (0, l.jsx)("input", {
-                    value: _.recordKey,
+                    value: k.recordKey,
                     maxLength: 120,
                     onChange: (j) => z({
-                      ..._,
+                      ...k,
                       recordKey: j.target.value
                     }),
                     placeholder: "從製作資料取得；外部來源可留空"
@@ -10727,30 +10729,30 @@ function Af({ project: r, busy: m, mutate: k }) {
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["來源紀錄版本", /* @__PURE__ */ (0, l.jsx)("input", {
                     type: "number",
                     min: 1,
-                    value: _.recordVersion,
+                    value: k.recordVersion,
                     onChange: (j) => z({
-                      ..._,
+                      ...k,
                       recordVersion: Number(j.target.value)
                     })
                   })] })
                 ]
               }),
-              !_.recordKey && /* @__PURE__ */ (0, l.jsxs)("label", { children: ["外部來源內容", /* @__PURE__ */ (0, l.jsx)("textarea", {
+              !k.recordKey && /* @__PURE__ */ (0, l.jsxs)("label", { children: ["外部來源內容", /* @__PURE__ */ (0, l.jsx)("textarea", {
                 rows: 4,
-                required: _.status === "reference" || _.status === "adopted",
-                value: _.content,
+                required: k.status === "reference" || k.status === "adopted",
+                value: k.content,
                 maxLength: 12e3,
                 onChange: (j) => z({
-                  ..._,
+                  ...k,
                   content: j.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用依據來源", /* @__PURE__ */ (0, l.jsx)("input", {
                 required: !0,
                 maxLength: 2e3,
-                value: _.source,
+                value: k.source,
                 onChange: (j) => z({
-                  ..._,
+                  ...k,
                   source: j.target.value
                 })
               })] }),
@@ -10758,45 +10760,45 @@ function Af({ project: r, busy: m, mutate: k }) {
                 className: "context-form-grid",
                 children: [
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["外部檔案版本", /* @__PURE__ */ (0, l.jsx)("input", {
-                    value: _.externalVersion,
+                    value: k.externalVersion,
                     maxLength: 200,
                     onChange: (j) => z({
-                      ..._,
+                      ...k,
                       externalVersion: j.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["來源檔案位置", /* @__PURE__ */ (0, l.jsx)("input", {
-                    value: _.location,
+                    value: k.location,
                     maxLength: 2e3,
                     onChange: (j) => z({
-                      ..._,
+                      ...k,
                       location: j.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用適用階段", /* @__PURE__ */ (0, l.jsx)("input", {
-                    value: _.stageIdsText,
+                    value: k.stageIdsText,
                     placeholder: "OP／ED自動限制於各自支線",
                     onChange: (j) => z({
-                      ..._,
+                      ...k,
                       stageIdsText: j.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用適用場次", /* @__PURE__ */ (0, l.jsx)("input", {
-                    value: _.sceneIdsText,
+                    value: k.sceneIdsText,
                     onChange: (j) => z({
-                      ..._,
+                      ...k,
                       sceneIdsText: j.target.value
                     })
                   })] })
                 ]
               }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["選用原因或待補說明", /* @__PURE__ */ (0, l.jsx)("textarea", {
-                required: _.status === "unresolved",
+                required: k.status === "unresolved",
                 rows: 3,
                 maxLength: 3e3,
-                value: _.note,
+                value: k.note,
                 onChange: (j) => z({
-                  ..._,
+                  ...k,
                   note: j.target.value
                 })
               })] }),
@@ -10905,7 +10907,7 @@ function Af({ project: r, busy: m, mutate: k }) {
                 disabled: X || !re.trim(),
                 onClick: async () => {
                   try {
-                    await k("import_episode_settings", JSON.parse(re)) && pe("");
+                    await _("import_episode_settings", JSON.parse(re)) && pe("");
                   } catch (j) {
                     W(j instanceof Error ? j.message : "格式錯誤");
                   }
@@ -10960,11 +10962,11 @@ var $r = {
   supersedesId: ""
 };
 function nx(r, m) {
-  const k = URL.createObjectURL(new Blob([JSON.stringify(m, null, 2)], { type: "application/json" })), u = document.createElement("a");
-  u.href = k, u.download = r, u.click(), setTimeout(() => URL.revokeObjectURL(k), 1e3);
+  const _ = URL.createObjectURL(new Blob([JSON.stringify(m, null, 2)], { type: "application/json" })), u = document.createElement("a");
+  u.href = _, u.download = r, u.click(), setTimeout(() => URL.revokeObjectURL(_), 1e3);
 }
-function sx({ project: r, mutate: m, busy: k }) {
-  const u = vl(r), [d, T] = (0, N.useState)("materials"), [v, O] = (0, N.useState)(!1), [w, _] = (0, N.useState)(Fr), [z, V] = (0, N.useState)(!1), [R, re] = (0, N.useState)({
+function sx({ project: r, mutate: m, busy: _ }) {
+  const u = vl(r), [d, T] = (0, N.useState)("materials"), [v, M] = (0, N.useState)(!1), [w, k] = (0, N.useState)(Fr), [z, V] = (0, N.useState)(!1), [R, re] = (0, N.useState)({
     type: "conflict",
     scopeType: "project",
     target: "",
@@ -11010,7 +11012,7 @@ function sx({ project: r, mutate: m, busy: k }) {
       "工作接續",
       u.results.length
     ]
-  ], Ue = k || r.archived;
+  ], Ue = _ || r.archived;
   async function y(h) {
     h.preventDefault(), await m("propose_record", {
       ...w,
@@ -11018,11 +11020,11 @@ function sx({ project: r, mutate: m, busy: k }) {
         type: w.scopeType,
         target: w.target
       }
-    }) && (O(!1), _(Fr), T("proposals"));
+    }) && (M(!1), k(Fr), T("proposals"));
   }
   function ie(h) {
     const P = u.records.find((We) => We.id === h);
-    _({
+    k({
       key: P.key,
       title: P.title,
       kind: P.kind,
@@ -11033,7 +11035,7 @@ function sx({ project: r, mutate: m, busy: k }) {
       scopeType: P.scope.type,
       target: P.scope.target,
       supersedesId: P.id
-    }), O(!0);
+    }), M(!0);
   }
   function me(h) {
     return /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
@@ -11079,7 +11081,7 @@ function sx({ project: r, mutate: m, busy: k }) {
       }),
       h.blockers.length > 0 && /* @__PURE__ */ (0, l.jsx)("div", {
         className: "context-blockers",
-        children: h.blockers.map((P, We) => /* @__PURE__ */ (0, l.jsx)("p", { children: P.replace(/缺少有效資料種類：(\w+)/g, (jt, M) => "缺少有效資料種類：" + ($r[M] || M)) }, We))
+        children: h.blockers.map((P, We) => /* @__PURE__ */ (0, l.jsx)("p", { children: P.replace(/缺少有效資料種類：(\w+)/g, (jt, O) => "缺少有效資料種類：" + ($r[O] || O)) }, We))
       }),
       /* @__PURE__ */ (0, l.jsx)("h3", { children: h.purpose === "documentation" ? "本次指定來源（整理用途）" : "本次有效依據" }),
       h.records.length ? h.records.map((P) => /* @__PURE__ */ (0, l.jsxs)("article", {
@@ -11177,15 +11179,15 @@ function sx({ project: r, mutate: m, busy: k }) {
         className: d === "settings" ? "" : "wide-card",
         children: d === "settings" ? /* @__PURE__ */ (0, l.jsx)(Af, {
           project: r,
-          busy: k,
+          busy: _,
           mutate: m
         }) : d === "links" ? /* @__PURE__ */ (0, l.jsx)(ix, {
           project: r,
-          busy: k,
+          busy: _,
           mutate: m
         }) : d === "materials" ? /* @__PURE__ */ (0, l.jsx)(ax, {
           project: r,
-          busy: k,
+          busy: _,
           mutate: m
         }) : ["baseline", "proposals"].includes(d) ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
           /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -11194,7 +11196,7 @@ function sx({ project: r, mutate: m, busy: k }) {
               className: "btn primary",
               disabled: Ue,
               onClick: () => {
-                _(Fr), O(!v);
+                k(Fr), M(!v);
               },
               children: "新增資料提案"
             })]
@@ -11212,7 +11214,7 @@ function sx({ project: r, mutate: m, busy: k }) {
                     placeholder: "例如 mother_position 或 script_main",
                     value: w.key,
                     readOnly: !!w.supersedesId,
-                    onChange: (h) => _({
+                    onChange: (h) => k({
                       ...w,
                       key: h.target.value
                     })
@@ -11221,14 +11223,14 @@ function sx({ project: r, mutate: m, busy: k }) {
                     required: !0,
                     maxLength: 200,
                     value: w.title,
-                    onChange: (h) => _({
+                    onChange: (h) => k({
                       ...w,
                       title: h.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["資料種類", /* @__PURE__ */ (0, l.jsx)("select", {
                     value: w.kind,
-                    onChange: (h) => _({
+                    onChange: (h) => k({
                       ...w,
                       kind: h.target.value
                     }),
@@ -11239,7 +11241,7 @@ function sx({ project: r, mutate: m, busy: k }) {
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["內容性質", /* @__PURE__ */ (0, l.jsx)("select", {
                     value: w.origin,
-                    onChange: (h) => _({
+                    onChange: (h) => k({
                       ...w,
                       origin: h.target.value
                     }),
@@ -11251,7 +11253,7 @@ function sx({ project: r, mutate: m, busy: k }) {
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["適用範圍", /* @__PURE__ */ (0, l.jsx)("select", {
                     value: w.scopeType,
                     disabled: !!w.supersedesId,
-                    onChange: (h) => _({
+                    onChange: (h) => k({
                       ...w,
                       scopeType: h.target.value,
                       target: ""
@@ -11266,7 +11268,7 @@ function sx({ project: r, mutate: m, busy: k }) {
                     disabled: w.scopeType === "project" || !!w.supersedesId,
                     placeholder: "例如 S06、01 或鏡頭 ID",
                     value: w.target,
-                    onChange: (h) => _({
+                    onChange: (h) => k({
                       ...w,
                       target: h.target.value
                     })
@@ -11278,7 +11280,7 @@ function sx({ project: r, mutate: m, busy: k }) {
                 rows: 5,
                 maxLength: 12e3,
                 value: w.content,
-                onChange: (h) => _({
+                onChange: (h) => k({
                   ...w,
                   content: h.target.value
                 })
@@ -11288,7 +11290,7 @@ function sx({ project: r, mutate: m, busy: k }) {
                 maxLength: 2e3,
                 placeholder: "原作章節、作者修改要求、檔案名稱與段落等",
                 value: w.source,
-                onChange: (h) => _({
+                onChange: (h) => k({
                   ...w,
                   source: h.target.value
                 })
@@ -11297,7 +11299,7 @@ function sx({ project: r, mutate: m, busy: k }) {
                 maxLength: 2e3,
                 placeholder: "可取得的檔案位置或連結；填入不等於已讀取",
                 value: w.location,
-                onChange: (h) => _({
+                onChange: (h) => k({
                   ...w,
                   location: h.target.value
                 })
@@ -11315,7 +11317,7 @@ function sx({ project: r, mutate: m, busy: k }) {
                 children: [/* @__PURE__ */ (0, l.jsx)("button", {
                   className: "btn",
                   type: "button",
-                  onClick: () => O(!1),
+                  onClick: () => M(!1),
                   children: "取消"
                 }), /* @__PURE__ */ (0, l.jsx)("button", {
                   className: "btn primary",
@@ -11808,13 +11810,13 @@ function Pr({ h: r, target: m }) {
           "。內容按所列版本交接；尚未對上成片的部分保留疑點，不自動變成下一集採用設定。"
         ]
       }),
-      Tf.map(([k, u]) => /* @__PURE__ */ (0, l.jsxs)("div", {
+      Tf.map(([_, u]) => /* @__PURE__ */ (0, l.jsxs)("div", {
         className: "context-mini",
         children: [/* @__PURE__ */ (0, l.jsx)("b", { children: u }), /* @__PURE__ */ (0, l.jsx)("p", {
           className: "production-source-text",
-          children: r[k]
+          children: r[_]
         })]
-      }, k)),
+      }, _)),
       /* @__PURE__ */ (0, l.jsxs)("details", { children: [
         /* @__PURE__ */ (0, l.jsx)("summary", { children: "來源識別鍵與版本紀錄" }),
         /* @__PURE__ */ (0, l.jsx)("p", { children: r.sourceKeys.join("、") }),
@@ -11829,8 +11831,8 @@ function Pr({ h: r, target: m }) {
     ]
   });
 }
-function rx({ project: r, episodes: m, busy: k, mutate: u }) {
-  const d = r.production?.completionReports?.at(-1), T = r.production?.handoffs?.at(-1), v = m.filter((I) => I.workId === r.workId && I.id !== r.id), [O, w] = (0, N.useState)("completed"), [_, z] = (0, N.useState)(""), [V, R] = (0, N.useState)(""), [re, pe] = (0, N.useState)(""), [J, W] = (0, N.useState)(xf), [le, X] = (0, N.useState)(""), [oe, H] = (0, N.useState)([]), [F, te] = (0, N.useState)("");
+function rx({ project: r, episodes: m, busy: _, mutate: u }) {
+  const d = r.production?.completionReports?.at(-1), T = r.production?.handoffs?.at(-1), v = m.filter((I) => I.workId === r.workId && I.id !== r.id), [M, w] = (0, N.useState)("completed"), [k, z] = (0, N.useState)(""), [V, R] = (0, N.useState)(""), [re, pe] = (0, N.useState)(""), [J, W] = (0, N.useState)(xf), [le, X] = (0, N.useState)(""), [oe, H] = (0, N.useState)([]), [F, te] = (0, N.useState)("");
   (0, N.useEffect)(() => {
     w(d?.status ?? "completed"), z(d?.note ?? ""), R(d?.source ?? ""), pe(T?.toEpisodeId ?? ""), W(T ?? xf), X(T?.sourceKeys.join(", ") ?? "");
   }, [
@@ -11849,7 +11851,7 @@ function rx({ project: r, episodes: m, busy: k, mutate: u }) {
       I = !1;
     };
   }, [r.id, r.revision]);
-  const ge = oo(r).registration, ce = k || r.archived;
+  const ge = oo(r).registration, ce = _ || r.archived;
   return /* @__PURE__ */ (0, l.jsxs)("section", {
     className: "wide-card episode-brief",
     children: [
@@ -11886,14 +11888,14 @@ function rx({ project: r, episodes: m, busy: k, mutate: u }) {
         className: "context-form",
         onSubmit: async (I) => {
           I.preventDefault(), await u("report_episode_completion", {
-            status: O,
-            note: _,
+            status: M,
+            note: k,
             source: V
           });
         },
         children: [
           /* @__PURE__ */ (0, l.jsxs)("label", { children: ["作者告知的製作狀態", /* @__PURE__ */ (0, l.jsxs)("select", {
-            value: O,
+            value: M,
             onChange: (I) => w(I.target.value),
             children: [
               /* @__PURE__ */ (0, l.jsx)("option", {
@@ -11914,7 +11916,7 @@ function rx({ project: r, episodes: m, busy: k, mutate: u }) {
             required: !0,
             rows: 3,
             maxLength: 3e3,
-            value: _,
+            value: k,
             onChange: (I) => z(I.target.value)
           })] }),
           /* @__PURE__ */ (0, l.jsxs)("label", { children: ["告知來源", /* @__PURE__ */ (0, l.jsx)("input", {
@@ -12045,8 +12047,8 @@ var eo = {
   location: "",
   baseVersion: void 0
 };
-function ox({ work: r, episode: m, episodes: k, busy: u, onWorkAction: d, onSelectEpisode: T, onPin: v, mutate: O }) {
-  const [w, _] = (0, N.useState)(m.title.split("｜")[0]), [z, V] = (0, N.useState)(""), [R, re] = (0, N.useState)(""), [pe, J] = (0, N.useState)(""), [W, le] = (0, N.useState)(""), [X, oe] = (0, N.useState)(""), [H, F] = (0, N.useState)(eo), [te, ge] = (0, N.useState)(!1);
+function ox({ work: r, episode: m, episodes: _, busy: u, onWorkAction: d, onSelectEpisode: T, onPin: v, mutate: M }) {
+  const [w, k] = (0, N.useState)(m.title.split("｜")[0]), [z, V] = (0, N.useState)(""), [R, re] = (0, N.useState)(""), [pe, J] = (0, N.useState)(""), [W, le] = (0, N.useState)(""), [X, oe] = (0, N.useState)(""), [H, F] = (0, N.useState)(eo), [te, ge] = (0, N.useState)(!1);
   if (!r) return /* @__PURE__ */ (0, l.jsxs)("section", {
     className: "wide-card",
     children: [
@@ -12069,7 +12071,7 @@ function ox({ work: r, episode: m, episodes: k, busy: u, onWorkAction: d, onSele
           required: !0,
           maxLength: 200,
           value: w,
-          onChange: (g) => _(g.target.value)
+          onChange: (g) => k(g.target.value)
         })] }), /* @__PURE__ */ (0, l.jsx)("button", {
           className: "btn primary",
           disabled: u,
@@ -12078,7 +12080,7 @@ function ox({ work: r, episode: m, episodes: k, busy: u, onWorkAction: d, onSele
       })
     ]
   });
-  const ce = k.filter((g) => g.workId === r.id).sort((g, ae) => g.episode.localeCompare(ae.episode, void 0, { numeric: !0 })), I = Math.max(0, ...ce.map((g) => Number(g.episode.replace(/^EP/i, "")) || 0)) + 1, j = "EP" + String(I).padStart(2, "0"), $ = [...new Map(r.sharedAssets.map((g) => [g.key, g])).values()], ze = $.filter((g) => !pe || [
+  const ce = _.filter((g) => g.workId === r.id).sort((g, ae) => g.episode.localeCompare(ae.episode, void 0, { numeric: !0 })), I = Math.max(0, ...ce.map((g) => Number(g.episode.replace(/^EP/i, "")) || 0)) + 1, j = "EP" + String(I).padStart(2, "0"), $ = [...new Map(r.sharedAssets.map((g) => [g.key, g])).values()], ze = $.filter((g) => !pe || [
     g.key,
     g.title,
     g.content,
@@ -12172,9 +12174,9 @@ function ox({ work: r, episode: m, episodes: k, busy: u, onWorkAction: d, onSele
       }),
       /* @__PURE__ */ (0, l.jsx)(rx, {
         project: m,
-        episodes: k,
+        episodes: _,
         busy: u,
-        mutate: O
+        mutate: M
       }),
       /* @__PURE__ */ (0, l.jsxs)("div", {
         className: "wide-card",
@@ -12310,7 +12312,7 @@ function ox({ work: r, episode: m, episodes: k, busy: u, onWorkAction: d, onSele
                 className: "muted",
                 children: [
                   "保留來源集數：",
-                  k.find((ae) => ae.id === g.originEpisodeId)?.episode ?? g.originEpisodeId,
+                  _.find((ae) => ae.id === g.originEpisodeId)?.episode ?? g.originEpisodeId,
                   "；按本集需求選用。"
                 ]
               }),
@@ -12394,25 +12396,25 @@ var gf = {
   adopt_model_version: "作者登記採用版本",
   pin_model_version: "本集引用模型版本"
 };
-function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, onAction: T, onProject: v, onDirty: O }) {
-  const [w, _] = (0, N.useState)(r?.modelId ?? ""), [z, V] = (0, N.useState)(r?.versionId ?? ""), [R, re] = (0, N.useState)(r?.stageId ?? "M01"), [pe, J] = (0, N.useState)(null), [W, le] = (0, N.useState)(gf), [X, oe] = (0, N.useState)(""), H = m ? Cs(m) : null, F = H?.models.find((M) => M.id === w) ?? H?.models[0], te = F?.versions.find((M) => M.id === z) ?? F?.versions.at(-1), ge = te?.stages[R], ce = Na.find((M) => M.id === R);
-  function I(M) {
-    Ne(M), O(M);
+function ux({ initialSelection: r, work: m, episode: _, episodes: u, busy: d, onAction: T, onProject: v, onDirty: M }) {
+  const [w, k] = (0, N.useState)(r?.modelId ?? ""), [z, V] = (0, N.useState)(r?.versionId ?? ""), [R, re] = (0, N.useState)(r?.stageId ?? "M01"), [pe, J] = (0, N.useState)(null), [W, le] = (0, N.useState)(gf), [X, oe] = (0, N.useState)(""), H = m ? Cs(m) : null, F = H?.models.find((O) => O.id === w) ?? H?.models[0], te = F?.versions.find((O) => O.id === z) ?? F?.versions.at(-1), ge = te?.stages[R], ce = Na.find((O) => O.id === R);
+  function I(O) {
+    Ne(O), M(O);
   }
   const [j, $] = (0, N.useState)([]), [ze, he] = (0, N.useState)(""), [g, ae] = (0, N.useState)(""), [Q, B] = (0, N.useState)(""), [G, fe] = (0, N.useState)(""), [se, Z] = (0, N.useState)(""), [f, D] = (0, N.useState)("technical"), [K, ee] = (0, N.useState)({}), [ne, Se] = (0, N.useState)(""), [je, Be] = (0, N.useState)(""), [Ee, Ne] = (0, N.useState)(!1);
   (0, N.useEffect)(() => {
     ge && ($(ge.checks), he(ge.evidence), ae(ge.summary), B(ge.nextStep), fe(te.candidateLocation), I(!1));
   }, [ge, te]), (0, N.useEffect)(() => {
     if (!Ee) return;
-    const M = (we) => we.preventDefault();
-    return window.addEventListener("beforeunload", M), () => window.removeEventListener("beforeunload", M);
+    const O = (we) => we.preventDefault();
+    return window.addEventListener("beforeunload", O), () => window.removeEventListener("beforeunload", O);
   }, [Ee]);
-  function Re(M) {
-    Ee && !window.confirm("有未儲存模型紀錄，要放棄修改嗎？") || (I(!1), oe(""), M());
+  function Re(O) {
+    Ee && !window.confirm("有未儲存模型紀錄，要放棄修改嗎？") || (I(!1), oe(""), O());
   }
-  async function Ue(M, we) {
+  async function Ue(O, we) {
     oe("");
-    const it = await T(M, we);
+    const it = await T(O, we);
     return it && I(!1), it;
   }
   function y() {
@@ -12443,7 +12445,7 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
       })
     ]
   });
-  const ie = H.issues.filter((M) => M.modelId === F?.id && M.versionId === te?.id), me = ie.filter((M) => M.status === "open"), h = !!te?.stages.M08.author, P = F && te ? Ym(m, F.id, te.id, R) : [], We = H.pins.filter((M) => M.episodeId === k.id), jt = new Map(We.map((M) => [[M.modelId, M.sceneIds].join("|"), M]));
+  const ie = H.issues.filter((O) => O.modelId === F?.id && O.versionId === te?.id), me = ie.filter((O) => O.status === "open"), h = !!te?.stages.M08.author, P = F && te ? Ym(m, F.id, te.id, R) : [], We = H.pins.filter((O) => O.episodeId === _.id), jt = new Map(We.map((O) => [[O.modelId, O.sceneIds].join("|"), O]));
   return /* @__PURE__ */ (0, l.jsxs)("section", {
     className: "model-workspace",
     children: [
@@ -12477,15 +12479,15 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
       }),
       pe && /* @__PURE__ */ (0, l.jsxs)("form", {
         className: "wide-card context-form model-register",
-        onSubmit: async (M) => {
-          M.preventDefault();
+        onSubmit: async (O) => {
+          O.preventDefault();
           const we = await Ue(pe === "register" ? "register_model" : "create_model_version", {
             ...W,
             modelId: F?.id
           });
           if (we) {
             const it = pe === "register" ? we.work.modelFlow?.models.at(-1) : we.work.modelFlow?.models.find((Jt) => Jt.id === F?.id);
-            J(null), _(it?.id ?? ""), V(it?.versions.at(-1)?.id ?? ""), re("M01");
+            J(null), k(it?.id ?? ""), V(it?.versions.at(-1)?.id ?? ""), re("M01");
           }
         },
         children: [
@@ -12507,9 +12509,9 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                   maxLength: 100,
                   value: W.key,
                   placeholder: "RG-REAL-01",
-                  onChange: (M) => le({
+                  onChange: (O) => le({
                     ...W,
-                    key: M.target.value
+                    key: O.target.value
                   })
                 })] }),
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["模型名稱 *", /* @__PURE__ */ (0, l.jsx)("input", {
@@ -12517,16 +12519,16 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                   maxLength: 200,
                   value: W.title,
                   placeholder: "現實主角家",
-                  onChange: (M) => le({
+                  onChange: (O) => le({
                     ...W,
-                    title: M.target.value
+                    title: O.target.value
                   })
                 })] }),
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["世界／場景分類", /* @__PURE__ */ (0, l.jsxs)("select", {
                   value: W.world,
-                  onChange: (M) => le({
+                  onChange: (O) => le({
                     ...W,
-                    world: M.target.value
+                    world: O.target.value
                   }),
                   children: [
                     /* @__PURE__ */ (0, l.jsx)("option", {
@@ -12548,9 +12550,9 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                 required: !0,
                 maxLength: 100,
                 value: W.label,
-                onChange: (M) => le({
+                onChange: (O) => le({
                   ...W,
-                  label: M.target.value
+                  label: O.target.value
                 })
               })] }),
               [
@@ -12558,25 +12560,25 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                 ["sourceVersion", "來源版本／清單版本 *"],
                 ["backupLocation", "原檔備份位置"],
                 ["sha256", "原檔 SHA-256（實際計算值）"]
-              ].map(([M, we]) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [we, /* @__PURE__ */ (0, l.jsx)("input", {
-                required: M === "sourceLocation" || M === "sourceVersion",
-                maxLength: M === "sha256" ? 64 : 2e3,
-                pattern: M === "sha256" ? "[a-fA-F0-9]{64}" : void 0,
-                value: W[M],
+              ].map(([O, we]) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [we, /* @__PURE__ */ (0, l.jsx)("input", {
+                required: O === "sourceLocation" || O === "sourceVersion",
+                maxLength: O === "sha256" ? 64 : 2e3,
+                pattern: O === "sha256" ? "[a-fA-F0-9]{64}" : void 0,
+                value: W[O],
                 onChange: (it) => le({
                   ...W,
-                  [M]: it.target.value
+                  [O]: it.target.value
                 })
-              })] }, M))
+              })] }, O))
             ]
           }),
           /* @__PURE__ */ (0, l.jsxs)("label", { children: ["設定與尺度來源／不可改動項目", /* @__PURE__ */ (0, l.jsx)("textarea", {
             rows: 4,
             maxLength: 12e3,
             value: W.reference,
-            onChange: (M) => le({
+            onChange: (O) => le({
               ...W,
-              reference: M.target.value
+              reference: O.target.value
             }),
             placeholder: "設計書與平面圖版本、固定節點／家具 ID、單位、重大變更待核定項。"
           })] }),
@@ -12608,33 +12610,33 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["模型", /* @__PURE__ */ (0, l.jsx)("select", {
                   value: F.id,
                   disabled: d,
-                  onChange: (M) => Re(() => {
-                    _(M.target.value), V(""), re("M01");
+                  onChange: (O) => Re(() => {
+                    k(O.target.value), V(""), re("M01");
                   }),
-                  children: H.models.map((M) => /* @__PURE__ */ (0, l.jsxs)("option", {
-                    value: M.id,
+                  children: H.models.map((O) => /* @__PURE__ */ (0, l.jsxs)("option", {
+                    value: O.id,
                     children: [
-                      M.key,
+                      O.key,
                       " · ",
-                      M.title
+                      O.title
                     ]
-                  }, M.id))
+                  }, O.id))
                 })] }),
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["精確版本", /* @__PURE__ */ (0, l.jsx)("select", {
                   value: te.id,
                   disabled: d,
-                  onChange: (M) => Re(() => V(M.target.value)),
-                  children: F.versions.map((M) => /* @__PURE__ */ (0, l.jsxs)("option", {
-                    value: M.id,
+                  onChange: (O) => Re(() => V(O.target.value)),
+                  children: F.versions.map((O) => /* @__PURE__ */ (0, l.jsxs)("option", {
+                    value: O.id,
                     children: [
                       "v",
-                      M.number,
+                      O.number,
                       " · ",
-                      M.label,
-                      M.stages.M08.author ? "（曾採用）" : "",
-                      F.adoptedVersionId === M.id ? "／目前採用" : ""
+                      O.label,
+                      O.stages.M08.author ? "（曾採用）" : "",
+                      F.adoptedVersionId === O.id ? "／目前採用" : ""
                     ]
-                  }, M.id))
+                  }, O.id))
                 })] }),
                 /* @__PURE__ */ (0, l.jsxs)("button", {
                   className: "btn",
@@ -12647,7 +12649,7 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
             /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "production-totals",
               children: [
-                /* @__PURE__ */ (0, l.jsxs)("b", { children: [Na.filter((M) => te.stages[M.id].author).length, " / 8 階段核定"] }),
+                /* @__PURE__ */ (0, l.jsxs)("b", { children: [Na.filter((O) => te.stages[O.id].author).length, " / 8 階段核定"] }),
                 /* @__PURE__ */ (0, l.jsxs)("b", { children: [me.length, " 項待修或待裁定"] }),
                 /* @__PURE__ */ (0, l.jsxs)("span", { children: [
                   F.world === "real" ? "現實場景" : F.world === "game" ? "遊戲場景" : "其他模型",
@@ -12679,16 +12681,16 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
         }),
         /* @__PURE__ */ (0, l.jsx)("div", {
           className: "model-stage-grid",
-          children: Na.map((M, we) => /* @__PURE__ */ (0, l.jsxs)("button", {
+          children: Na.map((O, we) => /* @__PURE__ */ (0, l.jsxs)("button", {
             disabled: d,
-            className: "model-step " + (R === M.id ? "selected" : "") + (te.stages[M.id].author ? " passed" : ""),
-            onClick: () => Re(() => re(M.id)),
+            className: "model-step " + (R === O.id ? "selected" : "") + (te.stages[O.id].author ? " passed" : ""),
+            onClick: () => Re(() => re(O.id)),
             children: [
-              /* @__PURE__ */ (0, l.jsx)("small", { children: M.id }),
-              /* @__PURE__ */ (0, l.jsx)("b", { children: M.title }),
-              /* @__PURE__ */ (0, l.jsx)("span", { children: te.stages[M.id].author ? "作者已確認" : te.stages[M.id].status === "needs_revision" ? "待修正" : te.stages[M.id].status === "candidate" ? "已有工作回報" : "待製作" })
+              /* @__PURE__ */ (0, l.jsx)("small", { children: O.id }),
+              /* @__PURE__ */ (0, l.jsx)("b", { children: O.title }),
+              /* @__PURE__ */ (0, l.jsx)("span", { children: te.stages[O.id].author ? "作者已確認" : te.stages[O.id].status === "needs_revision" ? "待修正" : te.stages[O.id].status === "candidate" ? "已有工作回報" : "待製作" })
             ]
-          }, M.id))
+          }, O.id))
         }),
         /* @__PURE__ */ (0, l.jsxs)("div", {
           className: "wide-card model-stage-detail",
@@ -12715,8 +12717,8 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
             }),
             /* @__PURE__ */ (0, l.jsxs)("form", {
               className: "context-form",
-              onSubmit: async (M) => {
-                M.preventDefault(), await Ue("save_model_stage", {
+              onSubmit: async (O) => {
+                O.preventDefault(), await Ue("save_model_stage", {
                   modelId: F.id,
                   versionId: te.id,
                   stageId: R,
@@ -12730,30 +12732,30 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
               children: [
                 /* @__PURE__ */ (0, l.jsx)("div", {
                   className: "checklist",
-                  children: ce.checks.map((M, we) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [/* @__PURE__ */ (0, l.jsx)("input", {
+                  children: ce.checks.map((O, we) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [/* @__PURE__ */ (0, l.jsx)("input", {
                     type: "checkbox",
                     disabled: d || h,
                     checked: j[we] ?? !1,
                     onChange: (it) => {
                       $((Jt) => Jt.map((et, Ja) => Ja === we ? it.target.checked : et)), I(!0);
                     }
-                  }), /* @__PURE__ */ (0, l.jsx)("span", { children: M })] }, M))
+                  }), /* @__PURE__ */ (0, l.jsx)("span", { children: O })] }, O))
                 }),
                 R === "M04" && /* @__PURE__ */ (0, l.jsxs)("label", { children: ["本次獨立候選 GLB", /* @__PURE__ */ (0, l.jsx)("input", {
                   disabled: d || h,
                   maxLength: 2e3,
                   value: G,
                   placeholder: ".../reality-home_v2_candidate.glb",
-                  onChange: (M) => {
-                    fe(M.target.value), I(!0);
+                  onChange: (O) => {
+                    fe(O.target.value), I(!0);
                   }
                 })] }),
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["實際產出／檢查依據位置", /* @__PURE__ */ (0, l.jsx)("textarea", {
                   rows: 2,
                   disabled: d || h,
                   value: ze,
-                  onChange: (M) => {
-                    he(M.target.value), I(!0);
+                  onChange: (O) => {
+                    he(O.target.value), I(!0);
                   },
                   placeholder: "原檔盤點報告、逐物件差異、檢查結果或指定鏡位截圖；附來源版本。"
                 })] }),
@@ -12763,8 +12765,8 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                   maxLength: 6e3,
                   disabled: d || h,
                   value: g,
-                  onChange: (M) => {
-                    ae(M.target.value), I(!0);
+                  onChange: (O) => {
+                    ae(O.target.value), I(!0);
                   },
                   placeholder: "具體節點／物件、改動、檢查方式、尚未完成項。"
                 })] }),
@@ -12774,8 +12776,8 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                   maxLength: 6e3,
                   disabled: d || h,
                   value: Q,
-                  onChange: (M) => {
-                    B(M.target.value), I(!0);
+                  onChange: (O) => {
+                    B(O.target.value), I(!0);
                   },
                   placeholder: "指定版本、檔案位置、先讀資料、下一個物件或鏡位，以及受阻原因。"
                 })] }),
@@ -12821,8 +12823,8 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
             }),
             /* @__PURE__ */ (0, l.jsxs)("form", {
               className: "context-form",
-              onSubmit: async (M) => {
-                M.preventDefault(), await Ue("report_model_issue", {
+              onSubmit: async (O) => {
+                O.preventDefault(), await Ue("report_model_issue", {
                   modelId: F.id,
                   versionId: te.id,
                   stageId: R,
@@ -12835,7 +12837,7 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                   className: "context-form-grid",
                   children: [/* @__PURE__ */ (0, l.jsxs)("label", { children: ["問題分類", /* @__PURE__ */ (0, l.jsxs)("select", {
                     value: f,
-                    onChange: (M) => D(M.target.value),
+                    onChange: (O) => D(O.target.value),
                     children: [
                       /* @__PURE__ */ (0, l.jsx)("option", {
                         value: "technical",
@@ -12860,7 +12862,7 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                   rows: 2,
                   maxLength: 6e3,
                   value: se,
-                  onChange: (M) => Z(M.target.value)
+                  onChange: (O) => Z(O.target.value)
                 })] }),
                 /* @__PURE__ */ (0, l.jsxs)("button", {
                   className: "btn",
@@ -12869,53 +12871,53 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                 })
               ]
             }),
-            ie.map((M) => /* @__PURE__ */ (0, l.jsxs)("article", {
+            ie.map((O) => /* @__PURE__ */ (0, l.jsxs)("article", {
               className: "context-record",
               children: [
                 /* @__PURE__ */ (0, l.jsxs)("div", {
                   className: "issue-top",
                   children: [/* @__PURE__ */ (0, l.jsx)("span", {
-                    className: "status " + (M.status === "open" ? "needs_revision" : "passed"),
-                    children: M.status === "open" ? "待處理" : "作者已複核"
+                    className: "status " + (O.status === "open" ? "needs_revision" : "passed"),
+                    children: O.status === "open" ? "待處理" : "作者已複核"
                   }), /* @__PURE__ */ (0, l.jsxs)("b", { children: [
-                    M.stageId,
+                    O.stageId,
                     " · ",
-                    M.kind === "major" ? "重大變更" : M.kind === "technical" ? "技術" : "視覺"
+                    O.kind === "major" ? "重大變更" : O.kind === "technical" ? "技術" : "視覺"
                   ] })]
                 }),
-                /* @__PURE__ */ (0, l.jsx)("p", { children: M.reason }),
+                /* @__PURE__ */ (0, l.jsx)("p", { children: O.reason }),
                 /* @__PURE__ */ (0, l.jsxs)("small", { children: [
-                  M.by,
+                  O.by,
                   " · ",
-                  new Date(M.at).toLocaleString("zh-TW", { timeZone: "Asia/Taipei" })
+                  new Date(O.at).toLocaleString("zh-TW", { timeZone: "Asia/Taipei" })
                 ] }),
-                M.status === "open" ? /* @__PURE__ */ (0, l.jsxs)("form", {
+                O.status === "open" ? /* @__PURE__ */ (0, l.jsxs)("form", {
                   className: "context-form",
                   onSubmit: async (we) => {
                     we.preventDefault(), await Ue("resolve_model_issue", {
                       modelId: F.id,
                       versionId: te.id,
-                      issueId: M.id,
-                      resolution: K[M.id] ?? ""
+                      issueId: O.id,
+                      resolution: K[O.id] ?? ""
                     });
                   },
                   children: [/* @__PURE__ */ (0, l.jsxs)("label", { children: ["作者修正複核／裁定結果", /* @__PURE__ */ (0, l.jsx)("textarea", {
                     required: !0,
                     rows: 2,
                     maxLength: 6e3,
-                    value: K[M.id] ?? "",
+                    value: K[O.id] ?? "",
                     onChange: (we) => ee({
                       ...K,
-                      [M.id]: we.target.value
+                      [O.id]: we.target.value
                     })
                   })] }), /* @__PURE__ */ (0, l.jsx)("button", {
                     className: "btn",
                     disabled: d,
                     children: "作者確認處理結果"
                   })]
-                }) : /* @__PURE__ */ (0, l.jsxs)("p", { children: ["處理結果：", M.resolution] })
+                }) : /* @__PURE__ */ (0, l.jsxs)("p", { children: ["處理結果：", O.resolution] })
               ]
-            }, M.id))
+            }, O.id))
           ]
         }),
         /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -12925,17 +12927,17 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
               className: "section-title",
               children: /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("h2", { children: [/* @__PURE__ */ (0, l.jsx)(As, { size: 19 }), "各集固定版本引用"] }), /* @__PURE__ */ (0, l.jsxs)("p", { children: [
                 "目前集數：",
-                k.episode,
+                _.episode,
                 "。新候選不會自動替換 EP01 或其他集的模型來源。"
               ] })] })
             }),
             h && /* @__PURE__ */ (0, l.jsxs)("form", {
               className: "context-form",
-              onSubmit: async (M) => {
-                M.preventDefault(), await Ue("pin_model_version", {
+              onSubmit: async (O) => {
+                O.preventDefault(), await Ue("pin_model_version", {
                   modelId: F.id,
                   versionId: te.id,
-                  episodeId: k.id,
+                  episodeId: _.id,
                   purpose: ne,
                   sceneIds: je
                 }) && (Se(""), Be(""));
@@ -12946,24 +12948,24 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                   value: je,
                   maxLength: 1e3,
                   placeholder: "S06、S07",
-                  onChange: (M) => Be(M.target.value)
+                  onChange: (O) => Be(O.target.value)
                 })] }), /* @__PURE__ */ (0, l.jsxs)("label", { children: ["本集用途 *", /* @__PURE__ */ (0, l.jsx)("input", {
                   required: !0,
                   value: ne,
                   maxLength: 2e3,
                   placeholder: "固定樓梯、餐桌與走道位置",
-                  onChange: (M) => Se(M.target.value)
+                  onChange: (O) => Se(O.target.value)
                 })] })]
               }), /* @__PURE__ */ (0, l.jsxs)("button", {
                 className: "btn",
                 disabled: d || me.length > 0,
-                children: ["將此採用版本引用至 ", k.episode]
+                children: ["將此採用版本引用至 ", _.episode]
               })]
             }),
             We.length ? /* @__PURE__ */ (0, l.jsx)("div", {
               className: "model-pins",
-              children: We.map((M, we) => {
-                const it = H.models.find((et) => et.id === M.modelId), Jt = it?.versions.find((et) => et.id === M.versionId);
+              children: We.map((O, we) => {
+                const it = H.models.find((et) => et.id === O.modelId), Jt = it?.versions.find((et) => et.id === O.versionId);
                 return /* @__PURE__ */ (0, l.jsxs)("article", { children: [
                   /* @__PURE__ */ (0, l.jsxs)("b", { children: [
                     it?.title,
@@ -12972,13 +12974,13 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
                   ] }),
                   " ",
                   /* @__PURE__ */ (0, l.jsx)("span", {
-                    className: "status " + (jt.get([M.modelId, M.sceneIds].join("|")) === M ? "passed" : "todo"),
-                    children: jt.get([M.modelId, M.sceneIds].join("|")) === M ? "本集現行引用" : "歷史引用"
+                    className: "status " + (jt.get([O.modelId, O.sceneIds].join("|")) === O ? "passed" : "todo"),
+                    children: jt.get([O.modelId, O.sceneIds].join("|")) === O ? "本集現行引用" : "歷史引用"
                   }),
                   /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-                    M.sceneIds || "本集",
+                    O.sceneIds || "本集",
                     " ／ ",
-                    M.purpose
+                    O.purpose
                   ] }),
                   /* @__PURE__ */ (0, l.jsx)("code", { children: Jt?.candidateLocation })
                 ] }, we);
@@ -12993,25 +12995,25 @@ function ux({ initialSelection: r, work: m, episode: k, episodes: u, busy: d, on
           className: "wide-card",
           children: [/* @__PURE__ */ (0, l.jsxs)("summary", { children: [
             "模型製作與 AI 接續紀錄（",
-            H.history.filter((M) => M.modelId === F.id).length,
+            H.history.filter((O) => O.modelId === F.id).length,
             "）"
-          ] }), [...H.history].reverse().filter((M) => M.modelId === F.id).slice(0, 60).map((M, we) => /* @__PURE__ */ (0, l.jsxs)("article", {
+          ] }), [...H.history].reverse().filter((O) => O.modelId === F.id).slice(0, 60).map((O, we) => /* @__PURE__ */ (0, l.jsxs)("article", {
             className: "context-mini",
             children: [
               /* @__PURE__ */ (0, l.jsxs)("b", { children: [
-                dx[M.action] ?? M.action,
+                dx[O.action] ?? O.action,
                 " · ",
-                M.stageId,
+                O.stageId,
                 " · ",
-                F.versions.find((it) => it.id === M.versionId)?.label
+                F.versions.find((it) => it.id === O.versionId)?.label
               ] }),
-              /* @__PURE__ */ (0, l.jsx)("p", { children: M.detail }),
+              /* @__PURE__ */ (0, l.jsx)("p", { children: O.detail }),
               /* @__PURE__ */ (0, l.jsxs)("small", { children: [
-                M.actor === "ai" ? "AI" : "作者",
+                O.actor === "ai" ? "AI" : "作者",
                 " · ",
-                M.by,
+                O.by,
                 " · ",
-                new Date(M.at).toLocaleString("zh-TW", { timeZone: "Asia/Taipei" })
+                new Date(O.at).toLocaleString("zh-TW", { timeZone: "Asia/Taipei" })
               ] })
             ]
           }, we))]
@@ -13061,17 +13063,17 @@ function ii(r) {
     minute: "2-digit"
   }) : "尚無紀錄";
 }
-function px(r, m, k = "application/json") {
-  const u = URL.createObjectURL(new Blob([m], { type: k })), d = document.createElement("a");
+function px(r, m, _ = "application/json") {
+  const u = URL.createObjectURL(new Blob([m], { type: _ })), d = document.createElement("a");
   d.href = u, d.download = r, d.click(), setTimeout(() => URL.revokeObjectURL(u), 1e3);
 }
-function fx({ nativeTransport: r, initialWorkId: m, initialTab: k = "resume", onDirtyChange: u } = {}) {
-  const [d, T] = (0, N.useState)([]), [v, O] = (0, N.useState)(null), [w, _] = (0, N.useState)(k), [z, V] = (0, N.useState)("01"), [R, re] = (0, N.useState)(null), [pe, J] = (0, N.useState)([]), [W, le] = (0, N.useState)(!0), [X, oe] = (0, N.useState)(!1), [H, F] = (0, N.useState)(""), [te, ge] = (0, N.useState)(""), [ce, I] = (0, N.useState)(!1), [j, $] = (0, N.useState)([]), [ze, he] = (0, N.useState)(""), [g, ae] = (0, N.useState)(""), [Q, B] = (0, N.useState)(!1), [G, fe] = (0, N.useState)(null), [se, Z] = (0, N.useState)({}), [f, D] = (0, N.useState)(""), [K, ee] = (0, N.useState)(!1), [ne, Se] = (0, N.useState)(null), je = (0, N.useRef)(0), Be = (0, N.useRef)(""), Ee = (0, N.useRef)(!1);
+function fx({ nativeTransport: r, initialWorkId: m, initialTab: _ = "resume", onDirtyChange: u } = {}) {
+  const [d, T] = (0, N.useState)([]), [v, M] = (0, N.useState)(null), [w, k] = (0, N.useState)(_), [z, V] = (0, N.useState)("01"), [R, re] = (0, N.useState)(null), [pe, J] = (0, N.useState)([]), [W, le] = (0, N.useState)(!0), [X, oe] = (0, N.useState)(!1), [H, F] = (0, N.useState)(""), [te, ge] = (0, N.useState)(""), [ce, I] = (0, N.useState)(!1), [j, $] = (0, N.useState)([]), [ze, he] = (0, N.useState)(""), [g, ae] = (0, N.useState)(""), [Q, B] = (0, N.useState)(!1), [G, fe] = (0, N.useState)(null), [se, Z] = (0, N.useState)({}), [f, D] = (0, N.useState)(""), [K, ee] = (0, N.useState)(!1), [ne, Se] = (0, N.useState)(null), je = (0, N.useRef)(0), Be = (0, N.useRef)(""), Ee = (0, N.useRef)(!1);
   (0, N.useEffect)(() => {
     Ee.current = Q, u?.(Q);
   }, [Q, u]);
   const Ne = (0, N.useCallback)((p) => {
-    Be.current = p.id, O(p), re((be) => be?.id === p.workId ? be : null), T((be) => [so(p), ...be.filter((ve) => ve.id !== p.id)]), B(!1);
+    Be.current = p.id, M(p), re((be) => be?.id === p.workId ? be : null), T((be) => [so(p), ...be.filter((ve) => ve.id !== p.id)]), B(!1);
   }, []);
   async function Re(p, be, ve = "projects") {
     const tt = r ? await r(ve, p, be) : await fetch("/api/" + ve + p, {
@@ -13097,7 +13099,7 @@ function fx({ nativeTransport: r, initialWorkId: m, initialTab: k = "resume", on
       const [ve, tt] = await Promise.all([Re(""), Re("", void 0, "works")]), Ze = m ? ve.filter((yt) => yt.workId === m) : ve, bt = p || Be.current || Ze.find((yt) => !yt.archived && yt.workId && yt.episode === "EP01")?.id || Ze.find((yt) => !yt.archived && yt.workId)?.id || Ze.find((yt) => !yt.archived)?.id;
       let ot = null, sn = null;
       if (bt && (ot = await Re("?id=" + encodeURIComponent(bt)), ot.workId && (sn = (await Re("?id=" + encodeURIComponent(ot.workId), void 0, "works")).work)), be !== je.current) return;
-      F(""), T(Ze), J(m ? tt.filter((yt) => yt.id === m) : tt), Ee.current || (ot ? Ne(ot) : O(null), re(sn));
+      F(""), T(Ze), J(m ? tt.filter((yt) => yt.id === m) : tt), Ee.current || (ot ? Ne(ot) : M(null), re(sn));
     } catch (ve) {
       be === je.current && F(ve.message);
     } finally {
@@ -13111,7 +13113,7 @@ function fx({ nativeTransport: r, initialWorkId: m, initialTab: k = "resume", on
       "project",
       "models",
       "context"
-    ].includes(p) && _(p);
+    ].includes(p) && k(p);
   }, []), (0, N.useEffect)(() => {
     Ue();
   }, [Ue]), (0, N.useEffect)(() => {
@@ -13193,7 +13195,7 @@ function fx({ nativeTransport: r, initialWorkId: m, initialTab: k = "resume", on
   }
   function P(p) {
     me(() => {
-      _(p), [
+      k(p), [
         "main",
         "op",
         "ed"
@@ -13210,14 +13212,14 @@ function fx({ nativeTransport: r, initialWorkId: m, initialTab: k = "resume", on
         action: "create_project",
         title: se.title || "現實遊戲",
         episode: se.episode || "EP01"
-      })), _("main"), V("01"), fe(null), ge("專案已建立，全部階段待確認")) : G === "shot" ? await y("save_shot", se) && fe(null) : G === "issue" ? await y("add_issue", se) && fe(null) : G === "resolve" ? await y("resolve_issue", se) && fe(null) : G === "archive" && await y(v?.archived ? "restore" : "archive") && fe(null);
+      })), k("main"), V("01"), fe(null), ge("專案已建立，全部階段待確認")) : G === "shot" ? await y("save_shot", se) && fe(null) : G === "issue" ? await y("add_issue", se) && fe(null) : G === "resolve" ? await y("resolve_issue", se) && fe(null) : G === "archive" && await y(v?.archived ? "restore" : "archive") && fe(null);
     } catch (be) {
       F(be.message);
     } finally {
       oe(!1);
     }
   }
-  const jt = v ? so(v) : null, M = Kt.find((p) => p.id === z), we = v?.stages[z], it = v ? Ef(v, z) : [], Jt = v ? _s(v, z) : [], et = Kt.filter((p) => p.group === w), Ja = v?.issues.filter((p) => p.status === "open") || [], jl = v?.production?.completionReports?.at(-1), Ut = jl?.status === "completed", ea = v ? oo(v).registration : null, Ia = [
+  const jt = v ? so(v) : null, O = Kt.find((p) => p.id === z), we = v?.stages[z], it = v ? Ef(v, z) : [], Jt = v ? _s(v, z) : [], et = Kt.filter((p) => p.group === w), Ja = v?.issues.filter((p) => p.status === "open") || [], jl = v?.production?.completionReports?.at(-1), Ut = jl?.status === "completed", ea = v ? oo(v).registration : null, Ia = [
     [
       "resume",
       "工作首頁",
@@ -13306,7 +13308,7 @@ function fx({ nativeTransport: r, initialWorkId: m, initialTab: k = "resume", on
               value: R?.id || "",
               onChange: (p) => me(() => {
                 const be = d.find((ve) => (ve.workId || "") === p.target.value && !ve.archived);
-                be && Ue(be.id), Se(null), _("resume");
+                be && Ue(be.id), Se(null), k("resume");
               }),
               children: [/* @__PURE__ */ (0, l.jsx)("option", {
                 value: "",
@@ -13690,14 +13692,14 @@ function fx({ nativeTransport: r, initialWorkId: m, initialTab: k = "resume", on
                         children: [/* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("span", {
                           className: "eyebrow",
                           children: w === "main" ? "STAGE " + z : w.toUpperCase() + " · " + z.slice(2)
-                        }), /* @__PURE__ */ (0, l.jsx)("h2", { children: M.title })] }), /* @__PURE__ */ (0, l.jsx)("span", {
+                        }), /* @__PURE__ */ (0, l.jsx)("h2", { children: O.title })] }), /* @__PURE__ */ (0, l.jsx)("span", {
                           className: "status " + we.status,
                           children: Ut && we.status === "todo" ? "已完成 · 明細待補登" : ao[we.status]
                         })]
                       }),
                       /* @__PURE__ */ (0, l.jsx)("p", {
                         className: "stage-description",
-                        children: M.description
+                        children: O.description
                       }),
                       Jt.length > 0 && /* @__PURE__ */ (0, l.jsxs)("div", {
                         className: "gate-notice",
@@ -13709,7 +13711,7 @@ function fx({ nativeTransport: r, initialWorkId: m, initialTab: k = "resume", on
                       }),
                       /* @__PURE__ */ (0, l.jsxs)("div", {
                         className: "output-box",
-                        children: [/* @__PURE__ */ (0, l.jsx)(bl, { size: 19 }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("strong", { children: "本階段產出" }), /* @__PURE__ */ (0, l.jsx)("p", { children: M.output })] })]
+                        children: [/* @__PURE__ */ (0, l.jsx)(bl, { size: 19 }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("strong", { children: "本階段產出" }), /* @__PURE__ */ (0, l.jsx)("p", { children: O.output })] })]
                       }),
                       Ka(v.episodeRules ?? []).filter((p) => !p.stageIds.length || p.stageIds.includes(z)).map((p) => /* @__PURE__ */ (0, l.jsxs)("div", {
                         className: "context-mini",
@@ -13739,7 +13741,7 @@ function fx({ nativeTransport: r, initialWorkId: m, initialTab: k = "resume", on
                       }),
                       /* @__PURE__ */ (0, l.jsx)("div", {
                         className: "checklist",
-                        children: M.checks.map((p, be) => /* @__PURE__ */ (0, l.jsxs)("label", {
+                        children: O.checks.map((p, be) => /* @__PURE__ */ (0, l.jsxs)("label", {
                           className: j[be] ? "checked" : "",
                           children: [/* @__PURE__ */ (0, l.jsx)("input", {
                             type: "checkbox",
@@ -14230,7 +14232,7 @@ function fx({ nativeTransport: r, initialWorkId: m, initialTab: k = "resume", on
                       ...se,
                       stageId: p.target.value
                     }),
-                    children: Ms(v).map((p) => /* @__PURE__ */ (0, l.jsxs)("option", {
+                    children: Os(v).map((p) => /* @__PURE__ */ (0, l.jsxs)("option", {
                       value: p.id,
                       children: [
                         p.id,
@@ -14340,12 +14342,12 @@ function vf(r) {
   return new URL(r, new URL("./", window.location.href)).href;
 }
 function hx(r) {
-  const m = r.split(/\r?\n/), k = [];
+  const m = r.split(/\r?\n/), _ = [];
   let u = !1, d = [];
   for (let T = 0; T < m.length; T++) {
-    const v = m[T].trimEnd(), O = v.trim();
-    if (O.startsWith("```")) {
-      u && (k.push(/* @__PURE__ */ (0, l.jsx)("pre", {
+    const v = m[T].trimEnd(), M = v.trim();
+    if (M.startsWith("```")) {
+      u && (_.push(/* @__PURE__ */ (0, l.jsx)("pre", {
         className: "essentials-code",
         children: d.join(`
 `)
@@ -14356,68 +14358,68 @@ function hx(r) {
       d.push(v);
       continue;
     }
-    if (!O) continue;
-    if (/^---+$/.test(O)) {
-      k.push(/* @__PURE__ */ (0, l.jsx)("hr", {}, T));
+    if (!M) continue;
+    if (/^---+$/.test(M)) {
+      _.push(/* @__PURE__ */ (0, l.jsx)("hr", {}, T));
       continue;
     }
-    const w = O.match(/^(#{1,3})\s+(.+)$/);
+    const w = M.match(/^(#{1,3})\s+(.+)$/);
     if (w) {
       const V = w[2];
-      k.push(w[1].length === 1 ? /* @__PURE__ */ (0, l.jsx)("h2", { children: V }, T) : w[1].length === 2 ? /* @__PURE__ */ (0, l.jsx)("h3", { children: V }, T) : /* @__PURE__ */ (0, l.jsx)("h4", { children: V }, T));
+      _.push(w[1].length === 1 ? /* @__PURE__ */ (0, l.jsx)("h2", { children: V }, T) : w[1].length === 2 ? /* @__PURE__ */ (0, l.jsx)("h3", { children: V }, T) : /* @__PURE__ */ (0, l.jsx)("h4", { children: V }, T));
       continue;
     }
-    if (O.startsWith("|")) {
+    if (M.startsWith("|")) {
       let V = [v], R = T + 1;
       for (; R < m.length && m[R].trim().startsWith("|"); ) V.push(m[R++]);
-      k.push(/* @__PURE__ */ (0, l.jsx)("pre", {
+      _.push(/* @__PURE__ */ (0, l.jsx)("pre", {
         className: "essentials-code",
         children: V.join(`
 `)
       }, T)), T = R - 1;
       continue;
     }
-    if (O.startsWith(">")) {
-      k.push(/* @__PURE__ */ (0, l.jsx)("blockquote", { children: O.replace(/^>\s?/, "") }, T));
+    if (M.startsWith(">")) {
+      _.push(/* @__PURE__ */ (0, l.jsx)("blockquote", { children: M.replace(/^>\s?/, "") }, T));
       continue;
     }
-    const _ = O.match(/^[-*]\s+(.+)$/), z = O.match(/^(\d+)\.\s+(.+)$/);
-    if (_ || z) {
-      k.push(/* @__PURE__ */ (0, l.jsxs)("p", {
+    const k = M.match(/^[-*]\s+(.+)$/), z = M.match(/^(\d+)\.\s+(.+)$/);
+    if (k || z) {
+      _.push(/* @__PURE__ */ (0, l.jsxs)("p", {
         className: "essentials-list",
-        children: [z ? z[1] + ". " : "• ", _ ? _[1] : z?.[2]]
+        children: [z ? z[1] + ". " : "• ", k ? k[1] : z?.[2]]
       }, T));
       continue;
     }
-    k.push(/* @__PURE__ */ (0, l.jsx)("p", { children: O }, T));
+    _.push(/* @__PURE__ */ (0, l.jsx)("p", { children: M }, T));
   }
-  return k;
+  return _;
 }
 function mx() {
-  const [r, m] = (0, N.useState)("handbook"), [k, u] = (0, N.useState)({}), [d, T] = (0, N.useState)({});
+  const [r, m] = (0, N.useState)("handbook"), [_, u] = (0, N.useState)({}), [d, T] = (0, N.useState)({});
   (0, N.useEffect)(() => {
-    const O = new AbortController();
+    const M = new AbortController();
     return Object.keys(xl).forEach(async (w) => {
       try {
-        const _ = await fetch(vf(xl[w].path), {
+        const k = await fetch(vf(xl[w].path), {
           credentials: "same-origin",
           cache: "no-store",
-          signal: O.signal
+          signal: M.signal
         });
-        if (!_.ok) throw new Error("HTTP " + _.status);
-        const z = await _.text();
+        if (!k.ok) throw new Error("HTTP " + k.status);
+        const z = await k.text();
         if (!z.includes(w === "handbook" ? "LIZHI-AI-RULES" : "LIZHI-APP-INTAKE")) throw new Error("文件版本或內容不符");
-        O.signal.aborted || u((V) => ({
+        M.signal.aborted || u((V) => ({
           ...V,
           [w]: z
         }));
-      } catch (_) {
-        O.signal.aborted || T((z) => ({
+      } catch (k) {
+        M.signal.aborted || T((z) => ({
           ...z,
-          [w]: "目前無法載入全文（" + _.message + "），請使用下方原始文件連結。"
+          [w]: "目前無法載入全文（" + k.message + "），請使用下方原始文件連結。"
         }));
       }
-    }), () => O.abort();
+    }), () => M.abort();
   }, []);
   const v = xl[r];
   return /* @__PURE__ */ (0, l.jsxs)("section", {
@@ -14437,17 +14439,17 @@ function mx() {
       }),
       /* @__PURE__ */ (0, l.jsx)("div", {
         className: "essentials-grid",
-        children: Object.keys(xl).map((O) => /* @__PURE__ */ (0, l.jsxs)("button", {
+        children: Object.keys(xl).map((M) => /* @__PURE__ */ (0, l.jsxs)("button", {
           type: "button",
-          className: "essentials-card " + (r === O ? "selected" : ""),
-          onClick: () => m(O),
-          "aria-pressed": r === O,
-          children: [O === "handbook" ? /* @__PURE__ */ (0, l.jsx)(gl, { size: 23 }) : /* @__PURE__ */ (0, l.jsx)(dm, { size: 23 }), /* @__PURE__ */ (0, l.jsxs)("span", { children: [/* @__PURE__ */ (0, l.jsx)("b", { children: xl[O].title }), /* @__PURE__ */ (0, l.jsxs)("small", { children: [
-            xl[O].version,
+          className: "essentials-card " + (r === M ? "selected" : ""),
+          onClick: () => m(M),
+          "aria-pressed": r === M,
+          children: [M === "handbook" ? /* @__PURE__ */ (0, l.jsx)(gl, { size: 23 }) : /* @__PURE__ */ (0, l.jsx)(dm, { size: 23 }), /* @__PURE__ */ (0, l.jsxs)("span", { children: [/* @__PURE__ */ (0, l.jsx)("b", { children: xl[M].title }), /* @__PURE__ */ (0, l.jsxs)("small", { children: [
+            xl[M].version,
             " · ",
-            xl[O].summary
+            xl[M].summary
           ] })] })]
-        }, O))
+        }, M))
       }),
       /* @__PURE__ */ (0, l.jsxs)("article", {
         className: "wide-card essentials-document",
@@ -14469,16 +14471,16 @@ function mx() {
           }),
           /* @__PURE__ */ (0, l.jsx)("div", {
             className: "essentials-highlights",
-            children: v.highlights.map((O) => /* @__PURE__ */ (0, l.jsxs)("p", { children: ["✓ ", O] }, O))
+            children: v.highlights.map((M) => /* @__PURE__ */ (0, l.jsxs)("p", { children: ["✓ ", M] }, M))
           }),
           d[r] && /* @__PURE__ */ (0, l.jsx)("p", {
             role: "status",
             className: "essentials-warning",
             children: d[r]
           }),
-          k[r] ? /* @__PURE__ */ (0, l.jsx)("div", {
+          _[r] ? /* @__PURE__ */ (0, l.jsx)("div", {
             className: "essentials-fulltext",
-            children: hx(k[r])
+            children: hx(_[r])
           }) : !d[r] && /* @__PURE__ */ (0, l.jsx)("p", {
             className: "muted",
             children: "正在讀取正式文件全文…"
@@ -14492,6 +14494,16 @@ function mx() {
     ]
   });
 }
+async function xx(r, m = () => window.open("about:blank", "_blank")) {
+  const _ = m();
+  if (!_) throw Error("瀏覽器阻擋了原圖視窗，請允許此網站開啟新視窗後再試。");
+  _.opener = null;
+  try {
+    _.location.replace(await r());
+  } catch (u) {
+    throw _.close(), u;
+  }
+}
 var ws = {
   animation: "動畫製作",
   model: "3D 模型",
@@ -14504,39 +14516,38 @@ var ws = {
   "FAIL",
   "BLOCKED",
   "NOT_TESTED"
-], zx = 10 * 1024 * 1024, xx = [
+], Nx = 10 * 1024 * 1024, gx = [
   "image/jpeg",
   "image/png",
   "image/webp"
 ];
-function gx({ image: r, access: m, onEdit: k, record: u }) {
-  const [d, T] = (0, N.useState)(""), [v, O] = (0, N.useState)(""), [w, _] = (0, N.useState)(!1);
+function bx({ image: r, access: m, onEdit: _, record: u }) {
+  const [d, T] = (0, N.useState)(""), [v, M] = (0, N.useState)(""), [w, k] = (0, N.useState)(!1);
   (0, N.useEffect)(() => {
     let V = !0;
     return m(r.id).then((R) => {
       V && T(R);
     }).catch((R) => {
-      V && O(R.message);
+      V && M(R.message);
     }), () => {
       V = !1;
     };
   }, [r.id, m]);
   async function z(V = !1) {
-    _(!0);
+    k(!0);
     try {
-      const R = await m(r.id);
       if (!V) {
-        window.open(R, "_blank", "noopener,noreferrer");
+        await xx(() => m(r.id));
         return;
       }
-      const re = await fetch(R);
+      const R = await m(r.id), re = await fetch(R);
       if (!re.ok) throw Error("原圖下載失敗");
       const pe = URL.createObjectURL(await re.blob()), J = document.createElement("a");
       J.href = pe, J.download = r.name, J.click(), setTimeout(() => URL.revokeObjectURL(pe), 1e3);
     } catch (R) {
-      O(R.message);
+      M(R.message);
     } finally {
-      _(!1);
+      k(!1);
     }
   }
   return /* @__PURE__ */ (0, l.jsxs)("article", {
@@ -14552,7 +14563,7 @@ function gx({ image: r, access: m, onEdit: k, record: u }) {
         loading: "lazy",
         src: d,
         alt: r.description || r.name,
-        onError: () => O("圖片連結可能已過期，請按重新載入")
+        onError: () => M("圖片連結可能已過期，請按重新載入")
       }) : /* @__PURE__ */ (0, l.jsx)("span", { children: "讀取圖片…" })
     }), /* @__PURE__ */ (0, l.jsxs)("div", {
       className: "project-image-info",
@@ -14574,7 +14585,7 @@ function gx({ image: r, access: m, onEdit: k, record: u }) {
           className: "project-image-actions",
           children: [/* @__PURE__ */ (0, l.jsx)("button", {
             className: "text-btn",
-            onClick: k,
+            onClick: _,
             children: "說明／連結紀錄"
           }), /* @__PURE__ */ (0, l.jsx)("button", {
             className: "icon-btn",
@@ -14590,8 +14601,8 @@ function gx({ image: r, access: m, onEdit: k, record: u }) {
     })]
   });
 }
-function bx({ project: r, transport: m, onSaved: k, onDirty: u, onBusy: d, recordFilter: T }) {
-  const [v, O] = (0, N.useState)(!1), [w, _] = (0, N.useState)([]), [z, V] = (0, N.useState)(""), [R, re] = (0, N.useState)(T ?? ""), [pe, J] = (0, N.useState)(""), [W, le] = (0, N.useState)(""), [X, oe] = (0, N.useState)(""), [H, F] = (0, N.useState)(!1), [te, ge] = (0, N.useState)(0), [ce, I] = (0, N.useState)(null), [j, $] = (0, N.useState)(T ?? ""), ze = (0, N.useRef)(null), he = (0, N.useRef)(r.revision);
+function vx({ project: r, transport: m, onSaved: _, onDirty: u, onBusy: d, recordFilter: T }) {
+  const [v, M] = (0, N.useState)(!1), [w, k] = (0, N.useState)([]), [z, V] = (0, N.useState)(""), [R, re] = (0, N.useState)(T ?? ""), [pe, J] = (0, N.useState)(""), [W, le] = (0, N.useState)(""), [X, oe] = (0, N.useState)(""), [H, F] = (0, N.useState)(!1), [te, ge] = (0, N.useState)(0), [ce, I] = (0, N.useState)(null), [j, $] = (0, N.useState)(T ?? ""), ze = (0, N.useRef)(null), he = (0, N.useRef)(r.revision);
   (0, N.useEffect)(() => {
     he.current = r.revision;
   }, [r.revision]), (0, N.useEffect)(() => (u(v || !!ce), () => u(!1)), [
@@ -14626,7 +14637,7 @@ function bx({ project: r, transport: m, onSaved: k, onDirty: u, onBusy: d, recor
     le("");
     const f = [];
     for (const D of Array.from(Z)) {
-      if (!xx.includes(D.type)) {
+      if (!gx.includes(D.type)) {
         le("只接受 JPG、PNG、WebP；其他格式請先轉換。");
         continue;
       }
@@ -14641,14 +14652,14 @@ function bx({ project: r, transport: m, onSaved: k, onDirty: u, onBusy: d, recor
         error: ""
       });
     }
-    _((D) => [...D, ...f]);
+    k((D) => [...D, ...f]);
   }
   async function B() {
     F(!0), d(!0), le("");
     let Z = !1;
     try {
       for (const f of w.filter((D) => D.status !== "saved")) {
-        _((K) => K.map((ee) => ee.key === f.key ? {
+        k((K) => K.map((ee) => ee.key === f.key ? {
           ...ee,
           status: "uploading",
           error: ""
@@ -14665,12 +14676,12 @@ function bx({ project: r, transport: m, onSaved: k, onDirty: u, onBusy: d, recor
         D.set("file", f.file, f.file.name);
         try {
           const K = await g("", D);
-          he.current = K.revision, k(K), _((ee) => ee.map((ne) => ne.key === f.key ? {
+          he.current = K.revision, _(K), k((ee) => ee.map((ne) => ne.key === f.key ? {
             ...ne,
             status: "saved"
           } : ne));
         } catch (K) {
-          Z = !0, _((ee) => ee.map((ne) => ne.key === f.key ? {
+          Z = !0, k((ee) => ee.map((ne) => ne.key === f.key ? {
             ...ne,
             status: "failed",
             error: K.message
@@ -14678,7 +14689,7 @@ function bx({ project: r, transport: m, onSaved: k, onDirty: u, onBusy: d, recor
           break;
         }
       }
-      Z || (oe("圖片已存入此專案"), O(!1), _([]), V(""), ge((f) => f + 1));
+      Z || (oe("圖片已存入此專案"), M(!1), k([]), V(""), ge((f) => f + 1));
     } finally {
       F(!1), d(!1);
     }
@@ -14687,7 +14698,7 @@ function bx({ project: r, transport: m, onSaved: k, onDirty: u, onBusy: d, recor
     if (Z.preventDefault(), !!ce) {
       F(!0), d(!0), le("");
       try {
-        k(await g("", {
+        _(await g("", {
           action: "update",
           projectId: r.id,
           revision: r.revision,
@@ -14728,7 +14739,7 @@ function bx({ project: r, transport: m, onSaved: k, onDirty: u, onBusy: d, recor
             className: "btn primary",
             disabled: r.archived || H,
             onClick: () => {
-              O(!0), I(null), V(""), re(j), J(""), _([]), le("");
+              M(!0), I(null), V(""), re(j), J(""), k([]), le("");
             },
             children: [/* @__PURE__ */ (0, l.jsx)(cf, { size: 17 }), "匯入圖片"]
           })]
@@ -14756,7 +14767,7 @@ function bx({ project: r, transport: m, onSaved: k, onDirty: u, onBusy: d, recor
       }),
       se.length ? /* @__PURE__ */ (0, l.jsx)("div", {
         className: "project-image-grid",
-        children: se.map((Z) => /* @__PURE__ */ (0, l.jsx)(gx, {
+        children: se.map((Z) => /* @__PURE__ */ (0, l.jsx)(bx, {
           image: Z,
           access: ae,
           record: r.records.find((f) => f.id === Z.recordId),
@@ -14786,7 +14797,7 @@ function bx({ project: r, transport: m, onSaved: k, onDirty: u, onBusy: d, recor
               "aria-label": "關閉圖片表單",
               disabled: H,
               onClick: () => {
-                window.confirm("放棄尚未儲存的表單？已成功上傳的圖片會保留。") && (O(!1), I(null));
+                window.confirm("放棄尚未儲存的表單？已成功上傳的圖片會保留。") && (M(!1), I(null));
               },
               children: /* @__PURE__ */ (0, l.jsx)(nn, { size: 20 })
             })]
@@ -14887,7 +14898,7 @@ function bx({ project: r, transport: m, onSaved: k, onDirty: u, onBusy: d, recor
                     const Z = m ? await m("workspace", "?view=managed&id=" + r.id) : await fetch("/api/workspace?view=managed&id=" + r.id);
                     if (Z.ok) {
                       const f = await Z.json();
-                      he.current = f.revision, k(f), le("");
+                      he.current = f.revision, _(f), le("");
                     }
                   },
                   children: "重新讀取專案"
@@ -14939,8 +14950,8 @@ function yf({ url: r, children: m }) {
     children: r
   })] });
 }
-function vx({ nativeTransport: r } = {}) {
-  const [m, k] = (0, N.useState)([]), [u, d] = (0, N.useState)(null), [T, v] = (0, N.useState)("overview"), [O, w] = (0, N.useState)(""), [_, z] = (0, N.useState)("resume"), [V, R] = (0, N.useState)(""), [re, pe] = (0, N.useState)(!0), [J, W] = (0, N.useState)(!1), [le, X] = (0, N.useState)(""), [oe, H] = (0, N.useState)(""), [F, te] = (0, N.useState)(""), [ge, ce] = (0, N.useState)(!1), [I, j] = (0, N.useState)(!1), [$, ze] = (0, N.useState)(""), [he, g] = (0, N.useState)({}), [ae, Q] = (0, N.useState)(!1), B = (0, N.useRef)(""), G = (0, N.useRef)(0), fe = (0, N.useRef)(""), se = (0, N.useRef)(!1);
+function jx({ nativeTransport: r } = {}) {
+  const [m, _] = (0, N.useState)([]), [u, d] = (0, N.useState)(null), [T, v] = (0, N.useState)("overview"), [M, w] = (0, N.useState)(""), [k, z] = (0, N.useState)("resume"), [V, R] = (0, N.useState)(""), [re, pe] = (0, N.useState)(!0), [J, W] = (0, N.useState)(!1), [le, X] = (0, N.useState)(""), [oe, H] = (0, N.useState)(""), [F, te] = (0, N.useState)(""), [ge, ce] = (0, N.useState)(!1), [I, j] = (0, N.useState)(!1), [$, ze] = (0, N.useState)(""), [he, g] = (0, N.useState)({}), [ae, Q] = (0, N.useState)(!1), B = (0, N.useRef)(""), G = (0, N.useRef)(0), fe = (0, N.useRef)(""), se = (0, N.useRef)(!1);
   fe.current = $;
   const Z = (0, N.useCallback)((y) => {
     se.current = y;
@@ -14962,7 +14973,7 @@ function vx({ nativeTransport: r } = {}) {
     try {
       const me = await f("workspace", "?view=managed"), h = y ? await f("workspace", "?view=managed&id=" + encodeURIComponent(y)) : null;
       if (ie !== G.current) return;
-      k(me), fe.current || d(h), X("");
+      _(me), fe.current || d(h), X("");
     } catch (me) {
       ie === G.current && X(me.message);
     } finally {
@@ -15121,7 +15132,7 @@ function vx({ nativeTransport: r } = {}) {
       }), me.title] }, me.id)) : /* @__PURE__ */ (0, l.jsx)("small", { children: "先在成果分頁登記，僅貼連結不能作為已檢查證據。" })]
     });
   }
-  return O && !ae ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsxs)("div", {
+  return M && !ae ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsxs)("div", {
     className: "project-return",
     children: [/* @__PURE__ */ (0, l.jsxs)("button", {
       className: "text-btn",
@@ -15142,10 +15153,10 @@ function vx({ nativeTransport: r } = {}) {
     })]
   }), /* @__PURE__ */ (0, l.jsx)(fx, {
     nativeTransport: r,
-    initialWorkId: O === "legacy" ? void 0 : O,
-    initialTab: _,
+    initialWorkId: M === "legacy" ? void 0 : M,
+    initialTab: k,
     onDirtyChange: Z
-  }, O + _)] }) : /* @__PURE__ */ (0, l.jsxs)("div", {
+  }, M + k)] }) : /* @__PURE__ */ (0, l.jsxs)("div", {
     className: "project-hub",
     children: [
       /* @__PURE__ */ (0, l.jsxs)("header", {
@@ -15504,7 +15515,7 @@ function vx({ nativeTransport: r } = {}) {
                   ]
                 }, y.id))
               ]
-            }) : T === "images" ? /* @__PURE__ */ (0, l.jsx)(bx, {
+            }) : T === "images" ? /* @__PURE__ */ (0, l.jsx)(vx, {
               project: u,
               transport: r,
               recordFilter: V,
@@ -15845,7 +15856,7 @@ function vx({ nativeTransport: r } = {}) {
     ]
   });
 }
-var jx = `
+var yx = `
 :host{--bg:#f7f8fa;--ink:#23322e;--muted:#85908b;--green:#326552;--border:#e4e9e6;--mint:#edf4ef;--font:'Noto Sans TC','PingFang TC','Microsoft JhengHei',system-ui,sans-serif}
 *{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--bg);font-family:var(--font);font-size:14px;line-height:1.6}button,input,textarea,select{font:inherit}button,a,input,textarea,select{-webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{cursor:default;opacity:.45}a{color:inherit;text-decoration:none}button{border:0}input,textarea,select{color:var(--ink)}textarea{resize:vertical}button:focus-visible,a:focus-visible{outline:3px solid #9abfae;outline-offset:3px}input:focus,textarea:focus,select:focus{outline:2px solid #92b5a3;outline-offset:1px}h1,h2,h3,p{margin:0}h1,h2,h3{font-weight:650;letter-spacing:.01em}small{font-size:11px}.workspace{display:flex;min-height:100vh}.sidebar{width:244px;background:#fff;border-right:1px solid var(--border);position:fixed;inset:0 auto 0 0;display:flex;flex-direction:column;padding:27px 18px 20px;z-index:15}.brand{display:flex;gap:12px;align-items:center;padding:0 8px 35px}.brandmark{height:39px;width:39px;display:grid;place-items:center;border-radius:11px;background:#315b49;color:white;font-family:serif;font-size:25px}.brand strong{display:block;font-size:17px;letter-spacing:.07em}.brand small{display:block;font-size:8px;color:#8a968e;letter-spacing:.12em;margin-top:2px}.side-label{font-size:10px;color:#909b96;letter-spacing:.12em;padding:0 12px 12px}.project-switch{display:flex;align-items:center;gap:9px;border:1px solid var(--border);border-radius:8px;padding:9px;color:#557062;margin:0 4px}.project-switch select{font-size:12px;min-width:0;width:100%;border:0;background:transparent;outline:none}.new-project{display:flex;justify-content:center;align-items:center;gap:6px;color:#62786b;background:transparent;padding:11px;font-size:11px;margin-bottom:22px}nav{display:grid;gap:6px}.nav-item{display:flex;align-items:center;gap:12px;width:100%;padding:13px 13px;background:transparent;text-align:left;border-radius:7px;color:#708078;font-size:12px}.nav-item.active{color:#315d48;background:#edf3ef;font-weight:650}.nav-item.active:before{content:'';position:absolute;left:0;width:3px;height:24px;background:#4d7a61;border-radius:0 3px 3px 0}.count{margin-left:auto;background:#f8e6e0;color:#b77457;border-radius:4px;min-width:20px;text-align:center;font-size:10px}.new-tag{margin-left:auto;font-size:8px;background:#e9edea;padding:1px 5px;border-radius:4px}.side-bottom{margin-top:auto;padding:28px 9px 0}.manual-mini{display:flex;gap:10px;padding:14px 0 20px;border-bottom:1px solid var(--border);color:#7d8a82}.manual-mini b,.manual-mini span{display:block;font-size:11px}.manual-mini span{font-size:10px;margin-top:4px;color:#9da59f}.archive-toggle{display:flex;gap:7px;align-items:center;font-size:10px;color:#8b968f;margin:15px 0}.side-bottom a{font-size:11px;display:flex;gap:6px;align-items:center;color:#819087}.main{margin-left:244px;min-width:0;flex:1}.topbar{height:67px;background:#fff;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 38px}.breadcrumb{display:flex;align-items:center;gap:12px;font-size:11px;color:#8a958e}.breadcrumb span{color:#4f6257}.top-actions{display:flex;gap:19px;align-items:center}.cloud-indicator{display:flex;gap:7px;align-items:center;font-size:10px;color:#7e8e84}.cloud-indicator i{width:5px;height:5px;background:#6c987c;border-radius:50%}.icon-btn{background:transparent;display:grid;place-items:center;padding:8px;color:#73857a;border-radius:6px}.icon-btn:hover{background:#edf2ef}.page-content{max-width:1540px;margin:auto;padding:35px 38px 18px}.page-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:27px;gap:20px}.eyebrow{font-size:9px;font-weight:600;letter-spacing:.16em;color:#829186;margin-bottom:7px}h1{font-size:27px;display:flex;gap:10px;align-items:center;line-height:1.5}.version{font-size:9px;font-weight:500;letter-spacing:.01em;background:#e9edeb;color:#849389;border-radius:4px;padding:2px 6px}.page-heading p{font-size:11px;color:#8d9690;margin-top:5px}.heading-actions{display:flex;gap:8px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #dce4de;border-radius:6px;background:#fff;padding:9px 13px;color:#62766a;font-size:11px;white-space:nowrap}.btn:hover{border-color:#87a393;background:#f9fbf9}.btn.primary{background:#365f4c;color:#fff;border-color:#365f4c}.btn.primary:hover{background:#244e3a}.btn.primary:disabled{background:#637c6d}.bordered{border:1px solid var(--border);background:#fff}.project-banner{border:1px solid #dae6de;background:linear-gradient(112deg,#f1f6f2,#eaf2ec);border-radius:10px;display:flex;justify-content:space-between;align-items:center;padding:24px 29px;margin-bottom:19px;gap:28px}.project-title{display:flex;gap:17px;align-items:center}.episode{height:47px;width:51px;background:white;border:1px solid #d9e5dc;display:grid;place-items:center;border-radius:8px;font-size:12px;font-weight:700;color:#587762;flex-shrink:0}.project-title h2{font-size:21px;display:flex;gap:10px;align-items:center}.project-title p{font-size:10px;color:#8b9a8f;margin-top:5px}.project-title p span{margin:0 7px}.project-progress{width:200px;flex-shrink:0}.project-progress>div:first-child{display:flex;justify-content:space-between;align-items:center}.project-progress span{font-size:10px;color:#718978}.project-progress b{font-size:23px;color:#476d55;font-weight:500}.project-progress b small{font-size:11px}.progress-track{height:4px;background:#dce8df;border-radius:9px;margin:5px 0}.progress-track i{display:block;height:4px;background:#71967c;border-radius:9px;transition:width .3s}.project-progress>small{display:block;text-align:right;color:#93a497;font-size:9px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:31px}.metrics>div{display:flex;gap:14px;align-items:center;background:#fff;border:1px solid var(--border);border-radius:8px;padding:17px 18px}.metric-icon{height:37px;width:37px;border-radius:9px;display:grid;place-items:center}.green{color:#5d8569;background:#edf4ef}.amber{color:#b49b6a;background:#faf5e9}.red{color:#bd8a79;background:#fbefeb}.blue{color:#849bb2;background:#eef3f7}.metrics b{font-size:23px;font-weight:550;line-height:1}.metrics em{font-size:11px;font-style:normal;font-weight:400;color:#b2b9b3}.metrics small{display:block;color:#8e9a92;font-size:10px;margin-top:5px}.section-title{display:flex;align-items:center;gap:13px;margin-bottom:17px}.section-title h2{font-size:15px}.section-title>span{font-size:10px;color:#9ca49e}.section-title p{font-size:11px;color:#98a098;margin-top:5px}.section-title>.btn{margin-left:auto}.branch-toggle{margin-left:auto;font-size:11px;display:flex;align-items:center;gap:6px;color:#617669}.flow-layout{display:grid;grid-template-columns:237px 1fr;gap:22px;align-items:start}.stage-list{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px}.stage-item{display:flex;gap:12px;align-items:center;padding:12px 10px;border-radius:7px;background:transparent;width:100%;text-align:left;position:relative}.stage-item:after{content:'';position:absolute;left:25px;bottom:-7px;height:18px;width:1px;background:#e6ebe7}.stage-item:last-of-type:after{display:none}.stage-item.selected{background:#edf4ef}.stage-item:hover{background:#f4f7f5}.stage-number{display:grid;place-items:center;flex-shrink:0;width:30px;height:30px;border:1px solid #e3e9e4;background:#fafbf9;color:#a2aca4;border-radius:50%;font-size:10px;position:relative;z-index:1}.stage-item.selected .stage-number{background:#487158;border-color:#487158;color:white}.stage-number.done{background:#e3efe6;color:#60846b;border-color:#e3efe6}.stage-item>div{flex:1}.stage-item small{font-size:8px;color:#a9b2ab;display:block}.stage-item strong{font-size:12px;display:block;font-weight:550;margin:1px 0}.stage-label{font-size:8px;color:#a2ada4;display:flex;gap:4px;align-items:center}.stage-item>svg{color:#bac7bd}.stage-item.selected strong{color:#3a674b}.legend{display:flex;justify-content:center;gap:16px;font-size:9px;color:#a5afa7;border-top:1px solid var(--border);padding:13px 0 3px;margin-top:10px}.legend span{display:flex;align-items:center;gap:5px}.legend-dot{width:5px;height:5px;border-radius:50%}.green-dot{background:#7c9d84}.gray-dot{background:#c3cbc5}.detail-card{background:#fff;border:1px solid var(--border);border-radius:9px;padding:27px 29px}.detail-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.detail-top h2{font-size:23px}.status{display:inline-flex;align-items:center;white-space:nowrap;padding:3px 9px;border-radius:4px;font-size:9px;line-height:1.7}.status.todo{background:#f0f2ef;color:#95a095}.status.candidate{background:#fbf4e3;color:#ac935c}.status.passed,.status.in_timeline{background:#e8f2e9;color:#587d61}.status.needs_revision{background:#faebe5;color:#b47762}.stage-description{color:#89968c;font-size:11px;line-height:1.9;margin:10px 0 21px}.gate-notice{display:flex;gap:9px;align-items:flex-start;font-size:10px;color:#a68e61;background:#fbf7ed;border:1px solid #eee6d3;border-radius:6px;padding:10px 12px;margin-bottom:19px}.gate-notice svg{flex-shrink:0;margin-top:1px}.output-box{display:flex;gap:12px;background:#f5f8f5;border:1px solid #e8ede6;border-radius:7px;padding:15px;margin-bottom:26px;color:#6f8975}.output-box strong{font-size:11px;font-weight:550}.output-box p{font-size:10px;color:#91a08f;margin-top:4px}.checklist-heading{display:flex;justify-content:space-between;margin-bottom:10px}.checklist-heading h3{font-size:12px}.checklist-heading span{font-size:10px;color:#92a08f}.checklist{margin-bottom:24px;display:grid;gap:8px}.checklist label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:11px 12px;background:#fff;border:1px solid #e7ebe6;border-radius:6px;color:#7b8b7e;font-size:11px;line-height:1.8}.checklist label.checked{background:#f5f9f5;border-color:#cedfcf;color:#53705a}input[type=checkbox]{accent-color:#5f896c;width:14px;height:14px;flex-shrink:0;margin:3px 0 0}.field-label{font-size:11px;display:flex;align-items:center;gap:5px;margin:18px 0 8px;color:#607566}.field-label span{font-size:8px;color:#a6b0a6;margin-left:auto}textarea{display:block;width:100%;border:1px solid #e2e8e1;border-radius:6px;padding:11px 12px;font-size:11px;line-height:1.8;background:#fdfefd;min-height:65px}.field-help{display:block;font-size:9px;color:#a0aca1;margin-top:5px}.reviews{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:23px}.reviews>div{background:#fafbf9;border:1px solid #ecf0e9;border-radius:6px;padding:12px}.review-title{display:flex;align-items:center;gap:6px;font-size:10px;color:#7e9180;margin-bottom:9px}.reviews b{font-size:10px}.reviews p{font-size:10px;white-space:pre-wrap;margin-top:5px;word-break:break-word}.reviews small{display:block;font-size:8px;color:#a6b1a5;margin-top:5px}.muted{color:#9aa69a;font-size:11px}.green-text{color:#5b865e}.red-text,.danger-text{color:#b37a65!important}.detail-actions{margin-top:25px;display:flex;justify-content:space-between;gap:10px;align-items:center;padding-top:19px;border-top:1px solid var(--border)}.detail-actions>div{display:flex;gap:7px}.text-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 0;font-size:10px;color:#6f8b73;background:transparent;white-space:nowrap}.gate-reasons{font-size:9px;line-height:1.9;color:#a3afa3;margin-top:12px;text-align:right}.principle{display:flex;align-items:center;gap:12px;background:#eef2ee;border:1px solid #e2e9df;border-radius:8px;padding:17px 20px;margin-top:21px;color:#7c907d}.principle b{font-size:11px;font-weight:550}.principle p{font-size:9px;color:#9aaa98;margin-top:3px}footer{font-size:8px;color:#abb4aa;margin:26px 0 0;display:flex;justify-content:space-between;gap:10px}footer span{font-size:8px}.empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;padding:65px 15px;color:#9eafa0;text-align:center}.empty h3{font-size:16px;color:#718975}.empty p{font-size:11px;color:#a4afa5}.onboarding{background:#fff;border:1px solid var(--border);border-radius:12px;text-align:center;padding:50px 25px}.onboarding-icon{background:#edf4ef;border:1px solid #dce8df;color:#5d8067;height:73px;width:73px;margin:0 auto 25px;border-radius:18px;display:grid;place-items:center}.onboarding h2{font-size:25px;margin-bottom:14px}.onboarding>p{color:#91a091;font-size:12px;line-height:2;margin-bottom:24px}.onboarding-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:730px;margin:35px auto 22px;text-align:left}.onboarding-grid>div{border:1px solid #e8ede7;background:#fbfcfa;border-radius:7px;padding:12px;color:#7b907e;font-size:11px;display:flex;gap:9px}.onboarding-grid span{color:#b3c0b1;font-size:10px}.onboarding>small{color:#aab4a6;font-size:10px}.wide-card{background:#fff;border:1px solid var(--border);border-radius:9px;padding:26px}.wide-card h2{font-size:19px}.search{display:flex;gap:10px;align-items:center;background:#f8faf7;border:1px solid #e6ece2;border-radius:7px;padding:9px 12px;color:#9aad96;margin-bottom:20px;max-width:400px}.search input{border:0;background:transparent;font-size:11px;width:100%;outline:none}.table-scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:10px;text-align:left}th{font-size:9px;color:#a3b29c;letter-spacing:.05em;background:#f7faf5;font-weight:500;padding:12px 9px;border-bottom:1px solid #e6ece1}td{padding:16px 9px;border-bottom:1px solid #edf0ea;min-width:90px;max-width:260px}td small{display:block;color:#a8b2a2;font-size:8px;margin-top:4px}td b{font-size:11px}td .table-actions{display:flex;flex-direction:column;gap:4px;align-items:flex-start}.inline-note{font-size:10px;color:#a3b09c;border-top:1px solid var(--border);padding-top:16px;margin-top:17px}.issue-list{display:grid;gap:12px}.issue-card{border:1px solid var(--border);border-radius:7px;padding:18px}.issue-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.issue-top b{font-size:11px}.issue-top time{margin-left:auto;font-size:9px;color:#a8b09f}.issue-card>p{font-size:12px;margin:14px 0;white-space:pre-wrap}.issue-card>small{font-size:9px;color:#a1b09c}.issue-card>.btn{display:block;margin-top:12px}.resolution{display:flex;gap:8px;color:#6d8e67;background:#f3f8ef;font-size:11px;padding:12px;margin-top:12px;white-space:pre-wrap}.audit-list>div{display:flex;gap:14px;padding:17px 0;border-bottom:1px solid var(--border);align-items:center}.audit-icon{width:33px;height:33px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;background:#eef4ea;color:#7e9d72}.audit-icon.ai{background:#eef1fa;color:#8798b8}.audit-list b{font-size:11px}.audit-list b span{color:#8aa17d;margin-left:8px}.audit-list small{display:block;font-size:9px;color:#9cac94;margin-top:4px}.audit-list time{margin-left:auto;font-size:9px;color:#a7b29f;white-space:nowrap}.connection-layout{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}.connection-symbol{display:flex;align-items:center;gap:20px;color:#73926b;padding:15px 0 30px}.connection-symbol svg:nth-child(2){color:#c3cfc0}.connection-state{display:flex;align-items:center;gap:12px;background:#f5f8f2;border:1px solid #e7ece1;padding:16px;border-radius:7px;margin:20px 0}.connection-state i{width:7px;height:7px;border-radius:50%}.online-dot{background:#709f62}.connection-state b{font-size:11px}.connection-state small{display:block;color:#a2b095;margin-top:4px;font-size:9px}.connect-steps{padding-left:22px;margin:25px 0;color:#7f9873}.connect-steps li{padding-left:9px;margin-bottom:20px}.connect-steps b{font-size:12px}.connect-steps p{font-size:10px;color:#a0ae97;line-height:1.9;margin-top:5px}.capability-card h3{font-size:13px;margin-bottom:22px}.capability-card>p{display:flex;align-items:center;gap:10px;font-size:11px;color:#8da180;margin:15px 0}.capability-card>p svg{color:#99b48b;flex-shrink:0}.author-only{border-top:1px solid var(--border);padding-top:22px;margin-top:25px;color:#779568}.author-only b{display:block;font-size:12px;margin:10px 0 6px}.author-only p{font-size:11px;color:#a1b294}.capability-card>small{display:block;color:#aebaa5;font-size:10px;margin-top:25px;line-height:1.9}.error-banner{display:flex;gap:10px;align-items:center;background:#fbede8;color:#ac745d;padding:12px 15px;border:1px solid #f0d8ca;border-radius:7px;margin-bottom:18px;font-size:12px}.error-banner>button{margin-left:auto;background:none;color:inherit}.error-banner a{text-decoration:underline;font-weight:bold}.toast{position:fixed;bottom:27px;left:calc(50% + 80px);transform:translateX(-50%);border:1px solid #d5e6cc;background:#f4fbef;box-shadow:0 5px 30px #37502b15;color:#6e955b;display:flex;gap:9px;align-items:center;padding:13px 22px;border-radius:9px;font-size:12px;z-index:55}.modal-backdrop{position:fixed;inset:0;background:#20332255;backdrop-filter:blur(3px);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px}.modal{width:460px;max-height:90vh;overflow:auto;background:#fff;border-radius:12px;padding:25px;box-shadow:0 20px 90px #182e2340}.modal.large{width:800px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.modal-head h2{font-size:19px}.form-field{display:flex;flex-direction:column;gap:7px;font-size:11px;color:#7f9672;margin-top:16px}.form-field input,.form-field select{width:100%;padding:10px 12px;border:1px solid #dee8d8;border-radius:6px;background:#fcfefa;font-size:12px}.form-field textarea{font-size:12px}.shot-form{display:grid;grid-template-columns:1fr 1fr;gap:0 17px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--border);padding-top:20px;margin-top:25px}.modal-error{color:#b7735e;background:#fbefe7;padding:10px;border-radius:5px;font-size:11px;margin-top:15px}details{font-size:11px;margin-top:20px;color:#7d9570}pre{font-size:10px;white-space:pre-wrap;word-break:break-all;padding:10px;background:#f7faf4}.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 @media(min-width:1500px){.page-content{padding-top:40px}.detail-card{padding:30px 36px}.stage-item{padding-top:13px;padding-bottom:13px}}
@@ -15886,37 +15897,37 @@ var jx = `
 .essentials-root{display:grid;gap:20px}.essentials-root .page-heading{margin-bottom:0}.essentials-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.essentials-card{display:flex;align-items:flex-start;gap:12px;width:100%;border:1px solid var(--border);background:#fff;padding:19px;border-radius:10px;text-align:left;color:var(--ink);cursor:pointer}.essentials-card svg{flex:none;color:var(--green)}.essentials-card.selected{border-color:var(--green);background:#f0f7f2}.essentials-card b{display:block;font-size:14px}.essentials-card small{display:block;color:var(--muted);font-size:11px;line-height:1.8;margin-top:7px}.essentials-document .section-title h2{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.essentials-document .section-title .btn{display:inline-flex;align-items:center;gap:5px;text-decoration:none}.essentials-highlights{display:grid;gap:6px;background:#f6f9f5;padding:15px 18px;border-radius:8px;margin:16px 0;color:#456b50}.essentials-highlights p{font-size:12px;margin:0}.essentials-fulltext{max-height:65dvh;overflow-y:auto;border:1px solid var(--border);padding:18px 23px;border-radius:8px;background:#fdfefd;line-height:1.85;overflow-wrap:anywhere}.essentials-fulltext h2{font-size:19px;margin:20px 0 12px}.essentials-fulltext h3{font-size:16px;margin:19px 0 10px}.essentials-fulltext h4{font-size:13px;margin:15px 0 8px}.essentials-fulltext p,.essentials-fulltext blockquote{font-size:12px;margin:8px 0;white-space:pre-wrap}.essentials-fulltext blockquote{border-left:3px solid var(--green);padding-left:12px;color:var(--muted)}.essentials-fulltext hr{border:0;border-top:1px solid var(--border);margin:20px 0}.essentials-code{white-space:pre-wrap;overflow-x:auto;word-break:break-word;background:#eef3ef;padding:14px;border-radius:7px;font-size:11px}.essentials-list{padding-left:8px}.essentials-warning{color:#a16a37;background:#fff9ea;padding:13px;border-radius:7px}@media(max-width:650px){.essentials-grid{grid-template-columns:1fr}.essentials-card{padding:14px}.essentials-document{padding:15px}.essentials-fulltext{padding:14px;max-height:70dvh}.hub-header .btn{font-size:11px}}
 .project-image-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:22px}.project-image-card{border:1px solid var(--border);border-radius:12px;overflow:hidden;min-width:0;background:#fff}.project-image-preview{border:0;background:#f0f3f0;width:100%;height:190px;display:grid;place-items:center;padding:0;cursor:zoom-in;color:var(--muted)}.project-image-preview img{width:100%;height:100%;object-fit:contain}.project-image-info{padding:15px}.project-image-info>b{display:block;font-size:13px;overflow-wrap:anywhere}.project-image-info p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:8px 0}.project-image-info small{display:block;font-size:11px;color:#718176;margin:7px 0;overflow-wrap:anywhere;max-height:4em;overflow:hidden}.project-image-info small svg{display:inline;vertical-align:middle;margin-right:5px}.project-image-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}.image-dropzone{display:block;border:1px dashed #759982;border-radius:12px;padding:25px;background:#f5f8f5;font-weight:600}.image-dropzone input{display:block;max-width:100%;margin-top:14px;font-size:13px}.image-upload-list{list-style:none;margin:14px 0;padding:0;max-height:190px;overflow-y:auto}.image-upload-list li{padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;overflow-wrap:anywhere}.image-upload-list li small{display:block;color:#6b7f71}.image-upload-list p{color:#a04433;margin:4px 0}.project-images>.form-field{max-width:500px}.hub-tabs{flex-wrap:wrap}@media(max-width:900px){.project-image-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.project-image-grid{grid-template-columns:1fr}.project-image-preview{height:240px}.image-dropzone{padding:18px}.project-images .section-title .heading-actions{width:100%;justify-content:flex-end}}
 
-:host{display:block;--bg:#f7f8fa;--ink:#23322e;--muted:#85908b;--green:#326552;--border:#e4e9e6;--mint:#edf4ef;--font:'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;color:var(--ink);font:14px/1.6 var(--font);background:var(--bg)}.native-production{min-width:0}.workspace{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:calc(100dvh - 70px)}.sidebar{position:sticky;inset:auto;top:0;width:auto;height:calc(100dvh - 70px);overflow-y:auto;padding-top:20px}.brand{display:none}.main{margin-left:0!important}.topbar{height:48px}.page-content{padding:24px}.cloud-indicator{font-size:11px}.sidebar nav{max-height:none}.side-bottom{padding-top:20px}@media(max-width:850px){.workspace{grid-template-columns:185px minmax(0,1fr)}.page-content{padding:20px}}@media(max-width:600px){.workspace{display:block}.sidebar{position:relative;height:auto;padding:12px 16px 0}.main{margin:0}.topbar{display:none}.page-content{padding:20px 16px}.page-heading{margin-top:0}.page-heading p{max-width:none;font-size:12px}.sidebar .new-project{margin-bottom:6px}h1{font-size:24px}}`, yx = "https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-production", ks = /* @__PURE__ */ new WeakMap(), Sx = async (r, m, k) => {
+:host{display:block;--bg:#f7f8fa;--ink:#23322e;--muted:#85908b;--green:#326552;--border:#e4e9e6;--mint:#edf4ef;--font:'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;color:var(--ink);font:14px/1.6 var(--font);background:var(--bg)}.native-production{min-width:0}.workspace{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:calc(100dvh - 70px)}.sidebar{position:sticky;inset:auto;top:0;width:auto;height:calc(100dvh - 70px);overflow-y:auto;padding-top:20px}.brand{display:none}.main{margin-left:0!important}.topbar{height:48px}.page-content{padding:24px}.cloud-indicator{font-size:11px}.sidebar nav{max-height:none}.side-bottom{padding-top:20px}@media(max-width:850px){.workspace{grid-template-columns:185px minmax(0,1fr)}.page-content{padding:20px}}@media(max-width:600px){.workspace{display:block}.sidebar{position:relative;height:auto;padding:12px 16px 0}.main{margin:0}.topbar{display:none}.page-content{padding:20px 16px}.page-heading{margin-top:0}.page-heading p{max-width:none;font-size:12px}.sidebar .new-project{margin-bottom:6px}h1{font-size:24px}}`, Sx = "https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-production", ks = /* @__PURE__ */ new WeakMap(), zx = async (r, m, _) => {
   const u = window.LizhiAuth;
   if (!u?.client) throw new Error("請先登入立之雲端庫");
   const { data: d, error: T } = await u.client.auth.getSession();
   if (T || !d.session?.access_token) throw new Error("登入已失效，請重新登入雲端庫");
-  return fetch(yx + "/" + r + m, {
+  return fetch(Sx + "/" + r + m, {
     cache: "no-store",
     headers: {
       Authorization: "Bearer " + d.session.access_token,
       apikey: window.LIZHI_SUPABASE_PUBLISHABLE_KEY,
-      ...k && !(k instanceof FormData) ? { "Content-Type": "application/json" } : {}
+      ..._ && !(_ instanceof FormData) ? { "Content-Type": "application/json" } : {}
     },
-    ...k ? {
+    ..._ ? {
       method: "POST",
-      body: k instanceof FormData ? k : JSON.stringify(k)
+      body: _ instanceof FormData ? _ : JSON.stringify(_)
     } : {}
   });
 };
-function Nx(r) {
+function wx(r) {
   if (ks.has(r)) return;
-  const m = r.attachShadow({ mode: "open" }), k = document.createElement("style");
-  k.textContent = jx, m.append(k);
+  const m = r.attachShadow({ mode: "open" }), _ = document.createElement("style");
+  _.textContent = yx, m.append(_);
   const u = document.createElement("div");
   u.className = "native-production", m.append(u);
   const d = (0, Hm.createRoot)(u);
-  ks.set(r, d), d.render(/* @__PURE__ */ (0, l.jsx)(vx, { nativeTransport: Sx }));
+  ks.set(r, d), d.render(/* @__PURE__ */ (0, l.jsx)(jx, { nativeTransport: zx }));
 }
-function wx(r) {
+function _x(r) {
   ks.get(r)?.unmount(), ks.delete(r);
 }
 export {
-  Nx as mount,
-  wx as unmount
+  wx as mount,
+  _x as unmount
 };

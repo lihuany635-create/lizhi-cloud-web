@@ -31,3 +31,11 @@
 調查前次 Pages run40259051042 的真實失敗 log，確認工作台使用 Vite 8 的 `minify: esbuild`，卻沒有宣告 esbuild，導致獨立 CI 建置失敗。補列 `esbuild: 0.28.0`，與既有 Sites 的實際版本一致。移除本次測試用 node_modules 連結，從 native package.json 重新安裝後，37 項測試全部通過，正式 native build 通過。原始缺漏不是通過狀態，正式瀏覽器仍待新部署。
 
 官方依據：https://v8.vite.dev/guide/migration （esbuild 已改為可選依賴，使用 esbuild 壓縮須自行安裝）。
+
+## 正式瀏覽器補驗與原圖視窗修復
+
+在隔離測試專案透過正式登入頁面實際匯入 PNG/JPG，兩圖640×360成功解碼；說明修改、紀錄圖片數2與0的篩選、整頁重新整理讀回皆通過。兩原檔下載逐位元組比對一致，PNG5802bytes / SHA256 3b6450a859ddd398b41796064c930a2b6d8191ecbd76a666d8f57baeae88c4e8，JPG11433bytes / SHA256 31ffeca6279497b563088b0398b4d17b5d6b8f421fcbe642ed6c54677f7e2e81。
+
+另發現原圖視窗在等待雲端網址後才呼叫window.open，瀏覽器可能阻擋且未顯示錯誤。改為點擊時同步建立視窗並立即移除opener，取得網址後載入；明確處理瀏覽器阻擋與讀取失敗，失敗關閉暫用視窗，不自動重送。新增3項時序／阻擋／失敗清理測試。native總測試40 PASS/0 FAIL、build通過。新版原圖視窗的正式瀏覽器重驗待發布；不能把修正程式或單元測試當成已重驗。
+
+實體手機選圖仍NOT_TESTED。
