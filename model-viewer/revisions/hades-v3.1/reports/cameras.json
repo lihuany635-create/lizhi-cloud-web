@@ -1,0 +1,202 @@
+[
+  {
+    "name": "C01_EXT_FRONT",
+    "eye_gltf_m": [
+      0.0,
+      3.2,
+      19.5
+    ],
+    "target_gltf_m": [
+      0.0,
+      3.6,
+      2.0
+    ],
+    "eye_plan_mm": [
+      4500,
+      -15500,
+      3200
+    ],
+    "target_plan_mm": [
+      4500,
+      2000,
+      3600
+    ],
+    "vfov_deg": 50,
+    "note": "Establishing exterior from south street"
+  },
+  {
+    "name": "C02_BLACK_CAR_WINDOW_VIEW",
+    "eye_gltf_m": [
+      2.755,
+      4.55,
+      3.25
+    ],
+    "target_gltf_m": [
+      3.0,
+      1.4,
+      8.3
+    ],
+    "eye_plan_mm": [
+      7255,
+      750,
+      4550
+    ],
+    "target_plan_mm": [
+      7500,
+      -4300,
+      1400
+    ],
+    "vfov_deg": 50,
+    "note": "V-002 R01 eye 0.75 m from south wall, +4.55 m; looks at car roof"
+  },
+  {
+    "name": "C03_ENTRY_TO_STAIRS",
+    "eye_gltf_m": [
+      -2.8,
+      1.55,
+      3.4
+    ],
+    "target_gltf_m": [
+      -3.7,
+      1.3,
+      -0.2
+    ],
+    "eye_plan_mm": [
+      1700,
+      600,
+      1550
+    ],
+    "target_plan_mm": [
+      800,
+      4200,
+      1300
+    ],
+    "vfov_deg": 60,
+    "note": "Inside D-01 looking at D-02 and stair"
+  },
+  {
+    "name": "C04_STAIR_UP",
+    "eye_gltf_m": [
+      -3.7,
+      1.55,
+      0.7
+    ],
+    "target_gltf_m": [
+      -2.3,
+      2.6,
+      -1.2
+    ],
+    "eye_plan_mm": [
+      800,
+      3300,
+      1550
+    ],
+    "target_plan_mm": [
+      2200,
+      5200,
+      2600
+    ],
+    "vfov_deg": 65,
+    "note": "Foot of flight 1 looking up to landing"
+  },
+  {
+    "name": "C05_ROOM_TO_HALL",
+    "eye_gltf_m": [
+      2.7,
+      4.2,
+      1.2
+    ],
+    "target_gltf_m": [
+      0.4,
+      4.1,
+      -0.3
+    ],
+    "eye_plan_mm": [
+      7200,
+      2800,
+      4200
+    ],
+    "target_plan_mm": [
+      4900,
+      4300,
+      4100
+    ],
+    "vfov_deg": 60,
+    "note": "Protagonist room toward D-08 / hall"
+  },
+  {
+    "name": "C06_LIVING_SOFA",
+    "eye_gltf_m": [
+      3.25,
+      1.15,
+      2.3
+    ],
+    "target_gltf_m": [
+      0.7,
+      1.05,
+      -0.3
+    ],
+    "eye_plan_mm": [
+      7750,
+      1700,
+      1150
+    ],
+    "target_plan_mm": [
+      5200,
+      4300,
+      1050
+    ],
+    "vfov_deg": 65,
+    "note": "Seated on sofa return toward TV wall and dining"
+  },
+  {
+    "name": "C07_DINING_KITCHEN",
+    "eye_gltf_m": [
+      3.95,
+      1.55,
+      -0.6
+    ],
+    "target_gltf_m": [
+      0.5,
+      1.1,
+      -3.4
+    ],
+    "eye_plan_mm": [
+      8450,
+      4600,
+      1550
+    ],
+    "target_plan_mm": [
+      5000,
+      7400,
+      1100
+    ],
+    "vfov_deg": 65,
+    "note": "Dining corner looking into kitchen"
+  },
+  {
+    "name": "C08_PROTAGONIST_DESK",
+    "eye_gltf_m": [
+      2.8,
+      4.2,
+      2.7
+    ],
+    "target_gltf_m": [
+      4.1,
+      3.8,
+      1.1
+    ],
+    "eye_plan_mm": [
+      7300,
+      1300,
+      4200
+    ],
+    "target_plan_mm": [
+      8600,
+      2900,
+      3800
+    ],
+    "vfov_deg": 60,
+    "note": "Desk with student ID / uniform"
+  }
+]

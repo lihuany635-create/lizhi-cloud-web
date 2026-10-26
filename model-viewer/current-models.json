@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-hades-v3-0-20261026",
+  "version": "mixed-current-hades-v3-1-20261026",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -20,22 +20,23 @@
     },
     {
       "model": "hades-house.glb",
-      "version": "HADES-v3.0",
-      "source_candidate": "revisions/hades-v3.0/hades-house_v3_0.glb",
-      "current_sha256": "c95e87cb9a35af58104da97a2a95b31505f7636af61fe27e42e91c55f3f405b9",
-      "backup": "revisions/hades-v2.4/transfer (exact HADES-v2.4, gz parts) + backups/pre-hades-v2.4/hades-house.glb (v2.3 repo baseline)",
-      "backup_sha256": "3e9954932b51c04f0d9c7b3750b978e93cda6b9b260049eae8988dd37a5bc21c",
+      "version": "HADES-v3.1",
+      "source_candidate": "revisions/hades-v3.1/hades-house_v3_1.glb",
+      "current_sha256": "8e00060940cfd00201cfbab1e98f175f261c3f7de69efea60c264f24f0320e32",
+      "backup": "revisions/hades-v3.0/hades-house_v3_0.glb",
+      "backup_sha256": "c95e87cb9a35af58104da97a2a95b31505f7636af61fe27e42e91c55f3f405b9",
       "integrated_contents": "Full rebuild from EP02 23-image package v2 (2026-10-26): 9x8 m two-storey shell per A-101/A-102 R00 SVG coordinates, R01 roof/elevations/stair/door index, 9 doors, 12 windows, U-stair 16x187.5, I-101/I-102 furniture, A-001 site with the single black car, 8 fixed cameras C01-C08.",
       "author_full_item_approval": "PENDING",
-      "review_url": "revisions/hades-v3.0/",
-      "build_script": "revisions/hades-v3.0/scripts/build_hades_v3.py",
+      "review_url": "revisions/hades-v3.1/",
+      "build_script": "revisions/hades-v3.1/scripts/build_hades_v3.py",
       "static_geometry_qa": "PASS (static only): 0 furniture/wall AABB overlaps, 0 door-swing conflicts, stair 16x187.5=3000, headroom >=2592 mm, V-002 car sightline 4082 mm at wall (window yes / bedside no)",
-      "visual_qa": "HEADLESS_RENDER_CAPTURED_15_VIEWS__AUTHOR_REVIEW_PENDING",
+      "visual_qa": "HEADLESS_POV_RERENDER_OF_REPORTED_SPOTS__AUTHOR_PHONE_RECHECK_PENDING",
       "deviations": [
         "D-02 leaf swings into foyer instead of drawn stair-side swing (3D collision with flight-1 treads)",
         "Window IDs W-101..W-206 named by location (A-402 R00 table not in package)"
       ],
-      "supersedes": "HADES-v2.4 (22x14 m inferred layout)"
+      "supersedes": "HADES-v2.4 (22x14 m inferred layout)",
+      "v3_1_fixes": "User phone POV review 2026-10-26: fridge against kitchen south wall + south counter; foyer mirror wall-mounted (was free-standing); umbrella stand out of entry path; corridor floor plant removed; 2F hall plant on cabinet; free-standing TV feature wall removed (TV on console stand); hall art z-fighting frame rebuilt with depth; beds with draped duvet, throw and round pillows"
     },
     {
       "model": "reality-highschool.glb",
