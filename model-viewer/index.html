@@ -111,7 +111,7 @@ button,label.btn{font:inherit;cursor:pointer}
   <label class="sample" for="sampleSel"><span>範例</span>
     <select id="sampleSel">
       <option value="reality-home">現實主角家（一、二樓）</option>
-      <option value="hades-house">哈德斯家 v3.2（EP02 9×8m，一、二樓）</option>
+      <option value="hades-house">哈德斯家 v3.3（EP02 9×8m，一、二樓）</option>
       <option value="reality-highschool">現實高中（校園＋3F 教室）</option>
       <option value="xiji-station">溪磯鎮車站</option>
       <option value="lahudi-academy">拉乎迪學院（校園＋V12 家具初稿）</option>
@@ -122,7 +122,7 @@ button,label.btn{font:inherit;cursor:pointer}
   
   <span id="viewerVersion" class="file" aria-live="polite"></span>
   <span id="academyViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="academyWhole" type="button">整座學院</button><button class="btn" id="academySchool" type="button">主教學樓</button><button class="btn" id="academyLibrary" type="button">圖書館區</button><button class="btn" id="academyGate" type="button">動畫校門 V14</button><button class="btn" id="academyGarden" type="button">薇媞後花園 V15</button><button class="btn" id="academyPlants" type="button">室內植栽 V16</button></span><label id="academyInteriorPicker" hidden class="sample"><span>室內家具</span><select id="academyInteriorSelect" aria-label="查看學院室內分區"><option value="">選擇區域／樓層</option><option value="B1">西教學翼 1F</option><option value="B2">西教學翼 2F</option><option value="C1">東教學翼 1F</option><option value="C2">東教學翼 2F</option><option value="D1">南入口 1F</option><option value="E1">北學術廳 1F</option><option value="G1">禮堂 1F</option><option value="H1">檔案翼 1F</option></select></label>
-  <span id="houseViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="house1F">一樓俯視</button><button class="btn" id="house2F">二樓俯視</button><button class="btn" id="houseWhole">完整外觀</button><a class="btn" href="revisions/hades-v3.2/">配置圖</a></span>
+  <span id="houseViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="house1F">一樓俯視</button><button class="btn" id="house2F">二樓俯視</button><button class="btn" id="houseWhole">完整外觀</button><a class="btn" href="revisions/hades-v3.3/">配置圖</a></span>
 </div>
 
 <div id="stage">
@@ -134,8 +134,8 @@ button,label.btn{font:inherit;cursor:pointer}
       <label>視角 <select id="previewShot" aria-label="預覽視角"></select></label>
       <label class="preview-zoom">放大 <input id="previewZoom" aria-label="預覽放大比例" type="range" min="100" max="300" step="25" value="100"><output id="previewZoomOut">100%</output></label>
       <button class="btn" id="previewReset" type="button">重設大小</button>
-      <a class="btn" id="previewReview" href="revisions/hades-v3.2/">完整配置圖</a>
-      <a class="btn" id="previewDownload" href="hades-house.glb?v=3.2-20261026" download>下載 GLB</a>
+      <a class="btn" id="previewReview" href="revisions/hades-v3.3/">完整配置圖</a>
+      <a class="btn" id="previewDownload" href="hades-house.glb?v=3.3-20261026" download>下載 GLB</a>
       <button class="btn" id="previewRetry" type="button">重試 3D</button>
       <button class="btn" id="previewBack" type="button" hidden>返回 3D</button>
     </header>
@@ -502,7 +502,7 @@ const SAMPLES={
   },
   "hades-house": {
     "name": "哈德斯家.glb",
-    "file": "hades-house.glb?v=3.2-20261026",
+    "file": "hades-house.glb?v=3.3-20261026",
     "cut": 0.75,
     "fit": [
       -8,
