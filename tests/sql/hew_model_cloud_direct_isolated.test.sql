@@ -32,9 +32,8 @@ begin
  if has_function_privilege('authenticated',
   'public.lizhi_model_cloud_write(uuid,uuid,text,uuid,bigint,jsonb)','EXECUTE')
   then raise exception 'Browser may mutate direct cloud model';end if;
- if has_table_privilege('authenticated',
-  'lizhi_model_private.cloud_documents','SELECT')
-  then raise exception 'Private scene leaked';end if;
+ if has_schema_privilege('authenticated','lizhi_model_private','USAGE')
+  then raise exception 'Private scene schema unexpectedly exposed';end if;
 end $$;
 reset role;
 -- The Edge service_role credentials are exclusively server-side.
