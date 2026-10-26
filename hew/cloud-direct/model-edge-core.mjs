@@ -24,7 +24,7 @@ async function equalToken(a,b){
 }
 async function query(db,name,args){
  const {data,error}=await db.rpc(name,args)
- if(error)throw Error(error.code==='40001'?'MODEL_REVISION_CONFLICT':'MODEL_STORAGE_ERROR')
+ if(error)throw Error(error.code==='P0001'&&error.message==='MODEL_REVISION_CONFLICT'?'MODEL_REVISION_CONFLICT':'MODEL_STORAGE_ERROR')
  return data
 }
 export async function handleCloudModelEdgeRequest(req,{token,ownerUid,db}){
