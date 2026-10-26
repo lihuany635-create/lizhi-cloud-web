@@ -2,9 +2,9 @@
   'use strict';
   const $=id=>document.getElementById(id);
   const sample=$('sampleSel'),pane=$('modelPreview'),image=$('previewImage');
-  const base='revisions/hades-v3.0/';
+  const base='revisions/hades-v3.1/';
   const scenes={
-    'hades-house':{name:'哈德斯家 v3.0',file:'hades-house.glb?v=3.0-20261026',review:base,views:[
+    'hades-house':{name:'哈德斯家 v3.1',file:'hades-house.glb?v=3.1-20261026',review:base,views:[
       ['一樓俯視','V04_PLAN_1F'],['二樓俯視','V05_PLAN_2F'],['完整外觀','V01_EXT_SE'],
       ['南向正面','V02_EXT_SOUTH'],['西北外觀','V03_EXT_NW'],['樓梯剖視','V06_STAIR_CUT'],['基地俯視','V07_SITE_TOP'],
       ['C01 街景','C01_EXT_FRONT'],['C02 主角窗看黑車','C02_BLACK_CAR_WINDOW_VIEW'],['C03 玄關看樓梯','C03_ENTRY_TO_STAIRS'],

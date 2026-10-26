@@ -1,0 +1,92 @@
+{
+  "project": "Reality Game EP02 Hades House",
+  "unit": "mm",
+  "status": "proposal_not_approved",
+  "coordinateSystem": {
+    "origin": "south-west exterior corner of 1F",
+    "axisX": "east",
+    "axisY": "north",
+    "axisZ": "up",
+    "basis": "suggested_for_new_model_only"
+  },
+  "envelope": {
+    "widthX": 9000,
+    "depthY": 8000,
+    "status": "unapproved R00"
+  },
+  "levels": {
+    "1F": 0,
+    "2F": 3000,
+    "eaves": 6100,
+    "ridge": 7700,
+    "slabThicknessCandidate": 220
+  },
+  "roof": {
+    "ridgeAxis": "east-west",
+    "roofType": "gable",
+    "overhangNominal": 450,
+    "status": "R01 proposal"
+  },
+  "stair": {
+    "location": "west-middle",
+    "stairwellX": 2900,
+    "stairwellY": 3100,
+    "risers": 16,
+    "riserHeight": 187.5,
+    "flights": 2,
+    "risersPerFlight": 8,
+    "treadDepthProposed": 260,
+    "landingProposed": 900,
+    "critical": "verify headroom, landing, collision and stairwell opening"
+  },
+  "rooms1F": [
+    "NW utility and bathroom",
+    "W-middle U-stair",
+    "SW foyer",
+    "N-center kitchen",
+    "NE dining",
+    "SE living room"
+  ],
+  "rooms2F": [
+    "NW bathroom",
+    "W-middle U-stair",
+    "SW father bedroom",
+    "SE protagonist bedroom",
+    "NE multipurpose room",
+    "central hall"
+  ],
+  "windowInventory": [
+    "W-101",
+    "W-102",
+    "W-103",
+    "W-104",
+    "W-105",
+    "W-106",
+    "W-201",
+    "W-202",
+    "W-203",
+    "W-204",
+    "W-205",
+    "W-206"
+  ],
+  "doorInventory": [
+    "D-01",
+    "D-02",
+    "D-03",
+    "D-04",
+    "D-05",
+    "D-06",
+    "D-07",
+    "D-08",
+    "D-09"
+  ],
+  "visualPolicy": "Moods are not measured construction elevations. Do not relocate walls or add windows to match generated perspective.",
+  "flags": [
+    "stair_headroom",
+    "car_visibility_from_bed",
+    "site_car_offset",
+    "unverified_structural_load",
+    "door_swing_clearance"
+  ],
+  "referenceIndex": "IMAGE_MANIFEST.json"
+}
