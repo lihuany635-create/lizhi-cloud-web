@@ -114,14 +114,14 @@ button,label.btn{font:inherit;cursor:pointer}
       <option value="hades-house">哈德斯家 v3.3（EP02 9×8m，一、二樓）</option>
       <option value="reality-highschool">現實高中（校園＋3F 教室）</option>
       <option value="xiji-station">溪磯鎮車站</option>
-      <option value="lahudi-academy">拉乎迪學院 R03（分間＋家具）</option>
+      <option value="lahudi-academy">拉乎迪學院 R09（景觀＋校門大道＋大階梯）</option>
       
     </select></label>
   <button class="btn" id="openPreview" type="button">配置圖預覽</button>
   
   
   <span id="viewerVersion" class="file" aria-live="polite"></span>
-  <span id="academyViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="academyWhole" type="button">整座學院</button><button class="btn" id="academySchool" type="button">L04 主教學樓</button><button class="btn" id="academyLibrary" type="button">L08 圖書館</button><button class="btn" id="academyGate" type="button">L01 校門＋前庭</button><button class="btn" id="academyGarden" type="button">L03 中庭</button><button class="btn" id="academyPlants" type="button">L07 旋梯塔</button></span><label id="academyInteriorPicker" hidden class="sample"><span>室內家具</span><select id="academyInteriorSelect" aria-label="查看學院室內分區"><option value="">選擇區域／樓層</option><option value="L04_1">L04 主教學樓 1F</option><option value="L04_2">L04 主教學樓 2F</option><option value="L06W_1">L06 西翼 1F</option><option value="L06W_2">L06 西翼 2F</option><option value="L06E_1">L06 東翼 1F</option><option value="L06E_2">L06 東翼 2F</option><option value="L05_1">L05 哥德走廊 1F</option><option value="L05_2">L05 哥德走廊 2F</option><option value="L08_1">L08 圖書館 1F</option><option value="L08_2">L08 圖書館 2F</option></select></label>
+  <span id="academyViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="academyWhole" type="button">整座學院</button><button class="btn" id="academySchool" type="button">L04 主教學樓</button><button class="btn" id="academyLibrary" type="button">L08 圖書館</button><button class="btn" id="academyGate" type="button">校門大道</button><button class="btn" id="academyGarden" type="button">L03 中庭</button><button class="btn" id="academyPlants" type="button">L07 旋梯塔</button></span><label id="academyInteriorPicker" hidden class="sample"><span>室內家具</span><select id="academyInteriorSelect" aria-label="查看學院室內分區"><option value="">選擇區域／樓層</option><option value="L04_1">L04 主教學樓 1F</option><option value="L04_2">L04 主教學樓 2F</option><option value="L06W_1">L06 西翼 1F</option><option value="L06W_2">L06 西翼 2F</option><option value="L06E_1">L06 東翼 1F</option><option value="L06E_2">L06 東翼 2F</option><option value="L05_1">L05 哥德走廊 1F</option><option value="L05_2">L05 哥德走廊 2F</option><option value="L08_1">L08 圖書館 1F</option><option value="L08_2">L08 圖書館 2F</option></select></label>
   <span id="houseViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="house1F">一樓俯視</button><button class="btn" id="house2F">二樓俯視</button><button class="btn" id="houseWhole">完整外觀</button><a class="btn" href="revisions/hades-v3.3/">配置圖</a></span>
 </div>
 
@@ -389,8 +389,8 @@ function academyView(region){
   const offset=model.position.y;
   const presets={
     // R03 座標：X 東、glTF Z = −北、Y 上（1 單位 = 1 m）
-    whole:[-76,-0.5,-146,76,28.5,0],
-    gate:[-24,-0.5,-44,24,8,0],
+    whole:[-76,-2.2,-146,76,35,0],
+    gate:[-14,-2.2,-84,14,24,0],
     school:[-26,-0.5,-114,26,17.5,-80],
     library:[-32,-0.5,-140,32,17.5,-116],
     garden:[-23,-0.5,-79,23,10,-44]
@@ -407,9 +407,9 @@ function academyView(region){
     controls.target.set(0,3+offset,-82);
     controls.update();anim=null;
   }else if(region==='gate'){
-    // 校外南側沿中軸望向校門與前庭
-    camera.position.set(0,8+offset,22);
-    controls.target.set(0,3+offset,-30);
+    // 動畫鏡位：校門口沿大道望向主樓兩段大階梯與鐘塔
+    camera.position.set(0,-0.4+offset,-3);
+    controls.target.set(0,6+offset,-60);
     controls.update();anim=null;
   }else if(anim){camera.position.copy(anim.p);controls.target.copy(anim.t);controls.update();anim=null;}
   document.querySelectorAll('#academyViews button').forEach(b=>b.setAttribute('aria-pressed',
@@ -539,14 +539,14 @@ const SAMPLES={
   },
   "lahudi-academy": {
     "name": "拉乎迪學院.glb",
-    "file": "lahudi-academy.glb?v=r03-g2f-20261027",
+    "file": "lahudi-academy.glb?v=r09-g3e-20261027",
     "cut": 1,
     "fit": [
       -76,
-      -0.5,
+      -2.2,
       -146,
       76,
-      28.5,
+      35,
       0
     ]
   },

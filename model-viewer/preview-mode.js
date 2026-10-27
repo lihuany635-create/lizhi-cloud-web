@@ -14,11 +14,11 @@
     'reality-home':{name:'現實主角家',file:'reality-home.glb?v=2.3-merged-20261022',hero:'HERO_reality_home'},
     'reality-highschool':{name:'現實高中',file:'reality-highschool.glb?v=2.3-merged-20261022',hero:'HERO_highschool'},
     'xiji-station':{name:'溪磯鎮車站',file:'xiji-station.glb?v=2.3-merged-20261022',hero:'HERO_station'},
-    'lahudi-academy':{name:'拉乎迪學院 R03',file:'lahudi-academy.glb?v=r03-g2f-20261027',review:'revisions/academy-r03-g2f/',base:'revisions/academy-r03-g2f/',views:[
-      ['L04 一樓','L04_1F'],['L04 二樓','L04_2F'],['全校外觀','V_EXT_SE'],
-      ['L06 西翼一樓','L06W_1F'],['L06 西翼二樓','L06W_2F'],['L06 東翼一樓','L06E_1F'],['L06 東翼二樓','L06E_2F'],
-      ['L05 附屬棟二樓','L05_2F'],['L08 一樓','L08_1F'],['L08 二樓','L08_2F'],
-      ['教室 201 室內','V_CLASS201'],['L08 閱覽大廳','V_L08_HALL'],['L08 二樓書庫','V_L08_STACKS']
+    'lahudi-academy':{name:'拉乎迪學院 R09',file:'lahudi-academy.glb?v=r09-g3e-20261027',review:'revisions/academy-r09/',base:'revisions/academy-r09/',views:[
+      ['校門大道（動畫鏡位）','V_GATE_AVENUE'],['主樓兩段大階梯','V_GRAND_STAIR'],['全校外觀','V_EXT_SE'],
+      ['L04 一樓','L04_1F'],['L04 二樓','L04_2F'],['L06 西翼一樓','L06W_1F'],['L06 西翼二樓','L06W_2F'],
+      ['L06 東翼一樓','L06E_1F'],['L06 東翼二樓','L06E_2F'],['L05 附屬棟一樓','L05_1F'],['L05 附屬棟二樓','L05_2F'],
+      ['L08 一樓','L08_1F'],['L08 二樓','L08_2F'],['東翼入口階梯','V_L06E_ENTRY']
     ]},
     'lahudi-academy-s01-v5':{name:'S01 V5 測試版（尚未驗收）',file:'preview/s01-v5.glb?v=20261023-v5',hero:'HERO_academy',review:'preview/s01-v5-status.json'}
   };
