@@ -316,7 +316,12 @@ async function openModel(buf,name,opts={}){
   try{
     const obj=await loadBuffer(buf,name);
     if(opts.serial!=null&&opts.serial!==loadSerial){disposeObject(obj);return;}
-    saveAvatars();clearModel();model=obj;removeFigure();sourceInfo=opts.sourceInfo||null;
+    let info=opts.sourceInfo||null;
+    if(!info){const bytes=new Uint8Array(await crypto.subtle.digest('SHA-256',buf));
+      const hash=Array.from(bytes).map(v=>v.toString(16).padStart(2,'0')).join('');
+      info={version:'本機檔案',actualSHA:hash,expectedSHA:null,manifestVerified:false};}
+    if(opts.serial!=null&&opts.serial!==loadSerial){disposeObject(obj);return;}
+    saveAvatars();clearModel();model=obj;removeFigure();sourceInfo=info;
     if(name.toLowerCase().endsWith('.fbx')||opts.scaleGuess){/* FBX often in cm */}
     model.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true;
       [].concat(o.material).forEach(m=>{if(m){m.clippingPlanes=[clip];m.clipShadows=true;m.side=m.side??THREE.FrontSide;}});}});
@@ -826,8 +831,8 @@ function enterPov(keepView){
   $('avatarCamera').textContent=viewMode==='first'?'第三人稱':'第一人稱';updatePovCamera();
 }
 function exitPov(){
-  if(!pov)return;pov=false;
-  figYaw=yaw;syncAvatar();
+  if(!pov)return;
+  figYaw=yaw;syncAvatar();pov=false;
   camera.fov=saved.fov;camera.near=saved.near;camera.updateProjectionMatrix();
   camera.position.copy(saved.pos);controls.target.copy(saved.tgt);controls.enabled=true;
   cutIn.disabled=false;cutIn.value=saved.cut;applyCut();
