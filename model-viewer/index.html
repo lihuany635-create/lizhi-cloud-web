@@ -999,9 +999,19 @@ renderSlots();
 const agentOrigin='https://lizhi-viewer-agent-20261027.lihuany635.chatgpt.site';
 let agentNonce=null,agentActive=false,agentBusy=false,agentRevision=0,agentFingerprint='',agentLastContact=0,agentInitGeneration=0,agentShadowSetting=null,agentDampingSetting=null;
 const agentRequests=new Map(),agentEvidence=[];
+let agentRenderNeeded=true,agentGraceContact=0,agentGraceUntil=0;
+controls.addEventListener('change',()=>{agentRenderNeeded=true;});
+function agentRender(){
+ agentRenderNeeded=false;
+ try{renderer.render(scene,camera);}finally{
+  // Let already queued authenticated heartbeats/STOP messages run after a
+  // synchronous GPU read. This grace is granted once per real contact only.
+  if(agentGraceContact!==agentLastContact){agentGraceContact=agentLastContact;agentGraceUntil=Date.now()+2000;}
+ }
+}
 const agentButton=document.createElement('button');agentButton.className='btn';agentButton.id='viewerAgentStop';agentButton.textContent='停止 AI 控制';agentButton.hidden=true;
 document.querySelector('.bar').append(agentButton);
-function agentStop(){agentInitGeneration++;agentActive=false;keys.clear();joyV.set(0,0);look=null;anim=null;controls.autoRotate=false;if(agentShadowSetting!==null){renderer.shadowMap.enabled=agentShadowSetting;agentShadowSetting=null;}if(agentDampingSetting!==null){controls.enableDamping=agentDampingSetting;agentDampingSetting=null;}setPlacing(false);agentButton.hidden=true;}
+function agentStop(){agentInitGeneration++;saveAvatars();agentActive=false;keys.clear();joyV.set(0,0);look=null;anim=null;controls.autoRotate=false;if(agentShadowSetting!==null){renderer.shadowMap.enabled=agentShadowSetting;agentShadowSetting=null;}if(agentDampingSetting!==null){controls.enableDamping=agentDampingSetting;agentDampingSetting=null;}setPlacing(false);agentButton.hidden=true;}
 agentButton.onclick=()=>{agentStop();parent.postMessage({channel:'lizhi-viewer-v1',type:'stopped',nonce:agentNonce},agentOrigin);};
 function agentScene(){
  syncAvatar();
@@ -1028,7 +1038,7 @@ function agentSurface(v){
 function agentSelect(id){if(!avatars.some(a=>a.id===id))throw Error('AVATAR_NOT_FOUND');chooseAvatar(id,false);}
 function agentGuard(command){
  if(!agentActive)throw Error('CONTROL_STOPPED');
- if(Date.now()-agentLastContact>8000)throw Error('CONTROL_HEARTBEAT_EXPIRED');
+ if(Date.now()-agentLastContact>8000&&Date.now()>agentGraceUntil)throw Error('CONTROL_HEARTBEAT_EXPIRED');
  if(Date.now()>Date.parse(command.deadline))throw Error('COMMAND_EXPIRED');
 }
 async function agentExecute(command){
@@ -1050,7 +1060,7 @@ async function agentExecute(command){
  if(name==='viewer_get_screenshot'){
   const image_id=crypto.randomUUID(),sz=renderer.getSize(new THREE.Vector2()),pr=renderer.getPixelRatio(),asp=camera.aspect;
   let data;
-  try{renderer.setPixelRatio(1);renderer.setSize(640,360,false);camera.aspect=640/360;camera.updateProjectionMatrix();renderer.render(scene,camera);data=renderer.domElement.toDataURL('image/jpeg',.86);}
+  try{renderer.setPixelRatio(1);renderer.setSize(640,360,false);camera.aspect=640/360;camera.updateProjectionMatrix();agentRender();data=renderer.domElement.toDataURL('image/jpeg',.86);}
   finally{renderer.setPixelRatio(pr);renderer.setSize(sz.x,sz.y,false);camera.aspect=asp;camera.updateProjectionMatrix();}
   if(!data.startsWith('data:image/jpeg;base64,')||data.length<1000||data.length>1400000)throw Error('SCREENSHOT_CAPTURE_FAILED');
   // Synchronous WebGL work can delay delivery of heartbeat/STOP messages.
@@ -1088,7 +1098,7 @@ async function agentExecute(command){
   const findings=(a.findings||[]).map(x=>{const e=agentEvidence.find(e=>e.id===x.screenshot_id&&e.model_sha===sourceInfo.actualSHA);if(!e)throw Error('OBSERVATION_REQUIRES_REAL_SCREENSHOT');return {...x,evidence:e};});
   saveAvatars();return {ok:true,scene:agentScene(),findings,note:a.note||'',storage:'server_commit_required',unobserved_areas:'NOT_INSPECTED'};
  }else throw Error('UNKNOWN_VIEWER_COMMAND');
- agentRevision++;renderer.render(scene,camera);return {ok:true,scene:agentScene()};
+ agentRevision++;agentRender();return {ok:true,scene:agentScene()};
 }
 addEventListener('message',async event=>{
  if(event.origin!==agentOrigin||event.source!==parent||parent===window)return;
@@ -1120,12 +1130,12 @@ addEventListener('message',async event=>{
  parent.postMessage({channel:m.channel,type:'result',nonce:agentNonce,request_id:c.request_id,result:record.result},agentOrigin);
 });
 function agentWatchdogStop(reason){if(!agentActive)return;agentStop();parent.postMessage({channel:'lizhi-viewer-v1',type:'stopped',nonce:agentNonce,reason},agentOrigin);}
-setInterval(()=>{if(agentActive&&Date.now()-agentLastContact>8000)agentWatchdogStop('HEARTBEAT_EXPIRED');},1000);
+setInterval(()=>{if(agentActive&&!agentBusy&&Date.now()-agentLastContact>8000&&Date.now()>agentGraceUntil)agentWatchdogStop('HEARTBEAT_EXPIRED');},1000);
 renderer.domElement.addEventListener('webglcontextlost',()=>agentWatchdogStop('WEBGL_CONTEXT_LOST'));
 addEventListener('pagehide',agentStop);
 
 /* ---------- loop ---------- */
-function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();if(pov)layoutGuide();}
+function resize(){agentRenderNeeded=true;const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();if(pov)layoutGuide();}
 new ResizeObserver(resize).observe(stage);resize();
 camera.position.set(-6,6,8);controls.target.set(0,1,0);
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1133,6 +1143,12 @@ let lastT=performance.now();
 (function loop(){requestAnimationFrame(loop);
   const now=performance.now(),dt=Math.min(.05,(now-lastT)/1000);lastT=now;
   if(window.GLBPreview.active)return;
+  if(agentActive){
+    if(pov){stepPov(dt);if(keys.size||joyV.lengthSq()>.0025||look)agentRenderNeeded=true;}
+    else controls.update();
+    if(agentRenderNeeded)agentRender();
+    return;
+  }
   if(pov){stepPov(dt);renderer.render(scene,camera);return;}
   if(anim){const k=reduce?1:0.1;camera.position.lerp(anim.p,k);controls.target.lerp(anim.t,k);if(camera.position.distanceTo(anim.p)<size.length()*0.0005)anim=null;}
   controls.update();renderer.render(scene,camera);})();

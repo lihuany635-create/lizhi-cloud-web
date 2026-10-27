@@ -11,7 +11,7 @@ const wrapper=`<!doctype html><html><body><iframe id="viewer" width="1280" heigh
 const frame=document.querySelector('iframe'),nonce=crypto.randomUUID();window.results={};window.ready=null;window.stopped=false;
 const post=(type,extra={})=>frame.contentWindow.postMessage({channel:'lizhi-viewer-v1',type,nonce,...extra},'${CHILD}');
 frame.onload=()=>post('init');
-addEventListener('message',e=>{if(e.source!==frame.contentWindow||e.origin!=='${CHILD}'||e.data.nonce!==nonce)return;const m=e.data;if(m.type==='ready')window.ready=m.scene;if(m.type==='result')window.results[m.request_id]=m.result;if(m.type==='stopped')window.stopped=true;});
+addEventListener('message',e=>{if(e.source!==frame.contentWindow||e.origin!=='${CHILD}'||e.data.nonce!==nonce)return;const m=e.data;if(m.type==='ready')window.ready=m.scene;if(m.type==='result')window.results[m.request_id]=m.result;if(m.type==='stopped'){window.stopped=true;window.stopReason=m.reason;}});
 window.send=c=>post('command',{command:c});window.stopAgent=()=>post('stop');setInterval(()=>post('heartbeat'),1000);
 </script></body></html>`;
 async function main(){
@@ -26,7 +26,7 @@ async function main(){
  const expected=JSON.parse(await fs.readFile('model-viewer/current-models.json','utf8')).models.find(x=>x.model==='lahudi-academy.glb').current_sha256;assert.equal(state.source.actualSHA,expected);
  async function command(name,args={},expect=true,id=randomUUID()){
    await page.evaluate(c=>window.send(c),{name,args:{...args,request_id:id},request_id:id,deadline:new Date(Date.now()+20000).toISOString()});
-   await page.waitForFunction(id=>window.results[id],id,{timeout:30000});const r=await page.evaluate(id=>window.results[id],id);if(expect)assert.equal(r.ok,true,JSON.stringify(r));if(r.scene)state=r.scene;return r;
+   await page.waitForFunction(id=>window.results[id]||window.stopped,id,{timeout:30000});const r=await page.evaluate(id=>window.results[id],id);assert(r,'controller stopped: '+await page.evaluate(()=>window.stopReason));if(expect)assert.equal(r.ok,true,JSON.stringify(r));if(r.scene)state=r.scene;return r;
  }
  const write=(name,args)=>command(name,{revision:state.revision,model_sha:state.source.actualSHA,...args});
  // Real academy gate/grounds grid. Rejected placements do not create avatars.
