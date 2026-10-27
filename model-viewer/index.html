@@ -55,6 +55,19 @@ button,label.btn{font:inherit;cursor:pointer}
 .cut output{font-family:var(--f-mono);font-size:12px;min-width:56px;text-align:right;color:var(--muted)}
 .hint{position:absolute;right:max(10px,env(safe-area-inset-right,0px));bottom:10px;font-size:11px;color:var(--muted);background:var(--panel);padding:4px 8px;border-radius:6px;opacity:.9}
 .tog:disabled{opacity:.45;cursor:not-allowed}
+
+.avatar-panel{position:absolute;z-index:12;right:12px;top:12px;width:min(330px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:10px;box-shadow:0 8px 22px #0005}
+.avatar-panel header{display:flex;gap:6px;align-items:center;justify-content:space-between}
+.avatar-row{border:1px solid var(--line);border-radius:8px;padding:7px;margin-top:8px;background:var(--chip)}
+.avatar-row.selected{border-color:var(--accent)}
+.avatar-row input{max-width:100%;width:100%;box-sizing:border-box;padding:6px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:5px}
+.avatar-row small{display:block;color:var(--muted);font:11px var(--f-mono);margin:5px 0}
+.avatar-actions{display:flex;gap:4px;flex-wrap:wrap}
+.avatar-actions button{min-height:34px;padding:5px 8px}
+.pov-avatar-select{position:absolute;left:140px;top:12px;max-width:34%;height:36px;background:#20272b;color:white;border:1px solid #777;border-radius:8px}
+.pov-camera-mode{position:absolute;right:12px;top:54px}
+@media(max-width:560px){.avatar-panel{top:8px;right:8px;max-height:67%}.pov-avatar-select{left:125px;max-width:37%;font-size:12px}}
+
 .pov-ui{overflow:hidden}
 .guide{position:absolute;box-shadow:0 0 0 9999px rgba(8,12,16,.5);outline:1px solid rgba(255,255,255,.75);pointer-events:none;
   background-image:linear-gradient(to right,transparent calc(33.333% - .5px),rgba(255,255,255,.28) calc(33.333% - .5px),rgba(255,255,255,.28) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.666% - .5px),rgba(255,255,255,.28) calc(66.666% - .5px),rgba(255,255,255,.28) calc(66.666% + .5px),transparent calc(66.666% + .5px)),
@@ -120,6 +133,7 @@ button,label.btn{font:inherit;cursor:pointer}
   <button class="btn" id="openPreview" type="button">配置圖預覽</button>
   
   
+  <button class="btn" id="avatarPanelToggle" type="button" aria-controls="avatarPanel" aria-expanded="false">人偶管理 <span id="avatarNum">0</span></button>
   <span id="viewerVersion" class="file" aria-live="polite"></span>
   <span id="academyViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="academyWhole" type="button">整座學院</button><button class="btn" id="academySchool" type="button">L04 主教學樓</button><button class="btn" id="academyLibrary" type="button">L08 圖書館</button><button class="btn" id="academyGate" type="button">校門大道</button><button class="btn" id="academyGarden" type="button">L03 中庭</button><button class="btn" id="academyPlants" type="button">L07 旋梯塔</button></span><label id="academyInteriorPicker" hidden class="sample"><span>室內家具</span><select id="academyInteriorSelect" aria-label="查看學院室內分區"><option value="">選擇區域／樓層</option><option value="L04_1">L04 主教學樓 1F</option><option value="L04_2">L04 主教學樓 2F</option><option value="L06W_1">L06 西翼 1F</option><option value="L06W_2">L06 西翼 2F</option><option value="L06E_1">L06 東翼 1F</option><option value="L06E_2">L06 東翼 2F</option><option value="L05_1">L05 哥德走廊 1F</option><option value="L05_2">L05 哥德走廊 2F</option><option value="L08_1">L08 圖書館 1F</option><option value="L08_2">L08 圖書館 2F</option></select></label>
   <span id="houseViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="house1F">一樓俯視</button><button class="btn" id="house2F">二樓俯視</button><button class="btn" id="houseWhole">完整外觀</button><a class="btn" href="revisions/hades-v3.3/">配置圖</a></span>
@@ -151,11 +165,18 @@ button,label.btn{font:inherit;cursor:pointer}
   </div>
   <div class="hint" id="hint">拖曳旋轉・右鍵/雙指平移・滾輪縮放・可把檔案拖進來</div>
   <div class="place-banner" id="placeBanner" hidden>點模型上的地板放置人偶</div>
+  <section class="avatar-panel" id="avatarPanel" hidden aria-label="人偶管理">
+    <header><strong>人偶管理</strong><button class="btn primary" id="avatarAdd" type="button">＋新增</button><button class="btn" id="avatarClose" type="button">關閉</button></header>
+    <div id="avatarList"></div>
+    <p class="avatar-empty" style="font-size:12px;color:var(--muted)">新增後點擊模型地板放置。位置與視角保存在本機瀏覽器。</p>
+  </section>
   <div class="pov-ui" id="povUi" hidden>
     <div class="guide" id="guide"><span class="guide-label" id="guideLabel"></span></div>
     <div class="crosshair"></div>
     <button class="btn pov-exit" id="povExit">← 離開人偶視角</button>
+    <select id="avatarQuick" class="pov-avatar-select" aria-label="切換人偶"></select>
     <button class="btn pov-speed" id="povSpeed">步行</button>
+    <button class="btn pov-camera-mode" id="avatarCamera" type="button">第三人稱</button>
     <div class="joy" id="joy" aria-label="移動搖桿"><i id="joyKnob"></i></div>
     <div class="pov-tip">拖曳畫面轉頭・左下搖桿移動<br>電腦：WASD／方向鍵移動，Shift 加速</div>
   </div>
@@ -295,7 +316,7 @@ async function openModel(buf,name,opts={}){
   try{
     const obj=await loadBuffer(buf,name);
     if(opts.serial!=null&&opts.serial!==loadSerial){disposeObject(obj);return;}
-    clearModel();model=obj;removeFigure();sourceInfo=opts.sourceInfo||null;
+    saveAvatars();clearModel();model=obj;removeFigure();sourceInfo=opts.sourceInfo||null;
     if(name.toLowerCase().endsWith('.fbx')||opts.scaleGuess){/* FBX often in cm */}
     model.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true;
       [].concat(o.material).forEach(m=>{if(m){m.clippingPlanes=[clip];m.clipShadows=true;m.side=m.side??THREE.FrontSide;}});}});
@@ -314,7 +335,7 @@ async function openModel(buf,name,opts={}){
     if(opts.key==='lahudi-academy'){renderer.setPixelRatio(Math.min(devicePixelRatio,1.15));renderer.toneMappingExposure=.68;$('exposureIn').value=68;$('exposureOut').textContent='0.68';$('academyWhole').setAttribute('aria-pressed','true');}
     else{renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.toneMappingExposure=.9;$('exposureIn').value=90;$('exposureOut').textContent='0.90';}
     $('viewerVersion').textContent=sourceInfo?.version?sourceInfo.version+' · SHA '+sourceInfo.actualSHA.slice(0,12):'本機檔案 · 版本未登記';
-    $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();$('houseViews').hidden=modelKey!=='hades-house'||window.GLBPreview.active;if(modelKey==='hades-house')houseView(2);$('academyViews').hidden=modelKey!=='lahudi-academy'||window.GLBPreview.active;$('academyInteriorPicker').hidden=modelKey!=='lahudi-academy'||window.GLBPreview.active;if(modelKey==='lahudi-academy')$('academyInteriorSelect').value='';
+    $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();loadAvatars();$('houseViews').hidden=modelKey!=='hades-house'||window.GLBPreview.active;if(modelKey==='hades-house')houseView(2);$('academyViews').hidden=modelKey!=='lahudi-academy'||window.GLBPreview.active;$('academyInteriorPicker').hidden=modelKey!=='lahudi-academy'||window.GLBPreview.active;if(modelKey==='lahudi-academy')$('academyInteriorSelect').value='';
   }catch(e){console.error(e);showError(e&&e.message?e.message:String(e));}
 }
 
@@ -601,7 +622,7 @@ sampleSel.onchange=()=>loadSample(sampleSel.value);
 
 /* ---------- mannequin ---------- */
 let EYE=1.6; const FIG_H=1.72;
-let figure=null, figFeet=new THREE.Vector3(), figYaw=0, placing=false, pov=false;
+let figure=null, figFeet=new THREE.Vector3(), figYaw=0, placing=false, pov=false, placeNew=false, viewMode='first';
 const figMat=new THREE.MeshStandardMaterial({color:0xe3803d,roughness:.45,metalness:.05,emissive:0x2a1004});
 const jointMat=new THREE.MeshStandardMaterial({color:0x3a3f45,roughness:.5});
 function part(geo,mat,x,y,z,rx=0,rz=0){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.set(rx,0,rz);m.castShadow=true;return m;}
@@ -622,10 +643,123 @@ function buildFigure(){
   const arrow=new THREE.Mesh(new THREE.ConeGeometry(.12,.28,3),ring.material);arrow.rotation.x=Math.PI/2;arrow.position.set(0,.012,.55);arrow.scale.y=1;g.add(arrow);
   return g;
 }
-function removeFigure(){if(figure){scene.remove(figure);figure=null;}$('tPov').disabled=true;if(pov)exitPov();}
-function placeFigure(p,yaw){
-  if(!figure){figure=buildFigure();scene.add(figure);}
-  figFeet.copy(p);figYaw=yaw;figure.position.copy(p);figure.rotation.y=yaw;$('tPov').disabled=false;
+
+const avatars=[];let selectedId=null,nextId=0,saveTimer=null;
+function chosen(){return avatars.find(x=>x.id===selectedId)||null;}
+function keyAvatars(){return 'mv-avatars:v1:'+modelKey+':'+(sourceInfo?.actualSHA||'local-file');}
+function syncAvatar(){
+  const a=chosen();if(!a)return;
+  a.pos.copy(figFeet);a.yaw=pov?yaw:figYaw;a.pitch=pitch;a.eye=EYE;a.mode=viewMode;
+  a.focal=shotCfg.focal;a.aspect=shotCfg.aspect;
+  a.mesh.position.copy(figFeet);a.mesh.rotation.y=a.yaw;
+}
+function saveAvatars(){
+  if(saveTimer){clearTimeout(saveTimer);saveTimer=null;}
+  if(!modelKey)return;syncAvatar();
+  const data={version:1,nextId,avatars:avatars.map(a=>({id:a.id,name:a.name,pos:a.pos.toArray(),yaw:a.yaw,pitch:a.pitch,
+    eye:a.eye,mode:a.mode,focal:a.focal,aspect:a.aspect,visible:a.visible}))};
+  try{localStorage.setItem(keyAvatars(),JSON.stringify(data));}
+  catch(e){console.warn('人偶資料無法儲存',e);$('avatarPanel').dataset.storageError='true';}
+}
+function queueAvatarSave(){if(saveTimer)clearTimeout(saveTimer);saveTimer=setTimeout(saveAvatars,850);}
+function updateAvatarMeshes(){
+  avatars.forEach(a=>{a.mesh.visible=a.visible!==false&&!(pov&&a.id===selectedId&&viewMode==='first');});
+}
+function renderAvatars(){
+  $('avatarNum').textContent=avatars.length;
+  const list=$('avatarList'),quick=$('avatarQuick');list.replaceChildren();quick.replaceChildren();
+  for(const a of avatars){
+    const opt=document.createElement('option');opt.value=a.id;opt.textContent=a.name;quick.append(opt);
+    const row=document.createElement('div');row.className='avatar-row'+(a.id===selectedId?' selected':'');
+    const inp=document.createElement('input');inp.type='text';inp.maxLength=40;inp.value=a.name;inp.setAttribute('aria-label','人偶名稱');
+    inp.onchange=()=>{a.name=inp.value.trim().slice(0,40)||a.id;saveAvatars();renderAvatars();};
+    const loc=document.createElement('small');loc.textContent=(a.id===selectedId?figFeet:a.pos).toArray().map(n=>n.toFixed(2)).join(' , ')+' m';
+    const buttons=document.createElement('div');buttons.className='avatar-actions';
+    function btn(name,fn){const el=document.createElement('button');el.className='btn';el.type='button';el.textContent=name;el.onclick=fn;buttons.append(el);}
+    btn('視角',()=>chooseAvatar(a.id,true));
+    btn('移動',()=>{chooseAvatar(a.id,false);setPlacing(true,true);});
+    btn('定位',()=>{chooseAvatar(a.id,false);avatarOrbit(false);});
+    btn(a.visible?'隱藏':'顯示',()=>{a.visible=!a.visible;updateAvatarMeshes();saveAvatars();renderAvatars();});
+    btn('刪除',()=>{if(confirm('確定刪除「'+a.name+'」？'))deleteAvatar(a.id);});
+    row.append(inp,loc,buttons);list.append(row);
+  }
+  quick.value=selectedId||'';quick.disabled=!avatars.length;$('tPov').disabled=!avatars.length;
+}
+function addAvatar(p,angle){
+  const id='avatar-'+(++nextId),mesh=buildFigure();
+  const a={id,name:'人偶'+String(nextId).padStart(2,'0'),mesh,pos:p.clone(),yaw:angle,pitch:0,eye:1.6,mode:'first',focal:28,aspect:'16:9',visible:true};
+  mesh.position.copy(p);mesh.rotation.y=angle;scene.add(mesh);avatars.push(a);
+  chooseAvatar(id,false);saveAvatars();return a;
+}
+function chooseAvatar(id,openView=false){
+  const a=avatars.find(x=>x.id===id);if(!a)return;
+  if(selectedId!==id)syncAvatar();
+  selectedId=id;figure=a.mesh;figFeet.copy(a.pos);figYaw=yaw=a.yaw;pitch=a.pitch;EYE=a.eye;
+  viewMode=a.mode==='third'?'third':'first';shotCfg.focal=a.focal||28;shotCfg.aspect=ASPECTS[a.aspect]?a.aspect:'16:9';
+  $('focalIn').value=shotCfg.focal;$('aspectSel').value=shotCfg.aspect;
+  updateAvatarMeshes();renderAvatars();
+  if(openView){if(!pov)enterPov(true);else{updatePovCamera();layoutGuide();}}
+  else if(pov)exitPov();
+  saveAvatars();
+}
+function avatarOrbit(top){
+  if(!figure)return;if(pov)exitPov();anim=null;
+  const target=figFeet.clone().add(new THREE.Vector3(0,EYE*.5,0));
+  camera.position.copy(target).add(top?new THREE.Vector3(0,12,0.001):new THREE.Vector3(-4,3,5));
+  controls.target.copy(target);controls.update();$('tTop').setAttribute('aria-pressed',String(top));
+}
+function cameraModeSet(mode){
+  if(!figure)return;
+  if(mode==='free'||mode==='top'){avatarOrbit(mode==='top');return;}
+  viewMode=mode==='third'?'third':'first';
+  if(!pov)enterPov(true);
+  updatePovCamera();updateAvatarMeshes();layoutGuide();syncAvatar();saveAvatars();
+  $('avatarCamera').textContent=viewMode==='first'?'第三人稱':'第一人稱';
+}
+function deleteAvatar(id){
+  const i=avatars.findIndex(x=>x.id===id);if(i<0)return;
+  if(id===selectedId&&pov)exitPov();
+  const [a]=avatars.splice(i,1);scene.remove(a.mesh);
+  a.mesh.traverse(o=>{o.geometry?.dispose();if(o.material&&!([figMat,jointMat].includes(o.material)))o.material.dispose();});
+  if(id===selectedId){selectedId=null;figure=null;if(avatars.length)chooseAvatar(avatars[0].id,false);}
+  saveAvatars();renderAvatars();
+}
+function loadAvatars(){
+  removeFigure();
+  let data;try{data=JSON.parse(localStorage.getItem(keyAvatars())||'null');}catch(e){}
+  if(data?.version===1&&Array.isArray(data.avatars)){
+    const ids=new Set();
+    for(const x of data.avatars){
+      if(!x||typeof x.id!=='string'||ids.has(x.id)||!Array.isArray(x.pos)||x.pos.length!==3||!x.pos.every(Number.isFinite))continue;
+      ids.add(x.id);
+      const mesh=buildFigure(),pos=new THREE.Vector3(...x.pos);
+      const a={id:x.id,name:typeof x.name==='string'?x.name.slice(0,40):x.id,mesh,pos,
+        yaw:Number.isFinite(x.yaw)?x.yaw:0,pitch:Number.isFinite(x.pitch)?Math.max(-1.35,Math.min(1.35,x.pitch)):0,
+        eye:Number.isFinite(x.eye)?Math.max(.3,Math.min(2.2,x.eye)):1.6,
+        mode:x.mode==='third'?'third':'first',focal:Number.isFinite(x.focal)?Math.max(12,Math.min(85,x.focal)):28,
+        aspect:ASPECTS[x.aspect]?x.aspect:'16:9',visible:x.visible!==false};
+      mesh.position.copy(pos);mesh.rotation.y=a.yaw;scene.add(mesh);avatars.push(a);
+    }
+    nextId=Math.max(0,Number.isSafeInteger(data.nextId)?data.nextId:0,...avatars.map(a=>Number(a.id.match(/^avatar-(\d+)$/)?.[1]||0)));
+  }
+  if(avatars.length)chooseAvatar(avatars[0].id,false);else renderAvatars();
+}
+function removeFigure(){
+  if(pov)exitPov();
+  for(const a of avatars){scene.remove(a.mesh);a.mesh.traverse(o=>{o.geometry?.dispose();if(o.material&&!([figMat,jointMat].includes(o.material)))o.material.dispose();});}
+  avatars.length=0;selectedId=null;figure=null;nextId=0;
+  if(saveTimer)clearTimeout(saveTimer);saveTimer=null;setPlacing(false);renderAvatars();
+}
+$('avatarPanelToggle').onclick=()=>{const open=$('avatarPanel').hidden;$('avatarPanel').hidden=!open;$('avatarPanelToggle').setAttribute('aria-expanded',String(open));if(open)renderAvatars();};
+$('avatarClose').onclick=()=>{$('avatarPanel').hidden=true;$('avatarPanelToggle').setAttribute('aria-expanded','false');};
+$('avatarAdd').onclick=()=>{if(model)setPlacing(true,true);};
+$('avatarQuick').onchange=e=>chooseAvatar(e.target.value,true);
+$('avatarCamera').onclick=()=>cameraModeSet(viewMode==='first'?'third':'first');
+addEventListener('pagehide',saveAvatars);
+
+function placeFigure(p,angle){
+ if(placeNew||!chosen())addAvatar(p,angle);
+ else{figFeet.copy(p);figYaw=yaw=angle;syncAvatar();saveAvatars();renderAvatars();}
 }
 const ray=new THREE.Raycaster(), ndc=new THREE.Vector2(), tmpN=new THREE.Vector3();
 function cutHeight(){return clip.constant<1e5?clip.constant:Infinity;}
@@ -648,11 +782,11 @@ function pickFloor(clientX,clientY){
   }
   // nothing hit: drop onto the ground plane
   const t=-(ray.ray.origin.y-box.min.y)/ray.ray.direction.y;
-  return t>0?ray.ray.origin.clone().addScaledVector(ray.ray.direction,t):null;
+  return null; // no surface detected; avoid placing a figure in midair
 }
-function setPlacing(on){placing=on;$('tPlace').setAttribute('aria-pressed',on);$('placeBanner').hidden=!on;
-  $('placeBanner').textContent='點模型上的地板放置人偶';}
-$('tPlace').onclick=()=>{if(!model)return;setPlacing(!placing);};
+function setPlacing(on,newMode=false){if(on&&pov)exitPov();placing=on;placeNew=newMode;$('tPlace').setAttribute('aria-pressed',String(on));$('placeBanner').hidden=!on;
+  $('placeBanner').textContent=newMode?'點地板新增人偶':'點地板移動選取的人偶';}
+$('tPlace').onclick=()=>{if(!model)return;setPlacing(!placing,!chosen());};
 let downAt=null;
 renderer.domElement.addEventListener('pointerdown',e=>{downAt={x:e.clientX,y:e.clientY,t:performance.now()};});
 renderer.domElement.addEventListener('pointerup',e=>{
@@ -660,7 +794,7 @@ renderer.domElement.addEventListener('pointerup',e=>{
   const moved=Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y);downAt=null;
   if(moved>8)return;
   const p=pickFloor(e.clientX,e.clientY);
-  if(!p){$('placeBanner').textContent='這裡是牆面，請點在地板上';return;}
+  if(!p){$('placeBanner').textContent='沒有偵測到有效地面，請換個位置';return;}
   const f=new THREE.Vector3();camera.getWorldDirection(f);
   placeFigure(p,Math.atan2(f.x,f.z));setPlacing(false);
 });
@@ -672,33 +806,35 @@ function enterPov(keepView){
   if(!figure||pov)return;pov=true;setPlacing(false);
   saved={pos:camera.position.clone(),tgt:controls.target.clone(),fov:camera.fov,near:camera.near,cut:cutIn.value};
   anim=null;controls.enabled=false;controls.autoRotate=false;$('tRot').setAttribute('aria-pressed',false);
-  setCut(1);cutIn.disabled=true;figure.visible=false;
+  setCut(1);cutIn.disabled=true;updateAvatarMeshes();
   if(!keepView){yaw=figYaw;pitch=0;}camera.near=0.05;layoutGuide();
   $('povUi').hidden=false;$('hint').hidden=true;$('shotPanel').hidden=false;document.querySelector('.panel').classList.add('pov');$('tPov').setAttribute('aria-pressed',true);$('tPov').textContent='離開視角';
-  updatePovCamera();
+  $('avatarCamera').textContent=viewMode==='first'?'第三人稱':'第一人稱';updatePovCamera();
 }
 function exitPov(){
   if(!pov)return;pov=false;
-  figure&&(figure.visible=true,figure.position.copy(figFeet),figure.rotation.y=figYaw=yaw);
+  figYaw=yaw;syncAvatar();
   camera.fov=saved.fov;camera.near=saved.near;camera.updateProjectionMatrix();
   camera.position.copy(saved.pos);controls.target.copy(saved.tgt);controls.enabled=true;
   cutIn.disabled=false;cutIn.value=saved.cut;applyCut();
   $('povUi').hidden=true;$('hint').hidden=false;$('shotPanel').hidden=true;document.querySelector('.panel').classList.remove('pov');$('tPov').setAttribute('aria-pressed',false);$('tPov').textContent='人偶視角';
-  keys.clear();joyV.set(0,0);
+  keys.clear();joyV.set(0,0);updateAvatarMeshes();queueAvatarSave();
 }
 $('tPov').onclick=()=>pov?exitPov():enterPov(false);
 $('povExit').onclick=exitPov;
 $('povSpeed').onclick=()=>{speedIdx=(speedIdx+1)%SPEEDS.length;$('povSpeed').textContent=SPEEDS[speedIdx][0];};
 function updatePovCamera(){
-  camera.position.set(figFeet.x,figFeet.y+EYE,figFeet.z);
+  const eye=new THREE.Vector3(figFeet.x,figFeet.y+EYE,figFeet.z);
   const d=new THREE.Vector3(Math.sin(yaw)*Math.cos(pitch),Math.sin(pitch),Math.cos(yaw)*Math.cos(pitch));
-  camera.lookAt(camera.position.clone().add(d));
+  if(viewMode==='third'){camera.position.copy(eye).addScaledVector(d,-3.2).add(new THREE.Vector3(0,.35,0));camera.lookAt(eye);}
+  else{camera.position.copy(eye);camera.lookAt(eye.clone().add(d));}
+  if(figure){figure.position.copy(figFeet);figure.rotation.y=yaw;figure.visible=viewMode==='third'&&chosen()?.visible!==false;}
 }
 // drag to look
 let look=null;
 renderer.domElement.addEventListener('pointerdown',e=>{if(!pov)return;look={id:e.pointerId,x:e.clientX,y:e.clientY};renderer.domElement.setPointerCapture(e.pointerId);});
 renderer.domElement.addEventListener('pointermove',e=>{if(!pov||!look||e.pointerId!==look.id)return;
-  const k=0.0042;yaw-=(e.clientX-look.x)*k;pitch=Math.max(-1.35,Math.min(1.35,pitch-(e.clientY-look.y)*k));look.x=e.clientX;look.y=e.clientY;});
+  const k=0.0042;yaw-=(e.clientX-look.x)*k;pitch=Math.max(-1.35,Math.min(1.35,pitch-(e.clientY-look.y)*k));look.x=e.clientX;look.y=e.clientY;queueAvatarSave();});
 ['pointerup','pointercancel'].forEach(t=>renderer.domElement.addEventListener(t,e=>{if(look&&e.pointerId===look.id)look=null;}));
 // joystick
 const joy=$('joy'),knob=$('joyKnob');let joyId=null;
@@ -736,7 +872,7 @@ function stepPov(dt){
     // follow floors / stairs / terrain (step up to 0.45 m, fall any height)
     ray.set(new THREE.Vector3(figFeet.x,figFeet.y+0.45,figFeet.z),down);ray.far=200;
     const hit=ray.intersectObject(model,true)[0];
-    figFeet.y=hit?hit.point.y:Math.max(box.min.y,figFeet.y-9.8*dt);
+    figFeet.y=hit?hit.point.y:Math.max(box.min.y,figFeet.y-9.8*dt);queueAvatarSave();
   }
   updatePovCamera();
 }
@@ -756,7 +892,7 @@ function layoutGuide(){
   $('guideLabel').textContent=`${currentSlot||'—'} · ${shotCfg.focal}mm · 眼高 ${EYE.toFixed(2)}m · ${shotCfg.aspect}`;
   $('focalOut').textContent=`${shotCfg.focal} mm · 垂直視野 ${vfovDeg(shotCfg.focal).toFixed(0)}°`;$('eyeVal').textContent=EYE.toFixed(2)+' m';
 }
-function setEye(v){EYE=Math.max(0.3,Math.min(2.2,Math.round(v*100)/100));$('eyeStand').setAttribute('aria-pressed',EYE===1.6);$('eyeSit').setAttribute('aria-pressed',EYE===1.15);if(pov){updatePovCamera();layoutGuide();}}
+function setEye(v){EYE=Math.max(0.3,Math.min(2.2,Math.round(v*100)/100));$('eyeStand').setAttribute('aria-pressed',EYE===1.6);$('eyeSit').setAttribute('aria-pressed',EYE===1.15);if(pov){updatePovCamera();layoutGuide();}queueAvatarSave();}
 $('eyeStand').onclick=()=>setEye(1.6);$('eyeSit').onclick=()=>setEye(1.15);
 $('eyeUp').onclick=()=>setEye(EYE+0.05);$('eyeDn').onclick=()=>setEye(EYE-0.05);
 $('focalIn').oninput=e=>{shotCfg.focal=+e.target.value;layoutGuide();};
@@ -784,8 +920,9 @@ function currentShotData(id){
 }
 function applyShot(s){
   const off=model?model.position:new THREE.Vector3();
-  if(!figure){figure=buildFigure();scene.add(figure);$('tPov').disabled=false;}
-  figFeet.set(s.feet[0]+off.x,s.feet[1]+off.y,s.feet[2]+off.z);figYaw=yaw=s.yaw_deg*Math.PI/180;pitch=s.pitch_deg*Math.PI/180;
+  const dest=new THREE.Vector3(s.feet[0]+off.x,s.feet[1]+off.y,s.feet[2]+off.z);
+  if(!figure)addAvatar(dest,s.yaw_deg*Math.PI/180);
+  figFeet.copy(dest);figYaw=yaw=s.yaw_deg*Math.PI/180;pitch=s.pitch_deg*Math.PI/180;viewMode='first';
   EYE=s.eye_height_m;shotCfg.focal=s.focal_mm;shotCfg.aspect=s.aspect;$('focalIn').value=s.focal_mm;$('aspectSel').value=s.aspect;
   $('shotNote').value=s.note||'';
   if(!pov)enterPov(true);setEye(EYE);updatePovCamera();layoutGuide();
@@ -793,7 +930,8 @@ function applyShot(s){
 function renderToDataURL(w,h,type='image/png',q){
   const prevPR=renderer.getPixelRatio(),sz=new THREE.Vector2();renderer.getSize(sz);const prevFov=camera.fov,prevAsp=camera.aspect;
   renderer.setPixelRatio(1);renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=vfovDeg(shotCfg.focal);camera.updateProjectionMatrix();
-  if(figure)figure.visible=false;renderer.render(scene,camera);const url=renderer.domElement.toDataURL(type,q);
+  const visibles=avatars.map(a=>a.mesh.visible);avatars.forEach(a=>a.mesh.visible=false);
+  let url;try{renderer.render(scene,camera);url=renderer.domElement.toDataURL(type,q);}finally{avatars.forEach((a,i)=>a.mesh.visible=visibles[i]);}
   renderer.setPixelRatio(prevPR);renderer.setSize(sz.x,sz.y,false);camera.aspect=prevAsp;camera.fov=prevFov;camera.updateProjectionMatrix();
   return url;
 }
@@ -825,7 +963,7 @@ $('expZip').onclick=async()=>{
     const url=renderToDataURL(w,h,'image/png');zip.file(`${id}${s.note?'_'+s.note.replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,24):''}.png`,url.split(',')[1],{base64:true});
   }
   // restore the view the user was on
-  figFeet.copy(keep.feet);yaw=keep.yaw;pitch=keep.pitch;EYE=keep.eye;shotCfg.focal=keep.focal;shotCfg.aspect=keep.aspect;currentSlot=keep.slot;
+  figFeet.copy(keep.feet);yaw=keep.yaw;pitch=keep.pitch;EYE=keep.eye;shotCfg.focal=keep.focal;shotCfg.aspect=keep.aspect;currentSlot=keep.slot;syncAvatar();queueAvatarSave();
   $('focalIn').value=keep.focal;$('aspectSel').value=keep.aspect;setEye(EYE);updatePovCamera();layoutGuide();renderSlots();
   msg('正在打包…');const blob=await zip.generateAsync({type:'blob'});download(blob,`${safeName()}_參考圖.zip`);
   msg(`已匯出 ${ids.length} 張參考圖與鏡位 JSON。`);
