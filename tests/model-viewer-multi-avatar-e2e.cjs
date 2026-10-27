@@ -65,6 +65,10 @@ async function main(){
     await page.locator('#avatarPanelToggle').click();
     await page.locator('.avatar-row').nth(3).getByRole('button',{name:'俯視'}).click();
     await page.waitForFunction(()=>document.querySelector('#povUi').hidden);
+    await page.locator('.avatar-row').nth(0).getByRole('button',{name:'視角'}).click();
+    await page.waitForFunction(()=>!document.querySelector('#povUi').hidden);
+    await page.locator('#avatarQuick').selectOption('avatar-4');
+    await page.waitForFunction(()=>document.querySelector('#povUi').hidden);
     await page.reload({waitUntil:'domcontentloaded'});
     await loadFloor(page,buf);
     await page.locator('#avatarPanelToggle').click();
