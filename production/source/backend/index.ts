@@ -40,6 +40,7 @@ export async function handler(req:Request){
   if(part==='images'){
    const objectUrl=(path:string)=>URL_BASE+'/storage/v1/object/'+IMAGE_BUCKET+'/'+path.split('/').map(encodeURIComponent).join('/');
    const result=await handleProjectImages(req,actor,{
+    readImages:async(projectId,ids)=>{const rows=await db('rpc/lizhi_production_image_index_v1',{method:'POST',body:JSON.stringify({p_owner:owner,p_project:projectId,p_ids:ids})});if(rows.length!==1)throw new FlowError('找不到本人專案圖片',404);return rows[0].images;},
     read:async()=>{const rows=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&select=revision,data');if(rows.length!==1)throw new FlowError('找不到本人工作台資料',404);return rows[0];},
     commit:async(revision,data)=>{const rows=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&revision=eq.'+revision+'&select=revision',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({revision:revision+1,data,updated_at:new Date().toISOString()})});if(rows.length!==1)throw new FlowError('其他裝置或AI已更新；請重新整理再上傳',409);},
     upload:async(path,bytes,mime)=>{const r=await fetch(objectUrl(path),{method:'POST',headers:{...adminHeaders,'Content-Type':mime,'x-upsert':'false'},body:bytes.buffer as ArrayBuffer});if(!r.ok)throw new FlowError('圖片儲存失敗，請稍後重試',503);},
