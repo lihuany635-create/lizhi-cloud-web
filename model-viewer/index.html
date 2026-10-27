@@ -114,14 +114,14 @@ button,label.btn{font:inherit;cursor:pointer}
       <option value="hades-house">哈德斯家 v3.3（EP02 9×8m，一、二樓）</option>
       <option value="reality-highschool">現實高中（校園＋3F 教室）</option>
       <option value="xiji-station">溪磯鎮車站</option>
-      <option value="lahudi-academy">拉乎迪學院（校園＋V12 家具初稿）</option>
+      <option value="lahudi-academy">拉乎迪學院 R03（分間＋家具）</option>
       
     </select></label>
   <button class="btn" id="openPreview" type="button">配置圖預覽</button>
   
   
   <span id="viewerVersion" class="file" aria-live="polite"></span>
-  <span id="academyViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="academyWhole" type="button">整座學院</button><button class="btn" id="academySchool" type="button">主教學樓</button><button class="btn" id="academyLibrary" type="button">圖書館區</button><button class="btn" id="academyGate" type="button">動畫校門 V14</button><button class="btn" id="academyGarden" type="button">薇媞後花園 V15</button><button class="btn" id="academyPlants" type="button">室內植栽 V16</button></span><label id="academyInteriorPicker" hidden class="sample"><span>室內家具</span><select id="academyInteriorSelect" aria-label="查看學院室內分區"><option value="">選擇區域／樓層</option><option value="B1">西教學翼 1F</option><option value="B2">西教學翼 2F</option><option value="C1">東教學翼 1F</option><option value="C2">東教學翼 2F</option><option value="D1">南入口 1F</option><option value="E1">北學術廳 1F</option><option value="G1">禮堂 1F</option><option value="H1">檔案翼 1F</option></select></label>
+  <span id="academyViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="academyWhole" type="button">整座學院</button><button class="btn" id="academySchool" type="button">L04 主教學樓</button><button class="btn" id="academyLibrary" type="button">L08 圖書館</button><button class="btn" id="academyGate" type="button">L01 校門＋前庭</button><button class="btn" id="academyGarden" type="button">L03 中庭</button><button class="btn" id="academyPlants" type="button">L07 旋梯塔</button></span><label id="academyInteriorPicker" hidden class="sample"><span>室內家具</span><select id="academyInteriorSelect" aria-label="查看學院室內分區"><option value="">選擇區域／樓層</option><option value="L04_1">L04 主教學樓 1F</option><option value="L04_2">L04 主教學樓 2F</option><option value="L06W_1">L06 西翼 1F</option><option value="L06W_2">L06 西翼 2F</option><option value="L06E_1">L06 東翼 1F</option><option value="L06E_2">L06 東翼 2F</option><option value="L05_1">L05 哥德走廊 1F</option><option value="L05_2">L05 哥德走廊 2F</option><option value="L08_1">L08 圖書館 1F</option><option value="L08_2">L08 圖書館 2F</option></select></label>
   <span id="houseViews" hidden style="display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn" id="house1F">一樓俯視</button><button class="btn" id="house2F">二樓俯視</button><button class="btn" id="houseWhole">完整外觀</button><a class="btn" href="revisions/hades-v3.3/">配置圖</a></span>
 </div>
 
@@ -388,11 +388,12 @@ function academyView(region){
   if(pov)exitPov();
   const offset=model.position.y;
   const presets={
-    whole:[-146,-1.5,-221.5,36,28.34,91.5],
-    gate:[-112,-1,51,-19,13,89],
-    school:[-133,-1,-115,-26,29,58],
-    library:[-132,-1,-193,31,30,-118],
-    garden:[-47.5,-.6,-216.5,-4.5,20,-181.0]
+    // R03 座標：X 東、glTF Z = −北、Y 上（1 單位 = 1 m）
+    whole:[-76,-0.5,-146,76,28.5,0],
+    gate:[-24,-0.5,-44,24,8,0],
+    school:[-26,-0.5,-114,26,17.5,-80],
+    library:[-32,-0.5,-140,32,17.5,-116],
+    garden:[-23,-0.5,-79,23,10,-44]
   };
   const q=presets[region]||presets.whole;
   fitBox=new THREE.Box3(
@@ -401,14 +402,14 @@ function academyView(region){
   setCut(1);
   fit(false);
   if(region==='garden'){
-    // North/rear camera looking inward toward existing F_LIBRARY back facade.
-    camera.position.set(-26.0,10.5+offset,-247);
-    controls.target.set(-26.0,2.1+offset,-197);
+    // L02 → L03 中軸，望向 L04 正門
+    camera.position.set(0,9+offset,-36);
+    controls.target.set(0,3+offset,-82);
     controls.update();anim=null;
   }else if(region==='gate'){
-    // South, frontal camera: preserve explicit animation establishing-shot axis.
-    camera.position.set(-70.1,11+offset,129);
-    controls.target.set(-70.1,4+offset,70);
+    // 校外南側沿中軸望向校門與前庭
+    camera.position.set(0,8+offset,22);
+    controls.target.set(0,3+offset,-30);
     controls.update();anim=null;
   }else if(anim){camera.position.copy(anim.p);controls.target.copy(anim.t);controls.update();anim=null;}
   document.querySelectorAll('#academyViews button').forEach(b=>b.setAttribute('aria-pressed',
@@ -428,10 +429,10 @@ function academyPlantFocus(){
   if(!model||modelKey!=='lahudi-academy')return;
   if(pov)exitPov();
   const offset=model.position.y;
-  fitBox=new THREE.Box3(new THREE.Vector3(-138.9,offset-0.5,-64.2),
-     new THREE.Vector3(-127.85,offset+3.7,-53.4));
-  // Only the 1F classroom so the plant is visible and 2F is not above it.
-  const top=3.59+offset;
+  // R03：L07 樓梯塔一樓（旋梯 proxy，PENDING_AUTHOR_REPLACEMENT）
+  fitBox=new THREE.Box3(new THREE.Vector3(31,offset-0.5,-101),
+     new THREE.Vector3(51,offset+5.2,-81));
+  const top=5.0+offset;
   setCut(Math.min(.995,Math.max(.001,(top-box.min.y)/size.y)));
   fit(true);
   if(anim){camera.position.copy(anim.p);controls.target.copy(anim.t);controls.update();anim=null;}
@@ -448,14 +449,11 @@ function academyInteriorView(zone){
  if(pov)exitPov();
  const offset=model.position.y;
  const presets={
-   B1:[-140,-1,-69,-113,3.70,25],
-   B2:[-140,3.85,-69,-113,8.20,25],
-   C1:[-36,-1,-69,-13,3.70,25],
-   C2:[-36,3.85,-69,-13,8.20,25],
-   D1:[-99,-1,29,-21,3.70,54],
-   E1:[-119,-1,-113,-39,3.70,-81],
-   G1:[-124,-1,-171,-94,3.70,-124],
-   H1:[3,-1,-175,29,3.70,-142]
+   L04_1:[-25,-0.5,-113,25,3.9,-81],  L04_2:[-25,5.3,-113,25,9.4,-81],
+   L06W_1:[-71,-0.5,-63,-39,3.9,-41], L06W_2:[-71,5.3,-63,-39,9.4,-41],
+   L06E_1:[39,-0.5,-63,71,3.9,-41],   L06E_2:[39,5.3,-63,71,9.4,-41],
+   L05_1:[-61,-0.5,-101,-31,3.9,-57], L05_2:[-61,5.3,-101,-31,9.4,-57],
+   L08_1:[-31,-0.5,-139,31,3.9,-117], L08_2:[-31,5.3,-139,31,9.4,-117]
  };
  if(!presets[zone])return;
  const a=presets[zone];
@@ -464,7 +462,7 @@ function academyInteriorView(zone){
   new THREE.Vector3(a[3],a[4]+offset,a[5])
  );
  // Cut at chosen world's Y height, separating upstairs from downstairs.
- const cutWorldY=(zone.endsWith('2')?8.15:3.56)+offset;
+ const cutWorldY=(zone.endsWith('2')?9.5:4.0)+offset;
  setCut(Math.min(.995,Math.max(.001,(cutWorldY-box.min.y)/size.y)));
  fit(true);
  if(anim){camera.position.copy(anim.p);controls.target.copy(anim.t);controls.update();anim=null;}
@@ -541,15 +539,15 @@ const SAMPLES={
   },
   "lahudi-academy": {
     "name": "拉乎迪學院.glb",
-    "file": "lahudi-academy.glb?v=rb2-indoor-greenery-v16-20261024",
+    "file": "lahudi-academy.glb?v=r03-g2f-20261027",
     "cut": 1,
     "fit": [
+      -76,
+      -0.5,
       -146,
-      -1.5,
-      -221.5,
-      36,
-      28.34,
-      91.5
+      76,
+      28.5,
+      0
     ]
   },
   "lahudi-academy-s01-v5": {

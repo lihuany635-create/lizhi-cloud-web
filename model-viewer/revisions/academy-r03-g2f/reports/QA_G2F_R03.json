@@ -1,0 +1,581 @@
+{
+ "summary": "96/96 PASS",
+ "checks": [
+  {
+   "item": "1F 標高 L04_MAIN_1F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=0.000",
+   "rule": "FFL_1=0.00"
+  },
+  {
+   "item": "2F 標高 L04_MAIN_2F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=5.400",
+   "rule": "abs(Z_2F−5.40)≤0.01"
+  },
+  {
+   "item": "1F 標高 L05_CLOISTER_1F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=0.000",
+   "rule": "FFL_1=0.00"
+  },
+  {
+   "item": "2F 標高 L05_CLOISTER_2F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=5.400",
+   "rule": "abs(Z_2F−5.40)≤0.01"
+  },
+  {
+   "item": "1F 標高 L05_ANNEX_1F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=0.000",
+   "rule": "FFL_1=0.00"
+  },
+  {
+   "item": "2F 標高 L05_ANNEX_2F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=5.400",
+   "rule": "abs(Z_2F−5.40)≤0.01"
+  },
+  {
+   "item": "1F 標高 L06_WEST_A_1F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=0.000",
+   "rule": "FFL_1=0.00"
+  },
+  {
+   "item": "2F 標高 L06_WEST_A_2F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=5.400",
+   "rule": "abs(Z_2F−5.40)≤0.01"
+  },
+  {
+   "item": "1F 標高 L06_EAST_C_1F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=0.000",
+   "rule": "FFL_1=0.00"
+  },
+  {
+   "item": "2F 標高 L06_EAST_C_2F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=5.400",
+   "rule": "abs(Z_2F−5.40)≤0.01"
+  },
+  {
+   "item": "1F 標高 L07_STAIR_TOWER_1F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=0.000",
+   "rule": "FFL_1=0.00"
+  },
+  {
+   "item": "2F 標高 L07_STAIR_TOWER_2F_SLAB_PROXY_PENDING",
+   "result": "PASS",
+   "detail": "Z_top=5.400",
+   "rule": "abs(Z_2F−5.40)≤0.01"
+  },
+  {
+   "item": "1F 標高 L08_LIBRARY_1F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=0.000",
+   "rule": "FFL_1=0.00"
+  },
+  {
+   "item": "2F 標高 L08_LIBRARY_2F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=5.400",
+   "rule": "abs(Z_2F−5.40)≤0.01"
+  },
+  {
+   "item": "1F 標高 CX_L05_L04_1F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=0.000",
+   "rule": "FFL_1=0.00"
+  },
+  {
+   "item": "2F 標高 CX_L05_L04_2F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=5.400",
+   "rule": "abs(Z_2F−5.40)≤0.01"
+  },
+  {
+   "item": "1F 標高 CX_L04_L07_1F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=0.000",
+   "rule": "FFL_1=0.00"
+  },
+  {
+   "item": "2F 標高 CX_L04_L07_2F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=5.400",
+   "rule": "abs(Z_2F−5.40)≤0.01"
+  },
+  {
+   "item": "1F 標高 CX_L04_L08_1F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=0.000",
+   "rule": "FFL_1=0.00"
+  },
+  {
+   "item": "2F 標高 CX_L04_L08_2F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=5.400",
+   "rule": "abs(Z_2F−5.40)≤0.01"
+  },
+  {
+   "item": "1F 標高 CX_L06E_L07_1F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=0.000",
+   "rule": "FFL_1=0.00"
+  },
+  {
+   "item": "2F 標高 CX_L06E_L07_2F_SLAB",
+   "result": "PASS",
+   "detail": "Z_top=5.400",
+   "rule": "abs(Z_2F−5.40)≤0.01"
+  },
+  {
+   "item": "樓板面積 L04_MAIN_1F_SLAB",
+   "result": "PASS",
+   "detail": "1440.00 m² (期望 1440.00 48×30)",
+   "rule": "計算書 §5/§6"
+  },
+  {
+   "item": "樓板面積 L04_MAIN_2F_SLAB",
+   "result": "PASS",
+   "detail": "1264.08 m² (期望 1264.08 1440 − 挑空 12×8.36 − 3 梯井)",
+   "rule": "計算書 §5/§6"
+  },
+  {
+   "item": "樓板面積 L08_LIBRARY_1F_SLAB",
+   "result": "PASS",
+   "detail": "1200.00 m² (期望 1200.00 )",
+   "rule": "計算書 §5/§6"
+  },
+  {
+   "item": "樓板面積 L08_LIBRARY_2F_SLAB",
+   "result": "PASS",
+   "detail": "953.60 m² (期望 953.60 1004 − 2 梯井)",
+   "rule": "計算書 §5/§6"
+  },
+  {
+   "item": "挑空射線 L04 12×8.36 挑空",
+   "result": "PASS",
+   "detail": "命中 L04_MAIN_1F_SLAB @Z=0.00",
+   "rule": "洞口下方不得有 2F 樓板"
+  },
+  {
+   "item": "挑空射線 L08 14×14 挑空",
+   "result": "PASS",
+   "detail": "命中 L08_LIBRARY_1F_SLAB @Z=0.00",
+   "rule": "洞口下方不得有 2F 樓板"
+  },
+  {
+   "item": "挑空射線 L08 挑空角落內側",
+   "result": "PASS",
+   "detail": "命中 L08_LIBRARY_1F_SLAB @Z=0.00",
+   "rule": "洞口下方不得有 2F 樓板"
+  },
+  {
+   "item": "挑空射線 L08 挑空外 (迴廊)",
+   "result": "PASS",
+   "detail": "命中 L08_LIBRARY_2F_SLAB @Z=5.40",
+   "rule": "洞口下方不得有 2F 樓板"
+  },
+  {
+   "item": "連通 L04↔L05 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L04↔L05 2F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L04↔L07 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L04↔L07 2F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L04↔L08 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L04↔L08 2F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L05 主廊↔附屬 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L05 主廊↔附屬 2F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L05↔L06 西翼入口廳 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L05↔L06 西翼入口廳 2F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L06 東翼入口廳↔連廊 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L06 東翼入口廳↔連廊 2F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L06西 入口廳→走廊 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L06西 入口廳→走廊 2F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L06東 入口廳→告白走廊 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L06東 入口廳→告白走廊 2F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 連廊↔L07 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 連廊↔L07 2F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L03→L04 正門 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L05 南端室外 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L06西 室外門→走廊 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "連通 L06東 室外門→告白走廊 1F",
+   "result": "PASS",
+   "detail": "通行無阻",
+   "rule": "不得斷頭路／堵牆"
+  },
+  {
+   "item": "反向測試 L04 西牆非門位",
+   "result": "PASS",
+   "detail": "被牆擋住（正確）",
+   "rule": "牆體完整"
+  },
+  {
+   "item": "反向測試 L08 南牆非門位",
+   "result": "PASS",
+   "detail": "被牆擋住（正確）",
+   "rule": "牆體完整"
+  },
+  {
+   "item": "樓梯 L04_STAIR_W",
+   "result": "PASS",
+   "detail": "30 級、平台 2.70、末踏 5.22→5.40",
+   "rule": "計算書 §3.2"
+  },
+  {
+   "item": "梯井真開口 L04_STAIR_W",
+   "result": "PASS",
+   "detail": "命中 L04_STAIR_W_1F_FLIGHT1",
+   "rule": "梯井上方不得有樓板"
+  },
+  {
+   "item": "樓梯抵達口 L04_STAIR_W",
+   "result": "PASS",
+   "detail": "抵達 2F 無阻擋",
+   "rule": ""
+  },
+  {
+   "item": "樓梯 L04_STAIR_E",
+   "result": "PASS",
+   "detail": "30 級、平台 2.70、末踏 5.22→5.40",
+   "rule": "計算書 §3.2"
+  },
+  {
+   "item": "梯井真開口 L04_STAIR_E",
+   "result": "PASS",
+   "detail": "命中 L04_STAIR_E_1F_FLIGHT1",
+   "rule": "梯井上方不得有樓板"
+  },
+  {
+   "item": "樓梯抵達口 L04_STAIR_E",
+   "result": "PASS",
+   "detail": "抵達 2F 無阻擋",
+   "rule": ""
+  },
+  {
+   "item": "樓梯 L04_STAIR_C",
+   "result": "PASS",
+   "detail": "30 級、平台 2.70、末踏 5.22→5.40",
+   "rule": "計算書 §3.2"
+  },
+  {
+   "item": "梯井真開口 L04_STAIR_C",
+   "result": "PASS",
+   "detail": "命中 L04_STAIR_C_1F_FLIGHT1",
+   "rule": "梯井上方不得有樓板"
+  },
+  {
+   "item": "樓梯抵達口 L04_STAIR_C",
+   "result": "PASS",
+   "detail": "抵達 2F 無阻擋",
+   "rule": ""
+  },
+  {
+   "item": "樓梯 L06W_STAIR",
+   "result": "PASS",
+   "detail": "30 級、平台 2.70、末踏 5.22→5.40",
+   "rule": "計算書 §3.2"
+  },
+  {
+   "item": "梯井真開口 L06W_STAIR",
+   "result": "PASS",
+   "detail": "命中 L06W_STAIR_1F_FLIGHT1",
+   "rule": "梯井上方不得有樓板"
+  },
+  {
+   "item": "樓梯抵達口 L06W_STAIR",
+   "result": "PASS",
+   "detail": "抵達 2F 無阻擋",
+   "rule": ""
+  },
+  {
+   "item": "樓梯 L06E_STAIR",
+   "result": "PASS",
+   "detail": "30 級、平台 2.70、末踏 5.22→5.40",
+   "rule": "計算書 §3.2"
+  },
+  {
+   "item": "梯井真開口 L06E_STAIR",
+   "result": "PASS",
+   "detail": "命中 L06E_STAIR_1F_FLIGHT1",
+   "rule": "梯井上方不得有樓板"
+  },
+  {
+   "item": "樓梯抵達口 L06E_STAIR",
+   "result": "PASS",
+   "detail": "抵達 2F 無阻擋",
+   "rule": ""
+  },
+  {
+   "item": "樓梯 L08_STAIR_SW",
+   "result": "PASS",
+   "detail": "30 級、平台 2.70、末踏 5.22→5.40",
+   "rule": "計算書 §3.2"
+  },
+  {
+   "item": "梯井真開口 L08_STAIR_SW",
+   "result": "PASS",
+   "detail": "命中 L08_STAIR_SW_1F_FLIGHT1",
+   "rule": "梯井上方不得有樓板"
+  },
+  {
+   "item": "樓梯抵達口 L08_STAIR_SW",
+   "result": "PASS",
+   "detail": "抵達 2F 無阻擋",
+   "rule": ""
+  },
+  {
+   "item": "樓梯 L08_STAIR_SE",
+   "result": "PASS",
+   "detail": "30 級、平台 2.70、末踏 5.22→5.40",
+   "rule": "計算書 §3.2"
+  },
+  {
+   "item": "梯井真開口 L08_STAIR_SE",
+   "result": "PASS",
+   "detail": "命中 L08_STAIR_SE_1F_FLIGHT1",
+   "rule": "梯井上方不得有樓板"
+  },
+  {
+   "item": "樓梯抵達口 L08_STAIR_SE",
+   "result": "PASS",
+   "detail": "抵達 2F 無阻擋",
+   "rule": ""
+  },
+  {
+   "item": "L07 旋梯級數",
+   "result": "PASS",
+   "detail": "29 踏（最高 5.22）＋抵達平台 5.40 = 30 級；掃角 224.0°",
+   "rule": "計算書 §3.2 級高"
+  },
+  {
+   "item": "L07 旋梯井真開口",
+   "result": "PASS",
+   "detail": "命中 L07_1F_SPIRAL_PROXY_PENDING_ARRIVAL_LANDING",
+   "rule": ""
+  },
+  {
+   "item": "窗：真洞口＋玻璃",
+   "result": "PASS",
+   "detail": "233 扇全部命中玻璃（玻璃物件計 233）",
+   "rule": "MOD_WINDOW_GOTHIC：先挖洞再放窗"
+  },
+  {
+   "item": "室內門洞可通行",
+   "result": "PASS",
+   "detail": "61 個門洞全部暢通",
+   "rule": ""
+  },
+  {
+   "item": "房間皆有出入口",
+   "result": "PASS",
+   "detail": "全部房間至少一個門洞",
+   "rule": ""
+  },
+  {
+   "item": "建築足跡不重疊",
+   "result": "PASS",
+   "detail": "全部只碰接",
+   "rule": "連接段以碰接為原則"
+  },
+  {
+   "item": "連廊不懸空 CX_L05_L04",
+   "result": "PASS",
+   "detail": "碰接 L04_MAIN、L05_CLOISTER",
+   "rule": "防止樓棟懸空"
+  },
+  {
+   "item": "連廊不懸空 CX_L04_L07",
+   "result": "PASS",
+   "detail": "碰接 L04_MAIN、L07_STAIR_TOWER",
+   "rule": "防止樓棟懸空"
+  },
+  {
+   "item": "連廊不懸空 CX_L04_L08",
+   "result": "PASS",
+   "detail": "碰接 L04_MAIN、L08_LIBRARY",
+   "rule": "防止樓棟懸空"
+  },
+  {
+   "item": "連廊不懸空 CX_L06E_L07",
+   "result": "PASS",
+   "detail": "碰接 L06_EAST_C、L07_STAIR_TOWER",
+   "rule": "防止樓棟懸空"
+  },
+  {
+   "item": "網格封閉 (manifold)",
+   "result": "PASS",
+   "detail": "916 件（341 組網格）全部封閉",
+   "rule": ""
+  },
+  {
+   "item": "法線朝外 (體積為正)",
+   "result": "PASS",
+   "detail": "全部正確",
+   "rule": ""
+  },
+  {
+   "item": "無實體穿插",
+   "result": "PASS",
+   "detail": "無（916 件兩兩檢查）",
+   "rule": "自相交檢查"
+  },
+  {
+   "item": "家具離牆 ≥ 0.15 m",
+   "result": "PASS",
+   "detail": "591 件家具全部符合",
+   "rule": "計算書 §7 房間裝修淨距"
+  },
+  {
+   "item": "家具共用網格",
+   "result": "PASS",
+   "detail": "591 件擺放／16 組模組網格：BED×3、BENCH×33、BLACKBOARD×16、CABINET×5、CONF_SET×2、COUNTER×3、DESK_SET_OFFICE×91、DESK_SET_STUDENT×210、DISCUSS_SET×5、DISPLAY×4、LOCKER×17、SHELF_DOUBLE×41、SHELF_WALL×134、SOFA_SET×7、TABLE_READING×4、TEACHER_SET×16",
+   "rule": "MOD_WOOD_FURNITURE：同材質共用模型"
+  },
+  {
+   "item": "L07 未誤標正式完成",
+   "result": "PASS",
+   "detail": "27 件皆 PENDING_AUTHOR_REPLACEMENT",
+   "rule": ""
+  },
+  {
+   "item": "無假報核定",
+   "result": "PASS",
+   "detail": "全部為 MODEL_ASSUMED / PENDING / G0_PROXY_ASSUMED",
+   "rule": ""
+  },
+  {
+   "item": "GLB 重開：物件數",
+   "result": "PASS",
+   "detail": "916 / 原檔 916",
+   "rule": ""
+  },
+  {
+   "item": "GLB 重開：世界座標",
+   "result": "PASS",
+   "detail": "min=[-76.0, 0.0, -0.35] max=[76.0, 146.0, 28.5]",
+   "rule": "不因匯出回歸原點；Z 頂 = L07 塔頂 22.00+0.30+尖頂 6.20"
+  },
+  {
+   "item": "GLB 重開：L08 2F 標高",
+   "result": "PASS",
+   "detail": "5.400",
+   "rule": ""
+  },
+  {
+   "item": "GLB 重開：extras 狀態欄保留",
+   "result": "PASS",
+   "detail": "916 件帶 status",
+   "rule": ""
+  }
+ ]
+}
