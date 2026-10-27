@@ -1047,10 +1047,12 @@ async function agentExecute(command){
  if(name==='viewer_get_screenshot'){
   const image_id=crypto.randomUUID(),sz=renderer.getSize(new THREE.Vector2()),pr=renderer.getPixelRatio(),asp=camera.aspect;
   let data;
-  try{renderer.setPixelRatio(1);renderer.setSize(1024,576,false);camera.aspect=1024/576;camera.updateProjectionMatrix();renderer.render(scene,camera);data=renderer.domElement.toDataURL('image/jpeg',.86);}
+  try{renderer.setPixelRatio(1);renderer.setSize(640,360,false);camera.aspect=640/360;camera.updateProjectionMatrix();renderer.render(scene,camera);data=renderer.domElement.toDataURL('image/jpeg',.86);}
   finally{renderer.setPixelRatio(pr);renderer.setSize(sz.x,sz.y,false);camera.aspect=asp;camera.updateProjectionMatrix();}
   if(!data.startsWith('data:image/jpeg;base64,')||data.length<1000||data.length>1400000)throw Error('SCREENSHOT_CAPTURE_FAILED');
-  agentGuard(command);
+  // Synchronous WebGL work can delay delivery of heartbeat/STOP messages.
+  // Accept only a bounded read frame; the server still rejects results after revocation.
+  if(!agentActive||Date.now()>Date.parse(command.deadline))throw Error('CAPTURE_EXPIRED_OR_STOPPED');
   agentEvidence.push({id:image_id,model_sha:now.source.actualSHA,revision:now.revision,camera:now.camera,avatar_id:selectedId,at:new Date().toISOString(),scope:'visible_camera_frame_only'});
   return {ok:true,screenshot_id:image_id,image:{mimeType:'image/jpeg',data:data.split(',')[1]},scene:agentScene()};
  }
