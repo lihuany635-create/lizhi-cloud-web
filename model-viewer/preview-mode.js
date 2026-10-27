@@ -14,7 +14,12 @@
     'reality-home':{name:'現實主角家',file:'reality-home.glb?v=2.3-merged-20261022',hero:'HERO_reality_home'},
     'reality-highschool':{name:'現實高中',file:'reality-highschool.glb?v=2.3-merged-20261022',hero:'HERO_highschool'},
     'xiji-station':{name:'溪磯鎮車站',file:'xiji-station.glb?v=2.3-merged-20261022',hero:'HERO_station'},
-    'lahudi-academy':{name:'拉乎迪學院',file:'lahudi-academy.glb?v=2.3-merged-20261022',hero:'HERO_academy'},
+    'lahudi-academy':{name:'拉乎迪學院 R03',file:'lahudi-academy.glb?v=r03-g2f-20261027',review:'revisions/academy-r03-g2f/',base:'revisions/academy-r03-g2f/',views:[
+      ['L04 一樓','L04_1F'],['L04 二樓','L04_2F'],['全校外觀','V_EXT_SE'],
+      ['L06 西翼一樓','L06W_1F'],['L06 西翼二樓','L06W_2F'],['L06 東翼一樓','L06E_1F'],['L06 東翼二樓','L06E_2F'],
+      ['L05 附屬棟二樓','L05_2F'],['L08 一樓','L08_1F'],['L08 二樓','L08_2F'],
+      ['教室 201 室內','V_CLASS201'],['L08 閱覽大廳','V_L08_HALL'],['L08 二樓書庫','V_L08_STACKS']
+    ]},
     'lahudi-academy-s01-v5':{name:'S01 V5 測試版（尚未驗收）',file:'preview/s01-v5.glb?v=20261023-v5',hero:'HERO_academy',review:'preview/s01-v5-status.json'}
   };
   let active=false,rendererAvailable=false,unavailable=false,zoom=1,onClose=null,onOpen=null;
@@ -34,7 +39,7 @@
     $('previewShot').value=String(index);
     $('previewImageStatus').textContent='正在讀取配置圖…';
     image.alt=scene.name+'｜'+view[0];
-    image.src=scene.views?base+'previews/'+view[1]+'.jpg':'fallback-previews/'+view[1]+'.jpg';
+    image.src=scene.views?(scene.base||base)+'previews/'+view[1]+'.jpg':'fallback-previews/'+view[1]+'.jpg';
     Array.from($('previewFloors').children).forEach((button,i)=>button.setAttribute('aria-pressed',String(i===index)));
     setZoom(1);$('previewViewport').scrollTo(0,0);
   }

@@ -1,0 +1,139 @@
+{
+ "outputs": [
+  {
+   "path": "01_working_source/LAHUDI_MASTER_R03_G2F_20261027_working.blend",
+   "bytes": 673651,
+   "sha256": "6266e0550fcb90197409a3dd2951c6d3bd1b86fcbfd360dfa2fe11af73a90ab0"
+  },
+  {
+   "path": "01_working_source/furniture_block.py",
+   "bytes": 16065,
+   "sha256": "7e5103331ecbf8c66943b6b3c84c4b215477ef2959499e41724926f5ae15e253"
+  },
+  {
+   "path": "01_working_source/furniture_log.json",
+   "bytes": 12033,
+   "sha256": "0d1401ba67936a93ba60448f0a309195d5bcd351eadb64bcab23ee7d80a0b0a1"
+  },
+  {
+   "path": "01_working_source/lahudi_g2f_build.py",
+   "bytes": 74398,
+   "sha256": "83c1ffd39fefded8c0a42a3ee25086cd77ea30a25f05bc19ba2cdd043bd62728"
+  },
+  {
+   "path": "01_working_source/lahudi_g2f_qa.py",
+   "bytes": 15017,
+   "sha256": "19aa479971b95de48bb39477c1a49c65aa26821511b624034dc65ef01a4204ab"
+  },
+  {
+   "path": "01_working_source/lahudi_g2f_render.py",
+   "bytes": 2116,
+   "sha256": "5c71fcf8dd9591c25a4af5ebdb138545d3d489d355d794da7af547525b7faa9f"
+  },
+  {
+   "path": "01_working_source/lahudi_plan_draw.py",
+   "bytes": 6240,
+   "sha256": "58ba111e65eb1dca126ec792169300dceb9b0b3245f784084093fdc117965d5f"
+  },
+  {
+   "path": "01_working_source/params_used.json",
+   "bytes": 9352,
+   "sha256": "2a4e2843c9f8072f6719e2fd8295f8c65d159b7ba939bd4671659667decdd183"
+  },
+  {
+   "path": "01_working_source/rooms.json",
+   "bytes": 16944,
+   "sha256": "a17d7ce485cfb83a3fda6baea152fb6f75b3249e052457a49de3aecbd755d472"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_CONNECTORS_R03_G2F_20261027.glb",
+   "bytes": 291112,
+   "sha256": "9afcd12e054bd7fb2aed8f9cdf2093963c24da6502a73d5c0f7741dc6111c7ef"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L04_MAIN_R03_G2F_20261027.glb",
+   "bytes": 551732,
+   "sha256": "4e2a30df80703830659eb3bc0cffbcd44038fe043b1f55de22b5cecf3c3dd052"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L05_ANNEX_R03_G2F_20261027.glb",
+   "bytes": 261356,
+   "sha256": "78121481edc1882c58343641241d2717703c246377153aff9f68a0b182de4119"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L05_CLOISTER_R03_G2F_20261027.glb",
+   "bytes": 231632,
+   "sha256": "62a01889457349e150150ce2b15dd36503fdb81606670a3651ab375de73d8cc6"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L06_EAST_C_R03_G2F_20261027.glb",
+   "bytes": 386508,
+   "sha256": "ab6eb9335ec334b7412140ab7da4c0c0cf6ab304f769d5508b0b0fe97a40dd9c"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L06_WEST_A_R03_G2F_20261027.glb",
+   "bytes": 442388,
+   "sha256": "2d8737621e79811c4077ec7badbfc3a1fef95f1e50e193136d5dd75fbc7d146f"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L07_STAIR_TOWER_R03_G2F_20261027.glb",
+   "bytes": 289244,
+   "sha256": "1eef06a2e1f3218b4459c2b49be5140a1eae3142b00c55093463690b402a7f5b"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L08_LIBRARY_R03_G2F_20261027.glb",
+   "bytes": 610584,
+   "sha256": "e703abe0522e1771dab6c710fca4a3df4e056fe2634e47e50495a115488d365c"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_SITE_L01_L02_L03_R03_G2F_20261027.glb",
+   "bytes": 67276,
+   "sha256": "98550766140d1b47e8ce28d2c3b72dffb3c3213355d7ecaadf1ddf3a2dbb6d72"
+  },
+  {
+   "path": "03_master_glb/LAHUDI_MASTER_R03_G2F_20261027.glb",
+   "bytes": 2984676,
+   "sha256": "307bae18db6c2ba1a0425da92b779ac21ce39b00f8525babaae5cfd007bea037"
+  },
+  {
+   "path": "04_test_images/G2F_01_L04_2F\u5bb6\u5177\u4fef\u8996.png",
+   "bytes": 1888342,
+   "sha256": "50c18cf5a9aefc84d336864bed8bcd907c95d3c6d9d9d7e077c1f65de1c74ffe"
+  },
+  {
+   "path": "04_test_images/G2F_02_L08_1F\u5bb6\u5177\u4fef\u8996.png",
+   "bytes": 1169957,
+   "sha256": "91a1b8838883619b58bb4dca74b7722b465cf1fb2aba8a00ba0d63ffd483e9b8"
+  },
+  {
+   "path": "04_test_images/G2F_03_L06\u897f\u7ffc2F\u4fef\u8996.png",
+   "bytes": 1896861,
+   "sha256": "8c7f7410bb353d5c50e1e2c48c5f0a3f6c8649468db2f274109b26859d3d3b9f"
+  },
+  {
+   "path": "04_test_images/G2F_04_\u6559\u5ba4201\u5ba4\u5167.png",
+   "bytes": 1619629,
+   "sha256": "1904ca74d8528113f9b5adc07269ca544e68d7bc2f1004dab6e600aa96841a18"
+  },
+  {
+   "path": "04_test_images/G2F_05_L08\u95b1\u89bd\u5927\u5ef3.png",
+   "bytes": 1582763,
+   "sha256": "c6b2af242da57780b3a857106b1b553c5a53cbb52d59766e0e88d4626c0421f5"
+  },
+  {
+   "path": "04_test_images/G2F_06_L08\u4e8c\u6a13\u897f\u66f8\u5eab.png",
+   "bytes": 1494827,
+   "sha256": "34612a0a6b9e4bec37955e564e59f9e7184bbebe7403379b4c4fb7aea47dbe1a"
+  },
+  {
+   "path": "05_reports/QA_G2F_R03.json",
+   "bytes": 14061,
+   "sha256": "d155e638a8234fc8b1fe6626efe876813115fd4c139535c0b9a1519d14e05a71"
+  },
+  {
+   "path": "05_reports/\u5de5\u4f5c\u7d00\u9304_G2F_R03_20261027.md",
+   "bytes": 2370,
+   "sha256": "b5073afc2ca98fda3dd0c7a7dcf5f0bc68e730eb5c990de5050bca457c88231d"
+  }
+ ]
+}

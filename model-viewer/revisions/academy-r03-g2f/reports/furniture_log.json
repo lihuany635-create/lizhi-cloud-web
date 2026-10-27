@@ -1,0 +1,722 @@
+[
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "L04-01",
+  "room": "大廳（含 L04-02 接待櫃台、北側大樓梯）",
+  "placed": 3,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "L04-04",
+  "room": "教職員辦公室",
+  "placed": 11,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "L04-08",
+  "room": "等候區",
+  "placed": 3,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "C1-S",
+  "room": "南走廊（接 L05／L07）",
+  "placed": 2,
+  "rejected": 7
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "ST-W",
+  "room": "西樓梯廳",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "L04-05",
+  "room": "會議室",
+  "placed": 4,
+  "rejected": 3
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "L04-03",
+  "room": "行政辦公室",
+  "placed": 11,
+  "rejected": 3
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "ST-E",
+  "room": "東樓梯廳",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "C1-N",
+  "room": "北走廊",
+  "placed": 2,
+  "rejected": 7
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "L04-07",
+  "room": "健康室",
+  "placed": 9,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "L04-06",
+  "room": "檔案室",
+  "placed": 7,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "L04-09",
+  "room": "男子廁所",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "1F",
+  "code": "L04-10",
+  "room": "女子廁所",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-01",
+  "room": "教室 201",
+  "placed": 16,
+  "rejected": 2
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-01",
+  "room": "教室 202",
+  "placed": 13,
+  "rejected": 1
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "ST-C",
+  "room": "中央樓梯廳（往 L08）",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-01",
+  "room": "教室 203",
+  "placed": 13,
+  "rejected": 1
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-01",
+  "room": "教室 204",
+  "placed": 16,
+  "rejected": 2
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-13",
+  "room": "北側二樓走廊",
+  "placed": 4,
+  "rejected": 5
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "ST-W",
+  "room": "西樓梯廳",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-05",
+  "room": "教師備課室",
+  "placed": 8,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-06",
+  "room": "教材室",
+  "placed": 4,
+  "rejected": 3
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-13",
+  "room": "中央大廳挑空",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-11",
+  "room": "教職員會議室",
+  "placed": 4,
+  "rejected": 3
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-12",
+  "room": "教師休息室",
+  "placed": 1,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "ST-E",
+  "room": "東樓梯廳",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-13",
+  "room": "南側二樓走廊（接 L05／L07）",
+  "placed": 2,
+  "rejected": 7
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-09",
+  "room": "研究室 1",
+  "placed": 5,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-07",
+  "room": "教師自習室",
+  "placed": 8,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "—",
+  "room": "南側展廊（面向 L03）",
+  "placed": 2,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-08",
+  "room": "學生自習室",
+  "placed": 8,
+  "rejected": 0
+ },
+ {
+  "building": "L04_MAIN",
+  "level": "2F",
+  "code": "L04-10",
+  "room": "研究室 2",
+  "placed": 5,
+  "rejected": 0
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "1F",
+  "code": "L06-01",
+  "room": "教室 101",
+  "placed": 18,
+  "rejected": 0
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "1F",
+  "code": "L06-01",
+  "room": "教室 102",
+  "placed": 18,
+  "rejected": 0
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "1F",
+  "code": "L06-01",
+  "room": "教室 103",
+  "placed": 14,
+  "rejected": 4
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "1F",
+  "code": "L06-11",
+  "room": "走廊／置物櫃區（L06-08）",
+  "placed": 5,
+  "rejected": 11
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "1F",
+  "code": "EN",
+  "room": "入口廳（接 L05／連廊）",
+  "placed": 1,
+  "rejected": 1
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "1F",
+  "code": "ST",
+  "room": "樓梯間",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "1F",
+  "code": "L06-02",
+  "room": "小組討論室",
+  "placed": 3,
+  "rejected": 0
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "1F",
+  "code": "L06-04",
+  "room": "教員休息室",
+  "placed": 1,
+  "rejected": 0
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "1F",
+  "code": "L06-05",
+  "room": "教具儲藏室",
+  "placed": 7,
+  "rejected": 0
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "2F",
+  "code": "L06-01",
+  "room": "A-1 教室",
+  "placed": 18,
+  "rejected": 0
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "2F",
+  "code": "L06-01",
+  "room": "A-2 教室",
+  "placed": 18,
+  "rejected": 0
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "2F",
+  "code": "L06-01",
+  "room": "A-3 教室",
+  "placed": 14,
+  "rejected": 4
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "2F",
+  "code": "L06-11",
+  "room": "西翼走廊／置物區",
+  "placed": 7,
+  "rejected": 9
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "2F",
+  "code": "EN",
+  "room": "入口廳（接 L05／連廊）",
+  "placed": 0,
+  "rejected": 2
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "2F",
+  "code": "ST",
+  "room": "樓梯間",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "2F",
+  "code": "L06-07",
+  "room": "課後討論室",
+  "placed": 5,
+  "rejected": 0
+ },
+ {
+  "building": "L06_WEST_A",
+  "level": "2F",
+  "code": "L06-08",
+  "room": "教師備課室",
+  "placed": 12,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "1F",
+  "code": "L06-01",
+  "room": "教室 104",
+  "placed": 14,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "1F",
+  "code": "L06-01",
+  "room": "教室 105",
+  "placed": 14,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "1F",
+  "code": "L06-01",
+  "room": "教室 106",
+  "placed": 14,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "1F",
+  "code": "L06-12",
+  "room": "走廊／置物櫃區（L06-08）",
+  "placed": 5,
+  "rejected": 11
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "1F",
+  "code": "EN",
+  "room": "入口廳（接 L05／連廊）",
+  "placed": 1,
+  "rejected": 1
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "1F",
+  "code": "ST",
+  "room": "樓梯間",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "1F",
+  "code": "L06-03",
+  "room": "自習角",
+  "placed": 8,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "1F",
+  "code": "L06-06",
+  "room": "教材準備室",
+  "placed": 7,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "1F",
+  "code": "L06-07",
+  "room": "設備間",
+  "placed": 5,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "2F",
+  "code": "L06-01",
+  "room": "C-1 教室",
+  "placed": 14,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "2F",
+  "code": "L06-01",
+  "room": "C-2 教室",
+  "placed": 14,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "2F",
+  "code": "L06-01",
+  "room": "C-3 教室",
+  "placed": 14,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "2F",
+  "code": "L06-12",
+  "room": "東翼走廊／告白走廊",
+  "placed": 1,
+  "rejected": 4
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "2F",
+  "code": "EN",
+  "room": "入口廳（接 L05／連廊）",
+  "placed": 0,
+  "rejected": 2
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "2F",
+  "code": "ST",
+  "room": "樓梯間",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "2F",
+  "code": "L06-09",
+  "room": "小組自習室",
+  "placed": 12,
+  "rejected": 0
+ },
+ {
+  "building": "L06_EAST_C",
+  "level": "2F",
+  "code": "L06-10",
+  "room": "學生自習室",
+  "placed": 12,
+  "rejected": 0
+ },
+ {
+  "building": "L05_ANNEX",
+  "level": "1F",
+  "code": "L05-05",
+  "room": "小型討論角",
+  "placed": 5,
+  "rejected": 0
+ },
+ {
+  "building": "L05_ANNEX",
+  "level": "1F",
+  "code": "L05-07",
+  "room": "管理儲藏室",
+  "placed": 10,
+  "rejected": 2
+ },
+ {
+  "building": "L05_ANNEX",
+  "level": "1F",
+  "code": "L05-02",
+  "room": "附屬走廊／長椅區",
+  "placed": 1,
+  "rejected": 2
+ },
+ {
+  "building": "L05_ANNEX",
+  "level": "1F",
+  "code": "L05-06",
+  "room": "展示櫃區",
+  "placed": 4,
+  "rejected": 0
+ },
+ {
+  "building": "L05_ANNEX",
+  "level": "1F",
+  "code": "L05-03",
+  "room": "休憩座席 A",
+  "placed": 1,
+  "rejected": 0
+ },
+ {
+  "building": "L05_ANNEX",
+  "level": "2F",
+  "code": "L05-01",
+  "room": "自習室",
+  "placed": 17,
+  "rejected": 0
+ },
+ {
+  "building": "L05_ANNEX",
+  "level": "2F",
+  "code": "L05-02",
+  "room": "小組討論室",
+  "placed": 5,
+  "rejected": 0
+ },
+ {
+  "building": "L05_ANNEX",
+  "level": "2F",
+  "code": "L05-08",
+  "room": "附屬走廊／窗邊休憩帶",
+  "placed": 1,
+  "rejected": 2
+ },
+ {
+  "building": "L05_ANNEX",
+  "level": "2F",
+  "code": "L05-06",
+  "room": "閱覽休憩區",
+  "placed": 1,
+  "rejected": 0
+ },
+ {
+  "building": "L05_ANNEX",
+  "level": "2F",
+  "code": "L05-05",
+  "room": "教師諮詢室",
+  "placed": 12,
+  "rejected": 0
+ },
+ {
+  "building": "L05_CLOISTER",
+  "level": "1F",
+  "code": "L05-01",
+  "room": "長廊主走道（含 L05-04 休憩座席 B）",
+  "placed": 7,
+  "rejected": 9
+ },
+ {
+  "building": "L05_CLOISTER",
+  "level": "2F",
+  "code": "L05-07",
+  "room": "哥德主走廊（含 L05-03 閱讀角、L05-04 展示區）",
+  "placed": 7,
+  "rejected": 9
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "1F",
+  "code": "L08-05",
+  "room": "典藏室",
+  "placed": 4,
+  "rejected": 1
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "1F",
+  "code": "L08-03",
+  "room": "書架區（含 L08-09 借還櫃台）",
+  "placed": 5,
+  "rejected": 6
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "1F",
+  "code": "L08-02",
+  "room": "閱覽大廳（含 L08-04 參考書區、L08-01 入口門廳）",
+  "placed": 4,
+  "rejected": 0
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "1F",
+  "code": "L08-08",
+  "room": "個人閱覽席（含 L08-10 服務台）",
+  "placed": 19,
+  "rejected": 0
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "1F",
+  "code": "L08-07",
+  "room": "小組閱覽室",
+  "placed": 1,
+  "rejected": 0
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "1F",
+  "code": "L08-06",
+  "room": "研究室",
+  "placed": 10,
+  "rejected": 0
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "1F",
+  "code": "ST",
+  "room": "東南樓梯／服務區",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "2F",
+  "code": "L08-2A",
+  "room": "西側書庫區",
+  "placed": 13,
+  "rejected": 12
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "2F",
+  "code": "L08-2B",
+  "room": "中庭挑空迴廊",
+  "placed": 0,
+  "rejected": 0
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "2F",
+  "code": "L08-2C",
+  "room": "東側書庫區",
+  "placed": 15,
+  "rejected": 10
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "2F",
+  "code": "L08-2D",
+  "room": "研究室",
+  "placed": 10,
+  "rejected": 0
+ },
+ {
+  "building": "L08_LIBRARY",
+  "level": "2F",
+  "code": "L08-2E",
+  "room": "資料室",
+  "placed": 2,
+  "rejected": 6
+ }
+]
