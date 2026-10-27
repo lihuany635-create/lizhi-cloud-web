@@ -1005,10 +1005,12 @@ function agentStop(){agentInitGeneration++;agentActive=false;keys.clear();joyV.s
 agentButton.onclick=()=>{agentStop();parent.postMessage({channel:'lizhi-viewer-v1',type:'stopped',nonce:agentNonce},agentOrigin);};
 function agentScene(){
  syncAvatar();
- const a=avatars.map(a=>({id:a.id,name:a.name,position:a.pos.toArray(),yaw:a.yaw,pitch:a.pitch,mode:a.mode,eye:a.eye,visible:a.visible}));
+ const a=avatars.map(a=>({id:a.id,name:a.name,position:a.pos.toArray(),yaw:a.yaw,pitch:a.pitch,mode:a.mode,eye:a.eye,visible:a.visible,focal:a.focal,aspect:a.aspect}));
  const cameraState={position:camera.position.toArray(),quaternion:camera.quaternion.toArray(),target:controls.target.toArray(),mode:viewMode,selected_id:selectedId,yaw,pitch,fov:camera.fov,aspect:camera.aspect};
- // Ignore sub-micrometer orbit-control roundoff when comparing CAS revisions.
- const fp=JSON.stringify([modelKey,sourceInfo?.actualSHA,a,cameraState,activeCutHeight],(_k,v)=>typeof v==='number'?Math.round(v*1e6)/1e6:v);
+ // Viewport-derived FOV/aspect can settle asynchronously after a panel opens.
+ // CAS tracks logical camera/shot changes, not this automatic browser layout.
+ const {fov:_fov,aspect:_aspect,...logicalCamera}=cameraState;
+ const fp=JSON.stringify([modelKey,sourceInfo?.actualSHA,a,logicalCamera,activeCutHeight],(_k,v)=>typeof v==='number'?Math.round(v*1e6)/1e6:v);
  if(agentFingerprint&&fp!==agentFingerprint)agentRevision++;agentFingerprint=fp;
  return {revision:agentRevision,model_key:modelKey,model_name:modelName,source:sourceInfo,avatars:a,camera:cameraState,
   bounds:{min:box.min.toArray(),max:box.max.toArray()},coordinate_system:'Three.js +Y up; viewer meters; positions after display transform',
@@ -1054,7 +1056,7 @@ async function agentExecute(command){
   // Synchronous WebGL work can delay delivery of heartbeat/STOP messages.
   // Accept only a bounded read frame; the server still rejects results after revocation.
   if(!agentActive||Date.now()>Date.parse(command.deadline))throw Error('CAPTURE_EXPIRED_OR_STOPPED');
-  agentEvidence.push({id:image_id,model_sha:now.source.actualSHA,revision:now.revision,camera:now.camera,avatar_id:selectedId,at:new Date().toISOString(),scope:'visible_camera_frame_only'});
+  agentEvidence.push({id:image_id,model_sha:now.source.actualSHA,revision:now.revision,camera:{...now.camera,aspect:640/360},image_size:[640,360],avatar_id:selectedId,at:new Date().toISOString(),scope:'visible_camera_frame_only'});
   return {ok:true,screenshot_id:image_id,image:{mimeType:'image/jpeg',data:data.split(',')[1]},scene:agentScene()};
  }
  if(name==='viewer_create_avatar'){
