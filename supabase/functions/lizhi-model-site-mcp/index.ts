@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "npm:@supabase/supabase-js@2.75.0";
 import {handleModelEdgeRequest} from "./edge-core.mjs";
+import {handleCloudModelEdgeRequest} from "./cloud-edge-core.mjs";
 
 // ISOLATED CANDIDATE. Do not deploy to production until the SQL RLS,
 // private ChatGPT Site OAuth/session, user opt-in and real Hew E2E are proven.
@@ -15,6 +16,11 @@ const db=endpoint&&serviceKey?
     global:{headers:{"Cache-Control":"no-store"}}
   }):null;
 
-Deno.serve((request:Request)=>handleModelEdgeRequest(request,{
-  db,token,ownerUid
-}));
+// v2 /mcp remains unchanged; v3 cloud-direct is explicitly opt-in via
+// the server-only Site adapter's query flag until private Site v3 is published.
+Deno.serve((request:Request)=>{
+  const cloud=new URL(request.url).searchParams.get('cloud')==='1';
+  return cloud
+   ? handleCloudModelEdgeRequest(request,{db,token,ownerUid})
+   : handleModelEdgeRequest(request,{db,token,ownerUid});
+});
