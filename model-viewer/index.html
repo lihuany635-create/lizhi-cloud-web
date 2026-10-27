@@ -679,7 +679,7 @@ function renderAvatars(){
     const buttons=document.createElement('div');buttons.className='avatar-actions';
     function btn(name,fn){const el=document.createElement('button');el.className='btn';el.type='button';el.textContent=name;el.onclick=fn;buttons.append(el);}
     btn('視角',()=>chooseAvatar(a.id,true));
-    btn('移動',()=>{chooseAvatar(a.id,false);setPlacing(true,true);});
+    btn('移動',()=>{chooseAvatar(a.id,false);setPlacing(true,false);});
     btn('自由',()=>{chooseAvatar(a.id,false);cameraModeSet('free');});
     btn('俯視',()=>{chooseAvatar(a.id,false);cameraModeSet('top');});
     btn(a.visible?'隱藏':'顯示',()=>{a.visible=!a.visible;updateAvatarMeshes();saveAvatars();renderAvatars();});
@@ -938,7 +938,7 @@ function applyShot(s){
   figFeet.copy(dest);figYaw=yaw=s.yaw_deg*Math.PI/180;pitch=s.pitch_deg*Math.PI/180;viewMode='first';
   EYE=s.eye_height_m;shotCfg.focal=s.focal_mm;shotCfg.aspect=s.aspect;$('focalIn').value=s.focal_mm;$('aspectSel').value=s.aspect;
   $('shotNote').value=s.note||'';
-  if(!pov)enterPov(true);setEye(EYE);updatePovCamera();layoutGuide();
+  if(!pov)enterPov(true);setEye(EYE);updatePovCamera();layoutGuide();queueAvatarSave();
 }
 function renderToDataURL(w,h,type='image/png',q){
   const prevPR=renderer.getPixelRatio(),sz=new THREE.Vector2();renderer.getSize(sz);const prevFov=camera.fov,prevAsp=camera.aspect;
