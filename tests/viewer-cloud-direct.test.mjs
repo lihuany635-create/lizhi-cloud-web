@@ -72,3 +72,22 @@ test('screenshot fails explicitly and checkpoint evidence cannot be fabricated',
  assert.equal(f.code,'REAL_SCREENSHOT_EVIDENCE_REQUIRED');assert.equal(current.revision,4);
  const stop=(await invoke('viewer_stop')).data;assert.equal(stop.mode,'cloud_direct');assert.equal(stop.pending_operations,0);
 });
+
+test('Site adapter exposes 13 cloud-native tools without online session fields',async()=>{
+ const {VIEWER_CLOUD_TOOLS}=await import('../sites-migration/viewer-cloud-direct/site-cloud-direct-tools.mjs');
+ assert.equal(VIEWER_CLOUD_TOOLS.length,13);
+ for(const t of VIEWER_CLOUD_TOOLS){
+  assert(!('session_id' in t.inputSchema.properties),'No browser session in '+t.name);
+  if(!['viewer_status','viewer_list_models','viewer_get_scene','viewer_list_avatars','viewer_get_screenshot','viewer_stop'].includes(t.name)){
+    assert(t.inputSchema.required.includes('expected_revision'),'CAS required for '+t.name);
+    assert(t.inputSchema.required.includes('request_id'),'idempotency required for '+t.name);
+  }
+ }
+ const {callViewerCloud}=await import('../sites-migration/viewer-cloud-direct/site-cloud-direct-mcp.mjs');
+ let called=false;
+ const result=await callViewerCloud({name:'viewer_status',args:{},owner,token,fetcher:async(url,opts)=>{
+  called=true;assert.match(url,/lizhi-viewer-cloud$/);assert.equal(JSON.parse(opts.body).owner,owner);
+  assert.equal(opts.redirect,'manual');return Response.json({ok:true,mode:'cloud_direct'});
+ }});
+ assert(called);assert.equal(result.mode,'cloud_direct');
+});
