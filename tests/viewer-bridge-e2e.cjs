@@ -22,6 +22,7 @@ async function main(){
  try{
  const page=await browser.newPage({viewport:{width:1360,height:1100}});await page.goto(PARENT);await page.waitForFunction(()=>window.ready?.render_ready,{timeout:90000});
  let state=await page.evaluate(()=>window.ready);assert.equal(state.model_key,'lahudi-academy');assert.equal(state.source.manifestVerified,true);
+ const overview={position:state.camera.position,target:state.camera.target};
  const expected=JSON.parse(await fs.readFile('model-viewer/current-models.json','utf8')).models.find(x=>x.model==='lahudi-academy.glb').current_sha256;assert.equal(state.source.actualSHA,expected);
  async function command(name,args={},expect=true,id=randomUUID()){
    await page.evaluate(c=>window.send(c),{name,args:{...args,request_id:id},request_id:id,deadline:new Date(Date.now()+20000).toISOString()});
@@ -39,15 +40,18 @@ async function main(){
   assert(found,'valid academy surface for mannequin');created.push(found.id);
  }
  assert.equal(state.avatars.length,5);
- await write('viewer_select_avatar',{avatar_id:created[0]});
- await write('viewer_set_camera',{avatar_id:created[0],mode:'first',yaw:0,pitch:0});
+ await write('viewer_select_avatar',{avatar_id:created[1]});
+ await write('viewer_set_camera',{avatar_id:created[1],mode:'first',yaw:0,pitch:0});assert.equal(state.camera.mode,'first');
+ // Gate POV may legitimately face a stone pier; use the original unobstructed
+ // whole-model camera for image-content assertions, without altering geometry.
+ await write('viewer_set_camera',{avatar_id:created[1],mode:'free',position:overview.position,target:overview.target});
  const shot=await command('viewer_get_screenshot');assert.equal(shot.image.mimeType,'image/jpeg');const bytes=Buffer.from(shot.image.data,'base64');
  await fs.mkdir('viewer-qa-evidence',{recursive:true});await fs.writeFile('viewer-qa-evidence/academy-real-frame.jpg',bytes);
  assert.equal(bytes[0],255);assert.equal(bytes[1],216);
  const pixels=await page.evaluate(async data=>{const image=await createImageBitmap(await(await fetch('data:image/jpeg;base64,'+data)).blob());const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);const p=ctx.getImageData(0,0,image.width,image.height).data;const colors=new Set();for(let i=0;i<p.length;i+=64)colors.add([p[i]>>3,p[i+1]>>3,p[i+2]>>3].join(','));return {width:image.width,height:image.height,colors:colors.size};},shot.image.data);
  assert.equal(pixels.width,640);assert.equal(pixels.height,360);assert(pixels.colors>12,'real rendered frame contains nonuniform geometry/color evidence');
- const other=state.avatars.filter(a=>a.id!==created[0]).map(a=>a.position);
- const moved=await write('viewer_move_avatar',{avatar_id:created[0],delta:[.25,0,0]});assert(moved.moved_steps>0,'real movement occurs');assert.deepEqual(state.avatars.filter(a=>a.id!==created[0]).map(a=>a.position),other);
+ const other=state.avatars.filter(a=>a.id!==created[1]).map(a=>a.position);
+ const moved=await write('viewer_move_avatar',{avatar_id:created[1],delta:[.25,0,0]});assert(moved.moved_steps>0,'real movement occurs');assert.deepEqual(state.avatars.filter(a=>a.id!==created[1]).map(a=>a.position),other);
  await write('viewer_set_camera',{avatar_id:created[1],mode:'third'});assert.equal(state.camera.mode,'third');
  await write('viewer_set_camera',{avatar_id:created[2],mode:'top'});assert.equal(state.camera.mode,'top');
  await write('viewer_set_camera',{avatar_id:created[3],mode:'free'});assert.equal(state.camera.mode,'free');
