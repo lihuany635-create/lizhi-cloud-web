@@ -1,0 +1,22 @@
+name: Viewer Cloud Direct Unit QA
+on:
+  push:
+    branches: [feature/viewer-cloud-direct-workbench-v1-20261028]
+    paths: ['supabase/functions/lizhi-viewer-cloud/**','supabase/migrations/20261028010000_lizhi_viewer_cloud_direct.sql','tests/viewer-cloud-direct.test.mjs','.github/workflows/viewer-cloud-direct-qa.yml']
+  pull_request:
+    paths: ['supabase/functions/lizhi-viewer-cloud/**','supabase/migrations/20261028010000_lizhi_viewer_cloud_direct.sql','tests/viewer-cloud-direct.test.mjs','.github/workflows/viewer-cloud-direct-qa.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cloud direct contract verification
+        run: node --test tests/viewer-cloud-direct.test.mjs
+      - name: Check browser-based original not overwritten
+        run: |
+          grep -q "const agentOrigin=" model-viewer/index.html
+          grep -q "CREATE TABLE IF NOT EXISTS public.lizhi_viewer_cloud_scenes" supabase/migrations/20261028010000_lizhi_viewer_cloud_direct.sql
