@@ -651,13 +651,15 @@ function syncAvatar(){
   const a=chosen();if(!a)return;
   a.pos.copy(figFeet);a.yaw=pov?yaw:figYaw;a.pitch=pitch;a.eye=EYE;a.mode=viewMode;
   a.focal=shotCfg.focal;a.aspect=shotCfg.aspect;
+  if(!pov&&(a.mode==='free'||a.mode==='top')){a.orbitPosition=camera.position.toArray();a.orbitTarget=controls.target.toArray();}
   a.mesh.position.copy(figFeet);a.mesh.rotation.y=a.yaw;
 }
 function saveAvatars(){
   if(saveTimer){clearTimeout(saveTimer);saveTimer=null;}
   if(!modelKey)return;syncAvatar();
   const data={version:1,nextId,avatars:avatars.map(a=>({id:a.id,name:a.name,pos:a.pos.toArray(),yaw:a.yaw,pitch:a.pitch,
-    eye:a.eye,mode:a.mode,focal:a.focal,aspect:a.aspect,visible:a.visible}))};
+    eye:a.eye,mode:a.mode,focal:a.focal,aspect:a.aspect,visible:a.visible,
+    orbitPosition:a.orbitPosition||null,orbitTarget:a.orbitTarget||null}))};
   try{localStorage.setItem(keyAvatars(),JSON.stringify(data));}
   catch(e){console.warn('人偶資料無法儲存',e);$('avatarPanel').dataset.storageError='true';}
 }
@@ -678,7 +680,8 @@ function renderAvatars(){
     function btn(name,fn){const el=document.createElement('button');el.className='btn';el.type='button';el.textContent=name;el.onclick=fn;buttons.append(el);}
     btn('視角',()=>chooseAvatar(a.id,true));
     btn('移動',()=>{chooseAvatar(a.id,false);setPlacing(true,true);});
-    btn('定位',()=>{chooseAvatar(a.id,false);avatarOrbit(false);});
+    btn('自由',()=>{chooseAvatar(a.id,false);cameraModeSet('free');});
+    btn('俯視',()=>{chooseAvatar(a.id,false);cameraModeSet('top');});
     btn(a.visible?'隱藏':'顯示',()=>{a.visible=!a.visible;updateAvatarMeshes();saveAvatars();renderAvatars();});
     btn('刪除',()=>{if(confirm('確定刪除「'+a.name+'」？'))deleteAvatar(a.id);});
     row.append(inp,loc,buttons);list.append(row);
@@ -695,22 +698,29 @@ function chooseAvatar(id,openView=false){
   const a=avatars.find(x=>x.id===id);if(!a)return;
   if(selectedId!==id)syncAvatar();
   selectedId=id;figure=a.mesh;figFeet.copy(a.pos);figYaw=yaw=a.yaw;pitch=a.pitch;EYE=a.eye;
-  viewMode=a.mode==='third'?'third':'first';shotCfg.focal=a.focal||28;shotCfg.aspect=ASPECTS[a.aspect]?a.aspect:'16:9';
+  viewMode=['first','third','free','top'].includes(a.mode)?a.mode:'first';shotCfg.focal=a.focal||28;shotCfg.aspect=ASPECTS[a.aspect]?a.aspect:'16:9';
   $('focalIn').value=shotCfg.focal;$('aspectSel').value=shotCfg.aspect;
   updateAvatarMeshes();renderAvatars();
-  if(openView){if(!pov)enterPov(true);else{updatePovCamera();layoutGuide();}}
+  if(openView){if(viewMode==='top'||viewMode==='free')avatarOrbit(viewMode==='top');
+    else if(!pov)enterPov(true);else{updatePovCamera();layoutGuide();}}
   else if(pov)exitPov();
   saveAvatars();
 }
 function avatarOrbit(top){
   if(!figure)return;if(pov)exitPov();anim=null;
   const target=figFeet.clone().add(new THREE.Vector3(0,EYE*.5,0));
-  camera.position.copy(target).add(top?new THREE.Vector3(0,12,0.001):new THREE.Vector3(-4,3,5));
-  controls.target.copy(target);controls.update();$('tTop').setAttribute('aria-pressed',String(top));
+  const a=chosen(),savedOrbit=a?.mode===(top?'top':'free')&&a.orbitPosition?.length===3&&a.orbitTarget?.length===3;
+  if(savedOrbit){camera.position.fromArray(a.orbitPosition);controls.target.fromArray(a.orbitTarget);}
+  else{camera.position.copy(target).add(top?new THREE.Vector3(0,12,0.001):new THREE.Vector3(-4,3,5));controls.target.copy(target);}
+  controls.update();$('tTop').setAttribute('aria-pressed',String(top));
+  if(a){a.orbitPosition=camera.position.toArray();a.orbitTarget=controls.target.toArray();queueAvatarSave();}
 }
 function cameraModeSet(mode){
   if(!figure)return;
-  if(mode==='free'||mode==='top'){avatarOrbit(mode==='top');return;}
+  if(mode==='free'||mode==='top'){
+    if(pov)exitPov();viewMode=mode;const a=chosen();if(a){a.mode=mode;a.orbitPosition=null;a.orbitTarget=null;}
+    avatarOrbit(mode==='top');saveAvatars();return;
+  }
   viewMode=mode==='third'?'third':'first';
   if(!pov)enterPov(true);
   updatePovCamera();updateAvatarMeshes();layoutGuide();syncAvatar();saveAvatars();
@@ -736,8 +746,10 @@ function loadAvatars(){
       const a={id:x.id,name:typeof x.name==='string'?x.name.slice(0,40):x.id,mesh,pos,
         yaw:Number.isFinite(x.yaw)?x.yaw:0,pitch:Number.isFinite(x.pitch)?Math.max(-1.35,Math.min(1.35,x.pitch)):0,
         eye:Number.isFinite(x.eye)?Math.max(.3,Math.min(2.2,x.eye)):1.6,
-        mode:x.mode==='third'?'third':'first',focal:Number.isFinite(x.focal)?Math.max(12,Math.min(85,x.focal)):28,
-        aspect:ASPECTS[x.aspect]?x.aspect:'16:9',visible:x.visible!==false};
+        mode:['first','third','free','top'].includes(x.mode)?x.mode:'first',focal:Number.isFinite(x.focal)?Math.max(12,Math.min(85,x.focal)):28,
+        aspect:ASPECTS[x.aspect]?x.aspect:'16:9',visible:x.visible!==false,
+        orbitPosition:Array.isArray(x.orbitPosition)&&x.orbitPosition.length===3&&x.orbitPosition.every(Number.isFinite)?x.orbitPosition:null,
+        orbitTarget:Array.isArray(x.orbitTarget)&&x.orbitTarget.length===3&&x.orbitTarget.every(Number.isFinite)?x.orbitTarget:null};
       mesh.position.copy(pos);mesh.rotation.y=a.yaw;scene.add(mesh);avatars.push(a);
     }
     nextId=Math.max(0,Number.isSafeInteger(data.nextId)?data.nextId:0,...avatars.map(a=>Number(a.id.match(/^avatar-(\d+)$/)?.[1]||0)));
@@ -756,6 +768,7 @@ $('avatarAdd').onclick=()=>{if(model)setPlacing(true,true);};
 $('avatarQuick').onchange=e=>chooseAvatar(e.target.value,true);
 $('avatarCamera').onclick=()=>cameraModeSet(viewMode==='first'?'third':'first');
 addEventListener('pagehide',saveAvatars);
+controls.addEventListener('end',()=>{if(!pov)queueAvatarSave();});
 
 function placeFigure(p,angle){
  if(placeNew||!chosen())addAvatar(p,angle);
@@ -820,7 +833,7 @@ function exitPov(){
   $('povUi').hidden=true;$('hint').hidden=false;$('shotPanel').hidden=true;document.querySelector('.panel').classList.remove('pov');$('tPov').setAttribute('aria-pressed',false);$('tPov').textContent='人偶視角';
   keys.clear();joyV.set(0,0);updateAvatarMeshes();queueAvatarSave();
 }
-$('tPov').onclick=()=>pov?exitPov():enterPov(false);
+$('tPov').onclick=()=>pov?exitPov():cameraModeSet('first');
 $('povExit').onclick=exitPov;
 $('povSpeed').onclick=()=>{speedIdx=(speedIdx+1)%SPEEDS.length;$('povSpeed').textContent=SPEEDS[speedIdx][0];};
 function updatePovCamera(){
@@ -895,8 +908,8 @@ function layoutGuide(){
 function setEye(v){EYE=Math.max(0.3,Math.min(2.2,Math.round(v*100)/100));$('eyeStand').setAttribute('aria-pressed',EYE===1.6);$('eyeSit').setAttribute('aria-pressed',EYE===1.15);if(pov){updatePovCamera();layoutGuide();}queueAvatarSave();}
 $('eyeStand').onclick=()=>setEye(1.6);$('eyeSit').onclick=()=>setEye(1.15);
 $('eyeUp').onclick=()=>setEye(EYE+0.05);$('eyeDn').onclick=()=>setEye(EYE-0.05);
-$('focalIn').oninput=e=>{shotCfg.focal=+e.target.value;layoutGuide();};
-$('aspectSel').onchange=e=>{shotCfg.aspect=e.target.value;layoutGuide();};
+$('focalIn').oninput=e=>{shotCfg.focal=+e.target.value;layoutGuide();queueAvatarSave();};
+$('aspectSel').onchange=e=>{shotCfg.aspect=e.target.value;layoutGuide();queueAvatarSave();};
 function storeKey(){return 'mv-shots:'+modelKey;}
 function persist(){try{localStorage.setItem(storeKey(),JSON.stringify(shots));}catch(e){msg('瀏覽器無法保存鏡位（可能是無痕模式），請記得匯出 JSON。');}}
 function loadShots(){shots={};currentSlot=null;try{const t=localStorage.getItem(storeKey());if(t)shots=JSON.parse(t)||{};}catch(e){}renderSlots();}
