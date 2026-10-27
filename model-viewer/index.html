@@ -821,6 +821,7 @@ function enterPov(keepView){
   anim=null;controls.enabled=false;controls.autoRotate=false;$('tRot').setAttribute('aria-pressed',false);
   setCut(1);cutIn.disabled=true;updateAvatarMeshes();
   if(!keepView){yaw=figYaw;pitch=0;}camera.near=0.05;layoutGuide();
+  $('avatarPanel').hidden=true;$('avatarPanelToggle').setAttribute('aria-expanded','false');
   $('povUi').hidden=false;$('hint').hidden=true;$('shotPanel').hidden=false;document.querySelector('.panel').classList.add('pov');$('tPov').setAttribute('aria-pressed',true);$('tPov').textContent='離開視角';
   $('avatarCamera').textContent=viewMode==='first'?'第三人稱':'第一人稱';updatePovCamera();
 }
