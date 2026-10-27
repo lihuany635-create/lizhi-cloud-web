@@ -41,8 +41,11 @@ async function main(){
  assert.equal(state.avatars.length,5);
  await write('viewer_select_avatar',{avatar_id:created[0]});
  await write('viewer_set_camera',{avatar_id:created[0],mode:'first',yaw:0,pitch:0});
- const shot=await command('viewer_get_screenshot');assert.equal(shot.image.mimeType,'image/jpeg');const bytes=Buffer.from(shot.image.data,'base64');assert(bytes.length>10000);assert.equal(bytes[0],255);assert.equal(bytes[1],216);
+ const shot=await command('viewer_get_screenshot');assert.equal(shot.image.mimeType,'image/jpeg');const bytes=Buffer.from(shot.image.data,'base64');
  await fs.mkdir('viewer-qa-evidence',{recursive:true});await fs.writeFile('viewer-qa-evidence/academy-real-frame.jpg',bytes);
+ assert.equal(bytes[0],255);assert.equal(bytes[1],216);
+ const pixels=await page.evaluate(async data=>{const image=await createImageBitmap(await(await fetch('data:image/jpeg;base64,'+data)).blob());const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);const p=ctx.getImageData(0,0,image.width,image.height).data;const colors=new Set();for(let i=0;i<p.length;i+=64)colors.add([p[i]>>3,p[i+1]>>3,p[i+2]>>3].join(','));return {width:image.width,height:image.height,colors:colors.size};},shot.image.data);
+ assert.equal(pixels.width,640);assert.equal(pixels.height,360);assert(pixels.colors>12,'real rendered frame contains nonuniform geometry/color evidence');
  const other=state.avatars.filter(a=>a.id!==created[0]).map(a=>a.position);
  const moved=await write('viewer_move_avatar',{avatar_id:created[0],delta:[.25,0,0]});assert(moved.moved_steps>0,'real movement occurs');assert.deepEqual(state.avatars.filter(a=>a.id!==created[0]).map(a=>a.position),other);
  await write('viewer_set_camera',{avatar_id:created[1],mode:'third'});assert.equal(state.camera.mode,'third');
