@@ -5,8 +5,8 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs/promises');
 function floorGlb(){
   const vertices=new Float32Array([
-    -10,0,-10, 10,0,10, -10,0,10,
-    -10,0,-10, 10,0,-10, 10,0,10
+    -10,0,-10, -10,0,10, 10,0,10,
+    -10,0,-10, 10,0,10, 10,0,-10
   ]);
   // Both triangles are front-facing upwards under glTF +Y.
   const geometry=Buffer.from(vertices.buffer);
@@ -27,7 +27,7 @@ function floorGlb(){
 }
 async function loadFloor(page,buffer){
   await page.locator('#fileIn').setInputFiles({name:'avatar-floor.glb',mimeType:'model/gltf-binary',buffer});
-  await page.waitForFunction(()=>document.querySelector('#fileName')?.textContent==='avatar-floor.glb'&&document.querySelector('#ov')?.hidden===true,{timeout:45000});
+  await page.waitForFunction(()=>document.querySelector('#fileName')?.textContent==='avatar-floor.glb'&&document.querySelector('#ov')?.hidden===true,null,{timeout:45000});
   await page.waitForTimeout(900);
 }
 async function main(){
@@ -62,6 +62,7 @@ async function main(){
     assert.equal(await page.locator('#avatarCamera').textContent(),'第一人稱');
     await page.locator('#avatarQuick').selectOption('avatar-3');
     assert.equal(await page.locator('#avatarQuick').inputValue(),'avatar-3');
+    await page.locator('#avatarPanelToggle').click();
     await page.locator('.avatar-row').nth(3).getByRole('button',{name:'俯視'}).click();
     await page.waitForFunction(()=>document.querySelector('#povUi').hidden);
     await page.reload({waitUntil:'domcontentloaded'});
