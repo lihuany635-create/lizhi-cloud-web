@@ -24,6 +24,7 @@ beforeEach(()=>{
   if(u.pathname==='/auth/v1/user'){const token=h.get('authorization');return token==='Bearer valid-user'?response({id:'owner',email:'owner@test'}):token==='Bearer other-user'?response({id:'other',email:'other@test'}):response({},401);}
   assert.equal(h.get('apikey'),env.SUPABASE_SERVICE_ROLE_KEY);
   if(u.pathname==='/rest/v1/lizhi_production_ai_keys')return response(u.searchParams.get('key_hash')==='eq.'+hash?[{owner_id:'owner',chatgpt_owner:'chatgpt-owner'}]:[]);
+  if(u.pathname==='/rest/v1/rpc/lizhi_production_image_index_v1'){const a=JSON.parse(init.body);assert.ok(['owner','other'].includes(a.p_owner));assert.equal(init.method,'POST');return response([]);}
   assert.equal(u.pathname,'/rest/v1/lizhi_production_state');const owner=u.searchParams.get('owner_id')?.slice(3);
   if(init.method==='PATCH'){const old=states.get(owner);if(conflict||String(old?.revision)!==u.searchParams.get('revision')?.slice(3))return response([]);const next={...old,...JSON.parse(init.body)};states.set(owner,next);return response([next]);}
   if(init.method==='POST'){const row=JSON.parse(init.body);if(states.has(row.owner_id))return response({},409);states.set(row.owner_id,{revision:row.revision,data:row.data});return new Response(null,{status:201});}

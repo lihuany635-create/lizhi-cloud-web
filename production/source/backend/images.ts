@@ -2,11 +2,25 @@ import {FlowError,type Actor} from '../lib/workflow.ts';
 import {managedOf,managedView} from '../lib/project-management.ts';
 import {attachProjectImage,updateProjectImage,findProjectImage,inspectImage,imageObjectPath,MAX_IMAGE_BYTES,type ProjectImage} from '../lib/project-images.ts';
 import type {PortfolioState} from '../lib/portfolio.ts';
-type Services={read:()=>Promise<{revision:number;data:PortfolioState}>;commit:(revision:number,data:PortfolioState)=>Promise<void>;upload:(path:string,bytes:Uint8Array,mime:string)=>Promise<void>;remove:(path:string)=>Promise<void>;signed:(path:string)=>Promise<string>};
+type Services={read:()=>Promise<{revision:number;data:PortfolioState}>;readImages?:(projectId:string,ids:string[])=>Promise<ProjectImage[]>;commit:(revision:number,data:PortfolioState)=>Promise<void>;upload:(path:string,bytes:Uint8Array,mime:string)=>Promise<void>;remove:(path:string)=>Promise<void>;signed:(path:string)=>Promise<string>};
 async function boundedBody(req:Request){const max=MAX_IMAGE_BYTES+65536,length=Number(req.headers.get('content-length')||0);if(length>max)throw new FlowError('圖片超過 10 MB 上傳限制',413);const chunks:Uint8Array[]=[];let size=0;const reader=req.body?.getReader();if(!reader)throw new FlowError('沒有收到圖片');try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>max){await reader.cancel();throw new FlowError('圖片超過 10 MB 上傳限制',413);}chunks.push(value);}}finally{reader.releaseLock();}const body=new Uint8Array(size);let offset=0;for(const c of chunks){body.set(c,offset);offset+=c.length;}return body;}
 export async function handleProjectImages(req:Request,actor:Actor,services:Services){
- const url=new URL(req.url),record=await services.read();
- if(req.method==='GET'){const batch=url.searchParams.get('imageIds');if(batch){const projectId=url.searchParams.get('projectId')??'',ids=batch.split(',');if(!ids.length||ids.length>50||new Set(ids).size!==ids.length)throw new FlowError('每次最多讀取50個素材');const images=ids.map(id=>findProjectImage(record.data,projectId,id,actor.id));return {expiresIn:300,urls:await Promise.all(images.map(async image=>({imageId:image.id,mime:image.mime,url:await services.signed(image.objectPath)})))};}const id=url.searchParams.get('projectId')??'',image=findProjectImage(record.data,id,url.searchParams.get('imageId')??'',actor.id);return {url:await services.signed(image.objectPath),expiresIn:300,image};}
+ const url=new URL(req.url);
+ if(req.method==='GET'){
+  const batch=url.searchParams.get('imageIds'),projectId=url.searchParams.get('projectId')??'',ids=batch!==null?batch.split(','):[url.searchParams.get('imageId')??''];
+  if(!ids.length||ids.length>50||new Set(ids).size!==ids.length||[projectId,...ids].some(id=>!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)))throw new FlowError('請指定有效專案與圖片，每次最多讀取50個素材');
+  const index=services.readImages?await services.readImages(projectId,ids):null;
+  const record=index?null:await services.read();
+  const images=ids.map(id=>{
+   const image=index?index.find(i=>i.id===id):findProjectImage(record!.data,projectId,id,actor.id);
+   if(!image)throw new FlowError('找不到本專案的圖片',404);
+   if(image.objectPath!==imageObjectPath(actor.id,projectId,image.blobId??image.id,image.mime))throw new FlowError('圖片位置不屬於此專案',403);
+   return image;
+  });
+  if(batch!==null)return {expiresIn:300,urls:await Promise.all(images.map(async image=>({imageId:image.id,mime:image.mime,url:await services.signed(image.objectPath)})))};
+  const image=images[0];return {url:await services.signed(image.objectPath),expiresIn:300,image};
+ }
+ const record=await services.read();
  if(req.headers.get('content-type')?.startsWith('application/json')){const bytes=await boundedBody(req);if(bytes.length>20000)throw new FlowError('圖片說明過長',413);const a=JSON.parse(new TextDecoder().decode(bytes));if(a.action!=='update')throw new FlowError('未知圖片操作');const next=updateProjectImage(record.data,String(a.projectId??''),a.revision,a,actor);await services.commit(record.revision,next.state);return next.result;}
  if(!req.headers.get('content-type')?.startsWith('multipart/form-data;'))throw new FlowError('請以圖片表單上傳');
  const bytes=await boundedBody(req),form=await new Request(req.url,{method:'POST',headers:{'Content-Type':req.headers.get('content-type')!},body:bytes}).formData();

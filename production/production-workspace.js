@@ -1,38 +1,38 @@
 var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), h.exports), Kh = /* @__PURE__ */ ca(((r) => {
-  function h(Z, B) {
-    var Y = Z.length;
-    Z.push(B);
-    e: for (; 0 < Y; ) {
-      var se = Y - 1 >>> 1, ce = Z[se];
-      if (0 < p(ce, B)) Z[se] = B, Z[Y] = ce, Y = se;
+  function h(K, Y) {
+    var Q = K.length;
+    K.push(Y);
+    e: for (; 0 < Q; ) {
+      var se = Q - 1 >>> 1, re = K[se];
+      if (0 < p(re, Y)) K[se] = Y, K[Q] = re, Q = se;
       else break e;
     }
   }
-  function k(Z) {
-    return Z.length === 0 ? null : Z[0];
+  function C(K) {
+    return K.length === 0 ? null : K[0];
   }
-  function f(Z) {
-    if (Z.length === 0) return null;
-    var B = Z[0], Y = Z.pop();
-    if (Y !== B) {
-      Z[0] = Y;
-      e: for (var se = 0, ce = Z.length, _e = ce >>> 1; se < _e; ) {
-        var d = 2 * (se + 1) - 1, _ = Z[d], q = d + 1, F = Z[q];
-        if (0 > p(_, Y)) q < ce && 0 > p(F, _) ? (Z[se] = F, Z[q] = Y, se = q) : (Z[se] = _, Z[d] = Y, se = d);
-        else if (q < ce && 0 > p(F, Y)) Z[se] = F, Z[q] = Y, se = q;
+  function f(K) {
+    if (K.length === 0) return null;
+    var Y = K[0], Q = K.pop();
+    if (Q !== Y) {
+      K[0] = Q;
+      e: for (var se = 0, re = K.length, _e = re >>> 1; se < _e; ) {
+        var o = 2 * (se + 1) - 1, j = K[o], R = o + 1, W = K[R];
+        if (0 > p(j, Q)) R < re && 0 > p(W, j) ? (K[se] = W, K[R] = Q, se = R) : (K[se] = j, K[o] = Q, se = o);
+        else if (R < re && 0 > p(W, Q)) K[se] = W, K[R] = Q, se = R;
         else break e;
       }
     }
-    return B;
+    return Y;
   }
-  function p(Z, B) {
-    var Y = Z.sortIndex - B.sortIndex;
-    return Y !== 0 ? Y : Z.id - B.id;
+  function p(K, Y) {
+    var Q = K.sortIndex - Y.sortIndex;
+    return Q !== 0 ? Q : K.id - Y.id;
   }
   if (r.unstable_now = void 0, typeof performance == "object" && typeof performance.now == "function") {
-    var w = performance;
+    var k = performance;
     r.unstable_now = function() {
-      return w.now();
+      return k.now();
     };
   } else {
     var x = Date, A = x.now();
@@ -40,111 +40,111 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
       return x.now() - A;
     };
   }
-  var z = [], E = [], S = 1, K = null, N = 3, le = !1, ne = !1, I = !1, Q = !1, re = typeof setTimeout == "function" ? setTimeout : null, L = typeof clearTimeout == "function" ? clearTimeout : null, ie = typeof setImmediate < "u" ? setImmediate : null;
-  function V(Z) {
-    for (var B = k(E); B !== null; ) {
-      if (B.callback === null) f(E);
-      else if (B.startTime <= Z) f(E), B.sortIndex = B.expirationTime, h(z, B);
+  var N = [], _ = [], w = 1, G = null, z = 3, le = !1, ne = !1, I = !1, X = !1, oe = typeof setTimeout == "function" ? setTimeout : null, q = typeof clearTimeout == "function" ? clearTimeout : null, ie = typeof setImmediate < "u" ? setImmediate : null;
+  function H(K) {
+    for (var Y = C(_); Y !== null; ) {
+      if (Y.callback === null) f(_);
+      else if (Y.startTime <= K) f(_), Y.sortIndex = Y.expirationTime, h(N, Y);
       else break;
-      B = k(E);
+      Y = C(_);
     }
   }
-  function ee(Z) {
-    if (I = !1, V(Z), !ne) if (k(z) !== null) ne = !0, P || (P = !0, ge());
+  function F(K) {
+    if (I = !1, H(K), !ne) if (C(N) !== null) ne = !0, $ || ($ = !0, ge());
     else {
-      var B = k(E);
-      B !== null && ae(ee, B.startTime - Z);
+      var Y = C(_);
+      Y !== null && ae(F, Y.startTime - K);
     }
   }
-  var P = !1, xe = -1, te = 5, $ = -1;
-  function j() {
-    return Q ? !0 : !(r.unstable_now() - $ < te);
+  var $ = !1, pe = -1, te = 5, P = -1;
+  function y() {
+    return X ? !0 : !(r.unstable_now() - P < te);
   }
-  function W() {
-    if (Q = !1, P) {
-      var Z = r.unstable_now();
-      $ = Z;
-      var B = !0;
+  function ee() {
+    if (X = !1, $) {
+      var K = r.unstable_now();
+      P = K;
+      var Y = !0;
       try {
         e: {
-          ne = !1, I && (I = !1, L(xe), xe = -1), le = !0;
-          var Y = N;
+          ne = !1, I && (I = !1, q(pe), pe = -1), le = !0;
+          var Q = z;
           try {
             t: {
-              for (V(Z), K = k(z); K !== null && !(K.expirationTime > Z && j()); ) {
-                var se = K.callback;
+              for (H(K), G = C(N); G !== null && !(G.expirationTime > K && y()); ) {
+                var se = G.callback;
                 if (typeof se == "function") {
-                  K.callback = null, N = K.priorityLevel;
-                  var ce = se(K.expirationTime <= Z);
-                  if (Z = r.unstable_now(), typeof ce == "function") {
-                    K.callback = ce, V(Z), B = !0;
+                  G.callback = null, z = G.priorityLevel;
+                  var re = se(G.expirationTime <= K);
+                  if (K = r.unstable_now(), typeof re == "function") {
+                    G.callback = re, H(K), Y = !0;
                     break t;
                   }
-                  K === k(z) && f(z), V(Z);
-                } else f(z);
-                K = k(z);
+                  G === C(N) && f(N), H(K);
+                } else f(N);
+                G = C(N);
               }
-              if (K !== null) B = !0;
+              if (G !== null) Y = !0;
               else {
-                var _e = k(E);
-                _e !== null && ae(ee, _e.startTime - Z), B = !1;
+                var _e = C(_);
+                _e !== null && ae(F, _e.startTime - K), Y = !1;
               }
             }
             break e;
           } finally {
-            K = null, N = Y, le = !1;
+            G = null, z = Q, le = !1;
           }
-          B = void 0;
+          Y = void 0;
         }
       } finally {
-        B ? ge() : P = !1;
+        Y ? ge() : $ = !1;
       }
     }
   }
   var ge;
   if (typeof ie == "function") ge = function() {
-    ie(W);
+    ie(ee);
   };
   else if (typeof MessageChannel < "u") {
-    var he = new MessageChannel(), b = he.port2;
-    he.port1.onmessage = W, ge = function() {
+    var me = new MessageChannel(), b = me.port2;
+    me.port1.onmessage = ee, ge = function() {
       b.postMessage(null);
     };
   } else ge = function() {
-    re(W, 0);
+    oe(ee, 0);
   };
-  function ae(Z, B) {
-    xe = re(function() {
-      Z(r.unstable_now());
-    }, B);
+  function ae(K, Y) {
+    pe = oe(function() {
+      K(r.unstable_now());
+    }, Y);
   }
-  r.unstable_IdlePriority = 5, r.unstable_ImmediatePriority = 1, r.unstable_LowPriority = 4, r.unstable_NormalPriority = 3, r.unstable_Profiling = null, r.unstable_UserBlockingPriority = 2, r.unstable_cancelCallback = function(Z) {
-    Z.callback = null;
-  }, r.unstable_forceFrameRate = function(Z) {
-    0 > Z || 125 < Z ? console.error("forceFrameRate takes a positive int between 0 and 125, forcing frame rates higher than 125 fps is not supported") : te = 0 < Z ? Math.floor(1e3 / Z) : 5;
+  r.unstable_IdlePriority = 5, r.unstable_ImmediatePriority = 1, r.unstable_LowPriority = 4, r.unstable_NormalPriority = 3, r.unstable_Profiling = null, r.unstable_UserBlockingPriority = 2, r.unstable_cancelCallback = function(K) {
+    K.callback = null;
+  }, r.unstable_forceFrameRate = function(K) {
+    0 > K || 125 < K ? console.error("forceFrameRate takes a positive int between 0 and 125, forcing frame rates higher than 125 fps is not supported") : te = 0 < K ? Math.floor(1e3 / K) : 5;
   }, r.unstable_getCurrentPriorityLevel = function() {
-    return N;
-  }, r.unstable_next = function(Z) {
-    switch (N) {
+    return z;
+  }, r.unstable_next = function(K) {
+    switch (z) {
       case 1:
       case 2:
       case 3:
-        var B = 3;
+        var Y = 3;
         break;
       default:
-        B = N;
+        Y = z;
     }
-    var Y = N;
-    N = B;
+    var Q = z;
+    z = Y;
     try {
-      return Z();
+      return K();
     } finally {
-      N = Y;
+      z = Q;
     }
   }, r.unstable_requestPaint = function() {
-    Q = !0;
-  }, r.unstable_runWithPriority = function(Z, B) {
-    switch (Z) {
+    X = !0;
+  }, r.unstable_runWithPriority = function(K, Y) {
+    switch (K) {
       case 1:
       case 2:
       case 3:
@@ -152,59 +152,59 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
       case 5:
         break;
       default:
-        Z = 3;
+        K = 3;
     }
-    var Y = N;
-    N = Z;
+    var Q = z;
+    z = K;
     try {
-      return B();
+      return Y();
     } finally {
-      N = Y;
+      z = Q;
     }
-  }, r.unstable_scheduleCallback = function(Z, B, Y) {
+  }, r.unstable_scheduleCallback = function(K, Y, Q) {
     var se = r.unstable_now();
-    switch (typeof Y == "object" && Y !== null ? (Y = Y.delay, Y = typeof Y == "number" && 0 < Y ? se + Y : se) : Y = se, Z) {
+    switch (typeof Q == "object" && Q !== null ? (Q = Q.delay, Q = typeof Q == "number" && 0 < Q ? se + Q : se) : Q = se, K) {
       case 1:
-        var ce = -1;
+        var re = -1;
         break;
       case 2:
-        ce = 250;
+        re = 250;
         break;
       case 5:
-        ce = 1073741823;
+        re = 1073741823;
         break;
       case 4:
-        ce = 1e4;
+        re = 1e4;
         break;
       default:
-        ce = 5e3;
+        re = 5e3;
     }
-    return ce = Y + ce, Z = {
-      id: S++,
-      callback: B,
-      priorityLevel: Z,
-      startTime: Y,
-      expirationTime: ce,
+    return re = Q + re, K = {
+      id: w++,
+      callback: Y,
+      priorityLevel: K,
+      startTime: Q,
+      expirationTime: re,
       sortIndex: -1
-    }, Y > se ? (Z.sortIndex = Y, h(E, Z), k(z) === null && Z === k(E) && (I ? (L(xe), xe = -1) : I = !0, ae(ee, Y - se))) : (Z.sortIndex = ce, h(z, Z), ne || le || (ne = !0, P || (P = !0, ge()))), Z;
-  }, r.unstable_shouldYield = j, r.unstable_wrapCallback = function(Z) {
-    var B = N;
+    }, Q > se ? (K.sortIndex = Q, h(_, K), C(N) === null && K === C(_) && (I ? (q(pe), pe = -1) : I = !0, ae(F, Q - se))) : (K.sortIndex = re, h(N, K), ne || le || (ne = !0, $ || ($ = !0, ge()))), K;
+  }, r.unstable_shouldYield = y, r.unstable_wrapCallback = function(K) {
+    var Y = z;
     return function() {
-      var Y = N;
-      N = B;
+      var Q = z;
+      z = Y;
       try {
-        return Z.apply(this, arguments);
+        return K.apply(this, arguments);
       } finally {
-        N = Y;
+        z = Q;
       }
     };
   };
 })), Jh = /* @__PURE__ */ ca(((r, h) => {
   h.exports = Kh();
 })), Ih = /* @__PURE__ */ ca(((r) => {
-  var h = /* @__PURE__ */ Symbol.for("react.transitional.element"), k = /* @__PURE__ */ Symbol.for("react.portal"), f = /* @__PURE__ */ Symbol.for("react.fragment"), p = /* @__PURE__ */ Symbol.for("react.strict_mode"), w = /* @__PURE__ */ Symbol.for("react.profiler"), x = /* @__PURE__ */ Symbol.for("react.consumer"), A = /* @__PURE__ */ Symbol.for("react.context"), z = /* @__PURE__ */ Symbol.for("react.forward_ref"), E = /* @__PURE__ */ Symbol.for("react.suspense"), S = /* @__PURE__ */ Symbol.for("react.memo"), K = /* @__PURE__ */ Symbol.for("react.lazy"), N = /* @__PURE__ */ Symbol.for("react.activity"), le = Symbol.iterator;
-  function ne(d) {
-    return d === null || typeof d != "object" ? null : (d = le && d[le] || d["@@iterator"], typeof d == "function" ? d : null);
+  var h = /* @__PURE__ */ Symbol.for("react.transitional.element"), C = /* @__PURE__ */ Symbol.for("react.portal"), f = /* @__PURE__ */ Symbol.for("react.fragment"), p = /* @__PURE__ */ Symbol.for("react.strict_mode"), k = /* @__PURE__ */ Symbol.for("react.profiler"), x = /* @__PURE__ */ Symbol.for("react.consumer"), A = /* @__PURE__ */ Symbol.for("react.context"), N = /* @__PURE__ */ Symbol.for("react.forward_ref"), _ = /* @__PURE__ */ Symbol.for("react.suspense"), w = /* @__PURE__ */ Symbol.for("react.memo"), G = /* @__PURE__ */ Symbol.for("react.lazy"), z = /* @__PURE__ */ Symbol.for("react.activity"), le = Symbol.iterator;
+  function ne(o) {
+    return o === null || typeof o != "object" ? null : (o = le && o[le] || o["@@iterator"], typeof o == "function" ? o : null);
   }
   var I = {
     isMounted: function() {
@@ -216,287 +216,287 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
     },
     enqueueSetState: function() {
     }
-  }, Q = Object.assign, re = {};
-  function L(d, _, q) {
-    this.props = d, this.context = _, this.refs = re, this.updater = q || I;
+  }, X = Object.assign, oe = {};
+  function q(o, j, R) {
+    this.props = o, this.context = j, this.refs = oe, this.updater = R || I;
   }
-  L.prototype.isReactComponent = {}, L.prototype.setState = function(d, _) {
-    if (typeof d != "object" && typeof d != "function" && d != null) throw Error("takes an object of state variables to update or a function which returns an object of state variables.");
-    this.updater.enqueueSetState(this, d, _, "setState");
-  }, L.prototype.forceUpdate = function(d) {
-    this.updater.enqueueForceUpdate(this, d, "forceUpdate");
+  q.prototype.isReactComponent = {}, q.prototype.setState = function(o, j) {
+    if (typeof o != "object" && typeof o != "function" && o != null) throw Error("takes an object of state variables to update or a function which returns an object of state variables.");
+    this.updater.enqueueSetState(this, o, j, "setState");
+  }, q.prototype.forceUpdate = function(o) {
+    this.updater.enqueueForceUpdate(this, o, "forceUpdate");
   };
   function ie() {
   }
-  ie.prototype = L.prototype;
-  function V(d, _, q) {
-    this.props = d, this.context = _, this.refs = re, this.updater = q || I;
+  ie.prototype = q.prototype;
+  function H(o, j, R) {
+    this.props = o, this.context = j, this.refs = oe, this.updater = R || I;
   }
-  var ee = V.prototype = new ie();
-  ee.constructor = V, Q(ee, L.prototype), ee.isPureReactComponent = !0;
-  var P = Array.isArray;
-  function xe() {
+  var F = H.prototype = new ie();
+  F.constructor = H, X(F, q.prototype), F.isPureReactComponent = !0;
+  var $ = Array.isArray;
+  function pe() {
   }
   var te = {
     H: null,
     A: null,
     T: null,
     S: null
-  }, $ = Object.prototype.hasOwnProperty;
-  function j(d, _, q) {
-    var F = q.ref;
+  }, P = Object.prototype.hasOwnProperty;
+  function y(o, j, R) {
+    var W = R.ref;
     return {
       $$typeof: h,
-      type: d,
-      key: _,
-      ref: F !== void 0 ? F : null,
-      props: q
+      type: o,
+      key: j,
+      ref: W !== void 0 ? W : null,
+      props: R
     };
   }
-  function W(d, _) {
-    return j(d.type, _, d.props);
+  function ee(o, j) {
+    return y(o.type, j, o.props);
   }
-  function ge(d) {
-    return typeof d == "object" && d !== null && d.$$typeof === h;
+  function ge(o) {
+    return typeof o == "object" && o !== null && o.$$typeof === h;
   }
-  function he(d) {
-    var _ = {
+  function me(o) {
+    var j = {
       "=": "=0",
       ":": "=2"
     };
-    return "$" + d.replace(/[=:]/g, function(q) {
-      return _[q];
+    return "$" + o.replace(/[=:]/g, function(R) {
+      return j[R];
     });
   }
   var b = /\/+/g;
-  function ae(d, _) {
-    return typeof d == "object" && d !== null && d.key != null ? he("" + d.key) : _.toString(36);
+  function ae(o, j) {
+    return typeof o == "object" && o !== null && o.key != null ? me("" + o.key) : j.toString(36);
   }
-  function Z(d) {
-    switch (d.status) {
+  function K(o) {
+    switch (o.status) {
       case "fulfilled":
-        return d.value;
+        return o.value;
       case "rejected":
-        throw d.reason;
+        throw o.reason;
       default:
-        switch (typeof d.status == "string" ? d.then(xe, xe) : (d.status = "pending", d.then(function(_) {
-          d.status === "pending" && (d.status = "fulfilled", d.value = _);
-        }, function(_) {
-          d.status === "pending" && (d.status = "rejected", d.reason = _);
-        })), d.status) {
+        switch (typeof o.status == "string" ? o.then(pe, pe) : (o.status = "pending", o.then(function(j) {
+          o.status === "pending" && (o.status = "fulfilled", o.value = j);
+        }, function(j) {
+          o.status === "pending" && (o.status = "rejected", o.reason = j);
+        })), o.status) {
           case "fulfilled":
-            return d.value;
+            return o.value;
           case "rejected":
-            throw d.reason;
+            throw o.reason;
         }
     }
-    throw d;
+    throw o;
   }
-  function B(d, _, q, F, de) {
-    var fe = typeof d;
-    (fe === "undefined" || fe === "boolean") && (d = null);
-    var ue = !1;
-    if (d === null) ue = !0;
-    else switch (fe) {
+  function Y(o, j, R, W, ce) {
+    var he = typeof o;
+    (he === "undefined" || he === "boolean") && (o = null);
+    var de = !1;
+    if (o === null) de = !0;
+    else switch (he) {
       case "bigint":
       case "string":
       case "number":
-        ue = !0;
+        de = !0;
         break;
       case "object":
-        switch (d.$$typeof) {
+        switch (o.$$typeof) {
           case h:
-          case k:
-            ue = !0;
+          case C:
+            de = !0;
             break;
-          case K:
-            return ue = d._init, B(ue(d._payload), _, q, F, de);
+          case G:
+            return de = o._init, Y(de(o._payload), j, R, W, ce);
         }
     }
-    if (ue) return de = de(d), ue = F === "" ? "." + ae(d, 0) : F, P(de) ? (q = "", ue != null && (q = ue.replace(b, "$&/") + "/"), B(de, _, q, "", function(dt) {
+    if (de) return ce = ce(o), de = W === "" ? "." + ae(o, 0) : W, $(ce) ? (R = "", de != null && (R = de.replace(b, "$&/") + "/"), Y(ce, j, R, "", function(dt) {
       return dt;
-    })) : de != null && (ge(de) && (de = W(de, q + (de.key == null || d && d.key === de.key ? "" : ("" + de.key).replace(b, "$&/") + "/") + ue)), _.push(de)), 1;
-    ue = 0;
-    var Ge = F === "" ? "." : F + ":";
-    if (P(d)) for (var ze = 0; ze < d.length; ze++) F = d[ze], fe = Ge + ae(F, ze), ue += B(F, _, q, fe, de);
-    else if (ze = ne(d), typeof ze == "function") for (d = ze.call(d), ze = 0; !(F = d.next()).done; ) F = F.value, fe = Ge + ae(F, ze++), ue += B(F, _, q, fe, de);
-    else if (fe === "object") {
-      if (typeof d.then == "function") return B(Z(d), _, q, F, de);
-      throw _ = String(d), Error("Objects are not valid as a React child (found: " + (_ === "[object Object]" ? "object with keys {" + Object.keys(d).join(", ") + "}" : _) + "). If you meant to render a collection of children, use an array instead.");
+    })) : ce != null && (ge(ce) && (ce = ee(ce, R + (ce.key == null || o && o.key === ce.key ? "" : ("" + ce.key).replace(b, "$&/") + "/") + de)), j.push(ce)), 1;
+    de = 0;
+    var Ge = W === "" ? "." : W + ":";
+    if ($(o)) for (var ze = 0; ze < o.length; ze++) W = o[ze], he = Ge + ae(W, ze), de += Y(W, j, R, he, ce);
+    else if (ze = ne(o), typeof ze == "function") for (o = ze.call(o), ze = 0; !(W = o.next()).done; ) W = W.value, he = Ge + ae(W, ze++), de += Y(W, j, R, he, ce);
+    else if (he === "object") {
+      if (typeof o.then == "function") return Y(K(o), j, R, W, ce);
+      throw j = String(o), Error("Objects are not valid as a React child (found: " + (j === "[object Object]" ? "object with keys {" + Object.keys(o).join(", ") + "}" : j) + "). If you meant to render a collection of children, use an array instead.");
     }
-    return ue;
+    return de;
   }
-  function Y(d, _, q) {
-    if (d == null) return d;
-    var F = [], de = 0;
-    return B(d, F, "", "", function(fe) {
-      return _.call(q, fe, de++);
-    }), F;
+  function Q(o, j, R) {
+    if (o == null) return o;
+    var W = [], ce = 0;
+    return Y(o, W, "", "", function(he) {
+      return j.call(R, he, ce++);
+    }), W;
   }
-  function se(d) {
-    if (d._status === -1) {
-      var _ = d._result;
-      _ = _(), _.then(function(q) {
-        (d._status === 0 || d._status === -1) && (d._status = 1, d._result = q);
-      }, function(q) {
-        (d._status === 0 || d._status === -1) && (d._status = 2, d._result = q);
-      }), d._status === -1 && (d._status = 0, d._result = _);
+  function se(o) {
+    if (o._status === -1) {
+      var j = o._result;
+      j = j(), j.then(function(R) {
+        (o._status === 0 || o._status === -1) && (o._status = 1, o._result = R);
+      }, function(R) {
+        (o._status === 0 || o._status === -1) && (o._status = 2, o._result = R);
+      }), o._status === -1 && (o._status = 0, o._result = j);
     }
-    if (d._status === 1) return d._result.default;
-    throw d._result;
+    if (o._status === 1) return o._result.default;
+    throw o._result;
   }
-  var ce = typeof reportError == "function" ? reportError : function(d) {
+  var re = typeof reportError == "function" ? reportError : function(o) {
     if (typeof window == "object" && typeof window.ErrorEvent == "function") {
-      var _ = new window.ErrorEvent("error", {
+      var j = new window.ErrorEvent("error", {
         bubbles: !0,
         cancelable: !0,
-        message: typeof d == "object" && d !== null && typeof d.message == "string" ? String(d.message) : String(d),
-        error: d
+        message: typeof o == "object" && o !== null && typeof o.message == "string" ? String(o.message) : String(o),
+        error: o
       });
-      if (!window.dispatchEvent(_)) return;
+      if (!window.dispatchEvent(j)) return;
     } else if (typeof process == "object" && typeof process.emit == "function") {
-      process.emit("uncaughtException", d);
+      process.emit("uncaughtException", o);
       return;
     }
-    console.error(d);
+    console.error(o);
   }, _e = {
-    map: Y,
-    forEach: function(d, _, q) {
-      Y(d, function() {
-        _.apply(this, arguments);
-      }, q);
+    map: Q,
+    forEach: function(o, j, R) {
+      Q(o, function() {
+        j.apply(this, arguments);
+      }, R);
     },
-    count: function(d) {
-      var _ = 0;
-      return Y(d, function() {
-        _++;
-      }), _;
+    count: function(o) {
+      var j = 0;
+      return Q(o, function() {
+        j++;
+      }), j;
     },
-    toArray: function(d) {
-      return Y(d, function(_) {
-        return _;
+    toArray: function(o) {
+      return Q(o, function(j) {
+        return j;
       }) || [];
     },
-    only: function(d) {
-      if (!ge(d)) throw Error("React.Children.only expected to receive a single React element child.");
-      return d;
+    only: function(o) {
+      if (!ge(o)) throw Error("React.Children.only expected to receive a single React element child.");
+      return o;
     }
   };
-  r.Activity = N, r.Children = _e, r.Component = L, r.Fragment = f, r.Profiler = w, r.PureComponent = V, r.StrictMode = p, r.Suspense = E, r.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = te, r.__COMPILER_RUNTIME = {
+  r.Activity = z, r.Children = _e, r.Component = q, r.Fragment = f, r.Profiler = k, r.PureComponent = H, r.StrictMode = p, r.Suspense = _, r.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = te, r.__COMPILER_RUNTIME = {
     __proto__: null,
-    c: function(d) {
-      return te.H.useMemoCache(d);
+    c: function(o) {
+      return te.H.useMemoCache(o);
     }
-  }, r.cache = function(d) {
+  }, r.cache = function(o) {
     return function() {
-      return d.apply(null, arguments);
+      return o.apply(null, arguments);
     };
   }, r.cacheSignal = function() {
     return null;
-  }, r.cloneElement = function(d, _, q) {
-    if (d == null) throw Error("The argument must be a React element, but you passed " + d + ".");
-    var F = Q({}, d.props), de = d.key;
-    if (_ != null) for (fe in _.key !== void 0 && (de = "" + _.key), _) !$.call(_, fe) || fe === "key" || fe === "__self" || fe === "__source" || fe === "ref" && _.ref === void 0 || (F[fe] = _[fe]);
-    var fe = arguments.length - 2;
-    if (fe === 1) F.children = q;
-    else if (1 < fe) {
-      for (var ue = Array(fe), Ge = 0; Ge < fe; Ge++) ue[Ge] = arguments[Ge + 2];
-      F.children = ue;
+  }, r.cloneElement = function(o, j, R) {
+    if (o == null) throw Error("The argument must be a React element, but you passed " + o + ".");
+    var W = X({}, o.props), ce = o.key;
+    if (j != null) for (he in j.key !== void 0 && (ce = "" + j.key), j) !P.call(j, he) || he === "key" || he === "__self" || he === "__source" || he === "ref" && j.ref === void 0 || (W[he] = j[he]);
+    var he = arguments.length - 2;
+    if (he === 1) W.children = R;
+    else if (1 < he) {
+      for (var de = Array(he), Ge = 0; Ge < he; Ge++) de[Ge] = arguments[Ge + 2];
+      W.children = de;
     }
-    return j(d.type, de, F);
-  }, r.createContext = function(d) {
-    return d = {
+    return y(o.type, ce, W);
+  }, r.createContext = function(o) {
+    return o = {
       $$typeof: A,
-      _currentValue: d,
-      _currentValue2: d,
+      _currentValue: o,
+      _currentValue2: o,
       _threadCount: 0,
       Provider: null,
       Consumer: null
-    }, d.Provider = d, d.Consumer = {
+    }, o.Provider = o, o.Consumer = {
       $$typeof: x,
-      _context: d
-    }, d;
-  }, r.createElement = function(d, _, q) {
-    var F, de = {}, fe = null;
-    if (_ != null) for (F in _.key !== void 0 && (fe = "" + _.key), _) $.call(_, F) && F !== "key" && F !== "__self" && F !== "__source" && (de[F] = _[F]);
-    var ue = arguments.length - 2;
-    if (ue === 1) de.children = q;
-    else if (1 < ue) {
-      for (var Ge = Array(ue), ze = 0; ze < ue; ze++) Ge[ze] = arguments[ze + 2];
-      de.children = Ge;
+      _context: o
+    }, o;
+  }, r.createElement = function(o, j, R) {
+    var W, ce = {}, he = null;
+    if (j != null) for (W in j.key !== void 0 && (he = "" + j.key), j) P.call(j, W) && W !== "key" && W !== "__self" && W !== "__source" && (ce[W] = j[W]);
+    var de = arguments.length - 2;
+    if (de === 1) ce.children = R;
+    else if (1 < de) {
+      for (var Ge = Array(de), ze = 0; ze < de; ze++) Ge[ze] = arguments[ze + 2];
+      ce.children = Ge;
     }
-    if (d && d.defaultProps) for (F in ue = d.defaultProps, ue) de[F] === void 0 && (de[F] = ue[F]);
-    return j(d, fe, de);
+    if (o && o.defaultProps) for (W in de = o.defaultProps, de) ce[W] === void 0 && (ce[W] = de[W]);
+    return y(o, he, ce);
   }, r.createRef = function() {
     return { current: null };
-  }, r.forwardRef = function(d) {
+  }, r.forwardRef = function(o) {
     return {
-      $$typeof: z,
-      render: d
+      $$typeof: N,
+      render: o
     };
-  }, r.isValidElement = ge, r.lazy = function(d) {
+  }, r.isValidElement = ge, r.lazy = function(o) {
     return {
-      $$typeof: K,
+      $$typeof: G,
       _payload: {
         _status: -1,
-        _result: d
+        _result: o
       },
       _init: se
     };
-  }, r.memo = function(d, _) {
+  }, r.memo = function(o, j) {
     return {
-      $$typeof: S,
-      type: d,
-      compare: _ === void 0 ? null : _
+      $$typeof: w,
+      type: o,
+      compare: j === void 0 ? null : j
     };
-  }, r.startTransition = function(d) {
-    var _ = te.T, q = {};
-    te.T = q;
+  }, r.startTransition = function(o) {
+    var j = te.T, R = {};
+    te.T = R;
     try {
-      var F = d(), de = te.S;
-      de !== null && de(q, F), typeof F == "object" && F !== null && typeof F.then == "function" && F.then(xe, ce);
-    } catch (fe) {
-      ce(fe);
+      var W = o(), ce = te.S;
+      ce !== null && ce(R, W), typeof W == "object" && W !== null && typeof W.then == "function" && W.then(pe, re);
+    } catch (he) {
+      re(he);
     } finally {
-      _ !== null && q.types !== null && (_.types = q.types), te.T = _;
+      j !== null && R.types !== null && (j.types = R.types), te.T = j;
     }
   }, r.unstable_useCacheRefresh = function() {
     return te.H.useCacheRefresh();
-  }, r.use = function(d) {
-    return te.H.use(d);
-  }, r.useActionState = function(d, _, q) {
-    return te.H.useActionState(d, _, q);
-  }, r.useCallback = function(d, _) {
-    return te.H.useCallback(d, _);
-  }, r.useContext = function(d) {
-    return te.H.useContext(d);
+  }, r.use = function(o) {
+    return te.H.use(o);
+  }, r.useActionState = function(o, j, R) {
+    return te.H.useActionState(o, j, R);
+  }, r.useCallback = function(o, j) {
+    return te.H.useCallback(o, j);
+  }, r.useContext = function(o) {
+    return te.H.useContext(o);
   }, r.useDebugValue = function() {
-  }, r.useDeferredValue = function(d, _) {
-    return te.H.useDeferredValue(d, _);
-  }, r.useEffect = function(d, _) {
-    return te.H.useEffect(d, _);
-  }, r.useEffectEvent = function(d) {
-    return te.H.useEffectEvent(d);
+  }, r.useDeferredValue = function(o, j) {
+    return te.H.useDeferredValue(o, j);
+  }, r.useEffect = function(o, j) {
+    return te.H.useEffect(o, j);
+  }, r.useEffectEvent = function(o) {
+    return te.H.useEffectEvent(o);
   }, r.useId = function() {
     return te.H.useId();
-  }, r.useImperativeHandle = function(d, _, q) {
-    return te.H.useImperativeHandle(d, _, q);
-  }, r.useInsertionEffect = function(d, _) {
-    return te.H.useInsertionEffect(d, _);
-  }, r.useLayoutEffect = function(d, _) {
-    return te.H.useLayoutEffect(d, _);
-  }, r.useMemo = function(d, _) {
-    return te.H.useMemo(d, _);
-  }, r.useOptimistic = function(d, _) {
-    return te.H.useOptimistic(d, _);
-  }, r.useReducer = function(d, _, q) {
-    return te.H.useReducer(d, _, q);
-  }, r.useRef = function(d) {
-    return te.H.useRef(d);
-  }, r.useState = function(d) {
-    return te.H.useState(d);
-  }, r.useSyncExternalStore = function(d, _, q) {
-    return te.H.useSyncExternalStore(d, _, q);
+  }, r.useImperativeHandle = function(o, j, R) {
+    return te.H.useImperativeHandle(o, j, R);
+  }, r.useInsertionEffect = function(o, j) {
+    return te.H.useInsertionEffect(o, j);
+  }, r.useLayoutEffect = function(o, j) {
+    return te.H.useLayoutEffect(o, j);
+  }, r.useMemo = function(o, j) {
+    return te.H.useMemo(o, j);
+  }, r.useOptimistic = function(o, j) {
+    return te.H.useOptimistic(o, j);
+  }, r.useReducer = function(o, j, R) {
+    return te.H.useReducer(o, j, R);
+  }, r.useRef = function(o) {
+    return te.H.useRef(o);
+  }, r.useState = function(o) {
+    return te.H.useState(o);
+  }, r.useSyncExternalStore = function(o, j, R) {
+    return te.H.useSyncExternalStore(o, j, R);
   }, r.useTransition = function() {
     return te.H.useTransition();
   }, r.version = "19.2.6";
@@ -504,13 +504,13 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
   h.exports = Ih();
 })), $h = /* @__PURE__ */ ca(((r) => {
   var h = ud();
-  function k(E) {
-    var S = "https://react.dev/errors/" + E;
+  function C(_) {
+    var w = "https://react.dev/errors/" + _;
     if (1 < arguments.length) {
-      S += "?args[]=" + encodeURIComponent(arguments[1]);
-      for (var K = 2; K < arguments.length; K++) S += "&args[]=" + encodeURIComponent(arguments[K]);
+      w += "?args[]=" + encodeURIComponent(arguments[1]);
+      for (var G = 2; G < arguments.length; G++) w += "&args[]=" + encodeURIComponent(arguments[G]);
     }
-    return "Minified React error #" + E + "; visit " + S + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
+    return "Minified React error #" + _ + "; visit " + w + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
   }
   function f() {
   }
@@ -518,7 +518,7 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
     d: {
       f,
       r: function() {
-        throw Error(k(522));
+        throw Error(C(522));
       },
       D: f,
       C: f,
@@ -530,107 +530,107 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
     },
     p: 0,
     findDOMNode: null
-  }, w = /* @__PURE__ */ Symbol.for("react.portal");
-  function x(E, S, K) {
-    var N = 3 < arguments.length && arguments[3] !== void 0 ? arguments[3] : null;
+  }, k = /* @__PURE__ */ Symbol.for("react.portal");
+  function x(_, w, G) {
+    var z = 3 < arguments.length && arguments[3] !== void 0 ? arguments[3] : null;
     return {
-      $$typeof: w,
-      key: N == null ? null : "" + N,
-      children: E,
-      containerInfo: S,
-      implementation: K
+      $$typeof: k,
+      key: z == null ? null : "" + z,
+      children: _,
+      containerInfo: w,
+      implementation: G
     };
   }
   var A = h.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
-  function z(E, S) {
-    if (E === "font") return "";
-    if (typeof S == "string") return S === "use-credentials" ? S : "";
+  function N(_, w) {
+    if (_ === "font") return "";
+    if (typeof w == "string") return w === "use-credentials" ? w : "";
   }
-  r.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = p, r.createPortal = function(E, S) {
-    var K = 2 < arguments.length && arguments[2] !== void 0 ? arguments[2] : null;
-    if (!S || S.nodeType !== 1 && S.nodeType !== 9 && S.nodeType !== 11) throw Error(k(299));
-    return x(E, S, null, K);
-  }, r.flushSync = function(E) {
-    var S = A.T, K = p.p;
+  r.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = p, r.createPortal = function(_, w) {
+    var G = 2 < arguments.length && arguments[2] !== void 0 ? arguments[2] : null;
+    if (!w || w.nodeType !== 1 && w.nodeType !== 9 && w.nodeType !== 11) throw Error(C(299));
+    return x(_, w, null, G);
+  }, r.flushSync = function(_) {
+    var w = A.T, G = p.p;
     try {
-      if (A.T = null, p.p = 2, E) return E();
+      if (A.T = null, p.p = 2, _) return _();
     } finally {
-      A.T = S, p.p = K, p.d.f();
+      A.T = w, p.p = G, p.d.f();
     }
-  }, r.preconnect = function(E, S) {
-    typeof E == "string" && (S ? (S = S.crossOrigin, S = typeof S == "string" ? S === "use-credentials" ? S : "" : void 0) : S = null, p.d.C(E, S));
-  }, r.prefetchDNS = function(E) {
-    typeof E == "string" && p.d.D(E);
-  }, r.preinit = function(E, S) {
-    if (typeof E == "string" && S && typeof S.as == "string") {
-      var K = S.as, N = z(K, S.crossOrigin), le = typeof S.integrity == "string" ? S.integrity : void 0, ne = typeof S.fetchPriority == "string" ? S.fetchPriority : void 0;
-      K === "style" ? p.d.S(E, typeof S.precedence == "string" ? S.precedence : void 0, {
-        crossOrigin: N,
+  }, r.preconnect = function(_, w) {
+    typeof _ == "string" && (w ? (w = w.crossOrigin, w = typeof w == "string" ? w === "use-credentials" ? w : "" : void 0) : w = null, p.d.C(_, w));
+  }, r.prefetchDNS = function(_) {
+    typeof _ == "string" && p.d.D(_);
+  }, r.preinit = function(_, w) {
+    if (typeof _ == "string" && w && typeof w.as == "string") {
+      var G = w.as, z = N(G, w.crossOrigin), le = typeof w.integrity == "string" ? w.integrity : void 0, ne = typeof w.fetchPriority == "string" ? w.fetchPriority : void 0;
+      G === "style" ? p.d.S(_, typeof w.precedence == "string" ? w.precedence : void 0, {
+        crossOrigin: z,
         integrity: le,
         fetchPriority: ne
-      }) : K === "script" && p.d.X(E, {
-        crossOrigin: N,
+      }) : G === "script" && p.d.X(_, {
+        crossOrigin: z,
         integrity: le,
         fetchPriority: ne,
-        nonce: typeof S.nonce == "string" ? S.nonce : void 0
+        nonce: typeof w.nonce == "string" ? w.nonce : void 0
       });
     }
-  }, r.preinitModule = function(E, S) {
-    if (typeof E == "string") if (typeof S == "object" && S !== null) {
-      if (S.as == null || S.as === "script") {
-        var K = z(S.as, S.crossOrigin);
-        p.d.M(E, {
-          crossOrigin: K,
-          integrity: typeof S.integrity == "string" ? S.integrity : void 0,
-          nonce: typeof S.nonce == "string" ? S.nonce : void 0
+  }, r.preinitModule = function(_, w) {
+    if (typeof _ == "string") if (typeof w == "object" && w !== null) {
+      if (w.as == null || w.as === "script") {
+        var G = N(w.as, w.crossOrigin);
+        p.d.M(_, {
+          crossOrigin: G,
+          integrity: typeof w.integrity == "string" ? w.integrity : void 0,
+          nonce: typeof w.nonce == "string" ? w.nonce : void 0
         });
       }
-    } else S ?? p.d.M(E);
-  }, r.preload = function(E, S) {
-    if (typeof E == "string" && typeof S == "object" && S !== null && typeof S.as == "string") {
-      var K = S.as, N = z(K, S.crossOrigin);
-      p.d.L(E, K, {
-        crossOrigin: N,
-        integrity: typeof S.integrity == "string" ? S.integrity : void 0,
-        nonce: typeof S.nonce == "string" ? S.nonce : void 0,
-        type: typeof S.type == "string" ? S.type : void 0,
-        fetchPriority: typeof S.fetchPriority == "string" ? S.fetchPriority : void 0,
-        referrerPolicy: typeof S.referrerPolicy == "string" ? S.referrerPolicy : void 0,
-        imageSrcSet: typeof S.imageSrcSet == "string" ? S.imageSrcSet : void 0,
-        imageSizes: typeof S.imageSizes == "string" ? S.imageSizes : void 0,
-        media: typeof S.media == "string" ? S.media : void 0
+    } else w ?? p.d.M(_);
+  }, r.preload = function(_, w) {
+    if (typeof _ == "string" && typeof w == "object" && w !== null && typeof w.as == "string") {
+      var G = w.as, z = N(G, w.crossOrigin);
+      p.d.L(_, G, {
+        crossOrigin: z,
+        integrity: typeof w.integrity == "string" ? w.integrity : void 0,
+        nonce: typeof w.nonce == "string" ? w.nonce : void 0,
+        type: typeof w.type == "string" ? w.type : void 0,
+        fetchPriority: typeof w.fetchPriority == "string" ? w.fetchPriority : void 0,
+        referrerPolicy: typeof w.referrerPolicy == "string" ? w.referrerPolicy : void 0,
+        imageSrcSet: typeof w.imageSrcSet == "string" ? w.imageSrcSet : void 0,
+        imageSizes: typeof w.imageSizes == "string" ? w.imageSizes : void 0,
+        media: typeof w.media == "string" ? w.media : void 0
       });
     }
-  }, r.preloadModule = function(E, S) {
-    if (typeof E == "string") if (S) {
-      var K = z(S.as, S.crossOrigin);
-      p.d.m(E, {
-        as: typeof S.as == "string" && S.as !== "script" ? S.as : void 0,
-        crossOrigin: K,
-        integrity: typeof S.integrity == "string" ? S.integrity : void 0
+  }, r.preloadModule = function(_, w) {
+    if (typeof _ == "string") if (w) {
+      var G = N(w.as, w.crossOrigin);
+      p.d.m(_, {
+        as: typeof w.as == "string" && w.as !== "script" ? w.as : void 0,
+        crossOrigin: G,
+        integrity: typeof w.integrity == "string" ? w.integrity : void 0
       });
-    } else p.d.m(E);
-  }, r.requestFormReset = function(E) {
-    p.d.r(E);
-  }, r.unstable_batchedUpdates = function(E, S) {
-    return E(S);
-  }, r.useFormState = function(E, S, K) {
-    return A.H.useFormState(E, S, K);
+    } else p.d.m(_);
+  }, r.requestFormReset = function(_) {
+    p.d.r(_);
+  }, r.unstable_batchedUpdates = function(_, w) {
+    return _(w);
+  }, r.useFormState = function(_, w, G) {
+    return A.H.useFormState(_, w, G);
   }, r.useFormStatus = function() {
     return A.H.useHostTransitionStatus();
   }, r.version = "19.2.6";
 })), Wh = /* @__PURE__ */ ca(((r, h) => {
-  function k() {
+  function C() {
     if (!(typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ > "u" || typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE != "function"))
       try {
-        __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(k);
+        __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(C);
       } catch (f) {
         console.error(f);
       }
   }
-  k(), h.exports = $h();
+  C(), h.exports = $h();
 })), Fh = /* @__PURE__ */ ca(((r) => {
-  var h = Jh(), k = ud(), f = Wh();
+  var h = Jh(), C = ud(), f = Wh();
   function p(e) {
     var t = "https://react.dev/errors/" + e;
     if (1 < arguments.length) {
@@ -639,7 +639,7 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
     }
     return "Minified React error #" + e + "; visit " + t + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
   }
-  function w(e) {
+  function k(e) {
     return !(!e || e.nodeType !== 1 && e.nodeType !== 9 && e.nodeType !== 11);
   }
   function x(e) {
@@ -660,17 +660,17 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
     }
     return null;
   }
-  function z(e) {
+  function N(e) {
     if (e.tag === 31) {
       var t = e.memoizedState;
       if (t === null && (e = e.alternate, e !== null && (t = e.memoizedState)), t !== null) return t.dehydrated;
     }
     return null;
   }
-  function E(e) {
+  function _(e) {
     if (x(e) !== e) throw Error(p(188));
   }
-  function S(e) {
+  function w(e) {
     var t = e.alternate;
     if (!t) {
       if (t = x(e), t === null) throw Error(p(188));
@@ -689,8 +689,8 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
       }
       if (n.child === s.child) {
         for (s = n.child; s; ) {
-          if (s === a) return E(n), e;
-          if (s === i) return E(n), t;
+          if (s === a) return _(n), e;
+          if (s === i) return _(n), t;
           s = s.sibling;
         }
         throw Error(p(188));
@@ -728,17 +728,17 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
     if (a.tag !== 3) throw Error(p(188));
     return a.stateNode.current === a ? e : t;
   }
-  function K(e) {
+  function G(e) {
     var t = e.tag;
     if (t === 5 || t === 26 || t === 27 || t === 6) return e;
     for (e = e.child; e !== null; ) {
-      if (t = K(e), t !== null) return t;
+      if (t = G(e), t !== null) return t;
       e = e.sibling;
     }
     return null;
   }
-  var N = Object.assign, le = /* @__PURE__ */ Symbol.for("react.element"), ne = /* @__PURE__ */ Symbol.for("react.transitional.element"), I = /* @__PURE__ */ Symbol.for("react.portal"), Q = /* @__PURE__ */ Symbol.for("react.fragment"), re = /* @__PURE__ */ Symbol.for("react.strict_mode"), L = /* @__PURE__ */ Symbol.for("react.profiler"), ie = /* @__PURE__ */ Symbol.for("react.consumer"), V = /* @__PURE__ */ Symbol.for("react.context"), ee = /* @__PURE__ */ Symbol.for("react.forward_ref"), P = /* @__PURE__ */ Symbol.for("react.suspense"), xe = /* @__PURE__ */ Symbol.for("react.suspense_list"), te = /* @__PURE__ */ Symbol.for("react.memo"), $ = /* @__PURE__ */ Symbol.for("react.lazy"), j = /* @__PURE__ */ Symbol.for("react.activity"), W = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), ge = Symbol.iterator;
-  function he(e) {
+  var z = Object.assign, le = /* @__PURE__ */ Symbol.for("react.element"), ne = /* @__PURE__ */ Symbol.for("react.transitional.element"), I = /* @__PURE__ */ Symbol.for("react.portal"), X = /* @__PURE__ */ Symbol.for("react.fragment"), oe = /* @__PURE__ */ Symbol.for("react.strict_mode"), q = /* @__PURE__ */ Symbol.for("react.profiler"), ie = /* @__PURE__ */ Symbol.for("react.consumer"), H = /* @__PURE__ */ Symbol.for("react.context"), F = /* @__PURE__ */ Symbol.for("react.forward_ref"), $ = /* @__PURE__ */ Symbol.for("react.suspense"), pe = /* @__PURE__ */ Symbol.for("react.suspense_list"), te = /* @__PURE__ */ Symbol.for("react.memo"), P = /* @__PURE__ */ Symbol.for("react.lazy"), y = /* @__PURE__ */ Symbol.for("react.activity"), ee = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), ge = Symbol.iterator;
+  function me(e) {
     return e === null || typeof e != "object" ? null : (e = ge && e[ge] || e["@@iterator"], typeof e == "function" ? e : null);
   }
   var b = /* @__PURE__ */ Symbol.for("react.client.reference");
@@ -747,32 +747,32 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
     if (typeof e == "function") return e.$$typeof === b ? null : e.displayName || e.name || null;
     if (typeof e == "string") return e;
     switch (e) {
-      case Q:
+      case X:
         return "Fragment";
-      case L:
+      case q:
         return "Profiler";
-      case re:
+      case oe:
         return "StrictMode";
-      case P:
+      case $:
         return "Suspense";
-      case xe:
+      case pe:
         return "SuspenseList";
-      case j:
+      case y:
         return "Activity";
     }
     if (typeof e == "object") switch (e.$$typeof) {
       case I:
         return "Portal";
-      case V:
+      case H:
         return e.displayName || "Context";
       case ie:
         return (e._context.displayName || "Context") + ".Consumer";
-      case ee:
+      case F:
         var t = e.render;
         return e = e.displayName, e || (e = t.displayName || t.name || "", e = e !== "" ? "ForwardRef(" + e + ")" : "ForwardRef"), e;
       case te:
         return t = e.displayName || null, t !== null ? t : ae(e.type) || "Memo";
-      case $:
+      case P:
         t = e._payload, e = e._init;
         try {
           return ae(e(t));
@@ -781,24 +781,24 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
     }
     return null;
   }
-  var Z = Array.isArray, B = k.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, Y = f.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, se = {
+  var K = Array.isArray, Y = C.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, Q = f.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, se = {
     pending: !1,
     data: null,
     method: null,
     action: null
-  }, ce = [], _e = -1;
-  function d(e) {
+  }, re = [], _e = -1;
+  function o(e) {
     return { current: e };
   }
-  function _(e) {
-    0 > _e || (e.current = ce[_e], ce[_e] = null, _e--);
+  function j(e) {
+    0 > _e || (e.current = re[_e], re[_e] = null, _e--);
   }
-  function q(e, t) {
-    _e++, ce[_e] = e.current, e.current = t;
+  function R(e, t) {
+    _e++, re[_e] = e.current, e.current = t;
   }
-  var F = d(null), de = d(null), fe = d(null), ue = d(null);
+  var W = o(null), ce = o(null), he = o(null), de = o(null);
   function Ge(e, t) {
-    switch (q(fe, t), q(de, e), q(F, null), t.nodeType) {
+    switch (R(he, t), R(ce, e), R(W, null), t.nodeType) {
       case 9:
       case 11:
         e = (e = t.documentElement) && (e = e.namespaceURI) ? Dp(e) : 0;
@@ -816,18 +816,18 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
             e = 0;
         }
     }
-    _(F), q(F, e);
+    j(W), R(W, e);
   }
   function ze() {
-    _(F), _(de), _(fe);
+    j(W), j(ce), j(he);
   }
   function dt(e) {
-    e.memoizedState !== null && q(ue, e);
-    var t = F.current, a = Up(t, e.type);
-    t !== a && (q(de, e), q(F, a));
+    e.memoizedState !== null && R(de, e);
+    var t = W.current, a = Up(t, e.type);
+    t !== a && (R(ce, e), R(W, a));
   }
   function Xe(e) {
-    de.current === e && (_(F), _(de)), ue.current === e && (_(ue), en._currentValue = se);
+    ce.current === e && (j(W), j(ce)), de.current === e && (j(de), en._currentValue = se);
   }
   var Me, ve;
   function qe(e) {
@@ -842,7 +842,7 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
 ` + Me + e + ve;
   }
   var lt = !1;
-  function o(e, t) {
+  function d(e, t) {
     if (!e || lt) return "";
     lt = !0;
     var a = Error.prepareStackTrace;
@@ -859,29 +859,29 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
             } }), typeof Reflect == "object" && Reflect.construct) {
               try {
                 Reflect.construct(J, []);
-              } catch (R) {
-                var U = R;
+              } catch (L) {
+                var U = L;
               }
               Reflect.construct(e, [], J);
             } else {
               try {
                 J.call();
-              } catch (R) {
-                U = R;
+              } catch (L) {
+                U = L;
               }
               e.call(J.prototype);
             }
           } else {
             try {
               throw Error();
-            } catch (R) {
-              U = R;
+            } catch (L) {
+              U = L;
             }
             (J = e()) && typeof J.catch == "function" && J.catch(function() {
             });
           }
-        } catch (R) {
-          if (R && U && typeof R.stack == "string") return [R.stack, U.stack];
+        } catch (L) {
+          if (L && U && typeof L.stack == "string") return [L.stack, U.stack];
         }
         return [null, null];
       } };
@@ -899,9 +899,9 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
         for (; 1 <= i && 0 <= n; i--, n--) if (v[i] !== D[n]) {
           if (i !== 1 || n !== 1) do
             if (i--, n--, 0 > n || v[i] !== D[n]) {
-              var G = `
+              var V = `
 ` + v[i].replace(" at new ", " at ");
-              return e.displayName && G.includes("<anonymous>") && (G = G.replace("<anonymous>", e.displayName)), G;
+              return e.displayName && V.includes("<anonymous>") && (V = V.replace("<anonymous>", e.displayName)), V;
             }
           while (1 <= i && 0 <= n);
           break;
@@ -912,7 +912,7 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
     }
     return (a = e ? e.displayName || e.name : "") ? qe(a) : "";
   }
-  function H(e, t) {
+  function B(e, t) {
     switch (e.tag) {
       case 26:
       case 27:
@@ -926,22 +926,22 @@ var ca = (r, h) => () => (h || (r((h = { exports: {} }).exports, h), r = null), 
         return qe("SuspenseList");
       case 0:
       case 15:
-        return o(e.type, !1);
+        return d(e.type, !1);
       case 11:
-        return o(e.type.render, !1);
+        return d(e.type.render, !1);
       case 1:
-        return o(e.type, !0);
+        return d(e.type, !0);
       case 31:
         return qe("Activity");
       default:
         return "";
     }
   }
-  function oe(e) {
+  function ue(e) {
     try {
       var t = "", a = null;
       do
-        t += H(e, a), a = e, e = e.return;
+        t += B(e, a), a = e, e = e.return;
       while (e);
       return t;
     } catch (i) {
@@ -962,7 +962,7 @@ Error generating stack: ` + i.message + `
     return e >>>= 0, e === 0 ? 32 : 31 - (un(e) / kt | 0) | 0;
   }
   var pn = 256, fn = 262144, hn = 4194304;
-  function Wa(e) {
+  function Fa(e) {
     var t = e & 42;
     if (t !== 0) return t;
     switch (e & -e) {
@@ -1023,7 +1023,7 @@ Error generating stack: ` + i.message + `
     var n = 0, s = e.suspendedLanes, c = e.pingedLanes;
     e = e.warmLanes;
     var u = i & 134217727;
-    return u !== 0 ? (i = u & ~s, i !== 0 ? n = Wa(i) : (c &= u, c !== 0 ? n = Wa(c) : a || (a = u & ~e, a !== 0 && (n = Wa(a))))) : (u = i & ~s, u !== 0 ? n = Wa(u) : c !== 0 ? n = Wa(c) : a || (a = i & ~e, a !== 0 && (n = Wa(a)))), n === 0 ? 0 : t !== 0 && t !== n && (t & s) === 0 && (s = n & -n, a = t & -t, s >= a || s === 32 && (a & 4194048) !== 0) ? t : n;
+    return u !== 0 ? (i = u & ~s, i !== 0 ? n = Fa(i) : (c &= u, c !== 0 ? n = Fa(c) : a || (a = u & ~e, a !== 0 && (n = Fa(a))))) : (u = i & ~s, u !== 0 ? n = Fa(u) : c !== 0 ? n = Fa(c) : a || (a = i & ~e, a !== 0 && (n = Fa(a)))), n === 0 ? 0 : t !== 0 && t !== n && (t & s) === 0 && (s = n & -n, a = t & -t, s >= a || s === 32 && (a & 4194048) !== 0) ? t : n;
   }
   function fi(e, t) {
     return (e.pendingLanes & ~(e.suspendedLanes & ~e.pingedLanes) & t) === 0;
@@ -1085,12 +1085,12 @@ Error generating stack: ` + i.message + `
     e.pendingLanes = a, e.suspendedLanes = 0, e.pingedLanes = 0, e.warmLanes = 0, e.expiredLanes &= a, e.entangledLanes &= a, e.errorRecoveryDisabledLanes &= a, e.shellSuspendCounter = 0;
     var u = e.entanglements, v = e.expirationTimes, D = e.hiddenUpdates;
     for (a = c & ~a; 0 < a; ) {
-      var G = 31 - ht(a), J = 1 << G;
-      u[G] = 0, v[G] = -1;
-      var U = D[G];
-      if (U !== null) for (D[G] = null, G = 0; G < U.length; G++) {
-        var R = U[G];
-        R !== null && (R.lane &= -536870913);
+      var V = 31 - ht(a), J = 1 << V;
+      u[V] = 0, v[V] = -1;
+      var U = D[V];
+      if (U !== null) for (D[V] = null, V = 0; V < U.length; V++) {
+        var L = U[V];
+        L !== null && (L.lane &= -536870913);
       }
       a &= ~J;
     }
@@ -1155,15 +1155,15 @@ Error generating stack: ` + i.message + `
     return e &= -e, 2 < e ? 8 < e ? (e & 134217727) !== 0 ? 32 : 268435456 : 8 : 2;
   }
   function jd() {
-    var e = Y.p;
+    var e = Q.p;
     return e !== 0 ? e : (e = window.event, e === void 0 ? 32 : af(e.type));
   }
   function yd(e, t) {
-    var a = Y.p;
+    var a = Q.p;
     try {
-      return Y.p = e, t();
+      return Q.p = e, t();
     } finally {
-      Y.p = a;
+      Q.p = a;
     }
   }
   var Ca = Math.random().toString(36).slice(2), vt = "__reactFiber$" + Ca, _t = "__reactProps$" + Ca, hi = "__reactContainer$" + Ca, Ls = "__reactEvents$" + Ca, Vf = "__reactListeners$" + Ca, Qf = "__reactHandles$" + Ca, Sd = "__reactResources$" + Ca, mi = "__reactMarker$" + Ca;
@@ -1208,7 +1208,7 @@ Error generating stack: ` + i.message + `
     e[mi] = !0;
   }
   var Nd = /* @__PURE__ */ new Set(), wd = {};
-  function Fa(e, t) {
+  function Pa(e, t) {
     _l(e, t), _l(e + "Capture", t);
   }
   function _l(e, t) {
@@ -1378,7 +1378,7 @@ Error generating stack: ` + i.message + `
     if (t == null) {
       if (i != null) {
         if (a != null) throw Error(p(92));
-        if (Z(i)) {
+        if (K(i)) {
           if (1 < i.length) throw Error(p(93));
           i = i[0];
         }
@@ -1615,7 +1615,7 @@ Error generating stack: ` + i.message + `
       for (var u in e) e.hasOwnProperty(u) && (a = e[u], this[u] = a ? a(s) : s[u]);
       return this.isDefaultPrevented = (s.defaultPrevented != null ? s.defaultPrevented : s.returnValue === !1) ? Nn : Ld, this.isPropagationStopped = Ld, this;
     }
-    return N(t.prototype, {
+    return z(t.prototype, {
       preventDefault: function() {
         this.defaultPrevented = !0;
         var a = this.nativeEvent;
@@ -1630,7 +1630,7 @@ Error generating stack: ` + i.message + `
       isPersistent: Nn
     }), t;
   }
-  var Pa = {
+  var el = {
     eventPhase: 0,
     bubbles: 0,
     cancelable: 0,
@@ -1639,10 +1639,10 @@ Error generating stack: ` + i.message + `
     },
     defaultPrevented: 0,
     isTrusted: 0
-  }, wn = Ct(Pa), vi = N({}, Pa, {
+  }, wn = Ct(el), vi = z({}, el, {
     view: 0,
     detail: 0
-  }), Ff = Ct(vi), Js, Is, ji, zn = N({}, vi, {
+  }), Ff = Ct(vi), Js, Is, ji, zn = z({}, vi, {
     screenX: 0,
     screenY: 0,
     clientX: 0,
@@ -1665,13 +1665,13 @@ Error generating stack: ` + i.message + `
     movementY: function(e) {
       return "movementY" in e ? e.movementY : Is;
     }
-  }), qd = Ct(zn), Pf = Ct(N({}, zn, { dataTransfer: 0 })), $s = Ct(N({}, vi, { relatedTarget: 0 })), e0 = Ct(N({}, Pa, {
+  }), qd = Ct(zn), Pf = Ct(z({}, zn, { dataTransfer: 0 })), $s = Ct(z({}, vi, { relatedTarget: 0 })), e0 = Ct(z({}, el, {
     animationName: 0,
     elapsedTime: 0,
     pseudoElement: 0
-  })), t0 = Ct(N({}, Pa, { clipboardData: function(e) {
+  })), t0 = Ct(z({}, el, { clipboardData: function(e) {
     return "clipboardData" in e ? e.clipboardData : window.clipboardData;
-  } })), Hd = Ct(N({}, Pa, { data: 0 })), a0 = {
+  } })), Hd = Ct(z({}, el, { data: 0 })), a0 = {
     Esc: "Escape",
     Spacebar: " ",
     Left: "ArrowLeft",
@@ -1734,7 +1734,7 @@ Error generating stack: ` + i.message + `
   function Ws() {
     return n0;
   }
-  var s0 = Ct(N({}, vi, {
+  var s0 = Ct(z({}, vi, {
     key: function(e) {
       if (e.key) {
         var t = a0[e.key] || e.key;
@@ -1760,7 +1760,7 @@ Error generating stack: ` + i.message + `
     which: function(e) {
       return e.type === "keypress" ? Sn(e) : e.type === "keydown" || e.type === "keyup" ? e.keyCode : 0;
     }
-  })), Bd = Ct(N({}, zn, {
+  })), Bd = Ct(z({}, zn, {
     pointerId: 0,
     width: 0,
     height: 0,
@@ -1771,7 +1771,7 @@ Error generating stack: ` + i.message + `
     twist: 0,
     pointerType: 0,
     isPrimary: 0
-  })), c0 = Ct(N({}, vi, {
+  })), c0 = Ct(z({}, vi, {
     touches: 0,
     targetTouches: 0,
     changedTouches: 0,
@@ -1780,11 +1780,11 @@ Error generating stack: ` + i.message + `
     ctrlKey: 0,
     shiftKey: 0,
     getModifierState: Ws
-  })), r0 = Ct(N({}, Pa, {
+  })), r0 = Ct(z({}, el, {
     propertyName: 0,
     elapsedTime: 0,
     pseudoElement: 0
-  })), d0 = Ct(N({}, zn, {
+  })), d0 = Ct(z({}, zn, {
     deltaX: function(e) {
       return "deltaX" in e ? e.deltaX : "wheelDeltaX" in e ? -e.wheelDeltaX : 0;
     },
@@ -1793,7 +1793,7 @@ Error generating stack: ` + i.message + `
     },
     deltaZ: 0,
     deltaMode: 0
-  })), o0 = Ct(N({}, Pa, {
+  })), o0 = Ct(z({}, el, {
     newState: 0,
     oldState: 0
   })), u0 = [
@@ -2002,31 +2002,31 @@ Error generating stack: ` + i.message + `
       listeners: i
     }), t.target = Ol)));
   }
-  function el(e, t) {
+  function tl(e, t) {
     var a = {};
     return a[e.toLowerCase()] = t.toLowerCase(), a["Webkit" + e] = "webkit" + t, a["Moz" + e] = "moz" + t, a;
   }
   var Dl = {
-    animationend: el("Animation", "AnimationEnd"),
-    animationiteration: el("Animation", "AnimationIteration"),
-    animationstart: el("Animation", "AnimationStart"),
-    transitionrun: el("Transition", "TransitionRun"),
-    transitionstart: el("Transition", "TransitionStart"),
-    transitioncancel: el("Transition", "TransitionCancel"),
-    transitionend: el("Transition", "TransitionEnd")
+    animationend: tl("Animation", "AnimationEnd"),
+    animationiteration: tl("Animation", "AnimationIteration"),
+    animationstart: tl("Animation", "AnimationStart"),
+    transitionrun: tl("Transition", "TransitionRun"),
+    transitionstart: tl("Transition", "TransitionStart"),
+    transitioncancel: tl("Transition", "TransitionCancel"),
+    transitionend: tl("Transition", "TransitionEnd")
   }, ic = {}, io = {};
   oa && (io = document.createElement("div").style, "AnimationEvent" in window || (delete Dl.animationend.animation, delete Dl.animationiteration.animation, delete Dl.animationstart.animation), "TransitionEvent" in window || delete Dl.transitionend.transition);
-  function tl(e) {
+  function al(e) {
     if (ic[e]) return ic[e];
     if (!Dl[e]) return e;
     var t = Dl[e], a;
     for (a in t) if (t.hasOwnProperty(a) && a in io) return ic[e] = t[a];
     return e;
   }
-  var no = tl("animationend"), so = tl("animationiteration"), co = tl("animationstart"), N0 = tl("transitionrun"), w0 = tl("transitionstart"), z0 = tl("transitioncancel"), ro = tl("transitionend"), oo = /* @__PURE__ */ new Map(), nc = "abort auxClick beforeToggle cancel canPlay canPlayThrough click close contextMenu copy cut drag dragEnd dragEnter dragExit dragLeave dragOver dragStart drop durationChange emptied encrypted ended error gotPointerCapture input invalid keyDown keyPress keyUp load loadedData loadedMetadata loadStart lostPointerCapture mouseDown mouseMove mouseOut mouseOver mouseUp paste pause play playing pointerCancel pointerDown pointerMove pointerOut pointerOver pointerUp progress rateChange reset resize seeked seeking stalled submit suspend timeUpdate touchCancel touchEnd touchStart volumeChange scroll toggle touchMove waiting wheel".split(" ");
+  var no = al("animationend"), so = al("animationiteration"), co = al("animationstart"), N0 = al("transitionrun"), w0 = al("transitionstart"), z0 = al("transitioncancel"), ro = al("transitionend"), oo = /* @__PURE__ */ new Map(), nc = "abort auxClick beforeToggle cancel canPlay canPlayThrough click close contextMenu copy cut drag dragEnd dragEnter dragExit dragLeave dragOver dragStart drop durationChange emptied encrypted ended error gotPointerCapture input invalid keyDown keyPress keyUp load loadedData loadedMetadata loadStart lostPointerCapture mouseDown mouseMove mouseOut mouseOver mouseUp paste pause play playing pointerCancel pointerDown pointerMove pointerOut pointerOver pointerUp progress rateChange reset resize seeked seeking stalled submit suspend timeUpdate touchCancel touchEnd touchStart volumeChange scroll toggle touchMove waiting wheel".split(" ");
   nc.push("scrollEnd");
   function ea(e, t) {
-    oo.set(e, t), Fa(t, [e]);
+    oo.set(e, t), Pa(t, [e]);
   }
   var _n = typeof reportError == "function" ? reportError : function(e) {
     if (typeof window == "object" && typeof window.ErrorEvent == "function") {
@@ -2065,7 +2065,7 @@ Error generating stack: ` + i.message + `
   function cc(e, t, a, i) {
     return En(e, t, a, i), An(e);
   }
-  function al(e, t) {
+  function ll(e, t) {
     return En(e, null, null, t), An(e);
   }
   function uo(e, t, a) {
@@ -2108,36 +2108,36 @@ Error generating stack: ` + i.message + `
   function Tn(e, t, a, i, n, s) {
     var c = 0;
     if (i = e, typeof e == "function") rc(e) && (c = 1);
-    else if (typeof e == "string") c = Mh(e, a, F.current) ? 26 : e === "html" || e === "head" || e === "body" ? 27 : 5;
+    else if (typeof e == "string") c = Mh(e, a, W.current) ? 26 : e === "html" || e === "head" || e === "body" ? 27 : 5;
     else e: switch (e) {
-      case j:
-        return e = Rt(31, a, t, n), e.elementType = j, e.lanes = s, e;
-      case Q:
-        return ll(a.children, n, s, t);
-      case re:
+      case y:
+        return e = Rt(31, a, t, n), e.elementType = y, e.lanes = s, e;
+      case X:
+        return il(a.children, n, s, t);
+      case oe:
         c = 8, n |= 24;
         break;
-      case L:
-        return e = Rt(12, a, t, n | 2), e.elementType = L, e.lanes = s, e;
-      case P:
-        return e = Rt(13, a, t, n), e.elementType = P, e.lanes = s, e;
-      case xe:
-        return e = Rt(19, a, t, n), e.elementType = xe, e.lanes = s, e;
+      case q:
+        return e = Rt(12, a, t, n | 2), e.elementType = q, e.lanes = s, e;
+      case $:
+        return e = Rt(13, a, t, n), e.elementType = $, e.lanes = s, e;
+      case pe:
+        return e = Rt(19, a, t, n), e.elementType = pe, e.lanes = s, e;
       default:
         if (typeof e == "object" && e !== null) switch (e.$$typeof) {
-          case V:
+          case H:
             c = 10;
             break e;
           case ie:
             c = 9;
             break e;
-          case ee:
+          case F:
             c = 11;
             break e;
           case te:
             c = 14;
             break e;
-          case $:
+          case P:
             c = 16, i = null;
             break e;
         }
@@ -2145,7 +2145,7 @@ Error generating stack: ` + i.message + `
     }
     return t = Rt(c, a, t, n), t.elementType = e, t.type = i, t.lanes = s, t;
   }
-  function ll(e, t, a, i) {
+  function il(e, t, a, i) {
     return e = Rt(7, e, i, t), e.lanes = a, e;
   }
   function dc(e, t, a) {
@@ -2169,13 +2169,13 @@ Error generating stack: ` + i.message + `
       return a !== void 0 ? a : (t = {
         value: e,
         source: t,
-        stack: oe(t)
+        stack: ue(t)
       }, ho.set(e, t), t);
     }
     return {
       value: e,
       source: t,
-      stack: oe(t)
+      stack: ue(t)
     };
   }
   var Ll = [], ql = 0, Mn = null, ki = 0, Xt = [], Zt = 0, Aa = null, ia = 1, na = "";
@@ -2273,7 +2273,7 @@ Error generating stack: ` + i.message + `
     } else t === 27 ? (t = et, Qa(e.type) ? (e = Ur, Ur = null, et = e) : et = t) : et = jt ? $t(e.stateNode.nextSibling) : null;
     return !0;
   }
-  function il() {
+  function nl() {
     et = jt = null, Le = !1;
   }
   function hc() {
@@ -2283,12 +2283,12 @@ Error generating stack: ` + i.message + `
   function _i(e) {
     Ta === null ? Ta = [e] : Ta.push(e);
   }
-  var mc = d(null), nl = null, fa = null;
+  var mc = o(null), sl = null, fa = null;
   function Oa(e, t, a) {
-    q(mc, t._currentValue), t._currentValue = a;
+    R(mc, t._currentValue), t._currentValue = a;
   }
   function ha(e) {
-    e._currentValue = mc.current, _(mc);
+    e._currentValue = mc.current, j(mc);
   }
   function xc(e, t, a) {
     for (; e !== null; ) {
@@ -2346,7 +2346,7 @@ Error generating stack: ` + i.message + `
           var u = n.type;
           Ut(n.pendingProps.value, c.value) || (e !== null ? e.push(u) : e = [u]);
         }
-      } else if (n === ue.current) {
+      } else if (n === de.current) {
         if (c = n.alternate, c === null) throw Error(p(387));
         c.memoizedState.memoizedState !== n.memoizedState.memoizedState && (e !== null ? e.push(en) : e = [en]);
       }
@@ -2361,14 +2361,14 @@ Error generating stack: ` + i.message + `
     }
     return !1;
   }
-  function sl(e) {
-    nl = e, fa = null, e = e.dependencies, e !== null && (e.firstContext = null);
+  function cl(e) {
+    sl = e, fa = null, e = e.dependencies, e !== null && (e.firstContext = null);
   }
   function yt(e) {
-    return vo(nl, e);
+    return vo(sl, e);
   }
   function Dn(e, t) {
-    return nl === null && sl(e), vo(e, t);
+    return sl === null && cl(e), vo(e, t);
   }
   function vo(e, t) {
     var a = t._currentValue;
@@ -2398,7 +2398,7 @@ Error generating stack: ` + i.message + `
       });
     };
   }, C0 = h.unstable_scheduleCallback, E0 = h.unstable_NormalPriority, ot = {
-    $$typeof: V,
+    $$typeof: H,
     Consumer: null,
     Provider: null,
     _currentValue: null,
@@ -2455,17 +2455,17 @@ Error generating stack: ` + i.message + `
       for (i.status = "rejected", i.reason = n, n = 0; n < a.length; n++) (0, a[n])(void 0);
     }), i;
   }
-  var yo = B.S;
-  B.S = function(e, t) {
+  var yo = Y.S;
+  Y.S = function(e, t) {
     tp = M(), typeof t == "object" && t !== null && typeof t.then == "function" && A0(e, t), yo !== null && yo(e, t);
   };
-  var cl = d(null);
+  var rl = o(null);
   function jc() {
-    var e = cl.current;
+    var e = rl.current;
     return e !== null ? e : Pe.pooledCache;
   }
   function Un(e, t) {
-    t === null ? q(cl, cl.current) : q(cl, t.pool);
+    t === null ? R(rl, rl.current) : R(rl, t.pool);
   }
   function So() {
     var e = jc();
@@ -2507,22 +2507,22 @@ Error generating stack: ` + i.message + `
           case "rejected":
             throw e = t.reason, ko(e), e;
         }
-        throw dl = t, Vl;
+        throw ol = t, Vl;
     }
   }
-  function rl(e) {
+  function dl(e) {
     try {
       var t = e._init;
       return t(e._payload);
     } catch (a) {
-      throw a !== null && typeof a == "object" && typeof a.then == "function" ? (dl = a, Vl) : a;
+      throw a !== null && typeof a == "object" && typeof a.then == "function" ? (ol = a, Vl) : a;
     }
   }
-  var dl = null;
+  var ol = null;
   function zo() {
-    if (dl === null) throw Error(p(459));
-    var e = dl;
-    return dl = null, e;
+    if (ol === null) throw Error(p(459));
+    var e = ol;
+    return ol = null, e;
   }
   function ko(e) {
     if (e === Vl || e === Rn) throw Error(p(483));
@@ -2539,206 +2539,206 @@ Error generating stack: ` + i.message + `
     throw t.$$typeof === le ? Error(p(525)) : (e = Object.prototype.toString.call(t), Error(p(31, e === "[object Object]" ? "object with keys {" + Object.keys(t).join(", ") + "}" : e)));
   }
   function _o(e) {
-    function t(C, y) {
+    function t(E, S) {
       if (e) {
-        var O = C.deletions;
-        O === null ? (C.deletions = [y], C.flags |= 16) : O.push(y);
+        var O = E.deletions;
+        O === null ? (E.deletions = [S], E.flags |= 16) : O.push(S);
       }
     }
-    function a(C, y) {
+    function a(E, S) {
       if (!e) return null;
-      for (; y !== null; ) t(C, y), y = y.sibling;
+      for (; S !== null; ) t(E, S), S = S.sibling;
       return null;
     }
-    function i(C) {
-      for (var y = /* @__PURE__ */ new Map(); C !== null; ) C.key !== null ? y.set(C.key, C) : y.set(C.index, C), C = C.sibling;
-      return y;
+    function i(E) {
+      for (var S = /* @__PURE__ */ new Map(); E !== null; ) E.key !== null ? S.set(E.key, E) : S.set(E.index, E), E = E.sibling;
+      return S;
     }
-    function n(C, y) {
-      return C = ua(C, y), C.index = 0, C.sibling = null, C;
+    function n(E, S) {
+      return E = ua(E, S), E.index = 0, E.sibling = null, E;
     }
-    function s(C, y, O) {
-      return C.index = O, e ? (O = C.alternate, O !== null ? (O = O.index, O < y ? (C.flags |= 67108866, y) : O) : (C.flags |= 67108866, y)) : (C.flags |= 1048576, y);
+    function s(E, S, O) {
+      return E.index = O, e ? (O = E.alternate, O !== null ? (O = O.index, O < S ? (E.flags |= 67108866, S) : O) : (E.flags |= 67108866, S)) : (E.flags |= 1048576, S);
     }
-    function c(C) {
-      return e && C.alternate === null && (C.flags |= 67108866), C;
+    function c(E) {
+      return e && E.alternate === null && (E.flags |= 67108866), E;
     }
-    function u(C, y, O, X) {
-      return y === null || y.tag !== 6 ? (y = dc(O, C.mode, X), y.return = C, y) : (y = n(y, O), y.return = C, y);
+    function u(E, S, O, Z) {
+      return S === null || S.tag !== 6 ? (S = dc(O, E.mode, Z), S.return = E, S) : (S = n(S, O), S.return = E, S);
     }
-    function v(C, y, O, X) {
+    function v(E, S, O, Z) {
       var be = O.type;
-      return be === Q ? G(C, y, O.props.children, X, O.key) : y !== null && (y.elementType === be || typeof be == "object" && be !== null && be.$$typeof === $ && rl(be) === y.type) ? (y = n(y, O.props), Ti(y, O), y.return = C, y) : (y = Tn(O.type, O.key, O.props, null, C.mode, X), Ti(y, O), y.return = C, y);
+      return be === X ? V(E, S, O.props.children, Z, O.key) : S !== null && (S.elementType === be || typeof be == "object" && be !== null && be.$$typeof === P && dl(be) === S.type) ? (S = n(S, O.props), Ti(S, O), S.return = E, S) : (S = Tn(O.type, O.key, O.props, null, E.mode, Z), Ti(S, O), S.return = E, S);
     }
-    function D(C, y, O, X) {
-      return y === null || y.tag !== 4 || y.stateNode.containerInfo !== O.containerInfo || y.stateNode.implementation !== O.implementation ? (y = oc(O, C.mode, X), y.return = C, y) : (y = n(y, O.children || []), y.return = C, y);
+    function D(E, S, O, Z) {
+      return S === null || S.tag !== 4 || S.stateNode.containerInfo !== O.containerInfo || S.stateNode.implementation !== O.implementation ? (S = oc(O, E.mode, Z), S.return = E, S) : (S = n(S, O.children || []), S.return = E, S);
     }
-    function G(C, y, O, X, be) {
-      return y === null || y.tag !== 7 ? (y = ll(O, C.mode, X, be), y.return = C, y) : (y = n(y, O), y.return = C, y);
+    function V(E, S, O, Z, be) {
+      return S === null || S.tag !== 7 ? (S = il(O, E.mode, Z, be), S.return = E, S) : (S = n(S, O), S.return = E, S);
     }
-    function J(C, y, O) {
-      if (typeof y == "string" && y !== "" || typeof y == "number" || typeof y == "bigint") return y = dc("" + y, C.mode, O), y.return = C, y;
-      if (typeof y == "object" && y !== null) {
-        switch (y.$$typeof) {
+    function J(E, S, O) {
+      if (typeof S == "string" && S !== "" || typeof S == "number" || typeof S == "bigint") return S = dc("" + S, E.mode, O), S.return = E, S;
+      if (typeof S == "object" && S !== null) {
+        switch (S.$$typeof) {
           case ne:
-            return O = Tn(y.type, y.key, y.props, null, C.mode, O), Ti(O, y), O.return = C, O;
+            return O = Tn(S.type, S.key, S.props, null, E.mode, O), Ti(O, S), O.return = E, O;
           case I:
-            return y = oc(y, C.mode, O), y.return = C, y;
-          case $:
-            return y = rl(y), J(C, y, O);
+            return S = oc(S, E.mode, O), S.return = E, S;
+          case P:
+            return S = dl(S), J(E, S, O);
         }
-        if (Z(y) || he(y)) return y = ll(y, C.mode, O, null), y.return = C, y;
-        if (typeof y.then == "function") return J(C, qn(y), O);
-        if (y.$$typeof === V) return J(C, Dn(C, y), O);
-        Hn(C, y);
+        if (K(S) || me(S)) return S = il(S, E.mode, O, null), S.return = E, S;
+        if (typeof S.then == "function") return J(E, qn(S), O);
+        if (S.$$typeof === H) return J(E, Dn(E, S), O);
+        Hn(E, S);
       }
       return null;
     }
-    function U(C, y, O, X) {
-      var be = y !== null ? y.key : null;
-      if (typeof O == "string" && O !== "" || typeof O == "number" || typeof O == "bigint") return be !== null ? null : u(C, y, "" + O, X);
+    function U(E, S, O, Z) {
+      var be = S !== null ? S.key : null;
+      if (typeof O == "string" && O !== "" || typeof O == "number" || typeof O == "bigint") return be !== null ? null : u(E, S, "" + O, Z);
       if (typeof O == "object" && O !== null) {
         switch (O.$$typeof) {
           case ne:
-            return O.key === be ? v(C, y, O, X) : null;
+            return O.key === be ? v(E, S, O, Z) : null;
           case I:
-            return O.key === be ? D(C, y, O, X) : null;
-          case $:
-            return O = rl(O), U(C, y, O, X);
+            return O.key === be ? D(E, S, O, Z) : null;
+          case P:
+            return O = dl(O), U(E, S, O, Z);
         }
-        if (Z(O) || he(O)) return be !== null ? null : G(C, y, O, X, null);
-        if (typeof O.then == "function") return U(C, y, qn(O), X);
-        if (O.$$typeof === V) return U(C, y, Dn(C, O), X);
-        Hn(C, O);
+        if (K(O) || me(O)) return be !== null ? null : V(E, S, O, Z, null);
+        if (typeof O.then == "function") return U(E, S, qn(O), Z);
+        if (O.$$typeof === H) return U(E, S, Dn(E, O), Z);
+        Hn(E, O);
       }
       return null;
     }
-    function R(C, y, O, X, be) {
-      if (typeof X == "string" && X !== "" || typeof X == "number" || typeof X == "bigint") return C = C.get(O) || null, u(y, C, "" + X, be);
-      if (typeof X == "object" && X !== null) {
-        switch (X.$$typeof) {
+    function L(E, S, O, Z, be) {
+      if (typeof Z == "string" && Z !== "" || typeof Z == "number" || typeof Z == "bigint") return E = E.get(O) || null, u(S, E, "" + Z, be);
+      if (typeof Z == "object" && Z !== null) {
+        switch (Z.$$typeof) {
           case ne:
-            return C = C.get(X.key === null ? O : X.key) || null, v(y, C, X, be);
+            return E = E.get(Z.key === null ? O : Z.key) || null, v(S, E, Z, be);
           case I:
-            return C = C.get(X.key === null ? O : X.key) || null, D(y, C, X, be);
-          case $:
-            return X = rl(X), R(C, y, O, X, be);
+            return E = E.get(Z.key === null ? O : Z.key) || null, D(S, E, Z, be);
+          case P:
+            return Z = dl(Z), L(E, S, O, Z, be);
         }
-        if (Z(X) || he(X)) return C = C.get(O) || null, G(y, C, X, be, null);
-        if (typeof X.then == "function") return R(C, y, O, qn(X), be);
-        if (X.$$typeof === V) return R(C, y, O, Dn(y, X), be);
-        Hn(y, X);
+        if (K(Z) || me(Z)) return E = E.get(O) || null, V(S, E, Z, be, null);
+        if (typeof Z.then == "function") return L(E, S, O, qn(Z), be);
+        if (Z.$$typeof === H) return L(E, S, O, Dn(S, Z), be);
+        Hn(S, Z);
       }
       return null;
     }
-    function pe(C, y, O, X) {
-      for (var be = null, Ye = null, me = y, Te = y = 0, Re = null; me !== null && Te < O.length; Te++) {
-        me.index > Te ? (Re = me, me = null) : Re = me.sibling;
-        var Ve = U(C, me, O[Te], X);
+    function fe(E, S, O, Z) {
+      for (var be = null, Ye = null, xe = S, Te = S = 0, Re = null; xe !== null && Te < O.length; Te++) {
+        xe.index > Te ? (Re = xe, xe = null) : Re = xe.sibling;
+        var Ve = U(E, xe, O[Te], Z);
         if (Ve === null) {
-          me === null && (me = Re);
+          xe === null && (xe = Re);
           break;
         }
-        e && me && Ve.alternate === null && t(C, me), y = s(Ve, y, Te), Ye === null ? be = Ve : Ye.sibling = Ve, Ye = Ve, me = Re;
+        e && xe && Ve.alternate === null && t(E, xe), S = s(Ve, S, Te), Ye === null ? be = Ve : Ye.sibling = Ve, Ye = Ve, xe = Re;
       }
-      if (Te === O.length) return a(C, me), Le && pa(C, Te), be;
-      if (me === null) {
-        for (; Te < O.length; Te++) me = J(C, O[Te], X), me !== null && (y = s(me, y, Te), Ye === null ? be = me : Ye.sibling = me, Ye = me);
-        return Le && pa(C, Te), be;
+      if (Te === O.length) return a(E, xe), Le && pa(E, Te), be;
+      if (xe === null) {
+        for (; Te < O.length; Te++) xe = J(E, O[Te], Z), xe !== null && (S = s(xe, S, Te), Ye === null ? be = xe : Ye.sibling = xe, Ye = xe);
+        return Le && pa(E, Te), be;
       }
-      for (me = i(me); Te < O.length; Te++) Re = R(me, C, Te, O[Te], X), Re !== null && (e && Re.alternate !== null && me.delete(Re.key === null ? Te : Re.key), y = s(Re, y, Te), Ye === null ? be = Re : Ye.sibling = Re, Ye = Re);
-      return e && me.forEach(function(Ia) {
-        return t(C, Ia);
-      }), Le && pa(C, Te), be;
+      for (xe = i(xe); Te < O.length; Te++) Re = L(xe, E, Te, O[Te], Z), Re !== null && (e && Re.alternate !== null && xe.delete(Re.key === null ? Te : Re.key), S = s(Re, S, Te), Ye === null ? be = Re : Ye.sibling = Re, Ye = Re);
+      return e && xe.forEach(function(Ia) {
+        return t(E, Ia);
+      }), Le && pa(E, Te), be;
     }
-    function Ne(C, y, O, X) {
+    function Ne(E, S, O, Z) {
       if (O == null) throw Error(p(151));
-      for (var be = null, Ye = null, me = y, Te = y = 0, Re = null, Ve = O.next(); me !== null && !Ve.done; Te++, Ve = O.next()) {
-        me.index > Te ? (Re = me, me = null) : Re = me.sibling;
-        var Ia = U(C, me, Ve.value, X);
+      for (var be = null, Ye = null, xe = S, Te = S = 0, Re = null, Ve = O.next(); xe !== null && !Ve.done; Te++, Ve = O.next()) {
+        xe.index > Te ? (Re = xe, xe = null) : Re = xe.sibling;
+        var Ia = U(E, xe, Ve.value, Z);
         if (Ia === null) {
-          me === null && (me = Re);
+          xe === null && (xe = Re);
           break;
         }
-        e && me && Ia.alternate === null && t(C, me), y = s(Ia, y, Te), Ye === null ? be = Ia : Ye.sibling = Ia, Ye = Ia, me = Re;
+        e && xe && Ia.alternate === null && t(E, xe), S = s(Ia, S, Te), Ye === null ? be = Ia : Ye.sibling = Ia, Ye = Ia, xe = Re;
       }
-      if (Ve.done) return a(C, me), Le && pa(C, Te), be;
-      if (me === null) {
-        for (; !Ve.done; Te++, Ve = O.next()) Ve = J(C, Ve.value, X), Ve !== null && (y = s(Ve, y, Te), Ye === null ? be = Ve : Ye.sibling = Ve, Ye = Ve);
-        return Le && pa(C, Te), be;
+      if (Ve.done) return a(E, xe), Le && pa(E, Te), be;
+      if (xe === null) {
+        for (; !Ve.done; Te++, Ve = O.next()) Ve = J(E, Ve.value, Z), Ve !== null && (S = s(Ve, S, Te), Ye === null ? be = Ve : Ye.sibling = Ve, Ye = Ve);
+        return Le && pa(E, Te), be;
       }
-      for (me = i(me); !Ve.done; Te++, Ve = O.next()) Ve = R(me, C, Te, Ve.value, X), Ve !== null && (e && Ve.alternate !== null && me.delete(Ve.key === null ? Te : Ve.key), y = s(Ve, y, Te), Ye === null ? be = Ve : Ye.sibling = Ve, Ye = Ve);
-      return e && me.forEach(function(Zh) {
-        return t(C, Zh);
-      }), Le && pa(C, Te), be;
+      for (xe = i(xe); !Ve.done; Te++, Ve = O.next()) Ve = L(xe, E, Te, Ve.value, Z), Ve !== null && (e && Ve.alternate !== null && xe.delete(Ve.key === null ? Te : Ve.key), S = s(Ve, S, Te), Ye === null ? be = Ve : Ye.sibling = Ve, Ye = Ve);
+      return e && xe.forEach(function(Zh) {
+        return t(E, Zh);
+      }), Le && pa(E, Te), be;
     }
-    function We(C, y, O, X) {
-      if (typeof O == "object" && O !== null && O.type === Q && O.key === null && (O = O.props.children), typeof O == "object" && O !== null) {
+    function We(E, S, O, Z) {
+      if (typeof O == "object" && O !== null && O.type === X && O.key === null && (O = O.props.children), typeof O == "object" && O !== null) {
         switch (O.$$typeof) {
           case ne:
             e: {
-              for (var be = O.key; y !== null; ) {
-                if (y.key === be) {
-                  if (be = O.type, be === Q) {
-                    if (y.tag === 7) {
-                      a(C, y.sibling), X = n(y, O.props.children), X.return = C, C = X;
+              for (var be = O.key; S !== null; ) {
+                if (S.key === be) {
+                  if (be = O.type, be === X) {
+                    if (S.tag === 7) {
+                      a(E, S.sibling), Z = n(S, O.props.children), Z.return = E, E = Z;
                       break e;
                     }
-                  } else if (y.elementType === be || typeof be == "object" && be !== null && be.$$typeof === $ && rl(be) === y.type) {
-                    a(C, y.sibling), X = n(y, O.props), Ti(X, O), X.return = C, C = X;
+                  } else if (S.elementType === be || typeof be == "object" && be !== null && be.$$typeof === P && dl(be) === S.type) {
+                    a(E, S.sibling), Z = n(S, O.props), Ti(Z, O), Z.return = E, E = Z;
                     break e;
                   }
-                  a(C, y);
+                  a(E, S);
                   break;
-                } else t(C, y);
-                y = y.sibling;
+                } else t(E, S);
+                S = S.sibling;
               }
-              O.type === Q ? (X = ll(O.props.children, C.mode, X, O.key), X.return = C, C = X) : (X = Tn(O.type, O.key, O.props, null, C.mode, X), Ti(X, O), X.return = C, C = X);
+              O.type === X ? (Z = il(O.props.children, E.mode, Z, O.key), Z.return = E, E = Z) : (Z = Tn(O.type, O.key, O.props, null, E.mode, Z), Ti(Z, O), Z.return = E, E = Z);
             }
-            return c(C);
+            return c(E);
           case I:
             e: {
-              for (be = O.key; y !== null; ) {
-                if (y.key === be) if (y.tag === 4 && y.stateNode.containerInfo === O.containerInfo && y.stateNode.implementation === O.implementation) {
-                  a(C, y.sibling), X = n(y, O.children || []), X.return = C, C = X;
+              for (be = O.key; S !== null; ) {
+                if (S.key === be) if (S.tag === 4 && S.stateNode.containerInfo === O.containerInfo && S.stateNode.implementation === O.implementation) {
+                  a(E, S.sibling), Z = n(S, O.children || []), Z.return = E, E = Z;
                   break e;
                 } else {
-                  a(C, y);
+                  a(E, S);
                   break;
                 }
-                else t(C, y);
-                y = y.sibling;
+                else t(E, S);
+                S = S.sibling;
               }
-              X = oc(O, C.mode, X), X.return = C, C = X;
+              Z = oc(O, E.mode, Z), Z.return = E, E = Z;
             }
-            return c(C);
-          case $:
-            return O = rl(O), We(C, y, O, X);
+            return c(E);
+          case P:
+            return O = dl(O), We(E, S, O, Z);
         }
-        if (Z(O)) return pe(C, y, O, X);
-        if (he(O)) {
-          if (be = he(O), typeof be != "function") throw Error(p(150));
-          return O = be.call(O), Ne(C, y, O, X);
+        if (K(O)) return fe(E, S, O, Z);
+        if (me(O)) {
+          if (be = me(O), typeof be != "function") throw Error(p(150));
+          return O = be.call(O), Ne(E, S, O, Z);
         }
-        if (typeof O.then == "function") return We(C, y, qn(O), X);
-        if (O.$$typeof === V) return We(C, y, Dn(C, O), X);
-        Hn(C, O);
+        if (typeof O.then == "function") return We(E, S, qn(O), Z);
+        if (O.$$typeof === H) return We(E, S, Dn(E, O), Z);
+        Hn(E, O);
       }
-      return typeof O == "string" && O !== "" || typeof O == "number" || typeof O == "bigint" ? (O = "" + O, y !== null && y.tag === 6 ? (a(C, y.sibling), X = n(y, O), X.return = C, C = X) : (a(C, y), X = dc(O, C.mode, X), X.return = C, C = X), c(C)) : a(C, y);
+      return typeof O == "string" && O !== "" || typeof O == "number" || typeof O == "bigint" ? (O = "" + O, S !== null && S.tag === 6 ? (a(E, S.sibling), Z = n(S, O), Z.return = E, E = Z) : (a(E, S), Z = dc(O, E.mode, Z), Z.return = E, E = Z), c(E)) : a(E, S);
     }
-    return function(C, y, O, X) {
+    return function(E, S, O, Z) {
       try {
         Ai = 0;
-        var be = We(C, y, O, X);
+        var be = We(E, S, O, Z);
         return Ql = null, be;
-      } catch (me) {
-        if (me === Vl || me === Rn) throw me;
-        var Ye = Rt(29, me, null, C.mode);
-        return Ye.lanes = X, Ye.return = C, Ye;
+      } catch (xe) {
+        if (xe === Vl || xe === Rn) throw xe;
+        var Ye = Rt(29, xe, null, E.mode);
+        return Ye.lanes = Z, Ye.return = E, Ye;
       }
     };
   }
-  var ol = _o(!0), Co = _o(!1), Da = !1;
+  var ul = _o(!0), Co = _o(!1), Da = !1;
   function Sc(e) {
     e.updateQueue = {
       baseState: e.memoizedState,
@@ -2761,7 +2761,7 @@ Error generating stack: ` + i.message + `
       callbacks: null
     });
   }
-  function ul(e) {
+  function pl(e) {
     return {
       lane: e,
       tag: 0,
@@ -2770,7 +2770,7 @@ Error generating stack: ` + i.message + `
       next: null
     };
   }
-  function pl(e, t, a) {
+  function fl(e, t, a) {
     var i = e.updateQueue;
     if (i === null) return null;
     if (i = i.shared, (Qe & 2) !== 0) {
@@ -2829,16 +2829,16 @@ Error generating stack: ` + i.message + `
       n.shared.pending = null;
       var v = u, D = v.next;
       v.next = null, c === null ? s = D : c.next = D, c = v;
-      var G = e.alternate;
-      G !== null && (G = G.updateQueue, u = G.lastBaseUpdate, u !== c && (u === null ? G.firstBaseUpdate = D : u.next = D, G.lastBaseUpdate = v));
+      var V = e.alternate;
+      V !== null && (V = V.updateQueue, u = V.lastBaseUpdate, u !== c && (u === null ? V.firstBaseUpdate = D : u.next = D, V.lastBaseUpdate = v));
     }
     if (s !== null) {
       var J = n.baseState;
-      c = 0, G = D = v = null, u = s;
+      c = 0, V = D = v = null, u = s;
       do {
-        var U = u.lane & -536870913, R = U !== u.lane;
-        if (R ? (Ue & U) === U : (i & U) === U) {
-          U !== 0 && U === Gl && (zc = !0), G !== null && (G = G.next = {
+        var U = u.lane & -536870913, L = U !== u.lane;
+        if (L ? (Ue & U) === U : (i & U) === U) {
+          U !== 0 && U === Gl && (zc = !0), V !== null && (V = V.next = {
             lane: 0,
             tag: u.tag,
             payload: u.payload,
@@ -2846,41 +2846,41 @@ Error generating stack: ` + i.message + `
             next: null
           });
           e: {
-            var pe = e, Ne = u;
+            var fe = e, Ne = u;
             U = t;
             var We = a;
             switch (Ne.tag) {
               case 1:
-                if (pe = Ne.payload, typeof pe == "function") {
-                  J = pe.call(We, J, U);
+                if (fe = Ne.payload, typeof fe == "function") {
+                  J = fe.call(We, J, U);
                   break e;
                 }
-                J = pe;
+                J = fe;
                 break e;
               case 3:
-                pe.flags = pe.flags & -65537 | 128;
+                fe.flags = fe.flags & -65537 | 128;
               case 0:
-                if (pe = Ne.payload, U = typeof pe == "function" ? pe.call(We, J, U) : pe, U == null) break e;
-                J = N({}, J, U);
+                if (fe = Ne.payload, U = typeof fe == "function" ? fe.call(We, J, U) : fe, U == null) break e;
+                J = z({}, J, U);
                 break e;
               case 2:
                 Da = !0;
             }
           }
-          U = u.callback, U !== null && (e.flags |= 64, R && (e.flags |= 8192), R = n.callbacks, R === null ? n.callbacks = [U] : R.push(U));
-        } else R = {
+          U = u.callback, U !== null && (e.flags |= 64, L && (e.flags |= 8192), L = n.callbacks, L === null ? n.callbacks = [U] : L.push(U));
+        } else L = {
           lane: U,
           tag: u.tag,
           payload: u.payload,
           callback: u.callback,
           next: null
-        }, G === null ? (D = G = R, v = J) : G = G.next = R, c |= U;
+        }, V === null ? (D = V = L, v = J) : V = V.next = L, c |= U;
         if (u = u.next, u === null) {
           if (u = n.shared.pending, u === null) break;
-          R = u, u = R.next, R.next = null, n.lastBaseUpdate = R, n.shared.pending = null;
+          L = u, u = L.next, L.next = null, n.lastBaseUpdate = L, n.shared.pending = null;
         }
       } while (!0);
-      G === null && (v = J), n.baseState = v, n.firstBaseUpdate = D, n.lastBaseUpdate = G, s === null && (n.shared.lanes = 0), Ha |= c, e.lanes = c, e.memoizedState = J;
+      V === null && (v = J), n.baseState = v, n.firstBaseUpdate = D, n.lastBaseUpdate = V, s === null && (n.shared.lanes = 0), Ha |= c, e.lanes = c, e.memoizedState = J;
     }
   }
   function Eo(e, t) {
@@ -2891,34 +2891,34 @@ Error generating stack: ` + i.message + `
     var a = e.callbacks;
     if (a !== null) for (e.callbacks = null, e = 0; e < a.length; e++) Eo(a[e], t);
   }
-  var Xl = d(null), Bn = d(0);
+  var Xl = o(null), Bn = o(0);
   function To(e, t) {
-    e = Na, q(Bn, e), q(Xl, t), Na = e | t.baseLanes;
+    e = Na, R(Bn, e), R(Xl, t), Na = e | t.baseLanes;
   }
   function kc() {
-    q(Bn, Na), q(Xl, Xl.current);
+    R(Bn, Na), R(Xl, Xl.current);
   }
   function _c() {
-    Na = Bn.current, _(Xl), _(Bn);
+    Na = Bn.current, j(Xl), j(Bn);
   }
-  var Lt = d(null), Jt = null;
+  var Lt = o(null), Jt = null;
   function Ua(e) {
     var t = e.alternate;
-    q(ct, ct.current & 1), q(Lt, e), Jt === null && (t === null || Xl.current !== null || t.memoizedState !== null) && (Jt = e);
+    R(ct, ct.current & 1), R(Lt, e), Jt === null && (t === null || Xl.current !== null || t.memoizedState !== null) && (Jt = e);
   }
   function Cc(e) {
-    q(ct, ct.current), q(Lt, e), Jt === null && (Jt = e);
+    R(ct, ct.current), R(Lt, e), Jt === null && (Jt = e);
   }
   function Mo(e) {
-    e.tag === 22 ? (q(ct, ct.current), q(Lt, e), Jt === null && (Jt = e)) : Ra(e);
+    e.tag === 22 ? (R(ct, ct.current), R(Lt, e), Jt === null && (Jt = e)) : Ra(e);
   }
   function Ra() {
-    q(ct, ct.current), q(Lt, Lt.current);
+    R(ct, ct.current), R(Lt, Lt.current);
   }
   function qt(e) {
-    _(Lt), Jt === e && (Jt = null), _(ct);
+    j(Lt), Jt === e && (Jt = null), j(ct);
   }
-  var ct = d(0);
+  var ct = o(0);
   function Gn(e) {
     for (var t = e; t !== null; ) {
       if (t.tag === 13) {
@@ -2939,7 +2939,7 @@ Error generating stack: ` + i.message + `
     }
     return null;
   }
-  var ma = 0, Ee = null, Ie = null, ut = null, Yn = !1, Zl = !1, fl = !1, Vn = 0, Ui = 0, Kl = null, M0 = 0;
+  var ma = 0, Ee = null, Ie = null, ut = null, Yn = !1, Zl = !1, hl = !1, Vn = 0, Ui = 0, Kl = null, M0 = 0;
   function it() {
     throw Error(p(321));
   }
@@ -2949,10 +2949,10 @@ Error generating stack: ` + i.message + `
     return !0;
   }
   function Ac(e, t, a, i, n, s) {
-    return ma = s, Ee = t, t.memoizedState = null, t.updateQueue = null, t.lanes = 0, B.H = e === null || e.memoizedState === null ? mu : Xc, fl = !1, s = a(i, n), fl = !1, Zl && (s = Do(t, a, i, n)), Oo(e), s;
+    return ma = s, Ee = t, t.memoizedState = null, t.updateQueue = null, t.lanes = 0, Y.H = e === null || e.memoizedState === null ? mu : Xc, hl = !1, s = a(i, n), hl = !1, Zl && (s = Do(t, a, i, n)), Oo(e), s;
   }
   function Oo(e) {
-    B.H = qi;
+    Y.H = qi;
     var t = Ie !== null && Ie.next !== null;
     if (ma = 0, ut = Ie = Ee = null, Yn = !1, Ui = 0, Kl = null, t) throw Error(p(300));
     e === null || pt || (e = e.dependencies, e !== null && On(e) && (pt = !0));
@@ -2966,12 +2966,12 @@ Error generating stack: ` + i.message + `
         var s = e.updateQueue;
         s.lastEffect = null, s.events = null, s.stores = null, s.memoCache != null && (s.memoCache.index = 0);
       }
-      B.H = xu, s = t(a, i);
+      Y.H = xu, s = t(a, i);
     } while (Zl);
     return s;
   }
   function O0() {
-    var e = B.H, t = e.useState()[0];
+    var e = Y.H, t = e.useState()[0];
     return t = typeof t.then == "function" ? Ri(t) : t, e = e.useState()[0], (Ie !== null ? Ie.memoizedState : null) !== e && (Ee.flags |= 1024), t;
   }
   function Tc() {
@@ -3031,12 +3031,12 @@ Error generating stack: ` + i.message + `
   }
   function Ri(e) {
     var t = Ui;
-    return Ui += 1, Kl === null && (Kl = []), e = wo(Kl, e, t), t = Ee, (ut === null ? t.memoizedState : ut.next) === null && (t = t.alternate, B.H = t === null || t.memoizedState === null ? mu : Xc), e;
+    return Ui += 1, Kl === null && (Kl = []), e = wo(Kl, e, t), t = Ee, (ut === null ? t.memoizedState : ut.next) === null && (t = t.alternate, Y.H = t === null || t.memoizedState === null ? mu : Xc), e;
   }
   function Xn(e) {
     if (e !== null && typeof e == "object") {
       if (typeof e.then == "function") return Ri(e);
-      if (e.$$typeof === V) return yt(e);
+      if (e.$$typeof === H) return yt(e);
     }
     throw Error(p(438, String(e)));
   }
@@ -3054,7 +3054,7 @@ Error generating stack: ` + i.message + `
     if (t ??= {
       data: [],
       index: 0
-    }, a === null && (a = Qn(), Ee.updateQueue = a), a.memoCache = t, a = t.data[t.index], a === void 0) for (a = t.data[t.index] = Array(e), i = 0; i < e; i++) a[i] = W;
+    }, a === null && (a = Qn(), Ee.updateQueue = a), a.memoCache = t, a = t.data[t.index], a === void 0) for (a = t.data[t.index] = Array(e), i = 0; i < e; i++) a[i] = ee;
     return t.index++, a;
   }
   function xa(e, t) {
@@ -3078,7 +3078,7 @@ Error generating stack: ` + i.message + `
     if (s = e.baseState, n === null) e.memoizedState = s;
     else {
       t = n.next;
-      var u = c = null, v = null, D = t, G = !1;
+      var u = c = null, v = null, D = t, V = !1;
       do {
         var J = D.lane & -536870913;
         if (J !== D.lane ? (Ue & J) === J : (ma & J) === J) {
@@ -3091,9 +3091,9 @@ Error generating stack: ` + i.message + `
             hasEagerState: D.hasEagerState,
             eagerState: D.eagerState,
             next: null
-          }), J === Gl && (G = !0);
+          }), J === Gl && (V = !0);
           else if ((ma & U) === U) {
-            D = D.next, U === Gl && (G = !0);
+            D = D.next, U === Gl && (V = !0);
             continue;
           } else J = {
             lane: 0,
@@ -3104,7 +3104,7 @@ Error generating stack: ` + i.message + `
             eagerState: D.eagerState,
             next: null
           }, v === null ? (u = v = J, c = s) : v = v.next = J, Ee.lanes |= U, Ha |= U;
-          J = D.action, fl && a(s, J), s = D.hasEagerState ? D.eagerState : a(s, J);
+          J = D.action, hl && a(s, J), s = D.hasEagerState ? D.eagerState : a(s, J);
         } else U = {
           lane: J,
           revertLane: D.revertLane,
@@ -3116,7 +3116,7 @@ Error generating stack: ` + i.message + `
         }, v === null ? (u = v = U, c = s) : v = v.next = U, Ee.lanes |= J, Ha |= J;
         D = D.next;
       } while (D !== null && D !== t);
-      if (v === null ? c = s : v.next = u, !Ut(s, e.memoizedState) && (pt = !0, G && (a = Yl, a !== null))) throw a;
+      if (v === null ? c = s : v.next = u, !Ut(s, e.memoizedState) && (pt = !0, V && (a = Yl, a !== null))) throw a;
       e.memoizedState = s, e.baseState = c, e.baseQueue = v, i.lastRenderedState = s;
     }
     return n === null && (i.lanes = 0), [e.memoizedState, i.dispatch];
@@ -3174,14 +3174,14 @@ Error generating stack: ` + i.message + `
     }
   }
   function Bo(e) {
-    var t = al(e, 2);
+    var t = ll(e, 2);
     t !== null && Ot(t, e, 2);
   }
   function Lc(e) {
     var t = zt();
     if (typeof e == "function") {
       var a = e;
-      if (e = a(), fl) {
+      if (e = a(), hl) {
         wt(!0);
         try {
           a();
@@ -3217,21 +3217,21 @@ Error generating stack: ` + i.message + `
           s.listeners.push(c);
         }
       };
-      B.T !== null ? a(!0) : s.isTransition = !1, i(s), a = t.pending, a === null ? (s.next = t.pending = s, Yo(t, s)) : (s.next = a.next, t.pending = a.next = s);
+      Y.T !== null ? a(!0) : s.isTransition = !1, i(s), a = t.pending, a === null ? (s.next = t.pending = s, Yo(t, s)) : (s.next = a.next, t.pending = a.next = s);
     }
   }
   function Yo(e, t) {
     var a = t.action, i = t.payload, n = e.state;
     if (t.isTransition) {
-      var s = B.T, c = {};
-      B.T = c;
+      var s = Y.T, c = {};
+      Y.T = c;
       try {
-        var u = a(n, i), v = B.S;
+        var u = a(n, i), v = Y.S;
         v !== null && v(c, u), Vo(e, t, u);
       } catch (D) {
         qc(e, t, D);
       } finally {
-        s !== null && c.types !== null && (s.types = c.types), B.T = s;
+        s !== null && c.types !== null && (s.types = c.types), Y.T = s;
       }
     } else try {
       s = a(n, i), Vo(e, t, s);
@@ -3429,7 +3429,7 @@ Error generating stack: ` + i.message + `
     t = t === void 0 ? null : t;
     var i = a.memoizedState;
     if (t !== null && Ec(t, i[1])) return i[0];
-    if (i = e(), fl) {
+    if (i = e(), hl) {
       wt(!0);
       try {
         e();
@@ -3446,22 +3446,22 @@ Error generating stack: ` + i.message + `
     return Ut(a, t) ? a : Xl.current !== null ? (e = Gc(e, a, i), Ut(e, t) || (pt = !0), e) : (ma & 42) === 0 || (ma & 1073741824) !== 0 && (Ue & 261930) === 0 ? (pt = !0, e.memoizedState = a) : (e = lp(), Ee.lanes |= e, Ha |= e, t);
   }
   function cu(e, t, a, i, n) {
-    var s = Y.p;
-    Y.p = s !== 0 && 8 > s ? s : 8;
-    var c = B.T, u = {};
-    B.T = u, Qc(e, !1, t, a);
+    var s = Q.p;
+    Q.p = s !== 0 && 8 > s ? s : 8;
+    var c = Y.T, u = {};
+    Y.T = u, Qc(e, !1, t, a);
     try {
-      var v = n(), D = B.S;
+      var v = n(), D = Y.S;
       D !== null && D(u, v), v !== null && typeof v == "object" && typeof v.then == "function" ? Li(e, t, T0(v, i), It(e)) : Li(e, t, i, It(e));
-    } catch (G) {
+    } catch (V) {
       Li(e, t, {
         then: function() {
         },
         status: "rejected",
-        reason: G
+        reason: V
       }, It());
     } finally {
-      Y.p = s, c !== null && u.types !== null && (c.types = u.types), B.T = c;
+      Q.p = s, c !== null && u.types !== null && (c.types = u.types), Y.T = c;
     }
   }
   function L0() {
@@ -3523,8 +3523,8 @@ Error generating stack: ` + i.message + `
         case 24:
         case 3:
           var a = It();
-          e = ul(a);
-          var i = pl(t, e, a);
+          e = pl(a);
+          var i = fl(t, e, a);
           i !== null && (Ot(i, t, a), Mi(i, t, a)), t = { cache: bc() }, e.payload = t;
           return;
       }
@@ -3643,7 +3643,7 @@ Error generating stack: ` + i.message + `
       var a = zt();
       t = t === void 0 ? null : t;
       var i = e();
-      if (fl) {
+      if (hl) {
         wt(!0);
         try {
           e();
@@ -3657,7 +3657,7 @@ Error generating stack: ` + i.message + `
       var i = zt();
       if (a !== void 0) {
         var n = a(t);
-        if (fl) {
+        if (hl) {
           wt(!0);
           try {
             a(t);
@@ -3814,23 +3814,23 @@ Error generating stack: ` + i.message + `
   };
   xu.useEffectEvent = Po;
   function Zc(e, t, a, i) {
-    t = e.memoizedState, a = a(i, t), a = a == null ? t : N({}, t, a), e.memoizedState = a, e.lanes === 0 && (e.updateQueue.baseState = a);
+    t = e.memoizedState, a = a(i, t), a = a == null ? t : z({}, t, a), e.memoizedState = a, e.lanes === 0 && (e.updateQueue.baseState = a);
   }
   var Kc = {
     enqueueSetState: function(e, t, a) {
       e = e._reactInternals;
-      var i = It(), n = ul(i);
-      n.payload = t, a != null && (n.callback = a), t = pl(e, n, i), t !== null && (Ot(t, e, i), Mi(t, e, i));
+      var i = It(), n = pl(i);
+      n.payload = t, a != null && (n.callback = a), t = fl(e, n, i), t !== null && (Ot(t, e, i), Mi(t, e, i));
     },
     enqueueReplaceState: function(e, t, a) {
       e = e._reactInternals;
-      var i = It(), n = ul(i);
-      n.tag = 1, n.payload = t, a != null && (n.callback = a), t = pl(e, n, i), t !== null && (Ot(t, e, i), Mi(t, e, i));
+      var i = It(), n = pl(i);
+      n.tag = 1, n.payload = t, a != null && (n.callback = a), t = fl(e, n, i), t !== null && (Ot(t, e, i), Mi(t, e, i));
     },
     enqueueForceUpdate: function(e, t) {
       e = e._reactInternals;
-      var a = It(), i = ul(a);
-      i.tag = 2, t != null && (i.callback = t), t = pl(e, i, a), t !== null && (Ot(t, e, a), Mi(t, e, a));
+      var a = It(), i = pl(a);
+      i.tag = 2, t != null && (i.callback = t), t = fl(e, i, a), t !== null && (Ot(t, e, a), Mi(t, e, a));
     }
   };
   function gu(e, t, a, i, n, s, c) {
@@ -3839,14 +3839,14 @@ Error generating stack: ` + i.message + `
   function bu(e, t, a, i) {
     e = t.state, typeof t.componentWillReceiveProps == "function" && t.componentWillReceiveProps(a, i), typeof t.UNSAFE_componentWillReceiveProps == "function" && t.UNSAFE_componentWillReceiveProps(a, i), t.state !== e && Kc.enqueueReplaceState(t, t.state, null);
   }
-  function hl(e, t) {
+  function ml(e, t) {
     var a = t;
     if ("ref" in t) {
       a = {};
       for (var i in t) i !== "ref" && (a[i] = t[i]);
     }
     if (e = e.defaultProps) {
-      a === t && (a = N({}, a));
+      a === t && (a = z({}, a));
       for (var n in e) a[n] === void 0 && (a[n] = e[n]);
     }
     return a;
@@ -3884,12 +3884,12 @@ Error generating stack: ` + i.message + `
     }
   }
   function Jc(e, t, a) {
-    return a = ul(a), a.tag = 3, a.payload = { element: null }, a.callback = function() {
+    return a = pl(a), a.tag = 3, a.payload = { element: null }, a.callback = function() {
       $n(e, t);
     }, a;
   }
   function ju(e) {
-    return e = ul(e), e.tag = 3, e;
+    return e = pl(e), e.tag = 3, e;
   }
   function yu(e, t, a, i) {
     var n = a.type.getDerivedStateFromError;
@@ -3943,7 +3943,7 @@ Error generating stack: ` + i.message + `
   }
   var Ic = Error(p(461)), pt = !1;
   function St(e, t, a, i) {
-    t.child = e === null ? Co(t, null, a, i) : ol(t, e.child, a, i);
+    t.child = e === null ? Co(t, null, a, i) : ul(t, e.child, a, i);
   }
   function Su(e, t, a, i, n) {
     a = a.render;
@@ -3952,7 +3952,7 @@ Error generating stack: ` + i.message + `
       var c = {};
       for (var u in i) u !== "ref" && (c[u] = i[u]);
     } else c = i;
-    return sl(t), i = Ac(e, t, a, c, s, n), u = Tc(), e !== null && !pt ? (Mc(e, t, n), ga(e, t, n)) : (Le && u && uc(t), t.flags |= 1, St(e, t, i, n), t.child);
+    return cl(t), i = Ac(e, t, a, c, s, n), u = Tc(), e !== null && !pt ? (Mc(e, t, n), ga(e, t, n)) : (Le && u && uc(t), t.flags |= 1, St(e, t, i, n), t.child);
   }
   function Nu(e, t, a, i, n) {
     if (e === null) {
@@ -4021,7 +4021,7 @@ Error generating stack: ` + i.message + `
     }, e.mode), t.ref = e.ref, e.child = t, t.return = e, t;
   }
   function _u(e, t, a) {
-    return ol(t, e.child, null, a), e = Wn(t, t.pendingProps), e.flags |= 2, qt(t), t.memoizedState = null, e;
+    return ul(t, e.child, null, a), e = Wn(t, t.pendingProps), e.flags |= 2, qt(t), t.memoizedState = null, e;
   }
   function Q0(e, t, a) {
     var i = t.pendingProps, n = (t.flags & 128) !== 0;
@@ -4048,7 +4048,7 @@ Error generating stack: ` + i.message + `
       else if (t.memoizedState !== null) t.child = e.child, t.flags |= 128, t = null;
       else throw Error(p(558));
       else if (pt || Bl(e, t, a, !1), n = (a & e.childLanes) !== 0, pt || n) {
-        if (i = Pe, i !== null && (c = bd(i, a), c !== 0 && c !== s.retryLane)) throw s.retryLane = c, al(e, c), Ot(i, e, c), Ic;
+        if (i = Pe, i !== null && (c = bd(i, a), c !== 0 && c !== s.retryLane)) throw s.retryLane = c, ll(e, c), Ot(i, e, c), Ic;
         rs(), t = _u(e, t, a);
       } else e = s.treeContext, et = $t(c.nextSibling), jt = t, Le = !0, Ta = null, Kt = !1, e !== null && xo(t, e), t = Wn(t, i), t.flags |= 4096;
       return t;
@@ -4067,34 +4067,34 @@ Error generating stack: ` + i.message + `
     }
   }
   function $c(e, t, a, i, n) {
-    return sl(t), a = Ac(e, t, a, i, void 0, n), i = Tc(), e !== null && !pt ? (Mc(e, t, n), ga(e, t, n)) : (Le && i && uc(t), t.flags |= 1, St(e, t, a, n), t.child);
+    return cl(t), a = Ac(e, t, a, i, void 0, n), i = Tc(), e !== null && !pt ? (Mc(e, t, n), ga(e, t, n)) : (Le && i && uc(t), t.flags |= 1, St(e, t, a, n), t.child);
   }
   function Cu(e, t, a, i, n, s) {
-    return sl(t), t.updateQueue = null, a = Do(t, i, a, n), Oo(e), i = Tc(), e !== null && !pt ? (Mc(e, t, s), ga(e, t, s)) : (Le && i && uc(t), t.flags |= 1, St(e, t, a, s), t.child);
+    return cl(t), t.updateQueue = null, a = Do(t, i, a, n), Oo(e), i = Tc(), e !== null && !pt ? (Mc(e, t, s), ga(e, t, s)) : (Le && i && uc(t), t.flags |= 1, St(e, t, a, s), t.child);
   }
   function Eu(e, t, a, i, n) {
-    if (sl(t), t.stateNode === null) {
+    if (cl(t), t.stateNode === null) {
       var s = Rl, c = a.contextType;
       typeof c == "object" && c !== null && (s = yt(c)), s = new a(i, s), t.memoizedState = s.state !== null && s.state !== void 0 ? s.state : null, s.updater = Kc, t.stateNode = s, s._reactInternals = t, s = t.stateNode, s.props = i, s.state = t.memoizedState, s.refs = {}, Sc(t), c = a.contextType, s.context = typeof c == "object" && c !== null ? yt(c) : Rl, s.state = t.memoizedState, c = a.getDerivedStateFromProps, typeof c == "function" && (Zc(t, a, c, i), s.state = t.memoizedState), typeof a.getDerivedStateFromProps == "function" || typeof s.getSnapshotBeforeUpdate == "function" || typeof s.UNSAFE_componentWillMount != "function" && typeof s.componentWillMount != "function" || (c = s.state, typeof s.componentWillMount == "function" && s.componentWillMount(), typeof s.UNSAFE_componentWillMount == "function" && s.UNSAFE_componentWillMount(), c !== s.state && Kc.enqueueReplaceState(s, s.state, null), Di(t, i, s, n), Oi(), s.state = t.memoizedState), typeof s.componentDidMount == "function" && (t.flags |= 4194308), i = !0;
     } else if (e === null) {
       s = t.stateNode;
-      var u = t.memoizedProps, v = hl(a, u);
+      var u = t.memoizedProps, v = ml(a, u);
       s.props = v;
-      var D = s.context, G = a.contextType;
-      c = Rl, typeof G == "object" && G !== null && (c = yt(G));
+      var D = s.context, V = a.contextType;
+      c = Rl, typeof V == "object" && V !== null && (c = yt(V));
       var J = a.getDerivedStateFromProps;
-      G = typeof J == "function" || typeof s.getSnapshotBeforeUpdate == "function", u = t.pendingProps !== u, G || typeof s.UNSAFE_componentWillReceiveProps != "function" && typeof s.componentWillReceiveProps != "function" || (u || D !== c) && bu(t, s, i, c), Da = !1;
+      V = typeof J == "function" || typeof s.getSnapshotBeforeUpdate == "function", u = t.pendingProps !== u, V || typeof s.UNSAFE_componentWillReceiveProps != "function" && typeof s.componentWillReceiveProps != "function" || (u || D !== c) && bu(t, s, i, c), Da = !1;
       var U = t.memoizedState;
-      s.state = U, Di(t, i, s, n), Oi(), D = t.memoizedState, u || U !== D || Da ? (typeof J == "function" && (Zc(t, a, J, i), D = t.memoizedState), (v = Da || gu(t, a, v, i, U, D, c)) ? (G || typeof s.UNSAFE_componentWillMount != "function" && typeof s.componentWillMount != "function" || (typeof s.componentWillMount == "function" && s.componentWillMount(), typeof s.UNSAFE_componentWillMount == "function" && s.UNSAFE_componentWillMount()), typeof s.componentDidMount == "function" && (t.flags |= 4194308)) : (typeof s.componentDidMount == "function" && (t.flags |= 4194308), t.memoizedProps = i, t.memoizedState = D), s.props = i, s.state = D, s.context = c, i = v) : (typeof s.componentDidMount == "function" && (t.flags |= 4194308), i = !1);
+      s.state = U, Di(t, i, s, n), Oi(), D = t.memoizedState, u || U !== D || Da ? (typeof J == "function" && (Zc(t, a, J, i), D = t.memoizedState), (v = Da || gu(t, a, v, i, U, D, c)) ? (V || typeof s.UNSAFE_componentWillMount != "function" && typeof s.componentWillMount != "function" || (typeof s.componentWillMount == "function" && s.componentWillMount(), typeof s.UNSAFE_componentWillMount == "function" && s.UNSAFE_componentWillMount()), typeof s.componentDidMount == "function" && (t.flags |= 4194308)) : (typeof s.componentDidMount == "function" && (t.flags |= 4194308), t.memoizedProps = i, t.memoizedState = D), s.props = i, s.state = D, s.context = c, i = v) : (typeof s.componentDidMount == "function" && (t.flags |= 4194308), i = !1);
     } else {
-      s = t.stateNode, Nc(e, t), c = t.memoizedProps, G = hl(a, c), s.props = G, J = t.pendingProps, U = s.context, D = a.contextType, v = Rl, typeof D == "object" && D !== null && (v = yt(D)), u = a.getDerivedStateFromProps, (D = typeof u == "function" || typeof s.getSnapshotBeforeUpdate == "function") || typeof s.UNSAFE_componentWillReceiveProps != "function" && typeof s.componentWillReceiveProps != "function" || (c !== J || U !== v) && bu(t, s, i, v), Da = !1, U = t.memoizedState, s.state = U, Di(t, i, s, n), Oi();
-      var R = t.memoizedState;
-      c !== J || U !== R || Da || e !== null && e.dependencies !== null && On(e.dependencies) ? (typeof u == "function" && (Zc(t, a, u, i), R = t.memoizedState), (G = Da || gu(t, a, G, i, U, R, v) || e !== null && e.dependencies !== null && On(e.dependencies)) ? (D || typeof s.UNSAFE_componentWillUpdate != "function" && typeof s.componentWillUpdate != "function" || (typeof s.componentWillUpdate == "function" && s.componentWillUpdate(i, R, v), typeof s.UNSAFE_componentWillUpdate == "function" && s.UNSAFE_componentWillUpdate(i, R, v)), typeof s.componentDidUpdate == "function" && (t.flags |= 4), typeof s.getSnapshotBeforeUpdate == "function" && (t.flags |= 1024)) : (typeof s.componentDidUpdate != "function" || c === e.memoizedProps && U === e.memoizedState || (t.flags |= 4), typeof s.getSnapshotBeforeUpdate != "function" || c === e.memoizedProps && U === e.memoizedState || (t.flags |= 1024), t.memoizedProps = i, t.memoizedState = R), s.props = i, s.state = R, s.context = v, i = G) : (typeof s.componentDidUpdate != "function" || c === e.memoizedProps && U === e.memoizedState || (t.flags |= 4), typeof s.getSnapshotBeforeUpdate != "function" || c === e.memoizedProps && U === e.memoizedState || (t.flags |= 1024), i = !1);
+      s = t.stateNode, Nc(e, t), c = t.memoizedProps, V = ml(a, c), s.props = V, J = t.pendingProps, U = s.context, D = a.contextType, v = Rl, typeof D == "object" && D !== null && (v = yt(D)), u = a.getDerivedStateFromProps, (D = typeof u == "function" || typeof s.getSnapshotBeforeUpdate == "function") || typeof s.UNSAFE_componentWillReceiveProps != "function" && typeof s.componentWillReceiveProps != "function" || (c !== J || U !== v) && bu(t, s, i, v), Da = !1, U = t.memoizedState, s.state = U, Di(t, i, s, n), Oi();
+      var L = t.memoizedState;
+      c !== J || U !== L || Da || e !== null && e.dependencies !== null && On(e.dependencies) ? (typeof u == "function" && (Zc(t, a, u, i), L = t.memoizedState), (V = Da || gu(t, a, V, i, U, L, v) || e !== null && e.dependencies !== null && On(e.dependencies)) ? (D || typeof s.UNSAFE_componentWillUpdate != "function" && typeof s.componentWillUpdate != "function" || (typeof s.componentWillUpdate == "function" && s.componentWillUpdate(i, L, v), typeof s.UNSAFE_componentWillUpdate == "function" && s.UNSAFE_componentWillUpdate(i, L, v)), typeof s.componentDidUpdate == "function" && (t.flags |= 4), typeof s.getSnapshotBeforeUpdate == "function" && (t.flags |= 1024)) : (typeof s.componentDidUpdate != "function" || c === e.memoizedProps && U === e.memoizedState || (t.flags |= 4), typeof s.getSnapshotBeforeUpdate != "function" || c === e.memoizedProps && U === e.memoizedState || (t.flags |= 1024), t.memoizedProps = i, t.memoizedState = L), s.props = i, s.state = L, s.context = v, i = V) : (typeof s.componentDidUpdate != "function" || c === e.memoizedProps && U === e.memoizedState || (t.flags |= 4), typeof s.getSnapshotBeforeUpdate != "function" || c === e.memoizedProps && U === e.memoizedState || (t.flags |= 1024), i = !1);
     }
-    return s = i, Fn(e, t), i = (t.flags & 128) !== 0, s || i ? (s = t.stateNode, a = i && typeof a.getDerivedStateFromError != "function" ? null : s.render(), t.flags |= 1, e !== null && i ? (t.child = ol(t, e.child, null, n), t.child = ol(t, null, a, n)) : St(e, t, a, n), t.memoizedState = s.state, e = t.child) : e = ga(e, t, n), e;
+    return s = i, Fn(e, t), i = (t.flags & 128) !== 0, s || i ? (s = t.stateNode, a = i && typeof a.getDerivedStateFromError != "function" ? null : s.render(), t.flags |= 1, e !== null && i ? (t.child = ul(t, e.child, null, n), t.child = ul(t, null, a, n)) : St(e, t, a, n), t.memoizedState = s.state, e = t.child) : e = ga(e, t, n), e;
   }
   function Au(e, t, a, i) {
-    return il(), t.flags |= 256, St(e, t, a, i), t.child;
+    return nl(), t.flags |= 256, St(e, t, a, i), t.child;
   }
   var Wc = {
     dehydrated: null,
@@ -4130,14 +4130,14 @@ Error generating stack: ` + i.message + `
       return i = i.fallback, n ? (Ra(t), n = t.mode, u = Pn({
         mode: "hidden",
         children: u
-      }, n), i = ll(i, n, a, null), u.return = t, i.return = t, u.sibling = i, t.child = u, i = t.child, i.memoizedState = Fc(a), i.childLanes = Pc(e, c, a), t.memoizedState = Wc, Hi(null, i)) : (Ua(t), er(t, u));
+      }, n), i = il(i, n, a, null), u.return = t, i.return = t, u.sibling = i, t.child = u, i = t.child, i.memoizedState = Fc(a), i.childLanes = Pc(e, c, a), t.memoizedState = Wc, Hi(null, i)) : (Ua(t), er(t, u));
     }
     var v = e.memoizedState;
     if (v !== null && (u = v.dehydrated, u !== null)) {
       if (s) t.flags & 256 ? (Ua(t), t.flags &= -257, t = tr(e, t, a)) : t.memoizedState !== null ? (Ra(t), t.child = e.child, t.flags |= 128, t = null) : (Ra(t), u = i.fallback, n = t.mode, i = Pn({
         mode: "visible",
         children: i.children
-      }, n), u = ll(u, n, a, null), u.flags |= 2, i.return = t, u.return = t, i.sibling = u, t.child = i, ol(t, e.child, null, a), i = t.child, i.memoizedState = Fc(a), i.childLanes = Pc(e, c, a), t.memoizedState = Wc, t = Hi(null, i));
+      }, n), u = il(u, n, a, null), u.flags |= 2, i.return = t, u.return = t, i.sibling = u, t.child = i, ul(t, e.child, null, a), i = t.child, i.memoizedState = Fc(a), i.childLanes = Pc(e, c, a), t.memoizedState = Wc, t = Hi(null, i));
       else if (Ua(t), Dr(u)) {
         if (c = u.nextSibling && u.nextSibling.dataset, c) var D = c.dgst;
         c = D, i = Error(p(419)), i.stack = "", i.digest = c, _i({
@@ -4146,7 +4146,7 @@ Error generating stack: ` + i.message + `
           stack: null
         }), t = tr(e, t, a);
       } else if (pt || Bl(e, t, a, !1), c = (a & e.childLanes) !== 0, pt || c) {
-        if (c = Pe, c !== null && (i = bd(c, a), i !== 0 && i !== v.retryLane)) throw v.retryLane = i, al(e, i), Ot(c, e, i), Ic;
+        if (c = Pe, c !== null && (i = bd(c, a), i !== 0 && i !== v.retryLane)) throw v.retryLane = i, ll(e, i), Ot(c, e, i), Ic;
         Or(u) || rs(), t = tr(e, t, a);
       } else Or(u) ? (t.flags |= 192, t.child = e.child, t = null) : (e = v.treeContext, et = $t(u.nextSibling), jt = t, Le = !0, Ta = null, Kt = !1, e !== null && xo(t, e), t = er(t, i.children), t.flags |= 4096);
       return t;
@@ -4154,7 +4154,7 @@ Error generating stack: ` + i.message + `
     return n ? (Ra(t), u = i.fallback, n = t.mode, v = e.child, D = v.sibling, i = ua(v, {
       mode: "hidden",
       children: i.children
-    }), i.subtreeFlags = v.subtreeFlags & 65011712, D !== null ? u = ua(D, u) : (u = ll(u, n, a, null), u.flags |= 2), u.return = t, i.return = t, i.sibling = u, t.child = i, Hi(null, i), i = t.child, u = e.child.memoizedState, u === null ? u = Fc(a) : (n = u.cachePool, n !== null ? (v = ot._currentValue, n = n.parent !== v ? {
+    }), i.subtreeFlags = v.subtreeFlags & 65011712, D !== null ? u = ua(D, u) : (u = il(u, n, a, null), u.flags |= 2), u.return = t, i.return = t, i.sibling = u, t.child = i, Hi(null, i), i = t.child, u = e.child.memoizedState, u === null ? u = Fc(a) : (n = u.cachePool, n !== null ? (v = ot._currentValue, n = n.parent !== v ? {
       parent: v,
       pool: v
     } : n) : n = So(), u = {
@@ -4175,7 +4175,7 @@ Error generating stack: ` + i.message + `
     return e = Rt(22, e, null, t), e.lanes = 0, e;
   }
   function tr(e, t, a) {
-    return ol(t, e.child, null, a), e = er(t, t.pendingProps.children), e.flags |= 2, t.memoizedState = null, e;
+    return ul(t, e.child, null, a), e = er(t, t.pendingProps.children), e.flags |= 2, t.memoizedState = null, e;
   }
   function Mu(e, t, a) {
     e.lanes |= t;
@@ -4198,7 +4198,7 @@ Error generating stack: ` + i.message + `
     var i = t.pendingProps, n = i.revealOrder, s = i.tail;
     i = i.children;
     var c = ct.current, u = (c & 2) !== 0;
-    if (u ? (c = c & 1 | 2, t.flags |= 128) : c &= 1, q(ct, c), St(e, t, i, a), i = Le ? ki : 0, !u && e !== null && (e.flags & 128) !== 0) e: for (e = t.child; e !== null; ) {
+    if (u ? (c = c & 1 | 2, t.flags |= 128) : c &= 1, R(ct, c), St(e, t, i, a), i = Le ? ki : 0, !u && e !== null && (e.flags & 128) !== 0) e: for (e = t.child; e !== null; ) {
       if (e.tag === 13) e.memoizedState !== null && Mu(e, a, t);
       else if (e.tag === 19) Mu(e, a, t);
       else if (e.child !== null) {
@@ -4253,7 +4253,7 @@ Error generating stack: ` + i.message + `
   function X0(e, t, a) {
     switch (t.tag) {
       case 3:
-        Ge(t, t.stateNode.containerInfo), Oa(t, ot, e.memoizedState.cache), il();
+        Ge(t, t.stateNode.containerInfo), Oa(t, ot, e.memoizedState.cache), nl();
         break;
       case 27:
       case 5:
@@ -4280,7 +4280,7 @@ Error generating stack: ` + i.message + `
           if (i) return Ou(e, t, a);
           t.flags |= 128;
         }
-        if (n = t.memoizedState, n !== null && (n.rendering = null, n.tail = null, n.lastEffect = null), q(ct, ct.current), i) break;
+        if (n = t.memoizedState, n !== null && (n.rendering = null, n.tail = null, n.lastEffect = null), R(ct, ct.current), i) break;
         return null;
       case 22:
         return t.lanes = 0, zu(e, t, a, t.pendingProps);
@@ -4300,11 +4300,11 @@ Error generating stack: ` + i.message + `
       case 16:
         e: {
           var i = t.pendingProps;
-          if (e = rl(t.elementType), t.type = e, typeof e == "function") rc(e) ? (i = hl(e, i), t.tag = 1, t = Eu(null, t, e, i, a)) : (t.tag = 0, t = $c(null, t, e, i, a));
+          if (e = dl(t.elementType), t.type = e, typeof e == "function") rc(e) ? (i = ml(e, i), t.tag = 1, t = Eu(null, t, e, i, a)) : (t.tag = 0, t = $c(null, t, e, i, a));
           else {
             if (e != null) {
               var n = e.$$typeof;
-              if (n === ee) {
+              if (n === F) {
                 t.tag = 11, t = Su(null, t, e, i, a);
                 break e;
               } else if (n === te) {
@@ -4319,7 +4319,7 @@ Error generating stack: ` + i.message + `
       case 0:
         return $c(e, t, t.type, t.pendingProps, a);
       case 1:
-        return i = t.type, n = hl(i, t.pendingProps), Eu(e, t, i, n, a);
+        return i = t.type, n = ml(i, t.pendingProps), Eu(e, t, i, n, a);
       case 3:
         e: {
           if (Ge(t, t.stateNode.containerInfo), e === null) throw Error(p(387));
@@ -4340,7 +4340,7 @@ Error generating stack: ` + i.message + `
           } else
             for (e = t.stateNode.containerInfo, e.nodeType === 9 ? e = e.body : e = e.nodeName === "HTML" ? e.ownerDocument.body : e, et = $t(e.firstChild), jt = t, Le = !0, Ta = null, Kt = !0, a = Co(t, null, i, a), t.child = a; a; ) a.flags = a.flags & -3 | 4096, a = a.sibling;
           else {
-            if (il(), i === n) {
+            if (nl(), i === n) {
               t = ga(e, t, a);
               break e;
             }
@@ -4350,9 +4350,9 @@ Error generating stack: ` + i.message + `
         }
         return t;
       case 26:
-        return Fn(e, t), e === null ? (a = Zp(t.type, null, t.pendingProps, null)) ? t.memoizedState = a : Le || (a = t.type, e = t.pendingProps, i = ms(fe.current).createElement(a), i[vt] = t, i[_t] = e, Nt(i, a, e), xt(i), t.stateNode = i) : t.memoizedState = Zp(t.type, e.memoizedProps, t.pendingProps, e.memoizedState), null;
+        return Fn(e, t), e === null ? (a = Zp(t.type, null, t.pendingProps, null)) ? t.memoizedState = a : Le || (a = t.type, e = t.pendingProps, i = ms(he.current).createElement(a), i[vt] = t, i[_t] = e, Nt(i, a, e), xt(i), t.stateNode = i) : t.memoizedState = Zp(t.type, e.memoizedProps, t.pendingProps, e.memoizedState), null;
       case 27:
-        return dt(t), e === null && Le && (i = t.stateNode = Vp(t.type, t.pendingProps, fe.current), jt = t, Kt = !0, n = et, Qa(t.type) ? (Ur = n, et = $t(i.firstChild)) : et = n), St(e, t, t.pendingProps.children, a), Fn(e, t), e === null && (t.flags |= 4194304), t.child;
+        return dt(t), e === null && Le && (i = t.stateNode = Vp(t.type, t.pendingProps, he.current), jt = t, Kt = !0, n = et, Qa(t.type) ? (Ur = n, et = $t(i.firstChild)) : et = n), St(e, t, t.pendingProps.children, a), Fn(e, t), e === null && (t.flags |= 4194304), t.child;
       case 5:
         return e === null && Le && ((n = i = et) && (i = vh(i, t.type, t.pendingProps, Kt), i !== null ? (t.stateNode = i, jt = t, et = $t(i.firstChild), Kt = !1, n = !0) : n = !1), n || Ma(t)), dt(t), n = t.type, s = t.pendingProps, c = e !== null ? e.memoizedProps : null, i = s.children, Ar(n, s) ? i = null : c !== null && Ar(n, c) && (t.flags |= 32), t.memoizedState !== null && (n = Ac(e, t, O0, null, null, a), en._currentValue = n), Fn(e, t), St(e, t, i, a), t.child;
       case 6:
@@ -4360,7 +4360,7 @@ Error generating stack: ` + i.message + `
       case 13:
         return Tu(e, t, a);
       case 4:
-        return Ge(t, t.stateNode.containerInfo), i = t.pendingProps, e === null ? t.child = ol(t, null, i, a) : St(e, t, i, a), t.child;
+        return Ge(t, t.stateNode.containerInfo), i = t.pendingProps, e === null ? t.child = ul(t, null, i, a) : St(e, t, i, a), t.child;
       case 11:
         return Su(e, t, t.type, t.pendingProps, a);
       case 7:
@@ -4372,7 +4372,7 @@ Error generating stack: ` + i.message + `
       case 10:
         return i = t.pendingProps, Oa(t, t.type, i.value), St(e, t, i.children, a), t.child;
       case 9:
-        return n = t.type._context, i = t.pendingProps.children, sl(t), n = yt(n), i = i(n), t.flags |= 1, St(e, t, i, a), t.child;
+        return n = t.type._context, i = t.pendingProps.children, cl(t), n = yt(n), i = i(n), t.flags |= 1, St(e, t, i, a), t.child;
       case 14:
         return Nu(e, t, t.type, t.pendingProps, a);
       case 15:
@@ -4384,7 +4384,7 @@ Error generating stack: ` + i.message + `
       case 22:
         return zu(e, t, a, t.pendingProps);
       case 24:
-        return sl(t), i = yt(ot), e === null ? (n = jc(), n === null && (n = Pe, s = bc(), n.pooledCache = s, s.refCount++, s !== null && (n.pooledCacheLanes |= a), n = s), t.memoizedState = {
+        return cl(t), i = yt(ot), e === null ? (n = jc(), n === null && (n = Pe, s = bc(), n.pooledCache = s, s.refCount++, s !== null && (n.pooledCacheLanes |= a), n = s), t.memoizedState = {
           parent: i,
           cache: n
         }, Sc(t), Oa(t, ot, n)) : ((e.lanes & a) !== 0 && (Nc(e, t), Di(t, null, null, a), Oi()), n = e.memoizedState, s = t.memoizedState, n.parent !== i ? (n = {
@@ -4403,13 +4403,13 @@ Error generating stack: ` + i.message + `
     if ((t = (e.mode & 32) !== 0) && (t = !1), t) {
       if (e.flags |= 16777216, (n & 335544128) === n) if (e.stateNode.complete) e.flags |= 8192;
       else if (cp()) e.flags |= 8192;
-      else throw dl = Ln, yc;
+      else throw ol = Ln, yc;
     } else e.flags &= -16777217;
   }
   function Uu(e, t) {
     if (t.type !== "stylesheet" || (t.state.loading & 4) !== 0) e.flags &= -16777217;
     else if (e.flags |= 16777216, !Wp(t)) if (cp()) e.flags |= 8192;
-    else throw dl = Ln, yc;
+    else throw ol = Ln, yc;
   }
   function es(e, t) {
     t !== null && (e.flags |= 4), e.flags & 16384 && (t = e.tag !== 22 ? md() : 536870912, e.lanes |= t, Fl |= t);
@@ -4454,13 +4454,13 @@ Error generating stack: ` + i.message + `
         var n = t.type, s = t.memoizedState;
         return e === null ? (ba(t), s !== null ? (tt(t), Uu(t, s)) : (tt(t), ir(t, n, null, i, a))) : s ? s !== e.memoizedState ? (ba(t), tt(t), Uu(t, s)) : (tt(t), t.flags &= -16777217) : (e = e.memoizedProps, e !== i && ba(t), tt(t), ir(t, n, e, i, a)), null;
       case 27:
-        if (Xe(t), a = fe.current, n = t.type, e !== null && t.stateNode != null) e.memoizedProps !== i && ba(t);
+        if (Xe(t), a = he.current, n = t.type, e !== null && t.stateNode != null) e.memoizedProps !== i && ba(t);
         else {
           if (!i) {
             if (t.stateNode === null) throw Error(p(166));
             return tt(t), null;
           }
-          e = F.current, Hl(t) ? go(t, e) : (e = Vp(n, i, a), t.stateNode = e, ba(t));
+          e = W.current, Hl(t) ? go(t, e) : (e = Vp(n, i, a), t.stateNode = e, ba(t));
         }
         return tt(t), null;
       case 5:
@@ -4470,9 +4470,9 @@ Error generating stack: ` + i.message + `
             if (t.stateNode === null) throw Error(p(166));
             return tt(t), null;
           }
-          if (s = F.current, Hl(t)) go(t, s);
+          if (s = W.current, Hl(t)) go(t, s);
           else {
-            var c = ms(fe.current);
+            var c = ms(he.current);
             switch (s) {
               case 1:
                 s = c.createElementNS("http://www.w3.org/2000/svg", n);
@@ -4534,7 +4534,7 @@ Error generating stack: ` + i.message + `
         if (e && t.stateNode != null) e.memoizedProps !== i && ba(t);
         else {
           if (typeof i != "string" && t.stateNode === null) throw Error(p(166));
-          if (e = fe.current, Hl(t)) {
+          if (e = he.current, Hl(t)) {
             if (e = t.stateNode, a = t.memoizedProps, i = null, n = jt, n !== null) switch (n.tag) {
               case 27:
               case 5:
@@ -4551,7 +4551,7 @@ Error generating stack: ` + i.message + `
               if (!i) throw Error(p(318));
               if (e = t.memoizedState, e = e !== null ? e.dehydrated : null, !e) throw Error(p(557));
               e[vt] = t;
-            } else il(), (t.flags & 128) === 0 && (t.memoizedState = null), t.flags |= 4;
+            } else nl(), (t.flags & 128) === 0 && (t.memoizedState = null), t.flags |= 4;
             tt(t), e = !1;
           } else a = hc(), e !== null && e.memoizedState !== null && (e.memoizedState.hydrationErrors = a), e = !0;
           if (!e)
@@ -4566,7 +4566,7 @@ Error generating stack: ` + i.message + `
               if (!n) throw Error(p(318));
               if (n = t.memoizedState, n = n !== null ? n.dehydrated : null, !n) throw Error(p(317));
               n[vt] = t;
-            } else il(), (t.flags & 128) === 0 && (t.memoizedState = null), t.flags |= 4;
+            } else nl(), (t.flags & 128) === 0 && (t.memoizedState = null), t.flags |= 4;
             tt(t), n = !1;
           } else n = hc(), e !== null && e.memoizedState !== null && (e.memoizedState.hydrationErrors = n), n = !0;
           if (!n)
@@ -4578,13 +4578,13 @@ Error generating stack: ` + i.message + `
       case 10:
         return ha(t.type), tt(t), null;
       case 19:
-        if (_(ct), i = t.memoizedState, i === null) return tt(t), null;
+        if (j(ct), i = t.memoizedState, i === null) return tt(t), null;
         if (n = (t.flags & 128) !== 0, s = i.rendering, s === null) if (n) Bi(i, !1);
         else {
           if (nt !== 0 || e !== null && (e.flags & 128) !== 0) for (e = t.child; e !== null; ) {
             if (s = Gn(e), s !== null) {
               for (t.flags |= 128, Bi(i, !1), e = s.updateQueue, t.updateQueue = e, es(t, e), t.subtreeFlags = 0, e = a, a = t.child; a !== null; ) po(a, e), a = a.sibling;
-              return q(ct, ct.current & 1 | 2), Le && pa(t, i.treeForkCount), t.child;
+              return R(ct, ct.current & 1 | 2), Le && pa(t, i.treeForkCount), t.child;
             }
             e = e.sibling;
           }
@@ -4596,10 +4596,10 @@ Error generating stack: ` + i.message + `
           } else 2 * M() - i.renderingStartTime > ns && a !== 536870912 && (t.flags |= 128, n = !0, Bi(i, !1), t.lanes = 4194304);
           i.isBackwards ? (s.sibling = t.child, t.child = s) : (e = i.last, e !== null ? e.sibling = s : t.child = s, i.last = s);
         }
-        return i.tail !== null ? (e = i.tail, i.rendering = e, i.tail = e.sibling, i.renderingStartTime = M(), e.sibling = null, a = ct.current, q(ct, n ? a & 1 | 2 : a & 1), Le && pa(t, i.treeForkCount), e) : (tt(t), null);
+        return i.tail !== null ? (e = i.tail, i.rendering = e, i.tail = e.sibling, i.renderingStartTime = M(), e.sibling = null, a = ct.current, R(ct, n ? a & 1 | 2 : a & 1), Le && pa(t, i.treeForkCount), e) : (tt(t), null);
       case 22:
       case 23:
-        return qt(t), _c(), i = t.memoizedState !== null, e !== null ? e.memoizedState !== null !== i && (t.flags |= 8192) : i && (t.flags |= 8192), i ? (a & 536870912) !== 0 && (t.flags & 128) === 0 && (tt(t), t.subtreeFlags & 6 && (t.flags |= 8192)) : tt(t), a = t.updateQueue, a !== null && es(t, a.retryQueue), a = null, e !== null && e.memoizedState !== null && e.memoizedState.cachePool !== null && (a = e.memoizedState.cachePool.pool), i = null, t.memoizedState !== null && t.memoizedState.cachePool !== null && (i = t.memoizedState.cachePool.pool), i !== a && (t.flags |= 2048), e !== null && _(cl), null;
+        return qt(t), _c(), i = t.memoizedState !== null, e !== null ? e.memoizedState !== null !== i && (t.flags |= 8192) : i && (t.flags |= 8192), i ? (a & 536870912) !== 0 && (t.flags & 128) === 0 && (tt(t), t.subtreeFlags & 6 && (t.flags |= 8192)) : tt(t), a = t.updateQueue, a !== null && es(t, a.retryQueue), a = null, e !== null && e.memoizedState !== null && e.memoizedState.cachePool !== null && (a = e.memoizedState.cachePool.pool), i = null, t.memoizedState !== null && t.memoizedState.cachePool !== null && (i = t.memoizedState.cachePool.pool), i !== a && (t.flags |= 2048), e !== null && j(rl), null;
       case 24:
         return a = null, e !== null && (a = e.memoizedState.cache), t.memoizedState.cache !== a && (t.flags |= 2048), ha(ot), tt(t), null;
       case 25:
@@ -4622,24 +4622,24 @@ Error generating stack: ` + i.message + `
       case 31:
         if (t.memoizedState !== null) {
           if (qt(t), t.alternate === null) throw Error(p(340));
-          il();
+          nl();
         }
         return e = t.flags, e & 65536 ? (t.flags = e & -65537 | 128, t) : null;
       case 13:
         if (qt(t), e = t.memoizedState, e !== null && e.dehydrated !== null) {
           if (t.alternate === null) throw Error(p(340));
-          il();
+          nl();
         }
         return e = t.flags, e & 65536 ? (t.flags = e & -65537 | 128, t) : null;
       case 19:
-        return _(ct), null;
+        return j(ct), null;
       case 4:
         return ze(), null;
       case 10:
         return ha(t.type), null;
       case 22:
       case 23:
-        return qt(t), _c(), e !== null && _(cl), e = t.flags, e & 65536 ? (t.flags = e & -65537 | 128, t) : null;
+        return qt(t), _c(), e !== null && j(rl), e = t.flags, e & 65536 ? (t.flags = e & -65537 | 128, t) : null;
       case 24:
         return ha(ot), null;
       case 25:
@@ -4668,14 +4668,14 @@ Error generating stack: ` + i.message + `
         qt(t);
         break;
       case 19:
-        _(ct);
+        j(ct);
         break;
       case 10:
         ha(t.type);
         break;
       case 22:
       case 23:
-        qt(t), _c(), e !== null && _(cl);
+        qt(t), _c(), e !== null && j(rl);
         break;
       case 24:
         ha(ot);
@@ -4714,16 +4714,16 @@ Error generating stack: ` + i.message + `
               var v = a, D = u;
               try {
                 D();
-              } catch (G) {
-                Je(n, v, G);
+              } catch (V) {
+                Je(n, v, V);
               }
             }
           }
           i = i.next;
         } while (i !== s);
       }
-    } catch (G) {
-      Je(t, t.return, G);
+    } catch (V) {
+      Je(t, t.return, V);
     }
   }
   function Lu(e) {
@@ -4738,7 +4738,7 @@ Error generating stack: ` + i.message + `
     }
   }
   function qu(e, t, a) {
-    a.props = hl(e.type, e.memoizedProps), a.state = e.memoizedState;
+    a.props = ml(e.type, e.memoizedProps), a.state = e.memoizedState;
     try {
       a.componentWillUnmount();
     } catch (i) {
@@ -4863,16 +4863,16 @@ Error generating stack: ` + i.message + `
             a = null;
             break e;
           }
-          var c = 0, u = -1, v = -1, D = 0, G = 0, J = e, U = null;
+          var c = 0, u = -1, v = -1, D = 0, V = 0, J = e, U = null;
           t: for (; ; ) {
-            for (var R; J !== a || n !== 0 && J.nodeType !== 3 || (u = c + n), J !== s || i !== 0 && J.nodeType !== 3 || (v = c + i), J.nodeType === 3 && (c += J.nodeValue.length), (R = J.firstChild) !== null; )
-              U = J, J = R;
+            for (var L; J !== a || n !== 0 && J.nodeType !== 3 || (u = c + n), J !== s || i !== 0 && J.nodeType !== 3 || (v = c + i), J.nodeType === 3 && (c += J.nodeValue.length), (L = J.firstChild) !== null; )
+              U = J, J = L;
             for (; ; ) {
               if (J === e) break t;
-              if (U === a && ++D === n && (u = c), U === s && ++G === i && (v = c), (R = J.nextSibling) !== null) break;
+              if (U === a && ++D === n && (u = c), U === s && ++V === i && (v = c), (L = J.nextSibling) !== null) break;
               J = U, U = J.parentNode;
             }
-            J = R;
+            J = L;
           }
           a = u === -1 || v === -1 ? null : {
             start: u,
@@ -4901,8 +4901,8 @@ Error generating stack: ` + i.message + `
           if ((e & 1024) !== 0 && s !== null) {
             e = void 0, a = t, n = s.memoizedProps, s = s.memoizedState, i = a.stateNode;
             try {
-              var pe = hl(a.type, n);
-              e = i.getSnapshotBeforeUpdate(pe, s), i.__reactInternalSnapshotBeforeUpdate = e;
+              var fe = ml(a.type, n);
+              e = i.getSnapshotBeforeUpdate(fe, s), i.__reactInternalSnapshotBeforeUpdate = e;
             } catch (Ne) {
               Je(a, a.return, Ne);
             }
@@ -4954,7 +4954,7 @@ Error generating stack: ` + i.message + `
           Je(a, a.return, c);
         }
         else {
-          var n = hl(a.type, t.memoizedProps);
+          var n = ml(a.type, t.memoizedProps);
           t = t.memoizedState;
           try {
             e.componentDidUpdate(n, t, e.__reactInternalSnapshotBeforeUpdate);
@@ -5199,8 +5199,8 @@ Error generating stack: ` + i.message + `
           n = e.stateNode;
           try {
             El(n, "");
-          } catch (pe) {
-            Je(e, e.return, pe);
+          } catch (fe) {
+            Je(e, e.return, fe);
           }
         }
         i & 4 && e.stateNode != null && (n = e.memoizedProps, nr(e, n, a !== null ? a.memoizedProps : n)), i & 1024 && (rr = !0);
@@ -5211,16 +5211,16 @@ Error generating stack: ` + i.message + `
           i = e.memoizedProps, a = e.stateNode;
           try {
             a.nodeValue = i;
-          } catch (pe) {
-            Je(e, e.return, pe);
+          } catch (fe) {
+            Je(e, e.return, fe);
           }
         }
         break;
       case 3:
         if (bs = null, n = ta, ta = xs(t.containerInfo), At(t, e), ta = n, Tt(e), i & 4 && a !== null && a.memoizedState.isDehydrated) try {
           si(t.containerInfo);
-        } catch (pe) {
-          Je(e, e.return, pe);
+        } catch (fe) {
+          Je(e, e.return, fe);
         }
         rr && (rr = !1, Iu(e));
         break;
@@ -5238,8 +5238,8 @@ Error generating stack: ` + i.message + `
         break;
       case 22:
         n = e.memoizedState !== null;
-        var v = a !== null && a.memoizedState !== null, D = va, G = ft;
-        if (va = D || n, ft = G || v, At(t, e), ft = G, va = D, Tt(e), i & 8192) e: for (t = e.stateNode, t._visibility = n ? t._visibility & -2 : t._visibility | 1, n && (a === null || v || va || ft || ml(e)), a = null, t = e; ; ) {
+        var v = a !== null && a.memoizedState !== null, D = va, V = ft;
+        if (va = D || n, ft = V || v, At(t, e), ft = V, va = D, Tt(e), i & 8192) e: for (t = e.stateNode, t._visibility = n ? t._visibility & -2 : t._visibility | 1, n && (a === null || v || va || ft || xl(e)), a = null, t = e; ; ) {
           if (t.tag === 5 || t.tag === 26) {
             if (a === null) {
               v = a = t;
@@ -5250,8 +5250,8 @@ Error generating stack: ` + i.message + `
                   var J = v.memoizedProps.style, U = J != null && J.hasOwnProperty("display") ? J.display : null;
                   u.style.display = U == null || typeof U == "boolean" ? "" : ("" + U).trim();
                 }
-              } catch (pe) {
-                Je(v, v.return, pe);
+              } catch (fe) {
+                Je(v, v.return, fe);
               }
             }
           } else if (t.tag === 6) {
@@ -5259,18 +5259,18 @@ Error generating stack: ` + i.message + `
               v = t;
               try {
                 v.stateNode.nodeValue = n ? "" : v.memoizedProps;
-              } catch (pe) {
-                Je(v, v.return, pe);
+              } catch (fe) {
+                Je(v, v.return, fe);
               }
             }
           } else if (t.tag === 18) {
             if (a === null) {
               v = t;
               try {
-                var R = v.stateNode;
-                n ? Hp(R, !0) : Hp(v.stateNode, !1);
-              } catch (pe) {
-                Je(v, v.return, pe);
+                var L = v.stateNode;
+                n ? Hp(L, !0) : Hp(v.stateNode, !1);
+              } catch (fe) {
+                Je(v, v.return, fe);
               }
             }
           } else if ((t.tag !== 22 && t.tag !== 23 || t.memoizedState === null || t === e) && t.child !== null) {
@@ -5342,7 +5342,7 @@ Error generating stack: ` + i.message + `
   function ya(e, t) {
     if (t.subtreeFlags & 8772) for (t = t.child; t !== null; ) Vu(e, t.alternate, t), t = t.sibling;
   }
-  function ml(e) {
+  function xl(e) {
     for (e = e.child; e !== null; ) {
       var t = e;
       switch (t.tag) {
@@ -5350,27 +5350,27 @@ Error generating stack: ` + i.message + `
         case 11:
         case 14:
         case 15:
-          La(4, t, t.return), ml(t);
+          La(4, t, t.return), xl(t);
           break;
         case 1:
           sa(t, t.return);
           var a = t.stateNode;
-          typeof a.componentWillUnmount == "function" && qu(t, t.return, a), ml(t);
+          typeof a.componentWillUnmount == "function" && qu(t, t.return, a), xl(t);
           break;
         case 27:
           Wi(t.stateNode);
         case 26:
         case 5:
-          sa(t, t.return), ml(t);
+          sa(t, t.return), xl(t);
           break;
         case 22:
-          t.memoizedState === null && ml(t);
+          t.memoizedState === null && xl(t);
           break;
         case 30:
-          ml(t);
+          xl(t);
           break;
         default:
-          ml(t);
+          xl(t);
       }
       e = e.sibling;
     }
@@ -5492,8 +5492,8 @@ Error generating stack: ` + i.message + `
         case 23:
           break;
         case 22:
-          var G = c.stateNode;
-          c.memoizedState !== null ? G._visibility & 2 ? Il(s, c, u, v, n) : Vi(s, c) : (G._visibility |= 2, Il(s, c, u, v, n)), n && D & 2048 && dr(c.alternate, c);
+          var V = c.stateNode;
+          c.memoizedState !== null ? V._visibility & 2 ? Il(s, c, u, v, n) : Vi(s, c) : (V._visibility |= 2, Il(s, c, u, v, n)), n && D & 2048 && dr(c.alternate, c);
           break;
         case 24:
           Il(s, c, u, v, n), n && D & 2048 && or(c.alternate, c);
@@ -5653,9 +5653,9 @@ Error generating stack: ` + i.message + `
     cacheSignal: function() {
       return yt(ot).controller.signal;
     }
-  }, W0 = typeof WeakMap == "function" ? WeakMap : Map, Qe = 0, Pe = null, Oe = null, Ue = 0, Ke = 0, Ht = null, qa = !1, Wl = !1, ur = !1, Na = 0, nt = 0, Ha = 0, xl = 0, pr = 0, Bt = 0, Fl = 0, Zi = null, Mt = null, fr = !1, is = 0, tp = 0, ns = 1 / 0, ss = null, Ba = null, mt = 0, Ga = null, Pl = null, wa = 0, hr = 0, mr = null, ap = null, Ki = 0, xr = null;
+  }, W0 = typeof WeakMap == "function" ? WeakMap : Map, Qe = 0, Pe = null, Oe = null, Ue = 0, Ke = 0, Ht = null, qa = !1, Wl = !1, ur = !1, Na = 0, nt = 0, Ha = 0, gl = 0, pr = 0, Bt = 0, Fl = 0, Zi = null, Mt = null, fr = !1, is = 0, tp = 0, ns = 1 / 0, ss = null, Ba = null, mt = 0, Ga = null, Pl = null, wa = 0, hr = 0, mr = null, ap = null, Ki = 0, xr = null;
   function It() {
-    return (Qe & 2) !== 0 && Ue !== 0 ? Ue & -Ue : B.T !== null ? Sr() : jd();
+    return (Qe & 2) !== 0 && Ue !== 0 ? Ue & -Ue : Y.T !== null ? Sr() : jd();
   }
   function lp() {
     if (Bt === 0) if ((Ue & 536870912) === 0 || Le) {
@@ -5665,7 +5665,7 @@ Error generating stack: ` + i.message + `
     return e = Lt.current, e !== null && (e.flags |= 32), Bt;
   }
   function Ot(e, t, a) {
-    (e === Pe && (Ke === 2 || Ke === 9) || e.cancelPendingCommit !== null) && (ei(e, 0), Ya(e, Ue, Bt, !1)), xn(e, a), ((Qe & 2) === 0 || e !== Pe) && (e === Pe && ((Qe & 2) === 0 && (xl |= a), nt === 4 && Ya(e, Ue, Bt, !1)), za(e));
+    (e === Pe && (Ke === 2 || Ke === 9) || e.cancelPendingCommit !== null) && (ei(e, 0), Ya(e, Ue, Bt, !1)), xn(e, a), ((Qe & 2) === 0 || e !== Pe) && (e === Pe && ((Qe & 2) === 0 && (gl |= a), nt === 4 && Ya(e, Ue, Bt, !1)), za(e));
   }
   function ip(e, t, a) {
     if ((Qe & 6) !== 0) throw Error(p(327));
@@ -5690,7 +5690,7 @@ Error generating stack: ` + i.message + `
               var v = u.current.memoizedState.isDehydrated;
               if (v && (ei(u, c).flags |= 256), c = br(u, c, !1), c !== 2) {
                 if (ur && !v) {
-                  u.errorRecoveryDisabledLanes |= s, xl |= s, n = 4;
+                  u.errorRecoveryDisabledLanes |= s, gl |= s, n = 4;
                   break e;
                 }
                 s = Mt, Mt = n, s !== null && (Mt === null ? Mt = s : Mt.push.apply(Mt, s));
@@ -5725,17 +5725,17 @@ Error generating stack: ` + i.message + `
           }
           if ((t & 62914560) === t && (n = is + 300 - M(), 10 < n)) {
             if (Ya(i, t, Bt, !qa), mn(i, 0, !0) !== 0) break e;
-            wa = t, i.timeoutHandle = Rp(np.bind(null, i, a, Mt, ss, fr, t, Bt, xl, Fl, qa, s, "Throttled", -0, 0), n);
+            wa = t, i.timeoutHandle = Rp(np.bind(null, i, a, Mt, ss, fr, t, Bt, gl, Fl, qa, s, "Throttled", -0, 0), n);
             break e;
           }
-          np(i, a, Mt, ss, fr, t, Bt, xl, Fl, qa, s, null, -0, 0);
+          np(i, a, Mt, ss, fr, t, Bt, gl, Fl, qa, s, null, -0, 0);
         }
       }
       break;
     } while (!0);
     za(e);
   }
-  function np(e, t, a, i, n, s, c, u, v, D, G, J, U, R) {
+  function np(e, t, a, i, n, s, c, u, v, D, V, J, U, L) {
     if (e.timeoutHandle = -1, J = t.subtreeFlags, J & 8192 || (J & 16785408) === 16785408) {
       J = {
         stylesheets: null,
@@ -5747,9 +5747,9 @@ Error generating stack: ` + i.message + `
         waitingForViewTransition: !1,
         unsuspend: da
       }, Wu(t, s, J);
-      var pe = (s & 62914560) === s ? is - M() : (s & 4194048) === s ? tp - M() : 0;
-      if (pe = Dh(J, pe), pe !== null) {
-        wa = s, e.cancelPendingCommit = pe(fp.bind(null, e, t, s, a, i, n, c, u, v, G, J, null, U, R)), Ya(e, s, c, !D);
+      var fe = (s & 62914560) === s ? is - M() : (s & 4194048) === s ? tp - M() : 0;
+      if (fe = Dh(J, fe), fe !== null) {
+        wa = s, e.cancelPendingCommit = fe(fp.bind(null, e, t, s, a, i, n, c, u, v, V, J, null, U, L)), Ya(e, s, c, !D);
         return;
       }
     }
@@ -5780,7 +5780,7 @@ Error generating stack: ` + i.message + `
     return !0;
   }
   function Ya(e, t, a, i) {
-    t &= ~pr, t &= ~xl, e.suspendedLanes |= t, e.pingedLanes &= ~t, i && (e.warmLanes |= t), i = e.expirationTimes;
+    t &= ~pr, t &= ~gl, e.suspendedLanes |= t, e.pingedLanes &= ~t, i && (e.warmLanes |= t), i = e.expirationTimes;
     for (var n = t; 0 < n; ) {
       var s = 31 - ht(n), c = 1 << s;
       i[s] = -1, n &= ~c;
@@ -5793,14 +5793,14 @@ Error generating stack: ` + i.message + `
   function gr() {
     if (Oe !== null) {
       if (Ke === 0) var e = Oe.return;
-      else e = Oe, fa = nl = null, Oc(e), Ql = null, Ai = 0, e = Oe;
+      else e = Oe, fa = sl = null, Oc(e), Ql = null, Ai = 0, e = Oe;
       for (; e !== null; ) Ru(e.alternate, e), e = e.return;
       Oe = null;
     }
   }
   function ei(e, t) {
     var a = e.timeoutHandle;
-    a !== -1 && (e.timeoutHandle = -1, xh(a)), a = e.cancelPendingCommit, a !== null && (e.cancelPendingCommit = null, a()), wa = 0, gr(), Pe = e, Oe = a = ua(e.current, null), Ue = t, Ke = 0, Ht = null, qa = !1, Wl = fi(e, t), ur = !1, Fl = Bt = pr = xl = Ha = nt = 0, Mt = Zi = null, fr = !1, (t & 8) !== 0 && (t |= t & 32);
+    a !== -1 && (e.timeoutHandle = -1, xh(a)), a = e.cancelPendingCommit, a !== null && (e.cancelPendingCommit = null, a()), wa = 0, gr(), Pe = e, Oe = a = ua(e.current, null), Ue = t, Ke = 0, Ht = null, qa = !1, Wl = fi(e, t), ur = !1, Fl = Bt = pr = gl = Ha = nt = 0, Mt = Zi = null, fr = !1, (t & 8) !== 0 && (t |= t & 32);
     var i = e.entangledLanes;
     if (i !== 0) for (e = e.entanglements, i &= t; 0 < i; ) {
       var n = 31 - ht(i), s = 1 << n;
@@ -5809,22 +5809,22 @@ Error generating stack: ` + i.message + `
     return Na = t, Cn(), a;
   }
   function sp(e, t) {
-    Ee = null, B.H = qi, t === Vl || t === Rn ? (t = zo(), Ke = 3) : t === yc ? (t = zo(), Ke = 4) : Ke = t === Ic ? 8 : t !== null && typeof t == "object" && typeof t.then == "function" ? 6 : 1, Ht = t, Oe === null && (nt = 1, $n(e, Qt(t, e.current)));
+    Ee = null, Y.H = qi, t === Vl || t === Rn ? (t = zo(), Ke = 3) : t === yc ? (t = zo(), Ke = 4) : Ke = t === Ic ? 8 : t !== null && typeof t == "object" && typeof t.then == "function" ? 6 : 1, Ht = t, Oe === null && (nt = 1, $n(e, Qt(t, e.current)));
   }
   function cp() {
     var e = Lt.current;
     return e === null ? !0 : (Ue & 4194048) === Ue ? Jt === null : (Ue & 62914560) === Ue || (Ue & 536870912) !== 0 ? e === Jt : !1;
   }
   function rp() {
-    var e = B.H;
-    return B.H = qi, e === null ? qi : e;
+    var e = Y.H;
+    return Y.H = qi, e === null ? qi : e;
   }
   function dp() {
-    var e = B.A;
-    return B.A = $0, e;
+    var e = Y.A;
+    return Y.A = $0, e;
   }
   function rs() {
-    nt = 4, qa || (Ue & 4194048) !== Ue && Lt.current !== null || (Wl = !0), (Ha & 134217727) === 0 && (xl & 134217727) === 0 || Pe === null || Ya(Pe, Ue, Bt, !1);
+    nt = 4, qa || (Ue & 4194048) !== Ue && Lt.current !== null || (Wl = !0), (Ha & 134217727) === 0 && (gl & 134217727) === 0 || Pe === null || Ya(Pe, Ue, Bt, !1);
   }
   function br(e, t, a) {
     var i = Qe;
@@ -5857,11 +5857,11 @@ Error generating stack: ` + i.message + `
         }
         P0(), c = nt;
         break;
-      } catch (G) {
-        sp(e, G);
+      } catch (V) {
+        sp(e, V);
       }
     while (!0);
-    return t && e.shellSuspendCounter++, fa = nl = null, Qe = i, B.H = n, B.A = s, Oe === null && (Pe = null, Ue = 0, Cn()), c;
+    return t && e.shellSuspendCounter++, fa = sl = null, Qe = i, Y.H = n, Y.A = s, Oe === null && (Pe = null, Ue = 0, Cn()), c;
   }
   function P0() {
     for (; Oe !== null; ) op(Oe);
@@ -5932,11 +5932,11 @@ Error generating stack: ` + i.message + `
         }
         th();
         break;
-      } catch (G) {
-        sp(e, G);
+      } catch (V) {
+        sp(e, V);
       }
     while (!0);
-    return fa = nl = null, B.H = i, B.A = n, Qe = a, Oe !== null ? 0 : (Pe = null, Ue = 0, Cn(), nt);
+    return fa = sl = null, Y.H = i, Y.A = n, Qe = a, Oe !== null ? 0 : (Pe = null, Ue = 0, Cn(), nt);
   }
   function th() {
     for (; Oe !== null && !Ze(); ) op(Oe);
@@ -5963,7 +5963,7 @@ Error generating stack: ` + i.message + `
     e.memoizedProps = e.pendingProps, t === null ? ds(e) : Oe = t;
   }
   function ti(e, t, a, i) {
-    fa = nl = null, Oc(t), Ql = null, Ai = 0;
+    fa = sl = null, Oc(t), Ql = null, Ai = 0;
     var n = t.return;
     try {
       if (V0(e, n, t, a, Ue)) {
@@ -6024,11 +6024,11 @@ Error generating stack: ` + i.message + `
       if (s = t.lanes | t.childLanes, s |= sc, Yf(e, a, s, c, u, v), e === Pe && (Oe = Pe = null, Ue = 0), Pl = t, Ga = e, wa = a, hr = s, mr = n, ap = i, (t.subtreeFlags & 10256) !== 0 || (t.flags & 10256) !== 0 ? (e.callbackNode = null, e.callbackPriority = 0, nh(Be, function() {
         return bp(), null;
       })) : (e.callbackNode = null, e.callbackPriority = 0), i = (t.flags & 13878) !== 0, (t.subtreeFlags & 13878) !== 0 || i) {
-        i = B.T, B.T = null, n = Y.p, Y.p = 2, c = Qe, Qe |= 4;
+        i = Y.T, Y.T = null, n = Q.p, Q.p = 2, c = Qe, Qe |= 4;
         try {
           J0(e, t, a);
         } finally {
-          Qe = c, Y.p = n, B.T = i;
+          Qe = c, Q.p = n, Y.T = i;
         }
       }
       mt = 1, hp(), mp(), xp();
@@ -6039,9 +6039,9 @@ Error generating stack: ` + i.message + `
       mt = 0;
       var e = Ga, t = Pl, a = (t.flags & 13878) !== 0;
       if ((t.subtreeFlags & 13878) !== 0 || a) {
-        a = B.T, B.T = null;
-        var i = Y.p;
-        Y.p = 2;
+        a = Y.T, Y.T = null;
+        var i = Q.p;
+        Q.p = 2;
         var n = Qe;
         Qe |= 4;
         try {
@@ -6049,34 +6049,34 @@ Error generating stack: ` + i.message + `
           var s = Er, c = ao(e.containerInfo), u = s.focusedElem, v = s.selectionRange;
           if (c !== u && u && u.ownerDocument && to(u.ownerDocument.documentElement, u)) {
             if (v !== null && tc(u)) {
-              var D = v.start, G = v.end;
-              if (G === void 0 && (G = D), "selectionStart" in u) u.selectionStart = D, u.selectionEnd = Math.min(G, u.value.length);
+              var D = v.start, V = v.end;
+              if (V === void 0 && (V = D), "selectionStart" in u) u.selectionStart = D, u.selectionEnd = Math.min(V, u.value.length);
               else {
                 var J = u.ownerDocument || document, U = J && J.defaultView || window;
                 if (U.getSelection) {
-                  var R = U.getSelection(), pe = u.textContent.length, Ne = Math.min(v.start, pe), We = v.end === void 0 ? Ne : Math.min(v.end, pe);
-                  !R.extend && Ne > We && (c = We, We = Ne, Ne = c);
-                  var C = eo(u, Ne), y = eo(u, We);
-                  if (C && y && (R.rangeCount !== 1 || R.anchorNode !== C.node || R.anchorOffset !== C.offset || R.focusNode !== y.node || R.focusOffset !== y.offset)) {
+                  var L = U.getSelection(), fe = u.textContent.length, Ne = Math.min(v.start, fe), We = v.end === void 0 ? Ne : Math.min(v.end, fe);
+                  !L.extend && Ne > We && (c = We, We = Ne, Ne = c);
+                  var E = eo(u, Ne), S = eo(u, We);
+                  if (E && S && (L.rangeCount !== 1 || L.anchorNode !== E.node || L.anchorOffset !== E.offset || L.focusNode !== S.node || L.focusOffset !== S.offset)) {
                     var O = J.createRange();
-                    O.setStart(C.node, C.offset), R.removeAllRanges(), Ne > We ? (R.addRange(O), R.extend(y.node, y.offset)) : (O.setEnd(y.node, y.offset), R.addRange(O));
+                    O.setStart(E.node, E.offset), L.removeAllRanges(), Ne > We ? (L.addRange(O), L.extend(S.node, S.offset)) : (O.setEnd(S.node, S.offset), L.addRange(O));
                   }
                 }
               }
             }
-            for (J = [], R = u; R = R.parentNode; ) R.nodeType === 1 && J.push({
-              element: R,
-              left: R.scrollLeft,
-              top: R.scrollTop
+            for (J = [], L = u; L = L.parentNode; ) L.nodeType === 1 && J.push({
+              element: L,
+              left: L.scrollLeft,
+              top: L.scrollTop
             });
             for (typeof u.focus == "function" && u.focus(), u = 0; u < J.length; u++) {
-              var X = J[u];
-              X.element.scrollLeft = X.left, X.element.scrollTop = X.top;
+              var Z = J[u];
+              Z.element.scrollLeft = Z.left, Z.element.scrollTop = Z.top;
             }
           }
           Ss = !!Cr, Er = Cr = null;
         } finally {
-          Qe = n, Y.p = i, B.T = a;
+          Qe = n, Q.p = i, Y.T = a;
         }
       }
       e.current = t, mt = 2;
@@ -6087,15 +6087,15 @@ Error generating stack: ` + i.message + `
       mt = 0;
       var e = Ga, t = Pl, a = (t.flags & 8772) !== 0;
       if ((t.subtreeFlags & 8772) !== 0 || a) {
-        a = B.T, B.T = null;
-        var i = Y.p;
-        Y.p = 2;
+        a = Y.T, Y.T = null;
+        var i = Q.p;
+        Q.p = 2;
         var n = Qe;
         Qe |= 4;
         try {
           Vu(e, t.alternate, t);
         } finally {
-          Qe = n, Y.p = i, B.T = a;
+          Qe = n, Q.p = i, Y.T = a;
         }
       }
       mt = 3;
@@ -6112,14 +6112,14 @@ Error generating stack: ` + i.message + `
       } catch {
       }
       if (i !== null) {
-        t = B.T, n = Y.p, Y.p = 2, B.T = null;
+        t = Y.T, n = Q.p, Q.p = 2, Y.T = null;
         try {
           for (var s = e.onRecoverableError, c = 0; c < i.length; c++) {
             var u = i[c];
             s(u.value, { componentStack: u.stack });
           }
         } finally {
-          B.T = t, Y.p = n;
+          Y.T = t, Q.p = n;
         }
       }
       (wa & 3) !== 0 && os(), za(e), n = e.pendingLanes, (a & 261930) !== 0 && (n & 42) !== 0 ? e === xr ? Ki++ : (Ki = 0, xr = e) : Ki = 0, Ji(0, !1);
@@ -6135,9 +6135,9 @@ Error generating stack: ` + i.message + `
     if (mt !== 5) return !1;
     var e = Ga, t = hr;
     hr = 0;
-    var a = Rs(wa), i = B.T, n = Y.p;
+    var a = Rs(wa), i = Y.T, n = Q.p;
     try {
-      Y.p = 32 > a ? 32 : a, B.T = null, a = mr, mr = null;
+      Q.p = 32 > a ? 32 : a, Y.T = null, a = mr, mr = null;
       var s = Ga, c = wa;
       if (mt = 0, Pl = Ga = null, wa = 0, (Qe & 6) !== 0) throw Error(p(331));
       var u = Qe;
@@ -6147,11 +6147,11 @@ Error generating stack: ` + i.message + `
       }
       return !0;
     } finally {
-      Y.p = n, B.T = i, gp(e, t);
+      Q.p = n, Y.T = i, gp(e, t);
     }
   }
   function vp(e, t, a) {
-    t = Qt(a, t), t = Jc(e.stateNode, t, 2), e = pl(e, t, 2), e !== null && (xn(e, 2), za(e));
+    t = Qt(a, t), t = Jc(e.stateNode, t, 2), e = fl(e, t, 2), e !== null && (xn(e, 2), za(e));
   }
   function Je(e, t, a) {
     if (e.tag === 3) vp(e, e, a);
@@ -6162,7 +6162,7 @@ Error generating stack: ` + i.message + `
       } else if (t.tag === 1) {
         var i = t.stateNode;
         if (typeof t.type.getDerivedStateFromError == "function" || typeof i.componentDidCatch == "function" && (Ba === null || !Ba.has(i))) {
-          e = Qt(a, e), a = ju(2), i = pl(t, a, 2), i !== null && (yu(a, i, t, e), xn(i, 2), za(i));
+          e = Qt(a, e), a = ju(2), i = fl(t, a, 2), i !== null && (yu(a, i, t, e), xn(i, 2), za(i));
           break;
         }
       }
@@ -6183,7 +6183,7 @@ Error generating stack: ` + i.message + `
     i !== null && i.delete(t), e.pingedLanes |= e.suspendedLanes & a, e.warmLanes &= ~a, Pe === e && (Ue & a) === a && (nt === 4 || nt === 3 && (Ue & 62914560) === Ue && 300 > M() - is ? (Qe & 2) === 0 && ei(e, 0) : pr |= a, Fl === Ue && (Fl = 0)), za(e);
   }
   function jp(e, t) {
-    t === 0 && (t = md()), e = al(e, t), e !== null && (xn(e, t), za(e));
+    t === 0 && (t = md()), e = ll(e, t), e !== null && (xn(e, t), za(e));
   }
   function lh(e) {
     var t = e.memoizedState, a = 0;
@@ -6340,12 +6340,12 @@ Error generating stack: ` + i.message + `
     var wr = nc[Nr];
     ea(wr.toLowerCase(), "on" + (wr[0].toUpperCase() + wr.slice(1)));
   }
-  ea(no, "onAnimationEnd"), ea(so, "onAnimationIteration"), ea(co, "onAnimationStart"), ea("dblclick", "onDoubleClick"), ea("focusin", "onFocus"), ea("focusout", "onBlur"), ea(N0, "onTransitionRun"), ea(w0, "onTransitionStart"), ea(z0, "onTransitionCancel"), ea(ro, "onTransitionEnd"), _l("onMouseEnter", ["mouseout", "mouseover"]), _l("onMouseLeave", ["mouseout", "mouseover"]), _l("onPointerEnter", ["pointerout", "pointerover"]), _l("onPointerLeave", ["pointerout", "pointerover"]), Fa("onChange", "change click focusin focusout input keydown keyup selectionchange".split(" ")), Fa("onSelect", "focusout contextmenu dragend focusin keydown keyup mousedown mouseup selectionchange".split(" ")), Fa("onBeforeInput", [
+  ea(no, "onAnimationEnd"), ea(so, "onAnimationIteration"), ea(co, "onAnimationStart"), ea("dblclick", "onDoubleClick"), ea("focusin", "onFocus"), ea("focusout", "onBlur"), ea(N0, "onTransitionRun"), ea(w0, "onTransitionStart"), ea(z0, "onTransitionCancel"), ea(ro, "onTransitionEnd"), _l("onMouseEnter", ["mouseout", "mouseover"]), _l("onMouseLeave", ["mouseout", "mouseover"]), _l("onPointerEnter", ["pointerout", "pointerover"]), _l("onPointerLeave", ["pointerout", "pointerover"]), Pa("onChange", "change click focusin focusout input keydown keyup selectionchange".split(" ")), Pa("onSelect", "focusout contextmenu dragend focusin keydown keyup mousedown mouseup selectionchange".split(" ")), Pa("onBeforeInput", [
     "compositionend",
     "keypress",
     "textInput",
     "paste"
-  ]), Fa("onCompositionEnd", "compositionend focusout keydown keypress keyup mousedown".split(" ")), Fa("onCompositionStart", "compositionstart focusout keydown keypress keyup mousedown".split(" ")), Fa("onCompositionUpdate", "compositionupdate focusout keydown keypress keyup mousedown".split(" "));
+  ]), Pa("onCompositionEnd", "compositionend focusout keydown keypress keyup mousedown".split(" ")), Pa("onCompositionStart", "compositionstart focusout keydown keypress keyup mousedown".split(" ")), Pa("onCompositionUpdate", "compositionupdate focusout keydown keypress keyup mousedown".split(" "));
   var Ii = "abort canplay canplaythrough durationchange emptied encrypted ended error loadeddata loadedmetadata loadstart pause play playing progress ratechange resize seeked seeking stalled suspend timeupdate volumechange waiting".split(" "), dh = new Set("beforetoggle cancel close invalid load scroll scrollend toggle".split(" ").concat(Ii));
   function _p(e, t) {
     t = (t & 4) !== 0;
@@ -6360,8 +6360,8 @@ Error generating stack: ` + i.message + `
           s = u, n.currentTarget = D;
           try {
             s(n);
-          } catch (G) {
-            _n(G);
+          } catch (V) {
+            _n(V);
           }
           n.currentTarget = null, s = v;
         }
@@ -6370,8 +6370,8 @@ Error generating stack: ` + i.message + `
           s = u, n.currentTarget = D;
           try {
             s(n);
-          } catch (G) {
-            _n(G);
+          } catch (V) {
+            _n(V);
           }
           n.currentTarget = null, s = v;
         }
@@ -6439,27 +6439,27 @@ Error generating stack: ` + i.message + `
       i = i.return;
     }
     Ud(function() {
-      var D = s, G = Qs(a), J = [];
+      var D = s, V = Qs(a), J = [];
       e: {
         var U = oo.get(e);
         if (U !== void 0) {
-          var R = wn, pe = e;
+          var L = wn, fe = e;
           switch (e) {
             case "keypress":
               if (Sn(a) === 0) break e;
             case "keydown":
             case "keyup":
-              R = s0;
+              L = s0;
               break;
             case "focusin":
-              pe = "focus", R = $s;
+              fe = "focus", L = $s;
               break;
             case "focusout":
-              pe = "blur", R = $s;
+              fe = "blur", L = $s;
               break;
             case "beforeblur":
             case "afterblur":
-              R = $s;
+              L = $s;
               break;
             case "click":
               if (a.button === 2) break e;
@@ -6471,7 +6471,7 @@ Error generating stack: ` + i.message + `
             case "mouseout":
             case "mouseover":
             case "contextmenu":
-              R = qd;
+              L = qd;
               break;
             case "drag":
             case "dragend":
@@ -6481,33 +6481,33 @@ Error generating stack: ` + i.message + `
             case "dragover":
             case "dragstart":
             case "drop":
-              R = Pf;
+              L = Pf;
               break;
             case "touchcancel":
             case "touchend":
             case "touchmove":
             case "touchstart":
-              R = c0;
+              L = c0;
               break;
             case no:
             case so:
             case co:
-              R = e0;
+              L = e0;
               break;
             case ro:
-              R = r0;
+              L = r0;
               break;
             case "scroll":
             case "scrollend":
-              R = Ff;
+              L = Ff;
               break;
             case "wheel":
-              R = d0;
+              L = d0;
               break;
             case "copy":
             case "cut":
             case "paste":
-              R = t0;
+              L = t0;
               break;
             case "gotpointercapture":
             case "lostpointercapture":
@@ -6517,20 +6517,20 @@ Error generating stack: ` + i.message + `
             case "pointerout":
             case "pointerover":
             case "pointerup":
-              R = Bd;
+              L = Bd;
               break;
             case "toggle":
             case "beforetoggle":
-              R = o0;
+              L = o0;
           }
-          var Ne = (t & 4) !== 0, We = !Ne && (e === "scroll" || e === "scrollend"), C = Ne ? U !== null ? U + "Capture" : null : U;
+          var Ne = (t & 4) !== 0, We = !Ne && (e === "scroll" || e === "scrollend"), E = Ne ? U !== null ? U + "Capture" : null : U;
           Ne = [];
-          for (var y = D, O; y !== null; ) {
-            var X = y;
-            if (O = X.stateNode, X = X.tag, X !== 5 && X !== 26 && X !== 27 || O === null || C === null || (X = gi(y, C), X != null && Ne.push($i(y, X, O))), We) break;
-            y = y.return;
+          for (var S = D, O; S !== null; ) {
+            var Z = S;
+            if (O = Z.stateNode, Z = Z.tag, Z !== 5 && Z !== 26 && Z !== 27 || O === null || E === null || (Z = gi(S, E), Z != null && Ne.push($i(S, Z, O))), We) break;
+            S = S.return;
           }
-          0 < Ne.length && (U = new R(U, pe, null, a, G), J.push({
+          0 < Ne.length && (U = new L(U, fe, null, a, V), J.push({
             event: U,
             listeners: Ne
           }));
@@ -6538,44 +6538,44 @@ Error generating stack: ` + i.message + `
       }
       if ((t & 7) === 0) {
         e: {
-          if (U = e === "mouseover" || e === "pointerover", R = e === "mouseout" || e === "pointerout", U && a !== Vs && (pe = a.relatedTarget || a.fromElement) && (wl(pe) || pe[hi])) break e;
-          if ((R || U) && (U = G.window === G ? G : (U = G.ownerDocument) ? U.defaultView || U.parentWindow : window, R ? (pe = a.relatedTarget || a.toElement, R = D, pe = pe ? wl(pe) : null, pe !== null && (We = x(pe), Ne = pe.tag, pe !== We || Ne !== 5 && Ne !== 27 && Ne !== 6) && (pe = null)) : (R = null, pe = D), R !== pe)) {
-            if (Ne = qd, X = "onMouseLeave", C = "onMouseEnter", y = "mouse", (e === "pointerout" || e === "pointerover") && (Ne = Bd, X = "onPointerLeave", C = "onPointerEnter", y = "pointer"), We = R == null ? U : xi(R), O = pe == null ? U : xi(pe), U = new Ne(X, y + "leave", R, a, G), U.target = We, U.relatedTarget = O, X = null, wl(G) === D && (Ne = new Ne(C, y + "enter", pe, a, G), Ne.target = O, Ne.relatedTarget = We, X = Ne), We = X, R && pe) t: {
-              for (Ne = oh, C = R, y = pe, O = 0, X = C; X; X = Ne(X)) O++;
-              X = 0;
-              for (var be = y; be; be = Ne(be)) X++;
-              for (; 0 < O - X; ) C = Ne(C), O--;
-              for (; 0 < X - O; ) y = Ne(y), X--;
+          if (U = e === "mouseover" || e === "pointerover", L = e === "mouseout" || e === "pointerout", U && a !== Vs && (fe = a.relatedTarget || a.fromElement) && (wl(fe) || fe[hi])) break e;
+          if ((L || U) && (U = V.window === V ? V : (U = V.ownerDocument) ? U.defaultView || U.parentWindow : window, L ? (fe = a.relatedTarget || a.toElement, L = D, fe = fe ? wl(fe) : null, fe !== null && (We = x(fe), Ne = fe.tag, fe !== We || Ne !== 5 && Ne !== 27 && Ne !== 6) && (fe = null)) : (L = null, fe = D), L !== fe)) {
+            if (Ne = qd, Z = "onMouseLeave", E = "onMouseEnter", S = "mouse", (e === "pointerout" || e === "pointerover") && (Ne = Bd, Z = "onPointerLeave", E = "onPointerEnter", S = "pointer"), We = L == null ? U : xi(L), O = fe == null ? U : xi(fe), U = new Ne(Z, S + "leave", L, a, V), U.target = We, U.relatedTarget = O, Z = null, wl(V) === D && (Ne = new Ne(E, S + "enter", fe, a, V), Ne.target = O, Ne.relatedTarget = We, Z = Ne), We = Z, L && fe) t: {
+              for (Ne = oh, E = L, S = fe, O = 0, Z = E; Z; Z = Ne(Z)) O++;
+              Z = 0;
+              for (var be = S; be; be = Ne(be)) Z++;
+              for (; 0 < O - Z; ) E = Ne(E), O--;
+              for (; 0 < Z - O; ) S = Ne(S), Z--;
               for (; O--; ) {
-                if (C === y || y !== null && C === y.alternate) {
-                  Ne = C;
+                if (E === S || S !== null && E === S.alternate) {
+                  Ne = E;
                   break t;
                 }
-                C = Ne(C), y = Ne(y);
+                E = Ne(E), S = Ne(S);
               }
               Ne = null;
             }
             else Ne = null;
-            R !== null && Ap(J, U, R, Ne, !1), pe !== null && We !== null && Ap(J, We, pe, Ne, !0);
+            L !== null && Ap(J, U, L, Ne, !1), fe !== null && We !== null && Ap(J, We, fe, Ne, !0);
           }
         }
         e: {
-          if (U = D ? xi(D) : window, R = U.nodeName && U.nodeName.toLowerCase(), R === "select" || R === "input" && U.type === "file") var Ye = Jd;
+          if (U = D ? xi(D) : window, L = U.nodeName && U.nodeName.toLowerCase(), L === "select" || L === "input" && U.type === "file") var Ye = Jd;
           else if (Zd(U)) if (Id) Ye = j0;
           else {
             Ye = b0;
-            var me = g0;
+            var xe = g0;
           }
-          else R = U.nodeName, !R || R.toLowerCase() !== "input" || U.type !== "checkbox" && U.type !== "radio" ? D && Ys(D.elementType) && (Ye = Jd) : Ye = v0;
+          else L = U.nodeName, !L || L.toLowerCase() !== "input" || U.type !== "checkbox" && U.type !== "radio" ? D && Ys(D.elementType) && (Ye = Jd) : Ye = v0;
           if (Ye && (Ye = Ye(e, D))) {
-            Kd(J, Ye, a, G);
+            Kd(J, Ye, a, V);
             break e;
           }
-          me && me(e, U, D), e === "focusout" && D && U.type === "number" && D.memoizedProps.value != null && Gs(U, "number", U.value);
+          xe && xe(e, U, D), e === "focusout" && D && U.type === "number" && D.memoizedProps.value != null && Gs(U, "number", U.value);
         }
-        switch (me = D ? xi(D) : window, e) {
+        switch (xe = D ? xi(D) : window, e) {
           case "focusin":
-            (Zd(me) || me.contentEditable === "true") && (Ol = me, ac = D, zi = null);
+            (Zd(xe) || xe.contentEditable === "true") && (Ol = xe, ac = D, zi = null);
             break;
           case "focusout":
             zi = ac = Ol = null;
@@ -6586,13 +6586,13 @@ Error generating stack: ` + i.message + `
           case "contextmenu":
           case "mouseup":
           case "dragend":
-            lc = !1, lo(J, a, G);
+            lc = !1, lo(J, a, V);
             break;
           case "selectionchange":
             if (S0) break;
           case "keydown":
           case "keyup":
-            lo(J, a, G);
+            lo(J, a, V);
         }
         var Te;
         if (Fs) e: {
@@ -6610,13 +6610,13 @@ Error generating stack: ` + i.message + `
           Re = void 0;
         }
         else Ml ? Qd(e, a) && (Re = "onCompositionEnd") : e === "keydown" && a.keyCode === 229 && (Re = "onCompositionStart");
-        Re && (Gd && a.locale !== "ko" && (Ml || Re !== "onCompositionStart" ? Re === "onCompositionEnd" && Ml && (Te = Rd()) : (Ea = G, Ks = "value" in Ea ? Ea.value : Ea.textContent, Ml = !0)), me = hs(D, Re), 0 < me.length && (Re = new Hd(Re, e, null, a, G), J.push({
+        Re && (Gd && a.locale !== "ko" && (Ml || Re !== "onCompositionStart" ? Re === "onCompositionEnd" && Ml && (Te = Rd()) : (Ea = V, Ks = "value" in Ea ? Ea.value : Ea.textContent, Ml = !0)), xe = hs(D, Re), 0 < xe.length && (Re = new Hd(Re, e, null, a, V), J.push({
           event: Re,
-          listeners: me
-        }), Te ? Re.data = Te : (Te = Xd(a), Te !== null && (Re.data = Te)))), (Te = p0 ? f0(e, a) : h0(e, a)) && (Re = hs(D, "onBeforeInput"), 0 < Re.length && (me = new Hd("onBeforeInput", "beforeinput", null, a, G), J.push({
-          event: me,
+          listeners: xe
+        }), Te ? Re.data = Te : (Te = Xd(a), Te !== null && (Re.data = Te)))), (Te = p0 ? f0(e, a) : h0(e, a)) && (Re = hs(D, "onBeforeInput"), 0 < Re.length && (xe = new Hd("onBeforeInput", "beforeinput", null, a, V), J.push({
+          event: xe,
           listeners: Re
-        }), me.data = Te)), rh(J, e, D, a, G);
+        }), xe.data = Te)), rh(J, e, D, a, V);
       }
       _p(J, t);
     });
@@ -6921,32 +6921,32 @@ Error generating stack: ` + i.message + `
         De("invalid", e);
         var u = s = c = n = null, v = null, D = null;
         for (i in a) if (a.hasOwnProperty(i)) {
-          var G = a[i];
-          if (G != null) switch (i) {
+          var V = a[i];
+          if (V != null) switch (i) {
             case "name":
-              n = G;
+              n = V;
               break;
             case "type":
-              c = G;
+              c = V;
               break;
             case "checked":
-              v = G;
+              v = V;
               break;
             case "defaultChecked":
-              D = G;
+              D = V;
               break;
             case "value":
-              s = G;
+              s = V;
               break;
             case "defaultValue":
-              u = G;
+              u = V;
               break;
             case "children":
             case "dangerouslySetInnerHTML":
-              if (G != null) throw Error(p(137, t));
+              if (V != null) throw Error(p(137, t));
               break;
             default:
-              $e(e, t, i, G, a, null);
+              $e(e, t, i, V, a, null);
           }
         }
         Ed(e, s, u, v, D, c, n, !1);
@@ -7032,7 +7032,7 @@ Error generating stack: ` + i.message + `
         return;
       default:
         if (Ys(t)) {
-          for (G in a) a.hasOwnProperty(G) && (i = a[G], i !== void 0 && _r(e, t, G, i, a, void 0));
+          for (V in a) a.hasOwnProperty(V) && (i = a[V], i !== void 0 && _r(e, t, V, i, a, void 0));
           return;
         }
     }
@@ -7050,10 +7050,10 @@ Error generating stack: ` + i.message + `
       case "li":
         break;
       case "input":
-        var n = null, s = null, c = null, u = null, v = null, D = null, G = null;
-        for (R in a) {
-          var J = a[R];
-          if (a.hasOwnProperty(R) && J != null) switch (R) {
+        var n = null, s = null, c = null, u = null, v = null, D = null, V = null;
+        for (L in a) {
+          var J = a[L];
+          if (a.hasOwnProperty(L) && J != null) switch (L) {
             case "checked":
               break;
             case "value":
@@ -7061,47 +7061,47 @@ Error generating stack: ` + i.message + `
             case "defaultValue":
               v = J;
             default:
-              i.hasOwnProperty(R) || $e(e, t, R, null, i, J);
+              i.hasOwnProperty(L) || $e(e, t, L, null, i, J);
           }
         }
         for (var U in i) {
-          var R = i[U];
-          if (J = a[U], i.hasOwnProperty(U) && (R != null || J != null)) switch (U) {
+          var L = i[U];
+          if (J = a[U], i.hasOwnProperty(U) && (L != null || J != null)) switch (U) {
             case "type":
-              s = R;
+              s = L;
               break;
             case "name":
-              n = R;
+              n = L;
               break;
             case "checked":
-              D = R;
+              D = L;
               break;
             case "defaultChecked":
-              G = R;
+              V = L;
               break;
             case "value":
-              c = R;
+              c = L;
               break;
             case "defaultValue":
-              u = R;
+              u = L;
               break;
             case "children":
             case "dangerouslySetInnerHTML":
-              if (R != null) throw Error(p(137, t));
+              if (L != null) throw Error(p(137, t));
               break;
             default:
-              R !== J && $e(e, t, U, R, i, J);
+              L !== J && $e(e, t, U, L, i, J);
           }
         }
-        Bs(e, c, u, v, D, G, s, n);
+        Bs(e, c, u, v, D, V, s, n);
         return;
       case "select":
-        R = c = u = U = null;
+        L = c = u = U = null;
         for (s in a) if (v = a[s], a.hasOwnProperty(s) && v != null) switch (s) {
           case "value":
             break;
           case "multiple":
-            R = v;
+            L = v;
           default:
             i.hasOwnProperty(s) || $e(e, t, s, null, i, v);
         }
@@ -7117,10 +7117,10 @@ Error generating stack: ` + i.message + `
           default:
             s !== v && $e(e, t, n, s, i, v);
         }
-        t = u, a = c, i = R, U != null ? Cl(e, !!a, U, !1) : !!i != !!a && (t != null ? Cl(e, !!a, t, !0) : Cl(e, !!a, a ? [] : "", !1));
+        t = u, a = c, i = L, U != null ? Cl(e, !!a, U, !1) : !!i != !!a && (t != null ? Cl(e, !!a, t, !0) : Cl(e, !!a, a ? [] : "", !1));
         return;
       case "textarea":
-        R = U = null;
+        L = U = null;
         for (u in a) if (n = a[u], a.hasOwnProperty(u) && n != null && !i.hasOwnProperty(u)) switch (u) {
           case "value":
             break;
@@ -7134,7 +7134,7 @@ Error generating stack: ` + i.message + `
             U = n;
             break;
           case "defaultValue":
-            R = n;
+            L = n;
             break;
           case "children":
             break;
@@ -7144,11 +7144,11 @@ Error generating stack: ` + i.message + `
           default:
             n !== s && $e(e, t, c, n, i, s);
         }
-        Ad(e, U, R);
+        Ad(e, U, L);
         return;
       case "option":
-        for (var pe in a) U = a[pe], a.hasOwnProperty(pe) && U != null && !i.hasOwnProperty(pe) && (pe === "selected" ? e.selected = !1 : $e(e, t, pe, null, i, U));
-        for (v in i) U = i[v], R = a[v], i.hasOwnProperty(v) && U !== R && (U != null || R != null) && (v === "selected" ? e.selected = U && typeof U != "function" && typeof U != "symbol" : $e(e, t, v, U, i, R));
+        for (var fe in a) U = a[fe], a.hasOwnProperty(fe) && U != null && !i.hasOwnProperty(fe) && (fe === "selected" ? e.selected = !1 : $e(e, t, fe, null, i, U));
+        for (v in i) U = i[v], L = a[v], i.hasOwnProperty(v) && U !== L && (U != null || L != null) && (v === "selected" ? e.selected = U && typeof U != "function" && typeof U != "symbol" : $e(e, t, v, U, i, L));
         return;
       case "img":
       case "link":
@@ -7166,24 +7166,24 @@ Error generating stack: ` + i.message + `
       case "wbr":
       case "menuitem":
         for (var Ne in a) U = a[Ne], a.hasOwnProperty(Ne) && U != null && !i.hasOwnProperty(Ne) && $e(e, t, Ne, null, i, U);
-        for (D in i) if (U = i[D], R = a[D], i.hasOwnProperty(D) && U !== R && (U != null || R != null)) switch (D) {
+        for (D in i) if (U = i[D], L = a[D], i.hasOwnProperty(D) && U !== L && (U != null || L != null)) switch (D) {
           case "children":
           case "dangerouslySetInnerHTML":
             if (U != null) throw Error(p(137, t));
             break;
           default:
-            $e(e, t, D, U, i, R);
+            $e(e, t, D, U, i, L);
         }
         return;
       default:
         if (Ys(t)) {
           for (var We in a) U = a[We], a.hasOwnProperty(We) && U !== void 0 && !i.hasOwnProperty(We) && _r(e, t, We, void 0, i, U);
-          for (G in i) U = i[G], R = a[G], !i.hasOwnProperty(G) || U === R || U === void 0 && R === void 0 || _r(e, t, G, U, i, R);
+          for (V in i) U = i[V], L = a[V], !i.hasOwnProperty(V) || U === L || U === void 0 && L === void 0 || _r(e, t, V, U, i, L);
           return;
         }
     }
-    for (var C in a) U = a[C], a.hasOwnProperty(C) && U != null && !i.hasOwnProperty(C) && $e(e, t, C, null, i, U);
-    for (J in i) U = i[J], R = a[J], !i.hasOwnProperty(J) || U === R || U == null && R == null || $e(e, t, J, U, i, R);
+    for (var E in a) U = a[E], a.hasOwnProperty(E) && U != null && !i.hasOwnProperty(E) && $e(e, t, E, null, i, U);
+    for (J in i) U = i[J], L = a[J], !i.hasOwnProperty(J) || U === L || U == null && L == null || $e(e, t, J, U, i, L);
   }
   function Op(e) {
     switch (e) {
@@ -7207,8 +7207,8 @@ Error generating stack: ` + i.message + `
           for (c = 0, u = n.responseEnd, i += 1; i < a.length; i++) {
             var v = a[i], D = v.startTime;
             if (D > u) break;
-            var G = v.transferSize, J = v.initiatorType;
-            G && Op(J) && (v = v.responseEnd, c += G * (v < u ? 1 : (u - D) / (v - D)));
+            var V = v.transferSize, J = v.initiatorType;
+            V && Op(J) && (v = v.responseEnd, c += V * (v < u ? 1 : (u - D) / (v - D)));
           }
           if (--i, t += 8 * (s + c) / (n.duration / 1e3), e++, 10 < e) break;
         }
@@ -7437,8 +7437,8 @@ Error generating stack: ` + i.message + `
   function xs(e) {
     return typeof e.getRootNode == "function" ? e.getRootNode() : e.nodeType === 9 ? e : e.ownerDocument;
   }
-  var ka = Y.d;
-  Y.d = {
+  var ka = Q.d;
+  Q.d = {
     f: Sh,
     r: Nh,
     D: wh,
@@ -7489,7 +7489,7 @@ Error generating stack: ` + i.message + `
         case "script":
           s = ni(e);
       }
-      Wt.has(s) || (e = N({
+      Wt.has(s) || (e = z({
         rel: "preload",
         href: t === "image" && a && a.imageSrcSet ? void 0 : e,
         as: t
@@ -7510,7 +7510,7 @@ Error generating stack: ` + i.message + `
         case "script":
           s = ni(e);
       }
-      if (!Wt.has(s) && (e = N({
+      if (!Wt.has(s) && (e = z({
         rel: "modulepreload",
         href: e
       }, t), Wt.set(s, e), a.querySelector(n) === null)) {
@@ -7541,14 +7541,14 @@ Error generating stack: ` + i.message + `
         };
         if (c = i.querySelector(Fi(s))) u.loading = 5;
         else {
-          e = N({
+          e = z({
             rel: "stylesheet",
             href: e,
             "data-precedence": t
           }, a), (a = Wt.get(s)) && Rr(e, a);
           var v = c = i.createElement("link");
-          xt(v), Nt(v, "link", e), v._p = new Promise(function(D, G) {
-            v.onload = D, v.onerror = G;
+          xt(v), Nt(v, "link", e), v._p = new Promise(function(D, V) {
+            v.onload = D, v.onerror = V;
           }), v.addEventListener("load", function() {
             u.loading |= 1;
           }), v.addEventListener("error", function() {
@@ -7569,7 +7569,7 @@ Error generating stack: ` + i.message + `
     var a = li;
     if (a && e) {
       var i = kl(a).hoistableScripts, n = ni(e), s = i.get(n);
-      s || (s = a.querySelector(Pi(n)), s || (e = N({
+      s || (s = a.querySelector(Pi(n)), s || (e = z({
         src: e,
         async: !0
       }, t), (t = Wt.get(n)) && Lr(e, t), s = a.createElement("script"), xt(s), Nt(s, "link", e), a.head.appendChild(s)), s = {
@@ -7585,7 +7585,7 @@ Error generating stack: ` + i.message + `
     var a = li;
     if (a && e) {
       var i = kl(a).hoistableScripts, n = ni(e), s = i.get(n);
-      s || (s = a.querySelector(Pi(n)), s || (e = N({
+      s || (s = a.querySelector(Pi(n)), s || (e = z({
         src: e,
         async: !0,
         type: "module"
@@ -7598,7 +7598,7 @@ Error generating stack: ` + i.message + `
     }
   }
   function Zp(e, t, a, i) {
-    var n = (n = fe.current) ? xs(n) : null;
+    var n = (n = he.current) ? xs(n) : null;
     if (!n) throw Error(p(446));
     switch (e) {
       case "meta":
@@ -7665,7 +7665,7 @@ Error generating stack: ` + i.message + `
     return 'link[rel="stylesheet"][' + e + "]";
   }
   function Kp(e) {
-    return N({}, e, {
+    return z({}, e, {
       "data-precedence": e.precedence,
       precedence: null
     });
@@ -7688,7 +7688,7 @@ Error generating stack: ` + i.message + `
       case "style":
         var i = e.querySelector('style[data-href~="' + Yt(a.href) + '"]');
         if (i) return t.instance = i, xt(i), i;
-        var n = N({}, a, {
+        var n = z({}, a, {
           "data-href": a.href,
           "data-precedence": a.precedence,
           href: null,
@@ -7705,7 +7705,7 @@ Error generating stack: ` + i.message + `
           c.onload = u, c.onerror = v;
         }), Nt(s, "link", i), t.state.loading |= 4, gs(s, a.precedence, e), t.instance = s;
       case "script":
-        return s = ni(a.src), (n = e.querySelector(Pi(s))) ? (t.instance = n, xt(n), n) : (i = a, (n = Wt.get(s)) && (i = N({}, a), Lr(i, n)), e = e.ownerDocument || e, n = e.createElement("script"), xt(n), Nt(n, "link", i), e.head.appendChild(n), t.instance = n);
+        return s = ni(a.src), (n = e.querySelector(Pi(s))) ? (t.instance = n, xt(n), n) : (i = a, (n = Wt.get(s)) && (i = z({}, a), Lr(i, n)), e = e.ownerDocument || e, n = e.createElement("script"), xt(n), Nt(n, "link", i), e.head.appendChild(n), t.instance = n);
       case "void":
         return null;
       default:
@@ -7836,7 +7836,7 @@ Error generating stack: ` + i.message + `
     }
   }
   var en = {
-    $$typeof: V,
+    $$typeof: H,
     Provider: null,
     Consumer: null,
     _currentValue: se,
@@ -7846,8 +7846,8 @@ Error generating stack: ` + i.message + `
   function Rh(e, t, a, i, n, s, c, u, v) {
     this.tag = 1, this.containerInfo = e, this.pingCache = this.current = this.pendingChildren = null, this.timeoutHandle = -1, this.callbackNode = this.next = this.pendingContext = this.context = this.cancelPendingCommit = null, this.callbackPriority = 0, this.expirationTimes = Us(-1), this.entangledLanes = this.shellSuspendCounter = this.errorRecoveryDisabledLanes = this.expiredLanes = this.warmLanes = this.pingedLanes = this.suspendedLanes = this.pendingLanes = 0, this.entanglements = Us(0), this.hiddenUpdates = Us(null), this.identifierPrefix = i, this.onUncaughtError = n, this.onCaughtError = s, this.onRecoverableError = c, this.pooledCache = null, this.pooledCacheLanes = 0, this.formState = v, this.incompleteTransitions = /* @__PURE__ */ new Map();
   }
-  function Lh(e, t, a, i, n, s, c, u, v, D, G, J) {
-    return e = new Rh(e, t, a, c, v, D, G, J, u), t = 1, s === !0 && (t |= 24), s = Rt(3, null, null, t), e.current = s, s.stateNode = e, t = bc(), t.refCount++, e.pooledCache = t, t.refCount++, s.memoizedState = {
+  function Lh(e, t, a, i, n, s, c, u, v, D, V, J) {
+    return e = new Rh(e, t, a, c, v, D, V, J, u), t = 1, s === !0 && (t |= 24), s = Rt(3, null, null, t), e.current = s, s.stateNode = e, t = bc(), t.refCount++, e.pooledCache = t, t.refCount++, s.memoizedState = {
       element: i,
       isDehydrated: a,
       cache: t
@@ -7857,7 +7857,7 @@ Error generating stack: ` + i.message + `
     return e ? (e = Rl, e) : Rl;
   }
   function Fp(e, t, a, i, n, s) {
-    n = qh(n), i.context === null ? i.context = n : i.pendingContext = n, i = ul(t), i.payload = { element: a }, s = s === void 0 ? null : s, s !== null && (i.callback = s), a = pl(e, i, t), a !== null && (Ot(a, e, t), Mi(a, e, t));
+    n = qh(n), i.context === null ? i.context = n : i.pendingContext = n, i = pl(t), i.payload = { element: a }, s = s === void 0 ? null : s, s !== null && (i.callback = s), a = fl(e, i, t), a !== null && (Ot(a, e, t), Mi(a, e, t));
   }
   function Pp(e, t) {
     if (e = e.memoizedState, e !== null && e.dehydrated !== null) {
@@ -7870,7 +7870,7 @@ Error generating stack: ` + i.message + `
   }
   function ef(e) {
     if (e.tag === 13 || e.tag === 31) {
-      var t = al(e, 67108864);
+      var t = ll(e, 67108864);
       t !== null && Ot(t, e, 67108864), Hr(e, 67108864);
     }
   }
@@ -7878,29 +7878,29 @@ Error generating stack: ` + i.message + `
     if (e.tag === 13 || e.tag === 31) {
       var t = It();
       t = vd(t);
-      var a = al(e, t);
+      var a = ll(e, t);
       a !== null && Ot(a, e, t), Hr(e, t);
     }
   }
   var Ss = !0;
   function Hh(e, t, a, i) {
-    var n = B.T;
-    B.T = null;
-    var s = Y.p;
+    var n = Y.T;
+    Y.T = null;
+    var s = Q.p;
     try {
-      Y.p = 2, Br(e, t, a, i);
+      Q.p = 2, Br(e, t, a, i);
     } finally {
-      Y.p = s, B.T = n;
+      Q.p = s, Y.T = n;
     }
   }
   function Bh(e, t, a, i) {
-    var n = B.T;
-    B.T = null;
-    var s = Y.p;
+    var n = Y.T;
+    Y.T = null;
+    var s = Q.p;
     try {
-      Y.p = 8, Br(e, t, a, i);
+      Q.p = 8, Br(e, t, a, i);
     } finally {
-      Y.p = s, B.T = n;
+      Q.p = s, Y.T = n;
     }
   }
   function Br(e, t, a, i) {
@@ -7914,7 +7914,7 @@ Error generating stack: ` + i.message + `
           if (s !== null) switch (s.tag) {
             case 3:
               if (s = s.stateNode, s.current.memoizedState.isDehydrated) {
-                var c = Wa(s.pendingLanes);
+                var c = Fa(s.pendingLanes);
                 if (c !== 0) {
                   var u = s;
                   for (u.pendingLanes |= 2, u.entangledLanes |= 2; c; ) {
@@ -7927,7 +7927,7 @@ Error generating stack: ` + i.message + `
               break;
             case 31:
             case 13:
-              u = al(s, 2), u !== null && Ot(u, s, 2), cs(), Hr(s, 2);
+              u = ll(s, 2), u !== null && Ot(u, s, 2), cs(), Hr(s, 2);
           }
           if (s = Gr(i), s === null && kr(e, t, i, Ns, a), s === n) break;
           n = s;
@@ -7950,7 +7950,7 @@ Error generating stack: ` + i.message + `
           if (e = A(t), e !== null) return e;
           e = null;
         } else if (a === 31) {
-          if (e = z(t), e !== null) return e;
+          if (e = N(t), e !== null) return e;
           e = null;
         } else if (a === 3) {
           if (t.stateNode.current.memoizedState.isDehydrated) return t.tag === 3 ? t.stateNode.containerInfo : null;
@@ -8115,7 +8115,7 @@ Error generating stack: ` + i.message + `
             return;
           }
         } else if (t === 31) {
-          if (t = z(a), t !== null) {
+          if (t = N(a), t !== null) {
             e.blockedOn = t, yd(e.priority, function() {
               tf(a);
             });
@@ -8257,19 +8257,19 @@ Error generating stack: ` + i.message + `
       Ja.splice(a, 0, e), a === 0 && nf(e);
     }
   };
-  var rf = k.version;
+  var rf = C.version;
   if (rf !== "19.2.6") throw Error(p(527, rf, "19.2.6"));
-  Y.findDOMNode = function(e) {
+  Q.findDOMNode = function(e) {
     var t = e._reactInternals;
     if (t === void 0)
       throw typeof e.render == "function" ? Error(p(188)) : (e = Object.keys(e).join(","), Error(p(268, e)));
-    return e = S(t), e = e !== null ? K(e) : null, e = e === null ? null : e.stateNode, e;
+    return e = w(t), e = e !== null ? G(e) : null, e = e === null ? null : e.stateNode, e;
   };
   var Xh = {
     bundleType: 0,
     version: "19.2.6",
     rendererPackageName: "react-dom",
-    currentDispatcherRef: B,
+    currentDispatcherRef: Y,
     reconcilerVersion: "19.2.6"
   };
   if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ < "u") {
@@ -8280,21 +8280,21 @@ Error generating stack: ` + i.message + `
     }
   }
   r.createRoot = function(e, t) {
-    if (!w(e)) throw Error(p(299));
+    if (!k(e)) throw Error(p(299));
     var a = !1, i = "", n = B0, s = G0, c = Y0;
     return t != null && (t.unstable_strictMode === !0 && (a = !0), t.identifierPrefix !== void 0 && (i = t.identifierPrefix), t.onUncaughtError !== void 0 && (n = t.onUncaughtError), t.onCaughtError !== void 0 && (s = t.onCaughtError), t.onRecoverableError !== void 0 && (c = t.onRecoverableError)), t = Lh(e, 1, !1, null, null, a, i, null, n, s, c, Qh), e[hi] = t.current, Cp(e), new Qr(t);
   };
 })), Ph = /* @__PURE__ */ ca(((r, h) => {
-  function k() {
+  function C() {
     if (!(typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ > "u" || typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE != "function"))
       try {
-        __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(k);
+        __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE(C);
       } catch (f) {
         console.error(f);
       }
   }
-  k(), h.exports = Fh();
-})), Ef = (...r) => r.filter((h, k, f) => !!h && h.trim() !== "" && f.indexOf(h) === k).join(" ").trim(), em = (r) => r.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase(), tm = (r) => r.replace(/^([A-Z])|[\s-_]+(\w)/g, (h, k, f) => f ? f.toUpperCase() : k.toLowerCase()), df = (r) => {
+  C(), h.exports = Fh();
+})), Ef = (...r) => r.filter((h, C, f) => !!h && h.trim() !== "" && f.indexOf(h) === C).join(" ").trim(), em = (r) => r.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase(), tm = (r) => r.replace(/^([A-Z])|[\s-_]+(\w)/g, (h, C, f) => f ? f.toUpperCase() : C.toLowerCase()), df = (r) => {
   const h = tm(r);
   return h.charAt(0).toUpperCase() + h.slice(1);
 }, Zr = {
@@ -8310,27 +8310,27 @@ Error generating stack: ` + i.message + `
 }, am = (r) => {
   for (const h in r) if (h.startsWith("aria-") || h === "role" || h === "title") return !0;
   return !1;
-}, g = ud(), lm = (0, g.createContext)({}), im = () => (0, g.useContext)(lm), nm = (0, g.forwardRef)(({ color: r, size: h, strokeWidth: k, absoluteStrokeWidth: f, className: p = "", children: w, iconNode: x, ...A }, z) => {
-  const { size: E = 24, strokeWidth: S = 2, absoluteStrokeWidth: K = !1, color: N = "currentColor", className: le = "" } = im() ?? {}, ne = f ?? K ? Number(k ?? S) * 24 / Number(h ?? E) : k ?? S;
+}, g = ud(), lm = (0, g.createContext)({}), im = () => (0, g.useContext)(lm), nm = (0, g.forwardRef)(({ color: r, size: h, strokeWidth: C, absoluteStrokeWidth: f, className: p = "", children: k, iconNode: x, ...A }, N) => {
+  const { size: _ = 24, strokeWidth: w = 2, absoluteStrokeWidth: G = !1, color: z = "currentColor", className: le = "" } = im() ?? {}, ne = f ?? G ? Number(C ?? w) * 24 / Number(h ?? _) : C ?? w;
   return (0, g.createElement)("svg", {
-    ref: z,
+    ref: N,
     ...Zr,
-    width: h ?? E ?? Zr.width,
-    height: h ?? E ?? Zr.height,
-    stroke: r ?? N,
+    width: h ?? _ ?? Zr.width,
+    height: h ?? _ ?? Zr.height,
+    stroke: r ?? z,
     strokeWidth: ne,
     className: Ef("lucide", le, p),
-    ...!w && !am(A) && { "aria-hidden": "true" },
+    ...!k && !am(A) && { "aria-hidden": "true" },
     ...A
-  }, [...x.map(([I, Q]) => (0, g.createElement)(I, Q)), ...Array.isArray(w) ? w : [w]]);
+  }, [...x.map(([I, X]) => (0, g.createElement)(I, X)), ...Array.isArray(k) ? k : [k]]);
 }), Ae = (r, h) => {
-  const k = (0, g.forwardRef)(({ className: f, ...p }, w) => (0, g.createElement)(nm, {
-    ref: w,
+  const C = (0, g.forwardRef)(({ className: f, ...p }, k) => (0, g.createElement)(nm, {
+    ref: k,
     iconNode: h,
     className: Ef(`lucide-${em(df(r))}`, `lucide-${r}`, f),
     ...p
   }));
-  return k.displayName = df(r), k;
+  return C.displayName = df(r), C;
 }, sm = [
   ["rect", {
     width: "20",
@@ -8540,7 +8540,7 @@ Error generating stack: ` + i.message + `
     d: "m14 20 2 2 4-4",
     key: "15kota"
   }]
-], vl = Ae("file-check-corner", Em), Am = [
+], jl = Ae("file-check-corner", Em), Am = [
   ["path", {
     d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z",
     key: "1oefj6"
@@ -8830,7 +8830,7 @@ Error generating stack: ` + i.message + `
     d: "M8 16H3v5",
     key: "1cv678"
   }]
-], Nl = Ae("refresh-cw", Pm), ex = [["path", {
+], Wa = Ae("refresh-cw", Pm), ex = [["path", {
   d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8",
   key: "1357e3"
 }], ["path", {
@@ -8850,7 +8850,7 @@ Error generating stack: ` + i.message + `
 }], ["path", {
   d: "m9 12 2 2 4-4",
   key: "dzmm74"
-}]], bl = Ae("shield-check", ax), lx = [
+}]], vl = Ae("shield-check", ax), lx = [
   ["path", {
     d: "M10 11v6",
     key: "nco0om"
@@ -8871,7 +8871,7 @@ Error generating stack: ` + i.message + `
     d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2",
     key: "e791ji"
   }]
-], jl = Ae("trash-2", lx), ix = [
+], yl = Ae("trash-2", lx), ix = [
   ["path", {
     d: "M12 3v12",
     key: "1x0j5s"
@@ -8890,7 +8890,7 @@ Error generating stack: ` + i.message + `
 }], ["path", {
   d: "m6 6 12 12",
   key: "d8bk6v"
-}]], yl = Ae("x", sx), cx = Ph(), _a = [
+}]], Sl = Ae("x", sx), cx = Ph(), _a = [
   {
     id: "M01",
     title: "原檔盤點與備份",
@@ -8988,18 +8988,18 @@ function Os(r) {
     history: []
   };
 }
-function dx(r, h, k) {
-  const f = Os(r).models.find((w) => w.id === h || w.key === h);
+function dx(r, h, C) {
+  const f = Os(r).models.find((k) => k.id === h || k.key === h);
   f || hf("找不到模型");
-  const p = f.versions.find((w) => w.id === k);
+  const p = f.versions.find((k) => k.id === C);
   return p || hf("找不到指定模型版本"), {
     m: f,
     v: p
   };
 }
-function ox(r, h, k, f) {
-  const { v: p } = dx(r, h, k), w = p.stages[f], x = _a.findIndex((z) => z.id === f), A = [];
-  return x > 0 && !p.stages[_a[x - 1].id].author && A.push("先核定 " + _a[x - 1].title), w.checks.every(Boolean) || A.push("完成本階段全部檢查"), w.evidence || A.push("填入實際產出或檢查報告位置"), (!w.summary || !w.nextStep) && A.push("填寫已做內容與接手下一步"), f === "M01" && (!p.sourceLocation || !p.sourceVersion || !p.backupLocation || !p.sha256) && A.push("補齊原檔版本、獨立備份與 SHA-256"), f === "M02" && !p.reference && A.push("補入設定及尺度來源"), x >= 3 && !p.candidateLocation && A.push("登記獨立候選 GLB"), Os(r).issues.some((z) => z.modelId === h && z.versionId === k && z.status === "open" && (z.stageId === f || x >= 6 || z.kind === "major" && x >= 3)) && A.push("處理適用的待修或待裁定問題"), A;
+function ox(r, h, C, f) {
+  const { v: p } = dx(r, h, C), k = p.stages[f], x = _a.findIndex((N) => N.id === f), A = [];
+  return x > 0 && !p.stages[_a[x - 1].id].author && A.push("先核定 " + _a[x - 1].title), k.checks.every(Boolean) || A.push("完成本階段全部檢查"), k.evidence || A.push("填入實際產出或檢查報告位置"), (!k.summary || !k.nextStep) && A.push("填寫已做內容與接手下一步"), f === "M01" && (!p.sourceLocation || !p.sourceVersion || !p.backupLocation || !p.sha256) && A.push("補齊原檔版本、獨立備份與 SHA-256"), f === "M02" && !p.reference && A.push("補入設定及尺度來源"), x >= 3 && !p.candidateLocation && A.push("登記獨立候選 GLB"), Os(r).issues.some((N) => N.modelId === h && N.versionId === C && N.status === "open" && (N.stageId === f || x >= 6 || N.kind === "major" && x >= 3)) && A.push("處理適用的待修或待裁定問題"), A;
 }
 var ux = [
   {
@@ -9188,15 +9188,15 @@ var ux = [
 ], Pt = [...ux.map((r) => ({
   ...r,
   group: "main"
-})), ...["op", "ed"].flatMap((r) => px.map((h, k) => ({
-  id: r + String(k + 1).padStart(2, "0"),
+})), ...["op", "ed"].flatMap((r) => px.map((h, C) => ({
+  id: r + String(C + 1).padStart(2, "0"),
   title: h,
   group: r,
   phase: r.toUpperCase() + " 支線",
   description: r === "op" ? "OP 以作品印象、人物關係及主題為主。" : "ED 以情緒收束及畫面變化為主。",
   output: h === "唯一音軌" ? "由作者在有效資料中指定音軌、版本與長度" : h,
-  checks: fx[k],
-  deps: k ? [r + String(k).padStart(2, "0")] : ["03"]
+  checks: fx[C],
+  deps: C ? [r + String(C).padStart(2, "0")] : ["03"]
 })))], hx = [
   "script",
   "character",
@@ -9219,9 +9219,9 @@ function mx(r) {
     episode: r.episode,
     revision: r.revision,
     workflowSchema: r.workflowSchema ?? 1,
-    genericChecks: Ds(r).map(({ id: h, title: k, checks: f }) => ({
+    genericChecks: Ds(r).map(({ id: h, title: C, checks: f }) => ({
       id: h,
-      title: k,
+      title: C,
       checks: f
     })),
     rules: pi(r.episodeRules ?? []),
@@ -9251,13 +9251,13 @@ function Ds(r) {
   return Pt.filter((h) => h.group === "main" || r.branches[h.group]);
 }
 function Ts(r, h) {
-  const k = Pt.find((f) => f.id === h);
-  if (!k) throw new Df("找不到階段");
-  return k.deps.filter((f) => Ds(r).some((p) => p.id === f) && !r.stages[f].author).map((f) => `${f} ${Pt.find((p) => p.id === f)?.title}`);
+  const C = Pt.find((f) => f.id === h);
+  if (!C) throw new Df("找不到階段");
+  return C.deps.filter((f) => Ds(r).some((p) => p.id === f) && !r.stages[f].author).map((f) => `${f} ${Pt.find((p) => p.id === f)?.title}`);
 }
 function Uf(r, h) {
-  const k = r.stages[h], f = Ts(r, h).map((w) => "先完成 " + w), p = Pt.find((w) => w.id === h).checks.length;
-  return (k.checks.length < p || !k.checks.slice(0, p).every(Boolean)) && f.push("勾選全部驗收項目"), k.evidence.trim() || f.push("填入產出連結或檔案位置"), r.issues.some((w) => w.status === "open" && w.stageId === h) && f.push("處理此階段未結問題"), Sl(r).problems.some((w) => w.status === "open" && (w.scope.type === "project" || w.scope.type === "stage" && w.scope.target === h || h === "12")) && f.push("處理適用範圍內的資訊矛盾或缺件"), h === "12" && (r.issues.some((w) => w.status === "open") && f.push("結清全部退修問題"), r.shots.some((w) => w.status !== "in_timeline") && f.push("總表中所有鏡頭須通過並入片"), r.shots.length || f.push("建立實際採用鏡頭與入片紀錄")), f;
+  const C = r.stages[h], f = Ts(r, h).map((k) => "先完成 " + k), p = Pt.find((k) => k.id === h).checks.length;
+  return (C.checks.length < p || !C.checks.slice(0, p).every(Boolean)) && f.push("勾選全部驗收項目"), C.evidence.trim() || f.push("填入產出連結或檔案位置"), r.issues.some((k) => k.status === "open" && k.stageId === h) && f.push("處理此階段未結問題"), Nl(r).problems.some((k) => k.status === "open" && (k.scope.type === "project" || k.scope.type === "stage" && k.scope.target === h || h === "12")) && f.push("處理適用範圍內的資訊矛盾或缺件"), h === "12" && (r.issues.some((k) => k.status === "open") && f.push("結清全部退修問題"), r.shots.some((k) => k.status !== "in_timeline") && f.push("總表中所有鏡頭須通過並入片"), r.shots.length || f.push("建立實際採用鏡頭與入片紀錄")), f;
 }
 function rd(r) {
   const h = Ds(r);
@@ -9270,36 +9270,36 @@ function rd(r) {
     archived: r.archived,
     updatedAt: r.updatedAt,
     completionReport: r.production?.completionReports?.at(-1) ?? null,
-    approved: h.filter((k) => r.stages[k.id].author).length,
+    approved: h.filter((C) => r.stages[C.id].author).length,
     total: h.length,
-    openIssues: r.issues.filter((k) => k.status === "open").length,
+    openIssues: r.issues.filter((C) => C.status === "open").length,
     shots: r.shots.length,
-    inTimeline: r.shots.filter((k) => k.status === "in_timeline").length,
+    inTimeline: r.shots.filter((C) => C.status === "in_timeline").length,
     lastMcpAt: r.lastMcpAt,
-    next: h.filter((k) => !r.stages[k.id].author && !Ts(r, k.id).length).map((k) => ({
-      id: k.id,
-      title: k.title,
-      reasons: Uf(r, k.id)
+    next: h.filter((C) => !r.stages[C.id].author && !Ts(r, C.id).length).map((C) => ({
+      id: C.id,
+      title: C.title,
+      reasons: Uf(r, C.id)
     }))
   };
 }
 function hd(r) {
-  const h = Sl(r), k = [...new Map((r.production?.links ?? []).map((p) => [p.shotId, p])).values()], f = [...new Map((r.production?.selections ?? []).map((p) => [p.shotId, p])).values()];
+  const h = Nl(r), C = [...new Map((r.production?.links ?? []).map((p) => [p.shotId, p])).values()], f = [...new Map((r.production?.selections ?? []).map((p) => [p.shotId, p])).values()];
   return {
     project: rd(r),
     settings: {
       rules: $a(r.episodeRules ?? []).length,
-      adopted: $a(r.baselines ?? []).map(({ key: p, title: w, category: x, version: A, recordVersion: z, externalVersion: E }) => ({
+      adopted: $a(r.baselines ?? []).map(({ key: p, title: k, category: x, version: A, recordVersion: N, externalVersion: _ }) => ({
         key: p,
-        title: w,
+        title: k,
         category: x,
         version: A,
-        recordVersion: z,
-        externalVersion: E
+        recordVersion: N,
+        externalVersion: _
       })),
-      pending: pi(r.baselines ?? []).filter((p) => p.status === "unresolved" || p.status === "reference").map(({ key: p, title: w, status: x, note: A }) => ({
+      pending: pi(r.baselines ?? []).filter((p) => p.status === "unresolved" || p.status === "reference").map(({ key: p, title: k, status: x, note: A }) => ({
         key: p,
-        title: w,
+        title: k,
         status: x,
         note: A
       }))
@@ -9308,9 +9308,9 @@ function hd(r) {
       sources: h.records.length,
       acceptedSources: h.records.filter(rn).length,
       shots: r.shots.length,
-      linkedShots: k.length,
-      locatedFrames: k.filter((p) => p.references.length).length,
-      registeredSelections: (/* @__PURE__ */ new Set([...f.map((p) => p.shotId), ...k.filter((p) => p.adoptedOutput).map((p) => p.shotId)])).size,
+      linkedShots: C.length,
+      locatedFrames: C.filter((p) => p.references.length).length,
+      registeredSelections: (/* @__PURE__ */ new Set([...f.map((p) => p.shotId), ...C.filter((p) => p.adoptedOutput).map((p) => p.shotId)])).size,
       timelineRegistrations: f.filter((p) => p.editorVersion && p.inPoint && p.outPoint).length
     },
     outgoing: r.production?.handoffs?.at(-1) ?? null,
@@ -9362,7 +9362,7 @@ var sn = {
   "audio",
   "reference"
 ];
-function Sl(r) {
+function Nl(r) {
   return r.knowledge ?? {
     records: [],
     problems: [],
@@ -9374,51 +9374,51 @@ function rn(r) {
   return r.approval?.verdict === "source_accepted" || r.status === "effective";
 }
 function Wr(r, h) {
-  return (r.production?.sections.find((k) => k.stageId === h)?.gaps ?? []).map((k, f) => {
-    const p = [...r.production?.supplements ?? []].reverse().find((w) => w.stageId === h && w.gapIndex === f && w.gap === k);
+  return (r.production?.sections.find((C) => C.stageId === h)?.gaps ?? []).map((C, f) => {
+    const p = [...r.production?.supplements ?? []].reverse().find((k) => k.stageId === h && k.gapIndex === f && k.gap === C);
     return {
       index: f,
-      description: k,
+      description: C,
       status: p ? "filled" : "open",
-      record: p ? Sl(r).records.find((w) => w.id === p.recordId) ?? null : null
+      record: p ? Nl(r).records.find((k) => k.id === p.recordId) ?? null : null
     };
   });
 }
 function bx(r, h) {
   if (r.workId && (!h || h.id !== r.workId) || h && h.id !== r.workId) throw new Df("集數與作品不相符", 400);
-  const k = hd(r), f = h ? Os(h) : null, p = (f?.models ?? []).map((x) => {
-    const A = x.versions.at(-1), z = [...f?.history ?? []].reverse().find((K) => K.modelId === x.id && K.versionId === A.id && K.action === "save_model_stage"), E = _a.find((K) => !A.stages[K.id].author) ?? _a[7], S = x.versions.find((K) => K.id === x.adoptedVersionId);
+  const C = hd(r), f = h ? Os(h) : null, p = (f?.models ?? []).map((x) => {
+    const A = x.versions.at(-1), N = [...f?.history ?? []].reverse().find((G) => G.modelId === x.id && G.versionId === A.id && G.action === "save_model_stage"), _ = _a.find((G) => !A.stages[G.id].author) ?? _a[7], w = x.versions.find((G) => G.id === x.adoptedVersionId);
     return {
       modelId: x.id,
       key: x.key,
       title: x.title,
       versionId: A.id,
       label: A.label,
-      adopted: S ? {
-        versionId: S.id,
-        label: S.label
+      adopted: w ? {
+        versionId: w.id,
+        label: w.label
       } : null,
       sourceLocation: A.sourceLocation,
       candidateLocation: A.candidateLocation,
-      stageId: E.id,
-      stageTitle: E.title,
-      approved: _a.filter((K) => A.stages[K.id].author).length,
-      lastWork: z ? {
-        at: z.at,
-        stageId: z.stageId,
-        summary: A.stages[z.stageId].summary,
-        evidence: A.stages[z.stageId].evidence,
-        nextStep: A.stages[z.stageId].nextStep
+      stageId: _.id,
+      stageTitle: _.title,
+      approved: _a.filter((G) => A.stages[G.id].author).length,
+      lastWork: N ? {
+        at: N.at,
+        stageId: N.stageId,
+        summary: A.stages[N.stageId].summary,
+        evidence: A.stages[N.stageId].evidence,
+        nextStep: A.stages[N.stageId].nextStep
       } : null,
-      openIssues: f.issues.filter((K) => K.modelId === x.id && K.versionId === A.id && K.status === "open"),
-      nextStep: z ? A.stages[z.stageId].nextStep : "尚無工作回報；先讀取模型來源與指定版本，再取得任務資料包。"
+      openIssues: f.issues.filter((G) => G.modelId === x.id && G.versionId === A.id && G.status === "open"),
+      nextStep: N ? A.stages[N.stageId].nextStep : "尚無工作回報；先讀取模型來源與指定版本，再取得任務資料包。"
     };
-  }), w = [...new Map((f?.pins ?? []).filter((x) => x.episodeId === r.id).map((x) => [[x.modelId, x.sceneIds].join("|"), x])).values()].map((x) => {
-    const A = f.models.find((E) => E.id === x.modelId), z = A?.versions.find((E) => E.id === x.versionId);
+  }), k = [...new Map((f?.pins ?? []).filter((x) => x.episodeId === r.id).map((x) => [[x.modelId, x.sceneIds].join("|"), x])).values()].map((x) => {
+    const A = f.models.find((_) => _.id === x.modelId), N = A?.versions.find((_) => _.id === x.versionId);
     return {
       ...x,
       title: A?.title ?? x.modelId,
-      label: z?.label ?? x.versionId
+      label: N?.label ?? x.versionId
     };
   });
   return {
@@ -9429,12 +9429,12 @@ function bx(r, h) {
     projectRevision: r.revision,
     workId: h?.id ?? null,
     workRevision: h?.revision ?? null,
-    episode: k,
+    episode: C,
     models: p,
-    pins: w,
+    pins: k,
     issues: {
       animation: r.issues.filter((x) => x.status === "open"),
-      context: k.openProblems,
+      context: C.openProblems,
       models: f?.issues.filter((x) => x.status === "open") ?? []
     },
     lastToolWrite: [r.lastMcpAt, ...(f?.history ?? []).filter((x) => x.actor === "ai").map((x) => x.at)].filter((x) => !!x).sort().at(-1) ?? null,
@@ -9442,46 +9442,46 @@ function bx(r, h) {
   };
 }
 var vx = /* @__PURE__ */ ca(((r) => {
-  var h = /* @__PURE__ */ Symbol.for("react.transitional.element"), k = /* @__PURE__ */ Symbol.for("react.fragment");
-  function f(p, w, x) {
+  var h = /* @__PURE__ */ Symbol.for("react.transitional.element"), C = /* @__PURE__ */ Symbol.for("react.fragment");
+  function f(p, k, x) {
     var A = null;
-    if (x !== void 0 && (A = "" + x), w.key !== void 0 && (A = "" + w.key), "key" in w) {
+    if (x !== void 0 && (A = "" + x), k.key !== void 0 && (A = "" + k.key), "key" in k) {
       x = {};
-      for (var z in w) z !== "key" && (x[z] = w[z]);
-    } else x = w;
-    return w = x.ref, {
+      for (var N in k) N !== "key" && (x[N] = k[N]);
+    } else x = k;
+    return k = x.ref, {
       $$typeof: h,
       type: p,
       key: A,
-      ref: w !== void 0 ? w : null,
+      ref: k !== void 0 ? k : null,
       props: x
     };
   }
-  r.Fragment = k, r.jsx = f, r.jsxs = f;
+  r.Fragment = C, r.jsx = f, r.jsxs = f;
 })), jx = /* @__PURE__ */ ca(((r, h) => {
   h.exports = vx();
 })), l = jx(), mf = (r) => r ? new Date(r).toLocaleString("zh-TW", { timeZone: "Asia/Taipei" }) : "尚無紀錄";
 function yx(r, h) {
-  const k = URL.createObjectURL(new Blob([h], { type: "text/plain;charset=utf-8" })), f = document.createElement("a");
-  f.href = k, f.download = r, f.click(), setTimeout(() => URL.revokeObjectURL(k), 1e3);
+  const C = URL.createObjectURL(new Blob([h], { type: "text/plain;charset=utf-8" })), f = document.createElement("a");
+  f.href = C, f.download = r, f.click(), setTimeout(() => URL.revokeObjectURL(C), 1e3);
 }
-function Sx({ project: r, work: h, busy: k, onNavigate: f, onModel: p }) {
-  const w = bx(r, h), [x, A] = (0, g.useState)(""), [z, E] = (0, g.useState)(""), [S, K] = (0, g.useState)("animation"), N = w.models.find((V) => V.versionId === S), le = w.episode.lastWork, ne = w.issues.animation.length + w.issues.context.length + w.issues.models.length, I = `請使用「立之雲端庫｜動畫製作流程」工具，接手 ${w.title}／${r.episode}。先呼叫 read_animation_workspace({projectId:${JSON.stringify(r.id)}})，重新讀取伺服器最新資料，不使用本段文字中的舊 revision。
-${N ? `本次範圍為模型 ${N.key}（modelId=${N.modelId}），精確版本 ${N.label}（versionId=${N.versionId}），定位階段 ${N.stageId}。workId=${h.id}。用 read_animation_models 查此版本的全部來源、問題及最近回報，確認實際任務範圍後，用 acquire_animation_model_context 取得新資料包；完成後用 update_animation_model_stage 回報。最新候選不等於已採用版。` : `本次範圍為 ${r.episode} 動畫。先讀 read_animation_episode_brief 與 read_animation_episode_settings，再依最近交接確認任務。用 preview_animation_context 檢查指定範圍，acquire_animation_context 保存資料包，以 submit_animation_work 回報。作者已告知完成的集數以資料補登為主，不因紀錄空白重做。`}
-實際讀取所需素材後才執行，缺件、矛盾或過期資料包先回報受阻。寫回已做內容、產出位置與版本、未解問題及下一步。保留原檔、作者採用版本與各集固定引用，不能自行正式核定。若目前對話沒有上述工具，明確告知尚未接通，不宣稱已讀取或已回寫。`, [Q, re] = (0, g.useState)(!1), L = w.episode.project.completionReport?.status === "completed", ie = [
-    ...w.issues.context.map((V) => ({
-      id: V.id,
-      text: V.description,
+function Sx({ project: r, work: h, busy: C, onNavigate: f, onModel: p }) {
+  const k = bx(r, h), [x, A] = (0, g.useState)(""), [N, _] = (0, g.useState)(""), [w, G] = (0, g.useState)("animation"), z = k.models.find((H) => H.versionId === w), le = k.episode.lastWork, ne = k.issues.animation.length + k.issues.context.length + k.issues.models.length, I = `請使用「立之雲端庫｜動畫製作流程」工具，接手 ${k.title}／${r.episode}。先呼叫 read_animation_workspace({projectId:${JSON.stringify(r.id)}})，重新讀取伺服器最新資料，不使用本段文字中的舊 revision。
+${z ? `本次範圍為模型 ${z.key}（modelId=${z.modelId}），精確版本 ${z.label}（versionId=${z.versionId}），定位階段 ${z.stageId}。workId=${h.id}。用 read_animation_models 查此版本的全部來源、問題及最近回報，確認實際任務範圍後，用 acquire_animation_model_context 取得新資料包；完成後用 update_animation_model_stage 回報。最新候選不等於已採用版。` : `本次範圍為 ${r.episode} 動畫。先讀 read_animation_episode_brief 與 read_animation_episode_settings，再依最近交接確認任務。用 preview_animation_context 檢查指定範圍，acquire_animation_context 保存資料包，以 submit_animation_work 回報。作者已告知完成的集數以資料補登為主，不因紀錄空白重做。`}
+實際讀取所需素材後才執行，缺件、矛盾或過期資料包先回報受阻。寫回已做內容、產出位置與版本、未解問題及下一步。保留原檔、作者採用版本與各集固定引用，不能自行正式核定。若目前對話沒有上述工具，明確告知尚未接通，不宣稱已讀取或已回寫。`, [X, oe] = (0, g.useState)(!1), q = k.episode.project.completionReport?.status === "completed", ie = [
+    ...k.issues.context.map((H) => ({
+      id: H.id,
+      text: H.description,
       tab: "context"
     })),
-    ...w.issues.animation.map((V) => ({
-      id: V.id,
-      text: V.reason,
+    ...k.issues.animation.map((H) => ({
+      id: H.id,
+      text: H.reason,
       tab: "issues"
     })),
-    ...w.issues.models.map((V) => ({
-      id: V.id,
-      text: V.reason,
+    ...k.issues.models.map((H) => ({
+      id: H.id,
+      text: H.reason,
       tab: "models"
     }))
   ];
@@ -9495,23 +9495,23 @@ ${N ? `本次範圍為模型 ${N.key}（modelId=${N.modelId}），精確版本 $
             className: "eyebrow",
             children: "接下來做什麼"
           }),
-          /* @__PURE__ */ (0, l.jsx)("h2", { children: L ? "本集已完成，繼續整理製作紀錄" : le ? "接著完成上次的工作" : "從本集製作資料開始" }),
-          /* @__PURE__ */ (0, l.jsx)("p", { children: le?.nextStep || (L ? "補上採用檔案與製作過程，讓下一集和下一位 AI 都能接著用。" : "先整理劇本、角色與場景參考，再開始製作。") }),
+          /* @__PURE__ */ (0, l.jsx)("h2", { children: q ? "本集已完成，繼續整理製作紀錄" : le ? "接著完成上次的工作" : "從本集製作資料開始" }),
+          /* @__PURE__ */ (0, l.jsx)("p", { children: le?.nextStep || (q ? "補上採用檔案與製作過程，讓下一集和下一位 AI 都能接著用。" : "先整理劇本、角色與場景參考，再開始製作。") }),
           /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "context-actions",
             children: [/* @__PURE__ */ (0, l.jsxs)("button", {
               className: "btn primary",
-              disabled: k,
+              disabled: C,
               onClick: () => f("context"),
               children: [
-                L ? "繼續整理資料" : "開啟製作資料",
+                q ? "繼續整理資料" : "開啟製作資料",
                 " ",
                 /* @__PURE__ */ (0, l.jsx)(di, { size: 16 })
               ]
             }), /* @__PURE__ */ (0, l.jsx)("button", {
               className: "btn",
-              onClick: () => re(!Q),
-              "aria-expanded": Q,
+              onClick: () => oe(!X),
+              "aria-expanded": X,
               children: "交給 ChatGPT 接手"
             })]
           })
@@ -9522,7 +9522,7 @@ ${N ? `本次範圍為模型 ${N.key}（modelId=${N.modelId}），精確版本 $
         children: [
           /* @__PURE__ */ (0, l.jsxs)("div", { children: [
             /* @__PURE__ */ (0, l.jsx)("span", { children: "本集製作" }),
-            /* @__PURE__ */ (0, l.jsx)("strong", { children: L ? "已完成" : w.episode.project.completionReport?.status === "in_progress" ? "製作中" : "尚未登記" }),
+            /* @__PURE__ */ (0, l.jsx)("strong", { children: q ? "已完成" : k.episode.project.completionReport?.status === "in_progress" ? "製作中" : "尚未登記" }),
             /* @__PURE__ */ (0, l.jsx)("small", { children: "依作者登記" })
           ] }),
           /* @__PURE__ */ (0, l.jsxs)("div", { children: [
@@ -9534,20 +9534,20 @@ ${N ? `本次範圍為模型 ${N.key}（modelId=${N.modelId}），精確版本 $
             onClick: () => f("models"),
             children: [
               /* @__PURE__ */ (0, l.jsx)("span", { children: "共用模型" }),
-              /* @__PURE__ */ (0, l.jsxs)("strong", { children: [w.models.length, /* @__PURE__ */ (0, l.jsx)("em", { children: " 個" })] }),
+              /* @__PURE__ */ (0, l.jsxs)("strong", { children: [k.models.length, /* @__PURE__ */ (0, l.jsx)("em", { children: " 個" })] }),
               /* @__PURE__ */ (0, l.jsx)("small", { children: "依已登記模型" })
             ]
           })
         ]
       }),
-      Q && /* @__PURE__ */ (0, l.jsxs)("article", {
+      X && /* @__PURE__ */ (0, l.jsxs)("article", {
         className: "wide-card ai-handoff",
         children: [
           /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "section-title",
             children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: "把這次工作交給 ChatGPT" }), /* @__PURE__ */ (0, l.jsx)("button", {
               className: "text-btn",
-              onClick: () => re(!1),
+              onClick: () => oe(!1),
               children: "收起"
             })]
           }),
@@ -9555,19 +9555,19 @@ ${N ? `本次範圍為模型 ${N.key}（modelId=${N.modelId}），精確版本 $
           /* @__PURE__ */ (0, l.jsxs)("label", {
             className: "form-field",
             children: ["要接手的工作", /* @__PURE__ */ (0, l.jsxs)("select", {
-              value: S,
-              onChange: (V) => K(V.target.value),
+              value: w,
+              onChange: (H) => G(H.target.value),
               children: [/* @__PURE__ */ (0, l.jsxs)("option", {
                 value: "animation",
                 children: [r.episode, " 動畫與資料整理"]
-              }), w.models.map((V) => /* @__PURE__ */ (0, l.jsxs)("option", {
-                value: V.versionId,
+              }), k.models.map((H) => /* @__PURE__ */ (0, l.jsxs)("option", {
+                value: H.versionId,
                 children: [
-                  V.title,
+                  H.title,
                   " · ",
-                  V.label
+                  H.label
                 ]
-              }, V.versionId))]
+              }, H.versionId))]
             })]
           }),
           /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -9608,7 +9608,7 @@ ${N ? `本次範圍為模型 ${N.key}（modelId=${N.modelId}），精確版本 $
           ] }),
           /* @__PURE__ */ (0, l.jsxs)("small", { children: [
             "複製指令不會自動啟動 AI。最近寫入：",
-            mf(w.lastToolWrite),
+            mf(k.lastToolWrite),
             "。"
           ] })
         ]
@@ -9626,7 +9626,7 @@ ${N ? `本次範圍為模型 ${N.key}（modelId=${N.modelId}），精確版本 $
               /* @__PURE__ */ (0, l.jsxs)("button", {
                 onClick: () => f("main"),
                 children: [
-                  /* @__PURE__ */ (0, l.jsx)(vl, { size: 22 }),
+                  /* @__PURE__ */ (0, l.jsx)(jl, { size: 22 }),
                   /* @__PURE__ */ (0, l.jsxs)("span", { children: [/* @__PURE__ */ (0, l.jsx)("b", { children: "動畫製作" }), /* @__PURE__ */ (0, l.jsx)("small", { children: "主線、片頭片尾與鏡頭素材" })] }),
                   /* @__PURE__ */ (0, l.jsx)(di, { size: 17 })
                 ]
@@ -9659,25 +9659,25 @@ ${N ? `本次範圍為模型 ${N.key}（modelId=${N.modelId}），精確版本 $
             })]
           }), ie.length ? /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "attention-list",
-            children: [ie.slice(0, 3).map((V) => /* @__PURE__ */ (0, l.jsxs)("button", {
-              onClick: () => f(V.tab),
+            children: [ie.slice(0, 3).map((H) => /* @__PURE__ */ (0, l.jsxs)("button", {
+              onClick: () => f(H.tab),
               children: [
                 /* @__PURE__ */ (0, l.jsx)(oi, { size: 17 }),
-                /* @__PURE__ */ (0, l.jsx)("span", { children: V.text }),
+                /* @__PURE__ */ (0, l.jsx)("span", { children: H.text }),
                 /* @__PURE__ */ (0, l.jsx)(di, { size: 15 })
               ]
-            }, V.id)), ie.length > 3 && /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsxs)("summary", { children: [
+            }, H.id)), ie.length > 3 && /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsxs)("summary", { children: [
               "其餘 ",
               ie.length - 3,
               " 項問題"
-            ] }), ie.slice(3).map((V) => /* @__PURE__ */ (0, l.jsx)("button", {
-              onClick: () => f(V.tab),
-              children: V.text
-            }, V.id))] })]
+            ] }), ie.slice(3).map((H) => /* @__PURE__ */ (0, l.jsx)("button", {
+              onClick: () => f(H.tab),
+              children: H.text
+            }, H.id))] })]
           }) : /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "quiet-state",
             children: [
-              /* @__PURE__ */ (0, l.jsx)(vl, { size: 28 }),
+              /* @__PURE__ */ (0, l.jsx)(jl, { size: 28 }),
               /* @__PURE__ */ (0, l.jsx)("h3", { children: "目前沒有登記問題" }),
               /* @__PURE__ */ (0, l.jsx)("p", { children: "發現缺件或需要修改時，再加入紀錄。" })
             ]
@@ -9697,41 +9697,41 @@ ${N ? `本次範圍為模型 ${N.key}（modelId=${N.modelId}），精確版本 $
             }),
             /* @__PURE__ */ (0, l.jsx)("small", { children: mf(le.at) })
           ] }) : /* @__PURE__ */ (0, l.jsx)("p", { children: "尚無 AI 工作回報；這不代表沒有製作成果。" }),
-          w.models.map((V) => /* @__PURE__ */ (0, l.jsxs)("div", {
+          k.models.map((H) => /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "home-model-row",
             children: [/* @__PURE__ */ (0, l.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, l.jsx)("b", { children: V.title }),
+              /* @__PURE__ */ (0, l.jsx)("b", { children: H.title }),
               /* @__PURE__ */ (0, l.jsxs)("p", { children: [
                 "目前候選 ",
-                V.label,
+                H.label,
                 " · 採用 ",
-                V.adopted?.label ?? "尚未登記"
+                H.adopted?.label ?? "尚未登記"
               ] }),
-              /* @__PURE__ */ (0, l.jsx)("small", { children: V.nextStep })
+              /* @__PURE__ */ (0, l.jsx)("small", { children: H.nextStep })
             ] }), /* @__PURE__ */ (0, l.jsx)("button", {
               className: "btn",
-              disabled: k,
+              disabled: C,
               onClick: () => p({
-                modelId: V.modelId,
-                versionId: V.versionId,
-                stageId: V.stageId
+                modelId: H.modelId,
+                versionId: H.versionId,
+                stageId: H.stageId
               }),
               children: "開啟版本"
             })]
-          }, V.modelId)),
+          }, H.modelId)),
           /* @__PURE__ */ (0, l.jsxs)("details", { children: [
             /* @__PURE__ */ (0, l.jsxs)("summary", { children: [
               "本集固定模型引用（",
-              w.pins.length,
+              k.pins.length,
               "）"
             ] }),
-            w.pins.map((V, ee) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-              V.title,
+            k.pins.map((H, F) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
+              H.title,
               " · ",
-              V.label,
+              H.label,
               " · ",
-              V.purpose
-            ] }, ee)),
+              H.purpose
+            ] }, F)),
             /* @__PURE__ */ (0, l.jsx)("button", {
               className: "btn",
               onClick: () => f("settings"),
@@ -9750,7 +9750,7 @@ ${N ? `本次範圍為模型 ${N.key}（modelId=${N.modelId}），精確版本 $
   });
 }
 function Nx({ project: r, check: h }) {
-  const [k, f] = (0, g.useState)(!1), [p, w] = (0, g.useState)(""), [x, A] = (0, g.useState)(""), z = `請使用「立之雲端庫｜動畫製作流程」外掛，先呼叫 read_animation_workspace，projectId 為 ${r.id}，確認 ${r.episode} 的目前進度、採用版本、未解問題與下一步。請重新讀取最新資料，不從聊天推定完成。若本集已由作者告知完成，先做資料補登。確認範圍後取得新的工作資料包，實際讀取參考素材，最後回報已做內容、成果位置、未完成項及下一步。若本對話沒有工具，請明確告知未連接。`;
+  const [C, f] = (0, g.useState)(!1), [p, k] = (0, g.useState)(""), [x, A] = (0, g.useState)(""), N = `請使用「立之雲端庫｜動畫製作流程」外掛，先呼叫 read_animation_workspace，projectId 為 ${r.id}，確認 ${r.episode} 的目前進度、採用版本、未解問題與下一步。請重新讀取最新資料，不從聊天推定完成。若本集已由作者告知完成，先做資料補登。確認範圍後取得新的工作資料包，實際讀取參考素材，最後回報已做內容、成果位置、未完成項及下一步。若本對話沒有工具，請明確告知未連接。`;
   return /* @__PURE__ */ (0, l.jsxs)("section", {
     className: "connection-simple",
     children: [/* @__PURE__ */ (0, l.jsxs)("article", {
@@ -9777,7 +9777,7 @@ function Nx({ project: r, check: h }) {
           className: "btn primary",
           onClick: async () => {
             try {
-              await navigator.clipboard.writeText(z), A("已複製，請貼到選用工作台的對話。");
+              await navigator.clipboard.writeText(N), A("已複製，請貼到選用工作台的對話。");
             } catch {
               A("請展開完整指令後手動複製。");
             }
@@ -9792,7 +9792,7 @@ function Nx({ project: r, check: h }) {
           "aria-label": "本集接手指令",
           readOnly: !0,
           rows: 7,
-          value: z
+          value: N
         })] })
       ]
     }), /* @__PURE__ */ (0, l.jsxs)("article", {
@@ -9802,21 +9802,21 @@ function Nx({ project: r, check: h }) {
         /* @__PURE__ */ (0, l.jsx)("p", { children: "網頁連線與對話工具是兩個檢查項目；這個按鈕會檢查網頁能否讀取共用資料。" }),
         /* @__PURE__ */ (0, l.jsxs)("button", {
           className: "btn",
-          disabled: k,
+          disabled: C,
           onClick: async () => {
-            f(!0), w("");
+            f(!0), k("");
             try {
-              await h(), w("共用資料讀取成功。對話是否已選用外掛，仍需由 ChatGPT 實際呼叫工具確認。");
-            } catch (E) {
-              w("讀取失敗：" + (E instanceof Error ? E.message : String(E)));
+              await h(), k("共用資料讀取成功。對話是否已選用外掛，仍需由 ChatGPT 實際呼叫工具確認。");
+            } catch (_) {
+              k("讀取失敗：" + (_ instanceof Error ? _.message : String(_)));
             } finally {
               f(!1);
             }
           },
-          children: [/* @__PURE__ */ (0, l.jsx)(Nl, {
+          children: [/* @__PURE__ */ (0, l.jsx)(Wa, {
             size: 15,
-            className: k ? "spin" : ""
-          }), k ? "檢查中…" : "檢查資料連線"]
+            className: C ? "spin" : ""
+          }), C ? "檢查中…" : "檢查資料連線"]
         }),
         /* @__PURE__ */ (0, l.jsx)("p", {
           role: "status",
@@ -9845,27 +9845,27 @@ var xf = {
   audio: "聲音",
   reference: "原作／參考"
 };
-function wx({ project: r, busy: h, mutate: k }) {
-  const [f, p] = (0, g.useState)(""), [w, x] = (0, g.useState)(""), [A, z] = (0, g.useState)(""), [E, S] = (0, g.useState)(30), [K, N] = (0, g.useState)("main"), [le, ne] = (0, g.useState)(null), [I, Q] = (0, g.useState)(""), [re, L] = (0, g.useState)(""), [ie, V] = (0, g.useState)({
+function wx({ project: r, busy: h, mutate: C }) {
+  const [f, p] = (0, g.useState)(""), [k, x] = (0, g.useState)(""), [A, N] = (0, g.useState)(""), [_, w] = (0, g.useState)(30), [G, z] = (0, g.useState)("main"), [le, ne] = (0, g.useState)(null), [I, X] = (0, g.useState)(""), [oe, q] = (0, g.useState)(""), [ie, H] = (0, g.useState)({
     content: "",
     source: "",
     location: ""
-  }), ee = Sl(r).records, P = r.production?.sections ?? [], xe = P.find((b) => b.stageId === f), te = ee.filter(rn).length, $ = Wr(r, f), j = P.reduce((b, ae) => b + Wr(r, ae.stageId).filter((Z) => Z.status === "open").length, 0), W = new Set(P.flatMap((b) => b.recordKeys)), ge = ee.filter((b) => (!f || xe?.recordKeys.includes(b.key) || b.scope.type === "stage" && b.scope.target === f) && (!A || b.kind === A) && (!w || [
+  }), F = Nl(r).records, $ = r.production?.sections ?? [], pe = $.find((b) => b.stageId === f), te = F.filter(rn).length, P = Wr(r, f), y = $.reduce((b, ae) => b + Wr(r, ae.stageId).filter((K) => K.status === "open").length, 0), ee = new Set($.flatMap((b) => b.recordKeys)), ge = F.filter((b) => (!f || pe?.recordKeys.includes(b.key) || b.scope.type === "stage" && b.scope.target === f) && (!A || b.kind === A) && (!k || [
     b.title,
     b.key,
     b.content,
     b.source,
     b.scope.target
-  ].join(" ").toLowerCase().includes(w.toLowerCase()))).sort((b, ae) => (b.key.startsWith("ep01_src_") ? 1 : W.has(b.key) ? 0 : 2) - (ae.key.startsWith("ep01_src_") ? 1 : W.has(ae.key) ? 0 : 2));
-  async function he(b) {
-    if (ne(null), Q(""), !!b)
+  ].join(" ").toLowerCase().includes(k.toLowerCase()))).sort((b, ae) => (b.key.startsWith("ep01_src_") ? 1 : ee.has(b.key) ? 0 : 2) - (ae.key.startsWith("ep01_src_") ? 1 : ee.has(ae.key) ? 0 : 2));
+  async function me(b) {
+    if (ne(null), X(""), !!b)
       try {
         if (b.size > 15e5) throw new Error("資料包不可超過 1.5 MB");
         const ae = JSON.parse(await b.text());
         if (ae.schemaVersion !== 1 || ae.episode !== r.episode || !Array.isArray(ae.records) || !Array.isArray(ae.shots) || !Array.isArray(ae.sections)) throw new Error("請選擇相同集數的製作資料包");
         ne(ae);
       } catch (ae) {
-        Q(ae instanceof Error ? ae.message : "資料包讀取失敗");
+        X(ae instanceof Error ? ae.message : "資料包讀取失敗");
       }
   }
   return /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
@@ -9884,7 +9884,7 @@ function wx({ project: r, busy: h, mutate: k }) {
           const b = URL.createObjectURL(new Blob([JSON.stringify({
             episode: r.episode,
             production: r.production,
-            records: ee,
+            records: F,
             shots: r.shots
           }, null, 2)], { type: "application/json" })), ae = document.createElement("a");
           ae.href = b, ae.download = r.episode + "_製作資料.json", ae.click(), setTimeout(() => URL.revokeObjectURL(b), 1e3);
@@ -9895,9 +9895,9 @@ function wx({ project: r, busy: h, mutate: k }) {
     /* @__PURE__ */ (0, l.jsxs)("div", {
       className: "production-totals",
       children: [
-        /* @__PURE__ */ (0, l.jsxs)("b", { children: [ee.length, " 筆資料"] }),
+        /* @__PURE__ */ (0, l.jsxs)("b", { children: [F.length, " 筆資料"] }),
         /* @__PURE__ */ (0, l.jsxs)("b", { children: [r.shots.length, " 列鏡頭規劃"] }),
-        /* @__PURE__ */ (0, l.jsxs)("b", { children: [P.length, " 個階段已盤點"] }),
+        /* @__PURE__ */ (0, l.jsxs)("b", { children: [$.length, " 個階段已盤點"] }),
         /* @__PURE__ */ (0, l.jsx)("span", { children: "實際缺件依下方清單，沒有以資料筆數推算完成率。" })
       ]
     }),
@@ -9912,14 +9912,14 @@ function wx({ project: r, busy: h, mutate: k }) {
         /* @__PURE__ */ (0, l.jsx)("p", { children: r.production.acceptance.note }),
         /* @__PURE__ */ (0, l.jsxs)("p", { children: [
           "補齊已開放 · ",
-          j,
+          y,
           " 項待補。可直接保存補充內容，不需逐筆再確認。不同來源版本保留，採用版本另行指定。"
         ] })
       ] }) : /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsx)("p", { children: "依作者確認，將已完成的資料一次通過，並開放剩餘項目直接補齊。" }), /* @__PURE__ */ (0, l.jsx)("button", {
         className: "btn primary",
-        disabled: h || r.archived || !P.length,
+        disabled: h || r.archived || !$.length,
         onClick: () => {
-          k("accept_production_data", { note: "依作者2026-10-21指示：目前先不用檢核，已完成的資料直接通過；剩餘項目開放直接補齊。" });
+          C("accept_production_data", { note: "依作者2026-10-21指示：目前先不用檢核，已完成的資料直接通過；剩餘項目開放直接補齊。" });
         },
         children: "通過現有資料並開放補齊"
       })] })
@@ -9929,15 +9929,15 @@ function wx({ project: r, busy: h, mutate: k }) {
       children: [
         /* @__PURE__ */ (0, l.jsxs)("label", { children: ["搜尋實際內容", /* @__PURE__ */ (0, l.jsx)("input", {
           placeholder: "台詞、F077、G11、角色或素材名稱",
-          value: w,
+          value: k,
           onChange: (b) => {
-            x(b.target.value), S(30);
+            x(b.target.value), w(30);
           }
         })] }),
         /* @__PURE__ */ (0, l.jsxs)("label", { children: ["製作階段", /* @__PURE__ */ (0, l.jsxs)("select", {
           value: f,
           onChange: (b) => {
-            p(b.target.value), S(30);
+            p(b.target.value), w(30);
           },
           children: [/* @__PURE__ */ (0, l.jsx)("option", {
             value: "",
@@ -9954,7 +9954,7 @@ function wx({ project: r, busy: h, mutate: k }) {
         /* @__PURE__ */ (0, l.jsxs)("label", { children: ["資料種類", /* @__PURE__ */ (0, l.jsxs)("select", {
           value: A,
           onChange: (b) => {
-            z(b.target.value), S(30);
+            N(b.target.value), w(30);
           },
           children: [/* @__PURE__ */ (0, l.jsx)("option", {
             value: "",
@@ -9974,36 +9974,36 @@ function wx({ project: r, busy: h, mutate: k }) {
         ["op", "OP 支線"],
         ["ed", "ED 支線"]
       ].map(([b, ae]) => /* @__PURE__ */ (0, l.jsx)("button", {
-        className: K === b ? "active" : "",
-        onClick: () => N(b),
+        className: G === b ? "active" : "",
+        onClick: () => z(b),
         children: ae
       }, b))
     }),
     /* @__PURE__ */ (0, l.jsx)("div", {
       className: "production-grid",
-      children: Pt.filter((b) => b.group === K).map((b) => {
-        const ae = P.find((B) => B.stageId === b.id), Z = Wr(r, b.id).filter((B) => B.status === "open").length;
+      children: Pt.filter((b) => b.group === G).map((b) => {
+        const ae = $.find((Y) => Y.stageId === b.id), K = Wr(r, b.id).filter((Y) => Y.status === "open").length;
         return /* @__PURE__ */ (0, l.jsxs)("button", {
           className: "production-stage " + (f === b.id ? "selected" : ""),
           onClick: () => {
-            p(f === b.id ? "" : b.id), L(""), S(30);
+            p(f === b.id ? "" : b.id), q(""), w(30);
           },
           children: [
             /* @__PURE__ */ (0, l.jsx)("small", { children: b.group === "main" ? b.id : b.group.toUpperCase() + " " + b.id.slice(2) }),
             /* @__PURE__ */ (0, l.jsx)("b", { children: b.title }),
             /* @__PURE__ */ (0, l.jsx)("span", { children: ae ? ae.recordKeys.length + " 筆相關資料" : "尚未盤點" }),
-            /* @__PURE__ */ (0, l.jsx)("em", { children: ae ? Z + " 項待補" : "待補資料" })
+            /* @__PURE__ */ (0, l.jsx)("em", { children: ae ? K + " 項待補" : "待補資料" })
           ]
         }, b.id);
       })
     }),
-    xe && /* @__PURE__ */ (0, l.jsxs)("div", {
+    pe && /* @__PURE__ */ (0, l.jsxs)("div", {
       className: "production-gaps",
       children: [
         /* @__PURE__ */ (0, l.jsxs)("h3", { children: [Pt.find((b) => b.id === f)?.title, " · 資料盤點"] }),
-        /* @__PURE__ */ (0, l.jsx)("p", { children: xe.overview }),
+        /* @__PURE__ */ (0, l.jsx)("p", { children: pe.overview }),
         /* @__PURE__ */ (0, l.jsx)("b", { children: "補齊清單" }),
-        $.length ? /* @__PURE__ */ (0, l.jsx)("div", { children: $.map((b) => /* @__PURE__ */ (0, l.jsxs)("article", {
+        P.length ? /* @__PURE__ */ (0, l.jsx)("div", { children: P.map((b) => /* @__PURE__ */ (0, l.jsxs)("article", {
           className: "production-gap",
           children: [
             /* @__PURE__ */ (0, l.jsx)("span", {
@@ -10020,14 +10020,14 @@ function wx({ project: r, busy: h, mutate: k }) {
               /* @__PURE__ */ (0, l.jsxs)("p", { children: ["來源：", b.record.source] }),
               /* @__PURE__ */ (0, l.jsxs)("p", { children: ["素材位置：", b.record.location || "內容已記錄"] })
             ] }),
-            r.production?.supplementsOpen && (re === f + ":" + b.index ? /* @__PURE__ */ (0, l.jsxs)("form", {
+            r.production?.supplementsOpen && (oe === f + ":" + b.index ? /* @__PURE__ */ (0, l.jsxs)("form", {
               className: "context-form",
               onSubmit: async (ae) => {
-                ae.preventDefault(), await k("supplement_production_data", {
+                ae.preventDefault(), await C("supplement_production_data", {
                   stageId: f,
                   gapIndex: b.index,
                   ...ie
-                }) && (L(""), V({
+                }) && (q(""), H({
                   content: "",
                   source: "",
                   location: ""
@@ -10039,7 +10039,7 @@ function wx({ project: r, busy: h, mutate: k }) {
                   rows: 5,
                   maxLength: 12e3,
                   value: ie.content,
-                  onChange: (ae) => V({
+                  onChange: (ae) => H({
                     ...ie,
                     content: ae.target.value
                   })
@@ -10048,7 +10048,7 @@ function wx({ project: r, busy: h, mutate: k }) {
                   required: !0,
                   maxLength: 2e3,
                   value: ie.source,
-                  onChange: (ae) => V({
+                  onChange: (ae) => H({
                     ...ie,
                     source: ae.target.value
                   })
@@ -10056,7 +10056,7 @@ function wx({ project: r, busy: h, mutate: k }) {
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["補件素材位置", /* @__PURE__ */ (0, l.jsx)("input", {
                   maxLength: 2e3,
                   value: ie.location,
-                  onChange: (ae) => V({
+                  onChange: (ae) => H({
                     ...ie,
                     location: ae.target.value
                   })
@@ -10066,7 +10066,7 @@ function wx({ project: r, busy: h, mutate: k }) {
                   children: [/* @__PURE__ */ (0, l.jsx)("button", {
                     className: "btn",
                     type: "button",
-                    onClick: () => L(""),
+                    onClick: () => q(""),
                     children: "取消"
                   }), /* @__PURE__ */ (0, l.jsx)("button", {
                     className: "btn primary",
@@ -10079,7 +10079,7 @@ function wx({ project: r, busy: h, mutate: k }) {
               className: "btn",
               disabled: h || r.archived,
               onClick: () => {
-                L(f + ":" + b.index), V({
+                q(f + ":" + b.index), H({
                   content: b.record?.content ?? "",
                   source: b.record?.source ?? "",
                   location: b.record?.location ?? ""
@@ -10101,7 +10101,7 @@ function wx({ project: r, busy: h, mutate: k }) {
     }),
     /* @__PURE__ */ (0, l.jsx)("div", {
       className: "production-records",
-      children: ge.slice(0, E).map((b) => /* @__PURE__ */ (0, l.jsxs)("details", {
+      children: ge.slice(0, _).map((b) => /* @__PURE__ */ (0, l.jsxs)("details", {
         className: "production-record",
         children: [
           /* @__PURE__ */ (0, l.jsxs)("summary", { children: [
@@ -10141,12 +10141,12 @@ function wx({ project: r, busy: h, mutate: k }) {
         ]
       }, b.id))
     }),
-    ge.length > E && /* @__PURE__ */ (0, l.jsx)("button", {
+    ge.length > _ && /* @__PURE__ */ (0, l.jsx)("button", {
       className: "btn",
-      onClick: () => S(E + 30),
+      onClick: () => w(_ + 30),
       children: "再顯示 30 筆資料"
     }),
-    !ee.length && /* @__PURE__ */ (0, l.jsx)("p", {
+    !F.length && /* @__PURE__ */ (0, l.jsx)("p", {
       className: "empty",
       children: "尚無製作資料。可逐筆新增，或匯入下方資料包。"
     }),
@@ -10160,7 +10160,7 @@ function wx({ project: r, busy: h, mutate: k }) {
           accept: "application/json,.json",
           disabled: h || r.archived,
           onChange: (b) => {
-            he(b.target.files?.[0]);
+            me(b.target.files?.[0]);
           }
         })] }),
         I && /* @__PURE__ */ (0, l.jsx)("p", {
@@ -10185,7 +10185,7 @@ function wx({ project: r, busy: h, mutate: k }) {
               className: "btn primary",
               disabled: h || r.archived,
               onClick: async () => {
-                await k("import_production_data", le) && (ne(null), p(""), x(""), z(""));
+                await C("import_production_data", le) && (ne(null), p(""), x(""), N(""));
               },
               children: "保存製作資料包"
             })
@@ -10207,7 +10207,7 @@ function wx({ project: r, busy: h, mutate: k }) {
     })
   ] });
 }
-function zx({ shotId: r, selection: h, disabled: k, mutate: f }) {
+function zx({ shotId: r, selection: h, disabled: C, mutate: f }) {
   const p = [
     ["output", "實際採用檔位置"],
     ["outputVersion", "採用檔版本"],
@@ -10216,20 +10216,20 @@ function zx({ shotId: r, selection: h, disabled: k, mutate: f }) {
     ["editorVersion", "剪輯工程版本"],
     ["inPoint", "工程入點"],
     ["outPoint", "工程出點"]
-  ], [w, x] = (0, g.useState)(() => Object.fromEntries(p.map(([A]) => [A, h?.[A] ?? ""])));
+  ], [k, x] = (0, g.useState)(() => Object.fromEntries(p.map(([A]) => [A, h?.[A] ?? ""])));
   return /* @__PURE__ */ (0, l.jsxs)("details", {
     className: "selection-editor",
     children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "登記採用檔與工程位置" }), /* @__PURE__ */ (0, l.jsxs)("form", {
       className: "context-form",
       onSubmit: async (A) => {
         A.preventDefault(), await f("register_shot_selection", {
-          ...w,
+          ...k,
           shotId: r,
           baseVersion: h?.version ?? 0
         });
       },
       children: [
-        p.map(([A, z]) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [z, /* @__PURE__ */ (0, l.jsx)("input", {
+        p.map(([A, N]) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [N, /* @__PURE__ */ (0, l.jsx)("input", {
           required: [
             "output",
             "outputVersion",
@@ -10237,10 +10237,10 @@ function zx({ shotId: r, selection: h, disabled: k, mutate: f }) {
             "source"
           ].includes(A),
           maxLength: A === "reason" ? 3e3 : 2e3,
-          value: w[A],
-          onChange: (E) => x({
-            ...w,
-            [A]: E.target.value
+          value: k[A],
+          onChange: (_) => x({
+            ...k,
+            [A]: _.target.value
           })
         })] }, A)),
         /* @__PURE__ */ (0, l.jsx)("p", {
@@ -10249,15 +10249,15 @@ function zx({ shotId: r, selection: h, disabled: k, mutate: f }) {
         }),
         /* @__PURE__ */ (0, l.jsx)("button", {
           className: "btn primary",
-          disabled: k,
+          disabled: C,
           children: "保存採用紀錄版本"
         })
       ]
     })]
   });
 }
-function kx({ project: r, busy: h, mutate: k }) {
-  const [f, p] = (0, g.useState)(""), [w, x] = (0, g.useState)(""), [A, z] = (0, g.useState)(""), [E, S] = (0, g.useState)(20), K = [...new Map((r.production?.selections ?? []).map((I) => [I.shotId, I])).values()], N = [...new Map((r.production?.links ?? []).map((I) => [I.shotId, I])).values()], le = Sl(r).records, ne = r.shots.filter((I) => [
+function kx({ project: r, busy: h, mutate: C }) {
+  const [f, p] = (0, g.useState)(""), [k, x] = (0, g.useState)(""), [A, N] = (0, g.useState)(""), [_, w] = (0, g.useState)(20), G = [...new Map((r.production?.selections ?? []).map((I) => [I.shotId, I])).values()], z = [...new Map((r.production?.links ?? []).map((I) => [I.shotId, I])).values()], le = Nl(r).records, ne = r.shots.filter((I) => [
     I.id,
     I.scene,
     I.description,
@@ -10279,13 +10279,13 @@ function kx({ project: r, busy: h, mutate: k }) {
       className: "production-totals",
       children: [
         /* @__PURE__ */ (0, l.jsxs)("b", { children: [
-          N.length,
+          z.length,
           " / ",
           r.shots.length,
           " 列已建立關聯"
         ] }),
-        /* @__PURE__ */ (0, l.jsxs)("b", { children: [N.filter((I) => I.references.length).length, " 列有影格來源定位"] }),
-        /* @__PURE__ */ (0, l.jsxs)("b", { children: [(/* @__PURE__ */ new Set([...K.map((I) => I.shotId), ...N.filter((I) => I.adoptedOutput).map((I) => I.shotId)])).size, " 列已登記採用檔"] })
+        /* @__PURE__ */ (0, l.jsxs)("b", { children: [z.filter((I) => I.references.length).length, " 列有影格來源定位"] }),
+        /* @__PURE__ */ (0, l.jsxs)("b", { children: [(/* @__PURE__ */ new Set([...G.map((I) => I.shotId), ...z.filter((I) => I.adoptedOutput).map((I) => I.shotId)])).size, " 列已登記採用檔"] })
       ]
     }),
     /* @__PURE__ */ (0, l.jsxs)("label", {
@@ -10293,13 +10293,13 @@ function kx({ project: r, busy: h, mutate: k }) {
       children: ["搜尋鏡頭關聯", /* @__PURE__ */ (0, l.jsx)("input", {
         value: f,
         onChange: (I) => {
-          p(I.target.value), S(20);
+          p(I.target.value), w(20);
         },
         placeholder: "F077、G11、S06 或鏡頭 ID"
       })]
     }),
-    ne.slice(0, E).map((I) => {
-      const Q = N.find((L) => L.shotId === I.id), re = K.find((L) => L.shotId === I.id);
+    ne.slice(0, _).map((I) => {
+      const X = z.find((q) => q.shotId === I.id), oe = G.find((q) => q.shotId === I.id);
       return /* @__PURE__ */ (0, l.jsxs)("details", {
         className: "production-record",
         children: [
@@ -10310,50 +10310,50 @@ function kx({ project: r, busy: h, mutate: k }) {
           ] }), /* @__PURE__ */ (0, l.jsxs)("small", { children: [
             I.scene,
             " · ",
-            Q ? "關聯已建立" : "來源對應待補"
+            X ? "關聯已建立" : "來源對應待補"
           ] })] }),
           /* @__PURE__ */ (0, l.jsx)("p", {
             className: "production-source-text",
             children: I.description
           }),
-          Q ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+          X ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
             /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "production-gaps",
               children: [
                 /* @__PURE__ */ (0, l.jsx)("b", { children: "接著做什麼" }),
-                /* @__PURE__ */ (0, l.jsx)("p", { children: re ? "採用檔已登記；接著開啟素材並對照工程版本與入出點。" : Q.nextStep }),
-                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["採用檔：", re?.output || Q.adoptedOutput || "位置尚未登記"] }),
-                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["選用原因：", re?.reason || Q.selectionReason || "尚未登記"] }),
-                Q.unknowns.length > 0 && /* @__PURE__ */ (0, l.jsx)("p", {
+                /* @__PURE__ */ (0, l.jsx)("p", { children: oe ? "採用檔已登記；接著開啟素材並對照工程版本與入出點。" : X.nextStep }),
+                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["採用檔：", oe?.output || X.adoptedOutput || "位置尚未登記"] }),
+                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["選用原因：", oe?.reason || X.selectionReason || "尚未登記"] }),
+                X.unknowns.length > 0 && /* @__PURE__ */ (0, l.jsx)("p", {
                   className: "muted",
                   children: "來源盤點時的缺口；新增採用登記另列於下方。"
                 }),
-                Q.unknowns.length > 0 && /* @__PURE__ */ (0, l.jsx)("ul", { children: Q.unknowns.map((L, ie) => /* @__PURE__ */ (0, l.jsx)("li", { children: L }, ie)) })
+                X.unknowns.length > 0 && /* @__PURE__ */ (0, l.jsx)("ul", { children: X.unknowns.map((q, ie) => /* @__PURE__ */ (0, l.jsx)("li", { children: q }, ie)) })
               ]
             }),
-            re && /* @__PURE__ */ (0, l.jsxs)("div", {
+            oe && /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "context-mini",
               children: [
                 /* @__PURE__ */ (0, l.jsxs)("b", { children: [
                   "採用登記 v",
-                  re.version,
+                  oe.version,
                   " · ",
-                  re.outputVersion
+                  oe.outputVersion
                 ] }),
-                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["依據：", re.source] }),
+                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["依據：", oe.source] }),
                 /* @__PURE__ */ (0, l.jsxs)("p", { children: [
                   "工程：",
-                  re.editorVersion || "未登記",
+                  oe.editorVersion || "未登記",
                   " · ",
-                  re.inPoint || "未登記",
+                  oe.inPoint || "未登記",
                   " → ",
-                  re.outPoint || "未登記"
+                  oe.outPoint || "未登記"
                 ] })
               ]
             }),
             /* @__PURE__ */ (0, l.jsx)("h3", { children: "使用依據與提示詞" }),
-            Q.recordKeys.map((L) => {
-              const ie = le.find((V) => V.key === L);
+            X.recordKeys.map((q) => {
+              const ie = le.find((H) => H.key === q);
               return ie ? /* @__PURE__ */ (0, l.jsxs)("details", {
                 className: "context-mini",
                 children: [
@@ -10369,18 +10369,18 @@ function kx({ project: r, busy: h, mutate: k }) {
                   }),
                   /* @__PURE__ */ (0, l.jsxs)("p", { children: ["來源：", ie.source] })
                 ]
-              }, L) : null;
+              }, q) : null;
             }),
             /* @__PURE__ */ (0, l.jsx)("h3", { children: "來源影格定位" }),
-            Q.references.length ? Q.references.map((L, ie) => /* @__PURE__ */ (0, l.jsxs)("div", {
+            X.references.length ? X.references.map((q, ie) => /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "context-mini",
               children: [
-                /* @__PURE__ */ (0, l.jsx)("b", { children: L.file }),
-                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["素材包：", L.archive] }),
-                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["包內位置：", L.member] }),
+                /* @__PURE__ */ (0, l.jsx)("b", { children: q.file }),
+                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["素材包：", q.archive] }),
+                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["包內位置：", q.member] }),
                 /* @__PURE__ */ (0, l.jsxs)("code", {
                   className: "context-id",
-                  children: ["SHA-256 ", L.sha256 || "來源未列"]
+                  children: ["SHA-256 ", q.sha256 || "來源未列"]
                 }),
                 /* @__PURE__ */ (0, l.jsx)("small", { children: "依來源索引定位；實際圖像讀取狀態另記。" })
               ]
@@ -10390,51 +10390,51 @@ function kx({ project: r, busy: h, mutate: k }) {
               className: "muted",
               children: "以下時間來自指定來源表，尚未指定為本鏡實際入片位置。"
             }),
-            Q.timelineCandidates.map((L, ie) => /* @__PURE__ */ (0, l.jsxs)("div", {
+            X.timelineCandidates.map((q, ie) => /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "context-mini",
               children: [
                 /* @__PURE__ */ (0, l.jsxs)("b", { children: [
                   "序號 ",
-                  L.sequence,
+                  q.sequence,
                   " · ",
-                  L.start,
+                  q.start,
                   " → ",
-                  L.end
+                  q.end
                 ] }),
-                /* @__PURE__ */ (0, l.jsx)("p", { children: L.text }),
-                /* @__PURE__ */ (0, l.jsx)("small", { children: L.source })
+                /* @__PURE__ */ (0, l.jsx)("p", { children: q.text }),
+                /* @__PURE__ */ (0, l.jsx)("small", { children: q.source })
               ]
             }, ie)),
-            !Q.timelineCandidates.length && /* @__PURE__ */ (0, l.jsx)("p", { children: "尚缺可核實的剪輯對照。" }),
+            !X.timelineCandidates.length && /* @__PURE__ */ (0, l.jsx)("p", { children: "尚缺可核實的剪輯對照。" }),
             /* @__PURE__ */ (0, l.jsx)("h3", { children: "台詞與音檔對照候選" }),
-            Q.voiceCandidates.map((L, ie) => /* @__PURE__ */ (0, l.jsxs)("div", {
+            X.voiceCandidates.map((q, ie) => /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "context-mini",
               children: [
-                /* @__PURE__ */ (0, l.jsx)("b", { children: L.lineId }),
-                /* @__PURE__ */ (0, l.jsx)("p", { children: L.file }),
+                /* @__PURE__ */ (0, l.jsx)("b", { children: q.lineId }),
+                /* @__PURE__ */ (0, l.jsx)("p", { children: q.file }),
                 /* @__PURE__ */ (0, l.jsxs)("small", { children: [
-                  L.start,
+                  q.start,
                   " → ",
-                  L.end,
+                  q.end,
                   " · ",
-                  L.source
+                  q.source
                 ] })
               ]
             }, ie)),
-            !Q.voiceCandidates.length && /* @__PURE__ */ (0, l.jsx)("p", { children: "尚未建立明確台詞對應，不依編號猜配。" })
+            !X.voiceCandidates.length && /* @__PURE__ */ (0, l.jsx)("p", { children: "尚未建立明確台詞對應，不依編號猜配。" })
           ] }) : /* @__PURE__ */ (0, l.jsx)("p", { children: "請補來源與實際輸出對應。" }),
           /* @__PURE__ */ (0, l.jsx)(zx, {
             shotId: I.id,
-            selection: re,
+            selection: oe,
             disabled: h || r.archived,
-            mutate: k
-          }, re?.id ?? I.id)
+            mutate: C
+          }, oe?.id ?? I.id)
         ]
       }, I.id);
     }),
-    ne.length > E && /* @__PURE__ */ (0, l.jsx)("button", {
+    ne.length > _ && /* @__PURE__ */ (0, l.jsx)("button", {
       className: "btn",
-      onClick: () => S(E + 20),
+      onClick: () => w(_ + 20),
       children: "再顯示 20 列"
     }),
     /* @__PURE__ */ (0, l.jsxs)("details", {
@@ -10444,9 +10444,9 @@ function kx({ project: r, busy: h, mutate: k }) {
         /* @__PURE__ */ (0, l.jsx)("p", { children: "貼上包含 bundleId 與 links 清單的 JSON；所有鏡頭與資料識別鍵必須已存在。保留歷次關聯。" }),
         /* @__PURE__ */ (0, l.jsxs)("label", { children: ["鏡頭關聯 JSON", /* @__PURE__ */ (0, l.jsx)("textarea", {
           rows: 5,
-          value: w,
+          value: k,
           onChange: (I) => {
-            x(I.target.value), z("");
+            x(I.target.value), N("");
           }
         })] }),
         A && /* @__PURE__ */ (0, l.jsx)("p", {
@@ -10455,12 +10455,12 @@ function kx({ project: r, busy: h, mutate: k }) {
         }),
         /* @__PURE__ */ (0, l.jsx)("button", {
           className: "btn primary",
-          disabled: h || r.archived || !w.trim(),
+          disabled: h || r.archived || !k.trim(),
           onClick: async () => {
             try {
-              await k("save_production_links", JSON.parse(w)) && x("");
+              await C("save_production_links", JSON.parse(k)) && x("");
             } catch (I) {
-              z(I instanceof Error ? I.message : "格式錯誤");
+              N(I instanceof Error ? I.message : "格式錯誤");
             }
           },
           children: "保存鏡頭製作關聯"
@@ -10508,42 +10508,42 @@ var cn = {
   status: "reference",
   baseVersion: 0
 };
-function Rf({ project: r, busy: h, mutate: k }) {
-  const [f, p] = (0, g.useState)(!1), [w, x] = (0, g.useState)(!1), [A, z] = (0, g.useState)(bf), [E, S] = (0, g.useState)(vf), [K, N] = (0, g.useState)(""), [le, ne] = (0, g.useState)(""), [I, Q] = (0, g.useState)(""), re = mx(r), L = h || r.archived, ie = $a(r.episodeRules ?? []), V = $a(r.baselines ?? []), ee = (j) => !K || [j.key, j.title].join(" ").toLowerCase().includes(K.toLowerCase());
-  function P(j) {
-    z({
-      ...j,
-      stageIdsText: j.stageIds.join(", "),
-      sceneIdsText: j.sceneIds.join(", "),
-      baseVersion: pi(r.episodeRules ?? []).find((W) => W.key === j.key).version
+function Rf({ project: r, busy: h, mutate: C }) {
+  const [f, p] = (0, g.useState)(!1), [k, x] = (0, g.useState)(!1), [A, N] = (0, g.useState)(bf), [_, w] = (0, g.useState)(vf), [G, z] = (0, g.useState)(""), [le, ne] = (0, g.useState)(""), [I, X] = (0, g.useState)(""), oe = mx(r), q = h || r.archived, ie = $a(r.episodeRules ?? []), H = $a(r.baselines ?? []), F = (y) => !G || [y.key, y.title].join(" ").toLowerCase().includes(G.toLowerCase());
+  function $(y) {
+    N({
+      ...y,
+      stageIdsText: y.stageIds.join(", "),
+      sceneIdsText: y.sceneIds.join(", "),
+      baseVersion: pi(r.episodeRules ?? []).find((ee) => ee.key === y.key).version
     }), p(!0);
   }
-  function xe(j) {
-    S({
-      ...j,
-      recordKey: j.snapshot?.key ?? "",
-      recordVersion: j.recordVersion ?? 1,
-      content: j.snapshot?.content ?? "",
-      stageIdsText: j.stageIds.join(", "),
-      sceneIdsText: j.sceneIds.join(", "),
-      baseVersion: pi(r.baselines ?? []).find((W) => W.key === j.key).version
+  function pe(y) {
+    w({
+      ...y,
+      recordKey: y.snapshot?.key ?? "",
+      recordVersion: y.recordVersion ?? 1,
+      content: y.snapshot?.content ?? "",
+      stageIdsText: y.stageIds.join(", "),
+      sceneIdsText: y.sceneIds.join(", "),
+      baseVersion: pi(r.baselines ?? []).find((ee) => ee.key === y.key).version
     }), x(!0);
   }
-  async function te(j, W) {
-    await k("save_episode_rule", {
-      ...j,
-      status: W,
-      baseVersion: re.rules.find((ge) => ge.key === j.key).version
+  async function te(y, ee) {
+    await C("save_episode_rule", {
+      ...y,
+      status: ee,
+      baseVersion: oe.rules.find((ge) => ge.key === y.key).version
     });
   }
-  async function $(j, W) {
-    await k("register_episode_baseline", {
-      ...j,
-      status: W,
-      recordKey: j.snapshot?.key ?? "",
-      recordVersion: j.recordVersion,
-      content: j.snapshot?.content ?? "",
-      baseVersion: re.baselines.find((ge) => ge.key === j.key).version
+  async function P(y, ee) {
+    await C("register_episode_baseline", {
+      ...y,
+      status: ee,
+      recordKey: y.snapshot?.key ?? "",
+      recordVersion: y.recordVersion,
+      content: y.snapshot?.content ?? "",
+      baseVersion: oe.baselines.find((ge) => ge.key === y.key).version
     });
   }
   return /* @__PURE__ */ (0, l.jsxs)("section", {
@@ -10562,8 +10562,8 @@ function Rf({ project: r, busy: h, mutate: k }) {
             className: "production-totals",
             children: [
               /* @__PURE__ */ (0, l.jsxs)("b", { children: [ie.length, " 項本集規則已採用"] }),
-              /* @__PURE__ */ (0, l.jsxs)("b", { children: [V.length, " 項來源已採用"] }),
-              /* @__PURE__ */ (0, l.jsxs)("span", { children: [re.baselines.filter((j) => j.status === "unresolved").length, " 項版本待補登"] })
+              /* @__PURE__ */ (0, l.jsxs)("b", { children: [H.length, " 項來源已採用"] }),
+              /* @__PURE__ */ (0, l.jsxs)("span", { children: [oe.baselines.filter((y) => y.status === "unresolved").length, " 項版本待補登"] })
             ]
           }),
           /* @__PURE__ */ (0, l.jsx)("p", {
@@ -10573,30 +10573,30 @@ function Rf({ project: r, busy: h, mutate: k }) {
           /* @__PURE__ */ (0, l.jsxs)("label", {
             className: "work-search",
             children: ["搜尋規則與採用項目", /* @__PURE__ */ (0, l.jsx)("input", {
-              value: K,
-              onChange: (j) => N(j.target.value),
+              value: G,
+              onChange: (y) => z(y.target.value),
               placeholder: "規則、角色、劇本、聲線或音軌"
             })]
           }),
-          /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "通用流程檢查項目" }), re.genericChecks.map((j) => /* @__PURE__ */ (0, l.jsxs)("div", {
+          /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "通用流程檢查項目" }), oe.genericChecks.map((y) => /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "context-mini",
             children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: [
-              j.id,
+              y.id,
               " ",
-              j.title
-            ] }), /* @__PURE__ */ (0, l.jsx)("ul", { children: j.checks.map((W) => /* @__PURE__ */ (0, l.jsx)("li", { children: W }, W)) })]
-          }, j.id))] }),
+              y.title
+            ] }), /* @__PURE__ */ (0, l.jsx)("ul", { children: y.checks.map((ee) => /* @__PURE__ */ (0, l.jsx)("li", { children: ee }, ee)) })]
+          }, y.id))] }),
           r.workflowLegacy && /* @__PURE__ */ (0, l.jsxs)("details", { children: [
             /* @__PURE__ */ (0, l.jsx)("summary", { children: "保留的舊版檢查表紀錄" }),
             /* @__PURE__ */ (0, l.jsx)("p", { children: "舊版單集條件及勾選狀態保留在此；本集實際適用的規則另列於下方。" }),
-            r.workflowLegacy.stages.map((j) => /* @__PURE__ */ (0, l.jsxs)("div", {
+            r.workflowLegacy.stages.map((y) => /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "context-mini",
-              children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: ["舊階段 ", j.stageId] }), j.labels.map((W, ge) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-                j.checks[ge] ? "已勾選" : "未勾選",
+              children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: ["舊階段 ", y.stageId] }), y.labels.map((ee, ge) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
+                y.checks[ge] ? "已勾選" : "未勾選",
                 " · ",
-                W
+                ee
               ] }, ge))]
-            }, j.stageId))
+            }, y.stageId))
           ] })
         ]
       }),
@@ -10607,17 +10607,17 @@ function Rf({ project: r, busy: h, mutate: k }) {
             className: "section-title",
             children: [/* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: "本集專用規則" }), /* @__PURE__ */ (0, l.jsx)("p", { children: "具體內容、來源、適用階段與場次，按版本保存。" })] }), /* @__PURE__ */ (0, l.jsx)("button", {
               className: "btn",
-              disabled: L,
+              disabled: q,
               onClick: () => {
-                z(bf), p(!f);
+                N(bf), p(!f);
               },
               children: "新增本集規則"
             })]
           }),
           f && /* @__PURE__ */ (0, l.jsxs)("form", {
             className: "context-form",
-            onSubmit: async (j) => {
-              j.preventDefault(), await k("save_episode_rule", {
+            onSubmit: async (y) => {
+              y.preventDefault(), await C("save_episode_rule", {
                 ...A,
                 stageIds: Es(A.stageIdsText),
                 sceneIds: Es(A.sceneIdsText)
@@ -10631,17 +10631,17 @@ function Rf({ project: r, busy: h, mutate: k }) {
                   readOnly: !!A.baseVersion,
                   maxLength: 100,
                   value: A.key,
-                  onChange: (j) => z({
+                  onChange: (y) => N({
                     ...A,
-                    key: j.target.value
+                    key: y.target.value
                   })
                 })] }), /* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則名稱", /* @__PURE__ */ (0, l.jsx)("input", {
                   required: !0,
                   maxLength: 200,
                   value: A.title,
-                  onChange: (j) => z({
+                  onChange: (y) => N({
                     ...A,
-                    title: j.target.value
+                    title: y.target.value
                   })
                 })] })]
               }),
@@ -10650,18 +10650,18 @@ function Rf({ project: r, busy: h, mutate: k }) {
                 rows: 4,
                 maxLength: 6e3,
                 value: A.content,
-                onChange: (j) => z({
+                onChange: (y) => N({
                   ...A,
-                  content: j.target.value
+                  content: y.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則來源", /* @__PURE__ */ (0, l.jsx)("input", {
                 required: !0,
                 maxLength: 2e3,
                 value: A.source,
-                onChange: (j) => z({
+                onChange: (y) => N({
                   ...A,
-                  source: j.target.value
+                  source: y.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -10669,74 +10669,74 @@ function Rf({ project: r, busy: h, mutate: k }) {
                 children: [/* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則適用階段", /* @__PURE__ */ (0, l.jsx)("input", {
                   value: A.stageIdsText,
                   placeholder: "逗號分隔；留空為本集共用",
-                  onChange: (j) => z({
+                  onChange: (y) => N({
                     ...A,
-                    stageIdsText: j.target.value
+                    stageIdsText: y.target.value
                   })
                 })] }), /* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則適用場次", /* @__PURE__ */ (0, l.jsx)("input", {
                   value: A.sceneIdsText,
                   placeholder: "逗號分隔；留空為全部場次",
-                  onChange: (j) => z({
+                  onChange: (y) => N({
                     ...A,
-                    sceneIdsText: j.target.value
+                    sceneIdsText: y.target.value
                   })
                 })] })]
               }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則狀態", /* @__PURE__ */ (0, l.jsx)("select", {
                 value: A.status,
-                onChange: (j) => z({
+                onChange: (y) => N({
                   ...A,
-                  status: j.target.value
+                  status: y.target.value
                 }),
-                children: Object.entries(cn).map(([j, W]) => /* @__PURE__ */ (0, l.jsx)("option", {
-                  value: j,
-                  children: W
-                }, j))
+                children: Object.entries(cn).map(([y, ee]) => /* @__PURE__ */ (0, l.jsx)("option", {
+                  value: y,
+                  children: ee
+                }, y))
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["規則備註", /* @__PURE__ */ (0, l.jsx)("textarea", {
                 rows: 2,
                 value: A.note,
-                onChange: (j) => z({
+                onChange: (y) => N({
                   ...A,
-                  note: j.target.value
+                  note: y.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn primary",
-                disabled: L,
+                disabled: q,
                 children: "保存本集規則版本"
               })
             ]
           }),
-          re.rules.filter(ee).map((j) => {
-            const W = ie.find((ge) => ge.key === j.key);
+          oe.rules.filter(F).map((y) => {
+            const ee = ie.find((ge) => ge.key === y.key);
             return /* @__PURE__ */ (0, l.jsxs)("details", {
               className: "production-record",
               children: [
-                /* @__PURE__ */ (0, l.jsxs)("summary", { children: [/* @__PURE__ */ (0, l.jsx)("b", { children: j.title }), /* @__PURE__ */ (0, l.jsxs)("span", { children: [
-                  cn[j.status],
+                /* @__PURE__ */ (0, l.jsxs)("summary", { children: [/* @__PURE__ */ (0, l.jsx)("b", { children: y.title }), /* @__PURE__ */ (0, l.jsxs)("span", { children: [
+                  cn[y.status],
                   " · v",
-                  j.version
+                  y.version
                 ] })] }),
-                /* @__PURE__ */ (0, l.jsx)("code", { children: j.key }),
+                /* @__PURE__ */ (0, l.jsx)("code", { children: y.key }),
                 /* @__PURE__ */ (0, l.jsx)("p", {
                   className: "production-source-text",
-                  children: j.content
+                  children: y.content
                 }),
-                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["來源：", j.source] }),
+                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["來源：", y.source] }),
                 /* @__PURE__ */ (0, l.jsxs)("p", { children: [
                   "階段：",
-                  j.stageIds.join("、") || "本集共用",
+                  y.stageIds.join("、") || "本集共用",
                   " · 場次：",
-                  j.sceneIds.join("、") || "全部場次"
+                  y.sceneIds.join("、") || "全部場次"
                 ] }),
-                /* @__PURE__ */ (0, l.jsx)("p", { children: j.note }),
-                W && W.id !== j.id && /* @__PURE__ */ (0, l.jsxs)("div", {
+                /* @__PURE__ */ (0, l.jsx)("p", { children: y.note }),
+                ee && ee.id !== y.id && /* @__PURE__ */ (0, l.jsxs)("div", {
                   className: "context-mini",
                   children: [
-                    /* @__PURE__ */ (0, l.jsxs)("b", { children: ["仍沿用已採用 v", W.version] }),
-                    /* @__PURE__ */ (0, l.jsx)("p", { children: W.content }),
-                    /* @__PURE__ */ (0, l.jsxs)("small", { children: ["來源：", W.source] })
+                    /* @__PURE__ */ (0, l.jsxs)("b", { children: ["仍沿用已採用 v", ee.version] }),
+                    /* @__PURE__ */ (0, l.jsx)("p", { children: ee.content }),
+                    /* @__PURE__ */ (0, l.jsxs)("small", { children: ["來源：", ee.source] })
                   ]
                 }),
                 /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -10744,32 +10744,32 @@ function Rf({ project: r, busy: h, mutate: k }) {
                   children: [
                     /* @__PURE__ */ (0, l.jsx)("button", {
                       className: "btn",
-                      disabled: L,
-                      onClick: () => P(j),
+                      disabled: q,
+                      onClick: () => $(y),
                       children: "編輯規則新版本"
                     }),
-                    j.status === "reference" && /* @__PURE__ */ (0, l.jsx)("button", {
+                    y.status === "reference" && /* @__PURE__ */ (0, l.jsx)("button", {
                       className: "btn primary",
-                      disabled: L,
+                      disabled: q,
                       onClick: () => {
-                        te(j, "adopted");
+                        te(y, "adopted");
                       },
                       children: "採用此規則"
                     }),
-                    W && /* @__PURE__ */ (0, l.jsx)("button", {
+                    ee && /* @__PURE__ */ (0, l.jsx)("button", {
                       className: "btn",
-                      disabled: L,
+                      disabled: q,
                       onClick: () => {
-                        te(W, "withdrawn");
+                        te(ee, "withdrawn");
                       },
                       children: "停止沿用規則"
                     })
                   ]
                 })
               ]
-            }, j.id);
+            }, y.id);
           }),
-          !re.rules.length && /* @__PURE__ */ (0, l.jsx)("p", { children: "本集尚未登記專用規則；不自動繼承前一集條件。" })
+          !oe.rules.length && /* @__PURE__ */ (0, l.jsx)("p", { children: "本集尚未登記專用規則；不自動繼承前一集條件。" })
         ]
       }),
       /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -10779,20 +10779,20 @@ function Rf({ project: r, busy: h, mutate: k }) {
             className: "section-title",
             children: [/* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: "本集採用版本清單" }), /* @__PURE__ */ (0, l.jsx)("p", { children: "依角色、場景或音軌使用固定識別鍵；指定來源全文的確切版本，或登記外部來源。" })] }), /* @__PURE__ */ (0, l.jsx)("button", {
               className: "btn",
-              disabled: L,
+              disabled: q,
               onClick: () => {
-                S(vf), x(!w);
+                w(vf), x(!k);
               },
               children: "新增採用項目"
             })]
           }),
-          w && /* @__PURE__ */ (0, l.jsxs)("form", {
+          k && /* @__PURE__ */ (0, l.jsxs)("form", {
             className: "context-form",
-            onSubmit: async (j) => {
-              j.preventDefault(), await k("register_episode_baseline", {
-                ...E,
-                stageIds: Es(E.stageIdsText),
-                sceneIds: Es(E.sceneIdsText)
+            onSubmit: async (y) => {
+              y.preventDefault(), await C("register_episode_baseline", {
+                ..._,
+                stageIds: Es(_.stageIdsText),
+                sceneIds: Es(_.sceneIdsText)
               }) && x(!1);
             },
             children: [
@@ -10801,181 +10801,181 @@ function Rf({ project: r, busy: h, mutate: k }) {
                 children: [
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用項目識別鍵", /* @__PURE__ */ (0, l.jsx)("input", {
                     required: !0,
-                    readOnly: !!E.baseVersion,
+                    readOnly: !!_.baseVersion,
                     maxLength: 100,
-                    value: E.key,
-                    onChange: (j) => S({
-                      ...E,
-                      key: j.target.value
+                    value: _.key,
+                    onChange: (y) => w({
+                      ..._,
+                      key: y.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用項目名稱", /* @__PURE__ */ (0, l.jsx)("input", {
                     required: !0,
                     maxLength: 200,
-                    value: E.title,
-                    onChange: (j) => S({
-                      ...E,
-                      title: j.target.value
+                    value: _.title,
+                    onChange: (y) => w({
+                      ..._,
+                      title: y.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用種類", /* @__PURE__ */ (0, l.jsx)("select", {
-                    value: E.category,
-                    onChange: (j) => S({
-                      ...E,
-                      category: j.target.value
+                    value: _.category,
+                    onChange: (y) => w({
+                      ..._,
+                      category: y.target.value
                     }),
-                    children: hx.map((j) => /* @__PURE__ */ (0, l.jsx)("option", {
-                      value: j,
-                      children: gf[j]
-                    }, j))
+                    children: hx.map((y) => /* @__PURE__ */ (0, l.jsx)("option", {
+                      value: y,
+                      children: gf[y]
+                    }, y))
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用項目狀態", /* @__PURE__ */ (0, l.jsx)("select", {
-                    value: E.status,
-                    onChange: (j) => S({
-                      ...E,
-                      status: j.target.value
+                    value: _.status,
+                    onChange: (y) => w({
+                      ..._,
+                      status: y.target.value
                     }),
-                    children: Object.entries(cn).map(([j, W]) => /* @__PURE__ */ (0, l.jsx)("option", {
-                      value: j,
-                      children: W
-                    }, j))
+                    children: Object.entries(cn).map(([y, ee]) => /* @__PURE__ */ (0, l.jsx)("option", {
+                      value: y,
+                      children: ee
+                    }, y))
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["已有來源識別鍵", /* @__PURE__ */ (0, l.jsx)("input", {
-                    value: E.recordKey,
+                    value: _.recordKey,
                     maxLength: 120,
-                    onChange: (j) => S({
-                      ...E,
-                      recordKey: j.target.value
+                    onChange: (y) => w({
+                      ..._,
+                      recordKey: y.target.value
                     }),
                     placeholder: "從製作資料取得；外部來源可留空"
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["來源紀錄版本", /* @__PURE__ */ (0, l.jsx)("input", {
                     type: "number",
                     min: 1,
-                    value: E.recordVersion,
-                    onChange: (j) => S({
-                      ...E,
-                      recordVersion: Number(j.target.value)
+                    value: _.recordVersion,
+                    onChange: (y) => w({
+                      ..._,
+                      recordVersion: Number(y.target.value)
                     })
                   })] })
                 ]
               }),
-              !E.recordKey && /* @__PURE__ */ (0, l.jsxs)("label", { children: ["外部來源內容", /* @__PURE__ */ (0, l.jsx)("textarea", {
+              !_.recordKey && /* @__PURE__ */ (0, l.jsxs)("label", { children: ["外部來源內容", /* @__PURE__ */ (0, l.jsx)("textarea", {
                 rows: 4,
-                required: E.status === "reference" || E.status === "adopted",
-                value: E.content,
+                required: _.status === "reference" || _.status === "adopted",
+                value: _.content,
                 maxLength: 12e3,
-                onChange: (j) => S({
-                  ...E,
-                  content: j.target.value
+                onChange: (y) => w({
+                  ..._,
+                  content: y.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用依據來源", /* @__PURE__ */ (0, l.jsx)("input", {
                 required: !0,
                 maxLength: 2e3,
-                value: E.source,
-                onChange: (j) => S({
-                  ...E,
-                  source: j.target.value
+                value: _.source,
+                onChange: (y) => w({
+                  ..._,
+                  source: y.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "context-form-grid",
                 children: [
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["外部檔案版本", /* @__PURE__ */ (0, l.jsx)("input", {
-                    value: E.externalVersion,
+                    value: _.externalVersion,
                     maxLength: 200,
-                    onChange: (j) => S({
-                      ...E,
-                      externalVersion: j.target.value
+                    onChange: (y) => w({
+                      ..._,
+                      externalVersion: y.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["來源檔案位置", /* @__PURE__ */ (0, l.jsx)("input", {
-                    value: E.location,
+                    value: _.location,
                     maxLength: 2e3,
-                    onChange: (j) => S({
-                      ...E,
-                      location: j.target.value
+                    onChange: (y) => w({
+                      ..._,
+                      location: y.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用適用階段", /* @__PURE__ */ (0, l.jsx)("input", {
-                    value: E.stageIdsText,
+                    value: _.stageIdsText,
                     placeholder: "OP／ED自動限制於各自支線",
-                    onChange: (j) => S({
-                      ...E,
-                      stageIdsText: j.target.value
+                    onChange: (y) => w({
+                      ..._,
+                      stageIdsText: y.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["採用適用場次", /* @__PURE__ */ (0, l.jsx)("input", {
-                    value: E.sceneIdsText,
-                    onChange: (j) => S({
-                      ...E,
-                      sceneIdsText: j.target.value
+                    value: _.sceneIdsText,
+                    onChange: (y) => w({
+                      ..._,
+                      sceneIdsText: y.target.value
                     })
                   })] })
                 ]
               }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["選用原因或待補說明", /* @__PURE__ */ (0, l.jsx)("textarea", {
-                required: E.status === "unresolved",
+                required: _.status === "unresolved",
                 rows: 3,
                 maxLength: 3e3,
-                value: E.note,
-                onChange: (j) => S({
-                  ...E,
-                  note: j.target.value
+                value: _.note,
+                onChange: (y) => w({
+                  ..._,
+                  note: y.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn primary",
-                disabled: L,
+                disabled: q,
                 children: "保存採用項目版本"
               })
             ]
           }),
-          re.baselines.filter(ee).map((j) => {
-            const W = V.find((ge) => ge.key === j.key);
+          oe.baselines.filter(F).map((y) => {
+            const ee = H.find((ge) => ge.key === y.key);
             return /* @__PURE__ */ (0, l.jsxs)("details", {
               className: "production-record",
               children: [
                 /* @__PURE__ */ (0, l.jsxs)("summary", { children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: [
-                  gf[j.category],
+                  gf[y.category],
                   "｜",
-                  j.title
+                  y.title
                 ] }), /* @__PURE__ */ (0, l.jsxs)("span", { children: [
-                  cn[j.status],
+                  cn[y.status],
                   " · v",
-                  j.version
+                  y.version
                 ] })] }),
-                /* @__PURE__ */ (0, l.jsx)("code", { children: j.key }),
-                /* @__PURE__ */ (0, l.jsx)("p", { children: j.note }),
-                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["來源：", j.source] }),
+                /* @__PURE__ */ (0, l.jsx)("code", { children: y.key }),
+                /* @__PURE__ */ (0, l.jsx)("p", { children: y.note }),
+                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["來源：", y.source] }),
                 /* @__PURE__ */ (0, l.jsxs)("p", { children: [
                   "來源版本：",
-                  j.snapshot ? `${j.snapshot.key} · v${j.recordVersion}` : "尚未指定",
-                  j.externalVersion ? " · " + j.externalVersion : ""
+                  y.snapshot ? `${y.snapshot.key} · v${y.recordVersion}` : "尚未指定",
+                  y.externalVersion ? " · " + y.externalVersion : ""
                 ] }),
-                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["檔案位置：", j.location || "待補登可讀取位置"] }),
+                /* @__PURE__ */ (0, l.jsxs)("p", { children: ["檔案位置：", y.location || "待補登可讀取位置"] }),
                 /* @__PURE__ */ (0, l.jsxs)("p", { children: [
                   "階段：",
-                  j.stageIds.join("、") || "本集共用",
+                  y.stageIds.join("、") || "本集共用",
                   " · 場次：",
-                  j.sceneIds.join("、") || "全部場次"
+                  y.sceneIds.join("、") || "全部場次"
                 ] }),
-                j.snapshot && /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "查看此來源版本全文" }), /* @__PURE__ */ (0, l.jsx)("p", {
+                y.snapshot && /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "查看此來源版本全文" }), /* @__PURE__ */ (0, l.jsx)("p", {
                   className: "production-source-text",
-                  children: j.snapshot.content
+                  children: y.snapshot.content
                 })] }),
-                W && W.id !== j.id && /* @__PURE__ */ (0, l.jsxs)("div", {
+                ee && ee.id !== y.id && /* @__PURE__ */ (0, l.jsxs)("div", {
                   className: "context-mini",
                   children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: [
                     "仍沿用已採用 v",
-                    W.version,
+                    ee.version,
                     "：",
-                    W.title
+                    ee.title
                   ] }), /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-                    W.externalVersion || W.snapshot?.key,
+                    ee.externalVersion || ee.snapshot?.key,
                     " · ",
-                    W.source
+                    ee.source
                   ] })]
                 }),
                 /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -10983,32 +10983,32 @@ function Rf({ project: r, busy: h, mutate: k }) {
                   children: [
                     /* @__PURE__ */ (0, l.jsx)("button", {
                       className: "btn",
-                      disabled: L,
-                      onClick: () => xe(j),
+                      disabled: q,
+                      onClick: () => pe(y),
                       children: "編輯採用項目新版本"
                     }),
-                    j.status === "reference" && j.snapshot && /* @__PURE__ */ (0, l.jsx)("button", {
+                    y.status === "reference" && y.snapshot && /* @__PURE__ */ (0, l.jsx)("button", {
                       className: "btn primary",
-                      disabled: L,
+                      disabled: q,
                       onClick: () => {
-                        $(j, "adopted");
+                        P(y, "adopted");
                       },
                       children: "採用此來源版本"
                     }),
-                    W && /* @__PURE__ */ (0, l.jsx)("button", {
+                    ee && /* @__PURE__ */ (0, l.jsx)("button", {
                       className: "btn",
-                      disabled: L,
+                      disabled: q,
                       onClick: () => {
-                        $(W, "withdrawn");
+                        P(ee, "withdrawn");
                       },
                       children: "停止沿用此項目"
                     })
                   ]
                 })
               ]
-            }, j.id);
+            }, y.id);
           }),
-          !re.baselines.length && /* @__PURE__ */ (0, l.jsx)("p", { children: "尚未指定本集採用版本。共用來源可按需連結後再選用。" }),
+          !oe.baselines.length && /* @__PURE__ */ (0, l.jsx)("p", { children: "尚未指定本集採用版本。共用來源可按需連結後再選用。" }),
           /* @__PURE__ */ (0, l.jsxs)("details", {
             className: "production-import",
             children: [
@@ -11017,8 +11017,8 @@ function Rf({ project: r, busy: h, mutate: k }) {
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["本集設定 JSON", /* @__PURE__ */ (0, l.jsx)("textarea", {
                 rows: 5,
                 value: le,
-                onChange: (j) => {
-                  ne(j.target.value), Q("");
+                onChange: (y) => {
+                  ne(y.target.value), X("");
                 }
               })] }),
               I && /* @__PURE__ */ (0, l.jsx)("p", {
@@ -11027,29 +11027,29 @@ function Rf({ project: r, busy: h, mutate: k }) {
               }),
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn primary",
-                disabled: L || !le.trim(),
+                disabled: q || !le.trim(),
                 onClick: async () => {
                   try {
-                    await k("import_episode_settings", JSON.parse(le)) && ne("");
-                  } catch (j) {
-                    Q(j instanceof Error ? j.message : "格式錯誤");
+                    await C("import_episode_settings", JSON.parse(le)) && ne("");
+                  } catch (y) {
+                    X(y instanceof Error ? y.message : "格式錯誤");
                   }
                 },
                 children: "保存本集設定清單"
               })
             ]
           }),
-          /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "設定歷史版本" }), [...r.episodeRules ?? [], ...r.baselines ?? []].map((j) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-            j.key,
+          /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "設定歷史版本" }), [...r.episodeRules ?? [], ...r.baselines ?? []].map((y) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
+            y.key,
             " v",
-            j.version,
+            y.version,
             " · ",
-            cn[j.status],
+            cn[y.status],
             " · ",
-            j.at,
+            y.at,
             " · ",
-            j.by
-          ] }, j.id))] })
+            y.by
+          ] }, y.id))] })
         ]
       })
     ]
@@ -11085,16 +11085,16 @@ var Fr = {
   supersedesId: ""
 };
 function _x(r, h) {
-  const k = URL.createObjectURL(new Blob([JSON.stringify(h, null, 2)], { type: "application/json" })), f = document.createElement("a");
-  f.href = k, f.download = r, f.click(), setTimeout(() => URL.revokeObjectURL(k), 1e3);
+  const C = URL.createObjectURL(new Blob([JSON.stringify(h, null, 2)], { type: "application/json" })), f = document.createElement("a");
+  f.href = C, f.download = r, f.click(), setTimeout(() => URL.revokeObjectURL(C), 1e3);
 }
-function Cx({ project: r, mutate: h, busy: k }) {
-  const f = Sl(r), [p, w] = (0, g.useState)("materials"), [x, A] = (0, g.useState)(!1), [z, E] = (0, g.useState)(ed), [S, K] = (0, g.useState)(!1), [N, le] = (0, g.useState)({
+function Cx({ project: r, mutate: h, busy: C }) {
+  const f = Nl(r), [p, k] = (0, g.useState)("materials"), [x, A] = (0, g.useState)(!1), [N, _] = (0, g.useState)(ed), [w, G] = (0, g.useState)(!1), [z, le] = (0, g.useState)({
     type: "conflict",
     scopeType: "project",
     target: "",
     description: ""
-  }), [ne, I] = (0, g.useState)("production"), [Q, re] = (0, g.useState)(""), [L, ie] = (0, g.useState)(""), [V, ee] = (0, g.useState)(""), [P, xe] = (0, g.useState)(""), [te, $] = (0, g.useState)(""), [j, W] = (0, g.useState)(""), [ge, he] = (0, g.useState)(""), [b, ae] = (0, g.useState)(""), [Z, B] = (0, g.useState)(""), [Y, se] = (0, g.useState)(""), [ce, _e] = (0, g.useState)(""), [d, _] = (0, g.useState)(""), [q, F] = (0, g.useState)(""), [de, fe] = (0, g.useState)({}), ue = f.packs.find((o) => o.id === b) ?? f.packs.at(-1), Ge = f.records.filter((o) => o.status === "effective"), ze = f.records.filter((o) => o.status === "proposed" && !rn(o)), dt = f.problems.filter((o) => o.status === "open"), Xe = [
+  }), [ne, I] = (0, g.useState)("production"), [X, oe] = (0, g.useState)(""), [q, ie] = (0, g.useState)(""), [H, F] = (0, g.useState)(""), [$, pe] = (0, g.useState)(""), [te, P] = (0, g.useState)(""), [y, ee] = (0, g.useState)(""), [ge, me] = (0, g.useState)(""), [b, ae] = (0, g.useState)(""), [K, Y] = (0, g.useState)(""), [Q, se] = (0, g.useState)(""), [re, _e] = (0, g.useState)(""), [o, j] = (0, g.useState)(""), [R, W] = (0, g.useState)(""), [ce, he] = (0, g.useState)({}), de = f.packs.find((d) => d.id === b) ?? f.packs.at(-1), Ge = f.records.filter((d) => d.status === "effective"), ze = f.records.filter((d) => d.status === "proposed" && !rn(d)), dt = f.problems.filter((d) => d.status === "open"), Xe = [
     [
       "materials",
       "製作資料",
@@ -11103,7 +11103,7 @@ function Cx({ project: r, mutate: h, busy: k }) {
     [
       "links",
       "製作關聯",
-      new Set((r.production?.links ?? []).map((o) => o.shotId)).size
+      new Set((r.production?.links ?? []).map((d) => d.shotId)).size
     ],
     [
       "settings",
@@ -11135,116 +11135,116 @@ function Cx({ project: r, mutate: h, busy: k }) {
       "工作接續",
       f.results.length
     ]
-  ], Me = k || r.archived;
-  async function ve(o) {
-    o.preventDefault(), await h("propose_record", {
-      ...z,
+  ], Me = C || r.archived;
+  async function ve(d) {
+    d.preventDefault(), await h("propose_record", {
+      ...N,
       scope: {
-        type: z.scopeType,
-        target: z.target
+        type: N.scopeType,
+        target: N.target
       }
-    }) && (A(!1), E(ed), w("proposals"));
+    }) && (A(!1), _(ed), k("proposals"));
   }
-  function qe(o) {
-    const H = f.records.find((oe) => oe.id === o);
-    E({
-      key: H.key,
-      title: H.title,
-      kind: H.kind,
+  function qe(d) {
+    const B = f.records.find((ue) => ue.id === d);
+    _({
+      key: B.key,
+      title: B.title,
+      kind: B.kind,
       origin: "author_decision",
-      content: H.content,
+      content: B.content,
       source: "",
-      location: H.location,
-      scopeType: H.scope.type,
-      target: H.scope.target,
-      supersedesId: H.id
+      location: B.location,
+      scopeType: B.scope.type,
+      target: B.scope.target,
+      supersedesId: B.id
     }), A(!0);
   }
-  function lt(o) {
+  function lt(d) {
     return /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
       /* @__PURE__ */ (0, l.jsxs)("div", {
         className: "context-pack-head",
         children: [
           /* @__PURE__ */ (0, l.jsx)("span", {
-            className: "status " + (o.readiness === "ready" ? "passed" : "needs_revision"),
-            children: o.readiness === "ready" ? o.purpose === "documentation" ? "可整理資料 · 保留來源差異" : "紀錄齊備 · 素材待實際讀取" : "受阻 · 先處理缺件與矛盾"
+            className: "status " + (d.readiness === "ready" ? "passed" : "needs_revision"),
+            children: d.readiness === "ready" ? d.purpose === "documentation" ? "可整理資料 · 保留來源差異" : "紀錄齊備 · 素材待實際讀取" : "受阻 · 先處理缺件與矛盾"
           }),
           /* @__PURE__ */ (0, l.jsx)("span", {
-            className: "status " + (o.projectRevision === r.revision ? "passed" : "needs_revision"),
-            children: o.projectRevision === r.revision ? "目前版本" : "已過期，需重新取得"
+            className: "status " + (d.projectRevision === r.revision ? "passed" : "needs_revision"),
+            children: d.projectRevision === r.revision ? "目前版本" : "已過期，需重新取得"
           }),
           /* @__PURE__ */ (0, l.jsx)("button", {
             className: "btn",
-            onClick: () => _x("AI_工作資料包_" + o.id + ".json", o),
+            onClick: () => _x("AI_工作資料包_" + d.id + ".json", d),
             children: "下載資料包 JSON"
           })
         ]
       }),
       /* @__PURE__ */ (0, l.jsx)("p", {
         className: "context-task",
-        children: o.task
+        children: d.task
       }),
       /* @__PURE__ */ (0, l.jsxs)("p", {
         className: "muted",
         children: [
           "範圍：",
           [
-            o.episode,
-            o.scope.stageId,
-            o.scope.sceneId,
-            o.scope.shotId
+            d.episode,
+            d.scope.stageId,
+            d.scope.sceneId,
+            d.scope.shotId
           ].filter(Boolean).join(" ／ "),
           " · 專案版本 ",
-          o.projectRevision
+          d.projectRevision
         ]
       }),
       /* @__PURE__ */ (0, l.jsx)("code", {
         className: "context-id",
-        children: o.id
+        children: d.id
       }),
-      o.blockers.length > 0 && /* @__PURE__ */ (0, l.jsx)("div", {
+      d.blockers.length > 0 && /* @__PURE__ */ (0, l.jsx)("div", {
         className: "context-blockers",
-        children: o.blockers.map((H, oe) => /* @__PURE__ */ (0, l.jsx)("p", { children: H.replace(/缺少有效資料種類：(\w+)/g, (He, T) => "缺少有效資料種類：" + (Fr[T] || T)) }, oe))
+        children: d.blockers.map((B, ue) => /* @__PURE__ */ (0, l.jsx)("p", { children: B.replace(/缺少有效資料種類：(\w+)/g, (He, T) => "缺少有效資料種類：" + (Fr[T] || T)) }, ue))
       }),
-      /* @__PURE__ */ (0, l.jsx)("h3", { children: o.purpose === "documentation" ? "本次指定來源（整理用途）" : "本次有效依據" }),
-      o.records.length ? o.records.map((H) => /* @__PURE__ */ (0, l.jsxs)("article", {
+      /* @__PURE__ */ (0, l.jsx)("h3", { children: d.purpose === "documentation" ? "本次指定來源（整理用途）" : "本次有效依據" }),
+      d.records.length ? d.records.map((B) => /* @__PURE__ */ (0, l.jsxs)("article", {
         className: "context-mini",
         children: [
           /* @__PURE__ */ (0, l.jsxs)("b", { children: [
-            H.title,
+            B.title,
             " · v",
-            H.version
+            B.version
           ] }),
           /* @__PURE__ */ (0, l.jsxs)("small", { children: [
-            H.key,
+            B.key,
             " · ",
-            Pr(H.scope)
+            Pr(B.scope)
           ] }),
-          /* @__PURE__ */ (0, l.jsx)("p", { children: H.content }),
-          /* @__PURE__ */ (0, l.jsxs)("small", { children: ["來源：", H.source] }),
-          /* @__PURE__ */ (0, l.jsxs)("small", { children: ["素材位置：", H.location || "內容已記錄；未登記外部檔案"] })
+          /* @__PURE__ */ (0, l.jsx)("p", { children: B.content }),
+          /* @__PURE__ */ (0, l.jsxs)("small", { children: ["來源：", B.source] }),
+          /* @__PURE__ */ (0, l.jsxs)("small", { children: ["素材位置：", B.location || "內容已記錄；未登記外部檔案"] })
         ]
-      }, H.id)) : /* @__PURE__ */ (0, l.jsx)("p", {
+      }, B.id)) : /* @__PURE__ */ (0, l.jsx)("p", {
         className: "muted",
         children: "尚無有效資料，AI 應回報受阻。"
       }),
       /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsxs)("summary", { children: [
         "禁止混用的版本／待確認提案（",
-        o.excluded.length,
+        d.excluded.length,
         "）"
-      ] }), o.excluded.map((H) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-        H.title,
+      ] }), d.excluded.map((B) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
+        B.title,
         " · ",
-        H.status,
+        B.status,
         " · ",
-        H.id
-      ] }, H.id))] }),
+        B.id
+      ] }, B.id))] }),
       /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "完整資料契約與素材清單" }), /* @__PURE__ */ (0, l.jsx)("pre", { children: JSON.stringify({
-        contract: o.contract,
-        manifest: o.manifest,
-        adoptedBaselines: o.adoptedBaselines,
-        episodeRules: o.episodeRules,
-        priorHandoff: o.priorHandoff
+        contract: d.contract,
+        manifest: d.manifest,
+        adoptedBaselines: d.adoptedBaselines,
+        episodeRules: d.episodeRules,
+        priorHandoff: d.priorHandoff
       }, null, 2) })] })
     ] });
   }
@@ -11254,25 +11254,25 @@ function Cx({ project: r, mutate: h, busy: k }) {
       /* @__PURE__ */ (0, l.jsx)("nav", {
         className: "section-nav",
         "aria-label": "資料與交接",
-        children: Xe.filter(([o]) => [
+        children: Xe.filter(([d]) => [
           "materials",
           "links",
           "handoff",
           "problems"
-        ].includes(o)).map(([o, H, oe]) => /* @__PURE__ */ (0, l.jsxs)("button", {
-          className: p === o ? "active" : "",
-          onClick: () => w(o),
+        ].includes(d)).map(([d, B, ue]) => /* @__PURE__ */ (0, l.jsxs)("button", {
+          className: p === d ? "active" : "",
+          onClick: () => k(d),
           children: [
             {
               materials: "製作資料",
               links: "鏡頭對應",
               handoff: "工作紀錄",
               problems: "缺件與疑問"
-            }[o],
+            }[d],
             " ",
-            /* @__PURE__ */ (0, l.jsx)("span", { children: oe })
+            /* @__PURE__ */ (0, l.jsx)("span", { children: ue })
           ]
-        }, o))
+        }, d))
       }),
       /* @__PURE__ */ (0, l.jsxs)("details", {
         className: "advanced-tools",
@@ -11280,20 +11280,20 @@ function Cx({ project: r, mutate: h, busy: k }) {
           /* @__PURE__ */ (0, l.jsx)("summary", { children: "進階：採用設定、資料提案與 AI 工作資料包" }),
           /* @__PURE__ */ (0, l.jsx)("div", {
             className: "context-tabs",
-            children: Xe.filter(([o]) => ![
+            children: Xe.filter(([d]) => ![
               "materials",
               "links",
               "handoff",
               "problems"
-            ].includes(o)).map(([o, H, oe]) => /* @__PURE__ */ (0, l.jsxs)("button", {
-              className: p === o ? "active" : "",
-              onClick: () => w(o),
+            ].includes(d)).map(([d, B, ue]) => /* @__PURE__ */ (0, l.jsxs)("button", {
+              className: p === d ? "active" : "",
+              onClick: () => k(d),
               children: [
-                H,
+                B,
                 " · ",
-                oe
+                ue
               ]
-            }, o))
+            }, d))
           }),
           /* @__PURE__ */ (0, l.jsx)("p", { children: "AI 接手時會讀取指定版本；一般查資料不需要手動建立資料包。" })
         ]
@@ -11302,15 +11302,15 @@ function Cx({ project: r, mutate: h, busy: k }) {
         className: p === "settings" ? "" : "wide-card",
         children: p === "settings" ? /* @__PURE__ */ (0, l.jsx)(Rf, {
           project: r,
-          busy: k,
+          busy: C,
           mutate: h
         }) : p === "links" ? /* @__PURE__ */ (0, l.jsx)(kx, {
           project: r,
-          busy: k,
+          busy: C,
           mutate: h
         }) : p === "materials" ? /* @__PURE__ */ (0, l.jsx)(wx, {
           project: r,
-          busy: k,
+          busy: C,
           mutate: h
         }) : ["baseline", "proposals"].includes(p) ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
           /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -11319,7 +11319,7 @@ function Cx({ project: r, mutate: h, busy: k }) {
               className: "btn primary",
               disabled: Me,
               onClick: () => {
-                E(ed), A(!x);
+                _(ed), A(!x);
               },
               children: "新增資料提案"
             })]
@@ -11335,65 +11335,65 @@ function Cx({ project: r, mutate: h, busy: k }) {
                     required: !0,
                     maxLength: 120,
                     placeholder: "例如 mother_position 或 script_main",
-                    value: z.key,
-                    readOnly: !!z.supersedesId,
-                    onChange: (o) => E({
-                      ...z,
-                      key: o.target.value
+                    value: N.key,
+                    readOnly: !!N.supersedesId,
+                    onChange: (d) => _({
+                      ...N,
+                      key: d.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["資料名稱", /* @__PURE__ */ (0, l.jsx)("input", {
                     required: !0,
                     maxLength: 200,
-                    value: z.title,
-                    onChange: (o) => E({
-                      ...z,
-                      title: o.target.value
+                    value: N.title,
+                    onChange: (d) => _({
+                      ...N,
+                      title: d.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["資料種類", /* @__PURE__ */ (0, l.jsx)("select", {
-                    value: z.kind,
-                    onChange: (o) => E({
-                      ...z,
-                      kind: o.target.value
+                    value: N.kind,
+                    onChange: (d) => _({
+                      ...N,
+                      kind: d.target.value
                     }),
-                    children: gx.map((o) => /* @__PURE__ */ (0, l.jsx)("option", {
-                      value: o,
-                      children: Fr[o]
-                    }, o))
+                    children: gx.map((d) => /* @__PURE__ */ (0, l.jsx)("option", {
+                      value: d,
+                      children: Fr[d]
+                    }, d))
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["內容性質", /* @__PURE__ */ (0, l.jsx)("select", {
-                    value: z.origin,
-                    onChange: (o) => E({
-                      ...z,
-                      origin: o.target.value
+                    value: N.origin,
+                    onChange: (d) => _({
+                      ...N,
+                      origin: d.target.value
                     }),
-                    children: Object.entries(jf).map(([o, H]) => /* @__PURE__ */ (0, l.jsx)("option", {
-                      value: o,
-                      children: H
-                    }, o))
+                    children: Object.entries(jf).map(([d, B]) => /* @__PURE__ */ (0, l.jsx)("option", {
+                      value: d,
+                      children: B
+                    }, d))
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["適用範圍", /* @__PURE__ */ (0, l.jsx)("select", {
-                    value: z.scopeType,
-                    disabled: !!z.supersedesId,
-                    onChange: (o) => E({
-                      ...z,
-                      scopeType: o.target.value,
+                    value: N.scopeType,
+                    disabled: !!N.supersedesId,
+                    onChange: (d) => _({
+                      ...N,
+                      scopeType: d.target.value,
                       target: ""
                     }),
-                    children: Object.entries(dd).map(([o, H]) => /* @__PURE__ */ (0, l.jsx)("option", {
-                      value: o,
-                      children: H
-                    }, o))
+                    children: Object.entries(dd).map(([d, B]) => /* @__PURE__ */ (0, l.jsx)("option", {
+                      value: d,
+                      children: B
+                    }, d))
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["範圍 ID", /* @__PURE__ */ (0, l.jsx)("input", {
-                    required: z.scopeType !== "project",
-                    disabled: z.scopeType === "project" || !!z.supersedesId,
+                    required: N.scopeType !== "project",
+                    disabled: N.scopeType === "project" || !!N.supersedesId,
                     placeholder: "例如 S06、01 或鏡頭 ID",
-                    value: z.target,
-                    onChange: (o) => E({
-                      ...z,
-                      target: o.target.value
+                    value: N.target,
+                    onChange: (d) => _({
+                      ...N,
+                      target: d.target.value
                     })
                   })] })
                 ]
@@ -11402,36 +11402,36 @@ function Cx({ project: r, mutate: h, busy: k }) {
                 required: !0,
                 rows: 5,
                 maxLength: 12e3,
-                value: z.content,
-                onChange: (o) => E({
-                  ...z,
-                  content: o.target.value
+                value: N.content,
+                onChange: (d) => _({
+                  ...N,
+                  content: d.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["來源依據", /* @__PURE__ */ (0, l.jsx)("input", {
                 required: !0,
                 maxLength: 2e3,
                 placeholder: "原作章節、作者修改要求、檔案名稱與段落等",
-                value: z.source,
-                onChange: (o) => E({
-                  ...z,
-                  source: o.target.value
+                value: N.source,
+                onChange: (d) => _({
+                  ...N,
+                  source: d.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["素材位置（選填）", /* @__PURE__ */ (0, l.jsx)("input", {
                 maxLength: 2e3,
                 placeholder: "可取得的檔案位置或連結；填入不等於已讀取",
-                value: z.location,
-                onChange: (o) => E({
-                  ...z,
-                  location: o.target.value
+                value: N.location,
+                onChange: (d) => _({
+                  ...N,
+                  location: d.target.value
                 })
               })] }),
-              z.supersedesId && /* @__PURE__ */ (0, l.jsxs)("p", {
+              N.supersedesId && /* @__PURE__ */ (0, l.jsxs)("p", {
                 className: "muted",
                 children: [
                   "明確取代：",
-                  z.supersedesId,
+                  N.supersedesId,
                   "。作者確認前，舊版仍然有效。"
                 ]
               }),
@@ -11452,64 +11452,64 @@ function Cx({ project: r, mutate: h, busy: k }) {
           }),
           /* @__PURE__ */ (0, l.jsx)("div", {
             className: "context-records",
-            children: (p === "baseline" ? Ge : ze).map((o) => /* @__PURE__ */ (0, l.jsxs)("article", {
+            children: (p === "baseline" ? Ge : ze).map((d) => /* @__PURE__ */ (0, l.jsxs)("article", {
               className: "context-record",
               children: [
                 /* @__PURE__ */ (0, l.jsxs)("div", {
                   className: "issue-top",
                   children: [/* @__PURE__ */ (0, l.jsx)("span", {
-                    className: "status " + (o.status === "effective" ? "passed" : "candidate"),
-                    children: o.status === "effective" ? "作者已確認" : "待確認"
+                    className: "status " + (d.status === "effective" ? "passed" : "candidate"),
+                    children: d.status === "effective" ? "作者已確認" : "待確認"
                   }), /* @__PURE__ */ (0, l.jsxs)("b", { children: [
-                    o.title,
+                    d.title,
                     " · v",
-                    o.version
+                    d.version
                   ] })]
                 }),
                 /* @__PURE__ */ (0, l.jsxs)("small", { children: [
-                  Fr[o.kind],
+                  Fr[d.kind],
                   " ／ ",
-                  jf[o.origin],
+                  jf[d.origin],
                   " ／ ",
-                  Pr(o.scope)
+                  Pr(d.scope)
                 ] }),
                 /* @__PURE__ */ (0, l.jsxs)("code", {
                   className: "context-id",
                   children: [
-                    o.key,
+                    d.key,
                     " · ",
-                    o.id
+                    d.id
                   ]
                 }),
-                /* @__PURE__ */ (0, l.jsx)("p", { children: o.content }),
+                /* @__PURE__ */ (0, l.jsx)("p", { children: d.content }),
                 /* @__PURE__ */ (0, l.jsxs)("div", {
                   className: "context-source",
                   children: [
                     "來源：",
-                    o.source,
-                    o.location && /* @__PURE__ */ (0, l.jsxs)("p", { children: ["素材位置：", o.location] })
+                    d.source,
+                    d.location && /* @__PURE__ */ (0, l.jsxs)("p", { children: ["素材位置：", d.location] })
                   ]
                 }),
-                o.supersedesId && /* @__PURE__ */ (0, l.jsxs)("small", { children: ["取代目標：", o.supersedesId] }),
-                o.approval && /* @__PURE__ */ (0, l.jsxs)("small", { children: ["確認者：", o.approval.by] }),
+                d.supersedesId && /* @__PURE__ */ (0, l.jsxs)("small", { children: ["取代目標：", d.supersedesId] }),
+                d.approval && /* @__PURE__ */ (0, l.jsxs)("small", { children: ["確認者：", d.approval.by] }),
                 /* @__PURE__ */ (0, l.jsx)("div", {
                   className: "context-actions",
-                  children: o.status === "proposed" ? /* @__PURE__ */ (0, l.jsx)("button", {
+                  children: d.status === "proposed" ? /* @__PURE__ */ (0, l.jsx)("button", {
                     className: "btn primary",
                     disabled: Me,
                     onClick: () => {
-                      h("activate_record", { recordId: o.id });
+                      h("activate_record", { recordId: d.id });
                     },
                     children: "作者確認為有效資料"
                   }) : /* @__PURE__ */ (0, l.jsx)("button", {
                     className: "btn",
                     disabled: Me,
-                    onClick: () => qe(o.id),
+                    onClick: () => qe(d.id),
                     children: "提出修改版本"
                   })
                 })
               ]
-            }, o.id))
+            }, d.id))
           }),
           !(p === "baseline" ? Ge : ze).length && !x && /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "empty",
@@ -11517,48 +11517,48 @@ function Cx({ project: r, mutate: h, busy: k }) {
           }),
           /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsxs)("summary", { children: [
             "已被取代的歷史版本（",
-            f.records.filter((o) => o.status === "superseded").length,
+            f.records.filter((d) => d.status === "superseded").length,
             "）"
-          ] }), f.records.filter((o) => o.status === "superseded").map((o) => /* @__PURE__ */ (0, l.jsxs)("article", {
+          ] }), f.records.filter((d) => d.status === "superseded").map((d) => /* @__PURE__ */ (0, l.jsxs)("article", {
             className: "context-mini",
             children: [
               /* @__PURE__ */ (0, l.jsxs)("b", { children: [
-                o.title,
+                d.title,
                 " v",
-                o.version,
+                d.version,
                 " · 已停用"
               ] }),
-              /* @__PURE__ */ (0, l.jsx)("p", { children: o.content }),
+              /* @__PURE__ */ (0, l.jsx)("p", { children: d.content }),
               /* @__PURE__ */ (0, l.jsxs)("small", { children: [
-                o.id,
+                d.id,
                 " → ",
-                o.supersededBy
+                d.supersededBy
               ] })
             ]
-          }, o.id))] })
+          }, d.id))] })
         ] }) : p === "problems" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
           /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "section-title",
             children: [/* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: "矛盾、缺件與待裁定事項" }), /* @__PURE__ */ (0, l.jsx)("p", { children: "相關任務在問題處理前回報受阻，AI 不自行裁定。" })] }), /* @__PURE__ */ (0, l.jsx)("button", {
               className: "btn",
               disabled: Me,
-              onClick: () => K(!S),
+              onClick: () => G(!w),
               children: "登記矛盾或缺件"
             })]
           }),
-          S && /* @__PURE__ */ (0, l.jsxs)("form", {
+          w && /* @__PURE__ */ (0, l.jsxs)("form", {
             className: "context-form",
-            onSubmit: async (o) => {
-              o.preventDefault(), await h("add_knowledge_problem", {
-                type: N.type,
+            onSubmit: async (d) => {
+              d.preventDefault(), await h("add_knowledge_problem", {
+                type: z.type,
                 scope: {
-                  type: N.scopeType,
-                  target: N.target
+                  type: z.scopeType,
+                  target: z.target
                 },
-                description: N.description,
+                description: z.description,
                 recordIds: []
-              }) && (K(!1), le({
-                ...N,
+              }) && (G(!1), le({
+                ...z,
                 description: ""
               }));
             },
@@ -11567,10 +11567,10 @@ function Cx({ project: r, mutate: h, busy: k }) {
                 className: "context-form-grid",
                 children: [
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["問題種類", /* @__PURE__ */ (0, l.jsxs)("select", {
-                    value: N.type,
-                    onChange: (o) => le({
-                      ...N,
-                      type: o.target.value
+                    value: z.type,
+                    onChange: (d) => le({
+                      ...z,
+                      type: d.target.value
                     }),
                     children: [/* @__PURE__ */ (0, l.jsx)("option", {
                       value: "conflict",
@@ -11581,24 +11581,24 @@ function Cx({ project: r, mutate: h, busy: k }) {
                     })]
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["範圍", /* @__PURE__ */ (0, l.jsx)("select", {
-                    value: N.scopeType,
-                    onChange: (o) => le({
-                      ...N,
-                      scopeType: o.target.value,
+                    value: z.scopeType,
+                    onChange: (d) => le({
+                      ...z,
+                      scopeType: d.target.value,
                       target: ""
                     }),
-                    children: Object.entries(dd).map(([o, H]) => /* @__PURE__ */ (0, l.jsx)("option", {
-                      value: o,
-                      children: H
-                    }, o))
+                    children: Object.entries(dd).map(([d, B]) => /* @__PURE__ */ (0, l.jsx)("option", {
+                      value: d,
+                      children: B
+                    }, d))
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["範圍 ID", /* @__PURE__ */ (0, l.jsx)("input", {
-                    required: N.scopeType !== "project",
-                    disabled: N.scopeType === "project",
-                    value: N.target,
-                    onChange: (o) => le({
-                      ...N,
-                      target: o.target.value
+                    required: z.scopeType !== "project",
+                    disabled: z.scopeType === "project",
+                    value: z.target,
+                    onChange: (d) => le({
+                      ...z,
+                      target: d.target.value
                     })
                   })] })
                 ]
@@ -11606,10 +11606,10 @@ function Cx({ project: r, mutate: h, busy: k }) {
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["問題與缺少的依據", /* @__PURE__ */ (0, l.jsx)("textarea", {
                 required: !0,
                 rows: 4,
-                value: N.description,
-                onChange: (o) => le({
-                  ...N,
-                  description: o.target.value
+                value: z.description,
+                onChange: (d) => le({
+                  ...z,
+                  description: d.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsx)("button", {
@@ -11619,28 +11619,28 @@ function Cx({ project: r, mutate: h, busy: k }) {
               })
             ]
           }),
-          f.problems.map((o) => /* @__PURE__ */ (0, l.jsxs)("article", {
+          f.problems.map((d) => /* @__PURE__ */ (0, l.jsxs)("article", {
             className: "context-record",
             children: [
               /* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "issue-top",
                 children: [/* @__PURE__ */ (0, l.jsxs)("span", {
-                  className: "status " + (o.status === "open" ? "needs_revision" : "passed"),
+                  className: "status " + (d.status === "open" ? "needs_revision" : "passed"),
                   children: [
-                    o.type === "conflict" ? "資訊矛盾" : "資料缺件",
+                    d.type === "conflict" ? "資訊矛盾" : "資料缺件",
                     " · ",
-                    o.status === "open" ? "待處理" : "作者已處理"
+                    d.status === "open" ? "待處理" : "作者已處理"
                   ]
-                }), /* @__PURE__ */ (0, l.jsx)("small", { children: Pr(o.scope) })]
+                }), /* @__PURE__ */ (0, l.jsx)("small", { children: Pr(d.scope) })]
               }),
-              /* @__PURE__ */ (0, l.jsx)("p", { children: o.description }),
-              o.resolution && /* @__PURE__ */ (0, l.jsxs)("p", { children: ["處理結果：", o.resolution] }),
-              o.status === "open" && (j === o.id ? /* @__PURE__ */ (0, l.jsxs)("form", {
-                onSubmit: async (H) => {
-                  H.preventDefault(), await h("resolve_knowledge_problem", {
-                    problemId: o.id,
+              /* @__PURE__ */ (0, l.jsx)("p", { children: d.description }),
+              d.resolution && /* @__PURE__ */ (0, l.jsxs)("p", { children: ["處理結果：", d.resolution] }),
+              d.status === "open" && (y === d.id ? /* @__PURE__ */ (0, l.jsxs)("form", {
+                onSubmit: async (B) => {
+                  B.preventDefault(), await h("resolve_knowledge_problem", {
+                    problemId: d.id,
                     resolution: ge
-                  }) && (W(""), he(""));
+                  }) && (ee(""), me(""));
                 },
                 children: [
                   /* @__PURE__ */ (0, l.jsxs)("label", {
@@ -11649,7 +11649,7 @@ function Cx({ project: r, mutate: h, busy: k }) {
                       required: !0,
                       rows: 3,
                       value: ge,
-                      onChange: (H) => he(H.target.value)
+                      onChange: (B) => me(B.target.value)
                     })]
                   }),
                   /* @__PURE__ */ (0, l.jsx)("p", {
@@ -11666,12 +11666,12 @@ function Cx({ project: r, mutate: h, busy: k }) {
                 className: "btn",
                 disabled: Me,
                 onClick: () => {
-                  W(o.id), he("");
+                  ee(d.id), me("");
                 },
                 children: "填寫作者處理結果"
               }))
             ]
-          }, o.id)),
+          }, d.id)),
           !f.problems.length && /* @__PURE__ */ (0, l.jsx)("p", {
             className: "muted",
             children: "目前沒有登記矛盾或缺件。資料包仍會檢查必要資料種類。"
@@ -11683,22 +11683,22 @@ function Cx({ project: r, mutate: h, busy: k }) {
           }),
           /* @__PURE__ */ (0, l.jsxs)("form", {
             className: "context-form",
-            onSubmit: async (o) => {
-              o.preventDefault();
-              const H = await h("create_context_pack", {
-                task: L,
-                stageId: V,
-                sceneId: P,
+            onSubmit: async (d) => {
+              d.preventDefault();
+              const B = await h("create_context_pack", {
+                task: q,
+                stageId: H,
+                sceneId: $,
                 shotId: te,
                 purpose: ne,
-                recordKeys: ne === "documentation" ? Q.split(/[,，\n]/).map((oe) => oe.trim()).filter(Boolean) : void 0
+                recordKeys: ne === "documentation" ? X.split(/[,，\n]/).map((ue) => ue.trim()).filter(Boolean) : void 0
               });
-              H && ae(Sl(H).packs.at(-1).id);
+              B && ae(Nl(B).packs.at(-1).id);
             },
             children: [
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["工作用途", /* @__PURE__ */ (0, l.jsxs)("select", {
                 value: ne,
-                onChange: (o) => I(o.target.value),
+                onChange: (d) => I(d.target.value),
                 children: [/* @__PURE__ */ (0, l.jsx)("option", {
                   value: "production",
                   children: "素材製作／檢視"
@@ -11710,8 +11710,8 @@ function Cx({ project: r, mutate: h, busy: k }) {
               ne === "documentation" && /* @__PURE__ */ (0, l.jsxs)("label", { children: ["本次來源識別鍵", /* @__PURE__ */ (0, l.jsx)("textarea", {
                 required: !0,
                 rows: 2,
-                value: Q,
-                onChange: (o) => re(o.target.value),
+                value: X,
+                onChange: (d) => oe(d.target.value),
                 placeholder: "以逗號分隔，最多20筆；可從製作資料或鏡頭關聯取得"
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["本次任務", /* @__PURE__ */ (0, l.jsx)("textarea", {
@@ -11719,26 +11719,26 @@ function Cx({ project: r, mutate: h, busy: k }) {
                 rows: 2,
                 maxLength: 2e3,
                 placeholder: "例如：檢查 S06 指定鏡頭的母親座位與場景一致性",
-                value: L,
-                onChange: (o) => ie(o.target.value)
+                value: q,
+                onChange: (d) => ie(d.target.value)
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "context-form-grid",
                 children: [
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["階段 ID（選填）", /* @__PURE__ */ (0, l.jsx)("input", {
                     placeholder: "例如 08、op01",
-                    value: V,
-                    onChange: (o) => ee(o.target.value)
+                    value: H,
+                    onChange: (d) => F(d.target.value)
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["場次 ID（選填）", /* @__PURE__ */ (0, l.jsx)("input", {
                     placeholder: "例如 S06",
-                    value: P,
-                    onChange: (o) => xe(o.target.value)
+                    value: $,
+                    onChange: (d) => pe(d.target.value)
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["鏡頭 ID（選填）", /* @__PURE__ */ (0, l.jsx)("input", {
                     placeholder: "素材總表的固定鏡頭 ID",
                     value: te,
-                    onChange: (o) => $(o.target.value)
+                    onChange: (d) => P(d.target.value)
                   })] })
                 ]
               }),
@@ -11749,32 +11749,32 @@ function Cx({ project: r, mutate: h, busy: k }) {
               })
             ]
           }),
-          ue ? /* @__PURE__ */ (0, l.jsx)("div", {
+          de ? /* @__PURE__ */ (0, l.jsx)("div", {
             className: "context-pack",
-            children: lt(ue)
+            children: lt(de)
           }) : /* @__PURE__ */ (0, l.jsx)("p", {
             className: "muted",
             children: "尚未建立資料包。AI 可透過 acquire_animation_context 取得同一份資料。"
           }),
-          ue?.purpose === "documentation" && ue.projectRevision === r.revision && /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "回報本次資料整理結果" }), /* @__PURE__ */ (0, l.jsxs)("form", {
+          de?.purpose === "documentation" && de.projectRevision === r.revision && /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "回報本次資料整理結果" }), /* @__PURE__ */ (0, l.jsxs)("form", {
             className: "context-form",
-            onSubmit: async (o) => {
-              o.preventDefault(), await h("submit_ai_work", {
-                contextPackId: ue.id,
+            onSubmit: async (d) => {
+              d.preventDefault(), await h("submit_ai_work", {
+                contextPackId: de.id,
                 resultId: crypto.randomUUID(),
                 status: "completed",
-                summary: Z,
-                nextStep: Y,
-                recordIds: ue.records.map((H) => H.id),
-                observations: ue.records.map((H) => ({
-                  recordId: H.id,
-                  version: H.version,
-                  note: de[H.id] ?? ""
+                summary: K,
+                nextStep: Q,
+                recordIds: de.records.map((B) => B.id),
+                observations: de.records.map((B) => ({
+                  recordId: B.id,
+                  version: B.version,
+                  note: ce[B.id] ?? ""
                 })),
                 artifacts: [{
-                  location: ce,
-                  version: d,
-                  description: q
+                  location: re,
+                  version: o,
+                  description: R
                 }]
               });
             },
@@ -11782,46 +11782,46 @@ function Cx({ project: r, mutate: h, busy: k }) {
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["本次完成內容", /* @__PURE__ */ (0, l.jsx)("textarea", {
                 required: !0,
                 rows: 3,
-                value: Z,
-                onChange: (o) => B(o.target.value)
+                value: K,
+                onChange: (d) => Y(d.target.value)
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["下一位 AI 接手動作", /* @__PURE__ */ (0, l.jsx)("textarea", {
                 required: !0,
                 rows: 3,
-                value: Y,
-                onChange: (o) => se(o.target.value)
+                value: Q,
+                onChange: (d) => se(d.target.value)
               })] }),
-              ue.records.map((o) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [
+              de.records.map((d) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [
                 "實際閱讀依據｜",
-                o.title,
+                d.title,
                 /* @__PURE__ */ (0, l.jsx)("textarea", {
                   required: !0,
                   rows: 2,
                   maxLength: 3e3,
-                  value: de[o.id] ?? "",
-                  onChange: (H) => fe({
-                    ...de,
-                    [o.id]: H.target.value
+                  value: ce[d.id] ?? "",
+                  onChange: (B) => he({
+                    ...ce,
+                    [d.id]: B.target.value
                   })
                 })
-              ] }, o.id)),
+              ] }, d.id)),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["整理成果位置", /* @__PURE__ */ (0, l.jsx)("input", {
                 required: !0,
                 maxLength: 2e3,
-                value: ce,
-                onChange: (o) => _e(o.target.value)
+                value: re,
+                onChange: (d) => _e(d.target.value)
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["整理成果版本", /* @__PURE__ */ (0, l.jsx)("input", {
                 required: !0,
                 maxLength: 100,
-                value: d,
-                onChange: (o) => _(o.target.value)
+                value: o,
+                onChange: (d) => j(d.target.value)
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["整理成果說明", /* @__PURE__ */ (0, l.jsx)("input", {
                 required: !0,
                 maxLength: 2e3,
-                value: q,
-                onChange: (o) => F(o.target.value)
+                value: R,
+                onChange: (d) => W(d.target.value)
               })] }),
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn primary",
@@ -11834,55 +11834,55 @@ function Cx({ project: r, mutate: h, busy: k }) {
             "先前資料包（",
             f.packs.length - 1,
             "）"
-          ] }), [...f.packs].reverse().map((o) => /* @__PURE__ */ (0, l.jsxs)("button", {
+          ] }), [...f.packs].reverse().map((d) => /* @__PURE__ */ (0, l.jsxs)("button", {
             className: "text-btn",
-            onClick: () => ae(o.id),
+            onClick: () => ae(d.id),
             children: [
-              o.task,
+              d.task,
               " · 版本 ",
-              o.projectRevision
+              d.projectRevision
             ]
-          }, o.id))] })
+          }, d.id))] })
         ] }) : /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
           /* @__PURE__ */ (0, l.jsx)("div", {
             className: "section-title",
             children: /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: "AI 工作接續紀錄" }), /* @__PURE__ */ (0, l.jsx)("p", { children: "依資料包回寫使用版本、實際閱讀自述、成果位置與下一步。" })] })
           }),
-          [...f.results].reverse().map((o) => /* @__PURE__ */ (0, l.jsxs)("article", {
+          [...f.results].reverse().map((d) => /* @__PURE__ */ (0, l.jsxs)("article", {
             className: "context-record",
             children: [
               /* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "issue-top",
                 children: [/* @__PURE__ */ (0, l.jsx)("span", {
-                  className: "status " + (o.needsReview ? "needs_revision" : o.status === "blocked" ? "todo" : "candidate"),
-                  children: o.needsReview ? f.packs.find((H) => H.id === o.packId)?.purpose === "documentation" ? "採用設定已更新，接手前讀取新版本" : "依據已變更，需重驗" : o.status === "completed" ? f.packs.find((H) => H.id === o.packId)?.purpose === "documentation" ? "資料整理完成" : "AI 回報完成，待作者驗收" : o.status === "partial" ? "部分完成" : "受阻"
-                }), /* @__PURE__ */ (0, l.jsx)("b", { children: o.task })]
+                  className: "status " + (d.needsReview ? "needs_revision" : d.status === "blocked" ? "todo" : "candidate"),
+                  children: d.needsReview ? f.packs.find((B) => B.id === d.packId)?.purpose === "documentation" ? "採用設定已更新，接手前讀取新版本" : "依據已變更，需重驗" : d.status === "completed" ? f.packs.find((B) => B.id === d.packId)?.purpose === "documentation" ? "資料整理完成" : "AI 回報完成，待作者驗收" : d.status === "partial" ? "部分完成" : "受阻"
+                }), /* @__PURE__ */ (0, l.jsx)("b", { children: d.task })]
               }),
-              /* @__PURE__ */ (0, l.jsx)("p", { children: o.summary }),
+              /* @__PURE__ */ (0, l.jsx)("p", { children: d.summary }),
               /* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "context-source",
-                children: [/* @__PURE__ */ (0, l.jsx)("b", { children: "下一步" }), /* @__PURE__ */ (0, l.jsx)("p", { children: o.nextStep })]
+                children: [/* @__PURE__ */ (0, l.jsx)("b", { children: "下一步" }), /* @__PURE__ */ (0, l.jsx)("p", { children: d.nextStep })]
               }),
-              o.needsReview && /* @__PURE__ */ (0, l.jsx)("p", {
+              d.needsReview && /* @__PURE__ */ (0, l.jsx)("p", {
                 className: "red-text",
-                children: o.reviewReason
+                children: d.reviewReason
               }),
-              o.artifacts.map((H, oe) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-                H.description,
+              d.artifacts.map((B, ue) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
+                B.description,
                 " · ",
-                H.version,
+                B.version,
                 /* @__PURE__ */ (0, l.jsx)("code", {
                   className: "context-id",
-                  children: H.location
+                  children: B.location
                 })
-              ] }, oe)),
+              ] }, ue)),
               /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "使用版本與閱讀自述" }), /* @__PURE__ */ (0, l.jsx)("pre", { children: JSON.stringify({
-                packId: o.packId,
-                recordIds: o.recordIds,
-                observations: o.observations
+                packId: d.packId,
+                recordIds: d.recordIds,
+                observations: d.observations
               }, null, 2) })] })
             ]
-          }, o.id)),
+          }, d.id)),
           !f.results.length && /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "empty",
             children: [/* @__PURE__ */ (0, l.jsx)("h3", { children: "等待 AI 回報工作" }), /* @__PURE__ */ (0, l.jsx)("p", { children: "工具 submit_animation_work 會保存結果與交接內容。" })]
@@ -11933,13 +11933,13 @@ function td({ h: r, target: h }) {
           "。內容按所列版本交接；尚未對上成片的部分保留疑點，不自動變成下一集採用設定。"
         ]
       }),
-      Lf.map(([k, f]) => /* @__PURE__ */ (0, l.jsxs)("div", {
+      Lf.map(([C, f]) => /* @__PURE__ */ (0, l.jsxs)("div", {
         className: "context-mini",
         children: [/* @__PURE__ */ (0, l.jsx)("b", { children: f }), /* @__PURE__ */ (0, l.jsx)("p", {
           className: "production-source-text",
-          children: r[k]
+          children: r[C]
         })]
-      }, k)),
+      }, C)),
       /* @__PURE__ */ (0, l.jsxs)("details", { children: [
         /* @__PURE__ */ (0, l.jsx)("summary", { children: "來源識別鍵與版本紀錄" }),
         /* @__PURE__ */ (0, l.jsx)("p", { children: r.sourceKeys.join("、") }),
@@ -11954,27 +11954,27 @@ function td({ h: r, target: h }) {
     ]
   });
 }
-function Ax({ project: r, episodes: h, busy: k, mutate: f }) {
-  const p = r.production?.completionReports?.at(-1), w = r.production?.handoffs?.at(-1), x = h.filter(($) => $.workId === r.workId && $.id !== r.id), [A, z] = (0, g.useState)("completed"), [E, S] = (0, g.useState)(""), [K, N] = (0, g.useState)(""), [le, ne] = (0, g.useState)(""), [I, Q] = (0, g.useState)(yf), [re, L] = (0, g.useState)(""), [ie, V] = (0, g.useState)([]), [ee, P] = (0, g.useState)("");
+function Ax({ project: r, episodes: h, busy: C, mutate: f }) {
+  const p = r.production?.completionReports?.at(-1), k = r.production?.handoffs?.at(-1), x = h.filter((P) => P.workId === r.workId && P.id !== r.id), [A, N] = (0, g.useState)("completed"), [_, w] = (0, g.useState)(""), [G, z] = (0, g.useState)(""), [le, ne] = (0, g.useState)(""), [I, X] = (0, g.useState)(yf), [oe, q] = (0, g.useState)(""), [ie, H] = (0, g.useState)([]), [F, $] = (0, g.useState)("");
   (0, g.useEffect)(() => {
-    z(p?.status ?? "completed"), S(p?.note ?? ""), N(p?.source ?? ""), ne(w?.toEpisodeId ?? ""), Q(w ?? yf), L(w?.sourceKeys.join(", ") ?? "");
+    N(p?.status ?? "completed"), w(p?.note ?? ""), z(p?.source ?? ""), ne(k?.toEpisodeId ?? ""), X(k ?? yf), q(k?.sourceKeys.join(", ") ?? "");
   }, [
     r.id,
     p?.at,
-    w?.id
+    k?.id
   ]), (0, g.useEffect)(() => {
-    let $ = !0;
-    return V([]), fetch("/api/projects?id=" + encodeURIComponent(r.id) + "&view=brief", { cache: "no-store" }).then(async (j) => {
-      const W = await j.json();
-      if (!j.ok) throw new Error(W.error ?? "接續資料讀取失敗");
-      $ && (V(W.incoming), P(""));
-    }).catch((j) => {
-      $ && P(j.message);
+    let P = !0;
+    return H([]), fetch("/api/projects?id=" + encodeURIComponent(r.id) + "&view=brief", { cache: "no-store" }).then(async (y) => {
+      const ee = await y.json();
+      if (!y.ok) throw new Error(ee.error ?? "接續資料讀取失敗");
+      P && (H(ee.incoming), $(""));
+    }).catch((y) => {
+      P && $(y.message);
     }), () => {
-      $ = !1;
+      P = !1;
     };
   }, [r.id, r.revision]);
-  const xe = hd(r).registration, te = k || r.archived;
+  const pe = hd(r).registration, te = C || r.archived;
   return /* @__PURE__ */ (0, l.jsxs)("section", {
     className: "wide-card episode-brief",
     children: [
@@ -11988,18 +11988,18 @@ function Ax({ project: r, episodes: h, busy: k, mutate: f }) {
         children: [
           /* @__PURE__ */ (0, l.jsx)("b", { children: p ? Ex[p.status] : "製作狀態尚未登記" }),
           /* @__PURE__ */ (0, l.jsxs)("span", { children: [
-            xe.acceptedSources,
+            pe.acceptedSources,
             " / ",
-            xe.sources,
+            pe.sources,
             " 筆來源已收錄"
           ] }),
           /* @__PURE__ */ (0, l.jsxs)("span", { children: [
-            xe.linkedShots,
+            pe.linkedShots,
             " / ",
-            xe.shots,
+            pe.shots,
             " 列鏡頭有關聯"
           ] }),
-          /* @__PURE__ */ (0, l.jsxs)("span", { children: [xe.registeredSelections, " 列已登記採用檔"] })
+          /* @__PURE__ */ (0, l.jsxs)("span", { children: [pe.registeredSelections, " 列已登記採用檔"] })
         ]
       }),
       p && /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsx)("p", { children: p.note }), /* @__PURE__ */ (0, l.jsxs)("small", { children: ["作者告知依據：", p.source] })] }),
@@ -12009,17 +12009,17 @@ function Ax({ project: r, episodes: h, busy: k, mutate: f }) {
       }),
       /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "補登本集製作狀態" }), /* @__PURE__ */ (0, l.jsxs)("form", {
         className: "context-form",
-        onSubmit: async ($) => {
-          $.preventDefault(), await f("report_episode_completion", {
+        onSubmit: async (P) => {
+          P.preventDefault(), await f("report_episode_completion", {
             status: A,
-            note: E,
-            source: K
+            note: _,
+            source: G
           });
         },
         children: [
           /* @__PURE__ */ (0, l.jsxs)("label", { children: ["作者告知的製作狀態", /* @__PURE__ */ (0, l.jsxs)("select", {
             value: A,
-            onChange: ($) => z($.target.value),
+            onChange: (P) => N(P.target.value),
             children: [
               /* @__PURE__ */ (0, l.jsx)("option", {
                 value: "completed",
@@ -12039,14 +12039,14 @@ function Ax({ project: r, episodes: h, busy: k, mutate: f }) {
             required: !0,
             rows: 3,
             maxLength: 3e3,
-            value: E,
-            onChange: ($) => S($.target.value)
+            value: _,
+            onChange: (P) => w(P.target.value)
           })] }),
           /* @__PURE__ */ (0, l.jsxs)("label", { children: ["告知來源", /* @__PURE__ */ (0, l.jsx)("input", {
             required: !0,
             maxLength: 2e3,
-            value: K,
-            onChange: ($) => N($.target.value)
+            value: G,
+            onChange: (P) => z(P.target.value)
           })] }),
           /* @__PURE__ */ (0, l.jsx)("button", {
             className: "btn primary",
@@ -12055,82 +12055,82 @@ function Ax({ project: r, episodes: h, busy: k, mutate: f }) {
           })
         ]
       })] }),
-      ee && /* @__PURE__ */ (0, l.jsx)("p", {
+      F && /* @__PURE__ */ (0, l.jsx)("p", {
         role: "alert",
-        children: ee
+        children: F
       }),
-      ie.map(($) => /* @__PURE__ */ (0, l.jsxs)("details", {
+      ie.map((P) => /* @__PURE__ */ (0, l.jsxs)("details", {
         className: "production-record",
         children: [/* @__PURE__ */ (0, l.jsxs)("summary", { children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: [
           "來自 ",
-          $.fromEpisode,
+          P.fromEpisode,
           " 的接續資料"
         ] }), /* @__PURE__ */ (0, l.jsxs)("span", { children: [
           "v",
-          $.handoff.version,
+          P.handoff.version,
           " · 來源集數紀錄版本 ",
-          $.fromRevision
+          P.fromRevision
         ] })] }), /* @__PURE__ */ (0, l.jsx)(td, {
-          h: $.handoff,
+          h: P.handoff,
           target: r.episode
         })]
-      }, $.handoff.id)),
-      w ? /* @__PURE__ */ (0, l.jsxs)("details", {
+      }, P.handoff.id)),
+      k ? /* @__PURE__ */ (0, l.jsxs)("details", {
         className: "production-record",
-        children: [/* @__PURE__ */ (0, l.jsxs)("summary", { children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: ["交接至 ", h.find(($) => $.id === w.toEpisodeId)?.episode ?? "指定集數"] }), /* @__PURE__ */ (0, l.jsxs)("span", { children: ["接續資料 v", w.version] })] }), /* @__PURE__ */ (0, l.jsx)(td, {
-          h: w,
-          target: h.find(($) => $.id === w.toEpisodeId)?.episode ?? "指定集數"
+        children: [/* @__PURE__ */ (0, l.jsxs)("summary", { children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: ["交接至 ", h.find((P) => P.id === k.toEpisodeId)?.episode ?? "指定集數"] }), /* @__PURE__ */ (0, l.jsxs)("span", { children: ["接續資料 v", k.version] })] }), /* @__PURE__ */ (0, l.jsx)(td, {
+          h: k,
+          target: h.find((P) => P.id === k.toEpisodeId)?.episode ?? "指定集數"
         })]
       }) : /* @__PURE__ */ (0, l.jsx)("p", {
         className: "muted",
         children: "尚未保存本集對後續集數的交接資料。"
       }),
-      /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: w ? "更新接續資料版本" : "補登跨集接續資料" }), x.length ? /* @__PURE__ */ (0, l.jsxs)("form", {
+      /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: k ? "更新接續資料版本" : "補登跨集接續資料" }), x.length ? /* @__PURE__ */ (0, l.jsxs)("form", {
         className: "context-form",
-        onSubmit: async ($) => {
-          $.preventDefault(), await f("save_episode_handoff", {
+        onSubmit: async (P) => {
+          P.preventDefault(), await f("save_episode_handoff", {
             ...I,
             toEpisodeId: le || x[0].id,
-            baseVersion: w?.version ?? 0,
-            sourceKeys: re.split(/[,，\n]/).map((j) => j.trim()).filter(Boolean)
+            baseVersion: k?.version ?? 0,
+            sourceKeys: oe.split(/[,，\n]/).map((y) => y.trim()).filter(Boolean)
           });
         },
         children: [
           /* @__PURE__ */ (0, l.jsxs)("label", { children: ["接續目標集數", /* @__PURE__ */ (0, l.jsx)("select", {
             value: le || x[0].id,
-            onChange: ($) => ne($.target.value),
-            children: x.map(($) => /* @__PURE__ */ (0, l.jsxs)("option", {
-              value: $.id,
+            onChange: (P) => ne(P.target.value),
+            children: x.map((P) => /* @__PURE__ */ (0, l.jsxs)("option", {
+              value: P.id,
               children: [
-                $.episode,
+                P.episode,
                 " · ",
-                $.title
+                P.title
               ]
-            }, $.id))
+            }, P.id))
           })] }),
           /* @__PURE__ */ (0, l.jsxs)("label", { children: ["接續資料名稱", /* @__PURE__ */ (0, l.jsx)("input", {
             required: !0,
             maxLength: 200,
             value: I.title,
-            onChange: ($) => Q({
+            onChange: (P) => X({
               ...I,
-              title: $.target.value
+              title: P.target.value
             })
           })] }),
-          Lf.map(([$, j]) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [j, /* @__PURE__ */ (0, l.jsx)("textarea", {
+          Lf.map(([P, y]) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [y, /* @__PURE__ */ (0, l.jsx)("textarea", {
             required: !0,
             rows: 3,
             maxLength: 6e3,
-            value: I[$],
-            onChange: (W) => Q({
+            value: I[P],
+            onChange: (ee) => X({
               ...I,
-              [$]: W.target.value
+              [P]: ee.target.value
             })
-          })] }, $)),
+          })] }, P)),
           /* @__PURE__ */ (0, l.jsxs)("label", { children: ["來源識別鍵（逗號分隔）", /* @__PURE__ */ (0, l.jsx)("textarea", {
             rows: 2,
-            value: re,
-            onChange: ($) => L($.target.value)
+            value: oe,
+            onChange: (P) => q(P.target.value)
           })] }),
           /* @__PURE__ */ (0, l.jsx)("button", {
             className: "btn primary",
@@ -12143,10 +12143,10 @@ function Ax({ project: r, episodes: h, busy: k, mutate: f }) {
         "先前接續版本（",
         r.production.handoffs.length - 1,
         "）"
-      ] }), r.production.handoffs.slice(0, -1).map(($) => /* @__PURE__ */ (0, l.jsx)(td, {
-        h: $,
-        target: h.find((j) => j.id === $.toEpisodeId)?.episode ?? $.toEpisodeId
-      }, $.id))] }),
+      ] }), r.production.handoffs.slice(0, -1).map((P) => /* @__PURE__ */ (0, l.jsx)(td, {
+        h: P,
+        target: h.find((y) => y.id === P.toEpisodeId)?.episode ?? P.toEpisodeId
+      }, P.id))] }),
       /* @__PURE__ */ (0, l.jsxs)("details", { children: [
         /* @__PURE__ */ (0, l.jsx)("summary", { children: "AI 接手順序與資料登記" }),
         /* @__PURE__ */ (0, l.jsxs)("ol", { children: [
@@ -12170,8 +12170,8 @@ var ad = {
   location: "",
   baseVersion: void 0
 };
-function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSelectEpisode: w, onPin: x, mutate: A }) {
-  const [z, E] = (0, g.useState)(h.title.split("｜")[0]), [S, K] = (0, g.useState)(""), [N, le] = (0, g.useState)(""), [ne, I] = (0, g.useState)(""), [Q, re] = (0, g.useState)(""), [L, ie] = (0, g.useState)(""), [V, ee] = (0, g.useState)(ad), [P, xe] = (0, g.useState)(!1);
+function Tx({ work: r, episode: h, episodes: C, busy: f, onWorkAction: p, onSelectEpisode: k, onPin: x, mutate: A }) {
+  const [N, _] = (0, g.useState)(h.title.split("｜")[0]), [w, G] = (0, g.useState)(""), [z, le] = (0, g.useState)(""), [ne, I] = (0, g.useState)(""), [X, oe] = (0, g.useState)(""), [q, ie] = (0, g.useState)(""), [H, F] = (0, g.useState)(ad), [$, pe] = (0, g.useState)(!1);
   if (!r) return /* @__PURE__ */ (0, l.jsxs)("section", {
     className: "wide-card",
     children: [
@@ -12185,7 +12185,7 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
         className: "context-form",
         onSubmit: async (b) => {
           b.preventDefault(), await p("convert_episode", {
-            title: z,
+            title: N,
             episodeId: h.id,
             episodeRevision: h.revision
           });
@@ -12193,8 +12193,8 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
         children: [/* @__PURE__ */ (0, l.jsxs)("label", { children: ["作品專案名稱", /* @__PURE__ */ (0, l.jsx)("input", {
           required: !0,
           maxLength: 200,
-          value: z,
-          onChange: (b) => E(b.target.value)
+          value: N,
+          onChange: (b) => _(b.target.value)
         })] }), /* @__PURE__ */ (0, l.jsx)("button", {
           className: "btn primary",
           disabled: f,
@@ -12203,14 +12203,14 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
       })
     ]
   });
-  const te = k.filter((b) => b.workId === r.id).sort((b, ae) => b.episode.localeCompare(ae.episode, void 0, { numeric: !0 })), $ = Math.max(0, ...te.map((b) => Number(b.episode.replace(/^EP/i, "")) || 0)) + 1, j = "EP" + String($).padStart(2, "0"), W = [...new Map(r.sharedAssets.map((b) => [b.key, b])).values()], ge = W.filter((b) => !ne || [
+  const te = C.filter((b) => b.workId === r.id).sort((b, ae) => b.episode.localeCompare(ae.episode, void 0, { numeric: !0 })), P = Math.max(0, ...te.map((b) => Number(b.episode.replace(/^EP/i, "")) || 0)) + 1, y = "EP" + String(P).padStart(2, "0"), ee = [...new Map(r.sharedAssets.map((b) => [b.key, b])).values()], ge = ee.filter((b) => !ne || [
     b.key,
     b.title,
     b.content,
     b.source
   ].join(" ").toLowerCase().includes(ne.toLowerCase()));
-  function he(b) {
-    ee({
+  function me(b) {
+    F({
       key: b.key,
       title: b.title,
       kind: b.kind,
@@ -12218,7 +12218,7 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
       source: b.source,
       location: b.location,
       baseVersion: b.version
-    }), xe(!0);
+    }), pe(!0);
   }
   return /* @__PURE__ */ (0, l.jsxs)("section", {
     className: "work-dashboard",
@@ -12236,7 +12236,7 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
             className: "production-totals",
             children: [
               /* @__PURE__ */ (0, l.jsxs)("b", { children: [te.length, " 集"] }),
-              /* @__PURE__ */ (0, l.jsxs)("b", { children: [W.length, " 項共用來源"] }),
+              /* @__PURE__ */ (0, l.jsxs)("b", { children: [ee.length, " 項共用來源"] }),
               /* @__PURE__ */ (0, l.jsx)("span", { children: "各集保留自己的劇本、進度與採用版本。" })
             ]
           }),
@@ -12245,7 +12245,7 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
             children: te.map((b) => /* @__PURE__ */ (0, l.jsxs)("button", {
               className: "episode-card " + (b.id === h.id ? "selected" : ""),
               disabled: f,
-              onClick: () => w(b.id),
+              onClick: () => k(b.id),
               children: [
                 /* @__PURE__ */ (0, l.jsx)("small", { children: b.episode }),
                 /* @__PURE__ */ (0, l.jsx)("b", { children: b.title }),
@@ -12262,9 +12262,9 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
             className: "context-form",
             onSubmit: async (b) => {
               b.preventDefault(), await p("create_episode", {
-                episode: S || j,
-                title: N || `${S || j} 製作資料`
-              }) && (K(""), le(""));
+                episode: w || y,
+                title: z || `${w || y} 製作資料`
+              }) && (G(""), le(""));
             },
             children: [
               /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -12272,14 +12272,14 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
                 children: [/* @__PURE__ */ (0, l.jsxs)("label", { children: ["新集數", /* @__PURE__ */ (0, l.jsx)("input", {
                   required: !0,
                   pattern: "[Ee][Pp][0-9]{2,4}",
-                  value: S || j,
-                  onChange: (b) => K(b.target.value),
+                  value: w || y,
+                  onChange: (b) => G(b.target.value),
                   placeholder: "EP02"
                 })] }), /* @__PURE__ */ (0, l.jsxs)("label", { children: ["本集名稱", /* @__PURE__ */ (0, l.jsx)("input", {
                   maxLength: 200,
-                  value: N,
+                  value: z,
                   onChange: (b) => le(b.target.value),
-                  placeholder: `${S || j} 製作資料`
+                  placeholder: `${w || y} 製作資料`
                 })] })]
               }),
               /* @__PURE__ */ (0, l.jsx)("p", {
@@ -12297,7 +12297,7 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
       }),
       /* @__PURE__ */ (0, l.jsx)(Ax, {
         project: h,
-        episodes: k,
+        episodes: C,
         busy: f,
         mutate: A
       }),
@@ -12310,15 +12310,15 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
               className: "btn",
               disabled: f,
               onClick: () => {
-                ee(ad), xe(!P);
+                F(ad), pe(!$);
               },
               children: "新增共用參考"
             })]
           }),
-          P && /* @__PURE__ */ (0, l.jsxs)("form", {
+          $ && /* @__PURE__ */ (0, l.jsxs)("form", {
             className: "context-form",
             onSubmit: async (b) => {
-              b.preventDefault(), await p("save_shared_asset", V) && (xe(!1), ee(ad));
+              b.preventDefault(), await p("save_shared_asset", H) && (pe(!1), F(ad));
             },
             children: [
               /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -12326,27 +12326,27 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
                 children: [
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["共用識別鍵", /* @__PURE__ */ (0, l.jsx)("input", {
                     required: !0,
-                    readOnly: V.baseVersion !== void 0,
+                    readOnly: H.baseVersion !== void 0,
                     maxLength: 110,
-                    value: V.key,
-                    onChange: (b) => ee({
-                      ...V,
+                    value: H.key,
+                    onChange: (b) => F({
+                      ...H,
                       key: b.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["共用名稱", /* @__PURE__ */ (0, l.jsx)("input", {
                     required: !0,
                     maxLength: 200,
-                    value: V.title,
-                    onChange: (b) => ee({
-                      ...V,
+                    value: H.title,
+                    onChange: (b) => F({
+                      ...H,
                       title: b.target.value
                     })
                   })] }),
                   /* @__PURE__ */ (0, l.jsxs)("label", { children: ["資料種類", /* @__PURE__ */ (0, l.jsx)("select", {
-                    value: V.kind,
-                    onChange: (b) => ee({
-                      ...V,
+                    value: H.kind,
+                    onChange: (b) => F({
+                      ...H,
                       kind: b.target.value
                     }),
                     children: [
@@ -12367,33 +12367,33 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
                 required: !0,
                 rows: 7,
                 maxLength: 12e3,
-                value: V.content,
-                onChange: (b) => ee({
-                  ...V,
+                value: H.content,
+                onChange: (b) => F({
+                  ...H,
                   content: b.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["來源", /* @__PURE__ */ (0, l.jsx)("input", {
                 required: !0,
                 maxLength: 2e3,
-                value: V.source,
-                onChange: (b) => ee({
-                  ...V,
+                value: H.source,
+                onChange: (b) => F({
+                  ...H,
                   source: b.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["素材位置", /* @__PURE__ */ (0, l.jsx)("input", {
                 maxLength: 2e3,
-                value: V.location,
-                onChange: (b) => ee({
-                  ...V,
+                value: H.location,
+                onChange: (b) => F({
+                  ...H,
                   location: b.target.value
                 })
               })] }),
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn primary",
                 disabled: f,
-                children: V.baseVersion ? "保存新版本" : "保存共用來源"
+                children: H.baseVersion ? "保存新版本" : "保存共用來源"
               })
             ]
           }),
@@ -12435,7 +12435,7 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
                 className: "muted",
                 children: [
                   "保留來源集數：",
-                  k.find((ae) => ae.id === b.originEpisodeId)?.episode ?? b.originEpisodeId,
+                  C.find((ae) => ae.id === b.originEpisodeId)?.episode ?? b.originEpisodeId,
                   "；按本集需求選用。"
                 ]
               }),
@@ -12451,7 +12451,7 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
                 }), /* @__PURE__ */ (0, l.jsx)("button", {
                   className: "btn",
                   disabled: f,
-                  onClick: () => he(b),
+                  onClick: () => me(b),
                   children: "建立新版本"
                 })]
               }),
@@ -12468,23 +12468,23 @@ function Tx({ work: r, episode: h, episodes: k, busy: f, onWorkAction: p, onSele
               /* @__PURE__ */ (0, l.jsx)("p", { children: "貼上包含 assets 清單的 JSON。每項須有 key、title、kind、content、source；識別鍵重複時拒絕覆寫。" }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["作品來源 JSON", /* @__PURE__ */ (0, l.jsx)("textarea", {
                 rows: 5,
-                value: Q,
+                value: X,
                 onChange: (b) => {
-                  re(b.target.value), ie("");
+                  oe(b.target.value), ie("");
                 }
               })] }),
-              L && /* @__PURE__ */ (0, l.jsx)("p", {
+              q && /* @__PURE__ */ (0, l.jsx)("p", {
                 role: "alert",
-                children: L
+                children: q
               }),
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn primary",
-                disabled: f || !Q.trim(),
+                disabled: f || !X.trim(),
                 onClick: async () => {
                   try {
-                    const b = JSON.parse(Q);
+                    const b = JSON.parse(X);
                     if (!Array.isArray(b.assets)) throw new Error("缺少 assets 清單");
-                    await p("import_shared_assets", { assets: b.assets }) && re("");
+                    await p("import_shared_assets", { assets: b.assets }) && oe("");
                   } catch (b) {
                     ie(b instanceof Error ? b.message : "格式錯誤");
                   }
@@ -12519,38 +12519,38 @@ var Sf = {
   adopt_model_version: "作者登記採用版本",
   pin_model_version: "本集引用模型版本"
 };
-function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, onAction: w, onProject: x, onDirty: A }) {
-  const [z, E] = (0, g.useState)(r?.modelId ?? ""), [S, K] = (0, g.useState)(r?.versionId ?? ""), [N, le] = (0, g.useState)(r?.stageId ?? "M01"), [ne, I] = (0, g.useState)(null), [Q, re] = (0, g.useState)(Sf), [L, ie] = (0, g.useState)(""), V = h ? Os(h) : null, ee = V?.models.find((T) => T.id === z) ?? V?.models[0], P = ee?.versions.find((T) => T.id === S) ?? ee?.versions.at(-1), xe = P?.stages[N], te = _a.find((T) => T.id === N);
-  function $(T) {
+function Ox({ initialSelection: r, work: h, episode: C, episodes: f, busy: p, onAction: k, onProject: x, onDirty: A }) {
+  const [N, _] = (0, g.useState)(r?.modelId ?? ""), [w, G] = (0, g.useState)(r?.versionId ?? ""), [z, le] = (0, g.useState)(r?.stageId ?? "M01"), [ne, I] = (0, g.useState)(null), [X, oe] = (0, g.useState)(Sf), [q, ie] = (0, g.useState)(""), H = h ? Os(h) : null, F = H?.models.find((T) => T.id === N) ?? H?.models[0], $ = F?.versions.find((T) => T.id === w) ?? F?.versions.at(-1), pe = $?.stages[z], te = _a.find((T) => T.id === z);
+  function P(T) {
     dt(T), A(T);
   }
-  const [j, W] = (0, g.useState)([]), [ge, he] = (0, g.useState)(""), [b, ae] = (0, g.useState)(""), [Z, B] = (0, g.useState)(""), [Y, se] = (0, g.useState)(""), [ce, _e] = (0, g.useState)(""), [d, _] = (0, g.useState)("technical"), [q, F] = (0, g.useState)({}), [de, fe] = (0, g.useState)(""), [ue, Ge] = (0, g.useState)(""), [ze, dt] = (0, g.useState)(!1);
+  const [y, ee] = (0, g.useState)([]), [ge, me] = (0, g.useState)(""), [b, ae] = (0, g.useState)(""), [K, Y] = (0, g.useState)(""), [Q, se] = (0, g.useState)(""), [re, _e] = (0, g.useState)(""), [o, j] = (0, g.useState)("technical"), [R, W] = (0, g.useState)({}), [ce, he] = (0, g.useState)(""), [de, Ge] = (0, g.useState)(""), [ze, dt] = (0, g.useState)(!1);
   (0, g.useEffect)(() => {
-    xe && (W(xe.checks), he(xe.evidence), ae(xe.summary), B(xe.nextStep), se(P.candidateLocation), $(!1));
-  }, [xe, P]), (0, g.useEffect)(() => {
+    pe && (ee(pe.checks), me(pe.evidence), ae(pe.summary), Y(pe.nextStep), se($.candidateLocation), P(!1));
+  }, [pe, $]), (0, g.useEffect)(() => {
     if (!ze) return;
     const T = (we) => we.preventDefault();
     return window.addEventListener("beforeunload", T), () => window.removeEventListener("beforeunload", T);
   }, [ze]);
   function Xe(T) {
-    ze && !window.confirm("有未儲存模型紀錄，要放棄修改嗎？") || ($(!1), ie(""), T());
+    ze && !window.confirm("有未儲存模型紀錄，要放棄修改嗎？") || (P(!1), ie(""), T());
   }
   async function Me(T, we) {
     ie("");
-    const Ze = await w(T, we);
-    return Ze && $(!1), Ze;
+    const Ze = await k(T, we);
+    return Ze && P(!1), Ze;
   }
   function ve() {
-    !ee || !P || (re({
-      key: ee.key,
-      title: ee.title,
-      world: ee.world,
-      label: "v" + (P.number + 2) + "_candidate",
-      sourceLocation: P.sourceLocation,
-      sourceVersion: P.sourceVersion,
-      backupLocation: P.backupLocation,
-      sha256: P.sha256,
-      reference: P.reference
+    !F || !$ || (oe({
+      key: F.key,
+      title: F.title,
+      world: F.world,
+      label: "v" + ($.number + 2) + "_candidate",
+      sourceLocation: $.sourceLocation,
+      sourceVersion: $.sourceVersion,
+      backupLocation: $.backupLocation,
+      sha256: $.sha256,
+      reference: $.reference
     }), I("version"));
   }
   if (!h) return /* @__PURE__ */ (0, l.jsxs)("section", {
@@ -12568,7 +12568,7 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
       })
     ]
   });
-  const qe = V.issues.filter((T) => T.modelId === ee?.id && T.versionId === P?.id), lt = qe.filter((T) => T.status === "open"), o = !!P?.stages.M08.author, H = ee && P ? ox(h, ee.id, P.id, N) : [], oe = V.pins.filter((T) => T.episodeId === k.id), He = new Map(oe.map((T) => [[T.modelId, T.sceneIds].join("|"), T]));
+  const qe = H.issues.filter((T) => T.modelId === F?.id && T.versionId === $?.id), lt = qe.filter((T) => T.status === "open"), d = !!$?.stages.M08.author, B = F && $ ? ox(h, F.id, $.id, z) : [], ue = H.pins.filter((T) => T.episodeId === C.id), He = new Map(ue.map((T) => [[T.modelId, T.sceneIds].join("|"), T]));
   return /* @__PURE__ */ (0, l.jsxs)("section", {
     className: "model-workspace",
     children: [
@@ -12587,16 +12587,16 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
             className: "btn primary",
             disabled: p,
             onClick: () => Xe(() => {
-              re(Sf), I("register");
+              oe(Sf), I("register");
             }),
             children: [/* @__PURE__ */ (0, l.jsx)(Ft, { size: 15 }), "登記模型"]
           })]
         }), /* @__PURE__ */ (0, l.jsxs)("div", {
           className: "model-principles",
           children: [
-            /* @__PURE__ */ (0, l.jsxs)("span", { children: [/* @__PURE__ */ (0, l.jsx)(vl, { size: 15 }), "先讀原檔與設定"] }),
+            /* @__PURE__ */ (0, l.jsxs)("span", { children: [/* @__PURE__ */ (0, l.jsx)(jl, { size: 15 }), "先讀原檔與設定"] }),
             /* @__PURE__ */ (0, l.jsxs)("span", { children: [/* @__PURE__ */ (0, l.jsx)(cd, { size: 15 }), "保留原檔及版本"] }),
-            /* @__PURE__ */ (0, l.jsxs)("span", { children: [/* @__PURE__ */ (0, l.jsx)(bl, { size: 15 }), "技術、視覺與採用分開"] })
+            /* @__PURE__ */ (0, l.jsxs)("span", { children: [/* @__PURE__ */ (0, l.jsx)(vl, { size: 15 }), "技術、視覺與採用分開"] })
           ]
         })]
       }),
@@ -12605,12 +12605,12 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
         onSubmit: async (T) => {
           T.preventDefault();
           const we = await Me(ne === "register" ? "register_model" : "create_model_version", {
-            ...Q,
-            modelId: ee?.id
+            ...X,
+            modelId: F?.id
           });
           if (we) {
-            const Ze = ne === "register" ? we.work.modelFlow?.models.at(-1) : we.work.modelFlow?.models.find((Dt) => Dt.id === ee?.id);
-            I(null), E(Ze?.id ?? ""), K(Ze?.versions.at(-1)?.id ?? ""), le("M01");
+            const Ze = ne === "register" ? we.work.modelFlow?.models.at(-1) : we.work.modelFlow?.models.find((Dt) => Dt.id === F?.id);
+            I(null), _(Ze?.id ?? ""), G(Ze?.versions.at(-1)?.id ?? ""), le("M01");
           }
         },
         children: [
@@ -12630,27 +12630,27 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["模型固定識別鍵 *", /* @__PURE__ */ (0, l.jsx)("input", {
                   required: !0,
                   maxLength: 100,
-                  value: Q.key,
+                  value: X.key,
                   placeholder: "RG-REAL-01",
-                  onChange: (T) => re({
-                    ...Q,
+                  onChange: (T) => oe({
+                    ...X,
                     key: T.target.value
                   })
                 })] }),
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["模型名稱 *", /* @__PURE__ */ (0, l.jsx)("input", {
                   required: !0,
                   maxLength: 200,
-                  value: Q.title,
+                  value: X.title,
                   placeholder: "現實主角家",
-                  onChange: (T) => re({
-                    ...Q,
+                  onChange: (T) => oe({
+                    ...X,
                     title: T.target.value
                   })
                 })] }),
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["世界／場景分類", /* @__PURE__ */ (0, l.jsxs)("select", {
-                  value: Q.world,
-                  onChange: (T) => re({
-                    ...Q,
+                  value: X.world,
+                  onChange: (T) => oe({
+                    ...X,
                     world: T.target.value
                   }),
                   children: [
@@ -12672,9 +12672,9 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["本次候選標籤 *", /* @__PURE__ */ (0, l.jsx)("input", {
                 required: !0,
                 maxLength: 100,
-                value: Q.label,
-                onChange: (T) => re({
-                  ...Q,
+                value: X.label,
+                onChange: (T) => oe({
+                  ...X,
                   label: T.target.value
                 })
               })] }),
@@ -12687,9 +12687,9 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                 required: T === "sourceLocation" || T === "sourceVersion",
                 maxLength: T === "sha256" ? 64 : 2e3,
                 pattern: T === "sha256" ? "[a-fA-F0-9]{64}" : void 0,
-                value: Q[T],
-                onChange: (Ze) => re({
-                  ...Q,
+                value: X[T],
+                onChange: (Ze) => oe({
+                  ...X,
                   [T]: Ze.target.value
                 })
               })] }, T))
@@ -12698,9 +12698,9 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
           /* @__PURE__ */ (0, l.jsxs)("label", { children: ["設定與尺度來源／不可改動項目", /* @__PURE__ */ (0, l.jsx)("textarea", {
             rows: 4,
             maxLength: 12e3,
-            value: Q.reference,
-            onChange: (T) => re({
-              ...Q,
+            value: X.reference,
+            onChange: (T) => oe({
+              ...X,
               reference: T.target.value
             }),
             placeholder: "設計書與平面圖版本、固定節點／家具 ID、單位、重大變更待核定項。"
@@ -12716,7 +12716,7 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
           })
         ]
       }),
-      !ee || !P ? /* @__PURE__ */ (0, l.jsxs)("div", {
+      !F || !$ ? /* @__PURE__ */ (0, l.jsxs)("div", {
         className: "wide-card empty",
         children: [
           /* @__PURE__ */ (0, l.jsx)(sd, { size: 36 }),
@@ -12731,12 +12731,12 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
               className: "model-selectors",
               children: [
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["模型", /* @__PURE__ */ (0, l.jsx)("select", {
-                  value: ee.id,
+                  value: F.id,
                   disabled: p,
                   onChange: (T) => Xe(() => {
-                    E(T.target.value), K(""), le("M01");
+                    _(T.target.value), G(""), le("M01");
                   }),
-                  children: V.models.map((T) => /* @__PURE__ */ (0, l.jsxs)("option", {
+                  children: H.models.map((T) => /* @__PURE__ */ (0, l.jsxs)("option", {
                     value: T.id,
                     children: [
                       T.key,
@@ -12746,10 +12746,10 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                   }, T.id))
                 })] }),
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["精確版本", /* @__PURE__ */ (0, l.jsx)("select", {
-                  value: P.id,
+                  value: $.id,
                   disabled: p,
-                  onChange: (T) => Xe(() => K(T.target.value)),
-                  children: ee.versions.map((T) => /* @__PURE__ */ (0, l.jsxs)("option", {
+                  onChange: (T) => Xe(() => G(T.target.value)),
+                  children: F.versions.map((T) => /* @__PURE__ */ (0, l.jsxs)("option", {
                     value: T.id,
                     children: [
                       "v",
@@ -12757,7 +12757,7 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                       " · ",
                       T.label,
                       T.stages.M08.author ? "（曾採用）" : "",
-                      ee.adoptedVersionId === T.id ? "／目前採用" : ""
+                      F.adoptedVersionId === T.id ? "／目前採用" : ""
                     ]
                   }, T.id))
                 })] }),
@@ -12772,12 +12772,12 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
             /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "production-totals",
               children: [
-                /* @__PURE__ */ (0, l.jsxs)("b", { children: [_a.filter((T) => P.stages[T.id].author).length, " / 8 階段核定"] }),
+                /* @__PURE__ */ (0, l.jsxs)("b", { children: [_a.filter((T) => $.stages[T.id].author).length, " / 8 階段核定"] }),
                 /* @__PURE__ */ (0, l.jsxs)("b", { children: [lt.length, " 項待修或待裁定"] }),
                 /* @__PURE__ */ (0, l.jsxs)("span", { children: [
-                  ee.world === "real" ? "現實場景" : ee.world === "game" ? "遊戲場景" : "其他模型",
+                  F.world === "real" ? "現實場景" : F.world === "game" ? "遊戲場景" : "其他模型",
                   " · ",
-                  o ? "此採用版本保持不變" : "候選製作中"
+                  d ? "此採用版本保持不變" : "候選製作中"
                 ] })
               ]
             }),
@@ -12786,18 +12786,18 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
               children: [
                 /* @__PURE__ */ (0, l.jsx)("dt", { children: "模型來源" }),
                 /* @__PURE__ */ (0, l.jsxs)("dd", { children: [
-                  P.sourceLocation,
+                  $.sourceLocation,
                   " · ",
-                  P.sourceVersion
+                  $.sourceVersion
                 ] }),
                 /* @__PURE__ */ (0, l.jsx)("dt", { children: "原檔備份" }),
-                /* @__PURE__ */ (0, l.jsx)("dd", { children: P.backupLocation || "待補" }),
+                /* @__PURE__ */ (0, l.jsx)("dd", { children: $.backupLocation || "待補" }),
                 /* @__PURE__ */ (0, l.jsx)("dt", { children: "SHA-256" }),
-                /* @__PURE__ */ (0, l.jsx)("dd", { children: P.sha256 || "待實際計算" }),
+                /* @__PURE__ */ (0, l.jsx)("dd", { children: $.sha256 || "待實際計算" }),
                 /* @__PURE__ */ (0, l.jsx)("dt", { children: "設定與尺度" }),
-                /* @__PURE__ */ (0, l.jsx)("dd", { children: P.reference || "待補" }),
+                /* @__PURE__ */ (0, l.jsx)("dd", { children: $.reference || "待補" }),
                 /* @__PURE__ */ (0, l.jsx)("dt", { children: "候選 GLB" }),
-                /* @__PURE__ */ (0, l.jsx)("dd", { children: P.candidateLocation || "尚未登記" })
+                /* @__PURE__ */ (0, l.jsx)("dd", { children: $.candidateLocation || "尚未登記" })
               ]
             })] })
           ]
@@ -12806,12 +12806,12 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
           className: "model-stage-grid",
           children: _a.map((T, we) => /* @__PURE__ */ (0, l.jsxs)("button", {
             disabled: p,
-            className: "model-step " + (N === T.id ? "selected" : "") + (P.stages[T.id].author ? " passed" : ""),
+            className: "model-step " + (z === T.id ? "selected" : "") + ($.stages[T.id].author ? " passed" : ""),
             onClick: () => Xe(() => le(T.id)),
             children: [
               /* @__PURE__ */ (0, l.jsx)("small", { children: T.id }),
               /* @__PURE__ */ (0, l.jsx)("b", { children: T.title }),
-              /* @__PURE__ */ (0, l.jsx)("span", { children: P.stages[T.id].author ? "作者已確認" : P.stages[T.id].status === "needs_revision" ? "待修正" : P.stages[T.id].status === "candidate" ? "已有工作回報" : "待製作" })
+              /* @__PURE__ */ (0, l.jsx)("span", { children: $.stages[T.id].author ? "作者已確認" : $.stages[T.id].status === "needs_revision" ? "待修正" : $.stages[T.id].status === "candidate" ? "已有工作回報" : "待製作" })
             ]
           }, T.id))
         }),
@@ -12825,31 +12825,31 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                 children: [
                   te.id,
                   " · ",
-                  ee.title,
+                  F.title,
                   " · ",
-                  P.label
+                  $.label
                 ]
               }), /* @__PURE__ */ (0, l.jsx)("h2", { children: te.title })] }), /* @__PURE__ */ (0, l.jsx)("span", {
-                className: "status " + (xe.author ? "passed" : xe.status === "needs_revision" ? "needs_revision" : "candidate"),
-                children: xe.author ? "作者已確認" : xe.status === "todo" ? "待製作" : "待確認工作"
+                className: "status " + (pe.author ? "passed" : pe.status === "needs_revision" ? "needs_revision" : "candidate"),
+                children: pe.author ? "作者已確認" : pe.status === "todo" ? "待製作" : "待確認工作"
               })]
             }),
             /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "output-box",
-              children: [/* @__PURE__ */ (0, l.jsx)(vl, { size: 19 }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("strong", { children: "應留下的產出" }), /* @__PURE__ */ (0, l.jsx)("p", { children: te.output })] })]
+              children: [/* @__PURE__ */ (0, l.jsx)(jl, { size: 19 }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("strong", { children: "應留下的產出" }), /* @__PURE__ */ (0, l.jsx)("p", { children: te.output })] })]
             }),
             /* @__PURE__ */ (0, l.jsxs)("form", {
               className: "context-form",
               onSubmit: async (T) => {
                 T.preventDefault(), await Me("save_model_stage", {
-                  modelId: ee.id,
-                  versionId: P.id,
-                  stageId: N,
-                  checks: j,
+                  modelId: F.id,
+                  versionId: $.id,
+                  stageId: z,
+                  checks: y,
                   evidence: ge,
                   summary: b,
-                  nextStep: Z,
-                  candidateLocation: Y
+                  nextStep: K,
+                  candidateLocation: Q
                 });
               },
               children: [
@@ -12857,28 +12857,28 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                   className: "checklist",
                   children: te.checks.map((T, we) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [/* @__PURE__ */ (0, l.jsx)("input", {
                     type: "checkbox",
-                    disabled: p || o,
-                    checked: j[we] ?? !1,
+                    disabled: p || d,
+                    checked: y[we] ?? !1,
                     onChange: (Ze) => {
-                      W((Dt) => Dt.map((M, ke) => ke === we ? Ze.target.checked : M)), $(!0);
+                      ee((Dt) => Dt.map((M, ke) => ke === we ? Ze.target.checked : M)), P(!0);
                     }
                   }), /* @__PURE__ */ (0, l.jsx)("span", { children: T })] }, T))
                 }),
-                N === "M04" && /* @__PURE__ */ (0, l.jsxs)("label", { children: ["本次獨立候選 GLB", /* @__PURE__ */ (0, l.jsx)("input", {
-                  disabled: p || o,
+                z === "M04" && /* @__PURE__ */ (0, l.jsxs)("label", { children: ["本次獨立候選 GLB", /* @__PURE__ */ (0, l.jsx)("input", {
+                  disabled: p || d,
                   maxLength: 2e3,
-                  value: Y,
+                  value: Q,
                   placeholder: ".../reality-home_v2_candidate.glb",
                   onChange: (T) => {
-                    se(T.target.value), $(!0);
+                    se(T.target.value), P(!0);
                   }
                 })] }),
                 /* @__PURE__ */ (0, l.jsxs)("label", { children: ["實際產出／檢查依據位置", /* @__PURE__ */ (0, l.jsx)("textarea", {
                   rows: 2,
-                  disabled: p || o,
+                  disabled: p || d,
                   value: ge,
                   onChange: (T) => {
-                    he(T.target.value), $(!0);
+                    me(T.target.value), P(!0);
                   },
                   placeholder: "原檔盤點報告、逐物件差異、檢查結果或指定鏡位截圖；附來源版本。"
                 })] }),
@@ -12886,10 +12886,10 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                   required: !0,
                   rows: 3,
                   maxLength: 6e3,
-                  disabled: p || o,
+                  disabled: p || d,
                   value: b,
                   onChange: (T) => {
-                    ae(T.target.value), $(!0);
+                    ae(T.target.value), P(!0);
                   },
                   placeholder: "具體節點／物件、改動、檢查方式、尚未完成項。"
                 })] }),
@@ -12897,10 +12897,10 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                   required: !0,
                   rows: 3,
                   maxLength: 6e3,
-                  disabled: p || o,
-                  value: Z,
+                  disabled: p || d,
+                  value: K,
                   onChange: (T) => {
-                    B(T.target.value), $(!0);
+                    Y(T.target.value), P(!0);
                   },
                   placeholder: "指定版本、檔案位置、先讀資料、下一個物件或鏡位，以及受阻原因。"
                 })] }),
@@ -12908,28 +12908,28 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                   className: "context-actions",
                   children: [/* @__PURE__ */ (0, l.jsxs)("button", {
                     className: "btn",
-                    disabled: p || o || !ze,
+                    disabled: p || d || !ze,
                     children: ["保存候選工作紀錄", ze ? " *" : ""]
                   }), /* @__PURE__ */ (0, l.jsxs)("button", {
                     type: "button",
                     className: "btn primary",
-                    disabled: p || o || ze || H.length > 0 || !!xe.author,
+                    disabled: p || d || ze || B.length > 0 || !!pe.author,
                     onClick: () => {
-                      Me(N === "M08" ? "adopt_model_version" : "approve_model_stage", {
-                        modelId: ee.id,
-                        versionId: P.id,
-                        stageId: N,
+                      Me(z === "M08" ? "adopt_model_version" : "approve_model_stage", {
+                        modelId: F.id,
+                        versionId: $.id,
+                        stageId: z,
                         note: "作者確認指定候選版本與適用範圍"
                       });
                     },
-                    children: [/* @__PURE__ */ (0, l.jsx)(bl, { size: 15 }), N === "M08" ? "作者登記採用此版本" : "作者確認本階段"]
+                    children: [/* @__PURE__ */ (0, l.jsx)(vl, { size: 15 }), z === "M08" ? "作者登記採用此版本" : "作者確認本階段"]
                   })]
                 }),
                 /* @__PURE__ */ (0, l.jsx)("p", {
                   className: "muted",
-                  children: o ? "已採用版本及舊集引用保持不變；需要修改請另建候選。" : ze ? "請先保存工作紀錄，再確認。" : H.length ? "待補：" + H.join("；") : "檢查條件已齊，請核對實際成果後確認。"
+                  children: d ? "已採用版本及舊集引用保持不變；需要修改請另建候選。" : ze ? "請先保存工作紀錄，再確認。" : B.length ? "待補：" + B.join("；") : "檢查條件已齊，請核對實際成果後確認。"
                 }),
-                N === "M08" && /* @__PURE__ */ (0, l.jsx)("p", {
+                z === "M08" && /* @__PURE__ */ (0, l.jsx)("p", {
                   className: "inline-note",
                   children: "採用僅保存作者選擇，不會覆寫或部署正式 GLB。實際替換正式模型須另行明確授權。"
                 })
@@ -12948,19 +12948,19 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
               className: "context-form",
               onSubmit: async (T) => {
                 T.preventDefault(), await Me("report_model_issue", {
-                  modelId: ee.id,
-                  versionId: P.id,
-                  stageId: N,
-                  kind: d,
-                  reason: ce
+                  modelId: F.id,
+                  versionId: $.id,
+                  stageId: z,
+                  kind: o,
+                  reason: re
                 }) && _e("");
               },
               children: [
                 /* @__PURE__ */ (0, l.jsxs)("div", {
                   className: "context-form-grid",
                   children: [/* @__PURE__ */ (0, l.jsxs)("label", { children: ["問題分類", /* @__PURE__ */ (0, l.jsxs)("select", {
-                    value: d,
-                    onChange: (T) => _(T.target.value),
+                    value: o,
+                    onChange: (T) => j(T.target.value),
                     children: [
                       /* @__PURE__ */ (0, l.jsx)("option", {
                         value: "technical",
@@ -12984,12 +12984,12 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                   required: !0,
                   rows: 2,
                   maxLength: 6e3,
-                  value: ce,
+                  value: re,
                   onChange: (T) => _e(T.target.value)
                 })] }),
                 /* @__PURE__ */ (0, l.jsxs)("button", {
                   className: "btn",
-                  disabled: p || !ce.trim(),
+                  disabled: p || !re.trim(),
                   children: [/* @__PURE__ */ (0, l.jsx)(oi, { size: 15 }), "登記問題"]
                 })
               ]
@@ -13018,19 +13018,19 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                   className: "context-form",
                   onSubmit: async (we) => {
                     we.preventDefault(), await Me("resolve_model_issue", {
-                      modelId: ee.id,
-                      versionId: P.id,
+                      modelId: F.id,
+                      versionId: $.id,
                       issueId: T.id,
-                      resolution: q[T.id] ?? ""
+                      resolution: R[T.id] ?? ""
                     });
                   },
                   children: [/* @__PURE__ */ (0, l.jsxs)("label", { children: ["作者修正複核／裁定結果", /* @__PURE__ */ (0, l.jsx)("textarea", {
                     required: !0,
                     rows: 2,
                     maxLength: 6e3,
-                    value: q[T.id] ?? "",
-                    onChange: (we) => F({
-                      ...q,
+                    value: R[T.id] ?? "",
+                    onChange: (we) => W({
+                      ...R,
                       [T.id]: we.target.value
                     })
                   })] }), /* @__PURE__ */ (0, l.jsx)("button", {
@@ -13050,45 +13050,45 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
               className: "section-title",
               children: /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("h2", { children: [/* @__PURE__ */ (0, l.jsx)(on, { size: 19 }), "各集固定版本引用"] }), /* @__PURE__ */ (0, l.jsxs)("p", { children: [
                 "目前集數：",
-                k.episode,
+                C.episode,
                 "。新候選不會自動替換 EP01 或其他集的模型來源。"
               ] })] })
             }),
-            o && /* @__PURE__ */ (0, l.jsxs)("form", {
+            d && /* @__PURE__ */ (0, l.jsxs)("form", {
               className: "context-form",
               onSubmit: async (T) => {
                 T.preventDefault(), await Me("pin_model_version", {
-                  modelId: ee.id,
-                  versionId: P.id,
-                  episodeId: k.id,
-                  purpose: de,
-                  sceneIds: ue
-                }) && (fe(""), Ge(""));
+                  modelId: F.id,
+                  versionId: $.id,
+                  episodeId: C.id,
+                  purpose: ce,
+                  sceneIds: de
+                }) && (he(""), Ge(""));
               },
               children: [/* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "context-form-grid",
                 children: [/* @__PURE__ */ (0, l.jsxs)("label", { children: ["引用場次（選填）", /* @__PURE__ */ (0, l.jsx)("input", {
-                  value: ue,
+                  value: de,
                   maxLength: 1e3,
                   placeholder: "S06、S07",
                   onChange: (T) => Ge(T.target.value)
                 })] }), /* @__PURE__ */ (0, l.jsxs)("label", { children: ["本集用途 *", /* @__PURE__ */ (0, l.jsx)("input", {
                   required: !0,
-                  value: de,
+                  value: ce,
                   maxLength: 2e3,
                   placeholder: "固定樓梯、餐桌與走道位置",
-                  onChange: (T) => fe(T.target.value)
+                  onChange: (T) => he(T.target.value)
                 })] })]
               }), /* @__PURE__ */ (0, l.jsxs)("button", {
                 className: "btn",
                 disabled: p || lt.length > 0,
-                children: ["將此採用版本引用至 ", k.episode]
+                children: ["將此採用版本引用至 ", C.episode]
               })]
             }),
-            oe.length ? /* @__PURE__ */ (0, l.jsx)("div", {
+            ue.length ? /* @__PURE__ */ (0, l.jsx)("div", {
               className: "model-pins",
-              children: oe.map((T, we) => {
-                const Ze = V.models.find((M) => M.id === T.modelId), Dt = Ze?.versions.find((M) => M.id === T.versionId);
+              children: ue.map((T, we) => {
+                const Ze = H.models.find((M) => M.id === T.modelId), Dt = Ze?.versions.find((M) => M.id === T.versionId);
                 return /* @__PURE__ */ (0, l.jsxs)("article", { children: [
                   /* @__PURE__ */ (0, l.jsxs)("b", { children: [
                     Ze?.title,
@@ -13118,9 +13118,9 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
           className: "wide-card",
           children: [/* @__PURE__ */ (0, l.jsxs)("summary", { children: [
             "模型製作與 AI 接續紀錄（",
-            V.history.filter((T) => T.modelId === ee.id).length,
+            H.history.filter((T) => T.modelId === F.id).length,
             "）"
-          ] }), [...V.history].reverse().filter((T) => T.modelId === ee.id).slice(0, 60).map((T, we) => /* @__PURE__ */ (0, l.jsxs)("article", {
+          ] }), [...H.history].reverse().filter((T) => T.modelId === F.id).slice(0, 60).map((T, we) => /* @__PURE__ */ (0, l.jsxs)("article", {
             className: "context-mini",
             children: [
               /* @__PURE__ */ (0, l.jsxs)("b", { children: [
@@ -13128,7 +13128,7 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
                 " · ",
                 T.stageId,
                 " · ",
-                ee.versions.find((Ze) => Ze.id === T.versionId)?.label
+                F.versions.find((Ze) => Ze.id === T.versionId)?.label
               ] }),
               /* @__PURE__ */ (0, l.jsx)("p", { children: T.detail }),
               /* @__PURE__ */ (0, l.jsxs)("small", { children: [
@@ -13142,9 +13142,9 @@ function Ox({ initialSelection: r, work: h, episode: k, episodes: f, busy: p, on
           }, we))]
         })
       ] }),
-      L && /* @__PURE__ */ (0, l.jsx)("p", {
+      q && /* @__PURE__ */ (0, l.jsx)("p", {
         role: "alert",
-        children: L
+        children: q
       })
     ]
   });
@@ -13186,17 +13186,17 @@ function ci(r) {
     minute: "2-digit"
   }) : "尚無紀錄";
 }
-function Dx(r, h, k = "application/json") {
-  const f = URL.createObjectURL(new Blob([h], { type: k })), p = document.createElement("a");
+function Dx(r, h, C = "application/json") {
+  const f = URL.createObjectURL(new Blob([h], { type: C })), p = document.createElement("a");
   p.href = f, p.download = r, p.click(), setTimeout(() => URL.revokeObjectURL(f), 1e3);
 }
-function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", onDirtyChange: f } = {}) {
-  const [p, w] = (0, g.useState)([]), [x, A] = (0, g.useState)(null), [z, E] = (0, g.useState)(k), [S, K] = (0, g.useState)("01"), [N, le] = (0, g.useState)(null), [ne, I] = (0, g.useState)([]), [Q, re] = (0, g.useState)(!0), [L, ie] = (0, g.useState)(!1), [V, ee] = (0, g.useState)(""), [P, xe] = (0, g.useState)(""), [te, $] = (0, g.useState)(!1), [j, W] = (0, g.useState)([]), [ge, he] = (0, g.useState)(""), [b, ae] = (0, g.useState)(""), [Z, B] = (0, g.useState)(!1), [Y, se] = (0, g.useState)(null), [ce, _e] = (0, g.useState)({}), [d, _] = (0, g.useState)(""), [q, F] = (0, g.useState)(!1), [de, fe] = (0, g.useState)(null), ue = (0, g.useRef)(0), Ge = (0, g.useRef)(""), ze = (0, g.useRef)(!1);
+function Ux({ nativeTransport: r, initialWorkId: h, initialTab: C = "resume", onDirtyChange: f } = {}) {
+  const [p, k] = (0, g.useState)([]), [x, A] = (0, g.useState)(null), [N, _] = (0, g.useState)(C), [w, G] = (0, g.useState)("01"), [z, le] = (0, g.useState)(null), [ne, I] = (0, g.useState)([]), [X, oe] = (0, g.useState)(!0), [q, ie] = (0, g.useState)(!1), [H, F] = (0, g.useState)(""), [$, pe] = (0, g.useState)(""), [te, P] = (0, g.useState)(!1), [y, ee] = (0, g.useState)([]), [ge, me] = (0, g.useState)(""), [b, ae] = (0, g.useState)(""), [K, Y] = (0, g.useState)(!1), [Q, se] = (0, g.useState)(null), [re, _e] = (0, g.useState)({}), [o, j] = (0, g.useState)(""), [R, W] = (0, g.useState)(!1), [ce, he] = (0, g.useState)(null), de = (0, g.useRef)(0), Ge = (0, g.useRef)(""), ze = (0, g.useRef)(!1);
   (0, g.useEffect)(() => {
-    ze.current = Z, f?.(Z);
-  }, [Z, f]);
+    ze.current = K, f?.(K);
+  }, [K, f]);
   const dt = (0, g.useCallback)((m) => {
-    Ge.current = m.id, A(m), le((ye) => ye?.id === m.workId ? ye : null), w((ye) => [rd(m), ...ye.filter((Se) => Se.id !== m.id)]), B(!1);
+    Ge.current = m.id, A(m), le((ye) => ye?.id === m.workId ? ye : null), k((ye) => [rd(m), ...ye.filter((Se) => Se.id !== m.id)]), Y(!1);
   }, []);
   async function Xe(m, ye, Se = "projects") {
     const st = r ? await r(Se, m, ye) : await fetch("/api/" + Se + m, {
@@ -13208,25 +13208,25 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
       } : {}
     });
     if (st.status === 401)
-      throw $(!0), new Error("請先登入流程工作台");
+      throw P(!0), new Error("請先登入流程工作台");
     if (!st.headers.get("content-type")?.includes("application/json"))
-      throw $(!0), new Error("請開啟工作台並使用 ChatGPT 登入");
+      throw P(!0), new Error("請開啟工作台並使用 ChatGPT 登入");
     const Fe = await st.json();
     if (!st.ok) throw new Error(Fe.error || "讀取失敗");
-    return $(!1), Fe;
+    return P(!1), Fe;
   }
   const Me = (0, g.useCallback)(async (m) => {
-    const ye = ++ue.current;
-    m && m !== Ge.current && (Ge.current = m, re(!0));
+    const ye = ++de.current;
+    m && m !== Ge.current && (Ge.current = m, oe(!0));
     try {
       const [Se, st] = await Promise.all([Xe(""), Xe("", void 0, "works")]), Fe = h ? Se.filter((kt) => kt.workId === h) : Se, wt = m || Ge.current || Fe.find((kt) => !kt.archived && kt.workId && kt.episode === "EP01")?.id || Fe.find((kt) => !kt.archived && kt.workId)?.id || Fe.find((kt) => !kt.archived)?.id;
       let ht = null, un = null;
-      if (wt && (ht = await Xe("?id=" + encodeURIComponent(wt)), ht.workId && (un = (await Xe("?id=" + encodeURIComponent(ht.workId), void 0, "works")).work)), ye !== ue.current) return;
-      ee(""), w(Fe), I(h ? st.filter((kt) => kt.id === h) : st), ze.current || (ht ? dt(ht) : A(null), le(un));
+      if (wt && (ht = await Xe("?id=" + encodeURIComponent(wt)), ht.workId && (un = (await Xe("?id=" + encodeURIComponent(ht.workId), void 0, "works")).work)), ye !== de.current) return;
+      F(""), k(Fe), I(h ? st.filter((kt) => kt.id === h) : st), ze.current || (ht ? dt(ht) : A(null), le(un));
     } catch (Se) {
-      ye === ue.current && ee(Se.message);
+      ye === de.current && F(Se.message);
     } finally {
-      ye === ue.current && re(!1);
+      ye === de.current && oe(!1);
     }
   }, [dt, h]);
   (0, g.useEffect)(() => {
@@ -13236,37 +13236,37 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
       "project",
       "models",
       "context"
-    ].includes(m) && E(m);
+    ].includes(m) && _(m);
   }, []), (0, g.useEffect)(() => {
     Me();
   }, [Me]), (0, g.useEffect)(() => {
     const m = setInterval(() => {
-      !Z && !Y && !L && Me(Ge.current || void 0);
+      !K && !Q && !q && Me(Ge.current || void 0);
     }, 2e4);
     return () => clearInterval(m);
   }, [
-    Z,
-    Y,
-    L,
+    K,
+    Q,
+    q,
     x?.id,
     Me
   ]), (0, g.useEffect)(() => {
-    const m = x?.stages[S];
-    m && (W(m.checks), he(m.evidence), ae(m.note), B(!1));
-  }, [x, S]), (0, g.useEffect)(() => {
-    if (!Z) return;
+    const m = x?.stages[w];
+    m && (ee(m.checks), me(m.evidence), ae(m.note), Y(!1));
+  }, [x, w]), (0, g.useEffect)(() => {
+    if (!K) return;
     const m = (ye) => {
       ye.preventDefault();
     };
     return window.addEventListener("beforeunload", m), () => window.removeEventListener("beforeunload", m);
-  }, [Z]), (0, g.useEffect)(() => {
-    if (!P) return;
-    const m = setTimeout(() => xe(""), 4500);
+  }, [K]), (0, g.useEffect)(() => {
+    if (!$) return;
+    const m = setTimeout(() => pe(""), 4500);
     return () => clearTimeout(m);
-  }, [P]);
+  }, [$]);
   async function ve(m, ye = {}) {
     if (x) {
-      ue.current++, ie(!0), ee("");
+      de.current++, ie(!0), F("");
       try {
         const Se = await Xe("", {
           projectId: x.id,
@@ -13274,16 +13274,16 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
           action: m,
           args: ye
         });
-        return dt(Se), Se.archived && F(!0), xe("已儲存至雲端"), Se;
+        return dt(Se), Se.archived && W(!0), pe("已儲存至雲端"), Se;
       } catch (Se) {
-        ee(Se.message);
+        F(Se.message);
       } finally {
         ie(!1);
       }
     }
   }
   async function qe(m, ye) {
-    ue.current++, ie(!0), ee("");
+    de.current++, ie(!0), F("");
     try {
       const Se = await Xe("", [
         "convert_episode",
@@ -13292,57 +13292,57 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
       ].includes(m) ? {
         action: m,
         ...ye,
-        workId: N?.id,
-        revision: N?.revision
+        workId: z?.id,
+        revision: z?.revision
       } : {
         action: m,
-        workId: N?.id,
-        revision: N?.revision,
+        workId: z?.id,
+        revision: z?.revision,
         args: ye
       }, "works");
       return le(Se.work), I((st) => [{
         ...xx(Se.work),
         episodeCount: Se.episodes.length
-      }, ...st.filter((Fe) => Fe.id !== Se.work.id)]), w((st) => [...Se.episodes, ...st.filter((Fe) => !Se.episodes.some((wt) => wt.id === Fe.id))]), Se.episode && dt(Se.episode), xe("作品專案已儲存"), Se;
+      }, ...st.filter((Fe) => Fe.id !== Se.work.id)]), k((st) => [...Se.episodes, ...st.filter((Fe) => !Se.episodes.some((wt) => wt.id === Fe.id))]), Se.episode && dt(Se.episode), pe("作品專案已儲存"), Se;
     } catch (Se) {
-      if (ee(Se.message), m === "create_episode") throw Se;
+      if (F(Se.message), m === "create_episode") throw Se;
     } finally {
       ie(!1);
     }
   }
   function lt(m) {
-    Z && !window.confirm("此階段有未儲存修改，要放棄修改嗎？") || (B(!1), m());
+    K && !window.confirm("此階段有未儲存修改，要放棄修改嗎？") || (Y(!1), m());
   }
-  function o(m) {
-    lt(() => K(m));
+  function d(m) {
+    lt(() => G(m));
   }
-  function H(m) {
+  function B(m) {
     lt(() => {
-      E(m), [
+      _(m), [
         "main",
         "op",
         "ed"
-      ].includes(m) && K(Pt.find((ye) => ye.group === m).id);
+      ].includes(m) && G(Pt.find((ye) => ye.group === m).id);
     });
   }
-  async function oe(m) {
-    m.preventDefault(), ie(!0), ee("");
+  async function ue(m) {
+    m.preventDefault(), ie(!0), F("");
     try {
-      Y === "create" ? (N ? await qe("create_episode", {
-        title: ce.title || "製作資料",
-        episode: ce.episode || "EP01"
+      Q === "create" ? (z ? await qe("create_episode", {
+        title: re.title || "製作資料",
+        episode: re.episode || "EP01"
       }) : dt(await Xe("", {
         action: "create_project",
-        title: ce.title || "現實遊戲",
-        episode: ce.episode || "EP01"
-      })), E("main"), K("01"), se(null), xe("專案已建立，全部階段待確認")) : Y === "shot" ? await ve("save_shot", ce) && se(null) : Y === "issue" ? await ve("add_issue", ce) && se(null) : Y === "resolve" ? await ve("resolve_issue", ce) && se(null) : Y === "archive" && await ve(x?.archived ? "restore" : "archive") && se(null);
+        title: re.title || "現實遊戲",
+        episode: re.episode || "EP01"
+      })), _("main"), G("01"), se(null), pe("專案已建立，全部階段待確認")) : Q === "shot" ? await ve("save_shot", re) && se(null) : Q === "issue" ? await ve("add_issue", re) && se(null) : Q === "resolve" ? await ve("resolve_issue", re) && se(null) : Q === "archive" && await ve(x?.archived ? "restore" : "archive") && se(null);
     } catch (ye) {
-      ee(ye.message);
+      F(ye.message);
     } finally {
       ie(!1);
     }
   }
-  const He = x ? rd(x) : null, T = Pt.find((m) => m.id === S), we = x?.stages[S], Ze = x ? Uf(x, S) : [], Dt = x ? Ts(x, S) : [], M = Pt.filter((m) => m.group === z), ke = x?.issues.filter((m) => m.status === "open") || [], je = x?.production?.completionReports?.at(-1), Ce = je?.status === "completed", Be = x ? hd(x).registration : null, bt = [
+  const He = x ? rd(x) : null, T = Pt.find((m) => m.id === w), we = x?.stages[w], Ze = x ? Uf(x, w) : [], Dt = x ? Ts(x, w) : [], M = Pt.filter((m) => m.group === N), ke = x?.issues.filter((m) => m.status === "open") || [], je = x?.production?.completionReports?.at(-1), Ce = je?.status === "completed", Be = x ? hd(x).registration : null, bt = [
     [
       "resume",
       "工作首頁",
@@ -13361,7 +13361,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
     [
       "settings",
       "採用設定",
-      vl
+      jl
     ],
     [
       "context",
@@ -13426,12 +13426,12 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
           /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "project-switch",
             children: [/* @__PURE__ */ (0, l.jsx)(nn, { size: 19 }), /* @__PURE__ */ (0, l.jsxs)("select", {
-              disabled: L || Q,
+              disabled: q || X,
               "aria-label": "切換作品專案",
-              value: N?.id || "",
+              value: z?.id || "",
               onChange: (m) => lt(() => {
                 const ye = p.find((Se) => (Se.workId || "") === m.target.value && !Se.archived);
-                ye && Me(ye.id), fe(null), E("resume");
+                ye && Me(ye.id), he(null), _("resume");
               }),
               children: [/* @__PURE__ */ (0, l.jsx)("option", {
                 value: "",
@@ -13454,7 +13454,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
           /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "project-switch",
             children: [/* @__PURE__ */ (0, l.jsx)(ui, { size: 19 }), /* @__PURE__ */ (0, l.jsxs)("select", {
-              disabled: L || Q,
+              disabled: q || X,
               "aria-label": "切換集數",
               value: x?.id || "",
               onChange: (m) => lt(() => {
@@ -13464,7 +13464,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                 value: "",
                 disabled: !0,
                 children: "選擇集數"
-              }), p.filter((m) => (m.workId || "") === (N?.id || "") && (q || !m.archived)).map((m) => /* @__PURE__ */ (0, l.jsxs)("option", {
+              }), p.filter((m) => (m.workId || "") === (z?.id || "") && (R || !m.archived)).map((m) => /* @__PURE__ */ (0, l.jsxs)("option", {
                 value: m.id,
                 children: [
                   m.episode,
@@ -13494,14 +13494,14 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
               "context",
               "chatgpt"
             ].includes(m)).map(([m, ye, Se]) => /* @__PURE__ */ (0, l.jsxs)("button", {
-              "aria-current": z === m ? "page" : void 0,
-              className: "nav-item " + (z === m || m === "main" && [
+              "aria-current": N === m ? "page" : void 0,
+              className: "nav-item " + (N === m || m === "main" && [
                 "op",
                 "ed",
                 "shots",
                 "issues"
-              ].includes(z) ? "active" : ""),
-              onClick: () => H(m),
+              ].includes(N) ? "active" : ""),
+              onClick: () => B(m),
               children: [/* @__PURE__ */ (0, l.jsx)(Se, { size: 18 }), /* @__PURE__ */ (0, l.jsx)("span", { children: ye })]
             }, m))
           }),
@@ -13511,14 +13511,14 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
               "project",
               "settings",
               "history"
-            ].includes(z) || void 0,
+            ].includes(N) || void 0,
             children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "專案管理" }), bt.filter(([m]) => [
               "project",
               "settings",
               "history"
             ].includes(m)).map(([m, ye, Se]) => /* @__PURE__ */ (0, l.jsxs)("button", {
-              className: "nav-item " + (z === m ? "active" : ""),
-              onClick: () => H(m),
+              className: "nav-item " + (N === m ? "active" : ""),
+              onClick: () => B(m),
               children: [/* @__PURE__ */ (0, l.jsx)(Se, { size: 17 }), ye]
             }, m))]
           }),
@@ -13528,8 +13528,8 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
               className: "archive-toggle",
               children: [/* @__PURE__ */ (0, l.jsx)("input", {
                 type: "checkbox",
-                checked: q,
-                onChange: (m) => F(m.target.checked)
+                checked: R,
+                onChange: (m) => W(m.target.checked)
               }), "顯示已封存專案"]
             }), /* @__PURE__ */ (0, l.jsxs)("a", {
               href: ld,
@@ -13548,7 +13548,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
             children: [
               "製作工作台 ",
               /* @__PURE__ */ (0, l.jsx)(uf, { size: 14 }),
-              /* @__PURE__ */ (0, l.jsx)("span", { children: bt.find((m) => m[0] === z)?.[1] })
+              /* @__PURE__ */ (0, l.jsx)("span", { children: bt.find((m) => m[0] === N)?.[1] })
             ]
           }), /* @__PURE__ */ (0, l.jsxs)("div", {
             className: "top-actions",
@@ -13559,34 +13559,34 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
               className: "icon-btn",
               title: "重新讀取雲端進度",
               "aria-label": "重新讀取雲端進度",
-              disabled: L || Q,
+              disabled: q || X,
               onClick: () => lt(() => {
                 Me(x?.id);
               }),
-              children: /* @__PURE__ */ (0, l.jsx)(Nl, {
+              children: /* @__PURE__ */ (0, l.jsx)(Wa, {
                 size: 17,
-                className: Q ? "spin" : ""
+                className: X ? "spin" : ""
               })
             })]
           })]
         }), /* @__PURE__ */ (0, l.jsxs)("div", {
           className: "page-content",
           children: [
-            V && /* @__PURE__ */ (0, l.jsxs)("div", {
+            H && /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "error-banner",
               role: "alert",
               children: [
                 /* @__PURE__ */ (0, l.jsx)(oi, { size: 18 }),
-                /* @__PURE__ */ (0, l.jsx)("span", { children: V }),
+                /* @__PURE__ */ (0, l.jsx)("span", { children: H }),
                 te && /* @__PURE__ */ (0, l.jsx)("a", {
-                  href: r ? ld : "/signin-with-chatgpt?return_to=" + encodeURIComponent("/?view=" + z),
+                  href: r ? ld : "/signin-with-chatgpt?return_to=" + encodeURIComponent("/?view=" + N),
                   target: "_top",
                   children: r ? "重新登入雲端庫" : "登入工作台 ↗"
                 }),
                 /* @__PURE__ */ (0, l.jsx)("button", {
                   "aria-label": "關閉訊息",
-                  onClick: () => ee(""),
-                  children: /* @__PURE__ */ (0, l.jsx)(yl, { size: 16 })
+                  onClick: () => F(""),
+                  children: /* @__PURE__ */ (0, l.jsx)(Sl, { size: 16 })
                 })
               ]
             }),
@@ -13597,8 +13597,8 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                   className: "eyebrow",
                   children: "製作工作台"
                 }),
-                /* @__PURE__ */ (0, l.jsx)("h1", { children: bt.find((m) => m[0] === z)?.[1] }),
-                /* @__PURE__ */ (0, l.jsx)("p", { children: z === "resume" ? "查看進度，選一件事接著做。" : z === "models" ? "選擇模型與版本，記錄這次完成的工作。" : z === "context" ? "查找製作資料，保留每次工作的交接。" : "目前選取的作品與集數如下。" })
+                /* @__PURE__ */ (0, l.jsx)("h1", { children: bt.find((m) => m[0] === N)?.[1] }),
+                /* @__PURE__ */ (0, l.jsx)("p", { children: N === "resume" ? "查看進度，選一件事接著做。" : N === "models" ? "選擇模型與版本，記錄這次完成的工作。" : N === "context" ? "查找製作資料，保留每次工作的交接。" : "目前選取的作品與集數如下。" })
               ] }), /* @__PURE__ */ (0, l.jsx)("div", {
                 className: "heading-actions",
                 children: x && /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsxs)("button", {
@@ -13616,7 +13616,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                 })] })
               })]
             }),
-            Q ? /* @__PURE__ */ (0, l.jsxs)("div", {
+            X ? /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "empty",
               children: [/* @__PURE__ */ (0, l.jsx)(Ir, {
                 className: "spin",
@@ -13630,7 +13630,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                   children: [/* @__PURE__ */ (0, l.jsx)("span", {
                     className: "episode",
                     children: x.episode
-                  }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("h2", { children: [N ? N.title + " · " + x.episode : x.title, x.archived && /* @__PURE__ */ (0, l.jsx)("span", {
+                  }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("h2", { children: [z ? z.title + " · " + x.episode : x.title, x.archived && /* @__PURE__ */ (0, l.jsx)("span", {
                     className: "status todo",
                     children: "已封存"
                   })] }), /* @__PURE__ */ (0, l.jsxs)("p", { children: [
@@ -13646,7 +13646,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                   children: [/* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("span", { children: "本集製作狀態" }), /* @__PURE__ */ (0, l.jsx)("strong", { children: Ce ? "作者告知已完成" : je?.status === "in_progress" ? "作者告知製作中" : je?.status === "not_started" ? "作者告知尚未開始" : "尚未登記" })] }), /* @__PURE__ */ (0, l.jsx)("small", { children: Ce ? "目前進行資料補登與來源對應" : "依本集作者告知紀錄顯示" })]
                 })]
               }),
-              z !== "resume" && /* @__PURE__ */ (0, l.jsxs)("details", {
+              N !== "resume" && /* @__PURE__ */ (0, l.jsxs)("details", {
                 className: "registration-detail",
                 children: [
                   /* @__PURE__ */ (0, l.jsx)("summary", { children: "查看資料登記統計" }),
@@ -13655,7 +13655,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                     children: [
                       /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("span", {
                         className: "metric-icon green",
-                        children: /* @__PURE__ */ (0, l.jsx)(bl, { size: 20 })
+                        children: /* @__PURE__ */ (0, l.jsx)(vl, { size: 20 })
                       }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: [Be.acceptedSources, /* @__PURE__ */ (0, l.jsxs)("em", { children: [" / ", Be.sources] })] }), /* @__PURE__ */ (0, l.jsx)("small", { children: "來源已確認收錄" })] })] }),
                       /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("span", {
                         className: "metric-icon blue",
@@ -13663,7 +13663,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                       }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: [Be.linkedShots, /* @__PURE__ */ (0, l.jsxs)("em", { children: [" / ", Be.shots] })] }), /* @__PURE__ */ (0, l.jsx)("small", { children: "鏡頭來源關聯" })] })] }),
                       /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("span", {
                         className: "metric-icon amber",
-                        children: /* @__PURE__ */ (0, l.jsx)(vl, { size: 20 })
+                        children: /* @__PURE__ */ (0, l.jsx)(jl, { size: 20 })
                       }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("b", { children: Be.registeredSelections || "待補登" }), /* @__PURE__ */ (0, l.jsx)("small", { children: "實際採用檔紀錄" })] })] }),
                       /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("span", {
                         className: "metric-icon red",
@@ -13693,7 +13693,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                 "ed",
                 "shots",
                 "issues"
-              ].includes(z) && /* @__PURE__ */ (0, l.jsx)("nav", {
+              ].includes(N) && /* @__PURE__ */ (0, l.jsx)("nav", {
                 className: "section-nav",
                 "aria-label": "動畫製作內容",
                 children: bt.filter(([m]) => [
@@ -13703,79 +13703,79 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                   "shots",
                   "issues"
                 ].includes(m)).map(([m, ye]) => /* @__PURE__ */ (0, l.jsxs)("button", {
-                  className: z === m ? "active" : "",
-                  "aria-current": z === m ? "page" : void 0,
-                  onClick: () => H(m),
+                  className: N === m ? "active" : "",
+                  "aria-current": N === m ? "page" : void 0,
+                  onClick: () => B(m),
                   children: [ye, m === "issues" && ke.length > 0 ? " · " + ke.length : ""]
                 }, m))
               }),
-              z === "resume" ? /* @__PURE__ */ (0, l.jsx)(Sx, {
+              N === "resume" ? /* @__PURE__ */ (0, l.jsx)(Sx, {
                 project: x,
-                work: N,
-                busy: L,
-                onNavigate: H,
+                work: z,
+                busy: q,
+                onNavigate: B,
                 onModel: (m) => {
-                  fe(m), H("models");
+                  he(m), B("models");
                 }
-              }) : z === "project" ? /* @__PURE__ */ (0, l.jsx)(Tx, {
-                work: N,
+              }) : N === "project" ? /* @__PURE__ */ (0, l.jsx)(Tx, {
+                work: z,
                 episode: x,
                 episodes: p,
-                busy: L,
+                busy: q,
                 onWorkAction: qe,
                 onSelectEpisode: (m) => lt(() => {
                   Me(m);
                 }),
                 onPin: (m) => ve("pin_shared_reference", { assetId: m }),
                 mutate: ve
-              }, x.id) : z === "models" ? /* @__PURE__ */ (0, l.jsx)(Ox, {
-                initialSelection: de,
-                work: N,
+              }, x.id) : N === "models" ? /* @__PURE__ */ (0, l.jsx)(Ox, {
+                initialSelection: ce,
+                work: z,
                 episode: x,
                 episodes: p,
-                busy: L,
+                busy: q,
                 onAction: qe,
-                onProject: () => H("project"),
-                onDirty: B
-              }, (N?.id || x.id) + JSON.stringify(de)) : z === "settings" ? /* @__PURE__ */ (0, l.jsx)(Rf, {
+                onProject: () => B("project"),
+                onDirty: Y
+              }, (z?.id || x.id) + JSON.stringify(ce)) : N === "settings" ? /* @__PURE__ */ (0, l.jsx)(Rf, {
                 project: x,
-                busy: L,
+                busy: q,
                 mutate: ve
-              }, x.id) : z === "context" ? /* @__PURE__ */ (0, l.jsx)(Cx, {
+              }, x.id) : N === "context" ? /* @__PURE__ */ (0, l.jsx)(Cx, {
                 project: x,
                 mutate: ve,
-                busy: L
+                busy: q
               }, x.id) : [
                 "main",
                 "op",
                 "ed"
-              ].includes(z) ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+              ].includes(N) ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                 /* @__PURE__ */ (0, l.jsxs)("div", {
                   className: "section-title",
                   children: [
-                    /* @__PURE__ */ (0, l.jsx)("h2", { children: z === "main" ? "主線製作流程" : z.toUpperCase() + " 獨立製作支線" }),
-                    /* @__PURE__ */ (0, l.jsx)("span", { children: z === "main" ? "每階段留下產出，再進行驗收" : "完成支線後接回全片驗收" }),
-                    z !== "main" && /* @__PURE__ */ (0, l.jsxs)("label", {
+                    /* @__PURE__ */ (0, l.jsx)("h2", { children: N === "main" ? "主線製作流程" : N.toUpperCase() + " 獨立製作支線" }),
+                    /* @__PURE__ */ (0, l.jsx)("span", { children: N === "main" ? "每階段留下產出，再進行驗收" : "完成支線後接回全片驗收" }),
+                    N !== "main" && /* @__PURE__ */ (0, l.jsxs)("label", {
                       className: "branch-toggle",
                       children: [/* @__PURE__ */ (0, l.jsx)("input", {
                         type: "checkbox",
-                        checked: x.branches[z],
-                        disabled: L || x.archived,
+                        checked: x.branches[N],
+                        disabled: q || x.archived,
                         onChange: (m) => {
                           ve("set_branches", {
                             ...x.branches,
-                            [z]: m.target.checked
+                            [N]: m.target.checked
                           });
                         }
                       }), "納入本集"]
                     })
                   ]
                 }),
-                z !== "main" && !x.branches[z] ? /* @__PURE__ */ (0, l.jsxs)("div", {
+                N !== "main" && !x.branches[N] ? /* @__PURE__ */ (0, l.jsxs)("div", {
                   className: "empty",
                   children: [
                     /* @__PURE__ */ (0, l.jsx)(nn, { size: 30 }),
-                    /* @__PURE__ */ (0, l.jsxs)("h3", { children: ["本集未納入 ", z.toUpperCase()] }),
+                    /* @__PURE__ */ (0, l.jsxs)("h3", { children: ["本集未納入 ", N.toUpperCase()] }),
                     /* @__PURE__ */ (0, l.jsx)("p", { children: "重新勾選「納入本集」即可保留並繼續原有紀錄。" })
                   ]
                 }) : /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -13785,12 +13785,12 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                     children: [M.map((m, ye) => {
                       const Se = x.stages[m.id], st = Ts(x, m.id).length > 0;
                       return /* @__PURE__ */ (0, l.jsxs)("button", {
-                        className: "stage-item " + (S === m.id ? "selected" : "") + (Se.author ? " completed" : ""),
-                        onClick: () => o(m.id),
+                        className: "stage-item " + (w === m.id ? "selected" : "") + (Se.author ? " completed" : ""),
+                        onClick: () => d(m.id),
                         children: [
                           /* @__PURE__ */ (0, l.jsx)("span", {
                             className: "stage-number " + (Se.author ? "done" : ""),
-                            children: Se.author ? /* @__PURE__ */ (0, l.jsx)(Cs, { size: 17 }) : z === "main" ? m.id : String(ye + 1).padStart(2, "0")
+                            children: Se.author ? /* @__PURE__ */ (0, l.jsx)(Cs, { size: 17 }) : N === "main" ? m.id : String(ye + 1).padStart(2, "0")
                           }),
                           /* @__PURE__ */ (0, l.jsxs)("div", { children: [
                             /* @__PURE__ */ (0, l.jsx)("small", { children: m.phase }),
@@ -13814,7 +13814,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                         className: "detail-top",
                         children: [/* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("span", {
                           className: "eyebrow",
-                          children: z === "main" ? "STAGE " + S : z.toUpperCase() + " · " + S.slice(2)
+                          children: N === "main" ? "STAGE " + w : N.toUpperCase() + " · " + w.slice(2)
                         }), /* @__PURE__ */ (0, l.jsx)("h2", { children: T.title })] }), /* @__PURE__ */ (0, l.jsx)("span", {
                           className: "status " + we.status,
                           children: Ce && we.status === "todo" ? "已完成 · 明細待補登" : id[we.status]
@@ -13834,9 +13834,9 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                       }),
                       /* @__PURE__ */ (0, l.jsxs)("div", {
                         className: "output-box",
-                        children: [/* @__PURE__ */ (0, l.jsx)(vl, { size: 19 }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("strong", { children: "本階段產出" }), /* @__PURE__ */ (0, l.jsx)("p", { children: T.output })] })]
+                        children: [/* @__PURE__ */ (0, l.jsx)(jl, { size: 19 }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("strong", { children: "本階段產出" }), /* @__PURE__ */ (0, l.jsx)("p", { children: T.output })] })]
                       }),
-                      $a(x.episodeRules ?? []).filter((m) => !m.stageIds.length || m.stageIds.includes(S)).map((m) => /* @__PURE__ */ (0, l.jsxs)("div", {
+                      $a(x.episodeRules ?? []).filter((m) => !m.stageIds.length || m.stageIds.includes(w)).map((m) => /* @__PURE__ */ (0, l.jsxs)("div", {
                         className: "context-mini",
                         children: [
                           /* @__PURE__ */ (0, l.jsxs)("b", { children: [
@@ -13857,21 +13857,21 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                       /* @__PURE__ */ (0, l.jsxs)("div", {
                         className: "checklist-heading",
                         children: [/* @__PURE__ */ (0, l.jsx)("h3", { children: Ce ? "逐項檢視紀錄" : "驗收確認" }), /* @__PURE__ */ (0, l.jsxs)("span", { children: [
-                          j.filter(Boolean).length,
+                          y.filter(Boolean).length,
                           " / ",
-                          j.length
+                          y.length
                         ] })]
                       }),
                       /* @__PURE__ */ (0, l.jsx)("div", {
                         className: "checklist",
                         children: T.checks.map((m, ye) => /* @__PURE__ */ (0, l.jsxs)("label", {
-                          className: j[ye] ? "checked" : "",
+                          className: y[ye] ? "checked" : "",
                           children: [/* @__PURE__ */ (0, l.jsx)("input", {
                             type: "checkbox",
-                            checked: j[ye] || !1,
-                            disabled: L || x.archived,
+                            checked: y[ye] || !1,
+                            disabled: q || x.archived,
                             onChange: (Se) => {
-                              W((st) => st.map((Fe, wt) => wt === ye ? Se.target.checked : Fe)), B(!0);
+                              ee((st) => st.map((Fe, wt) => wt === ye ? Se.target.checked : Fe)), Y(!0);
                             }
                           }), /* @__PURE__ */ (0, l.jsx)("span", { children: m })]
                         }, ye))
@@ -13892,7 +13892,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                         value: ge,
                         disabled: x.archived,
                         onChange: (m) => {
-                          he(m.target.value), B(!0);
+                          me(m.target.value), Y(!0);
                         }
                       }),
                       /* @__PURE__ */ (0, l.jsx)("small", {
@@ -13911,7 +13911,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                         value: b,
                         disabled: x.archived,
                         onChange: (m) => {
-                          ae(m.target.value), B(!0);
+                          ae(m.target.value), Y(!0);
                         }
                       }),
                       /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -13935,7 +13935,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                           children: "尚未收到 AI 初驗"
                         })] }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("span", {
                           className: "review-title",
-                          children: [/* @__PURE__ */ (0, l.jsx)(bl, { size: 15 }), "作者正式核定"]
+                          children: [/* @__PURE__ */ (0, l.jsx)(vl, { size: 15 }), "作者正式核定"]
                         }), we.author ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                           /* @__PURE__ */ (0, l.jsx)("b", {
                             className: "green-text",
@@ -13956,10 +13956,10 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                         className: "detail-actions",
                         children: [/* @__PURE__ */ (0, l.jsxs)("button", {
                           className: "text-btn danger-text",
-                          disabled: L || x.archived,
+                          disabled: q || x.archived,
                           onClick: () => {
                             _e({
-                              stageId: S,
+                              stageId: w,
                               reason: "",
                               shotId: ""
                             }), se("issue");
@@ -13967,43 +13967,43 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                           children: [/* @__PURE__ */ (0, l.jsx)(oi, { size: 15 }), "記錄退修"]
                         }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("button", {
                           className: "btn",
-                          disabled: L || x.archived || !Z,
+                          disabled: q || x.archived || !K,
                           onClick: () => {
                             ve("save_stage", {
-                              stageId: S,
-                              checks: j,
+                              stageId: w,
+                              checks: y,
                               evidence: ge,
                               note: b
                             });
                           },
                           children: [
-                            L ? /* @__PURE__ */ (0, l.jsx)(Ir, {
+                            q ? /* @__PURE__ */ (0, l.jsx)(Ir, {
                               size: 15,
                               className: "spin"
                             }) : null,
                             "儲存草稿",
-                            Z ? " *" : ""
+                            K ? " *" : ""
                           ]
                         }), /* @__PURE__ */ (0, l.jsxs)("button", {
                           className: "btn primary",
-                          disabled: L || x.archived || Z || Ze.length > 0 || !!we.author,
+                          disabled: q || x.archived || K || Ze.length > 0 || !!we.author,
                           onClick: () => {
                             ve("approve_stage", {
-                              stageId: S,
+                              stageId: w,
                               note: "作者已核對產出與全部驗收條件"
                             });
                           },
-                          children: [/* @__PURE__ */ (0, l.jsx)(bl, { size: 15 }), we.author ? "已正式核定" : "作者確認通過"]
+                          children: [/* @__PURE__ */ (0, l.jsx)(vl, { size: 15 }), we.author ? "已正式核定" : "作者確認通過"]
                         })] })]
                       }),
                       !we.author && /* @__PURE__ */ (0, l.jsx)("div", {
                         className: "gate-reasons",
-                        children: Ce ? "本集維持作者告知完成；此處保存逐項檢視依據，不要求重新確認整集。" : Z ? "先儲存修改，再確認通過。" : Ze.length ? "待完成：" + Ze.join("；") : "已符合檢查條件，請實際檢視成果後確認通過。"
+                        children: Ce ? "本集維持作者告知完成；此處保存逐項檢視依據，不要求重新確認整集。" : K ? "先儲存修改，再確認通過。" : Ze.length ? "待完成：" + Ze.join("；") : "已符合檢查條件，請實際檢視成果後確認通過。"
                       })
                     ]
-                  }, S)]
+                  }, w)]
                 }),
-                z === "main" && /* @__PURE__ */ (0, l.jsxs)("div", {
+                N === "main" && /* @__PURE__ */ (0, l.jsxs)("div", {
                   className: "principle",
                   children: [/* @__PURE__ */ (0, l.jsx)(nn, { size: 19 }), /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("b", { children: "發現問題，就回到造成問題的環節。" }), /* @__PURE__ */ (0, l.jsx)("p", { children: "更新已核定的製作依據時，相關下游階段會標為待修正。AI 初驗與作者核定各自留存。" })] })]
                 }),
@@ -14028,7 +14028,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                     ]
                   })]
                 })
-              ] }) : z === "shots" ? /* @__PURE__ */ (0, l.jsxs)("section", {
+              ] }) : N === "shots" ? /* @__PURE__ */ (0, l.jsxs)("section", {
                 className: "wide-card",
                 children: [
                   /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -14047,8 +14047,8 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                     children: [/* @__PURE__ */ (0, l.jsx)(fd, { size: 16 }), /* @__PURE__ */ (0, l.jsx)("input", {
                       "aria-label": "搜尋鏡頭",
                       placeholder: "搜尋場次、鏡頭 ID 或舊編號…",
-                      value: d,
-                      onChange: (m) => _(m.target.value)
+                      value: o,
+                      onChange: (m) => j(m.target.value)
                     })]
                   }),
                   x.shots.length ? /* @__PURE__ */ (0, l.jsx)("div", {
@@ -14065,7 +14065,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                       m.scene,
                       m.description,
                       m.legacyIds
-                    ].join(" ").includes(d)).map((m) => /* @__PURE__ */ (0, l.jsxs)("tr", { children: [
+                    ].join(" ").includes(o)).map((m) => /* @__PURE__ */ (0, l.jsxs)("tr", { children: [
                       /* @__PURE__ */ (0, l.jsxs)("td", { children: [/* @__PURE__ */ (0, l.jsx)("b", { children: m.id }), /* @__PURE__ */ (0, l.jsx)("small", { children: m.scene })] }),
                       /* @__PURE__ */ (0, l.jsxs)("td", { children: [m.description, /* @__PURE__ */ (0, l.jsxs)("small", { children: [
                         m.legacyIds || "未填舊編號",
@@ -14101,14 +14101,14 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                           children: "查看／編輯"
                         }), m.author ? m.status !== "in_timeline" ? /* @__PURE__ */ (0, l.jsx)("button", {
                           className: "text-btn",
-                          disabled: L || x.archived,
+                          disabled: q || x.archived,
                           onClick: () => {
                             ve("timeline_shot", { shotId: m.id });
                           },
                           children: "確認已入片"
                         }) : null : /* @__PURE__ */ (0, l.jsx)("button", {
                           className: "text-btn",
-                          disabled: L || x.archived,
+                          disabled: q || x.archived,
                           onClick: () => {
                             ve("approve_shot", { shotId: m.id });
                           },
@@ -14129,7 +14129,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                     children: "新版本會保留前次紀錄；填寫檔案位置不會上傳或覆寫原始素材。鏡頭更新後須重新核定。"
                   })
                 ]
-              }) : z === "issues" ? /* @__PURE__ */ (0, l.jsxs)("section", {
+              }) : N === "issues" ? /* @__PURE__ */ (0, l.jsxs)("section", {
                 className: "wide-card",
                 children: [/* @__PURE__ */ (0, l.jsxs)("div", {
                   className: "section-title",
@@ -14194,7 +14194,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                     /* @__PURE__ */ (0, l.jsx)("p", { children: "發現問題時，請指定造成問題的階段。" })
                   ]
                 })]
-              }) : z === "chatgpt" ? /* @__PURE__ */ (0, l.jsx)(Nx, {
+              }) : N === "chatgpt" ? /* @__PURE__ */ (0, l.jsx)(Nx, {
                 project: x,
                 check: () => Xe("")
               }) : /* @__PURE__ */ (0, l.jsxs)("section", {
@@ -14210,7 +14210,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                   children: [...x.audit].reverse().map((m, ye) => /* @__PURE__ */ (0, l.jsxs)("div", { children: [
                     /* @__PURE__ */ (0, l.jsx)("span", {
                       className: "audit-icon " + (m.actor === "ai" ? "ai" : ""),
-                      children: m.actor === "ai" ? /* @__PURE__ */ (0, l.jsx)($r, { size: 17 }) : /* @__PURE__ */ (0, l.jsx)(bl, { size: 17 })
+                      children: m.actor === "ai" ? /* @__PURE__ */ (0, l.jsx)($r, { size: 17 }) : /* @__PURE__ */ (0, l.jsx)(vl, { size: 17 })
                     }),
                     /* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: [
                       {
@@ -14272,34 +14272,34 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
           ]
         })]
       }),
-      P && /* @__PURE__ */ (0, l.jsxs)("div", {
+      $ && /* @__PURE__ */ (0, l.jsxs)("div", {
         className: "toast",
         role: "status",
-        children: [/* @__PURE__ */ (0, l.jsx)(Cs, { size: 17 }), P]
+        children: [/* @__PURE__ */ (0, l.jsx)(Cs, { size: 17 }), $]
       }),
-      Y && /* @__PURE__ */ (0, l.jsx)("div", {
+      Q && /* @__PURE__ */ (0, l.jsx)("div", {
         className: "modal-backdrop",
         onMouseDown: (m) => {
-          m.target === m.currentTarget && !L && se(null);
+          m.target === m.currentTarget && !q && se(null);
         },
         children: /* @__PURE__ */ (0, l.jsxs)("section", {
-          className: "modal " + (Y === "shot" ? "large" : ""),
+          className: "modal " + (Q === "shot" ? "large" : ""),
           role: "dialog",
           "aria-modal": "true",
-          "aria-label": Y === "create" ? "建立製作專案" : Y === "shot" ? "鏡頭素材紀錄" : "製作確認",
+          "aria-label": Q === "create" ? "建立製作專案" : Q === "shot" ? "鏡頭素材紀錄" : "製作確認",
           children: [/* @__PURE__ */ (0, l.jsxs)("div", {
             className: "modal-head",
-            children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: Y === "create" ? "建立製作專案" : Y === "shot" ? "鏡頭素材紀錄" : Y === "issue" ? "記錄退修問題" : Y === "resolve" ? "修正與複核結果" : x?.archived ? "還原專案" : "封存專案" }), /* @__PURE__ */ (0, l.jsx)("button", {
+            children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: Q === "create" ? "建立製作專案" : Q === "shot" ? "鏡頭素材紀錄" : Q === "issue" ? "記錄退修問題" : Q === "resolve" ? "修正與複核結果" : x?.archived ? "還原專案" : "封存專案" }), /* @__PURE__ */ (0, l.jsx)("button", {
               className: "icon-btn",
               "aria-label": "關閉視窗",
-              disabled: L,
+              disabled: q,
               onClick: () => se(null),
-              children: /* @__PURE__ */ (0, l.jsx)(yl, { size: 21 })
+              children: /* @__PURE__ */ (0, l.jsx)(Sl, { size: 21 })
             })]
           }), /* @__PURE__ */ (0, l.jsxs)("form", {
-            onSubmit: oe,
+            onSubmit: ue,
             children: [
-              Y === "create" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsx)("p", {
+              Q === "create" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsx)("p", {
                 className: "muted",
                 children: "依手冊建立完整流程，從待製作開始記錄。"
               }), [["title", "專案名稱"], ["episode", "集數"]].map(([m, ye]) => /* @__PURE__ */ (0, l.jsxs)("label", {
@@ -14307,13 +14307,13 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                 children: [ye, /* @__PURE__ */ (0, l.jsx)("input", {
                   required: !0,
                   maxLength: m === "title" ? 200 : 60,
-                  value: ce[m] || "",
+                  value: re[m] || "",
                   onChange: (Se) => _e({
-                    ...ce,
+                    ...re,
                     [m]: Se.target.value
                   })
                 })]
-              }, m))] }) : Y === "shot" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+              }, m))] }) : Q === "shot" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                 /* @__PURE__ */ (0, l.jsx)("p", {
                   className: "muted",
                   children: "修改既有鏡頭請使用相同 ID。系統保留前次紀錄，並要求重新驗收。"
@@ -14329,16 +14329,16 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                         "description"
                       ].includes(m),
                       maxLength: m === "id" ? 100 : 12e3,
-                      value: ce[m] || "",
+                      value: re[m] || "",
                       placeholder: m === "id" ? "如 EP01_S06_SH03" : "",
                       onChange: (Se) => _e({
-                        ...ce,
+                        ...re,
                         [m]: Se.target.value
                       })
                     })]
                   }, m))
                 }),
-                x?.shots.find((m) => m.id === ce.id)?.versions.length ? /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "查看保留的舊版本" }), x.shots.find((m) => m.id === ce.id).versions.map((m, ye) => /* @__PURE__ */ (0, l.jsxs)("pre", { children: [
+                x?.shots.find((m) => m.id === re.id)?.versions.length ? /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "查看保留的舊版本" }), x.shots.find((m) => m.id === re.id).versions.map((m, ye) => /* @__PURE__ */ (0, l.jsxs)("pre", { children: [
                   ci(m.at),
                   " · ",
                   m.by,
@@ -14346,13 +14346,13 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
 `,
                   JSON.stringify(m.data, null, 2)
                 ] }, ye))] }) : null
-              ] }) : Y === "issue" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+              ] }) : Q === "issue" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                 /* @__PURE__ */ (0, l.jsxs)("label", {
                   className: "form-field",
                   children: ["回查階段", /* @__PURE__ */ (0, l.jsx)("select", {
-                    value: ce.stageId || "08",
+                    value: re.stageId || "08",
                     onChange: (m) => _e({
-                      ...ce,
+                      ...re,
                       stageId: m.target.value
                     }),
                     children: Ds(x).map((m) => /* @__PURE__ */ (0, l.jsxs)("option", {
@@ -14368,9 +14368,9 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                 /* @__PURE__ */ (0, l.jsxs)("label", {
                   className: "form-field",
                   children: ["受影響鏡頭（選填）", /* @__PURE__ */ (0, l.jsxs)("select", {
-                    value: ce.shotId || "",
+                    value: re.shotId || "",
                     onChange: (m) => _e({
-                      ...ce,
+                      ...re,
                       shotId: m.target.value
                     }),
                     children: [/* @__PURE__ */ (0, l.jsx)("option", {
@@ -14384,9 +14384,9 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                   children: ["具體問題與回查原因", /* @__PURE__ */ (0, l.jsx)("textarea", {
                     required: !0,
                     rows: 5,
-                    value: ce.reason || "",
+                    value: re.reason || "",
                     onChange: (m) => _e({
-                      ...ce,
+                      ...re,
                       reason: m.target.value
                     })
                   })]
@@ -14395,39 +14395,39 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
                   className: "muted",
                   children: "此階段與受影響的下游核定將標為待修正，修正後重新驗收。"
                 })
-              ] }) : Y === "resolve" ? /* @__PURE__ */ (0, l.jsxs)("label", {
+              ] }) : Q === "resolve" ? /* @__PURE__ */ (0, l.jsxs)("label", {
                 className: "form-field",
                 children: ["已修正內容與複核依據", /* @__PURE__ */ (0, l.jsx)("textarea", {
                   required: !0,
                   rows: 6,
-                  value: ce.resolution || "",
+                  value: re.resolution || "",
                   onChange: (m) => _e({
-                    ...ce,
+                    ...re,
                     resolution: m.target.value
                   })
                 })]
               }) : /* @__PURE__ */ (0, l.jsxs)("p", { children: ["專案", x?.archived ? "還原後可繼續製作。" : "封存後會保留全部進度與紀錄，可隨時還原。"] }),
-              V && /* @__PURE__ */ (0, l.jsx)("div", {
+              H && /* @__PURE__ */ (0, l.jsx)("div", {
                 className: "modal-error",
                 role: "alert",
-                children: V
+                children: H
               }),
               /* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "modal-actions",
                 children: [/* @__PURE__ */ (0, l.jsx)("button", {
                   type: "button",
                   className: "btn",
-                  disabled: L,
+                  disabled: q,
                   onClick: () => se(null),
                   children: "取消"
                 }), /* @__PURE__ */ (0, l.jsxs)("button", {
                   type: "submit",
                   className: "btn primary",
-                  disabled: L,
-                  children: [L ? /* @__PURE__ */ (0, l.jsx)(Ir, {
+                  disabled: q,
+                  children: [q ? /* @__PURE__ */ (0, l.jsx)(Ir, {
                     className: "spin",
                     size: 16
-                  }) : null, Y === "create" ? "建立專案" : Y === "archive" ? x?.archived ? "還原專案" : "確認封存" : "儲存紀錄"]
+                  }) : null, Q === "create" ? "建立專案" : Q === "archive" ? x?.archived ? "還原專案" : "確認封存" : "儲存紀錄"]
                 })]
               })
             ]
@@ -14437,7 +14437,7 @@ function Ux({ nativeTransport: r, initialWorkId: h, initialTab: k = "resume", on
     ]
   });
 }
-var gl = {
+var bl = {
   handbook: {
     title: "AI 員工守則",
     version: "v1.0",
@@ -14465,16 +14465,16 @@ function wf(r) {
   return new URL(r, new URL("./", window.location.href)).href;
 }
 function Rx(r) {
-  const h = r.split(/\r?\n/), k = [];
+  const h = r.split(/\r?\n/), C = [];
   let f = !1, p = [];
-  for (let w = 0; w < h.length; w++) {
-    const x = h[w].trimEnd(), A = x.trim();
+  for (let k = 0; k < h.length; k++) {
+    const x = h[k].trimEnd(), A = x.trim();
     if (A.startsWith("```")) {
-      f && (k.push(/* @__PURE__ */ (0, l.jsx)("pre", {
+      f && (C.push(/* @__PURE__ */ (0, l.jsx)("pre", {
         className: "essentials-code",
         children: p.join(`
 `)
-      }, "code" + w)), p = []), f = !f;
+      }, "code" + k)), p = []), f = !f;
       continue;
     }
     if (f) {
@@ -14483,68 +14483,68 @@ function Rx(r) {
     }
     if (!A) continue;
     if (/^---+$/.test(A)) {
-      k.push(/* @__PURE__ */ (0, l.jsx)("hr", {}, w));
+      C.push(/* @__PURE__ */ (0, l.jsx)("hr", {}, k));
       continue;
     }
-    const z = A.match(/^(#{1,3})\s+(.+)$/);
-    if (z) {
-      const K = z[2];
-      k.push(z[1].length === 1 ? /* @__PURE__ */ (0, l.jsx)("h2", { children: K }, w) : z[1].length === 2 ? /* @__PURE__ */ (0, l.jsx)("h3", { children: K }, w) : /* @__PURE__ */ (0, l.jsx)("h4", { children: K }, w));
+    const N = A.match(/^(#{1,3})\s+(.+)$/);
+    if (N) {
+      const G = N[2];
+      C.push(N[1].length === 1 ? /* @__PURE__ */ (0, l.jsx)("h2", { children: G }, k) : N[1].length === 2 ? /* @__PURE__ */ (0, l.jsx)("h3", { children: G }, k) : /* @__PURE__ */ (0, l.jsx)("h4", { children: G }, k));
       continue;
     }
     if (A.startsWith("|")) {
-      let K = [x], N = w + 1;
-      for (; N < h.length && h[N].trim().startsWith("|"); ) K.push(h[N++]);
-      k.push(/* @__PURE__ */ (0, l.jsx)("pre", {
+      let G = [x], z = k + 1;
+      for (; z < h.length && h[z].trim().startsWith("|"); ) G.push(h[z++]);
+      C.push(/* @__PURE__ */ (0, l.jsx)("pre", {
         className: "essentials-code",
-        children: K.join(`
+        children: G.join(`
 `)
-      }, w)), w = N - 1;
+      }, k)), k = z - 1;
       continue;
     }
     if (A.startsWith(">")) {
-      k.push(/* @__PURE__ */ (0, l.jsx)("blockquote", { children: A.replace(/^>\s?/, "") }, w));
+      C.push(/* @__PURE__ */ (0, l.jsx)("blockquote", { children: A.replace(/^>\s?/, "") }, k));
       continue;
     }
-    const E = A.match(/^[-*]\s+(.+)$/), S = A.match(/^(\d+)\.\s+(.+)$/);
-    if (E || S) {
-      k.push(/* @__PURE__ */ (0, l.jsxs)("p", {
+    const _ = A.match(/^[-*]\s+(.+)$/), w = A.match(/^(\d+)\.\s+(.+)$/);
+    if (_ || w) {
+      C.push(/* @__PURE__ */ (0, l.jsxs)("p", {
         className: "essentials-list",
-        children: [S ? S[1] + ". " : "• ", E ? E[1] : S?.[2]]
-      }, w));
+        children: [w ? w[1] + ". " : "• ", _ ? _[1] : w?.[2]]
+      }, k));
       continue;
     }
-    k.push(/* @__PURE__ */ (0, l.jsx)("p", { children: A }, w));
+    C.push(/* @__PURE__ */ (0, l.jsx)("p", { children: A }, k));
   }
-  return k;
+  return C;
 }
 function Lx() {
-  const [r, h] = (0, g.useState)("handbook"), [k, f] = (0, g.useState)({}), [p, w] = (0, g.useState)({});
+  const [r, h] = (0, g.useState)("handbook"), [C, f] = (0, g.useState)({}), [p, k] = (0, g.useState)({});
   (0, g.useEffect)(() => {
     const A = new AbortController();
-    return Object.keys(gl).forEach(async (z) => {
+    return Object.keys(bl).forEach(async (N) => {
       try {
-        const E = await fetch(wf(gl[z].path), {
+        const _ = await fetch(wf(bl[N].path), {
           credentials: "same-origin",
           cache: "no-store",
           signal: A.signal
         });
-        if (!E.ok) throw new Error("HTTP " + E.status);
-        const S = await E.text();
-        if (!S.includes(z === "handbook" ? "LIZHI-AI-RULES" : "LIZHI-APP-INTAKE")) throw new Error("文件版本或內容不符");
-        A.signal.aborted || f((K) => ({
-          ...K,
-          [z]: S
+        if (!_.ok) throw new Error("HTTP " + _.status);
+        const w = await _.text();
+        if (!w.includes(N === "handbook" ? "LIZHI-AI-RULES" : "LIZHI-APP-INTAKE")) throw new Error("文件版本或內容不符");
+        A.signal.aborted || f((G) => ({
+          ...G,
+          [N]: w
         }));
-      } catch (E) {
-        A.signal.aborted || w((S) => ({
-          ...S,
-          [z]: "目前無法載入全文（" + E.message + "），請使用下方原始文件連結。"
+      } catch (_) {
+        A.signal.aborted || k((w) => ({
+          ...w,
+          [N]: "目前無法載入全文（" + _.message + "），請使用下方原始文件連結。"
         }));
       }
     }), () => A.abort();
   }, []);
-  const x = gl[r];
+  const x = bl[r];
   return /* @__PURE__ */ (0, l.jsxs)("section", {
     className: "essentials-root",
     "aria-label": "員工必知",
@@ -14562,15 +14562,15 @@ function Lx() {
       }),
       /* @__PURE__ */ (0, l.jsx)("div", {
         className: "essentials-grid",
-        children: Object.keys(gl).map((A) => /* @__PURE__ */ (0, l.jsxs)("button", {
+        children: Object.keys(bl).map((A) => /* @__PURE__ */ (0, l.jsxs)("button", {
           type: "button",
           className: "essentials-card " + (r === A ? "selected" : ""),
           onClick: () => h(A),
           "aria-pressed": r === A,
-          children: [A === "handbook" ? /* @__PURE__ */ (0, l.jsx)(bl, { size: 23 }) : /* @__PURE__ */ (0, l.jsx)(vm, { size: 23 }), /* @__PURE__ */ (0, l.jsxs)("span", { children: [/* @__PURE__ */ (0, l.jsx)("b", { children: gl[A].title }), /* @__PURE__ */ (0, l.jsxs)("small", { children: [
-            gl[A].version,
+          children: [A === "handbook" ? /* @__PURE__ */ (0, l.jsx)(vl, { size: 23 }) : /* @__PURE__ */ (0, l.jsx)(vm, { size: 23 }), /* @__PURE__ */ (0, l.jsxs)("span", { children: [/* @__PURE__ */ (0, l.jsx)("b", { children: bl[A].title }), /* @__PURE__ */ (0, l.jsxs)("small", { children: [
+            bl[A].version,
             " · ",
-            gl[A].summary
+            bl[A].summary
           ] })] })]
         }, A))
       }),
@@ -14601,9 +14601,9 @@ function Lx() {
             className: "essentials-warning",
             children: p[r]
           }),
-          k[r] ? /* @__PURE__ */ (0, l.jsx)("div", {
+          C[r] ? /* @__PURE__ */ (0, l.jsx)("div", {
             className: "essentials-fulltext",
-            children: Rx(k[r])
+            children: Rx(C[r])
           }) : !p[r] && /* @__PURE__ */ (0, l.jsx)("p", {
             className: "muted",
             children: "正在讀取正式文件全文…"
@@ -14618,14 +14618,72 @@ function Lx() {
   });
 }
 async function qx(r, h = () => window.open("about:blank", "_blank")) {
-  const k = h();
-  if (!k) throw Error("瀏覽器阻擋了原圖視窗，請允許此網站開啟新視窗後再試。");
-  k.opener = null;
+  const C = h();
+  if (!C) throw Error("瀏覽器阻擋了原圖視窗，請允許此網站開啟新視窗後再試。");
+  C.opener = null;
   try {
-    k.location.replace(await r());
+    C.location.replace(await r());
   } catch (f) {
-    throw k.close(), f;
+    throw C.close(), f;
   }
+}
+function Hx(r, h = 15e3) {
+  return new Promise((C, f) => {
+    const p = setTimeout(() => f(Error("圖片讀取逾時，請按重試")), h);
+    Promise.resolve().then(r).then(C, f).finally(() => clearTimeout(p));
+  });
+}
+function Bx(r, h = Date.now, C = 15e3) {
+  const f = /* @__PURE__ */ new Map(), p = /* @__PURE__ */ new Map(), k = /* @__PURE__ */ new Map();
+  let x = !1;
+  async function A() {
+    if (!x) {
+      x = !0;
+      try {
+        for (; p.size; ) {
+          const N = [...p.entries()].slice(0, 50);
+          for (const [_] of N) p.delete(_);
+          try {
+            const _ = await Hx(() => r(N.map(([G]) => G)), C), w = new Map(_.urls.map((G) => [G.imageId, G.url]));
+            for (const [G, z] of N) {
+              const le = w.get(G);
+              if (!le) {
+                for (const ne of z) ne.reject(Error("圖片連結未取得，請重試"));
+                continue;
+              }
+              f.set(G, {
+                url: le,
+                until: h() + Math.max(0, _.expiresIn - 30) * 1e3
+              });
+              for (const ne of z) ne.resolve(le);
+            }
+          } catch (_) {
+            for (const [, w] of N) for (const G of w) G.reject(_);
+          }
+        }
+      } finally {
+        x = !1;
+      }
+    }
+  }
+  return { get(N, _ = !1) {
+    _ && f.delete(N);
+    const w = f.get(N);
+    if (w && w.until > h()) return Promise.resolve(w.url);
+    const G = k.get(N);
+    if (G) return G;
+    const z = new Promise((ne, I) => {
+      p.set(N, [{
+        resolve: ne,
+        reject: I
+      }]), queueMicrotask(() => {
+        A();
+      });
+    });
+    k.set(N, z);
+    const le = () => k.delete(N);
+    return z.then(le, le), z;
+  } };
 }
 var As = {
   animation: "動畫製作",
@@ -14639,74 +14697,107 @@ var As = {
   "FAIL",
   "BLOCKED",
   "NOT_TESTED"
-], Wx = 10 * 1024 * 1024, qf = [
+], Px = 10 * 1024 * 1024, qf = [
   "image/jpeg",
   "image/png",
   "image/webp"
-], Hx = [
+], Gx = [
   ...qf,
   "image/svg+xml",
   "application/pdf"
 ];
-function Bx({ image: r, access: h, onEdit: k, onTrash: f, disabled: p, record: w }) {
-  const [x, A] = (0, g.useState)(""), [z, E] = (0, g.useState)(""), [S, K] = (0, g.useState)(!1);
+function Yx({ image: r, access: h, onEdit: C, onTrash: f, disabled: p, record: k }) {
+  const [x, A] = (0, g.useState)(""), [N, _] = (0, g.useState)(""), [w, G] = (0, g.useState)(!1), [z, le] = (0, g.useState)(0), [ne, I] = (0, g.useState)(!1), [X, oe] = (0, g.useState)(!1), q = (0, g.useRef)(null);
   (0, g.useEffect)(() => {
-    let le = !0;
-    return h(r.id).then((ne) => {
-      le && A(ne);
-    }).catch((ne) => {
-      le && E(ne.message);
+    const H = q.current;
+    if (!H) return;
+    if (typeof IntersectionObserver > "u") {
+      I(!0);
+      return;
+    }
+    const F = new IntersectionObserver(($) => {
+      $.some((pe) => pe.isIntersecting) && (I(!0), F.disconnect());
+    }, { rootMargin: "300px" });
+    return F.observe(H), () => F.disconnect();
+  }, []), (0, g.useEffect)(() => {
+    if (!ne) return;
+    let H = !0;
+    return _(""), A(""), oe(!1), h(r.id, z > 0).then((F) => {
+      H && A(F);
+    }).catch((F) => {
+      H && _(F.message);
     }), () => {
-      le = !1;
+      H = !1;
     };
-  }, [r.id, h]);
-  async function N(le = !1) {
-    K(!0);
+  }, [
+    r.id,
+    h,
+    z,
+    ne
+  ]), (0, g.useEffect)(() => {
+    if (!x || X || N) return;
+    const H = setTimeout(() => _("圖片載入逾時，請按重試"), 2e4);
+    return () => clearTimeout(H);
+  }, [
+    x,
+    X,
+    N
+  ]);
+  async function ie(H = !1) {
+    G(!0), _("");
     try {
-      if (!le) {
+      if (!H) {
         await qx(() => h(r.id));
         return;
       }
-      const ne = await h(r.id), I = await fetch(ne);
-      if (!I.ok) throw Error("原圖下載失敗");
-      const Q = URL.createObjectURL(await I.blob()), re = document.createElement("a");
-      re.href = Q, re.download = r.name, re.click(), setTimeout(() => URL.revokeObjectURL(Q), 1e3);
-    } catch (ne) {
-      E(ne.message);
+      const F = await h(r.id), $ = await fetch(F, { signal: AbortSignal.timeout(2e4) });
+      if (!$.ok) throw Error("原圖下載失敗");
+      const pe = URL.createObjectURL(await $.blob()), te = document.createElement("a");
+      te.href = pe, te.download = r.name, te.click(), setTimeout(() => URL.revokeObjectURL(pe), 1e3);
+    } catch (F) {
+      _(F.message);
     } finally {
-      K(!1);
+      G(!1);
     }
   }
   return /* @__PURE__ */ (0, l.jsxs)("article", {
+    ref: q,
     className: "project-image-card",
     children: [/* @__PURE__ */ (0, l.jsx)("button", {
       className: "project-image-preview",
-      disabled: !x || S,
+      disabled: !x || !!N || w,
       onClick: () => {
-        N();
+        ie();
       },
       "aria-label": "查看原圖：" + r.name,
-      children: x ? /* @__PURE__ */ (0, l.jsx)("img", {
-        loading: "lazy",
+      children: x && !N ? /* @__PURE__ */ (0, l.jsx)("img", {
         src: x,
         alt: r.description || r.name,
-        onError: () => E("圖片連結可能已過期，請按重新載入")
-      }) : /* @__PURE__ */ (0, l.jsx)("span", { children: "讀取圖片…" })
+        onLoad: () => oe(!0),
+        onError: () => _("圖片連結失效或載入失敗，請按重試")
+      }) : /* @__PURE__ */ (0, l.jsx)("span", { children: N ? "圖片暫時無法顯示" : ne ? "讀取圖片…" : "捲動至此處載入圖片" })
     }), /* @__PURE__ */ (0, l.jsxs)("div", {
       className: "project-image-info",
       children: [
         /* @__PURE__ */ (0, l.jsx)("b", { children: r.name }),
         /* @__PURE__ */ (0, l.jsx)("p", { children: r.description || "尚未填寫說明" }),
-        r.recordId && /* @__PURE__ */ (0, l.jsxs)("small", { children: [/* @__PURE__ */ (0, l.jsx)(on, { size: 12 }), w ? "紀錄：" + w.summary : "原連結紀錄目前未列於此版本"] }),
+        r.recordId && /* @__PURE__ */ (0, l.jsxs)("small", { children: [/* @__PURE__ */ (0, l.jsx)(on, { size: 12 }), k ? "紀錄：" + k.summary : "原連結紀錄目前未列於此版本"] }),
         /* @__PURE__ */ (0, l.jsxs)("small", { children: [
           (r.size / 1024 / 1024).toFixed(2),
           " MB · ",
           new Date(r.at).toLocaleDateString("zh-TW", { timeZone: "Asia/Taipei" })
         ] }),
-        z && /* @__PURE__ */ (0, l.jsx)("p", {
-          className: "red-text",
+        N && /* @__PURE__ */ (0, l.jsxs)("div", {
           role: "alert",
-          children: z
+          className: "image-load-error",
+          children: [/* @__PURE__ */ (0, l.jsx)("p", { children: N }), /* @__PURE__ */ (0, l.jsxs)("button", {
+            className: "btn",
+            disabled: w,
+            onClick: () => {
+              I(!0), le((H) => H + 1);
+            },
+            children: [/* @__PURE__ */ (0, l.jsx)(Wa, { size: 15 }), "重試這張圖片"]
+          })]
         }),
         /* @__PURE__ */ (0, l.jsxs)("div", {
           className: "project-image-actions",
@@ -14714,24 +14805,24 @@ function Bx({ image: r, access: h, onEdit: k, onTrash: f, disabled: p, record: w
             /* @__PURE__ */ (0, l.jsx)("button", {
               className: "text-btn",
               disabled: p,
-              onClick: k,
+              onClick: C,
               children: "說明／連結紀錄"
             }),
             /* @__PURE__ */ (0, l.jsx)("button", {
               className: "icon-btn",
-              disabled: S,
+              disabled: w,
               onClick: () => {
-                N(!0);
+                ie(!0);
               },
               "aria-label": "下載：" + r.name,
               children: /* @__PURE__ */ (0, l.jsx)(dn, { size: 16 })
             }),
             /* @__PURE__ */ (0, l.jsx)("button", {
               className: "icon-btn danger",
-              disabled: S || p,
+              disabled: w || p,
               onClick: f,
               "aria-label": "刪除圖片：" + r.name,
-              children: /* @__PURE__ */ (0, l.jsx)(jl, { size: 16 })
+              children: /* @__PURE__ */ (0, l.jsx)(yl, { size: 16 })
             })
           ]
         })
@@ -14739,127 +14830,130 @@ function Bx({ image: r, access: h, onEdit: k, onTrash: f, disabled: p, record: w
     })]
   });
 }
-function Gx({ project: r, transport: h, onTrash: k, onSaved: f, onDirty: p, onBusy: w, recordFilter: x }) {
-  const [A, z] = (0, g.useState)(!1), [E, S] = (0, g.useState)([]), [K, N] = (0, g.useState)(""), [le, ne] = (0, g.useState)(x ?? ""), [I, Q] = (0, g.useState)(""), [re, L] = (0, g.useState)(""), [ie, V] = (0, g.useState)(""), [ee, P] = (0, g.useState)(!1), [xe, te] = (0, g.useState)(0), [$, j] = (0, g.useState)(null), [W, ge] = (0, g.useState)(x ?? ""), he = (0, g.useRef)(null), b = (0, g.useRef)(r.revision);
+function Vx({ project: r, transport: h, onTrash: C, onSaved: f, onDirty: p, onBusy: k, recordFilter: x }) {
+  const [A, N] = (0, g.useState)(!1), [_, w] = (0, g.useState)([]), [G, z] = (0, g.useState)(""), [le, ne] = (0, g.useState)(x ?? ""), [I, X] = (0, g.useState)(""), [oe, q] = (0, g.useState)(""), [ie, H] = (0, g.useState)(""), [F, $] = (0, g.useState)(!1), [pe, te] = (0, g.useState)(0), [P, y] = (0, g.useState)(null), [ee, ge] = (0, g.useState)(x ?? ""), me = (0, g.useRef)(null), b = (0, g.useRef)(r.revision);
   (0, g.useEffect)(() => {
     b.current = r.revision;
-  }, [r.revision]), (0, g.useEffect)(() => (p(A || !!$), () => p(!1)), [
+  }, [r.revision]), (0, g.useEffect)(() => (p(A || !!P), () => p(!1)), [
     A,
-    $,
+    P,
     p
   ]), (0, g.useEffect)(() => {
-    if (!A && !$) return;
-    const d = (_) => _.preventDefault();
-    return window.addEventListener("beforeunload", d), () => window.removeEventListener("beforeunload", d);
-  }, [A, $]);
-  const ae = (0, g.useCallback)(async (d, _) => {
-    const q = h ? await h("images", d, _) : await fetch("/api/images" + d, {
+    if (!A && !P) return;
+    const j = (R) => R.preventDefault();
+    return window.addEventListener("beforeunload", j), () => window.removeEventListener("beforeunload", j);
+  }, [A, P]);
+  const ae = (0, g.useCallback)(async (j, R) => {
+    const W = h ? await h("images", j, R) : await fetch("/api/images" + j, {
       cache: "no-store",
-      ..._ ? {
+      ...R ? {
         method: "POST",
-        ..._ instanceof FormData ? { body: _ } : {
+        ...R instanceof FormData ? { body: R } : {
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(_)
+          body: JSON.stringify(R)
         }
       } : {}
-    }), F = await q.json();
-    if (!q.ok) throw Error(F.error || "圖片操作失敗");
-    return F;
-  }, [h]), Z = (0, g.useCallback)(async (d) => (await ae("?projectId=" + encodeURIComponent(r.id) + "&imageId=" + encodeURIComponent(d))).url, [
+    }), ce = await W.json();
+    if (!W.ok) throw Error(ce.error || "圖片操作失敗");
+    return ce;
+  }, [h]), K = (0, g.useMemo)(() => Bx((j) => ae("?" + new URLSearchParams({
+    projectId: r.id,
+    imageIds: j.join(",")
+  }))), [
     ae,
     r.id,
-    xe
-  ]);
-  function B(d) {
-    if (!d) return;
-    L("");
-    const _ = [];
-    for (const q of Array.from(d)) {
-      if (!qf.includes(q.type)) {
-        L("只接受 JPG、PNG、WebP；其他格式請先轉換。");
+    pe
+  ]), Y = (0, g.useCallback)((j, R = !1) => K.get(j, R), [K]);
+  function Q(j) {
+    if (!j) return;
+    q("");
+    const R = [];
+    for (const W of Array.from(j)) {
+      if (!qf.includes(W.type)) {
+        q("只接受 JPG、PNG、WebP；其他格式請先轉換。");
         continue;
       }
-      if (!q.size || q.size > 10485760) {
-        L("每張圖片上限 10 MB；過大的圖片未加入。");
+      if (!W.size || W.size > 10485760) {
+        q("每張圖片上限 10 MB；過大的圖片未加入。");
         continue;
       }
-      _.push({
-        file: q,
+      R.push({
+        file: W,
         key: crypto.randomUUID(),
         status: "waiting",
         error: ""
       });
     }
-    S((q) => [...q, ..._]);
+    w((W) => [...W, ...R]);
   }
-  async function Y() {
-    P(!0), w(!0), L("");
-    let d = !1;
+  async function se() {
+    $(!0), k(!0), q("");
+    let j = !1;
     try {
-      for (const _ of E.filter((q) => q.status !== "saved")) {
-        S((F) => F.map((de) => de.key === _.key ? {
-          ...de,
+      for (const R of _.filter((W) => W.status !== "saved")) {
+        w((ce) => ce.map((he) => he.key === R.key ? {
+          ...he,
           status: "uploading",
           error: ""
-        } : de));
-        const q = new FormData();
-        for (const [F, de] of Object.entries({
+        } : he));
+        const W = new FormData();
+        for (const [ce, he] of Object.entries({
           projectId: r.id,
           revision: String(b.current),
-          key: _.key,
-          description: K,
+          key: R.key,
+          description: G,
           recordId: le,
           stageId: I
-        })) q.set(F, de);
-        q.set("file", _.file, _.file.name);
+        })) W.set(ce, he);
+        W.set("file", R.file, R.file.name);
         try {
-          const F = await ae("", q);
-          b.current = F.revision, f(F), S((de) => de.map((fe) => fe.key === _.key ? {
-            ...fe,
+          const ce = await ae("", W);
+          b.current = ce.revision, f(ce), w((he) => he.map((de) => de.key === R.key ? {
+            ...de,
             status: "saved"
-          } : fe));
-        } catch (F) {
-          d = !0, S((de) => de.map((fe) => fe.key === _.key ? {
-            ...fe,
+          } : de));
+        } catch (ce) {
+          j = !0, w((he) => he.map((de) => de.key === R.key ? {
+            ...de,
             status: "failed",
-            error: F.message
-          } : fe)), L(F.message);
+            error: ce.message
+          } : de)), q(ce.message);
           break;
         }
       }
-      d || (V("圖片已存入此專案"), z(!1), S([]), N(""), te((_) => _ + 1));
+      j || (H("圖片已存入此專案"), N(!1), w([]), z(""), te((R) => R + 1));
     } finally {
-      P(!1), w(!1);
+      $(!1), k(!1);
     }
   }
-  async function se(d) {
-    if (d.preventDefault(), !!$) {
-      P(!0), w(!0), L("");
+  async function re(j) {
+    if (j.preventDefault(), !!P) {
+      $(!0), k(!0), q("");
       try {
         f(await ae("", {
           action: "update",
           projectId: r.id,
           revision: r.revision,
           key: crypto.randomUUID(),
-          imageId: $.id,
-          description: K,
+          imageId: P.id,
+          description: G,
           recordId: le,
           stageId: I
-        })), j(null), V("圖片說明與紀錄連結已保存");
-      } catch (_) {
-        L(_.message);
+        })), y(null), H("圖片說明與紀錄連結已保存");
+      } catch (R) {
+        q(R.message);
       } finally {
-        P(!1), w(!1);
+        $(!1), k(!1);
       }
     }
   }
-  const ce = /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsx)("option", {
+  const _e = /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsx)("option", {
     value: "",
     children: "不連結紀錄"
-  }), [...r.records].reverse().map((d) => /* @__PURE__ */ (0, l.jsx)("option", {
-    value: d.id,
-    children: d.summary.slice(0, 85)
-  }, d.id))] }), _e = r.images.filter((d) => !W || d.recordId === W);
+  }), [...r.records].reverse().map((j) => /* @__PURE__ */ (0, l.jsx)("option", {
+    value: j.id,
+    children: j.summary.slice(0, 85)
+  }, j.id))] }), o = r.images.filter((j) => !ee || j.recordId === ee);
   return /* @__PURE__ */ (0, l.jsxs)("section", {
     className: "wide-card project-images",
     children: [
@@ -14869,15 +14963,15 @@ function Gx({ project: r, transport: h, onTrash: k, onSaved: f, onDirty: p, onBu
           className: "heading-actions",
           children: [/* @__PURE__ */ (0, l.jsx)("button", {
             className: "icon-btn bordered",
-            disabled: ee,
+            disabled: F,
             "aria-label": "重新載入圖片",
-            onClick: () => te((d) => d + 1),
-            children: /* @__PURE__ */ (0, l.jsx)(Nl, { size: 16 })
+            onClick: () => te((j) => j + 1),
+            children: /* @__PURE__ */ (0, l.jsx)(Wa, { size: 16 })
           }), /* @__PURE__ */ (0, l.jsxs)("button", {
             className: "btn primary",
-            disabled: r.archived || ee,
+            disabled: r.archived || F,
             onClick: () => {
-              z(!0), j(null), N(""), ne(W), Q(""), S([]), L("");
+              N(!0), y(null), z(""), ne(ee), X(""), w([]), q("");
             },
             children: [/* @__PURE__ */ (0, l.jsx)(pf, { size: 17 }), "匯入圖片"]
           })]
@@ -14887,15 +14981,15 @@ function Gx({ project: r, transport: h, onTrash: k, onSaved: f, onDirty: p, onBu
         className: "form-field",
         children: ["依工作紀錄查看", /* @__PURE__ */ (0, l.jsxs)("select", {
           "aria-label": "依工作紀錄查看圖片",
-          value: W,
-          onChange: (d) => ge(d.target.value),
+          value: ee,
+          onChange: (j) => ge(j.target.value),
           children: [/* @__PURE__ */ (0, l.jsx)("option", {
             value: "",
             children: "全部圖片"
-          }), [...r.records].reverse().map((d) => /* @__PURE__ */ (0, l.jsx)("option", {
-            value: d.id,
-            children: d.summary.slice(0, 85)
-          }, d.id))]
+          }), [...r.records].reverse().map((j) => /* @__PURE__ */ (0, l.jsx)("option", {
+            value: j.id,
+            children: j.summary.slice(0, 85)
+          }, j.id))]
         })]
       }),
       ie && /* @__PURE__ */ (0, l.jsx)("p", {
@@ -14903,27 +14997,27 @@ function Gx({ project: r, transport: h, onTrash: k, onSaved: f, onDirty: p, onBu
         className: "green-text",
         children: ie
       }),
-      _e.length ? /* @__PURE__ */ (0, l.jsx)("div", {
+      o.length ? /* @__PURE__ */ (0, l.jsx)("div", {
         className: "project-image-grid",
-        children: _e.map((d) => /* @__PURE__ */ (0, l.jsx)(Bx, {
-          image: d,
-          access: Z,
-          disabled: ee || A || !!$,
-          onTrash: () => k(d.id),
-          record: r.records.find((_) => _.id === d.recordId),
+        children: o.map((j) => /* @__PURE__ */ (0, l.jsx)(Yx, {
+          image: j,
+          access: Y,
+          disabled: F || A || !!P,
+          onTrash: () => C(j.id),
+          record: r.records.find((R) => R.id === j.recordId),
           onEdit: () => {
-            r.archived || (j(d), N(d.description), ne(d.recordId), Q(d.stageId), L(""));
+            r.archived || (y(j), z(j.description), ne(j.recordId), X(j.stageId), q(""));
           }
-        }, d.id + ":" + xe))
+        }, j.id + ":" + pe))
       }) : /* @__PURE__ */ (0, l.jsxs)("div", {
         className: "empty",
         children: [
           /* @__PURE__ */ (0, l.jsx)(pf, { size: 30 }),
-          /* @__PURE__ */ (0, l.jsx)("h3", { children: W ? "這筆紀錄還沒有圖片" : "先匯入一張圖片" }),
+          /* @__PURE__ */ (0, l.jsx)("h3", { children: ee ? "這筆紀錄還沒有圖片" : "先匯入一張圖片" }),
           /* @__PURE__ */ (0, l.jsx)("p", { children: "支援 JPG、PNG、WebP，每張最多 10 MB。圖片原檔私有保存，重新整理後仍可查看。" })
         ]
       }),
-      (A || $) && /* @__PURE__ */ (0, l.jsx)("div", {
+      (A || P) && /* @__PURE__ */ (0, l.jsx)("div", {
         className: "modal-backdrop",
         children: /* @__PURE__ */ (0, l.jsxs)("section", {
           className: "modal",
@@ -14935,28 +15029,28 @@ function Gx({ project: r, transport: h, onTrash: k, onSaved: f, onDirty: p, onBu
             children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: A ? "匯入圖片" : "圖片說明與紀錄" }), /* @__PURE__ */ (0, l.jsx)("button", {
               className: "icon-btn",
               "aria-label": "關閉圖片表單",
-              disabled: ee,
+              disabled: F,
               onClick: () => {
-                window.confirm("放棄尚未儲存的表單？已成功上傳的圖片會保留。") && (z(!1), j(null));
+                window.confirm("放棄尚未儲存的表單？已成功上傳的圖片會保留。") && (N(!1), y(null));
               },
-              children: /* @__PURE__ */ (0, l.jsx)(yl, { size: 20 })
+              children: /* @__PURE__ */ (0, l.jsx)(Sl, { size: 20 })
             })]
           }), /* @__PURE__ */ (0, l.jsxs)("form", {
-            onSubmit: (d) => {
-              A ? (d.preventDefault(), Y()) : se(d);
+            onSubmit: (j) => {
+              A ? (j.preventDefault(), se()) : re(j);
             },
             children: [
               A && /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                 /* @__PURE__ */ (0, l.jsxs)("label", {
                   className: "image-dropzone",
                   children: ["選擇圖片（可多選）", /* @__PURE__ */ (0, l.jsx)("input", {
-                    ref: he,
+                    ref: me,
                     type: "file",
                     accept: "image/jpeg,image/png,image/webp",
                     multiple: !0,
-                    disabled: ee,
-                    onChange: (d) => {
-                      B(d.target.files), d.target.value = "";
+                    disabled: F,
+                    onChange: (j) => {
+                      Q(j.target.files), j.target.value = "";
                     }
                   })]
                 }),
@@ -14966,32 +15060,32 @@ function Gx({ project: r, transport: h, onTrash: k, onSaved: f, onDirty: p, onBu
                 }),
                 /* @__PURE__ */ (0, l.jsx)("ul", {
                   className: "image-upload-list",
-                  children: E.map((d) => /* @__PURE__ */ (0, l.jsxs)("li", { children: [
-                    /* @__PURE__ */ (0, l.jsx)("span", { children: d.file.name }),
+                  children: _.map((j) => /* @__PURE__ */ (0, l.jsxs)("li", { children: [
+                    /* @__PURE__ */ (0, l.jsx)("span", { children: j.file.name }),
                     /* @__PURE__ */ (0, l.jsx)("small", { children: {
                       waiting: "等待上傳",
                       uploading: "上傳中…",
                       saved: "已保存",
                       failed: "未完成"
-                    }[d.status] }),
-                    d.error && /* @__PURE__ */ (0, l.jsx)("p", {
+                    }[j.status] }),
+                    j.error && /* @__PURE__ */ (0, l.jsx)("p", {
                       role: "alert",
-                      children: d.error
+                      children: j.error
                     })
-                  ] }, d.key))
+                  ] }, j.key))
                 })
               ] }),
               /* @__PURE__ */ (0, l.jsxs)("label", {
                 className: "form-field",
                 children: [
                   "圖片說明",
-                  A && E.length > 1 ? "（套用本次圖片）" : "",
+                  A && _.length > 1 ? "（套用本次圖片）" : "",
                   /* @__PURE__ */ (0, l.jsx)("textarea", {
                     rows: 3,
                     maxLength: 3e3,
-                    value: K,
-                    disabled: ee,
-                    onChange: (d) => N(d.target.value)
+                    value: G,
+                    disabled: F,
+                    onChange: (j) => z(j.target.value)
                   })
                 ]
               }),
@@ -14999,54 +15093,54 @@ function Gx({ project: r, transport: h, onTrash: k, onSaved: f, onDirty: p, onBu
                 className: "form-field",
                 children: ["連結工作紀錄", /* @__PURE__ */ (0, l.jsx)("select", {
                   value: le,
-                  disabled: ee,
-                  onChange: (d) => ne(d.target.value),
-                  children: ce
+                  disabled: F,
+                  onChange: (j) => ne(j.target.value),
+                  children: _e
                 })]
               }),
               /* @__PURE__ */ (0, l.jsxs)("label", {
                 className: "form-field",
                 children: ["所屬階段", /* @__PURE__ */ (0, l.jsxs)("select", {
                   value: I,
-                  disabled: ee,
-                  onChange: (d) => Q(d.target.value),
+                  disabled: F,
+                  onChange: (j) => X(j.target.value),
                   children: [/* @__PURE__ */ (0, l.jsx)("option", {
                     value: "",
                     children: "不指定階段"
-                  }), r.stages.map((d) => /* @__PURE__ */ (0, l.jsxs)("option", {
-                    value: d.id,
+                  }), r.stages.map((j) => /* @__PURE__ */ (0, l.jsxs)("option", {
+                    value: j.id,
                     children: [
-                      d.key,
+                      j.key,
                       " · ",
-                      d.title
+                      j.title
                     ]
-                  }, d.id))]
+                  }, j.id))]
                 })]
               }),
-              re && /* @__PURE__ */ (0, l.jsx)("p", {
+              oe && /* @__PURE__ */ (0, l.jsx)("p", {
                 className: "modal-error",
                 role: "alert",
-                children: re
+                children: oe
               }),
               /* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "modal-actions",
-                children: [re && /* @__PURE__ */ (0, l.jsx)("button", {
+                children: [oe && /* @__PURE__ */ (0, l.jsx)("button", {
                   className: "btn",
-                  disabled: ee,
+                  disabled: F,
                   type: "button",
                   onClick: async () => {
-                    const d = h ? await h("workspace", "?view=managed&id=" + r.id) : await fetch("/api/workspace?view=managed&id=" + r.id);
-                    if (d.ok) {
-                      const _ = await d.json();
-                      b.current = _.revision, f(_), L("");
+                    const j = h ? await h("workspace", "?view=managed&id=" + r.id) : await fetch("/api/workspace?view=managed&id=" + r.id);
+                    if (j.ok) {
+                      const R = await j.json();
+                      b.current = R.revision, f(R), q("");
                     }
                   },
                   children: "重新讀取專案"
                 }), /* @__PURE__ */ (0, l.jsx)("button", {
                   className: "btn primary",
-                  disabled: ee || A && !E.some((d) => d.status !== "saved"),
+                  disabled: F || A && !_.some((j) => j.status !== "saved"),
                   type: "submit",
-                  children: ee ? "保存中…" : A ? "上傳並保存" : "保存說明"
+                  children: F ? "保存中…" : A ? "上傳並保存" : "保存說明"
                 })]
               })
             ]
@@ -15057,31 +15151,31 @@ function Gx({ project: r, transport: h, onTrash: k, onSaved: f, onDirty: p, onBu
   });
 }
 function Hf(r, h) {
-  return (0, g.useCallback)(async (k, f = {}, p) => {
-    const w = {
-      action: k,
+  return (0, g.useCallback)(async (C, f = {}, p) => {
+    const k = {
+      action: C,
       id: r,
       revision: p,
       args: f
-    }, x = h ? await h("workspace", "", w) : await fetch("/api/workspace", {
+    }, x = h ? await h("workspace", "", k) : await fetch("/api/workspace", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(w)
+      body: JSON.stringify(k)
     }), A = await x.json();
     if (!x.ok) throw Error(A.error || "素材操作失敗");
     return A;
   }, [r, h]);
 }
-async function od(r, h, k) {
+async function od(r, h, C) {
   if (!h.length) return {};
   const f = "?" + new URLSearchParams({
     projectId: r,
     imageIds: h.join(",")
-  }), p = k ? await k("images", f) : await fetch("/api/images" + f), w = await p.json();
-  if (!p.ok) throw Error(w.error || "原檔讀取失敗");
-  return Object.fromEntries(w.urls.map((x) => [x.imageId, x.url]));
+  }), p = C ? await C("images", f) : await fetch("/api/images" + f), k = await p.json();
+  if (!p.ok) throw Error(k.error || "原檔讀取失敗");
+  return Object.fromEntries(k.urls.map((x) => [x.imageId, x.url]));
 }
-var Yx = [
+var Qx = [
   "平面圖",
   "立面圖",
   "剖面圖",
@@ -15092,38 +15186,38 @@ var Yx = [
   "3D 模型參考",
   "其他"
 ];
-function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
-  const w = Hf(r.id, h), [x, A] = (0, g.useState)([]), [z, E] = (0, g.useState)([]), [S, K] = (0, g.useState)({}), [N, le] = (0, g.useState)(""), [ne, I] = (0, g.useState)(""), [Q, re] = (0, g.useState)(!1), [L, ie] = (0, g.useState)(""), [V, ee] = (0, g.useState)(""), [P, xe] = (0, g.useState)({
+function Xx({ project: r, transport: h, onUpdated: C, onDirty: f, onBusy: p }) {
+  const k = Hf(r.id, h), [x, A] = (0, g.useState)([]), [N, _] = (0, g.useState)([]), [w, G] = (0, g.useState)({}), [z, le] = (0, g.useState)(""), [ne, I] = (0, g.useState)(""), [X, oe] = (0, g.useState)(!1), [q, ie] = (0, g.useState)(""), [H, F] = (0, g.useState)(""), [$, pe] = (0, g.useState)({
     kind: "image",
     ids: []
-  }), [te, $] = (0, g.useState)(null), [j, W] = (0, g.useState)({}), [ge, he] = (0, g.useState)(null), [b, ae] = (0, g.useState)(""), [Z, B] = (0, g.useState)(""), [Y, se] = (0, g.useState)(""), [ce, _e] = (0, g.useState)(!1), [d, _] = (0, g.useState)([]), [q, F] = (0, g.useState)([]), [de, fe] = (0, g.useState)(0), [ue, Ge] = (0, g.useState)(0), ze = (0, g.useRef)(r.revision), dt = (0, g.useRef)(null), Xe = (0, g.useRef)(0), Me = (0, g.useCallback)(async () => {
+  }), [te, P] = (0, g.useState)(null), [y, ee] = (0, g.useState)({}), [ge, me] = (0, g.useState)(null), [b, ae] = (0, g.useState)(""), [K, Y] = (0, g.useState)(""), [Q, se] = (0, g.useState)(""), [re, _e] = (0, g.useState)(!1), [o, j] = (0, g.useState)([]), [R, W] = (0, g.useState)([]), [ce, he] = (0, g.useState)(0), [de, Ge] = (0, g.useState)(0), ze = (0, g.useRef)(r.revision), dt = (0, g.useRef)(null), Xe = (0, g.useRef)(0), Me = (0, g.useCallback)(async () => {
     const M = ++Xe.current;
     try {
-      const ke = await w("listProjectFolders");
-      !ke.initialized && !r.archived && await w("initializeProjectAssets", { key: crypto.randomUUID() }, ke.revision);
-      const je = await w("queryProjectAssets", {
+      const ke = await k("listProjectFolders");
+      !ke.initialized && !r.archived && await k("initializeProjectAssets", { key: crypto.randomUUID() }, ke.revision);
+      const je = await k("queryProjectAssets", {
         query: ne,
-        folderId: N === "*" ? void 0 : N,
+        folderId: z === "*" ? void 0 : z,
         includeRecycled: !0,
-        offset: de,
+        offset: ce,
         limit: 50
       });
       if (M !== Xe.current) return;
-      if (A(ke.folders.filter((Ce) => Ce.available)), E(je.assets), Ge(je.total), _([...ke.recycled, ...je.recycled]), ze.current = je.revision, K({}), je.assets.length) {
+      if (A(ke.folders.filter((Ce) => Ce.available)), _(je.assets), Ge(je.total), j([...ke.recycled, ...je.recycled]), ze.current = je.revision, G({}), je.assets.length) {
         const Ce = await od(r.id, je.assets.map((Be) => Be.id), h);
-        M === Xe.current && K(Ce);
+        M === Xe.current && G(Ce);
       }
       ie("");
     } catch (ke) {
       M === Xe.current && ie(ke.message);
     }
   }, [
-    w,
+    k,
     r.id,
     h,
     ne,
-    N,
-    de
+    z,
+    ce
   ]);
   (0, g.useEffect)(() => {
     const M = setTimeout(() => {
@@ -15132,34 +15226,34 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
     return () => {
       clearTimeout(M), Xe.current++;
     };
-  }, [Me]), (0, g.useEffect)(() => (f(!!b || q.some((M) => M.status !== "已保存" && M.status !== "已存在") || !!te && JSON.stringify(j) !== JSON.stringify({
+  }, [Me]), (0, g.useEffect)(() => (f(!!b || R.some((M) => M.status !== "已保存" && M.status !== "已存在") || !!te && JSON.stringify(y) !== JSON.stringify({
     name: te.name,
     description: te.description,
     purpose: te.purpose ?? "",
     tags: (te.tags ?? []).join("、")
   })), () => f(!1)), [
     b,
-    q,
+    R,
     te,
-    j,
+    y,
     f
   ]);
   const ve = (M) => {
-    re(M), p(M);
+    oe(M), p(M);
   };
   async function qe(M, ke) {
     ve(!0), ie("");
     try {
-      const je = await w(M, {
+      const je = await k(M, {
         key: crypto.randomUUID(),
         ...ke
       }, ze.current);
       ze.current = je.revision;
       const Ce = je.results?.filter((Be) => !Be.success) ?? [];
-      return ee(Ce.length ? Ce.map((Be) => Be.error).join("；") : "已保存並讀回"), ae(""), xe({
+      return F(Ce.length ? Ce.map((Be) => Be.error).join("；") : "已保存並讀回"), ae(""), pe({
         kind: "image",
         ids: []
-      }), $(null), k(), await Me(), je;
+      }), P(null), C(), await Me(), je;
     } catch (je) {
       ie(je.message);
     } finally {
@@ -15167,17 +15261,17 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
     }
   }
   function lt(M) {
-    ie(""), F((ke) => [...ke, ...M.filter((je) => !Hx.includes(je.type) || !je.size || je.size > 10485760 ? (ie("僅接受PNG、JPEG、WebP、靜態SVG、PDF，每檔最多10MB"), !1) : !0).map((je) => ({
+    ie(""), W((ke) => [...ke, ...M.filter((je) => !Gx.includes(je.type) || !je.size || je.size > 10485760 ? (ie("僅接受PNG、JPEG、WebP、靜態SVG、PDF，每檔最多10MB"), !1) : !0).map((je) => ({
       file: je,
       key: crypto.randomUUID(),
       status: "待上傳"
     }))]);
   }
-  async function o() {
+  async function d() {
     ve(!0), ie("");
     try {
-      for (const M of q.filter((ke) => !["已保存", "已存在"].includes(ke.status))) {
-        F((je) => je.map((Ce) => Ce.key === M.key ? {
+      for (const M of R.filter((ke) => !["已保存", "已存在"].includes(ke.status))) {
+        W((je) => je.map((Ce) => Ce.key === M.key ? {
           ...Ce,
           status: "上傳中",
           error: ""
@@ -15188,7 +15282,7 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
           revision: String(ze.current),
           key: M.key,
           assetUpload: "1",
-          folderId: N === "*" ? "" : N,
+          folderId: z === "*" ? "" : z,
           description: "",
           recordId: "",
           stageId: ""
@@ -15200,12 +15294,12 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
             body: ke
           }), Ce = await je.json();
           if (!je.ok) throw Error(Ce.error || "上傳失敗");
-          ze.current = Ce.revision, F((Be) => Be.map((bt) => bt.key === M.key ? {
+          ze.current = Ce.revision, W((Be) => Be.map((bt) => bt.key === M.key ? {
             ...bt,
             status: Ce.uploadResult?.deduplicated ? "已存在" : "已保存"
           } : bt));
         } catch (je) {
-          F((Ce) => Ce.map((Be) => Be.key === M.key ? {
+          W((Ce) => Ce.map((Be) => Be.key === M.key ? {
             ...Be,
             status: "失敗",
             error: je.message
@@ -15213,23 +15307,23 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
           break;
         }
       }
-      k(), await Me();
+      C(), await Me();
     } finally {
       ve(!1);
     }
   }
-  function H(M, ke, je) {
-    xe((Ce) => ({
+  function B(M, ke, je) {
+    pe((Ce) => ({
       kind: M,
       ids: je ? [...Ce.kind === M ? Ce.ids : [], ke] : Ce.ids.filter((Be) => Be !== ke)
     }));
   }
-  async function oe(M = "trash", ke = P.kind, je = P.ids) {
+  async function ue(M = "trash", ke = $.kind, je = $.ids) {
     if (je.length) {
       if (M === "trash") {
         let Ce = "資料夾內原檔保留，會在待分類中可見。";
         if (ke === "image") {
-          const Be = await w("queryProjectAssets", {
+          const Be = await k("queryProjectAssets", {
             ids: je,
             limit: 100
           });
@@ -15260,7 +15354,7 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
   }
   async function T() {
     try {
-      const M = await w("exportProjectAssets"), ke = URL.createObjectURL(new Blob([JSON.stringify(M, null, 2)], { type: "application/json" })), je = document.createElement("a");
+      const M = await k("exportProjectAssets"), ke = URL.createObjectURL(new Blob([JSON.stringify(M, null, 2)], { type: "application/json" })), je = document.createElement("a");
       je.href = ke, je.download = "project-assets-" + r.id + ".json", je.click(), setTimeout(() => URL.revokeObjectURL(ke), 1e3);
     } catch (M) {
       ie(M.message);
@@ -15277,7 +15371,7 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
     }
     return ke;
   }
-  const Ze = P.ids.length, Dt = /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsx)("option", {
+  const Ze = $.ids.length, Dt = /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsx)("option", {
     value: "",
     children: "待分類／根目錄"
   }), x.map((M) => /* @__PURE__ */ (0, l.jsxs)("option", {
@@ -15292,21 +15386,21 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
         children: [
           /* @__PURE__ */ (0, l.jsxs)("button", {
             className: "btn",
-            disabled: Q || r.archived,
+            disabled: X || r.archived,
             onClick: () => {
-              B(""), ae("create");
+              Y(""), ae("create");
             },
             children: [/* @__PURE__ */ (0, l.jsx)(Um, { size: 16 }), "新增資料夾"]
           }),
           /* @__PURE__ */ (0, l.jsxs)("button", {
             className: "btn primary",
-            disabled: Q || r.archived,
+            disabled: X || r.archived,
             onClick: () => dt.current?.click(),
             children: [/* @__PURE__ */ (0, l.jsx)(nx, { size: 16 }), "上傳"]
           }),
           /* @__PURE__ */ (0, l.jsxs)("button", {
             className: "btn",
-            disabled: Q || !Ze || r.archived,
+            disabled: X || !Ze || r.archived,
             onClick: () => {
               se(""), ae("move");
             },
@@ -15314,25 +15408,25 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
           }),
           /* @__PURE__ */ (0, l.jsxs)("button", {
             className: "btn danger",
-            disabled: Q || !Ze || r.archived,
+            disabled: X || !Ze || r.archived,
             onClick: () => {
-              oe();
+              ue();
             },
-            children: [/* @__PURE__ */ (0, l.jsx)(jl, { size: 16 }), "刪除"]
+            children: [/* @__PURE__ */ (0, l.jsx)(yl, { size: 16 }), "刪除"]
           }),
           /* @__PURE__ */ (0, l.jsxs)("details", { children: [
             /* @__PURE__ */ (0, l.jsx)("summary", { children: "更多" }),
             /* @__PURE__ */ (0, l.jsx)("button", {
               className: "text-btn",
-              disabled: Q || P.kind !== "folder" || Ze !== 1 || r.archived,
+              disabled: X || $.kind !== "folder" || Ze !== 1 || r.archived,
               onClick: () => {
-                B(x.find((M) => M.id === P.ids[0])?.name ?? ""), ae("rename");
+                Y(x.find((M) => M.id === $.ids[0])?.name ?? ""), ae("rename");
               },
               children: "資料夾重新命名"
             }),
             /* @__PURE__ */ (0, l.jsxs)("button", {
               className: "text-btn",
-              disabled: Q || P.kind !== "folder" || !Ze || r.archived,
+              disabled: X || $.kind !== "folder" || !Ze || r.archived,
               onClick: () => {
                 se(""), ae("copy");
               },
@@ -15340,9 +15434,9 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
             }),
             /* @__PURE__ */ (0, l.jsx)("button", {
               className: "text-btn",
-              disabled: Q || P.kind !== "image" || !Ze || r.archived,
+              disabled: X || $.kind !== "image" || !Ze || r.archived,
               onClick: () => {
-                B(""), ae("classify");
+                Y(""), ae("classify");
               },
               children: "批次分類"
             }),
@@ -15356,20 +15450,20 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
           ] }),
           /* @__PURE__ */ (0, l.jsx)("button", {
             className: "btn",
-            disabled: Q,
+            disabled: X,
             onClick: () => {
-              _e((M) => !M), $(null);
+              _e((M) => !M), P(null);
             },
-            children: ce ? "返回素材" : "回收區"
+            children: re ? "返回素材" : "回收區"
           }),
           /* @__PURE__ */ (0, l.jsx)("button", {
             className: "icon-btn",
             "aria-label": "重新整理素材",
-            disabled: Q,
+            disabled: X,
             onClick: () => {
               Me();
             },
-            children: /* @__PURE__ */ (0, l.jsx)(Nl, { size: 16 })
+            children: /* @__PURE__ */ (0, l.jsx)(Wa, { size: 16 })
           }),
           /* @__PURE__ */ (0, l.jsx)("input", {
             ref: dt,
@@ -15390,33 +15484,33 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
           placeholder: "搜尋檔名、說明、分類或資料夾",
           value: ne,
           onChange: (M) => {
-            I(M.target.value), fe(0);
+            I(M.target.value), he(0);
           }
         })]
       }),
-      L && /* @__PURE__ */ (0, l.jsx)("p", {
+      q && /* @__PURE__ */ (0, l.jsx)("p", {
         className: "modal-error",
         role: "alert",
-        children: L
+        children: q
       }),
-      V && /* @__PURE__ */ (0, l.jsx)("p", {
+      H && /* @__PURE__ */ (0, l.jsx)("p", {
         role: "status",
-        children: V
+        children: H
       }),
-      !!q.length && /* @__PURE__ */ (0, l.jsxs)("section", {
+      !!R.length && /* @__PURE__ */ (0, l.jsxs)("section", {
         className: "wide-card",
         children: [
           /* @__PURE__ */ (0, l.jsxs)("b", { children: [
             "上傳清單 · ",
-            q.filter((M) => ["已保存", "已存在"].includes(M.status)).length,
+            R.filter((M) => ["已保存", "已存在"].includes(M.status)).length,
             "/",
-            q.length
+            R.length
           ] }),
           /* @__PURE__ */ (0, l.jsx)("progress", {
-            max: q.length,
-            value: q.filter((M) => ["已保存", "已存在"].includes(M.status)).length
+            max: R.length,
+            value: R.filter((M) => ["已保存", "已存在"].includes(M.status)).length
           }),
-          q.map((M) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
+          R.map((M) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
             M.file.name,
             " · ",
             M.status,
@@ -15424,16 +15518,16 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
           ] }, M.key)),
           /* @__PURE__ */ (0, l.jsx)("button", {
             className: "btn primary",
-            disabled: Q || r.archived,
+            disabled: X || r.archived,
             onClick: () => {
-              o();
+              d();
             },
             children: "開始上傳／重試失敗檔案"
           }),
           /* @__PURE__ */ (0, l.jsx)("button", {
             className: "btn",
-            disabled: Q,
-            onClick: () => F([]),
+            disabled: X,
+            onClick: () => W([]),
             children: "清除清單"
           }),
           /* @__PURE__ */ (0, l.jsx)("p", {
@@ -15442,13 +15536,13 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
           })
         ]
       }),
-      ce ? /* @__PURE__ */ (0, l.jsxs)("section", {
+      re ? /* @__PURE__ */ (0, l.jsxs)("section", {
         className: "wide-card",
         children: [
           /* @__PURE__ */ (0, l.jsx)("h2", { children: "素材回收區" }),
           /* @__PURE__ */ (0, l.jsx)("p", { children: "至少保留30天，沒有自動清空排程。還原使用原ID與原檔。" }),
-          !d.length && /* @__PURE__ */ (0, l.jsx)("p", { children: "回收區是空的。" }),
-          d.map((M) => /* @__PURE__ */ (0, l.jsxs)("article", {
+          !o.length && /* @__PURE__ */ (0, l.jsx)("p", { children: "回收區是空的。" }),
+          o.map((M) => /* @__PURE__ */ (0, l.jsxs)("article", {
             className: "journal-card",
             children: [
               /* @__PURE__ */ (0, l.jsx)("b", { children: M.title }),
@@ -15462,9 +15556,9 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
               /* @__PURE__ */ (0, l.jsxs)("p", { children: ["保留至 ", M.retainUntil ? new Date(M.retainUntil).toLocaleDateString("zh-TW") : "未設定期限"] }),
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn",
-                disabled: Q || r.archived,
+                disabled: X || r.archived,
                 onClick: () => {
-                  oe("restore", M.kind, [M.id]);
+                  ue("restore", M.kind, [M.id]);
                 },
                 children: "還原"
               })
@@ -15479,16 +15573,16 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
             children: [
               /* @__PURE__ */ (0, l.jsxs)("h3", { children: [/* @__PURE__ */ (0, l.jsx)(Lm, { size: 17 }), "資料夾"] }),
               /* @__PURE__ */ (0, l.jsx)("button", {
-                className: N === "*" ? "active" : "",
+                className: z === "*" ? "active" : "",
                 onClick: () => {
-                  le("*"), fe(0);
+                  le("*"), he(0);
                 },
                 children: "全部素材"
               }),
               /* @__PURE__ */ (0, l.jsx)("button", {
-                className: N === "" ? "active" : "",
+                className: z === "" ? "active" : "",
                 onClick: () => {
-                  le(""), fe(0);
+                  le(""), he(0);
                 },
                 children: "待分類"
               }),
@@ -15497,12 +15591,12 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
                 children: [/* @__PURE__ */ (0, l.jsx)("input", {
                   type: "checkbox",
                   "aria-label": "選取資料夾：" + M.name,
-                  checked: P.kind === "folder" && P.ids.includes(M.id),
-                  onChange: (ke) => H("folder", M.id, ke.target.checked)
+                  checked: $.kind === "folder" && $.ids.includes(M.id),
+                  onChange: (ke) => B("folder", M.id, ke.target.checked)
                 }), /* @__PURE__ */ (0, l.jsx)("button", {
-                  className: N === M.id ? "active" : "",
+                  className: z === M.id ? "active" : "",
                   onClick: () => {
-                    le(M.id), fe(0);
+                    le(M.id), he(0);
                   },
                   children: M.name
                 })]
@@ -15513,13 +15607,13 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
             className: "asset-files",
             onDragOver: (M) => M.preventDefault(),
             onDrop: (M) => {
-              M.preventDefault(), !Q && !r.archived && lt(Array.from(M.dataTransfer.files));
+              M.preventDefault(), !X && !r.archived && lt(Array.from(M.dataTransfer.files));
             },
             children: [
               /* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "section-title",
-                children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: N === "*" ? "全部素材" : x.find((M) => M.id === N)?.name ?? "待分類" }), /* @__PURE__ */ (0, l.jsxs)("span", { children: [
-                  ue,
+                children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: z === "*" ? "全部素材" : x.find((M) => M.id === z)?.name ?? "待分類" }), /* @__PURE__ */ (0, l.jsxs)("span", { children: [
+                  de,
                   "個檔案 · 已選",
                   Ze
                 ] })]
@@ -15530,27 +15624,27 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
               }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: [/* @__PURE__ */ (0, l.jsx)("input", {
                 type: "checkbox",
-                checked: !!z.length && P.kind === "image" && z.every((M) => P.ids.includes(M.id)),
-                onChange: (M) => xe({
+                checked: !!N.length && $.kind === "image" && N.every((M) => $.ids.includes(M.id)),
+                onChange: (M) => pe({
                   kind: "image",
-                  ids: M.target.checked ? z.map((ke) => ke.id) : []
+                  ids: M.target.checked ? N.map((ke) => ke.id) : []
                 })
               }), "選取本頁"] }),
               /* @__PURE__ */ (0, l.jsx)("div", {
                 className: "asset-grid",
-                children: z.map((M) => /* @__PURE__ */ (0, l.jsxs)("article", {
+                children: N.map((M) => /* @__PURE__ */ (0, l.jsxs)("article", {
                   className: "asset-card" + (te?.id === M.id ? " selected" : ""),
                   children: [
                     /* @__PURE__ */ (0, l.jsxs)("label", { children: [/* @__PURE__ */ (0, l.jsx)("input", {
                       type: "checkbox",
                       "aria-label": "選取素材：" + M.name,
-                      checked: P.kind === "image" && P.ids.includes(M.id),
-                      onChange: (ke) => H("image", M.id, ke.target.checked)
+                      checked: $.kind === "image" && $.ids.includes(M.id),
+                      onChange: (ke) => B("image", M.id, ke.target.checked)
                     }), M.purpose || "未分類用途"] }),
                     /* @__PURE__ */ (0, l.jsx)("button", {
                       className: "asset-thumb",
                       onClick: () => {
-                        $(M), W({
+                        P(M), ee({
                           name: M.name,
                           description: M.description,
                           purpose: M.purpose ?? "",
@@ -15558,8 +15652,8 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
                         });
                       },
                       "aria-label": "素材詳情：" + M.name,
-                      children: S[M.id] && M.mime !== "application/pdf" ? /* @__PURE__ */ (0, l.jsx)("img", {
-                        src: S[M.id],
+                      children: w[M.id] && M.mime !== "application/pdf" ? /* @__PURE__ */ (0, l.jsx)("img", {
+                        src: w[M.id],
                         alt: M.description || M.name
                       }) : /* @__PURE__ */ (0, l.jsx)(Tm, { size: 40 })
                     }),
@@ -15567,14 +15661,14 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
                     /* @__PURE__ */ (0, l.jsxs)("small", { children: [(M.size / 1024).toFixed(0), " KB"] }),
                     /* @__PURE__ */ (0, l.jsxs)("button", {
                       className: "text-btn",
-                      disabled: !S[M.id],
-                      onClick: () => he(M),
+                      disabled: !w[M.id],
+                      onClick: () => me(M),
                       children: [/* @__PURE__ */ (0, l.jsx)(Jm, { size: 13 }), "全螢幕檢視"]
                     })
                   ]
                 }, M.id))
               }),
-              !z.length && /* @__PURE__ */ (0, l.jsx)("div", {
+              !N.length && /* @__PURE__ */ (0, l.jsx)("div", {
                 className: "empty",
                 children: "此分類尚無素材。"
               }),
@@ -15582,13 +15676,13 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
                 className: "heading-actions",
                 children: [/* @__PURE__ */ (0, l.jsx)("button", {
                   className: "btn",
-                  disabled: !de,
-                  onClick: () => fe((M) => Math.max(0, M - 50)),
+                  disabled: !ce,
+                  onClick: () => he((M) => Math.max(0, M - 50)),
                   children: "上一頁"
                 }), /* @__PURE__ */ (0, l.jsx)("button", {
                   className: "btn",
-                  disabled: de + z.length >= ue,
-                  onClick: () => fe((M) => M + 50),
+                  disabled: ce + N.length >= de,
+                  onClick: () => he((M) => M + 50),
                   children: "下一頁"
                 })]
               })
@@ -15600,16 +15694,16 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "icon-btn",
                 "aria-label": "關閉素材詳情",
-                onClick: () => $(null),
-                children: /* @__PURE__ */ (0, l.jsx)(yl, { size: 18 })
+                onClick: () => P(null),
+                children: /* @__PURE__ */ (0, l.jsx)(Sl, { size: 18 })
               }),
               /* @__PURE__ */ (0, l.jsx)("h3", { children: "素材資訊" }),
               /* @__PURE__ */ (0, l.jsxs)("label", {
                 className: "form-field",
                 children: ["檔名", /* @__PURE__ */ (0, l.jsx)("input", {
-                  value: j.name ?? "",
-                  onChange: (M) => W({
-                    ...j,
+                  value: y.name ?? "",
+                  onChange: (M) => ee({
+                    ...y,
                     name: M.target.value
                   })
                 })]
@@ -15617,9 +15711,9 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
               /* @__PURE__ */ (0, l.jsxs)("label", {
                 className: "form-field",
                 children: ["描述", /* @__PURE__ */ (0, l.jsx)("textarea", {
-                  value: j.description ?? "",
-                  onChange: (M) => W({
-                    ...j,
+                  value: y.description ?? "",
+                  onChange: (M) => ee({
+                    ...y,
                     description: M.target.value
                   })
                 })]
@@ -15630,37 +15724,37 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
                   "用途",
                   /* @__PURE__ */ (0, l.jsx)("input", {
                     list: "asset-purposes",
-                    value: j.purpose ?? "",
-                    onChange: (M) => W({
-                      ...j,
+                    value: y.purpose ?? "",
+                    onChange: (M) => ee({
+                      ...y,
                       purpose: M.target.value
                     })
                   }),
                   /* @__PURE__ */ (0, l.jsx)("datalist", {
                     id: "asset-purposes",
-                    children: Yx.map((M) => /* @__PURE__ */ (0, l.jsx)("option", { value: M }, M))
+                    children: Qx.map((M) => /* @__PURE__ */ (0, l.jsx)("option", { value: M }, M))
                   })
                 ]
               }),
               /* @__PURE__ */ (0, l.jsxs)("label", {
                 className: "form-field",
                 children: ["分類標籤（、分隔）", /* @__PURE__ */ (0, l.jsx)("input", {
-                  value: j.tags ?? "",
-                  onChange: (M) => W({
-                    ...j,
+                  value: y.tags ?? "",
+                  onChange: (M) => ee({
+                    ...y,
                     tags: M.target.value
                   })
                 })]
               }),
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn primary",
-                disabled: Q || r.archived,
+                disabled: X || r.archived,
                 onClick: () => {
                   qe("updateProjectAssets", {
                     ids: [te.id],
                     patch: {
-                      ...j,
-                      tags: String(j.tags).split(/[、,，]/).map((M) => M.trim()).filter(Boolean)
+                      ...y,
+                      tags: String(y.tags).split(/[、,，]/).map((M) => M.trim()).filter(Boolean)
                     }
                   });
                 },
@@ -15701,22 +15795,22 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
           }[b] }), /* @__PURE__ */ (0, l.jsxs)("form", {
             onSubmit: (M) => {
               M.preventDefault(), b === "create" ? qe("createProjectFolder", {
-                name: Z,
-                parentId: N === "*" ? "" : N
+                name: K,
+                parentId: z === "*" ? "" : z
               }) : b === "classify" ? qe("updateProjectAssets", {
-                ids: P.ids,
-                patch: { purpose: Z }
+                ids: $.ids,
+                patch: { purpose: K }
               }) : b === "rename" ? qe("manageProjectFolders", {
                 action: "rename",
-                ids: P.ids,
-                name: Z
-              }) : P.kind === "folder" ? qe("manageProjectFolders", {
+                ids: $.ids,
+                name: K
+              }) : $.kind === "folder" ? qe("manageProjectFolders", {
                 action: b,
-                ids: P.ids,
-                parentId: Y
+                ids: $.ids,
+                parentId: Q
               }) : qe("updateProjectAssets", {
-                ids: P.ids,
-                patch: { folderId: Y }
+                ids: $.ids,
+                patch: { folderId: Q }
               });
             },
             children: [[
@@ -15728,13 +15822,13 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
               children: ["名稱／用途", /* @__PURE__ */ (0, l.jsx)("input", {
                 required: !0,
                 maxLength: 200,
-                value: Z,
-                onChange: (M) => B(M.target.value)
+                value: K,
+                onChange: (M) => Y(M.target.value)
               })]
             }) : /* @__PURE__ */ (0, l.jsxs)("label", {
               className: "form-field",
               children: ["目的資料夾", /* @__PURE__ */ (0, l.jsx)("select", {
-                value: Y,
+                value: Q,
                 onChange: (M) => se(M.target.value),
                 children: Dt
               })]
@@ -15743,12 +15837,12 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
               children: [/* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn",
                 type: "button",
-                disabled: Q,
+                disabled: X,
                 onClick: () => ae(""),
                 children: "取消"
               }), /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn primary",
-                disabled: Q,
+                disabled: X,
                 children: "儲存"
               })]
             })]
@@ -15771,15 +15865,15 @@ function Vx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
           }),
           /* @__PURE__ */ (0, l.jsx)("button", {
             className: "btn",
-            onClick: () => he(null),
+            onClick: () => me(null),
             children: "關閉"
           })
         ] }), ge.mime === "application/pdf" ? /* @__PURE__ */ (0, l.jsx)("iframe", {
           sandbox: "",
-          src: S[ge.id],
+          src: w[ge.id],
           title: ge.name
         }) : /* @__PURE__ */ (0, l.jsx)("img", {
-          src: S[ge.id],
+          src: w[ge.id],
           alt: ge.description || ge.name
         })]
       })
@@ -15803,93 +15897,93 @@ var kf = {
   consistent: "使用者已確認一致",
   conflict: "有衝突，待處理"
 };
-function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
-  const w = Hf(r.id, h), [x, A] = (0, g.useState)(null), [z, E] = (0, g.useState)(""), [S, K] = (0, g.useState)(""), [N, le] = (0, g.useState)(!1), [ne, I] = (0, g.useState)(""), [Q, re] = (0, g.useState)(""), [L, ie] = (0, g.useState)({}), [V, ee] = (0, g.useState)(""), [P, xe] = (0, g.useState)(""), [te, $] = (0, g.useState)(null), [j, W] = (0, g.useState)({}), [ge, he] = (0, g.useState)(!1), [b, ae] = (0, g.useState)(50), Z = (0, g.useCallback)(async () => {
+function Zx({ project: r, transport: h, onUpdated: C, onDirty: f, onBusy: p }) {
+  const k = Hf(r.id, h), [x, A] = (0, g.useState)(null), [N, _] = (0, g.useState)(""), [w, G] = (0, g.useState)(""), [z, le] = (0, g.useState)(!1), [ne, I] = (0, g.useState)(""), [X, oe] = (0, g.useState)(""), [q, ie] = (0, g.useState)({}), [H, F] = (0, g.useState)(""), [$, pe] = (0, g.useState)(""), [te, P] = (0, g.useState)(null), [y, ee] = (0, g.useState)({}), [ge, me] = (0, g.useState)(!1), [b, ae] = (0, g.useState)(50), K = (0, g.useCallback)(async () => {
     try {
-      A(await w("getProjectDrawings")), E("");
-    } catch (d) {
-      E(d.message);
+      A(await k("getProjectDrawings")), _("");
+    } catch (o) {
+      _(o.message);
     }
-  }, [w]);
+  }, [k]);
   (0, g.useEffect)(() => {
-    Z();
-  }, [Z]), (0, g.useEffect)(() => (f(!!Q), () => f(!1)), [Q, f]);
-  async function B(d, _) {
-    le(!0), p(!0), E("");
+    K();
+  }, [K]), (0, g.useEffect)(() => (f(!!X), () => f(!1)), [X, f]);
+  async function Y(o, j) {
+    le(!0), p(!0), _("");
     try {
-      const q = await w(d, {
+      const R = await k(o, {
         key: crypto.randomUUID(),
-        ..._
+        ...j
       }, x.revision);
-      return re(""), K("已保存，版本與稽核紀錄已保留"), k(), await Z(), q;
-    } catch (q) {
-      E(q.message);
+      return oe(""), G("已保存，版本與稽核紀錄已保留"), C(), await K(), R;
+    } catch (R) {
+      _(R.message);
     } finally {
       le(!1), p(!1);
     }
   }
-  function Y(d, _, q = !1, F = !1) {
+  function Q(o, j, R = !1, W = !1) {
     return /* @__PURE__ */ (0, l.jsxs)("label", {
       className: "form-field",
-      children: [_, F ? /* @__PURE__ */ (0, l.jsx)("textarea", {
-        required: q,
-        value: L[d] ?? "",
-        onChange: (de) => ie({
-          ...L,
-          [d]: de.target.value
+      children: [j, W ? /* @__PURE__ */ (0, l.jsx)("textarea", {
+        required: R,
+        value: q[o] ?? "",
+        onChange: (ce) => ie({
+          ...q,
+          [o]: ce.target.value
         })
       }) : /* @__PURE__ */ (0, l.jsx)("input", {
-        required: q,
+        required: R,
         maxLength: 300,
-        value: L[d] ?? "",
-        onChange: (de) => ie({
-          ...L,
-          [d]: de.target.value
+        value: q[o] ?? "",
+        onChange: (ce) => ie({
+          ...q,
+          [o]: ce.target.value
         })
       })]
     });
   }
-  function se(d, _, q, F = !0) {
+  function se(o, j, R, W = !0) {
     return /* @__PURE__ */ (0, l.jsxs)("label", {
       className: "form-field",
-      children: [_, /* @__PURE__ */ (0, l.jsxs)("select", {
-        required: !F,
-        value: L[d] ?? "",
-        onChange: (de) => ie({
-          ...L,
-          [d]: de.target.value
+      children: [j, /* @__PURE__ */ (0, l.jsxs)("select", {
+        required: !W,
+        value: q[o] ?? "",
+        onChange: (ce) => ie({
+          ...q,
+          [o]: ce.target.value
         }),
-        children: [F && /* @__PURE__ */ (0, l.jsx)("option", {
+        children: [W && /* @__PURE__ */ (0, l.jsx)("option", {
           value: "",
           children: "不指定"
-        }), q.map((de) => /* @__PURE__ */ (0, l.jsx)("option", {
-          value: de.id,
-          children: de.title
-        }, de.id))]
+        }), R.map((ce) => /* @__PURE__ */ (0, l.jsx)("option", {
+          value: ce.id,
+          children: ce.title
+        }, ce.id))]
       })]
     });
   }
-  function ce(d, _ = {}) {
+  function re(o, j = {}) {
     ie({
-      role: d === "relation" ? "related" : "reference",
+      role: o === "relation" ? "related" : "reference",
       status: "draft",
       checkState: "needs_check",
       assetId: x.files[0]?.id ?? "",
       from: x.nodes[0]?.id ?? "",
       to: x.nodes[1]?.id ?? "",
-      ..._
-    }), re(d), E("");
+      ...j
+    }), oe(o), _("");
   }
   async function _e() {
     le(!0);
     try {
-      const d = await w("getDrawingComparison", {
-        leftId: V,
-        rightId: P
+      const o = await k("getDrawingComparison", {
+        leftId: H,
+        rightId: $
       });
-      W(await od(r.id, [.../* @__PURE__ */ new Set([d.left.asset.id, d.right.asset.id])], h)), $(d), E("");
-    } catch (d) {
-      E(d.message);
+      ee(await od(r.id, [.../* @__PURE__ */ new Set([o.left.asset.id, o.right.asset.id])], h)), P(o), _("");
+    } catch (o) {
+      _(o.message);
     } finally {
       le(!1);
     }
@@ -15917,42 +16011,42 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
           children: [
             /* @__PURE__ */ (0, l.jsxs)("button", {
               className: "btn primary",
-              disabled: N || r.archived || !x.files.length,
-              onClick: () => ce("version"),
+              disabled: z || r.archived || !x.files.length,
+              onClick: () => re("version"),
               children: [/* @__PURE__ */ (0, l.jsx)(Ft, { size: 16 }), "新增版本"]
             }),
             /* @__PURE__ */ (0, l.jsxs)("button", {
               className: "btn",
-              disabled: N || r.archived || x.nodes.length < 2,
-              onClick: () => ce("relation"),
+              disabled: z || r.archived || x.nodes.length < 2,
+              onClick: () => re("relation"),
               children: [/* @__PURE__ */ (0, l.jsx)(on, { size: 16 }), "建立關聯"]
             }),
             /* @__PURE__ */ (0, l.jsx)("button", {
               className: "icon-btn",
               "aria-label": "重新整理圖說",
-              disabled: N,
+              disabled: z,
               onClick: () => {
-                Z();
+                K();
               },
-              children: /* @__PURE__ */ (0, l.jsx)(Nl, { size: 16 })
+              children: /* @__PURE__ */ (0, l.jsx)(Wa, { size: 16 })
             })
           ]
         })]
       }),
-      z && /* @__PURE__ */ (0, l.jsx)("p", {
+      N && /* @__PURE__ */ (0, l.jsx)("p", {
         role: "alert",
         className: "modal-error",
-        children: z
+        children: N
       }),
-      S && /* @__PURE__ */ (0, l.jsx)("p", {
+      w && /* @__PURE__ */ (0, l.jsx)("p", {
         role: "status",
-        children: S
+        children: w
       }),
       /* @__PURE__ */ (0, l.jsxs)("label", {
         className: "form-field",
         children: ["搜尋圖號、圖名與版本", /* @__PURE__ */ (0, l.jsx)("input", {
           value: ne,
-          onChange: (d) => I(d.target.value),
+          onChange: (o) => I(o.target.value),
           placeholder: "例如 A-201、人物正面、車身"
         })]
       }),
@@ -15962,38 +16056,38 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
       }),
       /* @__PURE__ */ (0, l.jsx)("div", {
         className: "drawing-grid",
-        children: x.drawings.filter((d) => !ne || [
-          d.number,
-          d.title,
-          d.version
-        ].join(" ").toLowerCase().includes(ne.toLowerCase())).map((d) => /* @__PURE__ */ (0, l.jsxs)("article", {
-          className: "wide-card drawing-card " + d.status,
+        children: x.drawings.filter((o) => !ne || [
+          o.number,
+          o.title,
+          o.version
+        ].join(" ").toLowerCase().includes(ne.toLowerCase())).map((o) => /* @__PURE__ */ (0, l.jsxs)("article", {
+          className: "wide-card drawing-card " + o.status,
           children: [
             /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "section-title",
               children: [/* @__PURE__ */ (0, l.jsxs)("h3", { children: [
-                d.number,
+                o.number,
                 " · ",
-                d.version
+                o.version
               ] }), /* @__PURE__ */ (0, l.jsx)("span", {
                 className: "status",
-                children: kf[d.status]
+                children: kf[o.status]
               })]
             }),
-            /* @__PURE__ */ (0, l.jsx)("b", { children: d.title }),
+            /* @__PURE__ */ (0, l.jsx)("b", { children: o.title }),
             /* @__PURE__ */ (0, l.jsx)("p", {
               className: "drawing-role",
-              children: ri[d.role]
+              children: ri[o.role]
             }),
-            /* @__PURE__ */ (0, l.jsx)("p", { children: d.reason }),
+            /* @__PURE__ */ (0, l.jsx)("p", { children: o.reason }),
             /* @__PURE__ */ (0, l.jsxs)("small", { children: [
-              new Date(d.createdAt).toLocaleString("zh-TW"),
+              new Date(o.createdAt).toLocaleString("zh-TW"),
               " · ",
-              d.by
+              o.by
             ] }),
-            /* @__PURE__ */ (0, l.jsxs)("p", { children: ["來源：", d.sourceName] }),
-            d.recordId && /* @__PURE__ */ (0, l.jsxs)("p", { children: ["工作紀錄：", x.records.find((_) => _.id === d.recordId)?.summary ?? "原連結紀錄已回收，待核對"] }),
-            !d.sourceAvailable && /* @__PURE__ */ (0, l.jsx)("p", {
+            /* @__PURE__ */ (0, l.jsxs)("p", { children: ["來源：", o.sourceName] }),
+            o.recordId && /* @__PURE__ */ (0, l.jsxs)("p", { children: ["工作紀錄：", x.records.find((j) => j.id === o.recordId)?.summary ?? "原連結紀錄已回收，待核對"] }),
+            !o.sourceAvailable && /* @__PURE__ */ (0, l.jsx)("p", {
               className: "red-text",
               children: "來源素材已回收或缺少，待核對；未自動替換基準。"
             }),
@@ -16002,12 +16096,12 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
               children: [
                 /* @__PURE__ */ (0, l.jsx)("button", {
                   className: "text-btn",
-                  disabled: N || r.archived,
-                  onClick: () => ce("version", {
-                    number: d.number,
-                    title: d.title,
-                    previousVersionId: d.id,
-                    role: d.role,
+                  disabled: z || r.archived,
+                  onClick: () => re("version", {
+                    number: o.number,
+                    title: o.title,
+                    previousVersionId: o.id,
+                    role: o.role,
                     version: "",
                     reason: ""
                   }),
@@ -16015,30 +16109,30 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
                 }),
                 /* @__PURE__ */ (0, l.jsx)("button", {
                   className: "text-btn",
-                  disabled: N || r.archived || d.status === "adopted",
-                  onClick: () => ce("status", {
-                    drawingId: d.id,
-                    status: d.status,
+                  disabled: z || r.archived || o.status === "adopted",
+                  onClick: () => re("status", {
+                    drawingId: o.id,
+                    status: o.status,
                     reason: ""
                   }),
                   children: "變更狀態"
                 }),
                 /* @__PURE__ */ (0, l.jsx)("button", {
                   className: "text-btn",
-                  disabled: N || r.archived || !h || !d.sourceAvailable || d.status === "adopted",
-                  onClick: () => ce("adopt", {
-                    drawingId: d.id,
-                    currentBaselineId: x.drawings.find((_) => _.number === d.number && _.role === d.role && _.status === "adopted")?.id ?? "",
+                  disabled: z || r.archived || !h || !o.sourceAvailable || o.status === "adopted",
+                  onClick: () => re("adopt", {
+                    drawingId: o.id,
+                    currentBaselineId: x.drawings.find((j) => j.number === o.number && j.role === o.role && j.status === "adopted")?.id ?? "",
                     reason: "",
-                    title: d.number + " " + d.version,
-                    role: d.role
+                    title: o.number + " " + o.version,
+                    role: o.role
                   }),
                   children: "設為正式基準"
                 })
               ]
             })
           ]
-        }, d.id))
+        }, o.id))
       }),
       /* @__PURE__ */ (0, l.jsxs)("section", {
         className: "wide-card",
@@ -16049,42 +16143,42 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
             children: "關聯不等於幾何一致。來源回收、衝突或尚未確認時保留「待核對」。未來模型可透過本專案的成果引用建立關聯。"
           }),
           !x.relations.length && /* @__PURE__ */ (0, l.jsx)("p", { children: "尚未建立關聯。" }),
-          x.relations.map((d) => /* @__PURE__ */ (0, l.jsxs)("article", {
+          x.relations.map((o) => /* @__PURE__ */ (0, l.jsxs)("article", {
             className: "journal-card",
             children: [
               /* @__PURE__ */ (0, l.jsxs)("b", { children: [
-                d.fromNode?.title ?? d.from,
+                o.fromNode?.title ?? o.from,
                 " ↔ ",
-                d.toNode?.title ?? d.to
+                o.toNode?.title ?? o.to
               ] }),
               /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-                ri[d.role],
+                ri[o.role],
                 " · ",
-                _f[d.effectiveCheckState]
+                _f[o.effectiveCheckState]
               ] }),
-              /* @__PURE__ */ (0, l.jsx)("p", { children: d.note }),
+              /* @__PURE__ */ (0, l.jsx)("p", { children: o.note }),
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "text-btn",
-                disabled: N || r.archived,
-                onClick: () => ce("relation", {
-                  ...d,
-                  relationId: d.id
+                disabled: z || r.archived,
+                onClick: () => re("relation", {
+                  ...o,
+                  relationId: o.id
                 }),
                 children: "修改／核對關聯"
               }),
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "text-btn danger",
-                disabled: N || r.archived,
+                disabled: z || r.archived,
                 onClick: () => {
-                  window.confirm("移除此關聯？原圖及版本仍保留。") && B("manageAssetRelations", {
+                  window.confirm("移除此關聯？原圖及版本仍保留。") && Y("manageAssetRelations", {
                     action: "remove",
-                    relationId: d.id
+                    relationId: o.id
                   });
                 },
                 children: "移除關聯"
               })
             ]
-          }, d.id))
+          }, o.id))
         ]
       }),
       /* @__PURE__ */ (0, l.jsxs)("section", {
@@ -16096,43 +16190,43 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
             children: [
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["左側版本", /* @__PURE__ */ (0, l.jsxs)("select", {
                 "aria-label": "比較左側版本",
-                value: V,
-                onChange: (d) => ee(d.target.value),
+                value: H,
+                onChange: (o) => F(o.target.value),
                 children: [/* @__PURE__ */ (0, l.jsx)("option", {
                   value: "",
                   children: "選擇版本"
-                }), x.drawings.map((d) => /* @__PURE__ */ (0, l.jsxs)("option", {
-                  value: d.id,
+                }), x.drawings.map((o) => /* @__PURE__ */ (0, l.jsxs)("option", {
+                  value: o.id,
                   children: [
-                    d.number,
+                    o.number,
                     " ",
-                    d.version,
+                    o.version,
                     " · ",
-                    d.title
+                    o.title
                   ]
-                }, d.id))]
+                }, o.id))]
               })] }),
               /* @__PURE__ */ (0, l.jsxs)("label", { children: ["右側版本", /* @__PURE__ */ (0, l.jsxs)("select", {
                 "aria-label": "比較右側版本",
-                value: P,
-                onChange: (d) => xe(d.target.value),
+                value: $,
+                onChange: (o) => pe(o.target.value),
                 children: [/* @__PURE__ */ (0, l.jsx)("option", {
                   value: "",
                   children: "選擇版本"
-                }), x.drawings.map((d) => /* @__PURE__ */ (0, l.jsxs)("option", {
-                  value: d.id,
+                }), x.drawings.map((o) => /* @__PURE__ */ (0, l.jsxs)("option", {
+                  value: o.id,
                   children: [
-                    d.number,
+                    o.number,
                     " ",
-                    d.version,
+                    o.version,
                     " · ",
-                    d.title
+                    o.title
                   ]
-                }, d.id))]
+                }, o.id))]
               })] }),
               /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn primary",
-                disabled: N || !V || !P || V === P,
+                disabled: z || !H || !$ || H === $,
                 onClick: () => {
                   _e();
                 },
@@ -16145,12 +16239,12 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
               className: "heading-actions",
               children: [/* @__PURE__ */ (0, l.jsxs)("button", {
                 className: "btn",
-                onClick: () => he(!1),
+                onClick: () => me(!1),
                 children: [/* @__PURE__ */ (0, l.jsx)(wm, { size: 16 }), "左右並排"]
               }), /* @__PURE__ */ (0, l.jsxs)("button", {
                 className: "btn",
-                disabled: [te.left.asset, te.right.asset].some((d) => d.mime === "application/pdf"),
-                onClick: () => he(!0),
+                disabled: [te.left.asset, te.right.asset].some((o) => o.mime === "application/pdf"),
+                onClick: () => me(!0),
                 children: [/* @__PURE__ */ (0, l.jsx)(Mf, { size: 16 }), "透明度疊圖"]
               })]
             }),
@@ -16173,48 +16267,48 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
                 min: "0",
                 max: "100",
                 value: b,
-                onChange: (d) => ae(Number(d.target.value))
+                onChange: (o) => ae(Number(o.target.value))
               })
             ] }),
             /* @__PURE__ */ (0, l.jsx)("div", {
               className: ge ? "drawing-overlay" : "drawing-side-by-side",
-              children: [te.left, te.right].map((d, _) => /* @__PURE__ */ (0, l.jsxs)("div", {
+              children: [te.left, te.right].map((o, j) => /* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "drawing-compare-image",
-                style: ge ? { opacity: _ ? b / 100 : 1 } : void 0,
+                style: ge ? { opacity: j ? b / 100 : 1 } : void 0,
                 children: [/* @__PURE__ */ (0, l.jsxs)("b", { children: [
-                  d.drawing.number,
+                  o.drawing.number,
                   " ",
-                  d.drawing.version,
+                  o.drawing.version,
                   " · ",
-                  ri[d.drawing.role]
-                ] }), d.asset.mime === "application/pdf" ? /* @__PURE__ */ (0, l.jsx)("iframe", {
+                  ri[o.drawing.role]
+                ] }), o.asset.mime === "application/pdf" ? /* @__PURE__ */ (0, l.jsx)("iframe", {
                   sandbox: "",
-                  title: d.drawing.title,
-                  src: j[d.asset.id]
+                  title: o.drawing.title,
+                  src: y[o.asset.id]
                 }) : /* @__PURE__ */ (0, l.jsx)("img", {
-                  src: j[d.asset.id],
-                  alt: d.drawing.title + " " + d.drawing.version
+                  src: y[o.asset.id],
+                  alt: o.drawing.title + " " + o.drawing.version
                 })]
-              }, _))
+              }, j))
             }),
             /* @__PURE__ */ (0, l.jsx)("p", {
               className: "muted",
               children: "顯示比例依容器調整，只供人工視覺比較，不作尺寸量測或自動驗收。PDF支援並排預覽，疊圖僅支援圖片。"
             }),
             /* @__PURE__ */ (0, l.jsx)("h4", { children: "修改說明" }),
-            te.notes.map((d, _) => /* @__PURE__ */ (0, l.jsx)("p", { children: d }, _)),
+            te.notes.map((o, j) => /* @__PURE__ */ (0, l.jsx)("p", { children: o }, j)),
             /* @__PURE__ */ (0, l.jsx)("h4", { children: "相關待處理事項" }),
-            te.issues.length ? te.issues.map((d) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-              d.title,
+            te.issues.length ? te.issues.map((o) => /* @__PURE__ */ (0, l.jsxs)("p", { children: [
+              o.title,
               "：",
-              d.detail
-            ] }, d.id)) : /* @__PURE__ */ (0, l.jsx)("p", { children: "目前沒有登記未結問題。" }),
+              o.detail
+            ] }, o.id)) : /* @__PURE__ */ (0, l.jsx)("p", { children: "目前沒有登記未結問題。" }),
             /* @__PURE__ */ (0, l.jsx)("button", {
               className: "text-btn",
               disabled: r.archived,
-              onClick: () => ce("relation", {
-                from: "drawing:" + V,
-                to: "drawing:" + P,
+              onClick: () => re("relation", {
+                from: "drawing:" + H,
+                to: "drawing:" + $,
                 note: "人工比對觀察：",
                 checkState: "needs_check"
               }),
@@ -16225,23 +16319,23 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
       }),
       /* @__PURE__ */ (0, l.jsxs)("details", {
         className: "wide-card",
-        children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "圖說版本與基準異動紀錄" }), [...x.history].reverse().map((d, _) => /* @__PURE__ */ (0, l.jsxs)("article", {
+        children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "圖說版本與基準異動紀錄" }), [...x.history].reverse().map((o, j) => /* @__PURE__ */ (0, l.jsxs)("article", {
           className: "journal-card",
           children: [
-            /* @__PURE__ */ (0, l.jsx)("b", { children: d.action }),
+            /* @__PURE__ */ (0, l.jsx)("b", { children: o.action }),
             /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-              d.at,
+              o.at,
               " · ",
-              d.by
+              o.by
             ] }),
             /* @__PURE__ */ (0, l.jsx)("pre", {
               className: "hub-json",
-              children: d.detail
+              children: o.detail
             })
           ]
-        }, _))]
+        }, j))]
       }),
-      Q && /* @__PURE__ */ (0, l.jsx)("div", {
+      X && /* @__PURE__ */ (0, l.jsx)("div", {
         className: "modal-backdrop",
         children: /* @__PURE__ */ (0, l.jsxs)("section", {
           className: "modal",
@@ -16255,37 +16349,37 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
               relation: "圖說與素材關聯",
               status: "版本狀態",
               adopt: "核定正式基準"
-            }[Q] }), /* @__PURE__ */ (0, l.jsx)("button", {
+            }[X] }), /* @__PURE__ */ (0, l.jsx)("button", {
               className: "icon-btn",
-              disabled: N,
-              onClick: () => re(""),
+              disabled: z,
+              onClick: () => oe(""),
               "aria-label": "關閉圖說表單",
-              children: /* @__PURE__ */ (0, l.jsx)(yl, { size: 18 })
+              children: /* @__PURE__ */ (0, l.jsx)(Sl, { size: 18 })
             })]
           }), /* @__PURE__ */ (0, l.jsxs)("form", {
-            onSubmit: (d) => {
-              d.preventDefault(), Q === "version" && B("createDrawingVersion", L), Q === "status" && B("updateDrawingStatus", L), Q === "relation" && B("manageAssetRelations", {
-                ...L,
-                action: L.relationId ? "update" : "create"
-              }), Q === "adopt" && B("adoptDrawingBaseline", L);
+            onSubmit: (o) => {
+              o.preventDefault(), X === "version" && Y("createDrawingVersion", q), X === "status" && Y("updateDrawingStatus", q), X === "relation" && Y("manageAssetRelations", {
+                ...q,
+                action: q.relationId ? "update" : "create"
+              }), X === "adopt" && Y("adoptDrawingBaseline", q);
             },
             children: [
-              Q === "version" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
-                Y("number", "圖號", !0),
-                Y("title", "圖名", !0),
-                Y("version", "版本號（例如 R00、R01）", !0),
-                Y("reason", "建立／修改原因", !0, !0),
-                se("assetId", "來源素材", x.files.map((d) => ({
-                  id: d.id,
-                  title: d.name
+              X === "version" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+                Q("number", "圖號", !0),
+                Q("title", "圖名", !0),
+                Q("version", "版本號（例如 R00、R01）", !0),
+                Q("reason", "建立／修改原因", !0, !0),
+                se("assetId", "來源素材", x.files.map((o) => ({
+                  id: o.id,
+                  title: o.name
                 })), !1),
-                se("recordId", "相關工作紀錄", x.records.map((d) => ({
-                  id: d.id,
-                  title: d.summary
+                se("recordId", "相關工作紀錄", x.records.map((o) => ({
+                  id: o.id,
+                  title: o.summary
                 }))),
-                se("role", "依據角色", Object.entries(ri).filter(([d]) => d !== "related").map(([d, _]) => ({
-                  id: d,
-                  title: _
+                se("role", "依據角色", Object.entries(ri).filter(([o]) => o !== "related").map(([o, j]) => ({
+                  id: o,
+                  title: j
                 })), !1),
                 se("status", "初始狀態", [{
                   id: "draft",
@@ -16294,49 +16388,49 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
                   id: "candidate",
                   title: "待確認候選"
                 }], !1)
-              ] }) : Q === "relation" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+              ] }) : X === "relation" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                 se("from", "關聯來源", x.nodes, !1),
                 se("to", "關聯對象", x.nodes, !1),
-                se("role", "關聯用途", Object.entries(ri).filter(([d]) => d !== "reference").map(([d, _]) => ({
-                  id: d,
-                  title: _
+                se("role", "關聯用途", Object.entries(ri).filter(([o]) => o !== "reference").map(([o, j]) => ({
+                  id: o,
+                  title: j
                 })), !1),
-                se("checkState", "人工核對狀態", Object.entries(_f).map(([d, _]) => ({
-                  id: d,
-                  title: _
+                se("checkState", "人工核對狀態", Object.entries(_f).map(([o, j]) => ({
+                  id: o,
+                  title: j
                 })), !1),
-                Y("note", "關聯／差異與修改說明", !1, !0)
-              ] }) : Q === "status" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [se("status", "狀態", Object.entries(kf).filter(([d]) => d !== "adopted").map(([d, _]) => ({
-                id: d,
-                title: _
-              })), !1), Y("reason", "變更原因", !0, !0)] }) : /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+                Q("note", "關聯／差異與修改說明", !1, !0)
+              ] }) : X === "status" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [se("status", "狀態", Object.entries(kf).filter(([o]) => o !== "adopted").map(([o, j]) => ({
+                id: o,
+                title: j
+              })), !1), Q("reason", "變更原因", !0, !0)] }) : /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                 /* @__PURE__ */ (0, l.jsxs)("p", { children: [
                   "將 ",
-                  L.title,
+                  q.title,
                   " 設為「",
-                  ri[L.role],
+                  ri[q.role],
                   "」的正式基準。同圖號同角色的原基準會保留為歷史版；其他角色的基準不受影響。"
                 ] }),
                 /* @__PURE__ */ (0, l.jsx)("p", { children: "請先人工檢查來源、幾何或外觀用途。這是使用者核定，AI不能代為批准。" }),
-                Y("reason", "正式採用／變更原因", !0, !0)
+                Q("reason", "正式採用／變更原因", !0, !0)
               ] }),
-              z && /* @__PURE__ */ (0, l.jsx)("p", {
+              N && /* @__PURE__ */ (0, l.jsx)("p", {
                 role: "alert",
                 className: "modal-error",
-                children: z
+                children: N
               }),
               /* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "modal-actions",
                 children: [/* @__PURE__ */ (0, l.jsx)("button", {
                   className: "btn",
-                  disabled: N,
+                  disabled: z,
                   type: "button",
-                  onClick: () => re(""),
+                  onClick: () => oe(""),
                   children: "取消"
                 }), /* @__PURE__ */ (0, l.jsx)("button", {
                   className: "btn primary",
-                  disabled: N,
-                  children: Q === "adopt" ? "本人確認採用此基準" : "保存並保留歷史"
+                  disabled: z,
+                  children: X === "adopt" ? "本人確認採用此基準" : "保存並保留歷史"
                 })]
               })
             ]
@@ -16346,47 +16440,47 @@ function Qx({ project: r, transport: h, onUpdated: k, onDirty: f, onBusy: p }) {
     ]
   }) : /* @__PURE__ */ (0, l.jsx)("section", {
     className: "wide-card",
-    children: z ? /* @__PURE__ */ (0, l.jsx)("p", {
+    children: N ? /* @__PURE__ */ (0, l.jsx)("p", {
       role: "alert",
-      children: z
+      children: N
     }) : "讀取圖說版本…"
   });
 }
-var Xx = {
+var Kx = {
   project: "專案",
   record: "工作紀錄",
   image: "圖片",
   folder: "資料夾"
 };
-function Zx({ request: r, onChange: h }) {
-  const [k, f] = (0, g.useState)(null), [p, w] = (0, g.useState)(!1), [x, A] = (0, g.useState)(""), [z, E] = (0, g.useState)("");
-  async function S() {
-    w(!0);
+function Jx({ request: r, onChange: h }) {
+  const [C, f] = (0, g.useState)(null), [p, k] = (0, g.useState)(!1), [x, A] = (0, g.useState)(""), [N, _] = (0, g.useState)("");
+  async function w() {
+    k(!0);
     try {
       f(await r("trash", "")), A("");
-    } catch (N) {
-      A(N.message);
+    } catch (z) {
+      A(z.message);
     } finally {
-      w(!1);
+      k(!1);
     }
   }
   (0, g.useEffect)(() => {
-    S();
+    w();
   }, [r]);
-  async function K(N, le) {
+  async function G(z, le) {
     let ne = "";
-    if (!(le === "purge" && (ne = window.prompt("永久刪除「" + N.title + "」後無法從工作台還原。既有備份與異動歷史仍保留。請輸入「永久刪除」確認。") ?? "", ne !== "永久刪除"))) {
-      w(!0), A("");
+    if (!(le === "purge" && (ne = window.prompt("永久刪除「" + z.title + "」後無法從工作台還原。既有備份與異動歷史仍保留。請輸入「永久刪除」確認。") ?? "", ne !== "永久刪除"))) {
+      k(!0), A("");
       try {
         f(await r("trash", "", {
           action: le,
-          trashId: N.id,
-          projectId: N.projectId,
-          projectRevision: N.projectRevision,
-          revision: k?.revision,
+          trashId: z.id,
+          projectId: z.projectId,
+          projectRevision: z.projectRevision,
+          revision: C?.revision,
           key: crypto.randomUUID(),
           confirm: ne
-        })), E(le === "restore" ? "已還原，原有資料已保留" : "已永久刪除此項目"), h();
+        })), _(le === "restore" ? "已還原，原有資料已保留" : "已永久刪除此項目"), h();
       } catch (I) {
         A(I.message);
         try {
@@ -16394,7 +16488,7 @@ function Zx({ request: r, onChange: h }) {
         } catch {
         }
       } finally {
-        w(!1);
+        k(!1);
       }
     }
   }
@@ -16403,13 +16497,13 @@ function Zx({ request: r, onChange: h }) {
     children: [
       /* @__PURE__ */ (0, l.jsxs)("div", {
         className: "section-title",
-        children: [/* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("h1", { children: [/* @__PURE__ */ (0, l.jsx)(jl, { size: 24 }), "垃圾桶"] }), /* @__PURE__ */ (0, l.jsx)("p", { children: "刪除的專案、圖片和紀錄會先留在這裡，可以還原。永久刪除需再次確認。" })] }), /* @__PURE__ */ (0, l.jsxs)("button", {
+        children: [/* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("h1", { children: [/* @__PURE__ */ (0, l.jsx)(yl, { size: 24 }), "垃圾桶"] }), /* @__PURE__ */ (0, l.jsx)("p", { children: "刪除的專案、圖片和紀錄會先留在這裡，可以還原。永久刪除需再次確認。" })] }), /* @__PURE__ */ (0, l.jsxs)("button", {
           className: "btn",
           disabled: p,
           onClick: () => {
-            S();
+            w();
           },
-          children: [/* @__PURE__ */ (0, l.jsx)(Nl, { size: 16 }), "重新整理"]
+          children: [/* @__PURE__ */ (0, l.jsx)(Wa, { size: 16 }), "重新整理"]
         })]
       }),
       x && /* @__PURE__ */ (0, l.jsx)("p", {
@@ -16417,41 +16511,41 @@ function Zx({ request: r, onChange: h }) {
         className: "modal-error",
         children: x
       }),
-      z && /* @__PURE__ */ (0, l.jsx)("p", {
+      N && /* @__PURE__ */ (0, l.jsx)("p", {
         role: "status",
-        children: z
+        children: N
       }),
-      k && !k.items.length && /* @__PURE__ */ (0, l.jsx)("div", {
+      C && !C.items.length && /* @__PURE__ */ (0, l.jsx)("div", {
         className: "empty",
         children: "垃圾桶是空的。"
       }),
-      !k && !x && /* @__PURE__ */ (0, l.jsx)("p", { children: "讀取中…" }),
-      k?.items.map((N) => /* @__PURE__ */ (0, l.jsxs)("article", {
+      !C && !x && /* @__PURE__ */ (0, l.jsx)("p", { children: "讀取中…" }),
+      C?.items.map((z) => /* @__PURE__ */ (0, l.jsxs)("article", {
         className: "journal-card",
         children: [
           /* @__PURE__ */ (0, l.jsx)("span", {
             className: "status",
-            children: Xx[N.kind]
+            children: Kx[z.kind]
           }),
-          /* @__PURE__ */ (0, l.jsx)("h3", { children: N.title }),
+          /* @__PURE__ */ (0, l.jsx)("h3", { children: z.title }),
           /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-            N.projectName,
+            z.projectName,
             " · ",
-            new Date(N.at).toLocaleString("zh-TW", { timeZone: "Asia/Taipei" })
+            new Date(z.at).toLocaleString("zh-TW", { timeZone: "Asia/Taipei" })
           ] }),
-          N.retainUntil && /* @__PURE__ */ (0, l.jsxs)("p", {
+          z.retainUntil && /* @__PURE__ */ (0, l.jsxs)("p", {
             className: "muted",
-            children: ["至少保留至 ", new Date(N.retainUntil).toLocaleDateString("zh-TW")]
+            children: ["至少保留至 ", new Date(z.retainUntil).toLocaleDateString("zh-TW")]
           }),
-          N.parentDeleted && /* @__PURE__ */ (0, l.jsx)("p", {
+          z.parentDeleted && /* @__PURE__ */ (0, l.jsx)("p", {
             className: "muted",
             children: "請先還原所屬專案，再處理此項目。"
           }),
-          N.purging && /* @__PURE__ */ (0, l.jsx)("p", {
+          z.purging && /* @__PURE__ */ (0, l.jsx)("p", {
             role: "status",
             children: "原圖永久刪除清理尚未完成；可以重試清理，無法還原。"
           }),
-          !N.canPurge && /* @__PURE__ */ (0, l.jsx)("p", {
+          !z.canPurge && /* @__PURE__ */ (0, l.jsx)("p", {
             className: "muted",
             children: "此專案連結動畫專業資料，或仍有圖片／垃圾桶項目。請保留於垃圾桶，或還原後先整理內容。"
           }),
@@ -16459,22 +16553,22 @@ function Zx({ request: r, onChange: h }) {
             className: "heading-actions",
             children: [/* @__PURE__ */ (0, l.jsxs)("button", {
               className: "btn",
-              disabled: p || N.parentDeleted || N.purging,
+              disabled: p || z.parentDeleted || z.purging,
               onClick: () => {
-                K(N, "restore");
+                G(z, "restore");
               },
               children: [/* @__PURE__ */ (0, l.jsx)(Of, { size: 16 }), "還原"]
             }), /* @__PURE__ */ (0, l.jsxs)("button", {
               className: "btn danger",
-              disabled: p || N.parentDeleted || !N.canPurge || !!N.retainUntil && Date.now() < Date.parse(N.retainUntil),
+              disabled: p || z.parentDeleted || !z.canPurge || !!z.retainUntil && Date.now() < Date.parse(z.retainUntil),
               onClick: () => {
-                K(N, "purge");
+                G(z, "purge");
               },
-              children: [/* @__PURE__ */ (0, l.jsx)(jl, { size: 16 }), N.purging ? "重試永久刪除" : "永久刪除"]
+              children: [/* @__PURE__ */ (0, l.jsx)(yl, { size: 16 }), z.purging ? "重試永久刪除" : "永久刪除"]
             })]
           })
         ]
-      }, N.id))
+      }, z.id))
     ]
   });
 }
@@ -16512,117 +16606,117 @@ function Cf({ url: r, children: h }) {
     children: r
   })] });
 }
-function Kx({ nativeTransport: r } = {}) {
-  const [h, k] = (0, g.useState)([]), [f, p] = (0, g.useState)(null), [w, x] = (0, g.useState)("overview"), [A, z] = (0, g.useState)(""), [E, S] = (0, g.useState)("resume"), [K, N] = (0, g.useState)(""), [le, ne] = (0, g.useState)(!0), [I, Q] = (0, g.useState)(!1), [re, L] = (0, g.useState)(""), [ie, V] = (0, g.useState)(""), [ee, P] = (0, g.useState)(""), [xe, te] = (0, g.useState)(!1), [$, j] = (0, g.useState)(!1), [W, ge] = (0, g.useState)(""), [he, b] = (0, g.useState)({}), [ae, Z] = (0, g.useState)(!1), [B, Y] = (0, g.useState)(!1), se = (0, g.useRef)(""), ce = (0, g.useRef)(0), _e = (0, g.useRef)(""), d = (0, g.useRef)(!1);
-  _e.current = W;
-  const _ = (0, g.useCallback)((o) => {
-    d.current = o;
-  }, []), q = (0, g.useCallback)(async (o, H, oe) => {
-    const He = r ? await r(o, H, oe) : await fetch("/api/" + o + H, {
+function Ix({ nativeTransport: r } = {}) {
+  const [h, C] = (0, g.useState)([]), [f, p] = (0, g.useState)(null), [k, x] = (0, g.useState)("overview"), [A, N] = (0, g.useState)(""), [_, w] = (0, g.useState)("resume"), [G, z] = (0, g.useState)(""), [le, ne] = (0, g.useState)(!0), [I, X] = (0, g.useState)(!1), [oe, q] = (0, g.useState)(""), [ie, H] = (0, g.useState)(""), [F, $] = (0, g.useState)(""), [pe, te] = (0, g.useState)(!1), [P, y] = (0, g.useState)(!1), [ee, ge] = (0, g.useState)(""), [me, b] = (0, g.useState)({}), [ae, K] = (0, g.useState)(!1), [Y, Q] = (0, g.useState)(!1), se = (0, g.useRef)(""), re = (0, g.useRef)(0), _e = (0, g.useRef)(""), o = (0, g.useRef)(!1);
+  _e.current = ee;
+  const j = (0, g.useCallback)((d) => {
+    o.current = d;
+  }, []), R = (0, g.useCallback)(async (d, B, ue) => {
+    const He = r ? await r(d, B, ue) : await fetch("/api/" + d + B, {
       cache: "no-store",
-      ...oe ? {
+      ...ue ? {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(oe)
+        body: JSON.stringify(ue)
       } : {}
     });
     if (!He.headers.get("content-type")?.includes("application/json")) throw Error("請先登入立之雲端庫");
     const T = await He.json();
     if (!He.ok) throw Error(T.error || "讀取失敗");
     return T;
-  }, [r]), F = (0, g.useCallback)(async (o = se.current) => {
-    const H = ++ce.current;
+  }, [r]), W = (0, g.useCallback)(async (d = se.current) => {
+    const B = ++re.current;
     try {
-      const oe = await q("workspace", "?view=managed"), He = o ? await q("workspace", "?view=managed&id=" + encodeURIComponent(o)) : null;
-      if (H !== ce.current) return;
-      k(oe), _e.current || p(He), L("");
-    } catch (oe) {
-      H === ce.current && L(oe.message);
+      const ue = await R("workspace", "?view=managed"), He = d ? await R("workspace", "?view=managed&id=" + encodeURIComponent(d)) : null;
+      if (B !== re.current) return;
+      C(ue), _e.current || p(He), q("");
+    } catch (ue) {
+      B === re.current && q(ue.message);
     } finally {
-      H === ce.current && ne(!1);
+      B === re.current && ne(!1);
     }
-  }, [q]);
+  }, [R]);
   (0, g.useEffect)(() => {
-    F();
-    const o = setInterval(() => {
-      !_e.current && !d.current && F();
+    W();
+    const d = setInterval(() => {
+      !_e.current && !o.current && W();
     }, 3e4);
-    return () => clearInterval(o);
-  }, [F]), (0, g.useEffect)(() => {
-    if (!W) return;
-    const o = (H) => H.preventDefault();
-    return window.addEventListener("beforeunload", o), () => window.removeEventListener("beforeunload", o);
+    return () => clearInterval(d);
   }, [W]), (0, g.useEffect)(() => {
+    if (!ee) return;
+    const d = (B) => B.preventDefault();
+    return window.addEventListener("beforeunload", d), () => window.removeEventListener("beforeunload", d);
+  }, [ee]), (0, g.useEffect)(() => {
     if (!ie) return;
-    const o = setTimeout(() => V(""), 4500);
-    return () => clearTimeout(o);
+    const d = setTimeout(() => H(""), 4500);
+    return () => clearTimeout(d);
   }, [ie]);
-  async function de(o) {
-    se.current = o, p(null), ne(!0), x("overview"), Z(!1), await F(o);
+  async function ce(d) {
+    se.current = d, p(null), ne(!0), x("overview"), K(!1), await W(d);
   }
-  function fe() {
-    d.current && !window.confirm("有尚未保存的圖片表單，確定離開？") || (d.current = !1, se.current = "", ce.current++, p(null), z(""), Z(!1), Y(!1), F(""));
+  function he() {
+    o.current && !window.confirm("有尚未保存的圖片表單，確定離開？") || (o.current = !1, se.current = "", re.current++, p(null), N(""), K(!1), Q(!1), W(""));
   }
-  function ue(o, H = {}) {
-    L(""), b({
+  function de(d, B = {}) {
+    q(""), b({
       key: crypto.randomUUID(),
       type: "software",
-      status: o === "record" ? "NOT_TESTED" : "PLANNED",
+      status: d === "record" ? "NOT_TESTED" : "PLANNED",
       mode: "not_run",
       stageId: f?.stages[0]?.id ?? "",
       evidenceIds: [],
       sourceIds: [],
-      ...H
-    }), ge(o);
+      ...B
+    }), ge(d);
   }
-  async function Ge(o, H) {
-    if (!(!f && o !== "createManagedProject")) {
-      ce.current++, Q(!0);
+  async function Ge(d, B) {
+    if (!(!f && d !== "createManagedProject")) {
+      re.current++, X(!0);
       try {
-        const oe = await q("workspace", "", {
-          action: o,
+        const ue = await R("workspace", "", {
+          action: d,
           id: f?.id,
           revision: f?.revision,
-          args: H
+          args: B
         });
-        return se.current = oe.id, p(oe), ge(""), _e.current = "", V("已保存並讀回最新專案"), await F(oe.id), oe;
-      } catch (oe) {
-        L(oe.message);
+        return se.current = ue.id, p(ue), ge(""), _e.current = "", H("已保存並讀回最新專案"), await W(ue.id), ue;
+      } catch (ue) {
+        q(ue.message);
       } finally {
-        Q(!1);
+        X(!1);
       }
     }
   }
-  async function ze(o, H) {
-    if (!(!f || I) && !(d.current && !window.confirm("有尚未儲存的修改，確定放棄？")) && window.confirm("將此" + {
+  async function ze(d, B) {
+    if (!(!f || I) && !(o.current && !window.confirm("有尚未儲存的修改，確定放棄？")) && window.confirm("將此" + {
       project: "專案",
       record: "紀錄",
       image: "圖片"
-    }[o] + "移到垃圾桶？之後可以還原。")) {
-      d.current = !1, Q(!0), ce.current++;
+    }[d] + "移到垃圾桶？之後可以還原。")) {
+      o.current = !1, X(!0), re.current++;
       try {
-        const oe = await q("trash", "");
-        await q("trash", "", {
+        const ue = await R("trash", "");
+        await R("trash", "", {
           action: "trash",
-          kind: o,
+          kind: d,
           projectId: f.id,
-          targetId: H,
+          targetId: B,
           projectRevision: f.revision,
-          revision: oe.revision,
+          revision: ue.revision,
           key: crypto.randomUUID()
-        }), o === "project" && (se.current = "", p(null), Y(!0)), await F(se.current), V("已移到垃圾桶，可隨時還原");
-      } catch (oe) {
-        L(oe.message);
+        }), d === "project" && (se.current = "", p(null), Q(!0)), await W(se.current), H("已移到垃圾桶，可隨時還原");
+      } catch (ue) {
+        q(ue.message);
       } finally {
-        Q(!1);
+        X(!1);
       }
     }
   }
-  async function dt(o) {
-    o.preventDefault(), await Ge({
+  async function dt(d) {
+    d.preventDefault(), await Ge({
       create: "createManagedProject",
       stage: "createProjectStage",
-      task: he.taskId ? "updateProjectTask" : "createProjectTask",
+      task: me.taskId ? "updateProjectTask" : "createProjectTask",
       record: "appendWorkRecord",
       artifact: "registerProjectArtifact",
       source: "registerProjectSource",
@@ -16630,93 +16724,93 @@ function Kx({ nativeTransport: r } = {}) {
       resolve: "resolveProjectIssue",
       edit: "updateManagedProject",
       restore: "restoreProjectBackup"
-    }[W], {
-      ...he,
-      ...W === "stage" ? { stageKey: he.stageKey || he.key } : W === "task" ? { taskKey: he.taskKey || he.key } : W === "artifact" ? { artifactKey: he.artifactKey || he.key } : W === "source" ? { sourceKey: he.sourceKey || he.key } : W === "issue" ? { issueKey: he.issueKey || he.key } : {}
+    }[ee], {
+      ...me,
+      ...ee === "stage" ? { stageKey: me.stageKey || me.key } : ee === "task" ? { taskKey: me.taskKey || me.key } : ee === "artifact" ? { artifactKey: me.artifactKey || me.key } : ee === "source" ? { sourceKey: me.sourceKey || me.key } : ee === "issue" ? { issueKey: me.issueKey || me.key } : {}
     });
   }
   async function Xe() {
     if (f) {
-      Q(!0);
+      X(!0);
       try {
-        const o = await q("workspace", "?view=managed&id=" + f.id);
-        let H = null;
+        const d = await R("workspace", "?view=managed&id=" + f.id);
+        let B = null;
         if (f.animation) {
-          const T = await q("works", "?id=" + f.animation.workId), we = [];
-          for (const Ze of f.animation.episodes) we.push(await q("projects", "?id=" + Ze.id));
-          H = {
+          const T = await R("works", "?id=" + f.animation.workId), we = [];
+          for (const Ze of f.animation.episodes) we.push(await R("projects", "?id=" + Ze.id));
+          B = {
             work: T.work,
             episodes: we
           };
         }
-        const oe = URL.createObjectURL(new Blob([JSON.stringify({
+        const ue = URL.createObjectURL(new Blob([JSON.stringify({
           schemaVersion: 2,
           exportedAt: (/* @__PURE__ */ new Date()).toISOString(),
-          project: o,
-          animation: H
+          project: d,
+          animation: B
         }, null, 2)], { type: "application/json" })), He = document.createElement("a");
-        He.href = oe, He.download = f.title.replace(/[\\/:*?"<>|]/g, "_") + "_專案備份.json", He.click(), setTimeout(() => URL.revokeObjectURL(oe), 1e3);
-      } catch (o) {
-        L(o.message);
+        He.href = ue, He.download = f.title.replace(/[\\/:*?"<>|]/g, "_") + "_專案備份.json", He.click(), setTimeout(() => URL.revokeObjectURL(ue), 1e3);
+      } catch (d) {
+        q(d.message);
       } finally {
-        Q(!1);
+        X(!1);
       }
     }
   }
-  function Me(o) {
-    f?.workId && (S(o), z(f.workId));
+  function Me(d) {
+    f?.workId && (w(d), N(f.workId));
   }
-  function ve(o, H, oe = !1, He = !1) {
+  function ve(d, B, ue = !1, He = !1) {
     return /* @__PURE__ */ (0, l.jsxs)("label", {
       className: "form-field",
-      children: [H, He ? /* @__PURE__ */ (0, l.jsx)("textarea", {
+      children: [B, He ? /* @__PURE__ */ (0, l.jsx)("textarea", {
         rows: 3,
-        required: oe,
-        maxLength: o === "snapshot" ? 6e4 : 12e3,
-        value: he[o] ?? "",
+        required: ue,
+        maxLength: d === "snapshot" ? 6e4 : 12e3,
+        value: me[d] ?? "",
         onChange: (T) => b({
-          ...he,
-          [o]: T.target.value
+          ...me,
+          [d]: T.target.value
         })
       }) : /* @__PURE__ */ (0, l.jsx)("input", {
-        required: oe,
-        maxLength: o === "sha256" ? 64 : 2e3,
-        value: he[o] ?? "",
+        required: ue,
+        maxLength: d === "sha256" ? 64 : 2e3,
+        value: me[d] ?? "",
         onChange: (T) => b({
-          ...he,
-          [o]: T.target.value
+          ...me,
+          [d]: T.target.value
         })
       })]
-    }, o);
+    }, d);
   }
-  function qe(o, H, oe) {
+  function qe(d, B, ue) {
     return /* @__PURE__ */ (0, l.jsxs)("label", {
       className: "form-field",
-      children: [H, /* @__PURE__ */ (0, l.jsx)("select", {
-        value: he[o] ?? "",
+      children: [B, /* @__PURE__ */ (0, l.jsx)("select", {
+        value: me[d] ?? "",
         onChange: (He) => b({
-          ...he,
-          [o]: He.target.value,
-          ...o === "stageId" ? { taskId: "" } : {}
+          ...me,
+          [d]: He.target.value,
+          ...d === "stageId" ? { taskId: "" } : {}
         }),
-        children: oe.map(([He, T]) => /* @__PURE__ */ (0, l.jsx)("option", {
+        children: ue.map(([He, T]) => /* @__PURE__ */ (0, l.jsx)("option", {
           value: He,
           children: T
         }, He))
       })]
     });
   }
-  function lt(o, H) {
+  function lt(d, B) {
     return /* @__PURE__ */ (0, l.jsxs)("fieldset", {
       className: "proof-picker",
-      children: [/* @__PURE__ */ (0, l.jsx)("legend", { children: o === "evidenceIds" ? "成果證據" : "已讀來源" }), H.length ? H.map((oe) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [/* @__PURE__ */ (0, l.jsx)("input", {
+      children: [/* @__PURE__ */ (0, l.jsx)("legend", { children: d === "evidenceIds" ? "成果證據" : "已讀來源" }), B.length ? B.map((ue) => /* @__PURE__ */ (0, l.jsxs)("label", { children: [/* @__PURE__ */ (0, l.jsx)("input", {
         type: "checkbox",
-        checked: (he[o] ?? []).includes(oe.id),
+        checked: (me[d] ?? []).includes(ue.id),
         onChange: (He) => b({
-          ...he,
-          [o]: He.target.checked ? [...he[o] ?? [], oe.id] : (he[o] ?? []).filter((T) => T !== oe.id)
+          ...me,
+          [d]: He.target.checked ? [...me[d] ?? [], ue.id] : (me[d] ?? []).filter((T) => T !== ue.id)
         })
-      }), oe.title] }, oe.id)) : /* @__PURE__ */ (0, l.jsx)("small", { children: "先在成果分頁登記，僅貼連結不能作為已檢查證據。" })]
+      }), ue.title] }, ue.id)) : /* @__PURE__ */ (0, l.jsx)("small", { children: "先在成果分頁登記，僅貼連結不能作為已檢查證據。" })]
     });
   }
   return A && !ae ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsxs)("div", {
@@ -16724,7 +16818,7 @@ function Kx({ nativeTransport: r } = {}) {
     children: [/* @__PURE__ */ (0, l.jsxs)("button", {
       className: "text-btn",
       onClick: () => {
-        d.current && !window.confirm("有未儲存的動畫或模型修改，確定離開？") || (d.current = !1, z(""), F());
+        o.current && !window.confirm("有未儲存的動畫或模型修改，確定離開？") || (o.current = !1, N(""), W());
       },
       children: [
         /* @__PURE__ */ (0, l.jsx)(of, { size: 16 }),
@@ -16734,16 +16828,16 @@ function Kx({ nativeTransport: r } = {}) {
     }), /* @__PURE__ */ (0, l.jsx)("button", {
       className: "text-btn",
       onClick: () => {
-        d.current && !window.confirm("有未儲存的動畫或模型修改，確定開啟員工必知？") || (d.current = !1, Z(!0));
+        o.current && !window.confirm("有未儲存的動畫或模型修改，確定開啟員工必知？") || (o.current = !1, K(!0));
       },
       children: "員工必知"
     })]
   }), /* @__PURE__ */ (0, l.jsx)(Ux, {
     nativeTransport: r,
     initialWorkId: A === "legacy" ? void 0 : A,
-    initialTab: E,
-    onDirtyChange: _
-  }, A + E)] }) : /* @__PURE__ */ (0, l.jsxs)("div", {
+    initialTab: _,
+    onDirtyChange: j
+  }, A + _)] }) : /* @__PURE__ */ (0, l.jsxs)("div", {
     className: "project-hub",
     children: [
       /* @__PURE__ */ (0, l.jsxs)("header", {
@@ -16755,55 +16849,55 @@ function Kx({ nativeTransport: r } = {}) {
           }),
           /* @__PURE__ */ (0, l.jsxs)("button", {
             className: "btn",
-            disabled: I || !!W,
-            "aria-pressed": B,
+            disabled: I || !!ee,
+            "aria-pressed": Y,
             onClick: () => {
-              d.current && !window.confirm("有未儲存修改，確定開啟垃圾桶？") || (d.current = !1, Y((o) => !o), Z(!1));
+              o.current && !window.confirm("有未儲存修改，確定開啟垃圾桶？") || (o.current = !1, Q((d) => !d), K(!1));
             },
-            children: [/* @__PURE__ */ (0, l.jsx)(jl, { size: 16 }), "垃圾桶"]
+            children: [/* @__PURE__ */ (0, l.jsx)(yl, { size: 16 }), "垃圾桶"]
           }),
           /* @__PURE__ */ (0, l.jsx)("button", {
             className: "btn" + (ae ? " primary" : ""),
             type: "button",
             "aria-pressed": ae,
             onClick: () => {
-              Y(!1), Z((o) => !o);
+              Q(!1), K((d) => !d);
             },
             children: "員工必知"
           }),
           /* @__PURE__ */ (0, l.jsx)("button", {
             className: "icon-btn",
             "aria-label": "重新整理",
-            disabled: le || I || !!W,
+            disabled: le || I || !!ee,
             onClick: () => {
-              F();
+              W();
             },
-            children: /* @__PURE__ */ (0, l.jsx)(Nl, { size: 18 })
+            children: /* @__PURE__ */ (0, l.jsx)(Wa, { size: 18 })
           })
         ]
       }),
       /* @__PURE__ */ (0, l.jsxs)("main", {
         className: "hub-main",
         children: [
-          re && /* @__PURE__ */ (0, l.jsxs)("div", {
+          oe && /* @__PURE__ */ (0, l.jsxs)("div", {
             role: "alert",
             className: "error-banner",
-            children: [re, /* @__PURE__ */ (0, l.jsx)("button", {
+            children: [oe, /* @__PURE__ */ (0, l.jsx)("button", {
               "aria-label": "關閉錯誤",
-              onClick: () => L(""),
-              children: /* @__PURE__ */ (0, l.jsx)(yl, { size: 16 })
+              onClick: () => q(""),
+              children: /* @__PURE__ */ (0, l.jsx)(Sl, { size: 16 })
             })]
           }),
           se.current && /* @__PURE__ */ (0, l.jsxs)("button", {
             className: "text-btn hub-back",
             disabled: I,
-            onClick: fe,
+            onClick: he,
             children: [/* @__PURE__ */ (0, l.jsx)(of, { size: 16 }), "我的專案"]
           }),
-          B ? /* @__PURE__ */ (0, l.jsx)(Zx, {
-            request: q,
+          Y ? /* @__PURE__ */ (0, l.jsx)(Jx, {
+            request: R,
             onChange: () => {
-              F();
+              W();
             }
           }) : ae ? /* @__PURE__ */ (0, l.jsx)(Lx, {}) : le ? /* @__PURE__ */ (0, l.jsx)("div", {
             className: "empty",
@@ -16852,7 +16946,7 @@ function Kx({ nativeTransport: r } = {}) {
                     onClick: () => {
                       ze("project", f.id);
                     },
-                    children: [/* @__PURE__ */ (0, l.jsx)(jl, { size: 16 }), "刪除專案"]
+                    children: [/* @__PURE__ */ (0, l.jsx)(yl, { size: 16 }), "刪除專案"]
                   })
                 ]
               })]
@@ -16870,17 +16964,17 @@ function Kx({ nativeTransport: r } = {}) {
                 ["images", "圖片（舊）"],
                 ["artifacts", "成果"],
                 ["issues", "問題"]
-              ].map(([o, H]) => /* @__PURE__ */ (0, l.jsxs)("button", {
-                className: w === o ? "active" : "",
-                "aria-current": w === o ? "page" : void 0,
+              ].map(([d, B]) => /* @__PURE__ */ (0, l.jsxs)("button", {
+                className: k === d ? "active" : "",
+                "aria-current": k === d ? "page" : void 0,
                 disabled: I,
                 onClick: () => {
-                  d.current && !window.confirm("有尚未儲存的圖片表單，確定切換？") || (d.current = !1, N(""), x(o));
+                  o.current && !window.confirm("有尚未儲存的圖片表單，確定切換？") || (o.current = !1, z(""), x(d));
                 },
-                children: [H, o === "issues" && f.issues.some((oe) => oe.status === "open") ? " · " + f.issues.filter((oe) => oe.status === "open").length : ""]
-              }, o))
+                children: [B, d === "issues" && f.issues.some((ue) => ue.status === "open") ? " · " + f.issues.filter((ue) => ue.status === "open").length : ""]
+              }, d))
             }),
-            w === "overview" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+            k === "overview" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
               /* @__PURE__ */ (0, l.jsxs)("section", {
                 className: "handoff-card",
                 children: [
@@ -16903,7 +16997,7 @@ function Kx({ nativeTransport: r } = {}) {
                     children: /* @__PURE__ */ (0, l.jsxs)("button", {
                       className: "btn primary",
                       disabled: f.archived,
-                      onClick: () => ue("record"),
+                      onClick: () => de("record"),
                       children: [/* @__PURE__ */ (0, l.jsx)(Ft, { size: 16 }), "記錄這次工作"]
                     })
                   })
@@ -16939,7 +17033,7 @@ function Kx({ nativeTransport: r } = {}) {
                     children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: "接手摘要" }), /* @__PURE__ */ (0, l.jsx)("button", {
                       className: "text-btn",
                       disabled: f.archived,
-                      onClick: () => ue("edit", {
+                      onClick: () => de("edit", {
                         name: f.title,
                         description: f.objective,
                         status: f.status
@@ -16948,16 +17042,16 @@ function Kx({ nativeTransport: r } = {}) {
                     })]
                   }),
                   /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-                    f.managedTasks.filter((o) => o.status !== "PASS").length,
+                    f.managedTasks.filter((d) => d.status !== "PASS").length,
                     " 項工作未完成 · ",
-                    f.issues.filter((o) => o.status === "open").length,
+                    f.issues.filter((d) => d.status === "open").length,
                     " 項問題"
                   ] }),
                   /* @__PURE__ */ (0, l.jsx)("h3", { children: "操作限制" }),
-                  f.restrictions.map((o, H) => /* @__PURE__ */ (0, l.jsx)("p", {
+                  f.restrictions.map((d, B) => /* @__PURE__ */ (0, l.jsx)("p", {
                     className: "muted",
-                    children: o
-                  }, H)),
+                    children: d
+                  }, B)),
                   /* @__PURE__ */ (0, l.jsxs)("details", { children: [
                     /* @__PURE__ */ (0, l.jsx)("summary", { children: "進階資訊與 AI 交接資料" }),
                     /* @__PURE__ */ (0, l.jsxs)("p", { children: [
@@ -16971,96 +17065,96 @@ function Kx({ nativeTransport: r } = {}) {
                       children: JSON.stringify(f.handoff, null, 2)
                     }),
                     /* @__PURE__ */ (0, l.jsx)("h3", { children: "異動紀錄" }),
-                    [...f.history].reverse().map((o, H) => /* @__PURE__ */ (0, l.jsxs)("p", {
+                    [...f.history].reverse().map((d, B) => /* @__PURE__ */ (0, l.jsxs)("p", {
                       className: "muted",
                       children: [
-                        nd(o.at),
+                        nd(d.at),
                         " · ",
-                        o.by,
+                        d.by,
                         " · ",
-                        o.action
+                        d.action
                       ]
-                    }, H)),
+                    }, B)),
                     /* @__PURE__ */ (0, l.jsxs)("label", {
                       className: "form-field",
                       children: ["回復本專案的通用資料備份", /* @__PURE__ */ (0, l.jsx)("input", {
                         type: "file",
                         accept: "application/json,.json",
                         disabled: I,
-                        onChange: async (o) => {
+                        onChange: async (d) => {
                           try {
-                            const H = o.target.files?.[0];
-                            if (!H) return;
-                            if (H.size > 24e6) throw Error("備份過大");
-                            const oe = JSON.parse(await H.text());
-                            if (oe.schemaVersion !== 2 || oe.project?.id !== f.id) throw Error("請選取此專案的 v2 備份");
-                            ue("restore", { backup: oe.project });
-                          } catch (H) {
-                            L(H.message);
+                            const B = d.target.files?.[0];
+                            if (!B) return;
+                            if (B.size > 24e6) throw Error("備份過大");
+                            const ue = JSON.parse(await B.text());
+                            if (ue.schemaVersion !== 2 || ue.project?.id !== f.id) throw Error("請選取此專案的 v2 備份");
+                            de("restore", { backup: ue.project });
+                          } catch (B) {
+                            q(B.message);
                           }
-                          o.target.value = "";
+                          d.target.value = "";
                         }
                       })]
                     })
                   ] })
                 ]
               })
-            ] }) : w === "stages" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsxs)("div", {
+            ] }) : k === "stages" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsxs)("div", {
               className: "section-title",
               children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: "階段與工作項目" }), /* @__PURE__ */ (0, l.jsxs)("button", {
                 className: "btn",
                 disabled: f.archived,
-                onClick: () => ue("stage"),
+                onClick: () => de("stage"),
                 children: [/* @__PURE__ */ (0, l.jsx)(Ft, { size: 16 }), "新增階段"]
               })]
-            }), f.stages.map((o) => /* @__PURE__ */ (0, l.jsxs)("section", {
+            }), f.stages.map((d) => /* @__PURE__ */ (0, l.jsxs)("section", {
               className: "wide-card stage-work-card",
               children: [/* @__PURE__ */ (0, l.jsxs)("div", {
                 className: "section-title",
                 children: [/* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsxs)("h3", { children: [
-                  o.key,
+                  d.key,
                   " · ",
-                  o.title
+                  d.title
                 ] }), /* @__PURE__ */ (0, l.jsx)("span", {
                   className: "status",
-                  children: la[o.status]
+                  children: la[d.status]
                 })] }), /* @__PURE__ */ (0, l.jsx)("button", {
                   className: "text-btn",
                   disabled: f.archived,
-                  onClick: () => ue("task", { stageId: o.id }),
+                  onClick: () => de("task", { stageId: d.id }),
                   children: "新增工作"
                 })]
-              }), f.managedTasks.filter((H) => H.stageId === o.id).map((H) => /* @__PURE__ */ (0, l.jsxs)("article", {
+              }), f.managedTasks.filter((B) => B.stageId === d.id).map((B) => /* @__PURE__ */ (0, l.jsxs)("article", {
                 className: "task-card",
                 children: [
                   /* @__PURE__ */ (0, l.jsxs)("div", { children: [
-                    /* @__PURE__ */ (0, l.jsx)("b", { children: H.title }),
-                    /* @__PURE__ */ (0, l.jsx)("small", { children: la[H.status] }),
-                    H.nextAction && /* @__PURE__ */ (0, l.jsxs)("p", { children: ["下一步：", H.nextAction] })
+                    /* @__PURE__ */ (0, l.jsx)("b", { children: B.title }),
+                    /* @__PURE__ */ (0, l.jsx)("small", { children: la[B.status] }),
+                    B.nextAction && /* @__PURE__ */ (0, l.jsxs)("p", { children: ["下一步：", B.nextAction] })
                   ] }),
                   /* @__PURE__ */ (0, l.jsx)("button", {
                     className: "text-btn",
                     disabled: f.archived,
-                    onClick: () => ue("record", {
-                      stageId: o.id,
-                      taskId: H.id,
-                      summary: H.title
+                    onClick: () => de("record", {
+                      stageId: d.id,
+                      taskId: B.id,
+                      summary: B.title
                     }),
                     children: "回報"
                   }),
                   /* @__PURE__ */ (0, l.jsx)("button", {
                     className: "text-btn",
                     disabled: f.archived,
-                    onClick: () => ue("task", {
-                      ...H,
+                    onClick: () => de("task", {
+                      ...B,
                       key: crypto.randomUUID(),
-                      taskId: H.id
+                      taskId: B.id
                     }),
                     children: "編輯"
                   })
                 ]
-              }, H.id))]
-            }, o.id))] }) : w === "records" ? /* @__PURE__ */ (0, l.jsxs)("section", {
+              }, B.id))]
+            }, d.id))] }) : k === "records" ? /* @__PURE__ */ (0, l.jsxs)("section", {
               className: "wide-card",
               children: [
                 /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -17068,7 +17162,7 @@ function Kx({ nativeTransport: r } = {}) {
                   children: [/* @__PURE__ */ (0, l.jsxs)("div", { children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: "執行紀錄" }), /* @__PURE__ */ (0, l.jsx)("p", { children: "計畫、模擬與實測分開保存；沒有證據不會轉成 PASS。" })] }), /* @__PURE__ */ (0, l.jsxs)("button", {
                     className: "btn primary",
                     disabled: f.archived,
-                    onClick: () => ue("record"),
+                    onClick: () => de("record"),
                     children: [/* @__PURE__ */ (0, l.jsx)(Ft, { size: 16 }), "新增紀錄"]
                   })]
                 }),
@@ -17076,71 +17170,71 @@ function Kx({ nativeTransport: r } = {}) {
                   className: "empty",
                   children: "還沒有工作紀錄。"
                 }),
-                [...f.records].reverse().map((o) => /* @__PURE__ */ (0, l.jsxs)("article", {
+                [...f.records].reverse().map((d) => /* @__PURE__ */ (0, l.jsxs)("article", {
                   className: "journal-card",
                   children: [
                     /* @__PURE__ */ (0, l.jsxs)("div", {
                       className: "journal-meta",
                       children: [
                         /* @__PURE__ */ (0, l.jsx)("span", {
-                          className: "result-badge " + o.status.toLowerCase(),
-                          children: la[o.status]
+                          className: "result-badge " + d.status.toLowerCase(),
+                          children: la[d.status]
                         }),
                         /* @__PURE__ */ (0, l.jsxs)("span", { children: [
-                          la[o.mode],
+                          la[d.mode],
                           " · ",
-                          o.scope
+                          d.scope
                         ] }),
                         /* @__PURE__ */ (0, l.jsxs)("small", { children: [
-                          nd(o.at),
+                          nd(d.at),
                           " · ",
-                          o.by
+                          d.by
                         ] })
                       ]
                     }),
-                    /* @__PURE__ */ (0, l.jsx)("h3", { children: o.summary }),
+                    /* @__PURE__ */ (0, l.jsx)("h3", { children: d.summary }),
                     /* @__PURE__ */ (0, l.jsxs)("dl", { children: [
                       /* @__PURE__ */ (0, l.jsx)("dt", { children: "方法與結果" }),
                       /* @__PURE__ */ (0, l.jsxs)("dd", { children: [
-                        o.method,
+                        d.method,
                         `
 `,
-                        o.result
+                        d.result
                       ] }),
                       /* @__PURE__ */ (0, l.jsx)("dt", { children: "證據" }),
-                      /* @__PURE__ */ (0, l.jsx)("dd", { children: [...o.evidenceIds.map((H) => f.artifacts.find((oe) => oe.id === H)?.title), ...o.sourceIds.map((H) => f.sources.find((oe) => oe.id === H)?.title)].filter(Boolean).join("、") || "未附可核對證據" }),
+                      /* @__PURE__ */ (0, l.jsx)("dd", { children: [...d.evidenceIds.map((B) => f.artifacts.find((ue) => ue.id === B)?.title), ...d.sourceIds.map((B) => f.sources.find((ue) => ue.id === B)?.title)].filter(Boolean).join("、") || "未附可核對證據" }),
                       /* @__PURE__ */ (0, l.jsx)("dt", { children: "下一步" }),
-                      /* @__PURE__ */ (0, l.jsx)("dd", { children: o.nextStep }),
-                      o.limitations && /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsx)("dt", { children: "限制" }), /* @__PURE__ */ (0, l.jsx)("dd", { children: o.limitations })] })
+                      /* @__PURE__ */ (0, l.jsx)("dd", { children: d.nextStep }),
+                      d.limitations && /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsx)("dt", { children: "限制" }), /* @__PURE__ */ (0, l.jsx)("dd", { children: d.limitations })] })
                     ] }),
                     /* @__PURE__ */ (0, l.jsxs)("button", {
                       className: "text-btn danger",
                       disabled: I,
                       onClick: () => {
-                        ze("record", o.id);
+                        ze("record", d.id);
                       },
-                      children: [/* @__PURE__ */ (0, l.jsx)(jl, { size: 15 }), "刪除紀錄"]
+                      children: [/* @__PURE__ */ (0, l.jsx)(yl, { size: 15 }), "刪除紀錄"]
                     }),
                     /* @__PURE__ */ (0, l.jsxs)("button", {
                       className: "text-btn",
                       onClick: () => {
-                        N(o.id), x("images");
+                        z(d.id), x("images");
                       },
-                      children: ["圖片 · ", f.images.filter((H) => H.recordId === o.id).length]
+                      children: ["圖片 · ", f.images.filter((B) => B.recordId === d.id).length]
                     }),
-                    o.requestedStatus !== o.status && /* @__PURE__ */ (0, l.jsxs)("p", {
+                    d.requestedStatus !== d.status && /* @__PURE__ */ (0, l.jsxs)("p", {
                       className: "modal-error",
                       children: [
                         "原回報 ",
-                        o.requestedStatus,
+                        d.requestedStatus,
                         "；",
-                        o.validationNote
+                        d.validationNote
                       ]
                     })
                   ]
-                }, o.id))
+                }, d.id))
               ]
-            }) : w === "models" ? /* @__PURE__ */ (0, l.jsxs)("section", {
+            }) : k === "models" ? /* @__PURE__ */ (0, l.jsxs)("section", {
               className: "wide-card",
               children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: "3D 模型" }), f.animation ? /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn primary",
@@ -17151,42 +17245,42 @@ function Kx({ nativeTransport: r } = {}) {
                 onClick: () => x("artifacts"),
                 children: "查看／登記模型成果"
               })] })]
-            }) : w === "drawings" ? /* @__PURE__ */ (0, l.jsx)(Qx, {
+            }) : k === "drawings" ? /* @__PURE__ */ (0, l.jsx)(Zx, {
               project: f,
               transport: r,
               onUpdated: () => {
-                F();
+                W();
               },
-              onDirty: _,
-              onBusy: Q
-            }) : w === "assets" ? /* @__PURE__ */ (0, l.jsx)(Vx, {
+              onDirty: j,
+              onBusy: X
+            }) : k === "assets" ? /* @__PURE__ */ (0, l.jsx)(Xx, {
               project: f,
               transport: r,
               onUpdated: () => {
-                F();
+                W();
               },
-              onDirty: _,
-              onBusy: Q
-            }) : w === "images" ? /* @__PURE__ */ (0, l.jsx)(Gx, {
+              onDirty: j,
+              onBusy: X
+            }) : k === "images" ? /* @__PURE__ */ (0, l.jsx)(Vx, {
               project: {
                 ...f,
-                images: f.images.filter((o) => [
+                images: f.images.filter((d) => [
                   "image/png",
                   "image/jpeg",
                   "image/webp"
-                ].includes(o.mime))
+                ].includes(d.mime))
               },
               transport: r,
-              onTrash: (o) => {
-                ze("image", o);
+              onTrash: (d) => {
+                ze("image", d);
               },
-              recordFilter: K,
-              onDirty: _,
-              onBusy: Q,
-              onSaved: (o) => {
-                ce.current++, p(o);
+              recordFilter: G,
+              onDirty: j,
+              onBusy: X,
+              onSaved: (d) => {
+                re.current++, p(d);
               }
-            }, f.id + K) : w === "artifacts" ? /* @__PURE__ */ (0, l.jsxs)("section", {
+            }, f.id + G) : k === "artifacts" ? /* @__PURE__ */ (0, l.jsxs)("section", {
               className: "wide-card",
               children: [
                 /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -17196,12 +17290,12 @@ function Kx({ nativeTransport: r } = {}) {
                     children: [/* @__PURE__ */ (0, l.jsx)("button", {
                       className: "btn",
                       disabled: f.archived,
-                      onClick: () => ue("source"),
+                      onClick: () => de("source"),
                       children: "登記來源"
                     }), /* @__PURE__ */ (0, l.jsxs)("button", {
                       className: "btn primary",
                       disabled: f.archived,
-                      onClick: () => ue("artifact"),
+                      onClick: () => de("artifact"),
                       children: [/* @__PURE__ */ (0, l.jsx)(Ft, { size: 16 }), "登記成果"]
                     })]
                   })]
@@ -17210,49 +17304,49 @@ function Kx({ nativeTransport: r } = {}) {
                   className: "muted",
                   children: "尚無成果；檔案位置只是引用，需檢查內容及雜湊才能作為 PASS 證據。"
                 }),
-                f.artifacts.map((o) => /* @__PURE__ */ (0, l.jsxs)("article", {
+                f.artifacts.map((d) => /* @__PURE__ */ (0, l.jsxs)("article", {
                   className: "journal-card",
                   children: [
                     /* @__PURE__ */ (0, l.jsx)("h3", { children: /* @__PURE__ */ (0, l.jsx)(Cf, {
-                      url: o.location,
-                      children: o.title
+                      url: d.location,
+                      children: d.title
                     }) }),
                     /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-                      o.version,
+                      d.version,
                       " · ",
-                      o.availability === "inspected" ? "已檢查（執行者回報）" : "僅登記位置"
+                      d.availability === "inspected" ? "已檢查（執行者回報）" : "僅登記位置"
                     ] }),
                     /* @__PURE__ */ (0, l.jsx)("p", {
                       className: "preserve-text",
-                      children: o.inspection
+                      children: d.inspection
                     }),
-                    /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "版本與雜湊" }), /* @__PURE__ */ (0, l.jsx)("code", { children: o.sha256 || "未提供" })] })
+                    /* @__PURE__ */ (0, l.jsxs)("details", { children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "版本與雜湊" }), /* @__PURE__ */ (0, l.jsx)("code", { children: d.sha256 || "未提供" })] })
                   ]
-                }, o.id)),
+                }, d.id)),
                 /* @__PURE__ */ (0, l.jsx)("h3", { children: "資料來源" }),
-                f.sources.map((o) => /* @__PURE__ */ (0, l.jsxs)("article", {
+                f.sources.map((d) => /* @__PURE__ */ (0, l.jsxs)("article", {
                   className: "journal-card",
                   children: [
                     /* @__PURE__ */ (0, l.jsx)("b", { children: /* @__PURE__ */ (0, l.jsx)(Cf, {
-                      url: o.location,
-                      children: o.title
+                      url: d.location,
+                      children: d.title
                     }) }),
                     /* @__PURE__ */ (0, l.jsxs)("p", { children: [
-                      o.readStatus === "read" ? "已讀內容快照" : "未讀，只登記連結",
+                      d.readStatus === "read" ? "已讀內容快照" : "未讀，只登記連結",
                       " · ",
-                      o.version
+                      d.version
                     ] }),
-                    /* @__PURE__ */ (0, l.jsx)("p", { children: o.observation }),
+                    /* @__PURE__ */ (0, l.jsx)("p", { children: d.observation }),
                     /* @__PURE__ */ (0, l.jsxs)("details", { children: [
                       /* @__PURE__ */ (0, l.jsx)("summary", { children: "查看保存的來源內容" }),
                       /* @__PURE__ */ (0, l.jsx)("pre", {
                         className: "hub-json",
-                        children: o.snapshot || "尚未讀取"
+                        children: d.snapshot || "尚未讀取"
                       }),
-                      /* @__PURE__ */ (0, l.jsx)("code", { children: o.sha256 })
+                      /* @__PURE__ */ (0, l.jsx)("code", { children: d.sha256 })
                     ] })
                   ]
-                }, o.id))
+                }, d.id))
               ]
             }) : /* @__PURE__ */ (0, l.jsxs)("section", {
               className: "wide-card",
@@ -17262,7 +17356,7 @@ function Kx({ nativeTransport: r } = {}) {
                   children: [/* @__PURE__ */ (0, l.jsx)("h2", { children: "問題與阻礙" }), /* @__PURE__ */ (0, l.jsx)("button", {
                     className: "btn primary",
                     disabled: f.archived,
-                    onClick: () => ue("issue"),
+                    onClick: () => de("issue"),
                     children: "新增問題"
                   })]
                 }),
@@ -17270,30 +17364,30 @@ function Kx({ nativeTransport: r } = {}) {
                   className: "empty",
                   children: "尚未登記問題。"
                 }),
-                f.issues.map((o) => /* @__PURE__ */ (0, l.jsxs)("article", {
+                f.issues.map((d) => /* @__PURE__ */ (0, l.jsxs)("article", {
                   className: "journal-card",
                   children: [
                     /* @__PURE__ */ (0, l.jsx)("span", {
                       className: "status",
-                      children: o.status === "open" ? "待處理" : "已記錄解法"
+                      children: d.status === "open" ? "待處理" : "已記錄解法"
                     }),
-                    /* @__PURE__ */ (0, l.jsx)("h3", { children: o.title }),
+                    /* @__PURE__ */ (0, l.jsx)("h3", { children: d.title }),
                     /* @__PURE__ */ (0, l.jsx)("p", {
                       className: "preserve-text",
-                      children: o.detail
+                      children: d.detail
                     }),
-                    o.resolution && /* @__PURE__ */ (0, l.jsx)("p", {
+                    d.resolution && /* @__PURE__ */ (0, l.jsx)("p", {
                       className: "preserve-text",
-                      children: o.resolution
+                      children: d.resolution
                     }),
-                    o.status === "open" && /* @__PURE__ */ (0, l.jsx)("button", {
+                    d.status === "open" && /* @__PURE__ */ (0, l.jsx)("button", {
                       className: "btn",
                       disabled: f.archived,
-                      onClick: () => ue("resolve", { issueId: o.id }),
+                      onClick: () => de("resolve", { issueId: d.id }),
                       children: "填寫處理結果"
                     })
                   ]
-                }, o.id))
+                }, d.id))
               ]
             })
           ] }) : /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [/* @__PURE__ */ (0, l.jsxs)("div", {
@@ -17303,32 +17397,32 @@ function Kx({ nativeTransport: r } = {}) {
                 className: "eyebrow",
                 children: "立之雲端庫"
               }),
-              /* @__PURE__ */ (0, l.jsx)("h1", { children: $ ? "專案範本" : "我的專案" }),
+              /* @__PURE__ */ (0, l.jsx)("h1", { children: P ? "專案範本" : "我的專案" }),
               /* @__PURE__ */ (0, l.jsx)("p", { children: "把目標、過程和成果放在同一個專案裡。" })
             ] }), /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "heading-actions",
               children: [/* @__PURE__ */ (0, l.jsx)("button", {
                 className: "btn",
-                onClick: () => j(!$),
-                children: $ ? "我的專案" : "專案範本"
+                onClick: () => y(!P),
+                children: P ? "我的專案" : "專案範本"
               }), /* @__PURE__ */ (0, l.jsxs)("button", {
                 className: "btn primary",
-                onClick: () => ue("create"),
+                onClick: () => de("create"),
                 children: [/* @__PURE__ */ (0, l.jsx)(Ft, { size: 17 }), "建立專案"]
               })]
             })]
-          }), $ ? /* @__PURE__ */ (0, l.jsx)("div", {
+          }), P ? /* @__PURE__ */ (0, l.jsx)("div", {
             className: "hub-project-grid",
-            children: Object.entries(As).map(([o, H]) => /* @__PURE__ */ (0, l.jsxs)("button", {
+            children: Object.entries(As).map(([d, B]) => /* @__PURE__ */ (0, l.jsxs)("button", {
               className: "hub-project-card",
-              onClick: () => ue("create", { type: o }),
+              onClick: () => de("create", { type: d }),
               children: [
                 /* @__PURE__ */ (0, l.jsx)(Jr, { size: 24 }),
-                /* @__PURE__ */ (0, l.jsx)("h2", { children: H }),
-                /* @__PURE__ */ (0, l.jsx)("p", { children: o === "animation" ? "集數、共用模型與既有動畫專業流程。" : o === "model" ? "八個模型工作階段，保存來源、候選、檢查與交接。" : o === "software" ? "需求、設計、實作、測試、發布與維護。" : "自訂階段、任務、工作紀錄及交付。" }),
+                /* @__PURE__ */ (0, l.jsx)("h2", { children: B }),
+                /* @__PURE__ */ (0, l.jsx)("p", { children: d === "animation" ? "集數、共用模型與既有動畫專業流程。" : d === "model" ? "八個模型工作階段，保存來源、候選、檢查與交接。" : d === "software" ? "需求、設計、實作、測試、發布與維護。" : "自訂階段、任務、工作紀錄及交付。" }),
                 /* @__PURE__ */ (0, l.jsx)("span", { children: "使用範本 →" })
               ]
-            }, o))
+            }, d))
           }) : /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
             /* @__PURE__ */ (0, l.jsxs)("div", {
               className: "hub-filter",
@@ -17337,36 +17431,36 @@ function Kx({ nativeTransport: r } = {}) {
                 children: [/* @__PURE__ */ (0, l.jsx)(fd, { size: 16 }), /* @__PURE__ */ (0, l.jsx)("input", {
                   "aria-label": "搜尋專案",
                   placeholder: "搜尋專案",
-                  value: ee,
-                  onChange: (o) => P(o.target.value)
+                  value: F,
+                  onChange: (d) => $(d.target.value)
                 })]
               }), /* @__PURE__ */ (0, l.jsxs)("label", { children: [/* @__PURE__ */ (0, l.jsx)("input", {
                 type: "checkbox",
-                checked: xe,
-                onChange: (o) => te(o.target.checked)
+                checked: pe,
+                onChange: (d) => te(d.target.checked)
               }), " 顯示封存"] })]
             }),
             /* @__PURE__ */ (0, l.jsx)("div", {
               className: "hub-project-grid",
-              children: h.filter((o) => (xe || !o.archived) && o.name.toLowerCase().includes(ee.toLowerCase())).map((o) => /* @__PURE__ */ (0, l.jsxs)("button", {
+              children: h.filter((d) => (pe || !d.archived) && d.name.toLowerCase().includes(F.toLowerCase())).map((d) => /* @__PURE__ */ (0, l.jsxs)("button", {
                 className: "hub-project-card",
                 onClick: () => {
-                  de(o.id);
+                  ce(d.id);
                 },
                 children: [
                   /* @__PURE__ */ (0, l.jsxs)("div", {
                     className: "project-card-top",
-                    children: [o.type === "animation" ? /* @__PURE__ */ (0, l.jsx)(ui, { size: 24 }) : o.type === "software" ? /* @__PURE__ */ (0, l.jsx)(Sm, { size: 24 }) : /* @__PURE__ */ (0, l.jsx)(Jr, { size: 24 }), /* @__PURE__ */ (0, l.jsx)("span", { children: As[o.type] })]
+                    children: [d.type === "animation" ? /* @__PURE__ */ (0, l.jsx)(ui, { size: 24 }) : d.type === "software" ? /* @__PURE__ */ (0, l.jsx)(Sm, { size: 24 }) : /* @__PURE__ */ (0, l.jsx)(Jr, { size: 24 }), /* @__PURE__ */ (0, l.jsx)("span", { children: As[d.type] })]
                   }),
-                  /* @__PURE__ */ (0, l.jsx)("h2", { children: o.name }),
-                  /* @__PURE__ */ (0, l.jsxs)("p", { children: ["目前階段：", o.currentStage] }),
+                  /* @__PURE__ */ (0, l.jsx)("h2", { children: d.name }),
+                  /* @__PURE__ */ (0, l.jsxs)("p", { children: ["目前階段：", d.currentStage] }),
                   /* @__PURE__ */ (0, l.jsxs)("div", {
                     className: "project-card-next",
                     children: [
                       /* @__PURE__ */ (0, l.jsx)("small", { children: "最近工作" }),
-                      /* @__PURE__ */ (0, l.jsx)("strong", { children: o.recentWork }),
+                      /* @__PURE__ */ (0, l.jsx)("strong", { children: d.recentWork }),
                       /* @__PURE__ */ (0, l.jsx)("small", { children: "下一個待辦" }),
-                      /* @__PURE__ */ (0, l.jsx)("strong", { children: o.nextAction })
+                      /* @__PURE__ */ (0, l.jsx)("strong", { children: d.nextAction })
                     ]
                   }),
                   /* @__PURE__ */ (0, l.jsxs)("div", {
@@ -17374,7 +17468,7 @@ function Kx({ nativeTransport: r } = {}) {
                     children: [/* @__PURE__ */ (0, l.jsx)("span", {}), /* @__PURE__ */ (0, l.jsx)("span", { children: "開啟專案 →" })]
                   })
                 ]
-              }, o.id))
+              }, d.id))
             }),
             !h.length && /* @__PURE__ */ (0, l.jsx)("div", {
               className: "empty",
@@ -17385,7 +17479,7 @@ function Kx({ nativeTransport: r } = {}) {
               children: [/* @__PURE__ */ (0, l.jsx)("summary", { children: "舊版獨立單集紀錄" }), /* @__PURE__ */ (0, l.jsx)("button", {
                 className: "text-btn",
                 onClick: () => {
-                  S("resume"), z("legacy");
+                  w("resume"), N("legacy");
                 },
                 children: "開啟舊版單集清單 →"
               })]
@@ -17402,7 +17496,7 @@ function Kx({ nativeTransport: r } = {}) {
         className: "toast",
         children: ie
       }),
-      W && /* @__PURE__ */ (0, l.jsx)("div", {
+      ee && /* @__PURE__ */ (0, l.jsx)("div", {
         className: "modal-backdrop",
         children: /* @__PURE__ */ (0, l.jsxs)("section", {
           className: "modal",
@@ -17422,53 +17516,53 @@ function Kx({ nativeTransport: r } = {}) {
               resolve: "問題處理",
               edit: "專案設定",
               restore: "回復備份"
-            }[W] }), /* @__PURE__ */ (0, l.jsx)("button", {
+            }[ee] }), /* @__PURE__ */ (0, l.jsx)("button", {
               className: "icon-btn",
               "aria-label": "關閉表單",
               disabled: I,
               onClick: () => {
                 window.confirm("確定放棄尚未儲存的表單？") && ge("");
               },
-              children: /* @__PURE__ */ (0, l.jsx)(yl, { size: 20 })
+              children: /* @__PURE__ */ (0, l.jsx)(Sl, { size: 20 })
             })]
           }), /* @__PURE__ */ (0, l.jsxs)("form", {
             onSubmit: dt,
             children: [
-              W === "create" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+              ee === "create" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                 qe("type", "專案類型", Object.entries(As)),
                 ve("name", "專案名稱", !0),
                 ve("description", "專案目標", !1, !0)
-              ] }) : W === "stage" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [ve("stageKey", "階段編號（例如 M0）", !0), ve("title", "階段名稱", !0)] }) : W === "edit" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+              ] }) : ee === "stage" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [ve("stageKey", "階段編號（例如 M0）", !0), ve("title", "階段名稱", !0)] }) : ee === "edit" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                 f?.kind !== "animation" && ve("name", "專案名稱", !0),
                 ve("description", "專案目標", !1, !0),
-                qe("status", "專案狀態", Object.entries(la).filter(([o]) => [
+                qe("status", "專案狀態", Object.entries(la).filter(([d]) => [
                   "planning",
                   "in_progress",
                   "blocked",
                   "completed"
-                ].includes(o)))
-              ] }) : W === "restore" ? /* @__PURE__ */ (0, l.jsx)("p", { children: "以新版本回復此專案的通用資料，保留回復前內容與異動紀錄。動畫及模型專業資料維持現況。" }) : W === "resolve" ? ve("resolution", "處理方式與依據", !0, !0) : /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [[
+                ].includes(d)))
+              ] }) : ee === "restore" ? /* @__PURE__ */ (0, l.jsx)("p", { children: "以新版本回復此專案的通用資料，保留回復前內容與異動紀錄。動畫及模型專業資料維持現況。" }) : ee === "resolve" ? ve("resolution", "處理方式與依據", !0, !0) : /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [[
                 "task",
                 "record",
                 "issue",
                 "artifact"
-              ].includes(W) && qe("stageId", "階段", [...W === "artifact" || W === "issue" ? [["", "不指定階段"]] : [], ...(f?.stages ?? []).map((o) => [o.id, o.key + " · " + o.title])]), W === "task" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+              ].includes(ee) && qe("stageId", "階段", [...ee === "artifact" || ee === "issue" ? [["", "不指定階段"]] : [], ...(f?.stages ?? []).map((d) => [d.id, d.key + " · " + d.title])]), ee === "task" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                 ve("title", "工作項目", !0),
-                qe("status", "目前狀態", zf.map((o) => [o, la[o]])),
+                qe("status", "目前狀態", zf.map((d) => [d, la[d]])),
                 ve("nextAction", "下一步", !1, !0),
                 /* @__PURE__ */ (0, l.jsx)("p", {
                   className: "muted",
                   children: "選擇 PASS 仍需有此任務的測試紀錄及證據，否則保存為待驗證。"
                 })
-              ] }) : W === "record" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
-                qe("taskId", "對應工作", [["", "整個階段"], ...(f?.managedTasks ?? []).filter((o) => o.stageId === he.stageId).map((o) => [o.id, o.title])]),
-                qe("status", "回報結果", zf.map((o) => [o, la[o]])),
+              ] }) : ee === "record" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+                qe("taskId", "對應工作", [["", "整個階段"], ...(f?.managedTasks ?? []).filter((d) => d.stageId === me.stageId).map((d) => [d.id, d.title])]),
+                qe("status", "回報結果", zf.map((d) => [d, la[d]])),
                 qe("mode", "這次如何執行", [
                   "actual",
                   "simulation",
                   "document",
                   "not_run"
-                ].map((o) => [o, la[o]])),
+                ].map((d) => [d, la[d]])),
                 ve("scope", "測試／工作範圍（例如 ezdxf 或模擬 MCP）", !0),
                 ve("summary", "這次實際做了什麼", !0, !0),
                 ve("method", "檢查方法", !1, !0),
@@ -17481,26 +17575,26 @@ function Kx({ nativeTransport: r } = {}) {
                   className: "muted",
                   children: "無有效證據的 PASS 回報會保存為 NOT_TESTED；模擬通過不代表實機通過。"
                 })
-              ] }) : W === "artifact" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+              ] }) : ee === "artifact" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                 ve("title", "成果名稱", !0),
                 ve("location", "成果檔案位置", !0),
                 ve("version", "成果版本"),
                 qe("availability", "檢查情形", [["reference", "只登記位置"], ["inspected", "已檢查內容"]]),
-                ve("sha256", "SHA-256", he.availability === "inspected"),
-                ve("inspection", "實際檢查內容", he.availability === "inspected", !0)
-              ] }) : W === "source" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
+                ve("sha256", "SHA-256", me.availability === "inspected"),
+                ve("inspection", "實際檢查內容", me.availability === "inspected", !0)
+              ] }) : ee === "source" ? /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [
                 ve("title", "來源名稱", !0),
                 ve("location", "來源位置", !0),
                 ve("version", "來源版本"),
                 qe("readStatus", "閱讀情形", [["reference", "未讀，只登記連結"], ["read", "已讀取內容"]]),
-                ve("snapshot", "讀取內容快照", he.readStatus === "read", !0),
-                ve("sha256", "內容 SHA-256", he.readStatus === "read"),
-                ve("observation", "閱讀觀察", he.readStatus === "read", !0)
+                ve("snapshot", "讀取內容快照", me.readStatus === "read", !0),
+                ve("sha256", "內容 SHA-256", me.readStatus === "read"),
+                ve("observation", "閱讀觀察", me.readStatus === "read", !0)
               ] }) : /* @__PURE__ */ (0, l.jsxs)(l.Fragment, { children: [ve("title", "問題名稱", !0), ve("detail", "問題、影響及缺少的條件", !0, !0)] })] }),
-              re && /* @__PURE__ */ (0, l.jsx)("p", {
+              oe && /* @__PURE__ */ (0, l.jsx)("p", {
                 className: "modal-error",
                 role: "alert",
-                children: re
+                children: oe
               }),
               /* @__PURE__ */ (0, l.jsx)("div", {
                 className: "modal-actions",
@@ -17508,7 +17602,7 @@ function Kx({ nativeTransport: r } = {}) {
                   type: "submit",
                   className: "btn primary",
                   disabled: I,
-                  children: I ? "儲存中…" : W === "restore" ? "回復成新版本" : "儲存並讀回"
+                  children: I ? "儲存中…" : ee === "restore" ? "回復成新版本" : "儲存並讀回"
                 })
               })
             ]
@@ -17518,7 +17612,7 @@ function Kx({ nativeTransport: r } = {}) {
     ]
   });
 }
-var Jx = `
+var $x = `
 :host{--bg:#f7f8fa;--ink:#23322e;--muted:#85908b;--green:#326552;--border:#e4e9e6;--mint:#edf4ef;--font:'Noto Sans TC','PingFang TC','Microsoft JhengHei',system-ui,sans-serif}
 *{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--bg);font-family:var(--font);font-size:14px;line-height:1.6}button,input,textarea,select{font:inherit}button,a,input,textarea,select{-webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{cursor:default;opacity:.45}a{color:inherit;text-decoration:none}button{border:0}input,textarea,select{color:var(--ink)}textarea{resize:vertical}button:focus-visible,a:focus-visible{outline:3px solid #9abfae;outline-offset:3px}input:focus,textarea:focus,select:focus{outline:2px solid #92b5a3;outline-offset:1px}h1,h2,h3,p{margin:0}h1,h2,h3{font-weight:650;letter-spacing:.01em}small{font-size:11px}.workspace{display:flex;min-height:100vh}.sidebar{width:244px;background:#fff;border-right:1px solid var(--border);position:fixed;inset:0 auto 0 0;display:flex;flex-direction:column;padding:27px 18px 20px;z-index:15}.brand{display:flex;gap:12px;align-items:center;padding:0 8px 35px}.brandmark{height:39px;width:39px;display:grid;place-items:center;border-radius:11px;background:#315b49;color:white;font-family:serif;font-size:25px}.brand strong{display:block;font-size:17px;letter-spacing:.07em}.brand small{display:block;font-size:8px;color:#8a968e;letter-spacing:.12em;margin-top:2px}.side-label{font-size:10px;color:#909b96;letter-spacing:.12em;padding:0 12px 12px}.project-switch{display:flex;align-items:center;gap:9px;border:1px solid var(--border);border-radius:8px;padding:9px;color:#557062;margin:0 4px}.project-switch select{font-size:12px;min-width:0;width:100%;border:0;background:transparent;outline:none}.new-project{display:flex;justify-content:center;align-items:center;gap:6px;color:#62786b;background:transparent;padding:11px;font-size:11px;margin-bottom:22px}nav{display:grid;gap:6px}.nav-item{display:flex;align-items:center;gap:12px;width:100%;padding:13px 13px;background:transparent;text-align:left;border-radius:7px;color:#708078;font-size:12px}.nav-item.active{color:#315d48;background:#edf3ef;font-weight:650}.nav-item.active:before{content:'';position:absolute;left:0;width:3px;height:24px;background:#4d7a61;border-radius:0 3px 3px 0}.count{margin-left:auto;background:#f8e6e0;color:#b77457;border-radius:4px;min-width:20px;text-align:center;font-size:10px}.new-tag{margin-left:auto;font-size:8px;background:#e9edea;padding:1px 5px;border-radius:4px}.side-bottom{margin-top:auto;padding:28px 9px 0}.manual-mini{display:flex;gap:10px;padding:14px 0 20px;border-bottom:1px solid var(--border);color:#7d8a82}.manual-mini b,.manual-mini span{display:block;font-size:11px}.manual-mini span{font-size:10px;margin-top:4px;color:#9da59f}.archive-toggle{display:flex;gap:7px;align-items:center;font-size:10px;color:#8b968f;margin:15px 0}.side-bottom a{font-size:11px;display:flex;gap:6px;align-items:center;color:#819087}.main{margin-left:244px;min-width:0;flex:1}.topbar{height:67px;background:#fff;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 38px}.breadcrumb{display:flex;align-items:center;gap:12px;font-size:11px;color:#8a958e}.breadcrumb span{color:#4f6257}.top-actions{display:flex;gap:19px;align-items:center}.cloud-indicator{display:flex;gap:7px;align-items:center;font-size:10px;color:#7e8e84}.cloud-indicator i{width:5px;height:5px;background:#6c987c;border-radius:50%}.icon-btn{background:transparent;display:grid;place-items:center;padding:8px;color:#73857a;border-radius:6px}.icon-btn:hover{background:#edf2ef}.page-content{max-width:1540px;margin:auto;padding:35px 38px 18px}.page-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:27px;gap:20px}.eyebrow{font-size:9px;font-weight:600;letter-spacing:.16em;color:#829186;margin-bottom:7px}h1{font-size:27px;display:flex;gap:10px;align-items:center;line-height:1.5}.version{font-size:9px;font-weight:500;letter-spacing:.01em;background:#e9edeb;color:#849389;border-radius:4px;padding:2px 6px}.page-heading p{font-size:11px;color:#8d9690;margin-top:5px}.heading-actions{display:flex;gap:8px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #dce4de;border-radius:6px;background:#fff;padding:9px 13px;color:#62766a;font-size:11px;white-space:nowrap}.btn:hover{border-color:#87a393;background:#f9fbf9}.btn.primary{background:#365f4c;color:#fff;border-color:#365f4c}.btn.primary:hover{background:#244e3a}.btn.primary:disabled{background:#637c6d}.bordered{border:1px solid var(--border);background:#fff}.project-banner{border:1px solid #dae6de;background:linear-gradient(112deg,#f1f6f2,#eaf2ec);border-radius:10px;display:flex;justify-content:space-between;align-items:center;padding:24px 29px;margin-bottom:19px;gap:28px}.project-title{display:flex;gap:17px;align-items:center}.episode{height:47px;width:51px;background:white;border:1px solid #d9e5dc;display:grid;place-items:center;border-radius:8px;font-size:12px;font-weight:700;color:#587762;flex-shrink:0}.project-title h2{font-size:21px;display:flex;gap:10px;align-items:center}.project-title p{font-size:10px;color:#8b9a8f;margin-top:5px}.project-title p span{margin:0 7px}.project-progress{width:200px;flex-shrink:0}.project-progress>div:first-child{display:flex;justify-content:space-between;align-items:center}.project-progress span{font-size:10px;color:#718978}.project-progress b{font-size:23px;color:#476d55;font-weight:500}.project-progress b small{font-size:11px}.progress-track{height:4px;background:#dce8df;border-radius:9px;margin:5px 0}.progress-track i{display:block;height:4px;background:#71967c;border-radius:9px;transition:width .3s}.project-progress>small{display:block;text-align:right;color:#93a497;font-size:9px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:31px}.metrics>div{display:flex;gap:14px;align-items:center;background:#fff;border:1px solid var(--border);border-radius:8px;padding:17px 18px}.metric-icon{height:37px;width:37px;border-radius:9px;display:grid;place-items:center}.green{color:#5d8569;background:#edf4ef}.amber{color:#b49b6a;background:#faf5e9}.red{color:#bd8a79;background:#fbefeb}.blue{color:#849bb2;background:#eef3f7}.metrics b{font-size:23px;font-weight:550;line-height:1}.metrics em{font-size:11px;font-style:normal;font-weight:400;color:#b2b9b3}.metrics small{display:block;color:#8e9a92;font-size:10px;margin-top:5px}.section-title{display:flex;align-items:center;gap:13px;margin-bottom:17px}.section-title h2{font-size:15px}.section-title>span{font-size:10px;color:#9ca49e}.section-title p{font-size:11px;color:#98a098;margin-top:5px}.section-title>.btn{margin-left:auto}.branch-toggle{margin-left:auto;font-size:11px;display:flex;align-items:center;gap:6px;color:#617669}.flow-layout{display:grid;grid-template-columns:237px 1fr;gap:22px;align-items:start}.stage-list{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px}.stage-item{display:flex;gap:12px;align-items:center;padding:12px 10px;border-radius:7px;background:transparent;width:100%;text-align:left;position:relative}.stage-item:after{content:'';position:absolute;left:25px;bottom:-7px;height:18px;width:1px;background:#e6ebe7}.stage-item:last-of-type:after{display:none}.stage-item.selected{background:#edf4ef}.stage-item:hover{background:#f4f7f5}.stage-number{display:grid;place-items:center;flex-shrink:0;width:30px;height:30px;border:1px solid #e3e9e4;background:#fafbf9;color:#a2aca4;border-radius:50%;font-size:10px;position:relative;z-index:1}.stage-item.selected .stage-number{background:#487158;border-color:#487158;color:white}.stage-number.done{background:#e3efe6;color:#60846b;border-color:#e3efe6}.stage-item>div{flex:1}.stage-item small{font-size:8px;color:#a9b2ab;display:block}.stage-item strong{font-size:12px;display:block;font-weight:550;margin:1px 0}.stage-label{font-size:8px;color:#a2ada4;display:flex;gap:4px;align-items:center}.stage-item>svg{color:#bac7bd}.stage-item.selected strong{color:#3a674b}.legend{display:flex;justify-content:center;gap:16px;font-size:9px;color:#a5afa7;border-top:1px solid var(--border);padding:13px 0 3px;margin-top:10px}.legend span{display:flex;align-items:center;gap:5px}.legend-dot{width:5px;height:5px;border-radius:50%}.green-dot{background:#7c9d84}.gray-dot{background:#c3cbc5}.detail-card{background:#fff;border:1px solid var(--border);border-radius:9px;padding:27px 29px}.detail-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.detail-top h2{font-size:23px}.status{display:inline-flex;align-items:center;white-space:nowrap;padding:3px 9px;border-radius:4px;font-size:9px;line-height:1.7}.status.todo{background:#f0f2ef;color:#95a095}.status.candidate{background:#fbf4e3;color:#ac935c}.status.passed,.status.in_timeline{background:#e8f2e9;color:#587d61}.status.needs_revision{background:#faebe5;color:#b47762}.stage-description{color:#89968c;font-size:11px;line-height:1.9;margin:10px 0 21px}.gate-notice{display:flex;gap:9px;align-items:flex-start;font-size:10px;color:#a68e61;background:#fbf7ed;border:1px solid #eee6d3;border-radius:6px;padding:10px 12px;margin-bottom:19px}.gate-notice svg{flex-shrink:0;margin-top:1px}.output-box{display:flex;gap:12px;background:#f5f8f5;border:1px solid #e8ede6;border-radius:7px;padding:15px;margin-bottom:26px;color:#6f8975}.output-box strong{font-size:11px;font-weight:550}.output-box p{font-size:10px;color:#91a08f;margin-top:4px}.checklist-heading{display:flex;justify-content:space-between;margin-bottom:10px}.checklist-heading h3{font-size:12px}.checklist-heading span{font-size:10px;color:#92a08f}.checklist{margin-bottom:24px;display:grid;gap:8px}.checklist label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:11px 12px;background:#fff;border:1px solid #e7ebe6;border-radius:6px;color:#7b8b7e;font-size:11px;line-height:1.8}.checklist label.checked{background:#f5f9f5;border-color:#cedfcf;color:#53705a}input[type=checkbox]{accent-color:#5f896c;width:14px;height:14px;flex-shrink:0;margin:3px 0 0}.field-label{font-size:11px;display:flex;align-items:center;gap:5px;margin:18px 0 8px;color:#607566}.field-label span{font-size:8px;color:#a6b0a6;margin-left:auto}textarea{display:block;width:100%;border:1px solid #e2e8e1;border-radius:6px;padding:11px 12px;font-size:11px;line-height:1.8;background:#fdfefd;min-height:65px}.field-help{display:block;font-size:9px;color:#a0aca1;margin-top:5px}.reviews{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:23px}.reviews>div{background:#fafbf9;border:1px solid #ecf0e9;border-radius:6px;padding:12px}.review-title{display:flex;align-items:center;gap:6px;font-size:10px;color:#7e9180;margin-bottom:9px}.reviews b{font-size:10px}.reviews p{font-size:10px;white-space:pre-wrap;margin-top:5px;word-break:break-word}.reviews small{display:block;font-size:8px;color:#a6b1a5;margin-top:5px}.muted{color:#9aa69a;font-size:11px}.green-text{color:#5b865e}.red-text,.danger-text{color:#b37a65!important}.detail-actions{margin-top:25px;display:flex;justify-content:space-between;gap:10px;align-items:center;padding-top:19px;border-top:1px solid var(--border)}.detail-actions>div{display:flex;gap:7px}.text-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 0;font-size:10px;color:#6f8b73;background:transparent;white-space:nowrap}.gate-reasons{font-size:9px;line-height:1.9;color:#a3afa3;margin-top:12px;text-align:right}.principle{display:flex;align-items:center;gap:12px;background:#eef2ee;border:1px solid #e2e9df;border-radius:8px;padding:17px 20px;margin-top:21px;color:#7c907d}.principle b{font-size:11px;font-weight:550}.principle p{font-size:9px;color:#9aaa98;margin-top:3px}footer{font-size:8px;color:#abb4aa;margin:26px 0 0;display:flex;justify-content:space-between;gap:10px}footer span{font-size:8px}.empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;padding:65px 15px;color:#9eafa0;text-align:center}.empty h3{font-size:16px;color:#718975}.empty p{font-size:11px;color:#a4afa5}.onboarding{background:#fff;border:1px solid var(--border);border-radius:12px;text-align:center;padding:50px 25px}.onboarding-icon{background:#edf4ef;border:1px solid #dce8df;color:#5d8067;height:73px;width:73px;margin:0 auto 25px;border-radius:18px;display:grid;place-items:center}.onboarding h2{font-size:25px;margin-bottom:14px}.onboarding>p{color:#91a091;font-size:12px;line-height:2;margin-bottom:24px}.onboarding-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:730px;margin:35px auto 22px;text-align:left}.onboarding-grid>div{border:1px solid #e8ede7;background:#fbfcfa;border-radius:7px;padding:12px;color:#7b907e;font-size:11px;display:flex;gap:9px}.onboarding-grid span{color:#b3c0b1;font-size:10px}.onboarding>small{color:#aab4a6;font-size:10px}.wide-card{background:#fff;border:1px solid var(--border);border-radius:9px;padding:26px}.wide-card h2{font-size:19px}.search{display:flex;gap:10px;align-items:center;background:#f8faf7;border:1px solid #e6ece2;border-radius:7px;padding:9px 12px;color:#9aad96;margin-bottom:20px;max-width:400px}.search input{border:0;background:transparent;font-size:11px;width:100%;outline:none}.table-scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:10px;text-align:left}th{font-size:9px;color:#a3b29c;letter-spacing:.05em;background:#f7faf5;font-weight:500;padding:12px 9px;border-bottom:1px solid #e6ece1}td{padding:16px 9px;border-bottom:1px solid #edf0ea;min-width:90px;max-width:260px}td small{display:block;color:#a8b2a2;font-size:8px;margin-top:4px}td b{font-size:11px}td .table-actions{display:flex;flex-direction:column;gap:4px;align-items:flex-start}.inline-note{font-size:10px;color:#a3b09c;border-top:1px solid var(--border);padding-top:16px;margin-top:17px}.issue-list{display:grid;gap:12px}.issue-card{border:1px solid var(--border);border-radius:7px;padding:18px}.issue-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.issue-top b{font-size:11px}.issue-top time{margin-left:auto;font-size:9px;color:#a8b09f}.issue-card>p{font-size:12px;margin:14px 0;white-space:pre-wrap}.issue-card>small{font-size:9px;color:#a1b09c}.issue-card>.btn{display:block;margin-top:12px}.resolution{display:flex;gap:8px;color:#6d8e67;background:#f3f8ef;font-size:11px;padding:12px;margin-top:12px;white-space:pre-wrap}.audit-list>div{display:flex;gap:14px;padding:17px 0;border-bottom:1px solid var(--border);align-items:center}.audit-icon{width:33px;height:33px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;background:#eef4ea;color:#7e9d72}.audit-icon.ai{background:#eef1fa;color:#8798b8}.audit-list b{font-size:11px}.audit-list b span{color:#8aa17d;margin-left:8px}.audit-list small{display:block;font-size:9px;color:#9cac94;margin-top:4px}.audit-list time{margin-left:auto;font-size:9px;color:#a7b29f;white-space:nowrap}.connection-layout{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}.connection-symbol{display:flex;align-items:center;gap:20px;color:#73926b;padding:15px 0 30px}.connection-symbol svg:nth-child(2){color:#c3cfc0}.connection-state{display:flex;align-items:center;gap:12px;background:#f5f8f2;border:1px solid #e7ece1;padding:16px;border-radius:7px;margin:20px 0}.connection-state i{width:7px;height:7px;border-radius:50%}.online-dot{background:#709f62}.connection-state b{font-size:11px}.connection-state small{display:block;color:#a2b095;margin-top:4px;font-size:9px}.connect-steps{padding-left:22px;margin:25px 0;color:#7f9873}.connect-steps li{padding-left:9px;margin-bottom:20px}.connect-steps b{font-size:12px}.connect-steps p{font-size:10px;color:#a0ae97;line-height:1.9;margin-top:5px}.capability-card h3{font-size:13px;margin-bottom:22px}.capability-card>p{display:flex;align-items:center;gap:10px;font-size:11px;color:#8da180;margin:15px 0}.capability-card>p svg{color:#99b48b;flex-shrink:0}.author-only{border-top:1px solid var(--border);padding-top:22px;margin-top:25px;color:#779568}.author-only b{display:block;font-size:12px;margin:10px 0 6px}.author-only p{font-size:11px;color:#a1b294}.capability-card>small{display:block;color:#aebaa5;font-size:10px;margin-top:25px;line-height:1.9}.error-banner{display:flex;gap:10px;align-items:center;background:#fbede8;color:#ac745d;padding:12px 15px;border:1px solid #f0d8ca;border-radius:7px;margin-bottom:18px;font-size:12px}.error-banner>button{margin-left:auto;background:none;color:inherit}.error-banner a{text-decoration:underline;font-weight:bold}.toast{position:fixed;bottom:27px;left:calc(50% + 80px);transform:translateX(-50%);border:1px solid #d5e6cc;background:#f4fbef;box-shadow:0 5px 30px #37502b15;color:#6e955b;display:flex;gap:9px;align-items:center;padding:13px 22px;border-radius:9px;font-size:12px;z-index:55}.modal-backdrop{position:fixed;inset:0;background:#20332255;backdrop-filter:blur(3px);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px}.modal{width:460px;max-height:90vh;overflow:auto;background:#fff;border-radius:12px;padding:25px;box-shadow:0 20px 90px #182e2340}.modal.large{width:800px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.modal-head h2{font-size:19px}.form-field{display:flex;flex-direction:column;gap:7px;font-size:11px;color:#7f9672;margin-top:16px}.form-field input,.form-field select{width:100%;padding:10px 12px;border:1px solid #dee8d8;border-radius:6px;background:#fcfefa;font-size:12px}.form-field textarea{font-size:12px}.shot-form{display:grid;grid-template-columns:1fr 1fr;gap:0 17px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--border);padding-top:20px;margin-top:25px}.modal-error{color:#b7735e;background:#fbefe7;padding:10px;border-radius:5px;font-size:11px;margin-top:15px}details{font-size:11px;margin-top:20px;color:#7d9570}pre{font-size:10px;white-space:pre-wrap;word-break:break-all;padding:10px;background:#f7faf4}.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 @media(min-width:1500px){.page-content{padding-top:40px}.detail-card{padding:30px 36px}.stage-item{padding-top:13px;padding-bottom:13px}}
@@ -17566,37 +17660,40 @@ var Jx = `
 
 .drawing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.drawing-card.adopted{border:2px solid var(--green)}.drawing-card p{overflow-wrap:anywhere}.drawing-role{display:inline-block;padding:4px 10px;background:var(--mint);border-radius:20px;color:var(--green)}.drawing-compare-select{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:16px}.drawing-compare-select label{display:grid;gap:5px;flex:1;min-width:180px}.drawing-compare-select select{width:100%;padding:9px;border:1px solid var(--border);border-radius:8px}.drawing-side-by-side{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}.drawing-compare-image{min-width:0;overflow:hidden;background:#eef1ef}.drawing-compare-image>b{display:block;padding:8px;font-size:12px}.drawing-compare-image img{width:100%;height:450px;object-fit:contain}.drawing-compare-image iframe{width:100%;height:450px;border:0}.drawing-overlay{position:relative;height:500px;margin:16px 0;background:#eee}.drawing-overlay .drawing-compare-image{position:absolute;inset:0;background:transparent}.drawing-overlay .drawing-compare-image img{height:calc(100% - 35px)}@media(max-width:650px){.drawing-grid{display:block}.drawing-side-by-side{display:block}.drawing-compare-image img,.drawing-compare-image iframe{height:320px}.drawing-overlay{height:360px}}
 
-:host{display:block;--bg:#f7f8fa;--ink:#23322e;--muted:#85908b;--green:#326552;--border:#e4e9e6;--mint:#edf4ef;--font:'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;color:var(--ink);font:14px/1.6 var(--font);background:var(--bg)}.native-production{min-width:0}.workspace{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:calc(100dvh - 70px)}.sidebar{position:sticky;inset:auto;top:0;width:auto;height:calc(100dvh - 70px);overflow-y:auto;padding-top:20px}.brand{display:none}.main{margin-left:0!important}.topbar{height:48px}.page-content{padding:24px}.cloud-indicator{font-size:11px}.sidebar nav{max-height:none}.side-bottom{padding-top:20px}@media(max-width:850px){.workspace{grid-template-columns:185px minmax(0,1fr)}.page-content{padding:20px}}@media(max-width:600px){.workspace{display:block}.sidebar{position:relative;height:auto;padding:12px 16px 0}.main{margin:0}.topbar{display:none}.page-content{padding:20px 16px}.page-heading{margin-top:0}.page-heading p{max-width:none;font-size:12px}.sidebar .new-project{margin-bottom:6px}h1{font-size:24px}}`, Ix = "https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-production", Ms = /* @__PURE__ */ new WeakMap(), $x = async (r, h, k) => {
+.image-load-error{color:#9d3f32;background:#fff5f0;border-radius:8px;padding:10px}.image-load-error .btn{width:100%;justify-content:center;min-height:44px}.project-image-preview:disabled{cursor:default;opacity:1}
+
+:host{display:block;--bg:#f7f8fa;--ink:#23322e;--muted:#85908b;--green:#326552;--border:#e4e9e6;--mint:#edf4ef;--font:'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;color:var(--ink);font:14px/1.6 var(--font);background:var(--bg)}.native-production{min-width:0}.workspace{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:calc(100dvh - 70px)}.sidebar{position:sticky;inset:auto;top:0;width:auto;height:calc(100dvh - 70px);overflow-y:auto;padding-top:20px}.brand{display:none}.main{margin-left:0!important}.topbar{height:48px}.page-content{padding:24px}.cloud-indicator{font-size:11px}.sidebar nav{max-height:none}.side-bottom{padding-top:20px}@media(max-width:850px){.workspace{grid-template-columns:185px minmax(0,1fr)}.page-content{padding:20px}}@media(max-width:600px){.workspace{display:block}.sidebar{position:relative;height:auto;padding:12px 16px 0}.main{margin:0}.topbar{display:none}.page-content{padding:20px 16px}.page-heading{margin-top:0}.page-heading p{max-width:none;font-size:12px}.sidebar .new-project{margin-bottom:6px}h1{font-size:24px}}`, Wx = "https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-production", Ms = /* @__PURE__ */ new WeakMap(), Fx = async (r, h, C) => {
   const f = window.LizhiAuth;
   if (!f?.client) throw new Error("請先登入立之雲端庫");
-  const { data: p, error: w } = await f.client.auth.getSession();
-  if (w || !p.session?.access_token) throw new Error("登入已失效，請重新登入雲端庫");
-  return fetch(Ix + "/" + r + h, {
+  const { data: p, error: k } = await f.client.auth.getSession();
+  if (k || !p.session?.access_token) throw new Error("登入已失效，請重新登入雲端庫");
+  return fetch(Wx + "/" + r + h, {
     cache: "no-store",
+    ...C ? {} : { signal: AbortSignal.timeout(2e4) },
     headers: {
       Authorization: "Bearer " + p.session.access_token,
       apikey: window.LIZHI_SUPABASE_PUBLISHABLE_KEY,
-      ...k && !(k instanceof FormData) ? { "Content-Type": "application/json" } : {}
+      ...C && !(C instanceof FormData) ? { "Content-Type": "application/json" } : {}
     },
-    ...k ? {
+    ...C ? {
       method: "POST",
-      body: k instanceof FormData ? k : JSON.stringify(k)
+      body: C instanceof FormData ? C : JSON.stringify(C)
     } : {}
   });
 };
-function Fx(r) {
+function eg(r) {
   if (Ms.has(r)) return;
-  const h = r.attachShadow({ mode: "open" }), k = document.createElement("style");
-  k.textContent = Jx, h.append(k);
+  const h = r.attachShadow({ mode: "open" }), C = document.createElement("style");
+  C.textContent = $x, h.append(C);
   const f = document.createElement("div");
   f.className = "native-production", h.append(f);
   const p = (0, cx.createRoot)(f);
-  Ms.set(r, p), p.render(/* @__PURE__ */ (0, l.jsx)(Kx, { nativeTransport: $x }));
+  Ms.set(r, p), p.render(/* @__PURE__ */ (0, l.jsx)(Ix, { nativeTransport: Fx }));
 }
-function Px(r) {
+function tg(r) {
   Ms.get(r)?.unmount(), Ms.delete(r);
 }
 export {
-  Fx as mount,
-  Px as unmount
+  eg as mount,
+  tg as unmount
 };
