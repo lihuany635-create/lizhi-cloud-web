@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {webcrypto} from 'node:crypto';
-globalThis.crypto=webcrypto;
+if(!globalThis.crypto)Object.defineProperty(globalThis,'crypto',{value:webcrypto,configurable:true});
 const SITE='appgprj_6ae0c336243881919e9ba2bbf450f1fb';
 const sha='80b4390068b5f78e805de7386ef53b9489d57f31f52e9a09ab1c01557fdf1c52';
 const token='a'.repeat(96);
