@@ -997,22 +997,22 @@ renderSlots();
 
 /* Installed INSIDE the existing viewer closure. No GLB changes or substitute renderer. */
 const agentOrigin='https://lizhi-viewer-agent-20261027.lihuany635.chatgpt.site';
-let agentNonce=null,agentActive=false,agentBusy=false,agentRevision=0,agentFingerprint='',agentLastContact=0,agentInitGeneration=0;
+let agentNonce=null,agentActive=false,agentBusy=false,agentRevision=0,agentFingerprint='',agentLastContact=0,agentInitGeneration=0,agentShadowSetting=null;
 const agentRequests=new Map(),agentEvidence=[];
 const agentButton=document.createElement('button');agentButton.className='btn';agentButton.id='viewerAgentStop';agentButton.textContent='停止 AI 控制';agentButton.hidden=true;
 document.querySelector('.bar').append(agentButton);
-function agentStop(){agentInitGeneration++;agentActive=false;keys.clear();joyV.set(0,0);look=null;anim=null;controls.autoRotate=false;setPlacing(false);agentButton.hidden=true;}
+function agentStop(){agentInitGeneration++;agentActive=false;keys.clear();joyV.set(0,0);look=null;anim=null;controls.autoRotate=false;if(agentShadowSetting!==null){renderer.shadowMap.enabled=agentShadowSetting;agentShadowSetting=null;}setPlacing(false);agentButton.hidden=true;}
 agentButton.onclick=()=>{agentStop();parent.postMessage({channel:'lizhi-viewer-v1',type:'stopped',nonce:agentNonce},agentOrigin);};
 function agentScene(){
  syncAvatar();
  const a=avatars.map(a=>({id:a.id,name:a.name,position:a.pos.toArray(),yaw:a.yaw,pitch:a.pitch,mode:a.mode,eye:a.eye,visible:a.visible}));
- const cameraState={position:camera.position.toArray(),quaternion:camera.quaternion.toArray(),target:controls.target.toArray(),mode:viewMode,selected_id:selectedId,yaw,pitch};
+ const cameraState={position:camera.position.toArray(),quaternion:camera.quaternion.toArray(),target:controls.target.toArray(),mode:viewMode,selected_id:selectedId,yaw,pitch,fov:camera.fov,aspect:camera.aspect};
  const fp=JSON.stringify([modelKey,sourceInfo?.actualSHA,a,cameraState,activeCutHeight]);
  if(agentFingerprint&&fp!==agentFingerprint)agentRevision++;agentFingerprint=fp;
  return {revision:agentRevision,model_key:modelKey,model_name:modelName,source:sourceInfo,avatars:a,camera:cameraState,
   bounds:{min:box.min.toArray(),max:box.max.toArray()},coordinate_system:'Three.js +Y up; viewer meters; positions after display transform',
   model_transform:model?{position:model.position.toArray(),scale:model.scale.toArray()}:null,
-  render_ready:!!model&&!window.GLBPreview.active&&!renderer.getContext().isContextLost(),mesh_count:meshLayers.length,
+  render_ready:!!model&&!window.GLBPreview.active&&!renderer.getContext().isContextLost(),render_profile:agentActive?'inspection_no_realtime_shadows':'original_viewer',mesh_count:meshLayers.length,
   evidence:agentEvidence.map(x=>({...x})),at:new Date().toISOString(),unobserved_areas:'NOT_INSPECTED'};
 }
 function agentVector(v){if(!Array.isArray(v)||v.length!==3||!v.every(n=>Number.isFinite(n)&&Math.abs(n)<=10000))throw Error('INVALID_COORDINATES');return new THREE.Vector3(...v);}
@@ -1094,7 +1094,7 @@ addEventListener('message',async event=>{
   agentNonce=m.nonce;const generation=++agentInitGeneration;
   for(let i=0;i<150&&!model;i++){await new Promise(r=>setTimeout(r,180));if(generation!==agentInitGeneration)return;}
   if(generation!==agentInitGeneration)return;
-  anim=null;controls.autoRotate=false;controls.enableDamping=false;agentActive=true;agentLastContact=Date.now();agentButton.hidden=false;
+  anim=null;controls.autoRotate=false;controls.enableDamping=false;if(agentShadowSetting===null)agentShadowSetting=renderer.shadowMap.enabled;renderer.shadowMap.enabled=false;agentActive=true;agentLastContact=Date.now();agentButton.hidden=false;
   parent.postMessage({channel:m.channel,type:'ready',nonce:agentNonce,scene:agentScene()},agentOrigin);return;
  }
  if(m.nonce!==agentNonce)return;
