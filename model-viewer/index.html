@@ -1007,7 +1007,8 @@ function agentScene(){
  syncAvatar();
  const a=avatars.map(a=>({id:a.id,name:a.name,position:a.pos.toArray(),yaw:a.yaw,pitch:a.pitch,mode:a.mode,eye:a.eye,visible:a.visible}));
  const cameraState={position:camera.position.toArray(),quaternion:camera.quaternion.toArray(),target:controls.target.toArray(),mode:viewMode,selected_id:selectedId,yaw,pitch,fov:camera.fov,aspect:camera.aspect};
- const fp=JSON.stringify([modelKey,sourceInfo?.actualSHA,a,cameraState,activeCutHeight]);
+ // Ignore sub-micrometer orbit-control roundoff when comparing CAS revisions.
+ const fp=JSON.stringify([modelKey,sourceInfo?.actualSHA,a,cameraState,activeCutHeight],(_k,v)=>typeof v==='number'?Math.round(v*1e6)/1e6:v);
  if(agentFingerprint&&fp!==agentFingerprint)agentRevision++;agentFingerprint=fp;
  return {revision:agentRevision,model_key:modelKey,model_name:modelName,source:sourceInfo,avatars:a,camera:cameraState,
   bounds:{min:box.min.toArray(),max:box.max.toArray()},coordinate_system:'Three.js +Y up; viewer meters; positions after display transform',

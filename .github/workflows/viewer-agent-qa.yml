@@ -12,9 +12,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install pinned browser test runtime
+        timeout-minutes: 4
+        env:
+          npm_config_fetch_retries: '1'
+          npm_config_fetch_timeout: '60000'
+          PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: '60000'
         run: |
           npm install --prefix /tmp/viewer-browser --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
-          /tmp/viewer-browser/node_modules/.bin/playwright install --with-deps chromium
+          # Ubuntu 24.04 runner already supplies the shared libraries (verified
+          # in prior job logs); avoid unrelated apt font/Xvfb upgrades here.
+          /tmp/viewer-browser/node_modules/.bin/playwright install chromium
       - name: Real academy render and control test
         env:
           NODE_PATH: /tmp/viewer-browser/node_modules
