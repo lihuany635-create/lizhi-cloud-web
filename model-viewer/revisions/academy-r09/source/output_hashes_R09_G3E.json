@@ -1,0 +1,204 @@
+{
+ "outputs": [
+  {
+   "path": "01_working_source/LAHUDI_MASTER_R09_G3E_20261027_working.blend",
+   "bytes": 769271,
+   "sha256": "7ca7f8b32d290abaa5832acf6fe64fbd1a7823018991556da72c06ae42c28fc5"
+  },
+  {
+   "path": "01_working_source/decor_block.py",
+   "bytes": 7293,
+   "sha256": "bf29cb42bf99eaaba18ada9a707e5b7b191427dbedb19b60ac626743ae4cf4a0"
+  },
+  {
+   "path": "01_working_source/furniture_block.py",
+   "bytes": 16065,
+   "sha256": "7e5103331ecbf8c66943b6b3c84c4b215477ef2959499e41724926f5ae15e253"
+  },
+  {
+   "path": "01_working_source/furniture_log.json",
+   "bytes": 12033,
+   "sha256": "0d1401ba67936a93ba60448f0a309195d5bcd351eadb64bcab23ee7d80a0b0a1"
+  },
+  {
+   "path": "01_working_source/lahudi_g4_build.py",
+   "bytes": 106661,
+   "sha256": "19f11f26cc894047c1357ffb24f5798f37c5ac8c24b328550b21c793811e2461"
+  },
+  {
+   "path": "01_working_source/lahudi_g4_qa.py",
+   "bytes": 20563,
+   "sha256": "96ed614b2a8a05dc9c3e740e83208b6c7c2d5fdb68a84cffbd7cfd2a6ec28398"
+  },
+  {
+   "path": "01_working_source/lahudi_g4_render.py",
+   "bytes": 1823,
+   "sha256": "ba81981f1b5f1263fc6db0ae978a3d84ccb8f27e7d033f07950c32269879ec78"
+  },
+  {
+   "path": "01_working_source/lahudi_plan_draw.py",
+   "bytes": 6240,
+   "sha256": "58ba111e65eb1dca126ec792169300dceb9b0b3245f784084093fdc117965d5f"
+  },
+  {
+   "path": "01_working_source/landscape_block.py",
+   "bytes": 14409,
+   "sha256": "1f09e92812dfb83e3cb94f5fdbd074f1385ca9e40c3e63c1344ea0d7ae1a6da7"
+  },
+  {
+   "path": "01_working_source/landscape_log.json",
+   "bytes": 129,
+   "sha256": "90b36e27ddcf4bebc1fb58d78a8e9ae1dbe9d90d51710dda401c0a2787373123"
+  },
+  {
+   "path": "01_working_source/params_used.json",
+   "bytes": 9405,
+   "sha256": "c20d597e6cfe09b8dce061432aae3d081de10172e40704a2a97d6b99dc6ce354"
+  },
+  {
+   "path": "01_working_source/rooms.json",
+   "bytes": 16944,
+   "sha256": "a17d7ce485cfb83a3fda6baea152fb6f75b3249e052457a49de3aecbd755d472"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_CONNECTORS_R09_G3E_20261027.glb",
+   "bytes": 297176,
+   "sha256": "e42b37eac4ccd96ed28f92c2985eafa4de9fef8912e4ad3d17a1de273abbc460"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L04_MAIN_R09_G3E_20261027.glb",
+   "bytes": 604744,
+   "sha256": "9ceac2624e5476e9fb1081fe1516a6bcce1fa6cdb7c85581c85b57e70650674b"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L05_ANNEX_R09_G3E_20261027.glb",
+   "bytes": 265760,
+   "sha256": "5b1d30627475a299858eb6c7c550b9849abe3b9a272a72bd41bb139f507f2cf3"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L05_CLOISTER_R09_G3E_20261027.glb",
+   "bytes": 242724,
+   "sha256": "5cd9014e2e6020c77a941a241b19f616d85810eb23244e4458dc63be7582f574"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L06_EAST_C_R09_G3E_20261027.glb",
+   "bytes": 417532,
+   "sha256": "5975d2f1d68b9b973c5d815f3511944b2f97904b4da0e93dc1db697db7611472"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L06_WEST_A_R09_G3E_20261027.glb",
+   "bytes": 473220,
+   "sha256": "483940e78bc796059b99601f07a45de3499c71ee108f8ab3c6c411016f436ec7"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L07_STAIR_TOWER_R09_G3E_20261027.glb",
+   "bytes": 289236,
+   "sha256": "9a670d9f9514fb350a56bcf527a419e7135b8c075bee1ae36ef39cf361d183b7"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_L08_LIBRARY_R09_G3E_20261027.glb",
+   "bytes": 657676,
+   "sha256": "e92a5dbe30eb28b53847932ad5257ff6c5089864cf6928ae6386a92f0538858d"
+  },
+  {
+   "path": "02_building_glb/LAHUDI_SITE_L01_L02_L03_R09_G3E_20261027.glb",
+   "bytes": 386296,
+   "sha256": "0a1329247412492f127094ceb2d0739bd0887cf9cb5c49f1385710b44e3ac219"
+  },
+  {
+   "path": "03_master_glb/LAHUDI_MASTER_R09_G3E_20261027.glb",
+   "bytes": 3483320,
+   "sha256": "80b4390068b5f78e805de7386ef53b9489d57f31f52e9a09ab1c01557fdf1c52"
+  },
+  {
+   "path": "04_test_images/G3E_01_\u622a\u5716\u540c\u89d2\u5ea6_\u6821\u9580\u5927\u9053.png",
+   "bytes": 1408695,
+   "sha256": "1789ea263da40d2a684737f941948fe0f6e281d98f083f75b09b38a947082245"
+  },
+  {
+   "path": "04_test_images/G3E_02_\u5927\u968e\u68af\u8fd1\u666f.png",
+   "bytes": 1573816,
+   "sha256": "763b423f029597c7af2ca0294d4181736fb830616207b7ad8bb58db30a27f558"
+  },
+  {
+   "path": "04_test_images/G3E_03_\u8ef8\u6e2c_\u6771\u5357.png",
+   "bytes": 1807397,
+   "sha256": "190b778ebe1f9426f21a7d80b3e78ff438cc112d79c7805ec9e04ec721b25a1c"
+  },
+  {
+   "path": "04_test_images/G3E_04_\u6771\u7ffc\u5165\u53e3\u968e\u68af.png",
+   "bytes": 1600580,
+   "sha256": "2e0338d7efa6cb3bdd9d208163ab2a770465fc8680d0b58c5ea2460e4b13e4f9"
+  },
+  {
+   "path": "04_test_images/PLAN_L04_MAIN_1F.png",
+   "bytes": 95734,
+   "sha256": "6d2c44e7bcc08d2a02909e2ba92bb48b1acd04401c6b5da45bdf8d46b633bc6b"
+  },
+  {
+   "path": "04_test_images/PLAN_L04_MAIN_2F.png",
+   "bytes": 127909,
+   "sha256": "64ef24b96e56b437a217dfad7f204a2e09d643aa28e6018473de70539e4dcbf9"
+  },
+  {
+   "path": "04_test_images/PLAN_L05_ANNEX_1F.png",
+   "bytes": 61555,
+   "sha256": "9f92bc8f673f41778d9760aadac3a23e92dcf3d783ef1eb96eeee486e98ecf11"
+  },
+  {
+   "path": "04_test_images/PLAN_L05_ANNEX_2F.png",
+   "bytes": 62280,
+   "sha256": "5605c3e4ea100e1a8750648237b3787bdc9f0e816bb43671a66977dad2c48ac5"
+  },
+  {
+   "path": "04_test_images/PLAN_L05_CLOISTER_1F.png",
+   "bytes": 65321,
+   "sha256": "745f54c80474f8022606cfb9c242cb6622f3a0f87ddf6fd5f28291deddf9fe0a"
+  },
+  {
+   "path": "04_test_images/PLAN_L05_CLOISTER_2F.png",
+   "bytes": 66852,
+   "sha256": "671bc85c405868945b0e684193c2336d19b5ec3c1ec8bdc1a99ab8525d58c958"
+  },
+  {
+   "path": "04_test_images/PLAN_L06_EAST_C_1F.png",
+   "bytes": 72164,
+   "sha256": "0474c36b2bd8abf1d75121399a44702ebb6dd2b141801a4a6ccd5194346941d5"
+  },
+  {
+   "path": "04_test_images/PLAN_L06_EAST_C_2F.png",
+   "bytes": 70519,
+   "sha256": "d6179ca7a5d2793679c08a3325e632812220d35d0ccf2646018bd0c986272691"
+  },
+  {
+   "path": "04_test_images/PLAN_L06_WEST_A_1F.png",
+   "bytes": 73809,
+   "sha256": "385b85beadf6ee16da81dc34385658177bd01a658889aa8f73417f108595e1c3"
+  },
+  {
+   "path": "04_test_images/PLAN_L06_WEST_A_2F.png",
+   "bytes": 71894,
+   "sha256": "15bbd1a24ed09c711d2f7c638474f46b567205306be5e3ddf23526890801ec87"
+  },
+  {
+   "path": "04_test_images/PLAN_L08_LIBRARY_1F.png",
+   "bytes": 74647,
+   "sha256": "6747ca48a92fcdbde0c567e2c27f97eff68e05e160820fa91925896a818372c7"
+  },
+  {
+   "path": "04_test_images/PLAN_L08_LIBRARY_2F.png",
+   "bytes": 73965,
+   "sha256": "ffa7d4f2e1b4412ea3287b608e8cbd3a44ad7edcde341f530ff6e1e2a928dbc6"
+  },
+  {
+   "path": "05_reports/QA_G3E_R09.json",
+   "bytes": 17522,
+   "sha256": "746e98ba6829e5af2c7dc815cb7c62276f04cf0f1555dd49e9ba490be1afe475"
+  },
+  {
+   "path": "05_reports/\u5de5\u4f5c\u7d00\u9304_G3L_R04_20261027.md",
+   "bytes": 8672,
+   "sha256": "6d76589ee690c0eb19e69449c6f61bc647f5a6d386b4a2358ea56772205e1f12"
+  }
+ ]
+}

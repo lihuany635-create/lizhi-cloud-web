@@ -1,6 +1,6 @@
 {
   "format": "rg-current-models/1",
-  "version": "mixed-current-academy-r03-g2f-20261027",
+  "version": "mixed-current-academy-r09-20261027",
   "scene_count": 5,
   "active_selector_count": 5,
   "user_instruction": "你有把同一個模型合併嗎？沒有就合併",
@@ -65,26 +65,30 @@
     },
     {
       "model": "lahudi-academy.glb",
-      "version": "ACADEMY-R03-G2F-20261027",
-      "source_candidate": "revisions/academy-r03-g2f/ (build: scripts/lahudi_g2f_build.py → LAHUDI_MASTER_R03_G2F_20261027.glb)",
-      "current_sha256": "307bae18db6c2ba1a0425da92b779ac21ce39b00f8525babaae5cfd007bea037",
-      "backup": "backups/pre-academy-r03-g2f/lahudi-academy.glb",
-      "backup_sha256": "aa1f5778f9d87672d0df1c7ba36b6202108eb14bbc4aeb4bb322504c7dbf2dc0",
-      "backup_version": "ACADEMY-V16-INDOOR-GREENERY-PHASE1-REVIEW",
-      "integrated_contents": "Full parametric rebuild from the 2026-10-27 package (119 images + 建模尺寸計算書 v0.1 + 3D 模型製作手冊 v1.0). World axes 1 unit = 1 m, X east, Y north (glTF -Z), Z up. L01–L08 shells with 271 pointed-arch window openings, pilasters, L04 48x30 and L08 60x20 true 2F voids, 4 two-level connectors, 7 two-flight stairs (30 risers, 0.18 m) + L07 spiral proxy, interior partitions for L04/L05/L06/L08 (F-104/F-204/F-206 R01/F-208 R01/F-108), 591 furniture placements from 16 shared module meshes.",
+      "version": "ACADEMY-R09-G3E-20261027",
+      "source_candidate": "revisions/academy-r09/ (build: scripts/lahudi_g4_build.py → LAHUDI_MASTER_R09_G3E_20261027.glb)",
+      "current_sha256": "80b4390068b5f78e805de7386ef53b9489d57f31f52e9a09ab1c01557fdf1c52",
+      "backup": "backups/pre-academy-r09/lahudi-academy.glb",
+      "backup_sha256": "307bae18db6c2ba1a0425da92b779ac21ce39b00f8525babaae5cfd007bea037",
+      "backup_version": "ACADEMY-R03-G2F-20261027",
+      "older_backup": "backups/pre-academy-r03-g2f/lahudi-academy.glb (V16, SHA aa1f5778…)",
+      "integrated_contents": "R03 buildings/interiors/furniture + M07 landscape (boundary wall, east side gate, rear garden, 83 conifers, paths) + E-301~E-304 exterior massing (L04 entrance clock tower +35.0, L08 north tower +33.0, 16 corner turrets, dormers, pinnacles) + author-directed entry: buildings on thickened podium, site grade lowered 1.85 m, straight fenced gate avenue (stone piers, iron railing, hedges, lamps; no fountains) ending at a two-flight L04 grand stair (6 + landing 2.4 m + 6), entry stairs at other exterior doors.",
       "author_full_item_approval": "PENDING",
-      "review_url": "revisions/academy-r03-g2f/",
-      "build_script": "revisions/academy-r03-g2f/scripts/lahudi_g2f_build.py",
-      "static_geometry_qa": "PASS 96/96 (static only): 2F levels ±0.01, slab areas (L04 1440/1264.08, L08 1200/953.6 m²), void ray tests, 11 cross-building routes on 1F+2F, all interior door openings, 271 window rays hit glass, 916 meshes zero interpenetration (world BVH), furniture ≥0.15 m from walls, GLB re-import 916 objects with extras",
+      "review_url": "revisions/academy-r09/",
+      "build_script": "revisions/academy-r09/scripts/lahudi_g4_build.py",
+      "static_geometry_qa": "PASS 118/118 (static only): levels, slab areas, voids, building and site routes, 6 entry stairs x 12 risers ray-checked, grand stair landing height, avenue fence continuity + 2 openings, boundary wall closure, 271 window rays, world BVH zero interpenetration (decor-vs-roof overlaps exempted and listed), furniture ≥0.15 m from walls, GLB re-import",
       "visual_qa": "HEADLESS_WORKBENCH_RENDERS_ONLY__AUTHOR_PHONE_REVIEW_PENDING",
       "deviations": [
         "L04 footprint 48x30 (F-104/F-204 majority) instead of 尺寸計算書 48x22; L08 and L04-L08 link moved north 6 m",
         "L04 atrium 12x8.36 instead of 12x10",
         "L06 classrooms ~9.5x8.9 vs room cards 12x8",
-        "L07 2F R02 images not adopted; L07 stays PENDING_AUTHOR_REPLACEMENT"
+        "L07 2F R02 images not adopted; L07 stays PENDING_AUTHOR_REPLACEMENT",
+        "Site grade −1.85 relative to building FFL (author direction 2026-10-27 21:42/21:53/22:07)",
+        "L02/L03 fountains removed (author); L05 south exterior door removed (conflict with L06W entry stair); CX_L06E_L07 south door moved X36→34",
+        "Tower/turret heights read from E-301~E-304 illustrative elevations, not confirmed"
       ],
       "not_carried_over_from_backup": "V16 content (A01 告白 scene, V14 animation gate, V15 rear garden, V16 indoor plants, V12 1734 furniture) is NOT in R03; restore from backup path if needed.",
-      "supersedes": "ACADEMY-V16-INDOOR-GREENERY-PHASE1-REVIEW"
+      "supersedes": "ACADEMY-R03-G2F-20261027"
     }
   ]
 }
