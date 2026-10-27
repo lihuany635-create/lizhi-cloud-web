@@ -1,0 +1,43 @@
+name: Model Viewer Multi-Avatar Chromium QA
+on:
+  push:
+    branches: [feature/model-viewer-multi-avatar-20261027]
+    paths:
+      - 'model-viewer/index.html'
+      - 'tests/model-viewer-multi-avatar-e2e.cjs'
+      - '.github/workflows/model-viewer-multi-avatar-qa.yml'
+  pull_request:
+    paths:
+      - 'model-viewer/index.html'
+      - 'tests/model-viewer-multi-avatar-e2e.cjs'
+      - '.github/workflows/model-viewer-multi-avatar-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: JavaScript syntax verification
+        run: |
+          node --check tests/model-viewer-multi-avatar-e2e.cjs
+          node -e "const f=require('fs').readFileSync('model-viewer/index.html','utf8');const m=f.match(/<script>\\s*\\(function\\(\\)\\{([\\s\\S]*?)\\}\\)\\(\\);\\s*<\\/script>/);if(!m)throw Error('inline script missing');new Function(m[1]);"
+      - name: Install Chromium Playwright
+        run: |
+          npm install --prefix /tmp/model-viewer-browser --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          /tmp/model-viewer-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Run real WebGL Chromium E2E
+        env:
+          NODE_PATH: /tmp/model-viewer-browser/node_modules
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8771 --bind 127.0.0.1 --directory . >/tmp/model-viewer-http.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8771/model-viewer/index.html >/dev/null; then break; fi
+            sleep 1
+          done
+          node tests/model-viewer-multi-avatar-e2e.cjs
