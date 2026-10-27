@@ -995,6 +995,128 @@ $('impJson').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)retu
 $('clearShots').onclick=()=>{if(!Object.keys(shots).length)return;if(!confirm('清空這個模型的 C01～C08 鏡位？'))return;shots={};currentSlot=null;persist();renderSlots();msg('已清空。');};
 renderSlots();
 
+/* Installed INSIDE the existing viewer closure. No GLB changes or substitute renderer. */
+const agentOrigin='https://lizhi-viewer-agent-20261027.lihuany635.chatgpt.site';
+let agentNonce=null,agentActive=false,agentBusy=false,agentRevision=0,agentFingerprint='',agentLastContact=0,agentInitGeneration=0;
+const agentRequests=new Map(),agentEvidence=[];
+const agentButton=document.createElement('button');agentButton.className='btn';agentButton.id='viewerAgentStop';agentButton.textContent='停止 AI 控制';agentButton.hidden=true;
+document.querySelector('.bar').append(agentButton);
+function agentStop(){agentInitGeneration++;agentActive=false;keys.clear();joyV.set(0,0);look=null;anim=null;controls.autoRotate=false;setPlacing(false);agentButton.hidden=true;}
+agentButton.onclick=()=>{agentStop();parent.postMessage({channel:'lizhi-viewer-v1',type:'stopped',nonce:agentNonce},agentOrigin);};
+function agentScene(){
+ syncAvatar();
+ const a=avatars.map(a=>({id:a.id,name:a.name,position:a.pos.toArray(),yaw:a.yaw,pitch:a.pitch,mode:a.mode,eye:a.eye,visible:a.visible}));
+ const cameraState={position:camera.position.toArray(),quaternion:camera.quaternion.toArray(),target:controls.target.toArray(),mode:viewMode,selected_id:selectedId,yaw,pitch};
+ const fp=JSON.stringify([modelKey,sourceInfo?.actualSHA,a,cameraState,activeCutHeight]);
+ if(agentFingerprint&&fp!==agentFingerprint)agentRevision++;agentFingerprint=fp;
+ return {revision:agentRevision,model_key:modelKey,model_name:modelName,source:sourceInfo,avatars:a,camera:cameraState,
+  bounds:{min:box.min.toArray(),max:box.max.toArray()},coordinate_system:'Three.js +Y up; viewer meters; positions after display transform',
+  model_transform:model?{position:model.position.toArray(),scale:model.scale.toArray()}:null,
+  render_ready:!!model&&!window.GLBPreview.active&&!renderer.getContext().isContextLost(),mesh_count:meshLayers.length,
+  evidence:agentEvidence.map(x=>({...x})),at:new Date().toISOString(),unobserved_areas:'NOT_INSPECTED'};
+}
+function agentVector(v){if(!Array.isArray(v)||v.length!==3||!v.every(n=>Number.isFinite(n)&&Math.abs(n)<=10000))throw Error('INVALID_COORDINATES');return new THREE.Vector3(...v);}
+function agentSurface(v){
+ model.updateMatrixWorld(true);
+ const r=new THREE.Raycaster(v.clone().add(new THREE.Vector3(0,.5,0)),new THREE.Vector3(0,-1,0),0,1.5);
+ const hit=r.intersectObject(model,true).find(h=>h.face&&h.object.visible&&h.face.normal.clone().transformDirection(h.object.matrixWorld).y>.55);
+ if(!hit)throw Error('NO_VALID_SURFACE');return hit.point.clone();
+}
+function agentSelect(id){if(!avatars.some(a=>a.id===id))throw Error('AVATAR_NOT_FOUND');chooseAvatar(id,false);}
+function agentGuard(command){
+ if(!agentActive)throw Error('CONTROL_STOPPED');
+ if(Date.now()-agentLastContact>8000)throw Error('CONTROL_HEARTBEAT_EXPIRED');
+ if(Date.now()>Date.parse(command.deadline))throw Error('COMMAND_EXPIRED');
+}
+async function agentExecute(command){
+ agentGuard(command);const {name,args:a}=command,now=agentScene();
+ if(name==='viewer_get_scene'&&a.model_key){
+  if(!Object.hasOwn(SAMPLES,a.model_key))throw Error('MODEL_NOT_REGISTERED');
+  await loadSample(a.model_key);agentGuard(command);
+  if(modelKey!==a.model_key||!sourceInfo?.manifestVerified||!model)throw Error('MODEL_LOAD_FAILED');
+  agentRevision++;return {ok:true,scene:agentScene()};
+ }
+ if(!now.render_ready)throw Error('REAL_WEBGL_RENDERER_UNAVAILABLE');
+ if(a.model_sha!==undefined&&a.model_sha!==now.source?.actualSHA)throw Error('MODEL_VERSION_CONFLICT');
+ if(a.revision!==undefined&&a.revision!==now.revision)throw Error('SCENE_REVISION_CONFLICT');
+ if(['viewer_get_scene','viewer_list_avatars'].includes(name)){
+  const nodes=meshLayers.filter(x=>!a.name_filter||x.object.name.toLowerCase().includes(a.name_filter.toLowerCase()));
+  const offset=a.offset||0;
+  return {ok:true,scene:now,...(name==='viewer_get_scene'?{nodes:nodes.slice(offset,offset+100).map(x=>({name:x.object.name,uuid:x.object.uuid,bounds:x.bounds,visible:x.object.visible})),offset,total_nodes:nodes.length,has_more:offset+100<nodes.length}:{})};
+ }
+ if(name==='viewer_get_screenshot'){
+  const image_id=crypto.randomUUID(),sz=renderer.getSize(new THREE.Vector2()),pr=renderer.getPixelRatio(),asp=camera.aspect;
+  let data;
+  try{renderer.setPixelRatio(1);renderer.setSize(1024,576,false);camera.aspect=1024/576;camera.updateProjectionMatrix();renderer.render(scene,camera);data=renderer.domElement.toDataURL('image/jpeg',.86);}
+  finally{renderer.setPixelRatio(pr);renderer.setSize(sz.x,sz.y,false);camera.aspect=asp;camera.updateProjectionMatrix();}
+  if(!data.startsWith('data:image/jpeg;base64,')||data.length<1000||data.length>1400000)throw Error('SCREENSHOT_CAPTURE_FAILED');
+  agentGuard(command);
+  agentEvidence.push({id:image_id,model_sha:now.source.actualSHA,revision:now.revision,camera:now.camera,avatar_id:selectedId,at:new Date().toISOString(),scope:'visible_camera_frame_only'});
+  return {ok:true,screenshot_id:image_id,image:{mimeType:'image/jpeg',data:data.split(',')[1]},scene:agentScene()};
+ }
+ if(name==='viewer_create_avatar'){
+  const p=agentSurface(agentVector(a.position));const avatar=addAvatar(p,a.yaw||0);avatar.name=a.name;saveAvatars();renderAvatars();
+ }else if(name==='viewer_select_avatar'){agentSelect(a.avatar_id);
+ }else if(name==='viewer_teleport_avatar'){
+  const p=agentSurface(agentVector(a.position));agentSelect(a.avatar_id);figFeet.copy(p);syncAvatar();saveAvatars();renderAvatars();
+ }else if(name==='viewer_move_avatar'){
+  const d=agentVector(a.delta);if(Math.abs(d.y)>.001||d.length()>3||d.length()<.001)throw Error('MOVE_REQUIRES_HORIZONTAL_DELTA_UP_TO_3M');
+  agentSelect(a.avatar_id);const n=Math.ceil(d.length()/.05),step=d.clone().multiplyScalar(1/n),direction=step.clone().normalize();
+  let moved=0;
+  for(let i=0;i<n;i++){
+   agentGuard(command);
+   if(blocked(figFeet,direction,step.length()+.25))break;
+   let target;try{target=agentSurface(figFeet.clone().add(step));}catch{break;}
+   if(target.y-figFeet.y>.45||figFeet.y-target.y>1)break;
+   figFeet.copy(target);moved++;syncAvatar();
+   if(i%5===0)await new Promise(r=>setTimeout(r,0));
+  }
+  saveAvatars();renderAvatars();agentRevision++;
+  return {ok:true,moved_steps:moved,requested_steps:n,blocked:moved<n,scene:agentScene(),route_inspected:false};
+ }else if(name==='viewer_set_camera'){
+  agentSelect(a.avatar_id);if(a.yaw!==undefined)figYaw=yaw=a.yaw;if(a.pitch!==undefined)pitch=a.pitch;
+  cameraModeSet(a.mode);
+  if(a.mode==='free'&&a.position&&a.target){camera.position.copy(agentVector(a.position));controls.target.copy(agentVector(a.target));controls.update();}
+  if(pov)updatePovCamera();syncAvatar();saveAvatars();
+ }else if(name==='viewer_delete_avatar'){if(!avatars.some(x=>x.id===a.avatar_id))throw Error('AVATAR_NOT_FOUND');deleteAvatar(a.avatar_id);
+ }else if(name==='viewer_save_checkpoint'){
+  const findings=(a.findings||[]).map(x=>{const e=agentEvidence.find(e=>e.id===x.screenshot_id&&e.model_sha===sourceInfo.actualSHA);if(!e)throw Error('OBSERVATION_REQUIRES_REAL_SCREENSHOT');return {...x,evidence:e};});
+  saveAvatars();return {ok:true,scene:agentScene(),findings,note:a.note||'',storage:'server_commit_required',unobserved_areas:'NOT_INSPECTED'};
+ }else throw Error('UNKNOWN_VIEWER_COMMAND');
+ agentRevision++;renderer.render(scene,camera);return {ok:true,scene:agentScene()};
+}
+addEventListener('message',async event=>{
+ if(event.origin!==agentOrigin||event.source!==parent||parent===window)return;
+ const m=event.data;if(!m||m.channel!=='lizhi-viewer-v1')return;
+ if(m.type==='init'&&typeof m.nonce==='string'&&/^[a-f0-9-]{36}$/.test(m.nonce)){
+  agentNonce=m.nonce;const generation=++agentInitGeneration;
+  for(let i=0;i<150&&!model;i++){await new Promise(r=>setTimeout(r,180));if(generation!==agentInitGeneration)return;}
+  if(generation!==agentInitGeneration)return;
+  anim=null;controls.autoRotate=false;controls.enableDamping=false;agentActive=true;agentLastContact=Date.now();agentButton.hidden=false;
+  parent.postMessage({channel:m.channel,type:'ready',nonce:agentNonce,scene:agentScene()},agentOrigin);return;
+ }
+ if(m.nonce!==agentNonce)return;
+ if(m.type==='stop'){agentStop();parent.postMessage({channel:m.channel,type:'stopped',nonce:agentNonce},agentOrigin);return;}
+ if(m.type==='heartbeat'){agentLastContact=Date.now();parent.postMessage({channel:m.channel,type:'scene',nonce:agentNonce,scene:agentScene()},agentOrigin);return;}
+ if(m.type!=='command'||!agentActive)return;
+ agentLastContact=Date.now();const c=m.command;
+ if(!c||typeof c.request_id!=='string')return;
+ const fingerprint=JSON.stringify(c);
+ if(agentRequests.has(c.request_id)){
+  const old=agentRequests.get(c.request_id);
+  if(old.fingerprint!==fingerprint)return;
+  if(old.result)parent.postMessage({channel:m.channel,type:'result',nonce:agentNonce,request_id:c.request_id,result:old.result},agentOrigin);
+  return;
+ }
+ if(agentBusy)return;agentBusy=true;
+ const record={fingerprint,result:null};agentRequests.set(c.request_id,record);
+ try{record.result=await agentExecute(c);}catch(e){record.result={ok:false,code:/^[A-Z_]{3,90}$/.test(e.message)?e.message:'VIEWER_EXECUTION_FAILED',scene:agentScene()};}
+ finally{agentBusy=false;}
+ parent.postMessage({channel:m.channel,type:'result',nonce:agentNonce,request_id:c.request_id,result:record.result},agentOrigin);
+});
+setInterval(()=>{if(agentActive&&Date.now()-agentLastContact>8000)agentStop();},1000);
+addEventListener('pagehide',agentStop);
+
 /* ---------- loop ---------- */
 function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();if(pov)layoutGuide();}
 new ResizeObserver(resize).observe(stage);resize();
@@ -1016,4 +1138,5 @@ window.GLBPreview.ready(()=>{if(model){$('ov').hidden=true;$('fileName').textCon
 
 </body>
 </html>
+
 

@@ -1,0 +1,27 @@
+name: Viewer Agent Real WebGL Bridge QA
+on:
+  pull_request:
+    paths: ['model-viewer/index.html','tests/viewer-bridge-e2e.cjs','.github/workflows/viewer-agent-qa.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned browser test runtime
+        run: |
+          npm install --prefix /tmp/viewer-browser --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          /tmp/viewer-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Real academy render and control test
+        env:
+          NODE_PATH: /tmp/viewer-browser/node_modules
+        run: node tests/viewer-bridge-e2e.cjs
+      - name: Preserve real render evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: viewer-real-webgl-evidence
+          path: viewer-qa-evidence/
