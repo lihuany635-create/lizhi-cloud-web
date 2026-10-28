@@ -66,9 +66,16 @@ export function minimise(tool,raw){
   need(new Set(tasks.map(t=>t.id)).size===tasks.length,'SOURCE_INVALID',502);
   return {projectId:PROJECT,revision:raw.revision,tasks};
  }
- need(Array.isArray(raw.unfinished),'SOURCE_INVALID',502);
+ // Existing Bridge has an array; a future source-side compact response may
+ // carry only a validated count. Never silently truncate or trust two forms.
+ const arrayForm=Array.isArray(raw.unfinished);
+ const countForm=Number.isSafeInteger(raw.unfinishedCount)&&raw.unfinishedCount>=0;
+ need(arrayForm!==countForm,'SOURCE_INVALID',502);
+ need(!arrayForm||raw.unfinished.length<=1000,'SOURCE_TOO_MANY_TASKS',502);
+ need(!countForm||raw.unfinishedCount<=1000,'SOURCE_TOO_MANY_TASKS',502);
  const key=raw.lastWork?.key??null;need(key===null||id(key),'SOURCE_INVALID',502);
- return {projectId:PROJECT,revision:raw.revision,lastWorkKey:key,unfinishedCount:raw.unfinished.length};
+ return {projectId:PROJECT,revision:raw.revision,lastWorkKey:key,
+   unfinishedCount:arrayForm?raw.unfinished.length:raw.unfinishedCount};
 }
 /** Trusted host-only adapter. Broad Bridge key never enters Worker capsule. */
 export function bridgeSource(env,fetchImpl=fetch){
