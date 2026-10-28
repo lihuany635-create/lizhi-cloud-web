@@ -2,7 +2,8 @@ import {handleRecycle} from '../lib/recycle-bin.ts';
 import {handleProjectImages} from './images.ts';
 import {IMAGE_BUCKET} from '../lib/project-images.ts';
 import {ASSET_OPS} from '../lib/project-assets.ts';
-import {MANAGED_OPS} from '../lib/project-management.ts';
+import {MANAGED_OPS,managedOf} from '../lib/project-management.ts';
+import {COMPACT_OPS,compactOwnedProjectOperation,PROJECT as AI_LOOP_PROJECT} from '../lib/ai-loop-compact.mjs';
 declare const Deno:{env:{get(name:string):string|undefined};serve(handler:(req:Request)=>Promise<Response>):void};
 import {operate,type State} from './state.ts';
 import {FlowError,episodeSettings} from '../lib/workflow.ts';
@@ -73,7 +74,18 @@ export async function handler(req:Request){
   }
   if(existing.length!==1)throw new FlowError('製作資料尚未搬移完成，請稍後重新整理',503);
   if(op==='registerProjectSource'){const a=(args[2]??{}) as any;if(a.readStatus==='read'&&await digest(String(a.snapshot??''))!==a.sha256)throw new FlowError('來源內容雜湊不符');}
-  const record=existing[0],next=operate(record.data as State,op,args,actor);
+  const record=existing[0];
+  // Candidate compact Bridge reads: only AFTER the existing Bridge key check
+  // and owner-scoped database lookup; never an unprotected public endpoint.
+  // Separate versioned operation names preserve legacy MCP response contracts.
+  if(part==='bridge'&&Object.hasOwn(COMPACT_OPS,op)){
+   if(req.method!=='POST'||Object.keys(b).some(k=>k!=='op'&&k!=='args'))throw new FlowError('精簡唯讀參數不符',400);
+   if(!Array.isArray(b.args))throw new FlowError('精簡唯讀參數不符',400);
+   const owned=managedOf(record.data as State,AI_LOOP_PROJECT);
+   try{return json(compactOwnedProjectOperation(op,args,owned));}
+   catch{return json({error:'精簡唯讀資料驗證失敗'},422);}
+  }
+  const next=operate(record.data as State,op,args,actor);
   if(next.changed){const updated=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&revision=eq.'+record.revision+'&select=revision',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({revision:record.revision+1,data:next.state,updated_at:new Date().toISOString()})});if(updated.length!==1)throw new FlowError('其他裝置或 AI 已更新，請重新讀取後再儲存',409);}
   return json(part==='projects'&&req.method==='GET'&&url.searchParams.get('view')==='settings'?episodeSettings(next.result as any):next.result);
  }catch(e){return json({error:e instanceof FlowError?e.message:e instanceof SyntaxError?'請求格式錯誤':'製作工作台服務暫時無法使用'},e instanceof FlowError?e.status:e instanceof SyntaxError?400:500);}
