@@ -80,29 +80,36 @@ export function bridgeSource(env,fetchImpl=fetch){
  };
 }
 export class ManualReadHost {
- constructor({ledger,read,owner,origin,now=Date.now,enabled=false,timeoutMs=8000}){
+ constructor({ledger,read,owner,origin,now=Date.now,enabled=false,timeoutMs=8000,verifyIngress}){
   need(id(owner)&&new URL(origin).protocol==='https:'&&ledger&&typeof read==='function','HOST_UNCONFIGURED',503);
+  // HTTP identity headers alone cannot authenticate a caller. Trusted server proof is mandatory.
+  need(typeof verifyIngress==='function','INGRESS_VERIFIER_REQUIRED',503);
   need(Number.isSafeInteger(timeoutMs)&&timeoutMs>0&&timeoutMs<=30000,'INVALID_TIMEOUT');
-  Object.assign(this,{ledger,read,owner,origin,now,enabled,timeoutMs});
+  Object.assign(this,{ledger,read,owner,origin,now,enabled,timeoutMs,verifyIngress});
  }
- authenticate(req){
+ async authenticate(req){
   // Platform ingress strips caller-supplied identity and supplies validated identity.
   // Service bypass bearer alone supplies NO visitor identity and is rejected.
   need(this.enabled===true,'WORKER_DISABLED',503);
   need(new URL(req.url).origin===this.origin,'ORIGIN_DENIED');
+  let principal;
+  try { principal=await this.verifyIngress(req); }
+  catch { throw new AuthError('INGRESS_IDENTITY_UNVERIFIED',401); }
+  need(principal?.authenticated===true && principal.subjectId===this.owner,'INGRESS_IDENTITY_UNVERIFIED',401);
+  // Secondary consistency check only, never primary identity evidence.
   need(req.headers.get('oai-authenticated-user-id')===this.owner,'OWNER_REQUIRED',401);
   need(!req.headers.has('origin')||req.headers.get('origin')===this.origin,'CSRF_DENIED');
   need(!req.headers.has('sec-fetch-site')||['same-origin','none'].includes(req.headers.get('sec-fetch-site')),'CSRF_DENIED');
   return this.owner;
  }
  async run(req,{projectId:project,mode,requestId}={}){
-  const owner=this.authenticate(req);need(mode==='MANUAL','AUTO_DISABLED');need(project===PROJECT,'PROJECT_DENIED');need(id(requestId),'INVALID_REQUEST',400);
+  const owner=await this.authenticate(req);need(mode==='MANUAL','AUTO_DISABLED');need(project===PROJECT,'PROJECT_DENIED');need(id(requestId),'INVALID_REQUEST',400);
   const signal=AbortSignal.timeout(this.timeoutMs);let g;
   try{
    g=await this.ledger.issue(owner,this.now());
    need(await this.ledger.claim(g.token,owner,requestId,this.now()),'DUPLICATE_OR_INACTIVE',409);
    const call=async(tool)=>{
-    this.authenticate(req);signal.throwIfAborted();
+    await this.authenticate(req);signal.throwIfAborted();
     need(await this.ledger.consume(g.grantId,owner,this.now()),'GRANT_INACTIVE');
     await this.ledger.audit(g.grantId,requestId,'READ_ATTEMPT',tool,this.now());
     // Recheck after awaited audit, before any upstream read.
@@ -114,7 +121,7 @@ export class ManualReadHost {
    const listed=await call('list_projects'),context=await call('get_project_context'),handoff=await call('get_project_handoff');
    const reviewContext=await call('get_project_context'),reviewHandoff=await call('get_project_handoff');
    need(listed[0].revision===context.revision&&context.revision===handoff.revision&&JSON.stringify(context)===JSON.stringify(reviewContext)&&JSON.stringify(handoff)===JSON.stringify(reviewHandoff),'SOURCE_CHANGED',409);
-   this.authenticate(req);signal.throwIfAborted();
+   await this.authenticate(req);signal.throwIfAborted();
    await this.ledger.audit(g.grantId,requestId,'REVIEW_MATCH',null,this.now());
    need(await this.ledger.finish(g.grantId,owner,'DONE',this.now()),'GRANT_INACTIVE');
    // Do not export source text, task titles, URLs, session, tokens or secret values.
@@ -130,7 +137,7 @@ export class ManualReadHost {
  }
  async handle(req){
   try{
-   const owner=this.authenticate(req);need(req.method==='POST','METHOD_DENIED',405);
+   const owner=await this.authenticate(req);need(req.method==='POST','METHOD_DENIED',405);
    need(req.headers.get('content-type')?.split(';')[0]==='application/json','JSON_REQUIRED',415);
    const body=await boundedJSON(req,2048,AbortSignal.timeout(this.timeoutMs));
    need(body&&typeof body==='object'&&!Array.isArray(body),'INVALID_REQUEST',400);
