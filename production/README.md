@@ -22,6 +22,9 @@ v7 通用專案：在既有 portfolio 上新增 schemaVersion 2，保留原動�
 所有處理本工作台資料的 ChatGPT、Claude、Codex、Gemini 或其他代理，接手前先閱讀 [AI 員工守則 v1.0](../docs/AI_EMPLOYEE_HANDBOOK_v1.0.md)（LIZHI-AI-RULES 1.0.0）。須按最新有效專案上下文、revision 和範圍證據回報；`queued`、`executed`、`saved`、`owner-approved` 分開。此處為文件入口，**並不代表現行 MCP 已自動注入規則或其他 AI 已閱讀**；相關自動載入與回條另列在共用工作台待辦。
 
 
+
+**新對話入口（2026-10-28）**：接手立之專案時，先讀 [AI 新對話啟動與現況核對規則 v1.0](../docs/AI_NEW_CHAT_BOOTSTRAP_v1.0.md)（`LIZHI-AI-BOOT/1.0.0`），再讀本守則與 `list_projects → get_project_context／get_project_handoff`。每筆工作須把任務、紀錄、證據、有效下一步分清楚；過期工作不得只因仍在待辦清單就重做。文件入口不等於 ChatGPT 記憶／自訂指示已設定，也不等於新對話已自動讀取。
+
 ## 員工必知（App 訪談與 AI 工作守則）
 
 製作工作台首頁、專案頁與動畫／模型流程的返回列新增「員工必知」。它提供兩份共用文件的卡片、同源 Markdown 全文與原始文件連結：
