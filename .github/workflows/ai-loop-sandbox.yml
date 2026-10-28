@@ -1,0 +1,25 @@
+name: AI loop isolated sandbox tests
+on:
+  pull_request:
+    paths:
+      - 'experimental/ai-loop/**'
+      - '.github/workflows/ai-loop-sandbox.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sandbox-node:
+    name: P1 P2 offline unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - name: Verify no external installation is required
+        run: node --version
+      - name: Run local-only tests
+        run: node --disable-warning=ExperimentalWarning --test experimental/ai-loop/*.test.mjs
