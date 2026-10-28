@@ -4,6 +4,8 @@ on:
     paths:
       - 'experimental/ai-loop/**'
       - 'production/source/lib/ai-loop-v15.mjs'
+      - 'production/source/lib/ai-loop-compact.mjs'
+      - 'production/source/backend/index.ts'
       - 'production/source/app/api/ai-loop/route.ts'
       - 'production/source/sql/ai-loop-v15-candidate.sql'
       - '.github/workflows/ai-loop-sandbox.yml'
@@ -27,6 +29,10 @@ jobs:
         run: node --version
       - name: Check candidate Site route syntax (no deployment)
         run: node --experimental-strip-types --check production/source/app/api/ai-loop/route.ts
+      - name: Check candidate Bridge handler syntax (no deployment)
+        run: node --experimental-strip-types --check production/source/backend/index.ts
+      - name: Check compact source module syntax (no deployment)
+        run: node --check production/source/lib/ai-loop-compact.mjs
       - name: Run offline tests and create sanitised evidence
         run: node --disable-warning=ExperimentalWarning experimental/ai-loop/acceptance-evidence.mjs --output ai-loop-acceptance-evidence.json
       - name: Validate AUTH01-AUTH10 mock-only evidence
