@@ -60,6 +60,7 @@ export function runSuite({dir=root,outputPath=null}={}){
  const proc=spawnSync(process.execPath,args,{encoding:'utf8',maxBuffer:16*1024*1024,timeout:45000,env:{...process.env,NODE_NO_WARNINGS:'1'}});
  need(!proc.error&&proc.status===0,'TEST_COMMAND_FAILED');
  const files=Object.fromEntries(sourceFiles.map(x=>[x,readFileSync(join(root,x))]));
+ for(const path of ['../../production/source/lib/ai-loop-v15.mjs','../../production/source/app/api/ai-loop/route.ts','../../production/source/sql/ai-loop-v15-candidate.sql'])files[path]=readFileSync(join(root,path));
  const evidence=createEvidence({tap:proc.stdout,files});
  if(outputPath)writeFileSync(resolve(outputPath),JSON.stringify(evidence,null,2)+'\n',{flag:'w',mode:0o600});
  return evidence;

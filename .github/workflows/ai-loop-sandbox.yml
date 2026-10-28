@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - 'experimental/ai-loop/**'
+      - 'production/source/lib/ai-loop-v15.mjs'
+      - 'production/source/app/api/ai-loop/route.ts'
+      - 'production/source/sql/ai-loop-v15-candidate.sql'
       - '.github/workflows/ai-loop-sandbox.yml'
       - 'docs/ai-loop/P5_REPRODUCIBLE_EVIDENCE_v1.0.md'
   workflow_dispatch:
@@ -22,6 +25,8 @@ jobs:
           node-version: '22.16.0'
       - name: Confirm Node runtime
         run: node --version
+      - name: Check candidate Site route syntax (no deployment)
+        run: node --experimental-strip-types --check production/source/app/api/ai-loop/route.ts
       - name: Run offline tests and create sanitised evidence
         run: node --disable-warning=ExperimentalWarning experimental/ai-loop/acceptance-evidence.mjs --output ai-loop-acceptance-evidence.json
       - name: Validate AUTH01-AUTH10 mock-only evidence
