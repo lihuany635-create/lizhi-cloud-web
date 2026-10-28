@@ -34,7 +34,7 @@ jobs:
       - name: Check compact source module syntax (no deployment)
         run: node --check production/source/lib/ai-loop-compact.mjs
       - name: Run actual candidate Bridge handler with mocked owner-scoped Supabase (no network)
-        run: node --disable-warning=ExperimentalWarning --experimental-strip-types experimental/ai-loop/compact-bridge-handler.mjs
+        run: node --disable-warning=ExperimentalWarning --experimental-transform-types experimental/ai-loop/compact-bridge-handler.mjs
       - name: Run offline tests and create sanitised evidence
         run: node --disable-warning=ExperimentalWarning experimental/ai-loop/acceptance-evidence.mjs --output ai-loop-acceptance-evidence.json
       - name: Validate AUTH01-AUTH10 mock-only evidence
