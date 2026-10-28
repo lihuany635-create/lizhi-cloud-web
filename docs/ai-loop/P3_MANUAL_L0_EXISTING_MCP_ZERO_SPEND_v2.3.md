@@ -40,7 +40,7 @@ v2.2 的 compact Bridge 尚在 Draft PR。原私人 Site v24 沒有發布新入�
 
 - OpenAI 官方 ChatGPT Sites FAQ：Plus、Pro **目前包含託管**，建置/編輯計入 Codex 方案用量；用量與儲存空間共用限制，單站 D1 上限 10GB。來源：https://help.openai.com/en/articles/20001339-creating-and-using-chatgpt-sites 。
 - Supabase 官方 Cost Control：**Free 方案不收費**，超量可能發生 Fair Use 服務限制；不能在未經本人核准時切換付費方案。來源：https://supabase.com/docs/guides/platform/cost-control 及 https://supabase.com/docs/guides/platform/billing-faq 。
-- 實際帳戶連接器唯讀核對：原 Supabase organization `plan=free`，project `ACTIVE_HEALTHY`。既有交接已於本人登入後核對 ChatGPT Plus／自動加值 OFF／credits 0；**本輪沒有重新進入 Sites 私人管理介面或取得帳單**。
+- 實際帳戶連接器唯讀核對：原 Supabase organization `plan=free`，project `ACTIVE_HEALTHY`，`lizhi-production` Edge 仍為 **ACTIVE v21**；只執行 `SELECT pg_database_size(current_database())`，得到 **23,178,387 bytes（約 22 MB，為 Supabase PostgreSQL）**，約占 Free 每專案 500 MB 資料庫上限 **4.4%**。這不是 Sites D1 容量、也不代表 Supabase 其他用量的剩餘配額。既有交接已於本人登入後核對 ChatGPT Plus／自動加值 OFF／credits 0；**本輪沒有重新進入 Sites 私人管理介面或取得帳單**。
 
 因此若維持現有方案、無新付費 API／升級／手動加值／其他外部付費服務，本輪 **MANUAL L0 三項讀取不需新建任何會收費的服務**。但 ChatGPT Sites 的當期 D1/CPU/hosting 可用餘量及臨界時的執行失效仍 **NOT_VERIFIED**；「本輪沒有加購」不等於「全帳單已實讀核算為零」。
 
