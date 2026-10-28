@@ -92,12 +92,12 @@ export class ManualReadHost {
   // Service bypass bearer alone supplies NO visitor identity and is rejected.
   need(this.enabled===true,'WORKER_DISABLED',503);
   need(new URL(req.url).origin===this.origin,'ORIGIN_DENIED');
+  // Header equality is an additional necessary check, but is never sufficient authentication.
+  need(req.headers.get('oai-authenticated-user-id')===this.owner,'OWNER_REQUIRED',401);
   let principal;
   try { principal=await this.verifyIngress(req); }
   catch { throw new AuthError('INGRESS_IDENTITY_UNVERIFIED',401); }
   need(principal?.authenticated===true && principal.subjectId===this.owner,'INGRESS_IDENTITY_UNVERIFIED',401);
-  // Secondary consistency check only, never primary identity evidence.
-  need(req.headers.get('oai-authenticated-user-id')===this.owner,'OWNER_REQUIRED',401);
   need(!req.headers.has('origin')||req.headers.get('origin')===this.origin,'CSRF_DENIED');
   need(!req.headers.has('sec-fetch-site')||['same-origin','none'].includes(req.headers.get('sec-fetch-site')),'CSRF_DENIED');
   return this.owner;
