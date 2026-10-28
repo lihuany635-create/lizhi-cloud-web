@@ -216,3 +216,41 @@ test('V18-07 independent SQLite connections preserve claim/replay protection',as
   a.db.close();b.db.close();
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
+
+
+test('V19-01 duplicate request does not create orphan grant/audit writes',async()=>{
+ const f=fixture();const first=await f.run(body('single-key'));assert.equal(first.status,200);
+ const beforeGrants=f.db.prepare('SELECT * FROM ai_loop_grants_v15 ORDER BY id').all();
+ const beforeAudit=f.db.prepare('SELECT * FROM ai_loop_audit_v15 ORDER BY id').all();
+ const second=await f.run(body('single-key'));
+ await error(second,'HOST_FAILED');
+ assert.deepEqual(f.db.prepare('SELECT * FROM ai_loop_grants_v15 ORDER BY id').all(),beforeGrants);
+ assert.deepEqual(f.db.prepare('SELECT * FROM ai_loop_audit_v15 ORDER BY id').all(),beforeAudit);
+ assert.equal(f.seen.length,5);
+});
+test('V19-02 concurrent duplicate on separate SQLite connections issues exactly one grant',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'ai-loop-v19-'));try{
+  const path=join(dir,'grants.db'),a=fixture({db:new DatabaseSync(path)}),b=fixture({db:new DatabaseSync(path),init:false});
+  const results=await Promise.all([a.run(body('key-2')),b.run(body('key-2'))]);
+  assert.deepEqual(results.map(r=>r.status).sort(),[200,503]);
+  assert.equal(a.db.prepare('SELECT COUNT(*) n FROM ai_loop_grants_v15').get().n,1);
+  assert.equal(a.db.prepare('SELECT COUNT(*) n FROM ai_loop_audit_v15').get().n,7);
+  assert.equal(a.seen.length+b.seen.length,5);
+  a.db.close();b.db.close();
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
+test('V19-03 pre-reserved requestId cannot be replaced during grant claim',async()=>{
+ const f=fixture();
+ const g=await f.ledger.issue(OWNER,f.now(),60000,'reserved-key');
+ assert.equal(await f.ledger.claim(g.token,OWNER,'attacker-key',f.now()),null);
+ assert.equal((await f.ledger.claim(g.token,OWNER,'reserved-key',f.now()))?.id,g.grantId);
+ assert.equal(f.db.prepare('SELECT request_id FROM ai_loop_grants_v15').get().request_id,'reserved-key');
+});
+test('V19-04 same requestId is distinct for different verified owners but duplicate owner fails',async()=>{
+ const f=fixture();await f.ledger.issue(OWNER,f.now(),60000,'shared-key');
+ const other=await f.ledger.issue('other-owner',f.now(),60000,'shared-key');
+ assert.ok(other.grantId);
+ await assert.rejects(()=>f.ledger.issue(OWNER,f.now(),60000,'shared-key'));
+ assert.equal(f.db.prepare('SELECT COUNT(*) n FROM ai_loop_grants_v15').get().n,2);
+ assert.equal(f.db.prepare('SELECT COUNT(*) n FROM ai_loop_audit_v15').get().n,2);
+});
