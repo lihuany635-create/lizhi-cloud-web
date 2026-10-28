@@ -144,3 +144,22 @@ test('V15-19 platform revocation before first source read fails closed and does 
  assert.equal(f.seen.length,0);
  assert.ok(checks>=3);
 });
+
+
+test('V15-20 Cloudflare-compatible manual redirects prevent Bridge credential forwarding',async()=>{
+ const calls=[];
+ const source=bridgeSource({
+  PRODUCTION_BRIDGE_URL:'https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-production',
+  PRODUCTION_BRIDGE_KEY:'TEST_ONLY_NOT_REAL_SECRET'
+ },async(url,options)=>{
+   calls.push({url,method:options.method,redirect:options.redirect});
+   assert.equal(options.redirect,'manual','Cloudflare Workers does not implement redirect:error');
+   assert.equal(options.method,'POST');
+   return new Response(null,{status:302,headers:{Location:'https://attacker.invalid/collect'}});
+ });
+ const f=fixture({read:source});
+ await error(await f.run(),'SOURCE_REDIRECT_DENIED');
+ assert.equal(calls.length,1,'no redirect follow or retries');
+ assert.equal(f.seen.length,1,'no second source call');
+ assert.equal(calls[0].url,'https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-production/bridge');
+});
