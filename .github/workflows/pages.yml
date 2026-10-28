@@ -3,6 +3,17 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [main]
+    # 只改文件、測試、SQL、Edge Function 或腳本時不重新部署網站（省 Actions 分鐘數）。
+    # 工作台會讀取的兩份守則例外，仍會觸發部署。
+    paths:
+      - '**'
+      - '!docs/**'
+      - '!**/*.md'
+      - '!tests/**'
+      - '!supabase/**'
+      - '!scripts/**'
+      - 'docs/AI_EMPLOYEE_HANDBOOK_v1.0.md'
+      - 'docs/APP_REQUIREMENTS_INTERVIEW_v1.0.md'
   workflow_dispatch:
 
 permissions:
@@ -126,9 +137,18 @@ jobs:
       # Native CADCraft compiles into this SAME Pages website; it is not a CAD cloud server.
       - name: Validate embedded LiZhi CAD integration
         run: node --test tests/cad-embedded.test.cjs
+      # CAD 釘在固定來源版本：編譯結果依建置腳本內容快取，版本沒變就直接沿用。
+      - name: Restore compiled CADCraft runtime
+        id: cad-runtime
+        uses: actions/cache@v4
+        with:
+          path: cad/runtime
+          key: cad-runtime-${{ hashFiles('cad/build-runtime.sh', 'cad/setup-build-toolchain.sh') }}
       - name: Install pinned CADCraft WebAssembly toolchain
+        if: steps.cad-runtime.outputs.cache-hit != 'true'
         run: bash cad/setup-build-toolchain.sh
       - name: Cache CADCraft cargo dependencies
+        if: steps.cad-runtime.outputs.cache-hit != 'true'
         uses: actions/cache@v4
         with:
           path: |
@@ -136,6 +156,7 @@ jobs:
             ~/.cargo/git
           key: lizhi-cad-cargo-19e09447345750ea-v1
       - name: Compile CADCraft into existing portal
+        if: steps.cad-runtime.outputs.cache-hit != 'true'
         env:
           CARGO_INCREMENTAL: '0'
           CARGO_BUILD_JOBS: '2'
@@ -145,7 +166,15 @@ jobs:
       # Hew is built into the SAME GitHub Pages origin as the authenticated
       # cloud portal. No extra website, token or remote 3D engine is required.
       # Source pin is reviewed separately in hew-editor-integration-preview.yml.
+      # Hew 同樣釘在固定 SHA：組裝好的 hew-editor 依 SHA 與組裝腳本快取。
+      - name: Restore assembled Hew editor
+        id: hew-editor
+        uses: actions/cache@v4
+        with:
+          path: hew-editor
+          key: hew-editor-0e4e16061f8d15ec1e5eeb4570d760bedbe2d5b5-${{ hashFiles('hew/build-embedded-runtime.sh') }}
       - name: Checkout reviewed public Hew WASM fork at immutable SHA
+        if: steps.hew-editor.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
         with:
           repository: lihuany635-create/lizhi-hew
@@ -153,31 +182,39 @@ jobs:
           path: .hew-model-build
           persist-credentials: false
       - name: Verify Hew source pin
+        if: steps.hew-editor.outputs.cache-hit != 'true'
         run: test "$(git -C .hew-model-build rev-parse HEAD)" = "0e4e16061f8d15ec1e5eeb4570d760bedbe2d5b5"
       - name: Pinned Hew Node version
+        if: steps.hew-editor.outputs.cache-hit != 'true'
         uses: actions/setup-node@v4
         with:
           node-version-file: .hew-model-build/.node-version
       - name: Hew pnpm package manager
+        if: steps.hew-editor.outputs.cache-hit != 'true'
         uses: pnpm/action-setup@v4
         with:
           version: 11.20.0
       - name: Hew Rust compile cache
+        if: steps.hew-editor.outputs.cache-hit != 'true'
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6
         with:
           workspaces: .hew-model-build
       - name: Hew pinned wasm-pack
+        if: steps.hew-editor.outputs.cache-hit != 'true'
         working-directory: .hew-model-build
         run: bash scripts/install-wasm-pack.sh
       - name: Hew frozen dependencies
+        if: steps.hew-editor.outputs.cache-hit != 'true'
         working-directory: .hew-model-build
         run: pnpm install --frozen-lockfile
       - name: Compile native Hew editor to relative URL subpath
+        if: steps.hew-editor.outputs.cache-hit != 'true'
         working-directory: .hew-model-build
         run: |
           pnpm --dir app build
           pnpm --dir app exec vite build --base=./
       - name: Stage Hew React/WASM inside original portal with license and source provenance
+        if: steps.hew-editor.outputs.cache-hit != 'true'
         run: bash hew/build-embedded-runtime.sh
       - name: Verify isolated Hew editor route without damaging original portal
         run: |
