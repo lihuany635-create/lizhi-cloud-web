@@ -19,9 +19,10 @@
 
 ## 目前證據與誠實界線
 
-- 本輪 GitHub Actions Run **40671781634**／Job **122760089237**，真正讀取 job log：`SANDBOX_PASS total266 passed266 liveE2e=NOT_TESTED`，`LOCAL_MOCK_PREFLIGHT_PASS localPass10 liveOwnerAuthorization=NOT_TESTED`。
+- 最終 GitHub Actions Run **40672411470**／Job **122762251677**，真正讀取 job log：`SANDBOX_PASS total266 passed266 liveE2e=NOT_TESTED`、`BACKEND_HANDLER_SIMULATION_PASS cases=7`、`LOCAL_MOCK_PREFLIGHT_PASS localPass10 liveOwnerAuthorization=NOT_TESTED`。
 - 原 `/bridge` 的工具憑證、owner DB 範圍與新版本操作僅有**原始碼核對和隔離測試**；沒有用真 Bridge key 呼叫、沒有部署到 Supabase Edge、沒有在 ChatGPT Sites 真實 MCP 使用此新操作。
-- 離線測試用的是 mock fetch、虛構資料及目前候選函數。並未執行整個 Deno `handler` 連同真 Supabase session、D1、真網路的完整 E2E。
+- **已補上原始候選 handler 隔離運行**：`experimental/ai-loop/compact-bridge-handler.mjs` 透過 Node TypeScript transform 及僅測試使用的 `ts-extension-loader.mjs`，實際載入 `production/source/backend/index.ts`。Deno 服務註冊、Supabase key lookup 和 owner DB 讀取皆使用本機虛構資料／fake fetch，驗證 7 組請求：三個新操作、外部 project、額外參數、匿名及舊版操作保留。日誌包含 `BACKEND_HANDLER_SIMULATION_PASS cases=7 sourceScoped=owner-db liveE2e=NOT_TESTED`。
+- 離線測試使用 mock fetch、虛構資料及候選處理器。**沒有使用真實 Supabase session、真 D1、正式 Bridge、Sites 登入、真網路**；Node 模擬不是平台實測。
 - 源端投影會減少**回傳的 HTTP body**，但舊工作台資料仍須先在原服務端 owner-scoped DB 讀取。它不是減小原本 Supabase 主資料列，也不是 D1 用量/費用估算器。
 - 來源端之後若正式升級，需核對正式 `getProjectContext` 與新操作的 task ID+status 集合及 revision 完全一致，並確認匿名/跨 owner、跨 project、錯誤/過量回應與舊工具相容性。
 
