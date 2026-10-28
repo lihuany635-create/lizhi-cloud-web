@@ -1,5 +1,8 @@
 # lizhi-cloud-web｜共用 AI 員工守則入口
 
+<!-- LIZHI-AI-BOOT v1.0.0 -->
+**新對話啟動（接手立之專案時）**：先閱讀 [AI 新對話啟動與現況核對規則 v1.0](https://github.com/lihuany635-create/lizhi-cloud-web/blob/main/docs/AI_NEW_CHAT_BOOTSTRAP_v1.0.md)（`LIZHI-AI-BOOT/1.0.0`），再核對員工守則與工作台的最新有效版本、專案 ID、任務、revision、驗證證據與下一步。只有實際讀取才能回報「已讀」；文件與記憶本身不代表所有新對話已自動執行。無關的普通對話不需讀取私人工作台。
+
 <!-- LIZHI-AI-RULES v1.0.0 -->
 
 本專案的 AI／自動化執行者應先閱讀 [立之雲端庫 AI 員工守則 v1.0](https://github.com/lihuany635-create/lizhi-cloud-web/blob/main/docs/AI_EMPLOYEE_HANDBOOK_v1.0.md)，識別碼 `LIZHI-AI-RULES`、版本 `1.0.0`。本文件是使用者的跨專案協作規範；必須同時遵守當前更高優先級的系統、安全與平台要求及本專案既有規則。
