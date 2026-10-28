@@ -46,7 +46,7 @@ export function createEvidence({tap,files,executable=process.execPath,at=new Dat
  const sourceFiles=Object.keys(files).sort().map(name=>({path:name,sha256:hash(files[name]),bytes:Buffer.byteLength(files[name])}));
  need(sourceFiles.some(x=>x.path==='durable-queue.mjs')&&sourceFiles.some(x=>x.path==='durable-review-integration.mjs')&&sourceFiles.some(x=>x.path==='workbench-readonly.mjs'),'SOURCES_MISSING');
  return {schema:'LIZHI-AI-LOOP-P5-EVIDENCE/1',at,environment:{runtime:process.version,executable:executable.split(/[\\/]/).at(-1)},
-   boundaries:{mode:'OFF',networkCalls:0,externalPaidApis:false,independentAiWorkers:false,workbenchWrite:false,authorApproved:false,
+   boundaries:{mode:'OFF_BY_DESIGN',networkUse:'NOT_INSTRUMENTED',externalPaidApis:false,independentAiWorkers:false,workbenchWrite:false,authorApproved:false,
      statement:'PASS covers only offline Node mock and local SQLite acceptance, NOT live MCP or human acceptance'},
    summary:verified.summary,acceptance:verified.coverage,sources:sourceFiles,tapSha256:hash(tap),
    result:'SANDBOX_PASS',liveE2e:'NOT_TESTED',ownerApproval:'NOT_OBTAINED'};
@@ -59,7 +59,7 @@ export function runSuite({dir=root,outputPath=null}={}){
  const args=['--disable-warning=ExperimentalWarning','--test','--test-reporter=tap',...tests.map(x=>join(root,x))];
  const proc=spawnSync(process.execPath,args,{encoding:'utf8',maxBuffer:16*1024*1024,timeout:45000,env:{...process.env,NODE_NO_WARNINGS:'1'}});
  need(!proc.error&&proc.status===0,'TEST_COMMAND_FAILED');
- const files=Object.fromEntries(sourceFiles.filter(x=>!x.endsWith('.test.mjs')).map(x=>[x,readFileSync(join(root,x))]));
+ const files=Object.fromEntries(sourceFiles.map(x=>[x,readFileSync(join(root,x))]));
  const evidence=createEvidence({tap:proc.stdout,files});
  if(outputPath)writeFileSync(resolve(outputPath),JSON.stringify(evidence,null,2)+'\n',{flag:'w',mode:0o600});
  return evidence;
