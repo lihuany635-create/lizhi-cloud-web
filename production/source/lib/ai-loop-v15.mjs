@@ -72,9 +72,11 @@ export function bridgeSource(env,fetchImpl=fetch){
  return async function read(tool,args,signal){
   need(TOOLS.includes(tool),'TOOL_DENIED');
   need(args&&Object.keys(args).length===(tool==='list_projects'?0:1)&&(tool==='list_projects'||args.projectId===PROJECT),'PROJECT_DENIED');
-  const res=await fetchImpl(base+'/bridge',{method:'POST',redirect:'error',cache:'no-store',signal,
+  // Cloudflare Workers supports manual (not error) redirect mode; never forward the Bridge key on a redirect.
+  const res=await fetchImpl(base+'/bridge',{method:'POST',redirect:'manual',cache:'no-store',signal,
    headers:{Authorization:'Bearer '+env.PRODUCTION_BRIDGE_KEY,'Content-Type':'application/json'},
    body:JSON.stringify({op:ops[tool],args:tool==='list_projects'?[]:[PROJECT]})});
+  need(!(res.status>=300&&res.status<400),'SOURCE_REDIRECT_DENIED',502);
   need(res.status===200,'SOURCE_UNAVAILABLE',502);
   return boundedJSON(res,262144,signal);
  };
