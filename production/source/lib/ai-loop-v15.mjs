@@ -28,12 +28,15 @@ export class D1Ledger {
  async audit(g,request,event,tool=null,at=Date.now()){
   await this.db.prepare('INSERT INTO ai_loop_audit_v15 VALUES(?,?,?,?,?,?)').bind(crypto.randomUUID(),g,request,event,tool,at).run();
  }
- async issue(owner,now,ttl=60000){
+ async issue(owner,now,ttl=60000,requestId=null){
   need(Number.isSafeInteger(ttl)&&ttl>0&&ttl<=300000,'INVALID_TTL');
+  // If supplied, reserve the retry key in the SAME transaction as grant/audit issuance.
+  // Duplicate requests must not leave more grant rows or extra audit writes.
+  need(requestId===null||id(requestId),'INVALID_REQUEST',400);
   const token=opaque(),grantId=crypto.randomUUID();
   // D1 batch is transactional: no live orphan grant if ISSUED audit fails.
   await this.db.batch([
-   this.db.prepare('INSERT INTO ai_loop_grants_v15(id,token_hash,owner,project,expires) VALUES(?,?,?,?,?)').bind(grantId,await hash(token),owner,PROJECT,now+ttl),
+   this.db.prepare('INSERT INTO ai_loop_grants_v15(id,token_hash,owner,project,expires,request_id) VALUES(?,?,?,?,?,?)').bind(grantId,await hash(token),owner,PROJECT,now+ttl,requestId),
    this.db.prepare('INSERT INTO ai_loop_audit_v15(id,grant_id,request_id,event,tool,at) VALUES(?,?,?,?,?,?)').bind(crypto.randomUUID(),grantId,null,'ISSUED',null,now),
   ]);
   return {token,grantId};
@@ -41,7 +44,7 @@ export class D1Ledger {
  async claim(token,owner,requestId,now){
   need(id(requestId),'INVALID_REQUEST',400);
   // Unique(owner,request_id) makes retries across grants/processes fail closed.
-  return this.one("UPDATE ai_loop_grants_v15 SET state='RUNNING',request_id=? WHERE token_hash=? AND owner=? AND project=? AND state='ISSUED' AND revoked=0 AND expires>? RETURNING id",requestId,await hash(token),owner,PROJECT,now);
+  return this.one("UPDATE ai_loop_grants_v15 SET state='RUNNING',request_id=? WHERE token_hash=? AND owner=? AND project=? AND state='ISSUED' AND revoked=0 AND expires>? AND (request_id IS NULL OR request_id=?) RETURNING id",requestId,await hash(token),owner,PROJECT,now,requestId);
  }
  async active(g,owner,now){return this.one("SELECT id FROM ai_loop_grants_v15 WHERE id=? AND owner=? AND project=? AND revoked=0 AND expires>? AND state='RUNNING'",g,owner,PROJECT,now);}
  async consume(g,owner,now){return this.one("UPDATE ai_loop_grants_v15 SET calls=calls+1 WHERE id=? AND owner=? AND project=? AND revoked=0 AND expires>? AND state='RUNNING' AND calls<5 RETURNING id",g,owner,PROJECT,now);}
@@ -114,7 +117,7 @@ export class ManualReadHost {
   const owner=await this.authenticate(req,signal);need(mode==='MANUAL','AUTO_DISABLED');need(project===PROJECT,'PROJECT_DENIED');need(id(requestId),'INVALID_REQUEST',400);
   let g;
   try{
-   signal.throwIfAborted();g=await this.ledger.issue(owner,this.now());signal.throwIfAborted();
+   signal.throwIfAborted();g=await this.ledger.issue(owner,this.now(),60000,requestId);signal.throwIfAborted();
    need(await this.ledger.claim(g.token,owner,requestId,this.now()),'DUPLICATE_OR_INACTIVE',409);
    const call=async(tool)=>{
     await this.authenticate(req,signal);signal.throwIfAborted();
