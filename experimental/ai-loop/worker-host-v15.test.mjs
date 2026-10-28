@@ -109,3 +109,38 @@ test('V15-16 missing schema fails closed; short-lived grant and TTL upper bound 
  const g=await f.ledger.issue(OWNER,f.now(),1);f.tick(2);assert.equal(await f.ledger.claim(g.token,OWNER,'expired-claim',f.now()),null);
  f.db.exec('DROP TABLE ai_loop_grants_v15');await error(await f.run(),'HOST_FAILED');assert.equal(f.seen.length,0);
 });
+
+
+test('V15-17 trusted ingress verifier is mandatory, a forged owner header cannot bypass it',async()=>{
+ const f=fixture();
+ const base={ledger:f.ledger,read:f.host.read,owner:OWNER,origin:ORIGIN,enabled:true,now:f.now};
+ assert.throws(()=>new ManualReadHost(base),e=>e.code==='INGRESS_VERIFIER_REQUIRED');
+ const forged=new ManualReadHost({...base,verifyIngress:async()=>null});
+ await error(await forged.handle(req(body())),'INGRESS_IDENTITY_UNVERIFIED');
+ assert.equal(f.seen.length,0);
+ assert.equal(f.db.prepare('select count(*) n from ai_loop_grants_v15').get().n,0);
+});
+test('V15-18 verified platform principal must match owner even when HTTP header matches',async()=>{
+ const f=fixture();
+ const base={ledger:f.ledger,read:f.host.read,owner:OWNER,origin:ORIGIN,enabled:true,now:f.now};
+ for(const verifier of [
+  async()=>({authenticated:false,subjectId:OWNER}),
+  async()=>({authenticated:true,subjectId:'other-owner'}),
+  async()=>{throw Error('hidden platform exception token');},
+ ]) {
+  const host=new ManualReadHost({...base,verifyIngress:verifier});
+  const res=await host.handle(req(body()));
+  await error(res,'INGRESS_IDENTITY_UNVERIFIED');
+ }
+ assert.equal(f.seen.length,0);
+});
+test('V15-19 platform revocation before first source read fails closed and does not issue visible results',async()=>{
+ const f=fixture();let checks=0;
+ const host=new ManualReadHost({ledger:f.ledger,read:f.host.read,owner:OWNER,origin:ORIGIN,
+  enabled:true,now:f.now,verifyIngress:async()=>{
+   checks++;return checks<3?{authenticated:true,subjectId:OWNER}:{authenticated:false,subjectId:OWNER};
+  }});
+ await error(await host.handle(req(body())),'INGRESS_IDENTITY_UNVERIFIED');
+ assert.equal(f.seen.length,0);
+ assert.ok(checks>=3);
+});
