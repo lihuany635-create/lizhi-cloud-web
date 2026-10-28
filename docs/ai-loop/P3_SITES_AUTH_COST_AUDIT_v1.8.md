@@ -43,19 +43,23 @@ Sites 官方技能 `references/identity-and-secrets.md` 與 `references/site-mcp
 
 ## 3. 免費額度與管理介面
 
-已使用瀏覽器開啟 `https://chatgpt.com/`；畫面顯示Log in/Sign up，沒有登入的Site管理帳號，因此未能進入原Site Settings/Usage。未要求或讀取密碼/OTP；不以service bypass模擬本人登入。可用Sites native工具沒有當期帳單/用量/DB容量查詢，database overview亦無容量metadata；不能從表名或版本tar大小推算D1使用量。
+初次管理瀏覽器未登入；其後本人透過安全登入流程選擇Google，已實際登入並讀到原帳戶Sites清單及該Site的Settings/Database/Analytics，再進入帳戶Usage。沒有讀取密碼/OTP、沒有以service bypass取代本人登入。原先「等待登入」阻礙已解除，不得繼續要求重複登入。
+
+實際管理畫面：原Site設定顯示Only visible to you；Database顯示Connected與animation_projects（資料列非容量計量），沒有DB大小/rows讀寫quota；Analytics有30日Requests、Unique Visitors與Page Views，沒有CPU/quota/remaining/reset。帳戶Usage顯示方案建置使用百分比及reset window、credit餘額與自動加值開關；已讀回auto-reload的aria-checked=false，未操作開關或購買。這些是建置/Codex/Work用量，**不是Site hosting/D1帳戶剩餘額度**。精確當期數值僅登記私人工作台，不放公開GitHub。
+
+Sites native工具亦無帳單/用量/DB容量查詢；不能從表名、已載資料列長度、版本tar大小或Analytics的請求總數推算剩餘配額。
 
 官方Help Center本輪實讀：Plus/Pro現階段包含hosting，建置/編輯消耗Codex usage；hosting流量/儲存另有共用限制，單Site DB上限10GB。**這些是一般適用文件，不是本帳戶管理畫面的方案、當期餘額或費用硬上限證據**。現階段一般政策比v1.7已有更明確資訊，但仍不足以通過本人的NT$0上線門檻。
 
 |要求|原帳戶判定|
 |---|---|
-|原Site適用帳戶/hosting方案|NOT_VERIFIED（不能僅用對話記憶中的Plus代替管理資料）|
-|當期剩餘量、重置時間|NOT_VERIFIED|
+|原Site適用帳戶/hosting方案|帳戶訂閱方案已在登入後管理UI確認；Sites專屬hosting計費/硬上限仍NOT_VERIFIED|
+|當期剩餘量、重置時間|帳戶建置用量/reset已實讀；Sites hosting/D1剩餘量與reset仍NOT_VERIFIED|
 |原D1實際容量|NOT_VERIFIED|
 |D1讀寫使用/配額|NOT_VERIFIED|
-|Workers/Sites執行用量|NOT_VERIFIED|
+|Workers/Sites執行用量|Site30日Analytics請求/頁覽已讀；CPU與計費配額NOT_VERIFIED|
 |超額確實拒絕執行|NOT_VERIFIED|
-|自動額外帳單/credit使用/自動購買風險|NOT_VERIFIED；未啟用或變更任何此類功能|
+|自動額外帳單/credit使用/自動購買風險|帳戶auto-reload=false已讀回、credit餘額及無credit usage歷史已見；Sites託管超額計費/全帳戶帳單仍NOT_VERIFIED。未改任何設定|
 |真正平台費用hard cap/超額計費開關|NOT_VERIFIED；沒有自行虛構可設定欄位|
 
 不套用Cloudflare原生Free配額作為ChatGPT Sites帳戶餘額。沒有新增API、外部模型、訂閱、新站或付費runner；沒有支付/升級。本輪會消耗既有建置/查詢/CI資源，**沒有帳單讀回，因此不聲稱實際帳單增量已驗證為零**。
@@ -79,4 +83,4 @@ Sites 官方技能 `references/identity-and-secrets.md` 與 `references/site-mcp
 
 **正式Worker AUTH01～AUTH10：全部NOT_TESTED，沒有真實PASS。** 三個外部401是既有前門負向觀測，不能充當部署後正式十項驗收或跨帳號/即時撤權成功。
 
-尚需：登入原帳戶管理畫面查用量/計費控制；補原Site可信principal/來源封鎖與session撤權實證；核定保存/清理與雲端D1一致性方案。未全部達成，**不請求正式部署批准**。條件日後齊備才一次核准原Site差分發布＋兩張隔離表（不改原表）＋短期MANUAL單專案三讀AUTH01～10＋測後OFF，回退至已記錄v24程式且保留隔離表/稽核，不刪DB作回退。任何Secrets新增/變更須另明確列出，本輪沒有此需要或許可。
+尚需：取得管理UI目前未顯示的Sites/D1當期配額、實際容量及超額/硬上限的可信平台證據（不再要求重複登入）；補原Site可信principal/來源封鎖與session撤權實證；核定保存/清理與雲端D1一致性方案。未全部達成，**不請求正式部署批准**。條件日後齊備才一次核准原Site差分發布＋兩張隔離表（不改原表）＋短期MANUAL單專案三讀AUTH01～10＋測後OFF，回退至已記錄v24程式且保留隔離表/稽核，不刪DB作回退。任何Secrets新增/變更須另明確列出，本輪沒有此需要或許可。
