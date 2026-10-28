@@ -4,6 +4,7 @@ on:
     paths:
       - 'experimental/ai-loop/**'
       - '.github/workflows/ai-loop-sandbox.yml'
+      - 'docs/ai-loop/P5_REPRODUCIBLE_EVIDENCE_v1.0.md'
   workflow_dispatch:
 
 permissions:
@@ -11,7 +12,7 @@ permissions:
 
 jobs:
   sandbox-node:
-    name: P1 P2 offline unit tests
+    name: P1-P5 offline acceptance evidence
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -19,7 +20,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22.16.0'
-      - name: Verify no external installation is required
+      - name: Confirm Node runtime
         run: node --version
-      - name: Run local-only tests
-        run: node --disable-warning=ExperimentalWarning --test experimental/ai-loop/*.test.mjs
+      - name: Run offline tests and create sanitised evidence
+        run: node --disable-warning=ExperimentalWarning experimental/ai-loop/acceptance-evidence.mjs --output ai-loop-acceptance-evidence.json
+      - name: Save sandbox evidence (3-day retention)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-loop-p5-sandbox-evidence
+          path: ai-loop-acceptance-evidence.json
+          retention-days: 3
