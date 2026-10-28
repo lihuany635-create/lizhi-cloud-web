@@ -35,5 +35,5 @@ test('P5-12 correct synthetic baseline still labels real E2E NOT_TESTED',()=>{
  const e=createEvidence({tap:tap(ids),files,at:'2026-10-28T00:00:00Z'});
  assert.equal(e.result,'SANDBOX_PASS');assert.equal(e.liveE2e,'NOT_TESTED');
  assert.equal(e.ownerApproval,'NOT_OBTAINED');assert.equal(e.boundaries.workbenchWrite,false);
- assert.equal(e.sources.length,3);assert.match(e.tapSha256,/^[0-9a-f]{64}$/);
+ assert.equal(e.sources.length,3);assert.equal(e.boundaries.networkUse,'NOT_INSTRUMENTED');assert.match(e.tapSha256,/^[0-9a-f]{64}$/);
 });
