@@ -20,7 +20,10 @@ function fixture({db=new DatabaseSync(':memory:'),init=true,read,enabled=true,ti
   if(tool==='list_projects')return [{projectId:PROJECT,revision:78},{projectId:'foreign',revision:8,private:'PRIVATE_SOURCE'}];
   if(tool==='get_project_context')return {projectId:PROJECT,revision:78,tasks:[{id:'task-1',key:'worker',status:'IN_PROGRESS',title:'PRIVATE_SOURCE'}],secret:'PRIVATE_SOURCE'};
   return {projectId:PROJECT,revision:78,lastWork:{key:'last-work'},unfinished:[{}],private:'PRIVATE_SOURCE'};};
- const host=new ManualReadHost({ledger,read:source,owner:OWNER,origin:ORIGIN,enabled,now:()=>time,timeoutMs});
+ // UNIT TEST ONLY: a mock Site verifier, not valid evidence for live owner authentication.
+ const verifyIngress=async req=>({authenticated:req.headers.get('oai-authenticated-user-id')===OWNER,
+   subjectId:req.headers.get('oai-authenticated-user-id')});
+ const host=new ManualReadHost({ledger,read:source,owner:OWNER,origin:ORIGIN,enabled,now:()=>time,timeoutMs,verifyIngress});
  return {db,ledger,host,seen,tick:n=>{time+=n;},now:()=>time,run:(b=body(),h={})=>host.handle(req(b,h))};
 }
 async function error(response,code){assert.equal((await response.json()).error,code);}
