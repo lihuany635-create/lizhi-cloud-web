@@ -81,7 +81,13 @@ export function minimise(tool,raw){
 export function bridgeSource(env,fetchImpl=fetch){
  const base='https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-production';
  need(env.PRODUCTION_BRIDGE_URL===base&&env.PRODUCTION_BRIDGE_KEY,'SOURCE_UNCONFIGURED',503);
- const ops={list_projects:'listManagedProjects',get_project_context:'getProjectContext',get_project_handoff:'getProjectHandoff'};
+ // Compact mode requires a separately verified upstream deployment. No silent fallback:
+ // any unknown setting fails rather than sending a broad legacy read.
+ const mode=env.AI_LOOP_COMPACT_SOURCE_MODE;
+ need(mode===undefined||mode==='verified-v1','SOURCE_MODE_UNVERIFIED',503);
+ const ops=mode==='verified-v1'
+  ?{list_projects:'listManagedProjectsCompactV1',get_project_context:'getProjectContextCompactV1',get_project_handoff:'getProjectHandoffCompactV1'}
+  :{list_projects:'listManagedProjects',get_project_context:'getProjectContext',get_project_handoff:'getProjectHandoff'};
  return async function read(tool,args,signal){
   need(TOOLS.includes(tool),'TOOL_DENIED');
   need(args&&Object.keys(args).length===(tool==='list_projects'?0:1)&&(tool==='list_projects'||args.projectId===PROJECT),'PROJECT_DENIED');
