@@ -37,7 +37,7 @@ test('P6-T04 Quick Tunnel script exposes only the Finance Gateway',()=>{
 });
 
 test('P6-T05 production browser still loads only the Gateway connector',()=>{
-  const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
+  const index=(fs.readFileSync(path.join(root,'index.html'),'utf8')+fs.readFileSync(path.join(root,'loader.js'),'utf8'));
   assert.match(index,/finance-ai-gateway-connector\.js/);
   assert.doesNotMatch(index,/ollama-connector\.js/);
 });

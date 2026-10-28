@@ -51,11 +51,15 @@ const active=kind=>state.records.filter(row=>row.kind===kind&&!row.deletedAt);
 const trashed=()=>state.records.filter(row=>row.deletedAt);
 function toast(message){document.querySelector(".toast")?.remove();const el=document.createElement("div");el.className="toast";el.textContent=message;document.body.append(el);setTimeout(()=>el.remove(),2600);}
 
-const navItems=[
-  ["home","⌂","封面"],["knowledge","書","圖書館"],["weave","AI","AI 處理中心"],["finance","財","理財管家"],["engineering","工","工程中心"],["media","影","影音庫"],["chat","↔","即時對話"],["study","✎","立之讀書室"],["a4","頁","A4 文件編輯器"],["licut","剪","立剪"],["cad","圖","立之 CAD"],["imagegraph","構","映構圖片工作台"],["model3d","模","3D 模型檢視器"],["hew3d","立","Hew 3D 建模"],["animationflow","程","專案工作台"],["phoneagent","機","手機代理"],["uploads","↑","上傳狀態"],["trash","♲","回收桶"],["settings","⚙","本機設定"]
+const navGroups=[
+  ["日常",[["home","⌂","封面"],["knowledge","書","圖書館"],["finance","財","理財管家"],["media","影","影音庫"],["chat","↔","即時對話"],["study","✎","立之讀書室"]]],
+  ["工作",[["engineering","工","工程中心"],["a4","頁","A4 文件編輯器"],["licut","剪","立剪"],["phoneagent","機","手機代理"]]],
+  ["動畫與製圖（之後拆成獨立專案）",[["animationflow","程","專案工作台"],["model3d","模","3D 模型檢視器"],["hew3d","立","Hew 3D 建模"],["cad","圖","立之 CAD"],["imagegraph","構","映構圖片工作台"]]],
+  ["系統",[["weave","AI","AI 處理中心"],["uploads","↑","上傳狀態"],["trash","♲","回收桶"],["settings","⚙","本機設定"]]]
 ];
+const navItems=navGroups.flatMap(([,items])=>items);
 function navDescription(route){return route==="knowledge"?"上傳檔案，Claude 幫你整理上架":route==="weave"?"全站狀態與 AI 處理紀錄":route==="finance"?"離線記帳與財務整理":route==="engineering"?"專業工程模組入口":route==="media"?"影片、音訊與已生成 Podcast":route==="chat"?"手機與電腦即時傳字":route==="study"?"畫布提問與教學模式":route==="a4"?"固定格子、模板與 Word／PDF":route==="licut"?"手機剪片、轉場、字幕與匯出":route==="cad"?"CADCraft 原生繪圖引擎、本機 DXF 與版本":route==="imagegraph"?"圖片關係、裝置資料夾、任務與驗收":route==="model3d"?"開啟 GLB／OBJ／FBX 模型，旋轉與剖切檢視":route==="hew3d"?"Hew 原生 3D 建模、需登入本人並明確允許 AI 操作":route==="animationflow"?"動畫、模型與軟體專案，工作過程及交接紀錄":route==="phoneagent"?"A22 雲端唯讀畫面與裝置狀態":route==="trash"?"復原已刪除內容":route==="uploads"?"最近回報、待上傳與失敗原因":route==="settings"?"備份與裝置資料":"返回收藏入口";}
-function layout(content){return `<div class="shell route-${state.route} ${state.sidebar?"drawer-open":""}"><header class="topbar"><a class="brand" href="#" data-route="home"><span class="brand-mark">立</span><span><b>立之雲端庫</b><small>${IS_CLOUD_SITE?"THIS LAPTOP CLOUD ARCHIVE":"LOCAL PRIVATE ARCHIVE"}</small></span></a><span class="local-pill">● ${IS_CLOUD_SITE?"21 集雲端同步":"本機資料庫"}</span><button class="button library-menu-button" data-action="toggle-menu">選擇收藏庫</button></header><button class="drawer-handle" data-action="toggle-menu" aria-label="${state.sidebar?"關閉收藏庫選單":"拉出收藏庫選單"}">${state.sidebar?"›":"‹"}</button><aside class="sidebar ${state.sidebar?"open":""}" aria-label="雲端庫入口"><div class="drawer-head"><div><div class="nav-title">LIBRARY MENU</div><h2>選擇收藏庫</h2></div><button class="drawer-close" data-action="toggle-menu" aria-label="關閉選單">×</button></div><nav class="nav-list">${navItems.map(([route,icon,label],index)=>`<button class="nav-link ${state.route===route?"active":""}" data-route="${route}"><span>${icon}</span><b><small>${String(index+1).padStart(2,"0")}</small>${label}<em>${navDescription(route)}</em></b><i>進入 →</i></button>`).join("")}</nav><div class="side-note">KNOWLEDGE · FINANCE · ENGINEERING · MEDIA · CHAT · STUDY · A4 · VIDEO<br>${IS_CLOUD_SITE?"AVAILABLE ON EVERY DEVICE":"PRIVATE BY DESIGN"}</div></aside><main class="main">${content}</main></div>${renderModal()}`;}
+function layout(content){return `<div class="shell route-${state.route} ${state.sidebar?"drawer-open":""}"><header class="topbar"><a class="brand" href="#" data-route="home"><span class="brand-mark">立</span><span><b>立之雲端庫</b><small>${IS_CLOUD_SITE?"THIS LAPTOP CLOUD ARCHIVE":"LOCAL PRIVATE ARCHIVE"}</small></span></a><span class="local-pill">● ${IS_CLOUD_SITE?"21 集雲端同步":"本機資料庫"}</span><button class="button library-menu-button" data-action="toggle-menu">選擇收藏庫</button></header><button class="drawer-handle" data-action="toggle-menu" aria-label="${state.sidebar?"關閉收藏庫選單":"拉出收藏庫選單"}">${state.sidebar?"›":"‹"}</button><aside class="sidebar ${state.sidebar?"open":""}" aria-label="雲端庫入口"><div class="drawer-head"><div><div class="nav-title">LIBRARY MENU</div><h2>選擇收藏庫</h2></div><button class="drawer-close" data-action="toggle-menu" aria-label="關閉選單">×</button></div><nav class="nav-list">${navGroups.map(([group,items])=>`<div class="nav-group-title">${group}</div>${items.map(([route,icon,label])=>`<button class="nav-link ${state.route===route?"active":""}" data-route="${route}"><span>${icon}</span><b><small>${String(navItems.findIndex(item=>item[0]===route)+1).padStart(2,"0")}</small>${label}<em>${navDescription(route)}</em></b><i>進入 →</i></button>`).join("")}`).join("")}</nav><div class="side-note">KNOWLEDGE · FINANCE · ENGINEERING · MEDIA · CHAT · STUDY · A4 · VIDEO<br>${IS_CLOUD_SITE?"AVAILABLE ON EVERY DEVICE":"PRIVATE BY DESIGN"}</div></aside><main class="main">${content}</main></div>${renderModal()}`;}
 function head(eyebrow,title,description,actions=""){return `<div class="page-head"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1><p>${description}</p></div><div class="actions">${actions}</div></div>`;}
 
 function renderPhoneAgent() {
@@ -104,27 +108,35 @@ mediaInput.addEventListener("change",async()=>{for(const file of mediaInput.file
 function exportBackup(){const payload={app:"立之雲端庫・本機版",version:1,exportedAt:now(),records:state.records};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download=`立之雲端庫-資料目錄-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast("已匯出資料目錄");}
 restoreInput.addEventListener("change",async()=>{const file=restoreInput.files[0];if(!file)return;try{const payload=JSON.parse(await file.text());if(!Array.isArray(payload.records))throw new Error("格式不正確");for(const row of payload.records)await putRecord(row);await refresh();toast("資料目錄已匯入");}catch{toast("備份檔格式不正確");}restoreInput.value="";});
 
+// 各功能的啟動程式：功能的 script 由 loader.js 在第一次進入時載入，載入完成後執行一次。
+function registerFeatureActivators(){
+  const loader=window.LizhiLoader;
+  loader.register("weave",()=>{
+    KnowledgeWeaving.installEvents(app);
+    if(window.AiCenter){AiCenter.configure({rerender:()=>{if(state.route==="weave")render();}});AiCenter.installEvents(app);}
+  });
+  loader.register("finance",()=>{FinanceHome.installEvents(app);});
+  loader.register("knowledge",()=>{
+    const knowledgeService=new KnowledgeService({
+      local:new LocalKnowledgeAdapter({records:()=>state.records,put:putRecord,afterSave:refresh}),
+      vault:new VaultKnowledgeAdapter({enabled:!IS_CLOUD_SITE})
+    });
+    KnowledgeHome.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
+    if(window.LibraryHome){LibraryHome.configure({rerender:()=>{if(state.route==="knowledge")render();}});LibraryHome.installEvents(app);}
+    KnowledgeHome.installEvents(app);
+    KnowledgeEditor.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
+    KnowledgeEditor.installEvents(app);
+    KnowledgeEditor.restore();
+  });
+  loader.register("engineering",()=>{EngineeringHub.installEvents(app);});
+}
+
 async function boot(){
   if(IS_CLOUD_SITE&&window.LizhiAuth&&!await window.LizhiAuth.requireUser())return;
   initializeChatIdentity();
   initializeDelivery();
   installWorkspaceEvents();
-  KnowledgeWeaving.installEvents(app);
-
-  if(window.AiCenter){AiCenter.configure({rerender:()=>{if(state.route==="weave")render();}});AiCenter.installEvents(app);}
-  FinanceHome.installEvents(app);
-  const knowledgeService=new KnowledgeService({
-    local:new LocalKnowledgeAdapter({records:()=>state.records,put:putRecord,afterSave:refresh}),
-    vault:new VaultKnowledgeAdapter({enabled:!IS_CLOUD_SITE})
-  });
-  KnowledgeHome.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
-  if(window.LibraryHome){LibraryHome.configure({rerender:()=>{if(state.route==="knowledge")render();}});LibraryHome.installEvents(app);}
-
-  KnowledgeHome.installEvents(app);
-  KnowledgeEditor.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
-  KnowledgeEditor.installEvents(app);
-  KnowledgeEditor.restore();
-  EngineeringHub.installEvents(app);
+  registerFeatureActivators();
   if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").then(registration=>registration.update()).catch(()=>{});
   seed().then(()=>window.LizhiSync?.sync?.()).then(loadCloudMedia).then(refresh).catch(error=>{app.innerHTML=`<div class="empty">無法開啟資料庫：${escapeHtml(error.message)}</div>`;});
 }

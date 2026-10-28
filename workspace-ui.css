@@ -72,3 +72,7 @@
 .route-phoneagent .phone-agent-element small{font-size:11px;color:#776d60;overflow-wrap:anywhere}
 .route-phoneagent .phone-agent-safety{font-size:12px;line-height:1.8;color:#6e6153}
 @media(max-width:720px){.route-phoneagent .phone-agent-columns{grid-template-columns:1fr}.route-phoneagent .phone-agent-display{max-width:380px}.route-phoneagent .phone-agent-controls .button{flex:1 1 135px}.route-phoneagent .phone-agent-elements{max-height:340px}}
+
+/* 選單分組：日常／工作／動畫與製圖／系統 */
+.nav-group-title{margin:18px 4px 6px;font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--cyan,#79c8d0)}
+.nav-group-title:first-child{margin-top:4px}

@@ -64,7 +64,7 @@ test("E0-09 workspace exposes an isolated Engineering renderer",()=>{
 });
 
 test("E0-10 production entry loads Engineering before workspace",()=>{
-  const index=read("index.html");
+  const index=(read("index.html")+read("loader.js"));
   assert.match(index,/engineering\/engineering\.js\?v=17[\s\S]*workspace-ui\.js\?v=24/);
 });
 

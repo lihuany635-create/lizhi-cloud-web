@@ -142,7 +142,7 @@ test('P6B-T19 migration enforces owner RLS, idempotency, expiry and atomic claim
 });
 
 test('P6B-T20 production assets load Job Bridge before SmallModelParser',()=>{
-  const index=fs.readFileSync(path.join(root,'index.html'),'utf8'),store=index.indexOf('finance-ai-job-store.js'),connector=index.indexOf('finance-ai-job-connector.js'),parser=index.indexOf('finance-small-model-parser.js');
+  const index=(fs.readFileSync(path.join(root,'index.html'),'utf8')+fs.readFileSync(path.join(root,'loader.js'),'utf8')),store=index.indexOf('finance-ai-job-store.js'),connector=index.indexOf('finance-ai-job-connector.js'),parser=index.indexOf('finance-small-model-parser.js');
   assert.ok(store>0&&connector>store&&parser>connector);assert.doesNotMatch(index,/ollama-connector\.js/);
 });
 

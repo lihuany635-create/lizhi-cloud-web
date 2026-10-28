@@ -50,6 +50,24 @@ function renderWorkspace() {
     workspacePanels.set(state.route, panel);
   }
   for(const [route, el] of workspacePanels) el.hidden = route !== state.route;
+  // 功能程式按需載入：尚未載入時先顯示載入中，載入完成後清空面板再重畫一次。
+  const featureGroup = window.LizhiLoader?.groupFor(state.route);
+  if(featureGroup && !window.LizhiLoader.isReady(featureGroup)) {
+    const route = state.route;
+    if(!panel.dataset.loading) {
+      panel.dataset.loading = '1';
+      panel.innerHTML = '<div class="empty">載入中…</div>';
+      window.LizhiLoader.ensure(featureGroup).then(() => {
+        delete panel.dataset.loading;
+        panel.replaceChildren();
+        if(state.route === route) render();
+      }).catch(error => {
+        delete panel.dataset.loading;
+        panel.innerHTML = `<div class="empty">這個功能載入失敗：${escapeHtml(error.message)}。請檢查網路後重新整理，其他功能不受影響。</div>`;
+      });
+    }
+    return;
+  }
   if(state.route === 'media') updateMediaPanel(panel);
   else if(state.route === 'chat') updateChatPanel(panel);
   else if(state.route === 'study' || state.route === 'cad' || state.route === 'a4' || state.route === 'licut' || state.route === 'imagegraph' || state.route === 'model3d' || state.route === 'hew3d' || state.route === 'animationflow') {
@@ -64,7 +82,7 @@ function renderWorkspace() {
       }
     }
   } else {
-    const renderers = {home:renderHome,knowledge:KnowledgeHome.render,weave:(window.AiCenter?AiCenter.render:KnowledgeWeaving.render),finance:FinanceHome.render,engineering:renderEngineeringHub,phoneagent:renderPhoneAgent,trash:renderTrash,settings:renderSettings,uploads:renderUploads};
+    const renderers = {home:renderHome,knowledge:()=>KnowledgeHome.render(),weave:()=>(window.AiCenter?AiCenter.render():KnowledgeWeaving.render()),finance:()=>FinanceHome.render(),engineering:renderEngineeringHub,phoneagent:renderPhoneAgent,trash:renderTrash,settings:renderSettings,uploads:renderUploads};
     const focused = document.activeElement;
     const searchFocused = panel.contains(focused) && focused.matches('[data-search]');
     const selection = searchFocused ? [focused.selectionStart, focused.selectionEnd] : null;

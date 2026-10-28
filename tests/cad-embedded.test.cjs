@@ -7,6 +7,8 @@ const root = path.resolve(__dirname, '..');
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const ui = fs.readFileSync(path.join(root, 'workspace-ui.js'), 'utf8');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+// 功能 script 改由 loader.js 按需載入（進入 CAD 時才下載）。
+const loader = fs.readFileSync(path.join(root, 'loader.js'), 'utf8');
 const host = fs.readFileSync(path.join(root, 'cad/cad-host.js'), 'utf8');
 const workflow = fs.readFileSync(path.join(root, '.github/workflows/pages.yml'), 'utf8');
 const builder = fs.readFileSync(path.join(root, 'cad/build-runtime.sh'), 'utf8');
@@ -18,7 +20,8 @@ test('CAD route, menu, persistent iframe and same-origin host are wired', () => 
   assert.match(app, /cad\/runtime\/index\.html\?host=parent/);
   assert.match(ui, /state\.route === 'cad'/);
   assert.match(ui, /LizhiCadHost\?\.mount\(panel\)/);
-  assert.match(html, /cad\/cad-host\.js/);
+  assert.match(loader, /cad\/cad-host\.js/);
+  assert.match(loader, /cad:"cad"/);
   assert.match(html, /cad\/cad\.css/);
 });
 test('native pinned WASM build is part of existing Pages deployment', () => {

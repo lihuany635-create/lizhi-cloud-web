@@ -68,4 +68,4 @@ test("P10-54 Phase 9 remains user-confirmed only",()=>{const home=read("finance/
 test("P10-55 Phase 8 transaction tombstones remain present",()=>assert.match(read("finance/storage/finance-db.js"),/tombstoneTransaction/));
 test("P10-56 Phase 7 voice input remains browser-only",()=>{const voice=read("finance/voice/finance-voice-input.js");assert.match(voice,/SpeechRecognition|webkitSpeechRecognition/);assert.doesNotMatch(voice,/new Blob|FormData|fetch\(/i);});
 test("P10-57 Phase 6 production bridge remains fixed",()=>{const home=read("finance/pages/home.js");assert.match(home,/productionJobBridge\?FinanceAIJobConnector:FinanceAIGatewayConnector/);});
-test("P10-58 one-click Host launcher remains wired",()=>{const index=read("index.html"),home=read("finance/pages/home.js");assert.match(index,/finance-ai-host-launcher\.js\?v=1/);assert.match(home,/launch-ai-host/);});
+test("P10-58 one-click Host launcher remains wired",()=>{const index=(read("index.html")+read("loader.js")),home=read("finance/pages/home.js");assert.match(index,/finance-ai-host-launcher\.js\?v=1/);assert.match(home,/launch-ai-host/);});

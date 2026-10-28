@@ -114,7 +114,7 @@ test("E1-20 persistence remains a dedicated versioned Engineering database",()=>
   assert.equal(Database.DB_NAME,"lizhi-engineering");assert.ok(Database.DB_VERSION>=2);assert.equal(Database.STORES.projects,"projects");assert.equal(Database.STORES.settings,"settings");
 });
 test("E1-21 production load order preserves UI-Service-Repository-Persistence",()=>{
-  const index=read("index.html");assert.match(index,/engineering-db\.js[\s\S]*project-repository\.js[\s\S]*project-service\.js[\s\S]*engineering-home\.js[\s\S]*engineering\.js/);
+  const index=(read("index.html")+read("loader.js"));assert.match(index,/engineering-db\.js[\s\S]*project-repository\.js[\s\S]*project-service\.js[\s\S]*engineering-home\.js[\s\S]*engineering\.js/);
 });
 test("E1-22 UI has no direct IndexedDB or Supabase access",()=>{
   const source=["engineering/pages/engineering-home.js","engineering/pages/project-workspace.js","engineering/engineering.js"].map(read).join("\n");assert.doesNotMatch(source,/indexedDB|supabase\.from/);
