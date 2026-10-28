@@ -12,7 +12,7 @@ Node.js >= 22.16.0。P2 使用 Node 內建實驗性 `node:sqlite`（此 Node 版
 node --disable-warning=ExperimentalWarning --test experimental/ai-loop/*.test.mjs
 ```
 
-目前本機測試：P1 15 項、P2 20 項，總計 **35 項**。此測試僅代表本地模擬實測，**不是** GitHub CI／Supabase／ChatGPT MCP 端到端驗收。
+目前本機測試：P1 15 項、P2 20 項、P3 14 項，總計 **49 項**。此測試僅代表本地模擬實測，**不是** GitHub CI／Supabase／ChatGPT MCP 端到端驗收。
 
 ## P2 核心使用方式
 
@@ -43,3 +43,10 @@ q.close(); // 重新開啟時能讀回 RUNNING 和原 attempt
 - `durable-queue.mjs`, `durable-queue.test.mjs`：P2 本地持久化調度核心與 20 個測試
 - `queue-claim-cli.mjs`：P2 跨程序競爭領取測試用
 - `docs/ai-loop/P2_HANDOFF_v0.4.md`：P2 完整交接與剩餘阻礙
+
+## P3｜五角色契約的隔離測試（尚非真實 AI）
+
+- `role-adapter.mjs`：僅接受明示 `readOnly: true` 的注入式 mock adapter；Planner 讀 mock context、Executor 讀一次、Reviewer **另讀一次**核對內容摘要與目標、Repairer 在失敗時只提出問題清單、Handover 只寫隔離 recorder 並重新讀回。
+- `role-adapter.test.mjs`：P3 新增 14 項，含隔離源兩次讀取不一致、拒絕寫入工具、跨專案、L2/L3、付費API、交接寫入/讀回異常及不冒充作者核定。
+- 整組 tests 49 項；GitHub Actions 只跑離線單元測試，未進行模型生成、真實MCP操作、站點部署或持久Worker整合。
+- P3 的角色是同步 deterministic mock callbacks，不是五個獨立模型；mock `readOnly` 註記不能替代正式MCP端的權限檢查；P3 的 Repairer **不會更動資料**。跨模型代理與正式授權/回寫仍為待實作。
