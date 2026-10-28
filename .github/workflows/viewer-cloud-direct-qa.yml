@@ -2,9 +2,9 @@ name: Viewer Cloud Direct Unit QA
 on:
   push:
     branches: [feature/viewer-cloud-direct-workbench-v1-20261028]
-    paths: ['supabase/functions/lizhi-viewer-cloud/**','supabase/migrations/20261028010000_lizhi_viewer_cloud_direct.sql','tests/viewer-cloud-direct.test.mjs','.github/workflows/viewer-cloud-direct-qa.yml']
+    paths: ['supabase/functions/lizhi-viewer-cloud/**','supabase/migrations/2026102801*_lizhi_viewer_cloud_*.sql','supabase/migrations/2026102802*_lizhi_viewer_cloud_*.sql','tests/viewer-cloud-*.test.mjs','model-viewer/nav/**','model-viewer/*.glb','model-viewer/current-models.json','sites-migration/viewer-cloud-direct/**','.github/workflows/viewer-cloud-direct-qa.yml']
   pull_request:
-    paths: ['supabase/functions/lizhi-viewer-cloud/**','supabase/migrations/20261028010000_lizhi_viewer_cloud_direct.sql','tests/viewer-cloud-direct.test.mjs','.github/workflows/viewer-cloud-direct-qa.yml']
+    paths: ['supabase/functions/lizhi-viewer-cloud/**','supabase/migrations/2026102801*_lizhi_viewer_cloud_*.sql','supabase/migrations/2026102802*_lizhi_viewer_cloud_*.sql','tests/viewer-cloud-*.test.mjs','model-viewer/nav/**','model-viewer/*.glb','model-viewer/current-models.json','sites-migration/viewer-cloud-direct/**','.github/workflows/viewer-cloud-direct-qa.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Cloud direct contract verification
-        run: node --test tests/viewer-cloud-direct.test.mjs
+        run: node --test tests/viewer-cloud-direct.test.mjs tests/viewer-cloud-nav.test.mjs
       - name: Check browser-based original not overwritten
         run: |
           grep -q "const agentOrigin=" model-viewer/index.html
