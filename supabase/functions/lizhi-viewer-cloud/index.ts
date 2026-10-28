@@ -38,14 +38,17 @@ async function listManifest(){
 const navCache=new Map();
 async function loadNav(key,sha){
  // Returns null when no grid matches this exact GLB SHA (then movement stays unverified, as before).
- const id=key+'|'+sha;if(navCache.has(id))return navCache.get(id);
+ // A miss is retried after 60 s, so a grid published to GitHub Pages later is picked up without redeploying.
+ const id=key+'|'+sha,hit=navCache.get(id);
+ if(hit&&(hit.nav||Date.now()-hit.at<60000))return hit.nav;
  let nav=null;
  try{
   const r=await fetch(ASSET_ROOT+'nav/'+key+'.nav.json?sha='+sha.slice(0,12),{redirect:'manual',signal:AbortSignal.timeout(15000)});
   if(r.ok){const doc=await r.json();if(doc.model_sha===sha)nav=await decodeNav(doc);}
  }catch(_e){nav=null;}
+ navCache.delete(id);
  if(navCache.size>=2)navCache.delete(navCache.keys().next().value);
- navCache.set(id,nav);return nav;
+ navCache.set(id,{nav,at:Date.now()});return nav;
 }
 function nameKey(key){const v=key??'lahudi-academy';if(typeof v!=='string'||!/^[a-z0-9_-]{2,80}$/.test(v))failure('INVALID_MODEL_KEY');return v;}
 async function modelOf(key,expected){
