@@ -10,7 +10,13 @@ import {join} from 'node:path';
 import {D1Ledger,ManualReadHost,bridgeSource,PROJECT,TOOLS} from '../../production/source/lib/ai-loop-v15.mjs';
 const ORIGIN='https://sandbox.invalid',OWNER='test-owner';
 const schema=readFileSync(new URL('../../production/source/sql/ai-loop-v15-candidate.sql',import.meta.url),'utf8');
-function d1(db){return {prepare(sql){return {bind(...args){return {async first(){return db.prepare(sql).get(...args)??null;},async run(){return db.prepare(sql).run(...args);}};}};}};}
+function d1(db){
+ const statement=(sql,args=[])=>({bind(...values){return statement(sql,values);},
+  async first(){return db.prepare(sql).get(...args)??null;},
+  async run(){return db.prepare(sql).run(...args);},
+  apply(){return db.prepare(sql).run(...args);}});
+ return {prepare:statement,async batch(statements){db.exec('BEGIN IMMEDIATE');try{const results=statements.map(s=>s.apply());db.exec('COMMIT');return results;}catch(e){db.exec('ROLLBACK');throw e;}}};
+}
 function req(body,headers={}){return new Request(ORIGIN+'/api/ai-loop',{method:'POST',headers:{'content-type':'application/json','oai-authenticated-user-id':OWNER,...headers},body:JSON.stringify(body)});}
 const body=(requestId='request-1')=>({action:'run',projectId:PROJECT,mode:'MANUAL',requestId});
 function fixture({db=new DatabaseSync(':memory:'),init=true,read,enabled=true,timeoutMs=8000}={}){
@@ -22,7 +28,7 @@ function fixture({db=new DatabaseSync(':memory:'),init=true,read,enabled=true,ti
   return {projectId:PROJECT,revision:78,lastWork:{key:'last-work'},unfinished:[{}],private:'PRIVATE_SOURCE'};};
  // UNIT TEST ONLY: a mock Site verifier, not valid evidence for live owner authentication.
  const verifyIngress=async req=>({authenticated:req.headers.get('oai-authenticated-user-id')===OWNER,
-   subjectId:req.headers.get('oai-authenticated-user-id')});
+   subjectId:req.headers.get('oai-authenticated-user-id'),expiresAt:time+60000});
  const host=new ManualReadHost({ledger,read:source,owner:OWNER,origin:ORIGIN,enabled,now:()=>time,timeoutMs,verifyIngress});
  return {db,ledger,host,seen,tick:n=>{time+=n;},now:()=>time,run:(b=body(),h={})=>host.handle(req(b,h))};
 }
@@ -138,7 +144,7 @@ test('V15-19 platform revocation before first source read fails closed and does 
  const f=fixture();let checks=0;
  const host=new ManualReadHost({ledger:f.ledger,read:f.host.read,owner:OWNER,origin:ORIGIN,
   enabled:true,now:f.now,verifyIngress:async()=>{
-   checks++;return checks<3?{authenticated:true,subjectId:OWNER}:{authenticated:false,subjectId:OWNER};
+   checks++;return checks<3?{authenticated:true,subjectId:OWNER,expiresAt:f.now()+60000}:{authenticated:false,subjectId:OWNER};
   }});
  await error(await host.handle(req(body())),'INGRESS_IDENTITY_UNVERIFIED');
  assert.equal(f.seen.length,0);
@@ -162,4 +168,51 @@ test('V15-20 Cloudflare-compatible manual redirects prevent Bridge credential fo
  assert.equal(calls.length,1,'no redirect follow or retries');
  assert.equal(f.seen.length,1,'no second source call');
  assert.equal(calls[0].url,'https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-production/bridge');
+});
+
+test('V18-01 expired, revoked, anonymous or incomplete principal never creates a grant',async()=>{
+ const f=fixture();const valid={authenticated:true,subjectId:OWNER,expiresAt:f.now()+1000};
+ for(const principal of [{...valid,expiresAt:f.now()},{...valid,expiresAt:undefined},{...valid,revoked:true},{...valid,isAnonymous:true}]){
+  f.host.verifyIngress=async()=>principal;await error(await f.run(),'INGRESS_IDENTITY_UNVERIFIED');
+ }
+ assert.equal(f.seen.length,0);assert.equal(f.db.prepare('select count(*) n from ai_loop_grants_v15').get().n,0);
+});
+test('V18-02 hanging verifier is bounded before grant allocation',async()=>{
+ const f=fixture({timeoutMs:20});f.host.verifyIngress=()=>new Promise(()=>{});
+ const keep=setTimeout(()=>{},1000);await error(await f.run(),'TIMEOUT');clearTimeout(keep);
+ assert.equal(f.seen.length,0);assert.equal(f.db.prepare('select count(*) n from ai_loop_grants_v15').get().n,0);
+});
+test('V18-03 principal revoked during READ_ATTEMPT audit blocks that source read',async()=>{
+ const f=fixture();let revoked=false;
+ f.host.verifyIngress=async()=>({authenticated:!revoked,subjectId:OWNER,expiresAt:f.now()+1000});
+ const audit=f.ledger.audit.bind(f.ledger);f.ledger.audit=async(...args)=>{await audit(...args);if(args[2]==='READ_ATTEMPT')revoked=true;};
+ await error(await f.run(),'INGRESS_IDENTITY_UNVERIFIED');assert.equal(f.seen.length,0);
+ assert.equal(f.db.prepare('select revoked from ai_loop_grants_v15').get().revoked,1);
+});
+test('V18-04 failed issuance audit transaction leaves zero orphan grants',async()=>{
+ const f=fixture();f.db.exec("CREATE TRIGGER fail_issue BEFORE INSERT ON ai_loop_audit_v15 BEGIN SELECT RAISE(ABORT,'test audit failure'); END;");
+ await error(await f.run(),'HOST_FAILED');assert.equal(f.seen.length,0);
+ assert.equal(f.db.prepare('select count(*) n from ai_loop_grants_v15').get().n,0);
+ assert.equal(f.db.prepare('select count(*) n from ai_loop_audit_v15').get().n,0);
+});
+test('V18-05 late principal revocation before summary discards all read results',async()=>{
+ const f=fixture();let revoked=false;f.host.verifyIngress=async()=>({authenticated:!revoked,subjectId:OWNER,expiresAt:f.now()+1000});
+ const audit=f.ledger.audit.bind(f.ledger);f.ledger.audit=async(...args)=>{await audit(...args);if(args[2]==='REVIEW_MATCH')revoked=true;};
+ await error(await f.run(),'INGRESS_IDENTITY_UNVERIFIED');assert.equal(f.seen.length,5);
+ assert.equal(f.db.prepare('select revoked from ai_loop_grants_v15').get().revoked,1);
+});
+test('V18-06 candidate constraints reject corrupt call/revoke/state and cannot affect existing table',()=>{
+ const db=new DatabaseSync(':memory:');db.exec("CREATE TABLE animation_projects(id TEXT PRIMARY KEY, payload TEXT); INSERT INTO animation_projects VALUES('original','unchanged');");
+ const f=fixture({db});
+ assert.throws(()=>f.db.prepare('INSERT INTO ai_loop_grants_v15(id,token_hash,owner,project,expires,calls) VALUES(?,?,?,?,?,?)').run('a','h',OWNER,PROJECT,1,6),/CHECK/);
+ assert.equal(f.db.prepare('SELECT payload FROM animation_projects').get().payload,'unchanged');
+ assert.deepEqual(f.db.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").all().map(x=>x.name),['ai_loop_audit_v15','ai_loop_grants_v15','animation_projects']);
+});
+test('V18-07 independent SQLite connections preserve claim/replay protection',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'ai-loop-v18-'));try{
+  const path=join(dir,'ledger.db'),a=fixture({db:new DatabaseSync(path)}),b=fixture({db:new DatabaseSync(path),init:false});
+  const results=await Promise.all([a.run(body('same-event')),b.run(body('same-event'))]);
+  assert.deepEqual(results.map(r=>r.status).sort(),[200,503]);assert.equal(a.seen.length+b.seen.length,5);
+  a.db.close();b.db.close();
+ }finally{rmSync(dir,{recursive:true,force:true});}
 });
