@@ -204,10 +204,62 @@ jobs:
           test -s ../../docs/APP_REQUIREMENTS_INTERVIEW_v1.0.md
           cp native-dist/production-workspace.js ../production-workspace.js
 
+      # Publish only runtime files. Source, docs, SQL, CI, tests, scripts,
+      # model backups/candidates/revisions and build inputs stay in the repo only.
+      - name: Stage runtime-only Pages payload
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          rsync -a \
+            --exclude='/_site/' --exclude='.git/' --exclude='.github/' \
+            --exclude='/docs/' --exclude='/supabase/' --exclude='/tests/' \
+            --exclude='/scripts/' --exclude='/sites-migration/' \
+            --exclude='/production/source/' \
+            --exclude='/model-viewer/backups/' --exclude='/model-viewer/candidates/' \
+            --exclude='/model-viewer/revisions/' --exclude='/model-viewer/tests/' \
+            --exclude='/finance/tests/' --exclude='/engineering/tests/' \
+            --exclude='node_modules/' \
+            --exclude='*.md' --exclude='*.sql' --exclude='*.zip' \
+            --exclude='*.ps1' --exclude='*.cmd' --exclude='*.sh' --exclude='*.py' \
+            --exclude='.env*' --exclude='.gitignore' \
+            ./ _site/
+          # The production workspace links these two policy documents at runtime.
+          mkdir -p _site/docs
+          cp docs/AI_EMPLOYEE_HANDBOOK_v1.0.md docs/APP_REQUIREMENTS_INTERVIEW_v1.0.md _site/docs/
+          # The model viewer links only the current revisions (review_url in current-models.json).
+          python3 - <<'PY'
+          import json, pathlib, shutil
+          models = json.loads(pathlib.Path('model-viewer/current-models.json').read_text(encoding='utf-8'))['models']
+          skip = shutil.ignore_patterns('*.py', '*.sql', '*.sh', '*.zip', '*.md', 'scripts')
+          for m in models:
+              url = m.get('review_url')
+              if not url or not url.startswith('revisions/'):
+                  continue
+              src = pathlib.Path('model-viewer') / url
+              dst = pathlib.Path('_site/model-viewer') / url
+              if src.is_dir():
+                  shutil.copytree(src, dst, ignore=skip, dirs_exist_ok=True)
+                  print('Published current revision', url)
+          PY
+      - name: Verify Pages payload (required files present, private files absent)
+        run: |
+          set -euo pipefail
+          for f in index.html app.js sw.js auth.js supabase-config.js media-manifest.json upload-status.json \
+                   schemas/weaving-proposal.schema.json production/production-workspace.js \
+                   cad/runtime/index.html hew-editor/index.html model-viewer/index.html \
+                   model-viewer/current-models.json model-viewer/revisions/hades-v3.3/index.html \
+                   docs/AI_EMPLOYEE_HANDBOOK_v1.0.md; do
+            test -s "_site/$f" || { echo "MISSING $f"; exit 1; }
+          done
+          for d in supabase docs/security docs/drawings .github model-viewer/backups model-viewer/candidates production/source; do
+            test ! -e "_site/$d" || { echo "LEAKED $d"; exit 1; }
+          done
+          if find _site -name '*.sql' -o -name '*.zip' -o -name '*.ps1' | grep -q .; then echo "LEAKED private file types"; exit 1; fi
+          echo "Pages payload: $(du -sh _site | cut -f1), $(find _site -type f | wc -l) files"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
