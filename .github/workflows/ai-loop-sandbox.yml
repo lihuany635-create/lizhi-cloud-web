@@ -24,10 +24,14 @@ jobs:
         run: node --version
       - name: Run offline tests and create sanitised evidence
         run: node --disable-warning=ExperimentalWarning experimental/ai-loop/acceptance-evidence.mjs --output ai-loop-acceptance-evidence.json
+      - name: Validate AUTH01-AUTH10 mock-only evidence
+        run: node --disable-warning=ExperimentalWarning experimental/ai-loop/auth-evidence.mjs --output ai-loop-auth-evidence.json
       - name: Save sandbox evidence (3-day retention)
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ai-loop-p5-sandbox-evidence
-          path: ai-loop-acceptance-evidence.json
+          path: |
+            ai-loop-acceptance-evidence.json
+            ai-loop-auth-evidence.json
           retention-days: 3
