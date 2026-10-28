@@ -31,7 +31,8 @@ globalThis.fetch=async(url,options={})=>{
  }
  throw Error('UNMOCKED_URL: '+u);
 };
-const source=readFileSync('supabase/functions/lizhi-viewer-cloud/index.ts','utf8');
+const navURL=new URL('../supabase/functions/lizhi-viewer-cloud/nav.mjs',import.meta.url).href;
+const source=readFileSync('supabase/functions/lizhi-viewer-cloud/index.ts','utf8').replace("'./nav.mjs'",JSON.stringify(navURL));
 const {handler}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
 const owner=SITE+':test-user';
 async function invoke(name,args={},withToken=true){
@@ -73,9 +74,9 @@ test('screenshot fails explicitly and checkpoint evidence cannot be fabricated',
  const stop=(await invoke('viewer_stop')).data;assert.equal(stop.mode,'cloud_direct');assert.equal(stop.pending_operations,0);
 });
 
-test('Site adapter exposes 13 cloud-native tools without online session fields',async()=>{
+test('Site adapter exposes 15 cloud-native tools without online session fields',async()=>{
  const {VIEWER_CLOUD_TOOLS}=await import('../sites-migration/viewer-cloud-direct/site-cloud-direct-tools.mjs');
- assert.equal(VIEWER_CLOUD_TOOLS.length,13);
+ assert.equal(VIEWER_CLOUD_TOOLS.length,15);
  for(const t of VIEWER_CLOUD_TOOLS){
   assert(!('session_id' in t.inputSchema.properties),'No browser session in '+t.name);
   if(!['viewer_status','viewer_list_models','viewer_get_scene','viewer_list_avatars','viewer_get_screenshot','viewer_stop'].includes(t.name)){

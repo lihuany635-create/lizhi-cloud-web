@@ -1,6 +1,9 @@
 // Cloud-direct GLB viewer state. Same data flow as Production Workbench:
 // ChatGPT -> private Site MCP -> this Edge -> owner-isolated Postgres RPC.
 // NO iframe, browser session, WebGL claim, or mutation to canonical GLB.
+// Movement is checked against a static walkable-floor grid (model-viewer/nav/*.nav.json)
+// built from the same canonical GLB: floors, stairs, walls and ledges. Not a physics or visual check.
+import {decodeNav,snap,walkSegment,findPath,nearestWalkable} from './nav.mjs';
 const SITE_ID='appgprj_6ae0c336243881919e9ba2bbf450f1fb';
 const MANIFEST='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/current-models.json';
 const ASSET_ROOT='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/';
@@ -22,11 +25,30 @@ async function rest(path,body){
  return await res.json();
 }
 const rpc=(name,body)=>rest('rpc/'+name,body);
+let manifestCache=null;
 async function listManifest(){
+ // Short cache: every tool call used to re-download the manifest from GitHub Pages (~0.3-1 s).
+ if(manifestCache&&Date.now()-manifestCache.at<60000)return manifestCache.models;
  const r=await fetch(MANIFEST,{cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(12000)});
  if(!r.ok)failure('MODEL_MANIFEST_UNAVAILABLE');
  const j=await r.json();if(!Array.isArray(j.models))failure('MODEL_MANIFEST_INVALID');
- return j.models.filter(m=>typeof m.model==='string'&&SHA.test(m.current_sha256||''));
+ const models=j.models.filter(m=>typeof m.model==='string'&&SHA.test(m.current_sha256||''));
+ manifestCache={at:Date.now(),models};return models;
+}
+const navCache=new Map();
+async function loadNav(key,sha){
+ // Returns null when no grid matches this exact GLB SHA (then movement stays unverified, as before).
+ // A miss is retried after 60 s, so a grid published to GitHub Pages later is picked up without redeploying.
+ const id=key+'|'+sha,hit=navCache.get(id);
+ if(hit&&(hit.nav||Date.now()-hit.at<60000))return hit.nav;
+ let nav=null;
+ try{
+  const r=await fetch(ASSET_ROOT+'nav/'+key+'.nav.json?sha='+sha.slice(0,12),{redirect:'manual',signal:AbortSignal.timeout(15000)});
+  if(r.ok){const doc=await r.json();if(doc.model_sha===sha)nav=await decodeNav(doc);}
+ }catch(_e){nav=null;}
+ navCache.delete(id);
+ if(navCache.size>=2)navCache.delete(navCache.keys().next().value);
+ navCache.set(id,{nav,at:Date.now()});return nav;
 }
 function nameKey(key){const v=key??'lahudi-academy';if(typeof v!=='string'||!/^[a-z0-9_-]{2,80}$/.test(v))failure('INVALID_MODEL_KEY');return v;}
 async function modelOf(key,expected){
@@ -42,7 +64,7 @@ async function scene(owner,key,sha){
  return r;
 }
 function validateCommon(a,write=false){
- fields(a,['model_key','model_sha','request_id','expected_revision','name','position','yaw','avatar_id','delta','mode','pitch','note','include_model_index','offset','limit','findings']);
+ fields(a,['model_key','model_sha','request_id','expected_revision','name','position','yaw','avatar_id','delta','mode','pitch','note','include_model_index','offset','limit','findings','target','waypoints']);
  if(write){
   if(!UUID.test(a.request_id||''))failure('INVALID_REQUEST_ID');
   if(!Number.isSafeInteger(a.expected_revision)||a.expected_revision<0)failure('INVALID_REVISION');
@@ -51,12 +73,30 @@ function validateCommon(a,write=false){
 }
 function takeAvatar(state,id){const a=state.avatars.find(x=>x.id===id);if(!a)failure('AVATAR_NOT_FOUND');return a;}
 function angle(n,min,max){if(typeof n!=='number'||!Number.isFinite(n)||n<min||n>max)failure('INVALID_ANGLE');return n;}
-function put(state,name,a){
+const r3=(v)=>v.map(n=>Math.round(n*1000)/1000);
+function placeOn(nav,pos){
+ if(!nav)return {position:pos,surface_verified:false,nav:'unavailable'};
+ const s=snap(nav,pos);
+ if(!s.ok){const e=Error(s.code);e.detail={near:s.near??null,levels_here:s.levels_here??null};throw e;}
+ return {position:r3(s.position),surface_verified:true,nav:'grid'};
+}
+function finishMove(target,nav,res,path){
+ // res: {position, travelled, blocked}; heading follows the last real displacement.
+ const from=target.position,to=r3(res.position);
+ if(res.travelled<0.05){const e=Error('MOVE_BLOCKED');e.detail={blocked:res.blocked,position:from};throw e;}
+ const dx=to[0]-from[0],dz=to[2]-from[2];
+ if(path&&path.length>1){const p=path[path.length-1],q=path[path.length-2];target.yaw=Math.atan2(p[0]-q[0],p[2]-q[2]);}
+ else if(Math.hypot(dx,dz)>1e-3)target.yaw=Math.atan2(dx,dz);
+ target.position=to;target.surface_verified=!!nav;target.collision_verified=false;
+ target.last_path=(path||[from,to]).slice(-120);
+ return {travelled_m:Math.round(res.travelled*1000)/1000,blocked:res.blocked,position:to,nav:nav?'grid':'unavailable'};
+}
+function put(state,name,a,nav=null){
  if(name==='viewer_create_avatar'){
-  const pos=vec(a.position),label=str(a.name,40);
+  const placed=placeOn(nav,vec(a.position)),label=str(a.name,40);
   if(state.avatars.length>=100)failure('AVATAR_LIMIT_100');
-  const item={id:crypto.randomUUID(),name:label,position:pos,yaw:a.yaw===undefined?0:angle(a.yaw,-7,7),pitch:0,mode:'first',surface_verified:false,collision_verified:false};
-  state.avatars.push(item);state.selected_id=item.id;state.camera={mode:'first',avatar_id:item.id};return;
+  const item={id:crypto.randomUUID(),name:label,position:placed.position,yaw:a.yaw===undefined?0:angle(a.yaw,-7,7),pitch:0,mode:'first',surface_verified:placed.surface_verified,collision_verified:false};
+  state.avatars.push(item);state.selected_id=item.id;state.camera={mode:'first',avatar_id:item.id};return {placed};
  }
  if(name==='viewer_select_avatar'){
   str(a.avatar_id,200);takeAvatar(state,a.avatar_id);state.selected_id=a.avatar_id;return;
@@ -66,13 +106,49 @@ function put(state,name,a){
   state.avatars=state.avatars.filter(x=>x.id!==old.id);
   if(state.selected_id===old.id){state.selected_id=state.avatars[0]?.id||null;state.camera={mode:'free'};}return;
  }
- if(name==='viewer_move_avatar'||name==='viewer_teleport_avatar'){
-  const target=takeAvatar(state,str(a.avatar_id,200));
-  const p=name==='viewer_move_avatar'?vec(a.delta):vec(a.position);
-  if(name==='viewer_move_avatar'&&(Math.hypot(...p)>3||Math.hypot(...p)<.001||Math.abs(p[1])>.001))failure('MOVE_LIMIT_3M_HORIZONTAL');
-  target.position=name==='viewer_move_avatar'?target.position.map((n,i)=>n+p[i]):p;
-  vec(target.position);
-  target.surface_verified=false;target.collision_verified=false;state.selected_id=target.id;return;
+ if(name==='viewer_teleport_avatar'){
+  const target=takeAvatar(state,str(a.avatar_id,200)),placed=placeOn(nav,vec(a.position));
+  target.position=placed.position;target.surface_verified=placed.surface_verified;target.collision_verified=false;
+  target.last_path=null;state.selected_id=target.id;return {placed};
+ }
+ if(name==='viewer_move_avatar'){
+  // Horizontal step along the floor; y of delta is ignored (stairs are followed automatically).
+  const target=takeAvatar(state,str(a.avatar_id,200)),d=vec(a.delta),len=Math.hypot(d[0],d[2]);
+  if(len>10||len<.01)failure('MOVE_LIMIT_10M_HORIZONTAL');
+  state.selected_id=target.id;
+  if(!nav){target.position=vec(target.position.map((n,i)=>i===1?n:n+d[i]));target.surface_verified=false;target.collision_verified=false;target.last_path=null;return {movement:{nav:'unavailable'}};}
+  const start=snap(nav,target.position,1.0);
+  if(!start.ok){const e=Error('START_NOT_ON_WALKABLE_FLOOR');e.detail={near:nearestWalkable(nav,target.position[0],target.position[2],target.position[1])};throw e;}
+  return {movement:finishMove(target,nav,walkSegment(nav,start.position,start.position[0]+d[0],start.position[2]+d[2]))};
+ }
+ if(name==='viewer_walk_path'){
+  // Straight segments through explicit [x,z] or [x,y,z] waypoints; stops at the first wall/ledge.
+  const target=takeAvatar(state,str(a.avatar_id,200));state.selected_id=target.id;
+  if(!nav)failure('NAV_GRID_UNAVAILABLE');
+  const wps=a.waypoints;if(!Array.isArray(wps)||wps.length<1||wps.length>30)failure('INVALID_WAYPOINTS');
+  const start=snap(nav,target.position,1.0);
+  if(!start.ok){const e=Error('START_NOT_ON_WALKABLE_FLOOR');e.detail={near:nearestWalkable(nav,target.position[0],target.position[2],target.position[1])};throw e;}
+  let cur=start.position,total=0,blocked=null;const path=[r3(cur)];
+  for(const w of wps){
+   if(!Array.isArray(w)||(w.length!==2&&w.length!==3)||w.some(n=>typeof n!=='number'||!Number.isFinite(n)||Math.abs(n)>10000))failure('INVALID_WAYPOINTS');
+   const [x,z]=w.length===2?w:[w[0],w[2]];
+   const seg=walkSegment(nav,cur,x,z);total+=seg.travelled;cur=seg.position;path.push(r3(cur));
+   if(total>300)failure('PATH_LIMIT_300M');
+   if(seg.blocked){blocked=seg.blocked;break;}
+  }
+  return {movement:finishMove(target,nav,{position:cur,travelled:total,blocked},path)};
+ }
+ if(name==='viewer_walk_to'){
+  // Server-side A* over the floor grid (stairs included): give only the destination.
+  const target=takeAvatar(state,str(a.avatar_id,200));state.selected_id=target.id;
+  if(!nav)failure('NAV_GRID_UNAVAILABLE');
+  const t=a.target;
+  if(!Array.isArray(t)||(t.length!==2&&t.length!==3)||t.some(n=>typeof n!=='number'||!Number.isFinite(n)||Math.abs(n)>10000))failure('INVALID_TARGET');
+  const goal=t.length===2?[t[0],NaN,t[1]]:t;
+  const p=findPath(nav,target.position,goal);
+  if(!p.ok){const e=Error(p.code);e.detail={near:p.near??null};throw e;}
+  if(p.length_m>300)failure('PATH_LIMIT_300M');
+  return {movement:finishMove(target,nav,{position:p.path[p.path.length-1],travelled:p.length_m,blocked:null},p.path)};
  }
  if(name==='viewer_set_camera'){
   const target=takeAvatar(state,str(a.avatar_id,200)),mode=a.mode;
@@ -110,6 +186,7 @@ async function run(owner,name,a){
  if(name==='viewer_status'){
   const list=await rest('lizhi_viewer_cloud_scenes?owner_id=eq.'+encodeURIComponent(owner)+'&select=model_key,model_sha,revision,updated_at');
   return {ok:true,mode:'cloud_direct',requires_browser:false,requires_connection_button:false,cloud_rendering:false,geometry_collision:false,
+   movement_check:'static_floor_grid (stairs, walls, ledges; doors/dynamic objects not modelled)',
    scenes:list,model_documents:'Existing canonical GitHub Pages GLBs; no parallel GLB store'};
  }
  if(name==='viewer_list_models'){
@@ -132,7 +209,7 @@ async function run(owner,name,a){
   }
   return answer;
  }
- const writeOps=['viewer_create_avatar','viewer_select_avatar','viewer_move_avatar','viewer_teleport_avatar','viewer_set_camera','viewer_save_checkpoint','viewer_delete_avatar'];
+ const writeOps=['viewer_create_avatar','viewer_select_avatar','viewer_move_avatar','viewer_teleport_avatar','viewer_walk_path','viewer_walk_to','viewer_set_camera','viewer_save_checkpoint','viewer_delete_avatar'];
  if(!writeOps.includes(name))failure('UNKNOWN_CLOUD_TOOL');
  validateCommon(a,true);
  // A matching request returns the original result before checking revision.
@@ -144,10 +221,13 @@ async function run(owner,name,a){
  }
  const current=await scene(owner,key,m.current_sha256);
  if(current.revision!==a.expected_revision)return {ok:false,code:'REVISION_CONFLICT',actual_revision:current.revision};
- const state=structuredClone(current.state);put(state,name,a);
+ const nav=['viewer_create_avatar','viewer_move_avatar','viewer_teleport_avatar','viewer_walk_path','viewer_walk_to'].includes(name)?await loadNav(key,m.current_sha256):null;
+ const state=structuredClone(current.state);let info={};
+ try{info=put(state,name,a,nav)||{};}
+ catch(e){if(e?.detail)return {ok:false,code:e.message,...e.detail,revision:current.revision,written:false};throw e;}
  const result=await rpc('lizhi_viewer_cloud_write',{p_owner:owner,p_request:a.request_id,p_model_key:key,
   p_model_sha:m.current_sha256,p_expected_revision:a.expected_revision,p_fingerprint:fp,p_state:state});
- return {...result,mode:'cloud_direct',browser_required:false,visually_inspected:false,collision_verified:false,unobserved_areas:'NOT_INSPECTED'};
+ return {...result,...info,mode:'cloud_direct',browser_required:false,visually_inspected:false,collision_verified:false,unobserved_areas:'NOT_INSPECTED'};
 }
 export async function handler(req){
  try{

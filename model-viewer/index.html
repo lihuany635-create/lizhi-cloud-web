@@ -97,6 +97,10 @@ button,label.btn{font:inherit;cursor:pointer}
 .joy{position:absolute;left:max(18px,env(safe-area-inset-left,0px));bottom:22px;width:116px;height:116px;border-radius:50%;background:rgba(20,26,30,.35);border:2px solid rgba(255,255,255,.45);touch-action:none}
 .joy i{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .pov-tip{position:absolute;right:max(12px,env(safe-area-inset-right,0px));bottom:12px;max-width:60%;font-size:11px;color:#f1f4f5;background:rgba(20,26,30,.6);padding:5px 9px;border-radius:6px;pointer-events:none}
+.cloud-badge{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:56px;z-index:4;display:flex;flex-wrap:wrap;align-items:center;gap:6px;max-width:min(320px,calc(100% - 24px));font-size:12px;color:#f1f4f5;background:rgba(20,40,70,.78);border:1px solid rgba(120,170,255,.45);padding:6px 8px;border-radius:10px;backdrop-filter:blur(6px)}
+.cloud-badge .btn{padding:4px 9px;font-size:12px;background:rgba(255,255,255,.12);color:#f1f4f5;border-color:rgba(255,255,255,.3)}
+.cloud-badge .btn[aria-pressed="true"]{background:#4f8ef7;border-color:#4f8ef7}
+.cloud-badge a{color:#cfe0ff}
 .crosshair{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:0 0 0 1px rgba(0,0,0,.35);pointer-events:none}
   :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
   body{margin:0;font-size:14px}
@@ -164,6 +168,7 @@ button,label.btn{font:inherit;cursor:pointer}
     </div>
   </div>
   <div class="hint" id="hint">拖曳旋轉・右鍵/雙指平移・滾輪縮放・可把檔案拖進來</div>
+  <div class="cloud-badge" id="cloudBadge" hidden aria-live="polite"><span id="cloudText">雲端人偶：連線中…</span><button class="btn" id="cloudFollow" type="button" aria-pressed="false">跟隨視角</button></div>
   <div class="place-banner" id="placeBanner" hidden>點模型上的地板放置人偶</div>
   <section class="avatar-panel" id="avatarPanel" hidden aria-label="人偶管理">
     <header><strong>人偶管理</strong><button class="btn primary" id="avatarAdd" type="button">＋新增</button><button class="btn" id="avatarClose" type="button">關閉</button></header>
@@ -205,6 +210,7 @@ button,label.btn{font:inherit;cursor:pointer}
   <div class="ctrls">
     <button class="tog" id="tPlace" aria-pressed="false">放置人偶</button>
     <button class="tog" id="tPov" disabled>人偶視角</button>
+    <button class="tog" id="tCloud" aria-pressed="false" title="顯示 ChatGPT 在雲端移動的人偶（藍色）；需先登入立之雲端庫">雲端人偶</button>
     <button class="tog" id="tFit">重新置中</button>
     <button class="tog" id="tTop" aria-pressed="false">俯視</button>
     <button class="tog" id="tRot" aria-pressed="false">自動旋轉</button>
@@ -221,6 +227,8 @@ button,label.btn{font:inherit;cursor:pointer}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../supabase-config.js"></script>
 <script src="viewer-inspection.js?v=20261022-2"></script>
 <script src="preview-mode.js?v=20261022-1"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -340,7 +348,7 @@ async function openModel(buf,name,opts={}){
     if(opts.key==='lahudi-academy'){renderer.setPixelRatio(Math.min(devicePixelRatio,1.15));renderer.toneMappingExposure=.68;$('exposureIn').value=68;$('exposureOut').textContent='0.68';$('academyWhole').setAttribute('aria-pressed','true');}
     else{renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.toneMappingExposure=.9;$('exposureIn').value=90;$('exposureOut').textContent='0.90';}
     $('viewerVersion').textContent=sourceInfo?.version?sourceInfo.version+' · SHA '+sourceInfo.actualSHA.slice(0,12):'本機檔案 · 版本未登記';
-    $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();loadAvatars();$('houseViews').hidden=modelKey!=='hades-house'||window.GLBPreview.active;if(modelKey==='hades-house')houseView(2);$('academyViews').hidden=modelKey!=='lahudi-academy'||window.GLBPreview.active;$('academyInteriorPicker').hidden=modelKey!=='lahudi-academy'||window.GLBPreview.active;if(modelKey==='lahudi-academy')$('academyInteriorSelect').value='';
+    $('fileName').textContent=name;ov.hidden=true;modelKey=opts.key||('file:'+name);modelName=name;loadShots();loadAvatars();cloudReset();$('houseViews').hidden=modelKey!=='hades-house'||window.GLBPreview.active;if(modelKey==='hades-house')houseView(2);$('academyViews').hidden=modelKey!=='lahudi-academy'||window.GLBPreview.active;$('academyInteriorPicker').hidden=modelKey!=='lahudi-academy'||window.GLBPreview.active;if(modelKey==='lahudi-academy')$('academyInteriorSelect').value='';
   }catch(e){console.error(e);showError(e&&e.message?e.message:String(e));}
 }
 
@@ -821,6 +829,7 @@ renderer.domElement.addEventListener('pointerup',e=>{
 let yaw=0,pitch=0,saved=null,speedIdx=0;const SPEEDS=[['步行',1.4],['跑步',4],['快速',12]];
 const keys=new Set(),joyV=new THREE.Vector2();
 function enterPov(keepView){
+  if(cloudFollowOn)cloudFollowSet(false);
   if(!figure||pov)return;pov=true;setPlacing(false);
   saved={pos:camera.position.clone(),tgt:controls.target.clone(),fov:camera.fov,near:camera.near,cut:cutIn.value};
   anim=null;controls.enabled=false;controls.autoRotate=false;$('tRot').setAttribute('aria-pressed',false);
@@ -1139,6 +1148,103 @@ setInterval(()=>{if(agentActive&&!agentBusy&&Date.now()-agentLastContact>8000&&D
 renderer.domElement.addEventListener('webglcontextlost',()=>agentWatchdogStop('WEBGL_CONTEXT_LOST'));
 addEventListener('pagehide',agentStop);
 
+/* ---------- cloud avatars (read-only mirror of ChatGPT-controlled state) ---------- */
+// Polls lizhi_viewer_cloud_browser_read with the site's own Supabase login. Blue figures are
+// the cloud state; the orange local figures and their localStorage are untouched.
+const cloudMat=new THREE.MeshStandardMaterial({color:0x3f7fe8,roughness:.45,metalness:.05,emissive:0x081a3a});
+const cloudRingMat=new THREE.MeshBasicMaterial({color:0x3f7fe8,transparent:true,opacity:.8,side:THREE.DoubleSide});
+const cloudFigs=new Map();let cloudOn=false,cloudFollowOn=false,cloudRev=-1,cloudTimer=null,cloudClient=null,cloudSelected=null,cloudBusy=false,cloudKey=null;
+const CLOUD_WALK=1.6; // m/s along the returned path
+function cloudSupabase(){
+  if(cloudClient)return cloudClient;
+  if(!window.supabase||!window.LIZHI_SUPABASE_URL)return null;
+  cloudClient=window.supabase.createClient(window.LIZHI_SUPABASE_URL,window.LIZHI_SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+  return cloudClient;
+}
+function cloudSay(html){$('cloudText').innerHTML=html;}
+function buildCloudFigure(){
+  const g=buildFigure();
+  g.traverse(o=>{if(o.material===figMat)o.material=cloudMat;else if(o.material&&o.material.isMeshBasicMaterial)o.material=cloudRingMat;});
+  return g;
+}
+function cloudClear(){
+  for(const f of cloudFigs.values()){scene.remove(f.mesh);f.mesh.traverse(o=>o.geometry?.dispose());}
+  cloudFigs.clear();cloudSelected=null;
+}
+function cloudReset(){cloudClear();cloudRev=-1;cloudKey=null;if(cloudOn)cloudPoll();}
+function cloudApply(state){
+  const seen=new Set();cloudSelected=state?.selected_id||null;
+  for(const a of state?.avatars||[]){
+    if(!a||typeof a.id!=='string'||!Array.isArray(a.position)||a.position.length!==3||!a.position.every(Number.isFinite))continue;
+    seen.add(a.id);let f=cloudFigs.get(a.id);
+    const to=new THREE.Vector3(...a.position);
+    if(!f){f={mesh:buildCloudFigure(),route:[],pos:to.clone(),yaw:a.yaw||0};f.mesh.position.copy(to);scene.add(f.mesh);cloudFigs.set(a.id,f);}
+    else if(f.pos.distanceTo(to)>1e-3||f.route.length){
+      // animate along the server path when it ends where the avatar now is, otherwise glide straight
+      const path=Array.isArray(a.last_path)?a.last_path.filter(p=>Array.isArray(p)&&p.length===3&&p.every(Number.isFinite)).map(p=>new THREE.Vector3(...p)):[];
+      f.route=path.length>1&&path[path.length-1].distanceTo(to)<.05?path.slice(1):[to];
+    }
+    f.name=String(a.name||'').slice(0,40);f.yaw=Number.isFinite(a.yaw)?a.yaw:0;f.pitch=Number.isFinite(a.pitch)?a.pitch:0;f.mode=a.mode||'first';f.target=to;
+  }
+  for(const [id,f] of cloudFigs)if(!seen.has(id)){scene.remove(f.mesh);cloudFigs.delete(id);}
+}
+async function cloudPoll(){
+  if(!cloudOn||cloudBusy||document.hidden)return;
+  if(!model||!sourceInfo?.manifestVerified||!/^[a-z0-9_-]{2,80}$/.test(modelKey||'')){cloudSay('雲端人偶只支援已登記版本的範例模型');return;}
+  const sb=cloudSupabase();if(!sb){cloudSay('無法載入登入元件');return;}
+  const key=modelKey+'|'+sourceInfo.actualSHA;if(key!==cloudKey){cloudClear();cloudRev=-1;cloudKey=key;}
+  cloudBusy=true;
+  try{
+    const {data:sess}=await sb.auth.getSession();
+    if(!sess?.session){cloudSay('請先在 <a href="../" target="_top">立之雲端庫</a> 登入，再回來開啟');return;}
+    const {data,error}=await sb.rpc('lizhi_viewer_cloud_browser_read',{p_model_key:modelKey,p_model_sha:sourceInfo.actualSHA,p_since:cloudRev});
+    if(error)throw error;
+    if(key!==cloudKey)return; // model switched while waiting
+    if(!data?.unchanged){cloudApply(data?.state);cloudRev=data?.revision??0;}
+    const n=cloudFigs.size,sel=cloudFigs.get(cloudSelected);
+    cloudSay(n?`雲端 ${n} 個人偶 · rev ${cloudRev}${sel?' · 選取：'+esc(sel.name||'未命名'):''}`:`雲端沒有人偶（rev ${cloudRev}）`);
+  }catch(e){console.warn('cloud avatars',e);cloudSay('雲端讀取失敗，稍後自動重試');}
+  finally{cloudBusy=false;}
+}
+function cloudSet(on){
+  cloudOn=on;$('tCloud').setAttribute('aria-pressed',String(on));$('cloudBadge').hidden=!on;
+  try{localStorage.setItem('mv-cloud-avatars',on?'1':'0');}catch(e){}
+  clearInterval(cloudTimer);cloudTimer=null;
+  if(on){cloudSay('雲端人偶：連線中…');cloudPoll();cloudTimer=setInterval(cloudPoll,2000);}
+  else{cloudFollowSet(false);cloudClear();cloudRev=-1;cloudKey=null;}
+}
+function cloudFollowSet(on){
+  if(on&&pov)exitPov();
+  cloudFollowOn=on;$('cloudFollow').setAttribute('aria-pressed',String(on));controls.enabled=!on;
+  if(on){anim=null;setCut(1);}
+  else for(const f of cloudFigs.values())f.mesh.visible=true;
+}
+$('tCloud').onclick=()=>cloudSet(!cloudOn);
+$('cloudFollow').onclick=()=>cloudFollowSet(!cloudFollowOn);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cloudOn)cloudPoll();});
+function cloudStep(dt){
+  for(const f of cloudFigs.values()){
+    let budget=CLOUD_WALK*Math.max(1,f.route.length/12)*dt; // long routes play faster
+    while(budget>0&&f.route.length){
+      const nxt=f.route[0],d=f.pos.distanceTo(nxt);
+      if(d<=budget){f.pos.copy(nxt);f.route.shift();budget-=d;}
+      else{const dir=nxt.clone().sub(f.pos);if(Math.hypot(dir.x,dir.z)>1e-4)f.walkYaw=Math.atan2(dir.x,dir.z);f.pos.addScaledVector(dir,budget/d);budget=0;}
+    }
+    f.mesh.position.copy(f.pos);
+    f.mesh.rotation.y=f.route.length&&f.walkYaw!==undefined?f.walkYaw:f.yaw;
+  }
+  if(!cloudFollowOn)return false;
+  const f=cloudFigs.get(cloudSelected)||cloudFigs.values().next().value;if(!f)return false;
+  const yawNow=f.mesh.rotation.y,p=f.route.length?0:f.pitch;
+  const eye=f.pos.clone().add(new THREE.Vector3(0,1.6,0));
+  const d=new THREE.Vector3(Math.sin(yawNow)*Math.cos(p),Math.sin(p),Math.cos(yawNow)*Math.cos(p));
+  for(const g of cloudFigs.values())g.mesh.visible=true;
+  if(f.mode==='third'||f.mode==='free'||f.mode==='top'){camera.position.copy(eye).addScaledVector(d,-3.2).add(new THREE.Vector3(0,.5,0));camera.lookAt(eye);}
+  else{f.mesh.visible=false;camera.position.copy(eye);camera.lookAt(eye.clone().add(d));}
+  return true;
+}
+try{if(localStorage.getItem('mv-cloud-avatars')==='1')setTimeout(()=>cloudSet(true),0);}catch(e){}
+
 /* ---------- loop ---------- */
 function resize(){agentRenderNeeded=true;const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();if(pov)layoutGuide();}
 new ResizeObserver(resize).observe(stage);resize();
@@ -1155,7 +1261,9 @@ let lastT=performance.now();
     if(agentRenderNeeded)agentRender();
     return;
   }
+  const following=cloudOn&&cloudStep(dt);
   if(pov){stepPov(dt);renderer.render(scene,camera);return;}
+  if(following){renderer.render(scene,camera);return;}
   if(anim){const k=reduce?1:0.1;camera.position.lerp(anim.p,k);controls.target.lerp(anim.t,k);if(camera.position.distanceTo(anim.p)<size.length()*0.0005)anim=null;}
   controls.update();renderer.render(scene,camera);})();
 
