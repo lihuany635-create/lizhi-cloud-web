@@ -25,6 +25,7 @@
   --primary:#7db4cb; --primary-ink:#0f1719; --hivis:#f2bd3c; --hivis-ink:#1c1a12;
   --ok:#6cc48f; --warn:#f0965a; --focus:#7db4cb; color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
 .wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
@@ -155,21 +156,8 @@ code.sql{display:block;white-space:pre;overflow-x:auto;font-family:var(--mono);f
 
   <!-- 3. ChatGPT -->
   <section class="panel">
-    <div class="ph"><span class="step">3</span><h2>給 ChatGPT 看照片、回填說明</h2>
-      <p>產生編號拼圖（每張最多 12 格），連同提示詞丟給 ChatGPT。它讀完小白板後透過 MCP 回填，或把它的回覆貼到下面。</p></div>
-    <div class="row">
-      <button class="primary" id="makeSheets">產生編號拼圖</button>
-      <button id="shareSheets" disabled>分享給 ChatGPT</button>
-      <button id="dlSheets" disabled>下載拼圖</button>
-      <button id="copyPrompt">複製提示詞</button>
-    </div>
-    <div class="sheets" id="sheetImgs"></div>
-    <pre class="prompt" id="prompt"></pre>
-
-    <label class="opt" for="reply">貼上 ChatGPT 的回覆（JSON 或「#1 2F_xxx」逐行都可以）</label>
-    <textarea id="reply" placeholder='{"1":"2F_防火塗料膜厚檢測","2":"3F_柱鋼筋綁紮"}'></textarea>
-    <div class="row"><button class="primary" id="applyReply">套用到表格</button></div>
-
+    <div class="ph"><span class="step">3</span><h2>ChatGPT 回填說明</h2>
+      <p>ChatGPT 透過 MCP 把說明寫進來，網頁會即時填進對應編號的說明欄。</p></div>
     <details id="rtBox">
       <summary>MCP 即時回填（Supabase） <span class="pill" id="rtState">未連線</span></summary>
       <div class="opts">
@@ -374,6 +362,7 @@ function applyFill(map){
 
 /* ---------- 編號拼圖 ---------- */
 function renderPrompt(){
+  if(!$('prompt')) return;
   $('prompt').textContent=
 `批次 ${state.batch}：附圖是施工照片編號拼圖，每格左上角黃底數字是照片編號。
 請讀每張照片裡小白板寫的位置與查驗項目，整理成「樓層_工項」，例如 2F_防火塗料膜厚檢測。看不清楚的在最後加「(?)」。
@@ -405,23 +394,10 @@ async function makeSheets(){
   renderSheets(); toast(`產生 ${pages} 張拼圖`);
 }
 function renderSheets(){
-  const el=$('sheetImgs'); el.innerHTML='';
+  const el=$('sheetImgs'); if(!el) return; el.innerHTML='';
   state.sheets.forEach(s=>{ const im=document.createElement('img'); im.src=s.url; im.alt=s.name; el.appendChild(im); });
   $('shareSheets').disabled=$('dlSheets').disabled=!state.sheets.length;
 }
-$('makeSheets').onclick=()=>makeSheets().catch(e=>toast('產生失敗：'+e.message));
-$('dlSheets').onclick=()=>state.sheets.forEach(s=>download(s.blob,s.name));
-$('shareSheets').onclick=async()=>{
-  const files=state.sheets.map(s=>new File([s.blob],s.name,{type:'image/jpeg'}));
-  try{
-    if(navigator.canShare&&navigator.canShare({files})){ await navigator.share({files,text:$('prompt').textContent}); }
-    else { toast('這裡不能直接分享，改為下載'); files.forEach((f,i)=>download(state.sheets[i].blob,f.name)); }
-  }catch(e){ if(e.name!=='AbortError') toast('分享失敗：'+e.message); }
-};
-$('copyPrompt').onclick=async()=>{
-  try{ await navigator.clipboard.writeText($('prompt').textContent); toast('已複製提示詞'); }
-  catch(e){ const r=document.createRange(); r.selectNodeContents($('prompt')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast('請手動複製已選取的文字'); }
-};
 
 /* ---------- 貼上回覆 ---------- */
 function parseReply(txt){
@@ -434,7 +410,6 @@ function parseReply(txt){
   txt.split(/\n+/).forEach(l=>{ const m=l.match(/^\s*#?\s*(\d+)\s*[.、:：)\-–]?\s*(.+)$/); if(m) map[m[1]]=m[2].replace(/^["「]|["」]$/g,''); });
   return map;
 }
-$('applyReply').onclick=()=>{ const n=applyFill(parseReply($('reply').value)); toast(n?`已填入 ${n} 格`:'看不懂這段回覆，請確認有編號'); };
 
 /* ---------- Supabase 即時回填 ---------- */
 let sb=null, chan=null;
