@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>施工照片填表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
+<style>
+/* 版面：上方工具列＋三個工作區（照片來源／檢查表／給 ChatGPT），表格是主角 */
+:root{
+  --paper:#f1f3f0; --surface:#ffffff; --ink:#1c282b; --muted:#5b696b; --line:#d3dad6;
+  --primary:#2c5a6e; --primary-ink:#ffffff; --hivis:#f0b42a; --hivis-ink:#1c1a12;
+  --ok:#2f7a4f; --warn:#b4581c; --focus:#3d8bb0;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#131a1c; --surface:#1a2326; --ink:#e4ebe9; --muted:#93a2a2; --line:#2d393c;
+  --primary:#7db4cb; --primary-ink:#0f1719; --hivis:#f2bd3c; --hivis-ink:#1c1a12;
+  --ok:#6cc48f; --warn:#f0965a; --focus:#7db4cb; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#131a1c; --surface:#1a2326; --ink:#e4ebe9; --muted:#93a2a2; --line:#2d393c;
+  --primary:#7db4cb; --primary-ink:#0f1719; --hivis:#f2bd3c; --hivis-ink:#1c1a12;
+  --ok:#6cc48f; --warn:#f0965a; --focus:#7db4cb; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-size:24px;font-weight:900;margin:0;letter-spacing:.02em;text-wrap:balance}
+.batch{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.batch b{color:var(--ink);background:var(--hivis);color:var(--hivis-ink);padding:2px 8px;border-radius:3px;margin-left:4px}
+section.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.ph{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.ph h2{margin:0;font-size:17px;font-weight:700}
+.step{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--hivis-ink);background:var(--hivis);border-radius:3px;padding:1px 6px}
+.ph p{margin:0;color:var(--muted);font-size:13px;flex-basis:100%}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button,.btn{font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:6px;padding:8px 14px;cursor:pointer;min-height:40px}
+button.primary{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+button.ghost{background:transparent}
+label.opt{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+select,input[type=text],input[type=number],input[type=password],textarea{font:inherit;font-size:14px;color:var(--ink);background:var(--paper);
+  border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-height:38px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.note{font-size:13px;color:var(--muted);margin:0}
+.note.warn{color:var(--warn)}
+/* 照片池 */
+.pool{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;max-height:420px;overflow:auto;padding:2px}
+.pool:empty{display:none}
+.tile{position:relative;border:2px solid transparent;border-radius:6px;overflow:hidden;background:var(--paper);cursor:pointer;padding:0;min-height:0}
+.tile.on{border-color:var(--primary)}
+.tile .im{aspect-ratio:4/3;width:100%;background:var(--line) center/cover no-repeat}
+.tile .cap{font-family:var(--mono);font-size:10px;padding:3px 5px;color:var(--muted);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .ck{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:var(--surface);border:2px solid var(--line);
+  display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--primary-ink)}
+.tile.on .ck{background:var(--primary);border-color:var(--primary)}
+/* 檢查表 */
+.sheet{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.r{display:grid;grid-template-columns:48px minmax(0,300px) minmax(0,1fr) auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:start}
+.r.sample{opacity:.7}
+.num{font-family:var(--mono);font-weight:700;font-size:15px;background:var(--hivis);color:var(--hivis-ink);border-radius:3px;text-align:center;padding:2px 0;height:max-content}
+.r img{width:100%;border-radius:4px;display:block;background:var(--line)}
+.meta{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px;word-break:break-all;font-variant-numeric:tabular-nums}
+.desc{display:flex;flex-direction:column;gap:4px;min-width:0}
+.desc .lbl{font-size:12px;color:var(--muted)}
+.desc textarea{min-height:72px;resize:vertical;width:100%}
+.desc textarea.flash{animation:flash 1.4s ease-out}
+@keyframes flash{0%{background:var(--hivis);color:var(--hivis-ink)}100%{background:var(--paper)}}
+.acts{display:flex;flex-direction:column;gap:4px}
+.acts button{min-height:32px;padding:4px 10px;font-size:13px}
+.empty{color:var(--muted);font-size:14px;padding:20px 0}
+@media (max-width:640px){
+  .r{grid-template-columns:40px minmax(0,1fr)}
+  .r .desc{grid-column:1 / -1}
+  .r .acts{grid-column:1 / -1;flex-direction:row}
+}
+/* ChatGPT 區 */
+.sheets{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.sheets img{width:100%;border:1px solid var(--line);border-radius:4px}
+pre.prompt{white-space:pre-wrap;font-family:var(--sans);font-size:13px;background:var(--paper);border:1px dashed var(--line);border-radius:6px;padding:10px;margin:0;max-height:180px;overflow:auto}
+textarea#reply{min-height:90px;width:100%}
+details{border-top:1px solid var(--line);padding-top:10px}
+summary{cursor:pointer;font-weight:500}
+details .opts{margin-top:10px}
+code.sql{display:block;white-space:pre;overflow-x:auto;font-family:var(--mono);font-size:12px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px;margin-top:10px}
+.pill{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.pill.live{color:var(--ok);border-color:var(--ok)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);
+  padding:10px 16px;border-radius:6px;font-size:14px;z-index:20;max-width:calc(100vw - 32px)}
+@media (prefers-reduced-motion:reduce){.desc textarea.flash{animation:none}}
+.backlink{display:inline-block;font-size:13px;color:var(--muted);text-decoration:none;margin-bottom:4px}.backlink:hover{color:var(--ink)}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><a class="backlink" href="../../?open=engineering">← 工程中心</a><h1>施工照片填表</h1></div>
+    <div class="row">
+      <span class="batch">批次碼<b id="batchCode">—</b></span>
+      <button class="ghost" id="newBatch">新批次</button>
+    </div>
+  </header>
+
+  <!-- 1. 照片來源 -->
+  <section class="panel">
+    <div class="ph"><span class="step">1</span><h2>從資料夾選照片</h2>
+      <p>電腦版 Chrome／Edge 可以連結整個資料夾，下次開網頁按「重新連接」即可。手機會改成一般選照片。</p></div>
+    <div class="row">
+      <button class="primary" id="pickFolder">連結資料夾</button>
+      <button id="reconnect" hidden></button>
+      <button id="pickFiles">選照片</button>
+      <label class="row note"><input type="checkbox" id="recursive"> 包含子資料夾</label>
+      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple hidden>
+    </div>
+    <div class="opts">
+      <label class="opt">比例
+        <select id="optRatio"><option value="4:3">4:3</option><option value="3:2">3:2</option><option value="1:1">1:1</option><option value="16:9">16:9</option><option value="orig">原比例</option></select></label>
+      <label class="opt">縮放方式
+        <select id="optFit"><option value="cover">裁切填滿</option><option value="contain">完整保留（補白邊）</option></select></label>
+      <label class="opt">寬度（像素）
+        <input type="number" id="optWidth" value="1280" min="320" max="4000" step="80"></label>
+      <label class="opt">直拍照片
+        <select id="optPortrait"><option value="flip">自動改直式比例</option><option value="keep">維持橫式比例</option></select></label>
+    </div>
+    <div class="row" id="poolBar" hidden>
+      <span class="note" id="poolInfo"></span>
+      <button class="ghost" id="selAll">全選</button>
+      <button class="ghost" id="selNone">全不選</button>
+      <button class="primary" id="importSel">匯入選取</button>
+    </div>
+    <div class="pool" id="pool"></div>
+  </section>
+
+  <!-- 2. 檢查表 -->
+  <section class="panel">
+    <div class="ph"><span class="step">2</span><h2>檢查表</h2>
+      <p>照片已依設定統一尺寸並照拍攝時間排序。說明可以手打，也可以讓 ChatGPT 回填。</p></div>
+    <div class="row">
+      <button id="exportXlsx">匯出 Excel</button>
+      <button class="ghost" id="clearRows">清空表格</button>
+      <span class="note" id="rowInfo"></span>
+    </div>
+    <div class="sheet" id="sheet"></div>
+  </section>
+
+  <!-- 3. ChatGPT -->
+  <section class="panel">
+    <div class="ph"><span class="step">3</span><h2>給 ChatGPT 看照片、回填說明</h2>
+      <p>產生編號拼圖（每張最多 12 格），連同提示詞丟給 ChatGPT。它讀完小白板後透過 MCP 回填，或把它的回覆貼到下面。</p></div>
+    <div class="row">
+      <button class="primary" id="makeSheets">產生編號拼圖</button>
+      <button id="shareSheets" disabled>分享給 ChatGPT</button>
+      <button id="dlSheets" disabled>下載拼圖</button>
+      <button id="copyPrompt">複製提示詞</button>
+    </div>
+    <div class="sheets" id="sheetImgs"></div>
+    <pre class="prompt" id="prompt"></pre>
+
+    <label class="opt" for="reply">貼上 ChatGPT 的回覆（JSON 或「#1 2F_xxx」逐行都可以）</label>
+    <textarea id="reply" placeholder='{"1":"2F_防火塗料膜厚檢測","2":"3F_柱鋼筋綁紮"}'></textarea>
+    <div class="row"><button class="primary" id="applyReply">套用到表格</button></div>
+
+    <details id="rtBox">
+      <summary>MCP 即時回填（Supabase） <span class="pill" id="rtState">未連線</span></summary>
+      <div class="opts">
+        <label class="opt">Supabase URL<input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co"></label>
+        <label class="opt">Publishable / anon key<input type="password" id="sbKey"></label>
+      </div>
+      <div class="row" style="margin-top:10px"><button id="rtConnect">連線並監聽本批次</button></div>
+      <p class="note" style="margin-top:8px">ChatGPT 的 MCP 工具 fill_cells 寫入下面這張表，網頁會即時把文字填進對應編號。</p>
+      <code class="sql">create table public.photo_fills (
+  batch text not null,
+  cell int not null,
+  text text not null,
+  updated_at timestamptz default now(),
+  primary key (batch, cell)
+);
+alter table public.photo_fills enable row level security;
+create policy "read fills" on public.photo_fills
+  for select to anon, authenticated using (true);
+alter publication supabase_realtime add table public.photo_fills;</code>
+    </details>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const IMG_RE = /\.(jpe?g|png|webp)$/i;
+const state = { pool: [], rows: [], sheets: [], batch: '', nextId: 1 };
+
+/* ---------- 小工具 ---------- */
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2600); }
+function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){ return null; } }
+function newBatchCode(){ const d=new Date(); const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let r=''; for(let i=0;i<2;i++) r+=c[Math.floor(Math.random()*c.length)];
+  return 'B'+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+r; }
+function fmtTime(t){ if(!t) return '無拍攝時間'; const d=new Date(t);
+  const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
+function download(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); }
+function loadScript(src){ return new Promise((ok,bad)=>{ const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>bad(new Error('載入失敗：'+src)); document.head.appendChild(s); }); }
+
+/* ---------- IndexedDB：記住資料夾 ---------- */
+function idb(){ return new Promise((ok,bad)=>{ const r=indexedDB.open('photo-sheet',1);
+  r.onupgradeneeded=()=>r.result.createObjectStore('kv'); r.onsuccess=()=>ok(r.result); r.onerror=()=>bad(r.error); }); }
+async function kvSet(k,v){ try{ const db=await idb(); await new Promise((ok,bad)=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k); tx.oncomplete=ok; tx.onerror=()=>bad(tx.error); }); }catch(e){} }
+async function kvGet(k){ try{ const db=await idb(); return await new Promise((ok,bad)=>{ const r=db.transaction('kv').objectStore('kv').get(k); r.onsuccess=()=>ok(r.result); r.onerror=()=>bad(r.error); }); }catch(e){ return null; } }
+
+/* ---------- EXIF 拍攝時間 ---------- */
+async function exifTime(file){
+  try{
+    const buf=await file.slice(0,262144).arrayBuffer(); const v=new DataView(buf);
+    if(v.getUint16(0)!==0xFFD8) return null;
+    let o=2;
+    while(o<v.byteLength-4){
+      const m=v.getUint16(o); const len=v.getUint16(o+2);
+      if(m===0xFFE1 && v.getUint32(o+4)===0x45786966){
+        const t=o+10; const le=v.getUint16(t)===0x4949;
+        const u16=p=>v.getUint16(t+p,le), u32=p=>v.getUint32(t+p,le);
+        const readIFD=(p,want)=>{ const n=u16(p); for(let i=0;i<n;i++){ const e=p+2+i*12; if(u16(e)===want) return e; } return -1; };
+        const str=e=>{ const cnt=u32(e+4); const off=cnt>4?u32(e+8):e+8; let s=''; for(let i=0;i<cnt-1;i++) s+=String.fromCharCode(v.getUint8(t+off+i)); return s; };
+        const ifd0=u32(4); let s=null;
+        const ex=readIFD(ifd0,0x8769);
+        if(ex>=0){ const e=readIFD(u32(ex+8),0x9003); if(e>=0) s=str(e); }
+        if(!s){ const e=readIFD(ifd0,0x0132); if(e>=0) s=str(e); }
+        if(s){ const m2=s.match(/(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+          if(m2) return new Date(+m2[1],m2[2]-1,+m2[3],+m2[4],+m2[5],+m2[6]).getTime(); }
+        return null;
+      }
+      if((m&0xFF00)!==0xFF00) break; o+=2+len;
+    }
+  }catch(e){}
+  return null;
+}
+
+/* ---------- 照片池 ---------- */
+async function collect(dir,recursive,out,prefix=''){
+  for await (const [name,h] of dir.entries()){
+    if(h.kind==='file' && IMG_RE.test(name)) out.push({file:await h.getFile(), path:prefix+name});
+    else if(h.kind==='directory' && recursive) await collect(h,true,out,prefix+name+'/');
+  }
+}
+async function loadFolder(handle){
+  toast('讀取資料夾中…');
+  const out=[]; await collect(handle,$('recursive').checked,out);
+  setPool(out); showReconnect(handle);
+}
+function showReconnect(handle){ const b=$('reconnect'); b.textContent='重新連接「'+handle.name+'」'; b.hidden=false; b._h=handle; }
+
+$('pickFolder').onclick=async()=>{
+  if(!window.showDirectoryPicker){ toast('這個瀏覽器不能連結資料夾，改用選照片'); $('fileInput').click(); return; }
+  try{ const h=await showDirectoryPicker({id:'site-photos',mode:'read'}); await kvSet('dir',h); await loadFolder(h); }
+  catch(e){ if(e.name!=='AbortError') toast('無法開啟資料夾：'+e.message); }
+};
+$('reconnect').onclick=async()=>{
+  const h=$('reconnect')._h; if(!h) return;
+  try{ let p=await h.queryPermission({mode:'read'}); if(p!=='granted') p=await h.requestPermission({mode:'read'});
+    if(p==='granted') await loadFolder(h); else toast('沒有取得資料夾權限'); }
+  catch(e){ toast('重新連接失敗，請按「連結資料夾」重選'); }
+};
+$('pickFiles').onclick=()=>$('fileInput').click();
+$('fileInput').onchange=e=>{ const fs=[...e.target.files].map(f=>({file:f,path:f.name})); if(fs.length) setPool(fs); e.target.value=''; };
+
+function setPool(items){
+  state.pool.forEach(p=>p.thumb&&URL.revokeObjectURL(p.thumb));
+  state.pool=items.map(it=>({file:it.file, name:it.path, time:null, thumb:null, on:true}));
+  renderPool(); fillPoolMeta();
+}
+async function fillPoolMeta(){
+  const list=state.pool; let i=0;
+  const worker=async()=>{ while(i<list.length){ const p=list[i++];
+    p.time=await exifTime(p.file) || p.file.lastModified || null;
+    try{ const b=await createImageBitmap(p.file,{resizeWidth:240,resizeQuality:'low'});
+      const c=document.createElement('canvas'); c.width=b.width; c.height=b.height; c.getContext('2d').drawImage(b,0,0); b.close&&b.close();
+      p.thumb=URL.createObjectURL(await new Promise(r=>c.toBlob(r,'image/jpeg',.7))); }catch(e){}
+    if(state.pool!==list) return; updateTile(p); } };
+  await Promise.all([worker(),worker(),worker()]);
+  if(state.pool===list){ list.sort((a,b)=>(a.time||0)-(b.time||0)); renderPool(); }
+}
+function renderPool(){
+  const el=$('pool'); el.innerHTML='';
+  state.pool.forEach((p,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='tile'+(p.on?' on':''); p.el=b;
+    b.innerHTML='<div class="im"></div><div class="cap"></div><span class="ck">✓</span>';
+    b.onclick=()=>{ p.on=!p.on; b.classList.toggle('on',p.on); poolInfo(); };
+    el.appendChild(b); updateTile(p); });
+  $('poolBar').hidden=!state.pool.length; poolInfo();
+}
+function updateTile(p){ if(!p.el) return; if(p.thumb) p.el.querySelector('.im').style.backgroundImage=`url("${p.thumb}")`;
+  p.el.querySelector('.cap').textContent=(p.time?fmtTime(p.time).slice(5)+' ':'')+p.name; }
+function poolInfo(){ const n=state.pool.filter(p=>p.on).length; $('poolInfo').textContent=`共 ${state.pool.length} 張，選取 ${n} 張`; $('importSel').disabled=!n; }
+$('selAll').onclick=()=>{ state.pool.forEach(p=>p.on=true); renderPool(); };
+$('selNone').onclick=()=>{ state.pool.forEach(p=>p.on=false); renderPool(); };
+
+/* ---------- 規格化 ---------- */
+function opts(){ return { ratio:$('optRatio').value, fit:$('optFit').value, width:Math.max(320,Math.min(4000,+$('optWidth').value||1280)), portrait:$('optPortrait').value }; }
+async function normalize(file,o){
+  const bmp=await createImageBitmap(file,{imageOrientation:'from-image'});
+  const bw=bmp.width,bh=bmp.height; let r;
+  if(o.ratio==='orig') r=bw/bh; else { const [a,b]=o.ratio.split(':').map(Number); r=a/b; if(bh>bw && o.portrait==='flip') r=1/r; }
+  const W=o.width, H=Math.round(W/r);
+  const c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  g.fillStyle='#ffffff'; g.fillRect(0,0,W,H); g.imageSmoothingQuality='high';
+  const s=o.fit==='cover'?Math.max(W/bw,H/bh):Math.min(W/bw,H/bh);
+  const dw=bw*s, dh=bh*s; g.drawImage(bmp,(W-dw)/2,(H-dh)/2,dw,dh); bmp.close&&bmp.close();
+  const blob=await new Promise(res=>c.toBlob(res,'image/jpeg',.85));
+  return {blob,w:W,h:H};
+}
+$('importSel').onclick=async()=>{
+  const sel=state.pool.filter(p=>p.on); if(!sel.length) return;
+  state.rows=state.rows.filter(r=>!r.sample);
+  const o=opts(); $('importSel').disabled=true; let done=0;
+  for(const p of sel){
+    try{ const n=await normalize(p.file,o);
+      state.rows.push({id:state.nextId++, name:p.name, time:p.time, blob:n.blob, url:URL.createObjectURL(n.blob), w:n.w, h:n.h, text:''}); }
+    catch(e){ toast('無法讀取 '+p.name); }
+    $('poolInfo').textContent=`處理中 ${++done}/${sel.length}`;
+  }
+  state.rows.sort((a,b)=>(a.time||0)-(b.time||0));
+  renderRows(); poolInfo(); toast(`已匯入 ${done} 張，尺寸 ${o.width} 寬`);
+  state.sheets=[]; renderSheets();
+};
+
+/* ---------- 檢查表 ---------- */
+function renderRows(){
+  const el=$('sheet'); el.innerHTML='';
+  if(!state.rows.length){ el.innerHTML='<div class="empty">還沒有照片。從上面連結資料夾或選照片，勾選後按「匯入選取」。</div>'; }
+  state.rows.forEach((r,i)=>{
+    const d=document.createElement('div'); d.className='r'+(r.sample?' sample':''); r.el=d;
+    d.innerHTML=`<div class="num">#${i+1}</div>
+      <div><img alt="照片 ${i+1}"><div class="meta"></div></div>
+      <div class="desc"><label class="lbl" for="t${r.id}">說明</label><textarea id="t${r.id}"></textarea></div>
+      <div class="acts"><button data-a="up">上移</button><button data-a="down">下移</button><button data-a="del">刪除</button></div>`;
+    d.querySelector('img').src=r.url;
+    d.querySelector('.meta').textContent=(r.sample?'範例 · ':'')+fmtTime(r.time)+' · '+r.w+'×'+r.h+(r.name?' · '+r.name:'');
+    const ta=d.querySelector('textarea'); ta.value=r.text; ta.oninput=()=>r.text=ta.value; r.ta=ta;
+    d.querySelector('.acts').onclick=e=>{ const a=e.target.dataset.a; if(!a) return;
+      if(a==='del'){ URL.revokeObjectURL(r.url); state.rows.splice(i,1); }
+      if(a==='up'&&i>0) [state.rows[i-1],state.rows[i]]=[state.rows[i],state.rows[i-1]];
+      if(a==='down'&&i<state.rows.length-1) [state.rows[i+1],state.rows[i]]=[state.rows[i],state.rows[i+1]];
+      state.sheets=[]; renderSheets(); renderRows(); };
+    el.appendChild(d);
+  });
+  const real=state.rows.filter(r=>!r.sample).length;
+  $('rowInfo').textContent=real?`${real} 張照片`:'';
+  $('exportXlsx').disabled=!real;
+}
+$('clearRows').onclick=()=>{ state.rows.forEach(r=>URL.revokeObjectURL(r.url)); state.rows=[]; state.sheets=[]; renderSheets(); renderRows(); };
+
+function applyFill(map){
+  let n=0;
+  for(const [k,v] of Object.entries(map)){ const r=state.rows[(+k)-1]; if(!r||typeof v!=='string') continue;
+    r.text=v.trim(); if(r.ta){ r.ta.value=r.text; r.ta.classList.remove('flash'); void r.ta.offsetWidth; r.ta.classList.add('flash'); } n++; }
+  return n;
+}
+
+/* ---------- 編號拼圖 ---------- */
+function renderPrompt(){
+  $('prompt').textContent=
+`批次 ${state.batch}：附圖是施工照片編號拼圖，每格左上角黃底數字是照片編號。
+請讀每張照片裡小白板寫的位置與查驗項目，整理成「樓層_工項」，例如 2F_防火塗料膜厚檢測。看不清楚的在最後加「(?)」。
+完成後呼叫 fill_cells 工具：batch 填 ${state.batch}，cells 填 [{"cell":1,"text":"..."}]。
+如果沒有工具可用，就只用 JSON 回覆：{"1":"...","2":"..."}`;
+}
+async function makeSheets(){
+  const rows=state.rows; if(!rows.length){ toast('表格裡還沒有照片'); return; }
+  const per=12, cols=3, cw=520, ch=390, head=64, pad=12;
+  const pages=Math.ceil(rows.length/per); state.sheets=[];
+  for(let p=0;p<pages;p++){
+    const chunk=rows.slice(p*per,(p+1)*per); const rowsN=Math.ceil(chunk.length/cols);
+    const c=document.createElement('canvas'); c.width=cols*cw+(cols+1)*pad; c.height=head+rowsN*ch+(rowsN+1)*pad;
+    const g=c.getContext('2d'); g.fillStyle='#1c282b'; g.fillRect(0,0,c.width,c.height);
+    g.fillStyle='#f0b42a'; g.font='700 30px "IBM Plex Mono",monospace'; g.textBaseline='middle';
+    g.fillText(`${state.batch}  第 ${p+1}/${pages} 張`,pad+4,head/2+4);
+    for(let i=0;i<chunk.length;i++){
+      const r=chunk[i], x=pad+(i%cols)*(cw+pad), y=head+pad+Math.floor(i/cols)*(ch+pad);
+      const img=new Image(); img.src=r.url; await img.decode();
+      const s=Math.min(cw/img.width,ch/img.height), dw=img.width*s, dh=img.height*s;
+      g.fillStyle='#ffffff'; g.fillRect(x,y,cw,ch); g.drawImage(img,x+(cw-dw)/2,y+(ch-dh)/2,dw,dh);
+      const label='#'+(p*per+i+1); g.font='700 46px "IBM Plex Mono",monospace';
+      const tw=g.measureText(label).width+24;
+      g.fillStyle='#f0b42a'; g.fillRect(x,y,tw,62); g.fillStyle='#1c1a12'; g.fillText(label,x+12,y+33);
+    }
+    const blob=await new Promise(res=>c.toBlob(res,'image/jpeg',.9));
+    state.sheets.push({blob,url:URL.createObjectURL(blob),name:`${state.batch}_拼圖${p+1}.jpg`});
+  }
+  renderSheets(); toast(`產生 ${pages} 張拼圖`);
+}
+function renderSheets(){
+  const el=$('sheetImgs'); el.innerHTML='';
+  state.sheets.forEach(s=>{ const im=document.createElement('img'); im.src=s.url; im.alt=s.name; el.appendChild(im); });
+  $('shareSheets').disabled=$('dlSheets').disabled=!state.sheets.length;
+}
+$('makeSheets').onclick=()=>makeSheets().catch(e=>toast('產生失敗：'+e.message));
+$('dlSheets').onclick=()=>state.sheets.forEach(s=>download(s.blob,s.name));
+$('shareSheets').onclick=async()=>{
+  const files=state.sheets.map(s=>new File([s.blob],s.name,{type:'image/jpeg'}));
+  try{
+    if(navigator.canShare&&navigator.canShare({files})){ await navigator.share({files,text:$('prompt').textContent}); }
+    else { toast('這裡不能直接分享，改為下載'); files.forEach((f,i)=>download(state.sheets[i].blob,f.name)); }
+  }catch(e){ if(e.name!=='AbortError') toast('分享失敗：'+e.message); }
+};
+$('copyPrompt').onclick=async()=>{
+  try{ await navigator.clipboard.writeText($('prompt').textContent); toast('已複製提示詞'); }
+  catch(e){ const r=document.createRange(); r.selectNodeContents($('prompt')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast('請手動複製已選取的文字'); }
+};
+
+/* ---------- 貼上回覆 ---------- */
+function parseReply(txt){
+  const map={}; const j=txt.match(/[\[{][\s\S]*[\]}]/);
+  if(j){ try{ const o=JSON.parse(j[0]);
+    const list=Array.isArray(o)?o:(Array.isArray(o.cells)?o.cells:null);
+    if(list) list.forEach(c=>{ if(c&&c.cell!=null) map[c.cell]=String(c.text??''); });
+    else Object.entries(o).forEach(([k,v])=>{ if(/^\d+$/.test(k)) map[k]=String(v); });
+    if(Object.keys(map).length) return map; }catch(e){} }
+  txt.split(/\n+/).forEach(l=>{ const m=l.match(/^\s*#?\s*(\d+)\s*[.、:：)\-–]?\s*(.+)$/); if(m) map[m[1]]=m[2].replace(/^["「]|["」]$/g,''); });
+  return map;
+}
+$('applyReply').onclick=()=>{ const n=applyFill(parseReply($('reply').value)); toast(n?`已填入 ${n} 格`:'看不懂這段回覆，請確認有編號'); };
+
+/* ---------- Supabase 即時回填 ---------- */
+let sb=null, chan=null;
+$('sbUrl').value=ls('ps.sbUrl')||''; $('sbKey').value=ls('ps.sbKey')||'';
+function rtState(t,live){ const p=$('rtState'); p.textContent=t; p.classList.toggle('live',!!live); }
+async function rtConnect(){
+  const url=$('sbUrl').value.trim(), key=$('sbKey').value.trim();
+  if(!url||!key){ toast('請填 Supabase URL 和 key'); return; }
+  ls('ps.sbUrl',url); ls('ps.sbKey',key);
+  try{
+    if(!window.supabase) await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js');
+    sb=window.supabase.createClient(url,key);
+    if(chan) await sb.removeChannel(chan);
+    const {data,error}=await sb.from('photo_fills').select('cell,text').eq('batch',state.batch);
+    if(error) throw error;
+    const m={}; (data||[]).forEach(r=>m[r.cell]=r.text); applyFill(m);
+    chan=sb.channel('fills-'+state.batch)
+      .on('postgres_changes',{event:'*',schema:'public',table:'photo_fills',filter:'batch=eq.'+state.batch},
+        p=>{ const r=p.new; if(r&&r.cell!=null){ applyFill({[r.cell]:r.text}); toast(`ChatGPT 填了 #${r.cell}`); } })
+      .subscribe(s=>rtState(s==='SUBSCRIBED'?'監聽 '+state.batch:s, s==='SUBSCRIBED'));
+  }catch(e){ rtState('連線失敗'); toast('Supabase 連線失敗：'+(e.message||e)); }
+}
+$('rtConnect').onclick=rtConnect;
+
+/* ---------- 匯出 Excel ---------- */
+$('exportXlsx').onclick=async()=>{
+  const rows=state.rows.filter(r=>!r.sample); if(!rows.length) return;
+  try{
+    if(!window.ExcelJS) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js');
+    const wb=new ExcelJS.Workbook(); const ws=wb.addWorksheet('施工照片');
+    ws.columns=[{header:'編號',width:7},{header:'照片',width:46},{header:'說明',width:44}];
+    ws.getRow(1).font={bold:true};
+    ws.pageSetup={paperSize:9,orientation:'portrait',fitToPage:true,fitToWidth:1,fitToHeight:0,horizontalCentered:true};
+    const bd={style:'thin'};
+    const imgW=320;
+    for(let i=0;i<rows.length;i++){
+      const r=rows[i], h=Math.round(imgW*r.h/r.w), rowNo=i+2;
+      ws.getCell(rowNo,1).value=i+1;
+      ws.getCell(rowNo,3).value='說明：'+(r.text||'');
+      ws.getRow(rowNo).height=h*0.75+8;
+      ['A','B','C'].forEach(c=>ws.getCell(c+rowNo).border={top:bd,left:bd,bottom:bd,right:bd});
+      ['A','C'].forEach(c=>ws.getCell(c+rowNo).alignment={vertical:'middle',wrapText:true});
+      const b64=await new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.readAsDataURL(r.blob); });
+      const id=wb.addImage({base64:b64,extension:'jpeg'});
+      ws.addImage(id,{tl:{col:1.05,row:rowNo-1+0.05},ext:{width:imgW,height:h}});
+    }
+    const buf=await wb.xlsx.writeBuffer();
+    download(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),state.batch+'_施工照片.xlsx');
+    toast('已匯出 Excel');
+  }catch(e){ toast('匯出失敗：'+e.message); }
+};
+
+/* ---------- 批次 ---------- */
+function setBatch(code){ state.batch=code; $('batchCode').textContent=code; renderPrompt(); rtState('未連線'); if(chan&&sb){ sb.removeChannel(chan); chan=null; } }
+$('newBatch').onclick=()=>{ setBatch(newBatchCode()); state.sheets=[]; renderSheets(); toast('新批次 '+state.batch); };
+
+/* ---------- 範例資料 ---------- */
+async function sampleRows(){
+  const demo=[['2F_防火塗料膜厚檢測','#b8b2a6'],['3F_柱鋼筋綁紮','#8f9a94'],['','#a7a39a']];
+  const base=new Date(); base.setHours(9,20,0,0);
+  for(let i=0;i<demo.length;i++){
+    const c=document.createElement('canvas'); c.width=640; c.height=480; const g=c.getContext('2d');
+    g.fillStyle=demo[i][1]; g.fillRect(0,0,640,480);
+    g.fillStyle='#f6f6f2'; g.fillRect(200,140,240,180); g.strokeStyle='#5a5f5c'; g.lineWidth=6; g.strokeRect(200,140,240,180);
+    g.fillStyle='#2d3436'; g.font='500 22px "Noto Sans TC",sans-serif'; g.fillText('範例照片',268,240);
+    const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.8));
+    state.rows.push({id:state.nextId++,sample:true,name:'',time:base.getTime()+i*600000,blob,url:URL.createObjectURL(blob),w:640,h:480,text:demo[i][0]});
+  }
+  renderRows();
+}
+
+/* ---------- 啟動 ---------- */
+setBatch(newBatchCode());
+if(!window.showDirectoryPicker) $('pickFolder').textContent='選照片（此瀏覽器不支援資料夾）';
+kvGet('dir').then(h=>{ if(h&&h.queryPermission) showReconnect(h); });
+sampleRows();
+})();
+</script>
+</body>
+</html>

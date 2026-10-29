@@ -192,7 +192,7 @@
   "./engineering/modules/woodworking/rendering/renderer-3d.js?v=1",
   "./engineering/documents/quote-pdf-renderer.js?v=1",
   "./engineering/integration/platform-adapter.js?v=1",
-  "./engineering/pages/engineering-home.js?v=10",
+  "./engineering/pages/engineering-home.js?v=11",
   "./engineering/ui/workspace-tabs.js?v=1",
   "./engineering/pages/project-workspace.js?v=19",
   "./engineering/modules/woodworking/module.js?v=3",
