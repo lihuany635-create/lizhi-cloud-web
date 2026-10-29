@@ -1,0 +1,33 @@
+name: Sync private models
+# Models are served only from the private Supabase bucket lizhi-models (owner-only).
+# This copies new/changed model-viewer content there after it lands on main.
+# Requires repository secret SUPABASE_SERVICE_ROLE_KEY (added by the owner); skips if absent.
+on:
+  push:
+    branches: [main]
+    paths: ['model-viewer/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: sync-private-models
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Upload changed model files
+        env:
+          SUPABASE_URL: https://hrdzywkihfqggiwjgavi.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_SERVICE_ROLE_KEY}" ]; then echo "::warning::SUPABASE_SERVICE_ROLE_KEY secret not set; private models not synced"; exit 0; fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            python3 scripts/sync_private_models.py --all
+          else
+            git diff --name-only HEAD~1 HEAD -- model-viewer | python3 -c "import sys,subprocess;files=[l.strip() for l in sys.stdin if l.strip()];sys.exit(subprocess.call(['python3','scripts/sync_private_models.py',*files]))"
+          fi

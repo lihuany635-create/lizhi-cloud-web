@@ -22,7 +22,7 @@
     ]},
     'lahudi-academy-s01-v5':{name:'S01 V5 測試版（尚未驗收）',file:'preview/s01-v5.glb?v=20261023-v5',hero:'HERO_academy',review:'preview/s01-v5-status.json'}
   };
-  let active=false,rendererAvailable=false,unavailable=false,zoom=1,onClose=null,onOpen=null;
+  let imageTicket=0,active=false,rendererAvailable=false,unavailable=false,zoom=1,onClose=null,onOpen=null;
   function key(){return scenes[sample.value]?sample.value:'reality-home';}
   const initial=(location.hash||'').slice(1).replace(/-v23$/,'');
   if(scenes[initial])sample.value=initial;
@@ -39,7 +39,12 @@
     $('previewShot').value=String(index);
     $('previewImageStatus').textContent='正在讀取配置圖…';
     image.alt=scene.name+'｜'+view[0];
-    image.src=scene.views?(scene.base||base)+'previews/'+view[1]+'.jpg':'fallback-previews/'+view[1]+'.jpg';
+    // Preview images are private (owner-only storage); load them through the signed-in session.
+    const path=scene.views?(scene.base||base)+'previews/'+view[1]+'.jpg':'fallback-previews/'+view[1]+'.jpg';
+    const ticket=++imageTicket;image.removeAttribute('src');
+    window.LizhiModels.objectURL(path,{cacheKey:path+'@'+(window.LIZHI_MODEL_MANIFEST_VERSION||'')})
+      .then(url=>{if(ticket===imageTicket)image.src=url;})
+      .catch(error=>{if(ticket===imageTicket)$('previewImageStatus').textContent=error.code==='LOGIN_REQUIRED'?'請先在立之雲端庫登入，才能看預覽圖。':'預覽圖讀取失敗。';});
     Array.from($('previewFloors').children).forEach((button,i)=>button.setAttribute('aria-pressed',String(i===index)));
     setZoom(1);$('previewViewport').scrollTo(0,0);
   }
@@ -47,8 +52,14 @@
     const scene=scenes[key()],views=scene.views||[['完整外觀',scene.hero]];
     $('fileName').textContent=scene.name+' · 圖片預覽';
     $('previewTitle').textContent=scene.name+'｜配置圖預覽';
-    $('previewDownload').href=scene.file;
-    $('previewReview').href=scene.review||'candidates/v2.3/';
+    $('previewDownload').onclick=event=>{
+      // Download the private GLB through the signed-in session (no public file URL exists).
+      event.preventDefault();const path=window.LizhiModels.clean(scene.file);
+      window.LizhiModels.blob(path).then(file=>{const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=path.split('/').pop();document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),60000);})
+        .catch(error=>{$('previewImageStatus').textContent=error.code==='LOGIN_REQUIRED'?'請先在立之雲端庫登入，才能下載模型。':'模型下載失敗。';});
+    };
+    $('previewReview').href=scene.review&&/^revisions\/[^/]+\/$/.test(scene.review)?'private-page.html?p='+encodeURIComponent(scene.review+'index.html'):'#';
+    $('previewReview').hidden=!(scene.review&&/^revisions\/[^/]+\/$/.test(scene.review));
     $('previewFloors').replaceChildren();$('previewShot').replaceChildren();
     views.forEach((view,i)=>{
       const option=document.createElement('option');option.value=String(i);option.textContent=view[0];$('previewShot').append(option);

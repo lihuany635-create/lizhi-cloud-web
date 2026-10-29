@@ -5,8 +5,13 @@
 // built from the same canonical GLB: floors, stairs, walls and ledges. Not a physics or visual check.
 import {decodeNav,snap,walkSegment,findPath,nearestWalkable} from './nav.mjs';
 const SITE_ID='appgprj_6ae0c336243881919e9ba2bbf450f1fb';
-const MANIFEST='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/current-models.json';
-const ASSET_ROOT='https://lihuany635-create.github.io/lizhi-cloud-web/model-viewer/';
+// Models live in the private lizhi-models bucket (owner-only); read here with the service role.
+async function asset(path,timeout=15000){
+ const key=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),base=Deno.env.get('SUPABASE_URL');
+ if(!key||!base)failure('NOT_CONFIGURED');
+ return await fetch(base+'/storage/v1/object/lizhi-models/'+path.split('/').map(encodeURIComponent).join('/'),
+  {redirect:'manual',headers:{apikey:key,authorization:'Bearer '+key},signal:AbortSignal.timeout(timeout)});
+}
 const HEX96=/^[a-f0-9]{96}$/,SHA=/^[a-f0-9]{64}$/;
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const json=(value,status=200)=>Response.json(value,{status,headers:{'cache-control':'no-store','x-content-type-options':'nosniff'}});
@@ -27,9 +32,9 @@ async function rest(path,body){
 const rpc=(name,body)=>rest('rpc/'+name,body);
 let manifestCache=null;
 async function listManifest(){
- // Short cache: every tool call used to re-download the manifest from GitHub Pages (~0.3-1 s).
+ // Short cache: every tool call used to re-download the manifest (~0.3-1 s).
  if(manifestCache&&Date.now()-manifestCache.at<60000)return manifestCache.models;
- const r=await fetch(MANIFEST,{cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(12000)});
+ const r=await asset('current-models.json',12000);
  if(!r.ok)failure('MODEL_MANIFEST_UNAVAILABLE');
  const j=await r.json();if(!Array.isArray(j.models))failure('MODEL_MANIFEST_INVALID');
  const models=j.models.filter(m=>typeof m.model==='string'&&SHA.test(m.current_sha256||''));
@@ -38,12 +43,12 @@ async function listManifest(){
 const navCache=new Map();
 async function loadNav(key,sha){
  // Returns null when no grid matches this exact GLB SHA (then movement stays unverified, as before).
- // A miss is retried after 60 s, so a grid published to GitHub Pages later is picked up without redeploying.
+ // A miss is retried after 60 s, so a grid published later is picked up without redeploying.
  const id=key+'|'+sha,hit=navCache.get(id);
  if(hit&&(hit.nav||Date.now()-hit.at<60000))return hit.nav;
  let nav=null;
  try{
-  const r=await fetch(ASSET_ROOT+'nav/'+key+'.nav.json?sha='+sha.slice(0,12),{redirect:'manual',signal:AbortSignal.timeout(15000)});
+  const r=await asset('nav/'+key+'.nav.json');
   if(r.ok){const doc=await r.json();if(doc.model_sha===sha)nav=await decodeNav(doc);}
  }catch(_e){nav=null;}
  navCache.delete(id);
@@ -165,15 +170,22 @@ function put(state,name,a,nav=null){
  }
  failure('UNKNOWN_CLOUD_TOOL');
 }
+// One verified GLB kept per warm isolate so paging the node index does not re-download it (egress).
+let glbCache=null;
 async function inspectGLB(key,sha,offset=0,limit=50){
  // Explicit real GLB binary load; geometry index is NOT raster rendering or collision test.
- const r=await fetch(ASSET_ROOT+key+'.glb',{redirect:'manual',signal:AbortSignal.timeout(20000)});
- if(!r.ok)failure('GLB_DOWNLOAD_FAILED');
- if(+(r.headers.get('content-length')||0)>35000000)failure('GLB_TOO_LARGE_FOR_EDGE');
- const bytes=await r.arrayBuffer();
- if(bytes.byteLength>35000000)failure('GLB_TOO_LARGE_FOR_EDGE');
- const actual=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');
- if(actual!==sha)failure('GLB_SHA_MISMATCH');
+ let bytes,actual;
+ if(glbCache&&glbCache.key===key&&glbCache.sha===sha){bytes=glbCache.bytes;actual=sha;}
+ else{
+  const r=await asset(key+'.glb',20000);
+  if(!r.ok)failure('GLB_DOWNLOAD_FAILED');
+  if(+(r.headers.get('content-length')||0)>35000000)failure('GLB_TOO_LARGE_FOR_EDGE');
+  bytes=await r.arrayBuffer();
+  if(bytes.byteLength>35000000)failure('GLB_TOO_LARGE_FOR_EDGE');
+  actual=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');
+  if(actual!==sha)failure('GLB_SHA_MISMATCH');
+  glbCache={key,sha,bytes};
+ }
  const dv=new DataView(bytes);if(bytes.byteLength<20||dv.getUint32(0,true)!==0x46546c67||dv.getUint32(4,true)!==2||dv.getUint32(8,true)!==bytes.byteLength||dv.getUint32(16,true)!==0x4e4f534a)failure('INVALID_GLB');
  const count=dv.getUint32(12,true);if(count+20>bytes.byteLength)failure('INVALID_GLB');
  const gltf=JSON.parse(new TextDecoder().decode(new Uint8Array(bytes,20,count)));
@@ -187,7 +199,7 @@ async function run(owner,name,a){
   const list=await rest('lizhi_viewer_cloud_scenes?owner_id=eq.'+encodeURIComponent(owner)+'&select=model_key,model_sha,revision,updated_at');
   return {ok:true,mode:'cloud_direct',requires_browser:false,requires_connection_button:false,cloud_rendering:false,geometry_collision:false,
    movement_check:'static_floor_grid (stairs, walls, ledges; doors/dynamic objects not modelled)',
-   scenes:list,model_documents:'Existing canonical GitHub Pages GLBs; no parallel GLB store'};
+   scenes:list,model_documents:'Canonical GLBs in the private lizhi-models store (owner-only)'};
  }
  if(name==='viewer_list_models'){
   const models=await listManifest();

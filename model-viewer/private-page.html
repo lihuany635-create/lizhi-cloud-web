@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>模型檢查頁</title>
+<style>
+:root{--bg:#f7f8fa;--ink:#23322e;--muted:#6b7772;--line:#e1e6e3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141816;--ink:#e6ece9;--muted:#9aa7a1;--line:#2b322f}}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1.6 'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif}
+header{display:flex;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line)}
+header a{color:inherit}
+#status{padding:24px 16px;color:var(--muted)}
+iframe{display:block;width:100%;height:calc(100% - 49px);border:0;background:#fff}
+</style>
+</head>
+<body>
+<header><a href="index.html">← 回模型檢視器</a><span id="title">模型檢查頁</span></header>
+<div id="status">正在讀取…</div>
+<iframe id="frame" hidden sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation" title="模型檢查頁"></iframe>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="../supabase-config.js"></script>
+<script src="private-assets.js?v=1"></script>
+<script>
+/* Renders a review page stored in private storage. The page is shown without scripts;
+ * its images and files are fetched through the signed-in session and swapped in as blob: URLs. */
+(async function(){
+  'use strict';
+  const status=document.getElementById('status'),frame=document.getElementById('frame');
+  const say=t=>{status.hidden=false;status.textContent=t;};
+  const page=new URLSearchParams(location.search).get('p')||'';
+  // Only review pages under revisions/<name>/index.html are allowed.
+  if(!/^revisions\/[A-Za-z0-9._-]+\/index\.html$/.test(page))return say('找不到這個檢查頁。');
+  const dir=page.slice(0,page.lastIndexOf('/')+1);
+  const resolve=rel=>{const u=new URL(rel,'https://x/'+dir);return u.pathname.slice(1);};
+  try{
+    const html=await (await window.LizhiModels.blob(page)).text();
+    const doc=new DOMParser().parseFromString(html,'text/html');
+    doc.querySelectorAll('script,iframe,object,embed').forEach(n=>n.remove());
+    document.getElementById('title').textContent=doc.title||'模型檢查頁';
+    const external=v=>!v||/^(?:[a-z]+:|#|\/\/)/i.test(v);
+    // Cache keys follow the page content, so an updated page re-fetches its files.
+    const tag=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(html)))].slice(0,8).map(x=>x.toString(16).padStart(2,'0')).join('');
+    const jobs=[];
+    for(const el of doc.querySelectorAll('[src],[href]')){
+      for(const attr of ['src','href']){
+        const v=el.getAttribute(attr);if(v===null||external(v))continue;
+        const target=resolve(v);
+        if(target==='index.html'){ // back to the viewer, keeping the model hash
+          el.setAttribute(attr,new URL('index.html'+(v.includes('#')?v.slice(v.indexOf('#')):''),location.href).href);
+          el.setAttribute('target','_top');continue;
+        }
+        if(/\.html?$/i.test(target)){el.removeAttribute(attr);continue;}
+        jobs.push(window.LizhiModels.objectURL(target,{cacheKey:target+'@'+tag}).then(url=>{
+          el.setAttribute(attr,url);
+          if(attr==='href'){el.setAttribute('target','_blank');if(/\.glb$/i.test(target))el.setAttribute('download',target.split('/').pop());}
+        }).catch(()=>{el.setAttribute('data-private-missing',target);if(attr==='href')el.removeAttribute('href');}));
+      }
+    }
+    await Promise.all(jobs);
+    frame.srcdoc='<!doctype html>'+doc.documentElement.outerHTML;
+    frame.hidden=false;status.hidden=true;
+  }catch(error){
+    say(error.code==='LOGIN_REQUIRED'?'這一頁只限本人帳號查看。請先到立之雲端庫首頁登入，再回來重新整理。':'讀取失敗：'+error.message);
+  }
+})();
+</script>
+</body>
+</html>
