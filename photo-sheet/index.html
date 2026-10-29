@@ -415,7 +415,7 @@ async function makeDocx(D,rows,batch,readImage){
     const r=rows[i], s=Math.min(box/r.w,box/r.h), w=Math.round(r.w*s), h=Math.round(r.h*s);
     body.push(new TableRow({cantSplit:true,children:[
       cell([new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun(String(i+1))]})],0),
-      cell([new Paragraph({alignment:AlignmentType.CENTER,children:[new ImageRun({data:await readImage(r),transformation:{width:w,height:h}})]})],1),
+      cell([new Paragraph({alignment:AlignmentType.CENTER,children:[new ImageRun({type:'jpg',data:await readImage(r),transformation:{width:w,height:h}})]})],1),
       cell([new Paragraph({children:[new TextRun('說明：'+(r.text||''))]})],2)]}));
   }
   const doc=new Document({styles:{default:{document:{run:{font:'標楷體',size:24}}}},sections:[{
@@ -427,15 +427,20 @@ async function makeDocx(D,rows,batch,readImage){
 $('exportDocx').onclick=async()=>{
   const rows=state.rows.filter(r=>!r.sample); if(!rows.length) return;
   try{
-    if(!window.docx) await loadScript('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js');
-    const doc=await makeDocx(window.docx,rows,state.batch,r=>r.blob.arrayBuffer());
+    if(!window.docx) await loadScript('https://cdn.jsdelivr.net/npm/docx@9.1.1/dist/index.iife.js');
+    // Word 檢視器（尤其手機 App）遇到多張大圖常只顯示前幾張；嵌入前縮到 640px 寬，列印仍清楚
+    const shrink=async r=>{ const bmp=await createImageBitmap(r.blob); const s=Math.min(1,640/bmp.width,640/bmp.height);
+      const c=document.createElement('canvas'); c.width=Math.round(bmp.width*s); c.height=Math.round(bmp.height*s);
+      const g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height); g.drawImage(bmp,0,0,c.width,c.height); bmp.close&&bmp.close();
+      return (await new Promise(res=>c.toBlob(res,'image/jpeg',.82))).arrayBuffer(); };
+    const doc=await makeDocx(window.docx,rows,state.batch,shrink);
     download(await window.docx.Packer.toBlob(doc),state.batch+'_施工照片.docx');
     toast('已匯出 Word');
   }catch(e){ toast('匯出失敗：'+e.message); }
 };
 
 /* ---------- 批次 ---------- */
-function setBatch(code){ state.batch=code; $('batchCode').textContent=code; renderPrompt(); rtState('未連線'); if(chan&&sb){ sb.removeChannel(chan); chan=null; } }
+function setBatch(code){ state.batch=code; $('batchCode').textContent=code; renderPrompt(); rtState('未連線'); }
 $('newBatch').onclick=()=>{ if(busy)return;if(state.rows.some(r=>!r.sample)&&!confirm('開始空白新批次？請先儲存或匯出目前內容。'))return;state.rows.forEach(r=>URL.revokeObjectURL(r.url));state.rows=[];cloud.project=null;createKey=crypto.randomUUID();dirty=false;setBatch(newBatchCode());renderRows();cloudInfo('新批次尚未儲存'); };
 
 /* ---------- 範例資料 ---------- */
