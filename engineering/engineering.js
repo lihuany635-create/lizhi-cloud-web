@@ -215,11 +215,11 @@
       if(event.target.matches("[data-engineering-ai-capability]")){state.ai.capabilityId=event.target.value;renderPanel();return;}
     },true);
     window.addEventListener("message",event=>{if(event.origin!==location.origin||event.data?.type!=="photo-sheet-height")return;const frame=document.querySelector(".eng2-tool-frame");if(frame&&event.source===frame.contentWindow)frame.style.height=Math.max(600,Math.ceil(event.data.height))+"px";});
+    app.addEventListener("click",event=>{const tool=event.target.closest("[data-engineering-tool]");if(!tool||tool.dataset.engineeringTool!=="photo-sheet")return;event.preventDefault();event.stopPropagation();state.view="photo-sheet";state.selected=null;renderPanel();window.scrollTo(0,0);},true);
     app.addEventListener("click",event=>{
       const button=event.target.closest("button");if(!button)return;
       if(button.dataset.engineeringOpen){const project=state.projects.find(item=>item.id===button.dataset.engineeringOpen);if(project)void openProject(project);}
       if(button.dataset.engineeringAction==="back"){revokeAttachmentUrls();state.view="list";state.selected=null;state.formError="";state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();state.ai=emptyAI();state.sync=emptySync();state.supervision=emptySupervision();state.calculationResult=null;renderPanel();}
-      if(button.dataset.engineeringTool==="photo-sheet"){state.view="photo-sheet";state.selected=null;renderPanel();window.scrollTo(0,0);}
       if(button.dataset.engineeringAction==="retry")void refresh();
       if(button.dataset.engineeringArchive)void perform(api=>api.archiveProject(button.dataset.engineeringArchive));
       if(button.dataset.engineeringReopen)void perform(api=>api.reopenProject(button.dataset.engineeringReopen),{stay:state.view==="list"});
