@@ -152,35 +152,19 @@ code.sql{display:block;white-space:pre;overflow-x:auto;font-family:var(--mono);f
     <div class="sheet" id="sheet"></div>
   </section>
 
-  <!-- 3. ChatGPT -->
   <section class="panel">
-    <div class="ph"><span class="step">3</span><h2>ChatGPT 回填說明</h2>
-      <p>ChatGPT 透過 MCP 把說明寫進來，網頁會即時填進對應編號的說明欄。</p></div>
-    <details id="rtBox">
-      <summary>MCP 即時回填（Supabase） <span class="pill" id="rtState">未連線</span></summary>
-      <div class="opts">
-        <label class="opt">Supabase URL<input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co"></label>
-        <label class="opt">Publishable / anon key<input type="password" id="sbKey"></label>
-      </div>
-      <div class="row" style="margin-top:10px"><button id="rtConnect">連線並監聽本批次</button></div>
-      <p class="note" style="margin-top:8px">ChatGPT 的 MCP 工具 fill_cells 寫入下面這張表，網頁會即時把文字填進對應編號。</p>
-      <code class="sql">create table public.photo_fills (
-  batch text not null,
-  cell int not null,
-  text text not null,
-  updated_at timestamptz default now(),
-  primary key (batch, cell)
-);
-alter table public.photo_fills enable row level security;
-create policy "read fills" on public.photo_fills
-  for select to anon, authenticated using (true);
-alter publication supabase_realtime add table public.photo_fills;</code>
-    </details>
+    <div class="ph"><span class="step">3</span><h2>工作台雲端批次</h2><p>儲存後，ChatGPT 可透過既有工作台讀取照片及修改說明。照片會上傳至你的私人工作台。</p></div>
+    <p class="note">雲端來源：<a href="https://drive.google.com/drive/folders/1QFbXSaI5IRaA39jWlEnPCoIcM0qRy3Hy" target="_blank" rel="noopener">自動檢查圖片放置區</a>。將照片放到這裡，再於 ChatGPT 指定資料夾與處理要求；子資料夾按需求新增。</p>
+    <div class="row"><button id="cloudList">列出雲端批次</button><select id="cloudProjects" aria-label="雲端批次"></select><button id="cloudOpen">開啟選取批次</button></div>
+    <div class="row"><button id="cloudCreate">連結施工照片工作區</button><button id="cloudSave">儲存到工作台</button><button id="cloudRefresh">讀取 AI 回填</button></div>
+    <p class="note" id="cloudStatus" role="status">尚未連結工作區；關閉前請匯出或儲存。</p>
+    <p class="note">讀取雲端會替換目前表格，操作前會確認。雲端照片刪除請到工作台回收區操作。</p>
   </section>
 </div>
 <div class="toast" id="toast" hidden></div>
 
-<script>
+<script type="module">
+import {Workbench} from "../photo-sheet/workbench.mjs";
 (() => {
 const $ = id => document.getElementById(id);
 const IMG_RE = /\.(jpe?g|png|webp)$/i;
@@ -342,88 +326,49 @@ function renderRows(){
   $('rowInfo').textContent=real?`${real} 張照片`:'';
   $('exportXlsx').disabled=$('exportDocx').disabled=!real;
 }
-$('clearRows').onclick=()=>{ state.rows.forEach(r=>URL.revokeObjectURL(r.url)); state.rows=[]; state.sheets=[]; renderSheets(); renderRows(); };
+$('clearRows').onclick=()=>{ dirty=true; state.rows.forEach(r=>URL.revokeObjectURL(r.url)); state.rows=[]; state.sheets=[]; renderSheets(); renderRows(); };
 
-function applyFill(map){
-  let n=0;
-  for(const [k,v] of Object.entries(map)){ const r=state.rows[(+k)-1]; if(!r||typeof v!=='string') continue;
-    r.text=v.trim(); if(r.ta){ r.ta.value=r.text; r.ta.classList.remove('flash'); void r.ta.offsetWidth; r.ta.classList.add('flash'); } n++; }
-  return n;
+function renderSheets(){} function renderPrompt(){} function rtState(){}
+let dirty=false,busy=false,saveBlocked=false;
+const cloud=new Workbench(async(path,body)=>{
+ const host=window.parent!==window?window.parent:window;
+ let auth=host.LizhiAuth;
+ if(!auth){
+  if(!window.supabase)await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js');
+  if(!window.LIZHI_SUPABASE_URL)await loadScript('../supabase-config.js');
+  if(!window.LizhiAuth)await loadScript('../auth.js');
+  auth=window.LizhiAuth;
+ }
+ const {data,error}=await auth.client.auth.getSession();
+ if(error||!data.session?.access_token)throw new Error('請先在立之雲端庫登入，再回到施工照片填表');
+ const response=await fetch('https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-production/'+path,{
+  method:body?'POST':'GET',cache:'no-store',signal:AbortSignal.timeout(60000),headers:{Authorization:'Bearer '+data.session.access_token,apikey:host.LIZHI_SUPABASE_PUBLISHABLE_KEY||window.LIZHI_SUPABASE_PUBLISHABLE_KEY,...body&&!(body instanceof FormData)?{'Content-Type':'application/json'}:{}},...body?{body:body instanceof FormData?body:JSON.stringify(body)}:{}
+ });
+ const value=await response.json();if(!response.ok)throw new Error(value.error||'工作台連線失敗');return value;
+});
+function cloudInfo(message){$('cloudStatus').textContent=message+(cloud.project?' · 專案 ID：'+cloud.project.id+' · revision '+cloud.project.revision:'');}
+async function cloudAction(fn){
+ if(busy)return;busy=true;const controls=[...document.querySelectorAll('button,input,select,textarea')];const disabled=controls.map(e=>e.disabled);controls.forEach(e=>e.disabled=true);
+ try{await fn();}catch(e){cloudInfo(e.message+'；未自動重送。結果不明時先重新列出／開啟批次確認。');}
+ finally{busy=false;controls.forEach((e,i)=>e.disabled=disabled[i]);renderRows();}
 }
-
-/* ---------- 編號拼圖 ---------- */
-function renderPrompt(){
-  if(!$('prompt')) return;
-  $('prompt').textContent=
-`批次 ${state.batch}：附圖是施工照片編號拼圖，每格左上角黃底數字是照片編號。
-請讀每張照片裡小白板寫的位置與查驗項目，整理成「樓層_工項」，例如 2F_防火塗料膜厚檢測。看不清楚的在最後加「(?)」。
-完成後呼叫 fill_cells 工具：batch 填 ${state.batch}，cells 填 [{"cell":1,"text":"..."}]。
-如果沒有工具可用，就只用 JSON 回覆：{"1":"...","2":"..."}`;
+$('sheet').addEventListener('input',()=>dirty=true);
+$('sheet').addEventListener('click',()=>dirty=true);
+$('importSel').addEventListener('click',()=>dirty=true);
+$('cloudList').onclick=()=>cloudAction(async()=>{
+ const loaded=cloud.project;const list=await cloud.list();const options=[];try{for(const p of list){await cloud.open(p.id);for(const batch of await cloud.batches()){const o=document.createElement('option');o.value=JSON.stringify([p.id,batch]);o.textContent=batch;options.push(o);}}}finally{cloud.project=loaded;}$('cloudProjects').replaceChildren(...options);cloudInfo('已讀取 '+options.length+' 個批次');
+});
+async function openCloud(id,batch){
+ if(state.rows.some(r=>!r.sample)&&!confirm('以雲端資料替換目前表格？未儲存內容請先匯出。'))return;
+ const old=cloud.project;try{await cloud.open(id);const rows=await cloud.loadRows(batch);state.rows.forEach(r=>URL.revokeObjectURL(r.url));state.rows=rows.map(r=>({...r,id:state.nextId++}));setBatch(batch);dirty=false;saveBlocked=false;renderRows();cloudInfo('雲端照片與說明已讀回');}catch(e){cloud.project=old;throw e;}
 }
-async function makeSheets(){
-  const rows=state.rows; if(!rows.length){ toast('表格裡還沒有照片'); return; }
-  const per=12, cols=3, cw=520, ch=390, head=64, pad=12;
-  const pages=Math.ceil(rows.length/per); state.sheets=[];
-  for(let p=0;p<pages;p++){
-    const chunk=rows.slice(p*per,(p+1)*per); const rowsN=Math.ceil(chunk.length/cols);
-    const c=document.createElement('canvas'); c.width=cols*cw+(cols+1)*pad; c.height=head+rowsN*ch+(rowsN+1)*pad;
-    const g=c.getContext('2d'); g.fillStyle='#1c282b'; g.fillRect(0,0,c.width,c.height);
-    g.fillStyle='#f0b42a'; g.font='700 30px "IBM Plex Mono",monospace'; g.textBaseline='middle';
-    g.fillText(`${state.batch}  第 ${p+1}/${pages} 張`,pad+4,head/2+4);
-    for(let i=0;i<chunk.length;i++){
-      const r=chunk[i], x=pad+(i%cols)*(cw+pad), y=head+pad+Math.floor(i/cols)*(ch+pad);
-      const img=new Image(); img.src=r.url; await img.decode();
-      const s=Math.min(cw/img.width,ch/img.height), dw=img.width*s, dh=img.height*s;
-      g.fillStyle='#ffffff'; g.fillRect(x,y,cw,ch); g.drawImage(img,x+(cw-dw)/2,y+(ch-dh)/2,dw,dh);
-      const label='#'+(p*per+i+1); g.font='700 46px "IBM Plex Mono",monospace';
-      const tw=g.measureText(label).width+24;
-      g.fillStyle='#f0b42a'; g.fillRect(x,y,tw,62); g.fillStyle='#1c1a12'; g.fillText(label,x+12,y+33);
-    }
-    const blob=await new Promise(res=>c.toBlob(res,'image/jpeg',.9));
-    state.sheets.push({blob,url:URL.createObjectURL(blob),name:`${state.batch}_拼圖${p+1}.jpg`});
-  }
-  renderSheets(); toast(`產生 ${pages} 張拼圖`);
-}
-function renderSheets(){
-  const el=$('sheetImgs'); if(!el) return; el.innerHTML='';
-  state.sheets.forEach(s=>{ const im=document.createElement('img'); im.src=s.url; im.alt=s.name; el.appendChild(im); });
-  $('shareSheets').disabled=$('dlSheets').disabled=!state.sheets.length;
-}
-
-/* ---------- 貼上回覆 ---------- */
-function parseReply(txt){
-  const map={}; const j=txt.match(/[\[{][\s\S]*[\]}]/);
-  if(j){ try{ const o=JSON.parse(j[0]);
-    const list=Array.isArray(o)?o:(Array.isArray(o.cells)?o.cells:null);
-    if(list) list.forEach(c=>{ if(c&&c.cell!=null) map[c.cell]=String(c.text??''); });
-    else Object.entries(o).forEach(([k,v])=>{ if(/^\d+$/.test(k)) map[k]=String(v); });
-    if(Object.keys(map).length) return map; }catch(e){} }
-  txt.split(/\n+/).forEach(l=>{ const m=l.match(/^\s*#?\s*(\d+)\s*[.、:：)\-–]?\s*(.+)$/); if(m) map[m[1]]=m[2].replace(/^["「]|["」]$/g,''); });
-  return map;
-}
-
-/* ---------- Supabase 即時回填 ---------- */
-let sb=null, chan=null;
-$('sbUrl').value=ls('ps.sbUrl')||''; $('sbKey').value=ls('ps.sbKey')||'';
-function rtState(t,live){ const p=$('rtState'); p.textContent=t; p.classList.toggle('live',!!live); }
-async function rtConnect(){
-  const url=$('sbUrl').value.trim(), key=$('sbKey').value.trim();
-  if(!url||!key){ toast('請填 Supabase URL 和 key'); return; }
-  ls('ps.sbUrl',url); ls('ps.sbKey',key);
-  try{
-    if(!window.supabase) await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js');
-    sb=window.supabase.createClient(url,key);
-    if(chan) await sb.removeChannel(chan);
-    const {data,error}=await sb.from('photo_fills').select('cell,text').eq('batch',state.batch);
-    if(error) throw error;
-    const m={}; (data||[]).forEach(r=>m[r.cell]=r.text); applyFill(m);
-    chan=sb.channel('fills-'+state.batch)
-      .on('postgres_changes',{event:'*',schema:'public',table:'photo_fills',filter:'batch=eq.'+state.batch},
-        p=>{ const r=p.new; if(r&&r.cell!=null){ applyFill({[r.cell]:r.text}); toast(`ChatGPT 填了 #${r.cell}`); } })
-      .subscribe(s=>rtState(s==='SUBSCRIBED'?'監聽 '+state.batch:s, s==='SUBSCRIBED'));
-  }catch(e){ rtState('連線失敗'); toast('Supabase 連線失敗：'+(e.message||e)); }
-}
-$('rtConnect').onclick=rtConnect;
+$('cloudOpen').onclick=()=>cloudAction(()=>openCloud(...JSON.parse($('cloudProjects').value)));
+$('cloudRefresh').onclick=()=>cloudAction(()=>{if(!cloud.project)throw new Error('請先開啟批次');return openCloud(cloud.project.id,state.batch);});
+let createKey=crypto.randomUUID();
+$('cloudCreate').onclick=()=>cloudAction(async()=>{if(cloud.project)throw new Error('已連結批次；請按儲存或新批次');await cloud.create(state.batch,createKey);cloudInfo('工作區已連結；可儲存本批次或列出 AI 完成的批次');});
+$('cloudSave').onclick=()=>cloudAction(async()=>{if(saveBlocked)throw new Error('前次儲存未確認，請先開啟雲端批次');const rows=state.rows.filter(r=>!r.sample);if(!rows.length)throw new Error('請先匯入照片');try{await cloud.save(rows,state.batch);}catch(e){saveBlocked=true;throw e;}dirty=false;cloudInfo('照片、順序與說明已儲存，並讀回確認');});
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===parent&&e.data?.type==='lizhi-account-logout')location.reload();});
 
 /* ---------- 匯出 Excel ---------- */
 $('exportXlsx').onclick=async()=>{
@@ -491,7 +436,7 @@ $('exportDocx').onclick=async()=>{
 
 /* ---------- 批次 ---------- */
 function setBatch(code){ state.batch=code; $('batchCode').textContent=code; renderPrompt(); rtState('未連線'); if(chan&&sb){ sb.removeChannel(chan); chan=null; } }
-$('newBatch').onclick=()=>{ setBatch(newBatchCode()); state.sheets=[]; renderSheets(); toast('新批次 '+state.batch); };
+$('newBatch').onclick=()=>{ if(busy)return;if(state.rows.some(r=>!r.sample)&&!confirm('開始空白新批次？請先儲存或匯出目前內容。'))return;state.rows.forEach(r=>URL.revokeObjectURL(r.url));state.rows=[];cloud.project=null;createKey=crypto.randomUUID();dirty=false;setBatch(newBatchCode());renderRows();cloudInfo('新批次尚未儲存'); };
 
 /* ---------- 範例資料 ---------- */
 async function sampleRows(){
