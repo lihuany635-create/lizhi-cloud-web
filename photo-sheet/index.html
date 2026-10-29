@@ -144,6 +144,7 @@ code.sql{display:block;white-space:pre;overflow-x:auto;font-family:var(--mono);f
       <p>照片已依設定統一尺寸並照拍攝時間排序。說明可以手打，也可以讓 ChatGPT 回填。</p></div>
     <div class="row">
       <button id="exportXlsx">匯出 Excel</button>
+      <button id="exportDocx">匯出 Word</button>
       <button class="ghost" id="clearRows">清空表格</button>
       <span class="note" id="rowInfo"></span>
     </div>
@@ -351,7 +352,7 @@ function renderRows(){
   });
   const real=state.rows.filter(r=>!r.sample).length;
   $('rowInfo').textContent=real?`${real} 張照片`:'';
-  $('exportXlsx').disabled=!real;
+  $('exportXlsx').disabled=$('exportDocx').disabled=!real;
 }
 $('clearRows').onclick=()=>{ state.rows.forEach(r=>URL.revokeObjectURL(r.url)); state.rows=[]; state.sheets=[]; renderSheets(); renderRows(); };
 
@@ -477,6 +478,39 @@ $('exportXlsx').onclick=async()=>{
     const buf=await wb.xlsx.writeBuffer();
     download(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),state.batch+'_施工照片.xlsx');
     toast('已匯出 Excel');
+  }catch(e){ toast('匯出失敗：'+e.message); }
+};
+
+/* ---------- 匯出 Word ---------- */
+async function makeDocx(D,rows,batch,readImage){
+  const {Document,Paragraph,TextRun,Table,TableRow,TableCell,ImageRun,WidthType,AlignmentType,VerticalAlign,BorderStyle,TableLayoutType}=D;
+  const box=300, cols=[800,5000,3838];
+  const line={style:BorderStyle.SINGLE,size:6,color:'000000'};
+  const borders={top:line,bottom:line,left:line,right:line};
+  const cell=(children,i,opts={})=>new TableCell({children,width:{size:cols[i],type:WidthType.DXA},verticalAlign:VerticalAlign.CENTER,borders,
+    margins:{top:120,bottom:120,left:100,right:100},...opts});
+  const head=new TableRow({tableHeader:true,cantSplit:true,children:['編號','照片','說明'].map((t,i)=>cell([new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:t,bold:true})]})],i,{shading:{fill:'EDEDED'}}))});
+  const body=[];
+  for(let i=0;i<rows.length;i++){
+    const r=rows[i], s=Math.min(box/r.w,box/r.h), w=Math.round(r.w*s), h=Math.round(r.h*s);
+    body.push(new TableRow({cantSplit:true,children:[
+      cell([new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun(String(i+1))]})],0),
+      cell([new Paragraph({alignment:AlignmentType.CENTER,children:[new ImageRun({data:await readImage(r),transformation:{width:w,height:h}})]})],1),
+      cell([new Paragraph({children:[new TextRun('說明：'+(r.text||''))]})],2)]}));
+  }
+  const doc=new Document({styles:{default:{document:{run:{font:'標楷體',size:24}}}},sections:[{
+    properties:{page:{size:{width:11906,height:16838},margin:{top:1134,bottom:1134,left:1134,right:1134}}},
+    children:[new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:200},children:[new TextRun({text:'施工照片',bold:true,size:32})]}),
+      new Table({width:{size:9638,type:WidthType.DXA},columnWidths:cols,layout:TableLayoutType.FIXED,rows:[head,...body]})]}]});
+  return doc;
+}
+$('exportDocx').onclick=async()=>{
+  const rows=state.rows.filter(r=>!r.sample); if(!rows.length) return;
+  try{
+    if(!window.docx) await loadScript('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js');
+    const doc=await makeDocx(window.docx,rows,state.batch,r=>r.blob.arrayBuffer());
+    download(await window.docx.Packer.toBlob(doc),state.batch+'_施工照片.docx');
+    toast('已匯出 Word');
   }catch(e){ toast('匯出失敗：'+e.message); }
 };
 
