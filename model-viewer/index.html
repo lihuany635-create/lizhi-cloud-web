@@ -152,8 +152,8 @@ button,label.btn{font:inherit;cursor:pointer}
       <label>視角 <select id="previewShot" aria-label="預覽視角"></select></label>
       <label class="preview-zoom">放大 <input id="previewZoom" aria-label="預覽放大比例" type="range" min="100" max="300" step="25" value="100"><output id="previewZoomOut">100%</output></label>
       <button class="btn" id="previewReset" type="button">重設大小</button>
-      <a class="btn" id="previewReview" href="revisions/hades-v3.3/">完整配置圖</a>
-      <a class="btn" id="previewDownload" href="hades-house.glb?v=3.3-20261026" download>下載 GLB</a>
+      <a class="btn" id="previewReview" href="private-page.html?p=revisions%2Fhades-v3.3%2Findex.html">完整配置圖</a>
+      <a class="btn" id="previewDownload" href="#" download>下載 GLB</a>
       <button class="btn" id="previewRetry" type="button">重試 3D</button>
       <button class="btn" id="previewBack" type="button" hidden>返回 3D</button>
     </header>
@@ -229,6 +229,7 @@ button,label.btn{font:inherit;cursor:pointer}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../supabase-config.js"></script>
+<script src="private-assets.js?v=1"></script>
 <script src="viewer-inspection.js?v=20261022-2"></script>
 <script src="preview-mode.js?v=20261022-1"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -308,7 +309,8 @@ function loadBuffer(buf,name){
 
 let modelKey="",modelName="",loadSerial=0;
 let inspection=true,meshLayers=[],modelLights=[],sourceInfo=null,activeCutHeight=null;
-let manifestPromise=fetch('current-models.json?v=20261024-academy-rb2-v16',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('版本清單讀取失敗');return r.json();}).then(j=>j.models).catch(()=>[]);
+// The version list lives in private storage with the models; a signed-in session is required.
+let manifestPromise=window.LizhiModels.json('current-models.json').then(j=>{window.LIZHI_MODEL_MANIFEST_VERSION=j.version||'';return j.models;}).catch(()=>[]);
 function disposeObject(obj){obj.traverse(o=>{o.geometry?.dispose();if(o.material)[].concat(o.material).forEach(m=>{Object.values(m).forEach(v=>{if(v&&v.isTexture)v.dispose();});m.dispose();});});}
 function applyInspection(){
   modelLights.forEach(x=>{x.object.visible=window.GLBInspection.lightVisible(x.originalVisible,inspection);});
@@ -596,34 +598,21 @@ const SAMPLES={
 async function loadSample(key){
   const serial=++loadSerial;const smp=SAMPLES[key]||SAMPLES["reality-home"];showLoading(smp.name);
   try{
-    // GitHub Pages occasionally responds 503 during deployment or large GLB delivery.
-    // Retry only transient 5xx/network failures; never accept a mismatched SHA.
-    let res=null,lastError=null;
-    for(let attempt=0;attempt<4;attempt++){
-      if(serial!==loadSerial)return;
-      try{
-        res=await fetch(smp.file,{cache:attempt?'reload':'default'});
-        if(res.ok)break;
-        lastError=new Error('範例檔讀取失敗（'+res.status+'）');
-        if(res.status<500||attempt===3)throw lastError;
-      }catch(error){
-        lastError=error;
-        if(attempt===3||(res&&!res.ok&&res.status<500))throw error;
-      }
-      showLoading(smp.name+' · 連線重試 '+(attempt+2)+'/4');
-      await new Promise(done=>setTimeout(done,500*(attempt+1)));
-    }
-    if(!res?.ok)throw lastError||new Error('模型下載失敗');
-    const total=+res.headers.get('content-length')||0;const reader=res.body.getReader();const chunks=[];let got=0;
-    for(;;){const {done,value}=await reader.read();if(done)break;chunks.push(value);got+=value.length;if(total)setProg(got/total);}
-    const buf=new Uint8Array(got);let o=0;chunks.forEach(c=>{buf.set(c,o);o+=c.length;});
+    // Models are private (owner-only storage). Known versions come from the local cache by SHA,
+    // so re-opening the same version costs no download; the hash is re-checked below either way.
+    const path=window.LizhiModels.clean(smp.file);
+    const listed=smp.expectedSHA?null:(await manifestPromise).find(x=>x.model===key+'.glb');
+    const pinned=smp.expectedSHA||listed?.current_sha256||null,cacheKey=pinned?'sha:'+pinned:null;
+    let buf;
+    try{buf=await window.LizhiModels.bytes(path,{cacheKey,onProgress:setProg});}
+    catch(error){if(error.code==='LOGIN_REQUIRED')throw Error('請先回到立之雲端庫首頁登入，再開啟模型（模型只限本人帳號讀取）。');throw error;}
     if(serial!==loadSerial)return;
     const actualSHA=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',buf))).map(v=>v.toString(16).padStart(2,'0')).join('');
     const entry=smp.expectedSHA
       ? {current_sha256:smp.expectedSHA,version:smp.version||"TEST_PREVIEW"}
       : (await manifestPromise).find(x=>x.model===key+'.glb');
     if(!entry?.current_sha256)throw Error('無法取得模型版本清單，請重新整理後再試。');
-    if(!window.GLBInspection.checkHash(entry.current_sha256,actualSHA))throw Error('模型與版本清單不一致，已停止載入；請重新整理後再試。');
+    if(!window.GLBInspection.checkHash(entry.current_sha256,actualSHA)){await window.LizhiModels.forget(cacheKey);throw Error('模型與版本清單不一致，已停止載入；請重新整理後再試。');}
     if(serial!==loadSerial)return;
     await openModel(buf.buffer,smp.name,{serial,cut:smp.cut,key:key,fit:smp.fit,sourceInfo:{version:entry?.version||null,expectedSHA:entry?.current_sha256||null,actualSHA,url:smp.file,manifestVerified:!!entry}});
   }catch(e){if(serial===loadSerial)showError(e.message);}
@@ -1157,8 +1146,7 @@ const cloudFigs=new Map();let cloudOn=false,cloudFollowOn=false,cloudRev=-1,clou
 const CLOUD_WALK=1.6; // m/s along the returned path
 function cloudSupabase(){
   if(cloudClient)return cloudClient;
-  if(!window.supabase||!window.LIZHI_SUPABASE_URL)return null;
-  cloudClient=window.supabase.createClient(window.LIZHI_SUPABASE_URL,window.LIZHI_SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+  try{cloudClient=window.LizhiModels.client();}catch(_e){return null;}
   return cloudClient;
 }
 function cloudSay(html){$('cloudText').innerHTML=html;}

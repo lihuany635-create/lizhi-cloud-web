@@ -14,7 +14,7 @@ globalThis.Deno={env:{get:k=>k==='SUPABASE_URL'?'https://test.supabase.co':k==='
 globalThis.fetch=async(url,options={})=>{
  const u=String(url);
  if(u.includes('current-models.json')){manifestFetches++;return Response.json({models:[{model:'hades-house.glb',version:'v3.3',current_sha256:sha}]});}
- if(u.includes('/model-viewer/nav/hades-house.nav.json')){navFetches++;return new Response(navDoc,{headers:{'content-type':'application/json'}});}
+ if(u.includes('/storage/v1/object/lizhi-models/nav/hades-house.nav.json')){navFetches++;return new Response(navDoc,{headers:{'content-type':'application/json'}});}
  if(u.includes('/rest/v1/lizhi_viewer_config'))return Response.json([{token_hash:tokenHash}]);
  if(u.includes('/rest/v1/lizhi_viewer_cloud_requests?')){const m=u.match(/request_id=eq\.([0-9a-f-]+)/);return Response.json(requests.has(m?.[1])?[requests.get(m[1])]:[]);}
  if(u.endsWith('/rpc/lizhi_viewer_cloud_read'))return Response.json({ok:true,...current});
