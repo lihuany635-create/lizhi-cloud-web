@@ -16,6 +16,7 @@
   function snapshot(){return {modules:registry()?.list?.()||[],failures:registry()?.failures?.()||[],formulas:formulaRegistry?.listFormulas?.()||[],templates:templateRegistry?.listTemplates?.()||[]};}
   function markup(){
     const common=snapshot();
+    if(state.view==="photo-sheet")return `<section class="eng2 eng2-tool" aria-labelledby="eng-tool-title"><header class="eng2-top"><div class="eng2-top-row"><span class="eng2-kicker">工程中心 · 現場工具</span><button type="button" class="eng2-back light" data-engineering-action="back">回工程中心</button></div><h1 id="eng-tool-title">施工照片填表</h1></header><div class="eng2-body" style="padding:0"><iframe class="eng2-tool-frame" src="./engineering/photo-sheet/?embed=1" title="施工照片填表" allow="web-share; clipboard-write" style="display:block;width:100%;height:1600px;border:0;background:transparent"></iframe></div></section>`;
     if(state.view==="workspace")return root.EngineeringProjectWorkspace.render({...common,project:state.selected,error:state.error,formError:state.formError,history:state.history,historyError:state.historyError,calculationResult:state.calculationResult,calculationInput:state.calculationInput,projectData:state.projectData,projectDataError:state.projectDataError,furniture:state.furniture,commercial:state.commercial,workflow:state.workflow,ai:state.ai,sync:state.sync,supervision:state.supervision});
     return root.EngineeringHome.render({...common,projects:state.projects,loading:state.loading,error:state.error,formError:state.formError});
   }
@@ -213,10 +214,12 @@
       if(event.target.matches("[data-workflow-filter]")){state.workflow.filter=event.target.value;renderPanel();return;}
       if(event.target.matches("[data-engineering-ai-capability]")){state.ai.capabilityId=event.target.value;renderPanel();return;}
     },true);
+    window.addEventListener("message",event=>{if(event.origin!==location.origin||event.data?.type!=="photo-sheet-height")return;const frame=document.querySelector(".eng2-tool-frame");if(frame&&event.source===frame.contentWindow)frame.style.height=Math.max(600,Math.ceil(event.data.height))+"px";});
     app.addEventListener("click",event=>{
       const button=event.target.closest("button");if(!button)return;
       if(button.dataset.engineeringOpen){const project=state.projects.find(item=>item.id===button.dataset.engineeringOpen);if(project)void openProject(project);}
       if(button.dataset.engineeringAction==="back"){revokeAttachmentUrls();state.view="list";state.selected=null;state.formError="";state.history=[];state.projectData=emptyProjectData();state.furniture=emptyFurniture();state.commercial=emptyCommercial();state.workflow=emptyWorkflow();state.ai=emptyAI();state.sync=emptySync();state.supervision=emptySupervision();state.calculationResult=null;renderPanel();}
+      if(button.dataset.engineeringTool==="photo-sheet"){state.view="photo-sheet";state.selected=null;renderPanel();window.scrollTo(0,0);}
       if(button.dataset.engineeringAction==="retry")void refresh();
       if(button.dataset.engineeringArchive)void perform(api=>api.archiveProject(button.dataset.engineeringArchive));
       if(button.dataset.engineeringReopen)void perform(api=>api.reopenProject(button.dataset.engineeringReopen),{stay:state.view==="list"});

@@ -95,6 +95,8 @@ code.sql{display:block;white-space:pre;overflow-x:auto;font-family:var(--mono);f
   padding:10px 16px;border-radius:6px;font-size:14px;z-index:20;max-width:calc(100vw - 32px)}
 @media (prefers-reduced-motion:reduce){.desc textarea.flash{animation:none}}
 .backlink{display:inline-block;font-size:13px;color:var(--muted);text-decoration:none;margin-bottom:4px}.backlink:hover{color:var(--ink)}
+.embedded .backlink,.embedded header h1{display:none}
+.embedded body{padding-block:0 24px}
 </style>
 
 </head>
@@ -192,6 +194,13 @@ alter publication supabase_realtime add table public.photo_fills;</code>
 </div>
 <div class="toast" id="toast" hidden></div>
 
+<script>
+if(window.parent!==window&&new URLSearchParams(location.search).has('embed')){
+  document.documentElement.classList.add('embedded');
+  const post=()=>parent.postMessage({type:'photo-sheet-height',height:document.documentElement.scrollHeight},location.origin);
+  new ResizeObserver(post).observe(document.body); addEventListener('load',post);
+}
+</script>
 <script>
 (() => {
 const $ = id => document.getElementById(id);

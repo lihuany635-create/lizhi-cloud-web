@@ -33,7 +33,7 @@
         </details>
       </header>
       ${warning}
-      <div class="eng2-body"><section class="eng2-list eng2-tools" style="margin-bottom:20px"><div class="eng2-card-head"><h2>現場工具</h2><span>不需選專案</span></div><a class="eng2-project" href="./engineering/photo-sheet/" style="text-decoration:none"><span class="eng2-project-main"><b>施工照片填表</b><small>連結資料夾匯入照片、統一尺寸、編號拼圖給 ChatGPT 回填說明、匯出 Excel</small></span><span class="eng2-project-chev">${chevron}</span></a></section>${body}</div>
+      <div class="eng2-body"><section class="eng2-list eng2-tools" style="margin-bottom:20px"><div class="eng2-card-head"><h2>現場工具</h2><span>不需選專案</span></div><button type="button" class="eng2-project" data-engineering-tool="photo-sheet"><span class="eng2-project-main"><b>施工照片填表</b><small>連結資料夾匯入照片、統一尺寸、編號拼圖給 ChatGPT 回填說明、匯出 Excel</small></span><span class="eng2-project-chev">${chevron}</span></button></section>${body}</div>
     </section>`;
   }
   return Object.freeze({render});
