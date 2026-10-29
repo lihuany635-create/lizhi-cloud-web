@@ -455,21 +455,24 @@ $('exportXlsx').onclick=async()=>{
   try{
     if(!window.ExcelJS) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js');
     const wb=new ExcelJS.Workbook(); const ws=wb.addWorksheet('施工照片');
-    ws.columns=[{header:'編號',width:7},{header:'照片',width:46},{header:'說明',width:44}];
-    ws.getRow(1).font={bold:true};
+    const box=320,pad=12,colPx=box+pad*2;
+    ws.columns=[{header:'編號',width:7},{header:'照片',width:Math.round((colPx-5)/7*100)/100},{header:'說明',width:44}];
+    ws.getRow(1).font={bold:true};ws.getRow(1).alignment={horizontal:'center'};
     ws.pageSetup={paperSize:9,orientation:'portrait',fitToPage:true,fitToWidth:1,fitToHeight:0,horizontalCentered:true};
     const bd={style:'thin'};
-    const imgW=320;
     for(let i=0;i<rows.length;i++){
-      const r=rows[i], h=Math.round(imgW*r.h/r.w), rowNo=i+2;
+      const r=rows[i], s=Math.min(box/r.w,box/r.h), w=Math.round(r.w*s), h=Math.round(r.h*s), rowNo=i+2, rowPx=h+pad*2;
       ws.getCell(rowNo,1).value=i+1;
       ws.getCell(rowNo,3).value='說明：'+(r.text||'');
-      ws.getRow(rowNo).height=h*0.75+8;
+      ws.getRow(rowNo).height=rowPx*0.75;
       ['A','B','C'].forEach(c=>ws.getCell(c+rowNo).border={top:bd,left:bd,bottom:bd,right:bd});
-      ['A','C'].forEach(c=>ws.getCell(c+rowNo).alignment={vertical:'middle',wrapText:true});
+      ws.getCell('A'+rowNo).alignment={vertical:'middle',horizontal:'center'};
+      ws.getCell('C'+rowNo).alignment={vertical:'middle',wrapText:true};
       const b64=await new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.readAsDataURL(r.blob); });
       const id=wb.addImage({base64:b64,extension:'jpeg'});
-      ws.addImage(id,{tl:{col:1.05,row:rowNo-1+0.05},ext:{width:imgW,height:h}});
+      // 用 EMU（1px = 9525）直接指定格內位移，讓照片在格子裡上下左右置中
+      const emu=9525;
+      ws.addImage(id,{tl:{nativeCol:1,nativeColOff:Math.round((colPx-w)/2*emu),nativeRow:rowNo-1,nativeRowOff:Math.round((rowPx-h)/2*emu)},ext:{width:w,height:h},editAs:'oneCell'});
     }
     const buf=await wb.xlsx.writeBuffer();
     download(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),state.batch+'_施工照片.xlsx');
