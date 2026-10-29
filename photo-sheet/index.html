@@ -403,17 +403,17 @@ $('exportXlsx').onclick=async()=>{
 
 /* ---------- 匯出 Word ---------- */
 async function makeDocx(D,rows,batch,readImage){
-  const {Document,Paragraph,TextRun,Table,TableRow,TableCell,ImageRun,WidthType,AlignmentType,VerticalAlign,BorderStyle,TableLayoutType}=D;
+  const {Document,Paragraph,TextRun,Table,TableRow,TableCell,ImageRun,WidthType,AlignmentType,VerticalAlign,BorderStyle,TableLayoutType,PageBreak}=D;
   const box=300, cols=[800,5000,3838];
   const line={style:BorderStyle.SINGLE,size:6,color:'000000'};
   const borders={top:line,bottom:line,left:line,right:line};
   const cell=(children,i,opts={})=>new TableCell({children,width:{size:cols[i],type:WidthType.DXA},verticalAlign:VerticalAlign.CENTER,borders,
     margins:{top:120,bottom:120,left:100,right:100},...opts});
-  const head=new TableRow({tableHeader:true,cantSplit:true,children:['編號','照片','說明'].map((t,i)=>cell([new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:t,bold:true})]})],i,{shading:{fill:'EDEDED'}}))});
+  const head=()=>new TableRow({children:['編號','照片','說明'].map((t,i)=>cell([new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:t,bold:true})]})],i,{shading:{fill:'EDEDED'}}))});
   const body=[];
   for(let i=0;i<rows.length;i++){
     const r=rows[i], s=Math.min(box/r.w,box/r.h), w=Math.round(r.w*s), h=Math.round(r.h*s);
-    body.push(new TableRow({cantSplit:true,children:[
+    body.push(new TableRow({children:[
       cell([new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun(String(i+1))]})],0),
       cell([new Paragraph({alignment:AlignmentType.CENTER,children:[new ImageRun({type:'jpg',data:await readImage(r),transformation:{width:w,height:h}})]})],1),
       cell([new Paragraph({children:[new TextRun('說明：'+(r.text||''))]})],2)]}));
@@ -421,7 +421,11 @@ async function makeDocx(D,rows,batch,readImage){
   const doc=new Document({styles:{default:{document:{run:{font:'標楷體',size:24}}}},sections:[{
     properties:{page:{size:{width:11906,height:16838},margin:{top:1134,bottom:1134,left:1134,right:1134}}},
     children:[new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:200},children:[new TextRun({text:'施工照片',bold:true,size:32})]}),
-      new Table({width:{size:9638,type:WidthType.DXA},columnWidths:cols,layout:TableLayoutType.FIXED,rows:[head,...body]})]}]});
+      // 每頁一張獨立表格（3 列），用分頁符號換頁；不依賴表格跨頁，簡易的手機 Word 檢視器也能正確顯示
+      ...Array.from({length:Math.ceil(body.length/3)},(_,k)=>{
+        const t=new Table({width:{size:9638,type:WidthType.DXA},columnWidths:cols,layout:TableLayoutType.FIXED,rows:[head(),...body.slice(k*3,k*3+3)]});
+        return k<Math.ceil(body.length/3)-1?[t,new Paragraph({children:[new PageBreak()]})]:[t];
+      }).flat()]}]});
   return doc;
 }
 $('exportDocx').onclick=async()=>{
