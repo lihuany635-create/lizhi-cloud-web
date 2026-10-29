@@ -11,6 +11,30 @@ const ORIGIN='https://lihuany635-create.github.io';
 const adminHeaders={'apikey':SERVICE,'Authorization':'Bearer '+SERVICE,'Content-Type':'application/json'};
 const digest=async(s:string)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))).map(b=>b.toString(16).padStart(2,'0')).join('');
 async function db(path:string,options:RequestInit={}):Promise<any>{const r=await fetch(URL_BASE+'/rest/v1/'+path,{...options,headers:{...adminHeaders,...options.headers}});if(!r.ok)throw new FlowError('工作台儲存服務暫時無法使用',503);const text=await r.text();return text?JSON.parse(text):null;}
+// Egress saver: the whole workbench lives in one ~7 MB row. Reading it on every
+// call used ~4 GB/day. Each request now first reads only revision+updated_at
+// (a few bytes) and reuses this isolate's copy when both match. The copy is kept
+// as JSON text and parsed per request, so no request can mutate another's data.
+// Writes stay CAS on revision exactly as before. TTL bounds staleness if the row
+// is ever edited out of band without bumping revision/updated_at.
+const STATE_TTL_MS=10*60*1000;
+let stateCache:{owner:string;revision:number;stamp:string;text:string;at:number}|null=null;
+export function __resetStateCache(){stateCache=null;}
+const stateUrl=(owner:string)=>'lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner);
+async function readState(owner:string):Promise<{revision:number;data:any}[]>{
+ const head=await db(stateUrl(owner)+'&select=revision,updated_at');if(!Array.isArray(head)||head.length!==1)return [];
+ const stamp=String(head[0].updated_at??''),c=stateCache;
+ if(c&&c.owner===owner&&c.revision===head[0].revision&&c.stamp===stamp&&Date.now()-c.at<STATE_TTL_MS)return [{revision:c.revision,data:JSON.parse(c.text)}];
+ const rows=await db(stateUrl(owner)+'&select=revision,updated_at,data');if(!Array.isArray(rows)||rows.length!==1)return [];
+ stateCache={owner,revision:rows[0].revision,stamp:String(rows[0].updated_at??''),text:JSON.stringify(rows[0].data),at:Date.now()};
+ return [{revision:rows[0].revision,data:rows[0].data}];
+}
+async function commitState(owner:string,revision:number,data:unknown,conflictMessage:string){
+ const text=JSON.stringify(data),updatedAt=new Date().toISOString();
+ const rows=await db(stateUrl(owner)+'&revision=eq.'+revision+'&select=revision,updated_at',{method:'PATCH',headers:{Prefer:'return=representation'},body:'{"revision":'+(revision+1)+',"data":'+text+',"updated_at":'+JSON.stringify(updatedAt)+'}'});
+ if(!Array.isArray(rows)||rows.length!==1){stateCache=null;throw new FlowError(conflictMessage,409);}
+ stateCache={owner,revision:revision+1,stamp:String(rows[0].updated_at??''),text,at:Date.now()};
+}
 export async function handler(req:Request){
  const origin=req.headers.get('origin'),cors:Record<string,string>={'Vary':'Origin','Cache-Control':'no-store','Content-Type':'application/json'};
  if(origin===ORIGIN){cors['Access-Control-Allow-Origin']=ORIGIN;cors['Access-Control-Allow-Headers']='authorization,apikey,content-type,x-client-info';cors['Access-Control-Allow-Methods']='GET,POST,OPTIONS';}
@@ -32,8 +56,8 @@ export async function handler(req:Request){
   const actor={id:owner,name,kind},url=new URL(req.url),part=url.pathname.split('/').filter(Boolean).at(-1);let op:string,args:unknown[];
   if(part==='trash'){
    const result=await handleRecycle(req,actor,{
-    read:async()=>{const rows=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&select=revision,data');if(rows.length!==1)throw new FlowError('找不到本人工作台資料',404);return rows[0];},
-    commit:async(revision,data)=>{const rows=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&revision=eq.'+revision+'&select=revision',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({revision:revision+1,data,updated_at:new Date().toISOString()})});if(rows.length!==1)throw new FlowError('工作台已更新，請重新整理垃圾桶',409);},
+    read:async()=>{const rows=await readState(owner);if(rows.length!==1)throw new FlowError('找不到本人工作台資料',404);return rows[0];},
+    commit:async(revision,data)=>{await commitState(owner,revision,data,'工作台已更新，請重新整理垃圾桶');},
     remove:async(path)=>{const r=await fetch(URL_BASE+'/storage/v1/object/'+IMAGE_BUCKET+'/'+path.split('/').map(encodeURIComponent).join('/'),{method:'DELETE',headers:adminHeaders});if(!r.ok&&r.status!==404)throw new FlowError('原圖清理未完成；請重新整理並重試永久刪除',503);}
    });return json(result);
   }
@@ -41,8 +65,8 @@ export async function handler(req:Request){
    const objectUrl=(path:string)=>URL_BASE+'/storage/v1/object/'+IMAGE_BUCKET+'/'+path.split('/').map(encodeURIComponent).join('/');
    const result=await handleProjectImages(req,actor,{
     readImages:async(projectId,ids)=>{const rows=await db('rpc/lizhi_production_image_index_v1',{method:'POST',body:JSON.stringify({p_owner:owner,p_project:projectId,p_ids:ids})});if(rows.length!==1)throw new FlowError('找不到本人專案圖片',404);return rows[0].images;},
-    read:async()=>{const rows=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&select=revision,data');if(rows.length!==1)throw new FlowError('找不到本人工作台資料',404);return rows[0];},
-    commit:async(revision,data)=>{const rows=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&revision=eq.'+revision+'&select=revision',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({revision:revision+1,data,updated_at:new Date().toISOString()})});if(rows.length!==1)throw new FlowError('其他裝置或AI已更新；請重新整理再上傳',409);},
+    read:async()=>{const rows=await readState(owner);if(rows.length!==1)throw new FlowError('找不到本人工作台資料',404);return rows[0];},
+    commit:async(revision,data)=>{await commitState(owner,revision,data,'其他裝置或AI已更新；請重新整理再上傳');},
     upload:async(path,bytes,mime)=>{const r=await fetch(objectUrl(path),{method:'POST',headers:{...adminHeaders,'Content-Type':mime,'x-upsert':'false'},body:bytes.buffer as ArrayBuffer});if(!r.ok)throw new FlowError('圖片儲存失敗，請稍後重試',503);},
     remove:async(path)=>{const r=await fetch(objectUrl(path),{method:'DELETE',headers:adminHeaders});if(!r.ok)throw new FlowError('暫存圖片清理失敗',503);},
     signed:async(path)=>{const r=await fetch(URL_BASE+'/storage/v1/object/sign/'+IMAGE_BUCKET+'/'+path.split('/').map(encodeURIComponent).join('/'),{method:'POST',headers:adminHeaders,body:JSON.stringify({expiresIn:300})});if(!r.ok)throw new FlowError('圖片讀取失敗',503);const b=await r.json() as {signedURL?:string};if(!b.signedURL?.startsWith('/object/sign/'+IMAGE_BUCKET+'/'))throw new FlowError('圖片網址格式錯誤',503);return URL_BASE+'/storage/v1'+b.signedURL;}
@@ -64,7 +88,7 @@ export async function handler(req:Request){
    else if(b.action==='create_episode'){op='createEpisode';args=[b.workId,b.revision,b.episode,b.title];}
    else {op='mutateWork';args=[b.workId,b.revision,b.action,b.args??{}];}
   }else throw new FlowError('找不到製作工作台介面',404);
-  const existing=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&select=revision,data');
+  const existing=await readState(owner);
   if(op==='migrate'){
    if(!isBridge)throw new FlowError('不允許資料搬移',403);const rows=b.rows;
    if(b.sourceOwner!==sourceOwner||!Array.isArray(rows)||rows.length>1000||rows.some((x:any)=>!x||typeof x.id!=='string'||typeof x.revision!=='number'||!x.title)||new Set(rows.map((x:any)=>x.id)).size!==rows.length)throw new FlowError('來源資料驗證失敗');
@@ -74,7 +98,7 @@ export async function handler(req:Request){
   if(existing.length!==1)throw new FlowError('製作資料尚未搬移完成，請稍後重新整理',503);
   if(op==='registerProjectSource'){const a=(args[2]??{}) as any;if(a.readStatus==='read'&&await digest(String(a.snapshot??''))!==a.sha256)throw new FlowError('來源內容雜湊不符');}
   const record=existing[0],next=operate(record.data as State,op,args,actor);
-  if(next.changed){const updated=await db('lizhi_production_state?owner_id=eq.'+encodeURIComponent(owner)+'&revision=eq.'+record.revision+'&select=revision',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({revision:record.revision+1,data:next.state,updated_at:new Date().toISOString()})});if(updated.length!==1)throw new FlowError('其他裝置或 AI 已更新，請重新讀取後再儲存',409);}
+  if(next.changed)await commitState(owner,record.revision,next.state,'其他裝置或 AI 已更新，請重新讀取後再儲存');
   return json(part==='projects'&&req.method==='GET'&&url.searchParams.get('view')==='settings'?episodeSettings(next.result as any):next.result);
  }catch(e){return json({error:e instanceof FlowError?e.message:e instanceof SyntaxError?'請求格式錯誤':'製作工作台服務暫時無法使用'},e instanceof FlowError?e.status:e instanceof SyntaxError?400:500);}
 }
