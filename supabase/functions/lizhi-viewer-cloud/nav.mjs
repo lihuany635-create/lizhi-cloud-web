@@ -56,15 +56,43 @@ function nextLevel(ls, cur) {
   return best;
 }
 
+function reachableLevels(ls, cur) {
+  return ls.filter(h => !(h - cur > STEP_UP + 1e-6 || cur - h > MAX_DROP + 1e-6));
+}
+
+// Straight walking: when a sample holds several reachable levels (floor + first stair tread),
+// keep the one from which the line can continue furthest over the next 0.6 m; ties -> nearest.
+function chooseLevel(nav, ls, cur, from, dx, dz, i, n, prefY = null) {
+  const cands = reachableLevels(ls, cur);
+  if (cands.length <= 1) return cands.length ? cands[0] : null;
+  // Set propagation over the next samples: how far can the line continue from level h?
+  const ahead = h => {
+    let set = [h], k = 0;
+    for (; k < 12 && i + k + 1 <= n; k++) {
+      const t = (i + k + 1) / n, ls = levelsAt(nav, from[0] + dx * t, from[2] + dz * t);
+      set = ls.filter(v => set.some(y => reachableLevels([v], y).length));
+      if (!set.length) break;
+    }
+    return k;
+  };
+  let best = null, bk = -1;
+  for (const h of cands) {
+    const k = ahead(h);
+    const ref = prefY ?? cur;   // tie-break: the waypoint's own height when given, else stay level
+    if (k > bk || (k === bk && Math.abs(h - ref) < Math.abs(best - ref))) { best = h; bk = k; }
+  }
+  return best;
+}
+
 // Walk in a straight line on the floor, climbing stairs, stopping at walls/ledges.
-export function walkSegment(nav, from, toX, toZ) {
+export function walkSegment(nav, from, toX, toZ, toY = null) {
   let [x, y, z] = from;
   const dx = toX - x, dz = toZ - z, dist = Math.hypot(dx, dz);
   const n = Math.max(1, Math.ceil(dist / SAMPLE));
   let travelled = 0;
   for (let i = 1; i <= n; i++) {
     const nx = from[0] + dx * i / n, nz = from[2] + dz * i / n;
-    const h = nextLevel(levelsAt(nav, nx, nz), y);
+    const h = chooseLevel(nav, levelsAt(nav, nx, nz), y, from, dx, dz, i, n, Number.isFinite(toY) ? toY : null);
     if (h === null) {
       const ls = levelsAt(nav, nx, nz);
       const reason = !ls.length ? 'WALL_OR_NO_FLOOR' : ls.some(v => v - y > STEP_UP) ? 'STEP_TOO_HIGH' : 'LEDGE_DROP';
@@ -126,11 +154,14 @@ export function findPath(nav, start, goal, maxExpand = 400000) {
       if (jx < 0 || jz < 0 || jx >= nav.nx || jz >= nz) continue;
       const nc = jx * nz + jz;
       if (dx && dz && (!passable(ix * nz + jz, h) || !passable(jx * nz + iz, h))) continue;
-      const nh = nextLevel(levelsAtCell(nav, nc), h);
-      if (nh === null) continue;
-      const nk = key(nc, levelIndex(nc, nh));
-      const cost = gk + Math.hypot(dx, dz) * cell + Math.abs(nh - h) * 0.5;
-      if (cost < (g.get(nk) ?? Infinity)) { g.set(nk, cost); prev.set(nk, k); heap.push(cost + hfun(nc), nk); }
+      // Branch on EVERY reachable level of the neighbour, not only the nearest one: at the
+      // foot of a stair the same cell holds both the floor (e.g. 2.20) and the first tread
+      // (2.38); taking only the nearest level kept the search on the floor forever.
+      for (const nh of reachableLevels(levelsAtCell(nav, nc), h)) {
+        const nk = key(nc, levelIndex(nc, nh));
+        const cost = gk + Math.hypot(dx, dz) * cell + Math.abs(nh - h) * 0.5;
+        if (cost < (g.get(nk) ?? Infinity)) { g.set(nk, cost); prev.set(nk, k); heap.push(cost + hfun(nc), nk); }
+      }
     }
     void l;
   }
