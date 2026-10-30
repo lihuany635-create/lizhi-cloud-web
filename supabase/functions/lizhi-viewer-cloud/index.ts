@@ -136,8 +136,8 @@ function put(state,name,a,nav=null){
   let cur=start.position,total=0,blocked=null;const path=[r3(cur)];
   for(const w of wps){
    if(!Array.isArray(w)||(w.length!==2&&w.length!==3)||w.some(n=>typeof n!=='number'||!Number.isFinite(n)||Math.abs(n)>10000))failure('INVALID_WAYPOINTS');
-   const [x,z]=w.length===2?w:[w[0],w[2]];
-   const seg=walkSegment(nav,cur,x,z);total+=seg.travelled;cur=seg.position;path.push(r3(cur));
+   const [x,z]=w.length===2?w:[w[0],w[2]],wy=w.length===3?w[1]:null;   // [x,y,z] picks floor vs stair where both exist
+   const seg=walkSegment(nav,cur,x,z,wy);total+=seg.travelled;cur=seg.position;path.push(r3(cur));
    if(total>300)failure('PATH_LIMIT_300M');
    if(seg.blocked){blocked=seg.blocked;break;}
   }
