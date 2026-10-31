@@ -20,9 +20,9 @@ CREATE OR REPLACE FUNCTION public.lizhi_viewer_cloud_snapshot_submit(
 ) RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
 AS $$
-DECLARE s record; frame bytea;
+DECLARE s record; frame bytea; matching_owners bigint;
 BEGIN
-  IF NOT public.lizhi_web_is_allowed() THEN RAISE EXCEPTION 'FORBIDDEN'; END IF;
+  IF auth.uid() IS NULL OR NOT public.lizhi_web_is_allowed() THEN RAISE EXCEPTION 'FORBIDDEN'; END IF;
   IF p_model_key !~ '^[a-z0-9_-]{2,80}$'
      OR p_model_sha !~ '^[a-f0-9]{64}$'
      OR p_revision IS NULL OR p_revision < 0
@@ -35,10 +35,19 @@ BEGIN
      OR pg_catalog.substring(frame FROM 1 FOR 3) <> pg_catalog.decode('ffd8ff','hex')
      OR pg_catalog.substring(frame FROM pg_catalog.octet_length(frame)-1 FOR 2) <> pg_catalog.decode('ffd9','hex')
   THEN RAISE EXCEPTION 'INVALID_JPEG'; END IF;
+  -- Browser account is approved separately from the private Site principal.
+  -- Fail closed rather than select an arbitrary principal if Site ownership grows.
+  SELECT pg_catalog.count(DISTINCT owner_id) INTO matching_owners
+    FROM public.lizhi_viewer_cloud_scenes
+    WHERE pg_catalog.left(owner_id,pg_catalog.length('appgprj_6ae0c336243881919e9ba2bbf450f1fb:'))
+      = 'appgprj_6ae0c336243881919e9ba2bbf450f1fb:'
+      AND model_key=p_model_key AND model_sha=p_model_sha;
+  IF matching_owners <> 1 THEN RAISE EXCEPTION 'OWNER_SCOPE_AMBIGUOUS'; END IF;
   SELECT owner_id,revision,state INTO s FROM public.lizhi_viewer_cloud_scenes
-    WHERE owner_id LIKE 'appgprj\_6ae0c336243881919e9ba2bbf450f1fb:%'
+    WHERE pg_catalog.left(owner_id,pg_catalog.length('appgprj_6ae0c336243881919e9ba2bbf450f1fb:'))
+      = 'appgprj_6ae0c336243881919e9ba2bbf450f1fb:'
       AND model_key=p_model_key AND model_sha=p_model_sha
-    ORDER BY updated_at DESC LIMIT 1;
+    FOR UPDATE;
   IF NOT FOUND OR s.revision <> p_revision OR s.state->>'selected_id' IS DISTINCT FROM p_avatar_id
      OR NOT EXISTS (SELECT 1 FROM pg_catalog.jsonb_array_elements(coalesce(s.state->'avatars','[]'::jsonb)) a WHERE a->>'id'=p_avatar_id)
   THEN RAISE EXCEPTION 'FRAME_SCENE_REVISION_MISMATCH'; END IF;
@@ -62,9 +71,37 @@ CREATE OR REPLACE FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(
 ) RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
 AS $$
+DECLARE matching_owners bigint;
 BEGIN
- IF NOT public.lizhi_web_is_allowed() THEN RAISE EXCEPTION 'FORBIDDEN'; END IF;
- IF p_model_key !~ '^[a-z0-9_-]{2,80}$' OR p_model_sha !~ '^[a-f0-9]{64}$' THEN RAISE EXCEPTION 'INVALID_ARGUMENTS'; END IF;
+ IF auth.uid() IS NULL OR NOT public.lizhi_web_is_allowed() THEN RAISE EXCEPTION 'FORBIDDEN'; END IF;
+ IF p_model_key !~ '^[a-z0-9_-]{2,80}
+ WHERE f.model_key=p_model_key AND f.model_sha=p_model_sha
+   AND EXISTS (SELECT 1 FROM public.lizhi_viewer_cloud_scenes AS s
+     WHERE s.owner_id=f.owner_id AND s.model_key=f.model_key AND s.model_sha=f.model_sha
+       AND pg_catalog.left(s.owner_id,pg_catalog.length('appgprj_6ae0c336243881919e9ba2bbf450f1fb:'))
+         = 'appgprj_6ae0c336243881919e9ba2bbf450f1fb:');
+ RETURN pg_catalog.jsonb_build_object('ok',true,'revoked',true);
+END;
+$$;
+REVOKE ALL ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) TO authenticated;
+ OR p_model_sha !~ '^[a-f0-9]{64}
+ WHERE f.model_key=p_model_key AND f.model_sha=p_model_sha
+   AND EXISTS (SELECT 1 FROM public.lizhi_viewer_cloud_scenes AS s
+     WHERE s.owner_id=f.owner_id AND s.model_key=f.model_key AND s.model_sha=f.model_sha
+       AND s.owner_id LIKE 'appgprj\_6ae0c336243881919e9ba2bbf450f1fb:%');
+ RETURN pg_catalog.jsonb_build_object('ok',true,'revoked',true);
+END;
+$$;
+REVOKE ALL ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) TO authenticated;
+ THEN RAISE EXCEPTION 'INVALID_ARGUMENTS'; END IF;
+ SELECT pg_catalog.count(DISTINCT owner_id) INTO matching_owners
+   FROM public.lizhi_viewer_cloud_scenes
+   WHERE pg_catalog.left(owner_id,pg_catalog.length('appgprj_6ae0c336243881919e9ba2bbf450f1fb:'))
+     = 'appgprj_6ae0c336243881919e9ba2bbf450f1fb:'
+     AND model_key=p_model_key AND model_sha=p_model_sha;
+ IF matching_owners <> 1 THEN RAISE EXCEPTION 'OWNER_SCOPE_AMBIGUOUS'; END IF;
  DELETE FROM public.lizhi_viewer_cloud_snapshots AS f
  WHERE f.model_key=p_model_key AND f.model_sha=p_model_sha
    AND EXISTS (SELECT 1 FROM public.lizhi_viewer_cloud_scenes AS s
