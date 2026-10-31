@@ -332,6 +332,8 @@ async function openModel(buf,name,opts={}){
       const hash=Array.from(bytes).map(v=>v.toString(16).padStart(2,'0')).join('');
       info={version:'本機檔案',actualSHA:hash,expectedSHA:null,manifestVerified:false};}
     if(opts.serial!=null&&opts.serial!==loadSerial){disposeObject(obj);return;}
+    // Consent was for the previous model only; revoke its shared frame before switching.
+    if(cloudCaptureEnabled)cloudCaptureSet(false);
     saveAvatars();clearModel();model=obj;removeFigure();sourceInfo=info;
     if(name.toLowerCase().endsWith('.fbx')||opts.scaleGuess){/* FBX often in cm */}
     model.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true;
