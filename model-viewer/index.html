@@ -211,6 +211,7 @@ button,label.btn{font:inherit;cursor:pointer}
     <button class="tog" id="tPlace" aria-pressed="false">放置人偶</button>
     <button class="tog" id="tPov" disabled>人偶視角</button>
     <button class="tog" id="tCloud" aria-pressed="false" title="顯示 ChatGPT 在雲端移動的人偶（藍色）；需先登入立之雲端庫">雲端人偶</button>
+     <button class="tog" id="tCloudCapture" aria-pressed="false" title="登入後主動開啟 30 分鐘 AI 巡查截圖分享；需保持本頁開啟，僅雲端人偶跟隨視角及新 revision 會擷取一張；圖片超過90秒拒讀，實體刪除無保證時限，意外關頁可能持續留存">共享 AI 巡查畫面</button>
     <button class="tog" id="tFit">重新置中</button>
     <button class="tog" id="tTop" aria-pressed="false">俯視</button>
     <button class="tog" id="tRot" aria-pressed="false">自動旋轉</button>
@@ -331,6 +332,8 @@ async function openModel(buf,name,opts={}){
       const hash=Array.from(bytes).map(v=>v.toString(16).padStart(2,'0')).join('');
       info={version:'本機檔案',actualSHA:hash,expectedSHA:null,manifestVerified:false};}
     if(opts.serial!=null&&opts.serial!==loadSerial){disposeObject(obj);return;}
+    // Consent was for the previous model only; revoke its shared frame before switching.
+    if(cloudCaptureEnabled)cloudCaptureSet(false);
     saveAvatars();clearModel();model=obj;removeFigure();sourceInfo=info;
     if(name.toLowerCase().endsWith('.fbx')||opts.scaleGuess){/* FBX often in cm */}
     model.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true;
@@ -1144,6 +1147,88 @@ const cloudMat=new THREE.MeshStandardMaterial({color:0x3f7fe8,roughness:.45,meta
 const cloudRingMat=new THREE.MeshBasicMaterial({color:0x3f7fe8,transparent:true,opacity:.8,side:THREE.DoubleSide});
 const cloudFigs=new Map();let cloudOn=false,cloudFollowOn=false,cloudRev=-1,cloudTimer=null,cloudClient=null,cloudSelected=null,cloudBusy=false,cloudKey=null;
 const CLOUD_WALK=1.6; // m/s along the returned path
+// Optional authenticated owner-browser capture. OFF by default and never persisted.
+let cloudCaptureEnabled=false,cloudCaptureUntil=0,cloudCaptureBusy=false,cloudCaptureLastRevision=-1,cloudCaptureLastAt=0,cloudCaptureCount=0;
+const CLOUD_CAPTURE_WINDOW_MS=30*60*1000;
+// Revocation deletes the last shared frame in the cloud. The result is shown on screen:
+// a failed delete is never reported as "stopped", and the button offers a retry.
+let cloudCaptureRevokePending=null;
+const cloudCaptureRevokeTargets=new Map();
+function cloudCaptureRevoke(target=cloudCaptureRevokePending){
+ if(!target){
+  if(!modelKey||!sourceInfo?.manifestVerified)return Promise.resolve(false);
+  target={key:modelKey,sha:sourceInfo.actualSHA};
+ }
+ const id=target.key+'|'+target.sha;
+ let entry=cloudCaptureRevokeTargets.get(id);
+ if(!entry){entry={target:{...target},promise:null};cloudCaptureRevokeTargets.set(id,entry);}
+ cloudCaptureRevokePending=cloudCaptureRevokeTargets.values().next().value?.target||null;
+ if(entry.promise)return entry.promise;
+ const done=ok=>{
+  // Only this exact attempt may remove its target; another model remains pending.
+  if(ok&&cloudCaptureRevokeTargets.get(id)===entry)cloudCaptureRevokeTargets.delete(id);
+  entry.promise=null;
+  cloudCaptureRevokePending=cloudCaptureRevokeTargets.values().next().value?.target||null;
+  const pending=!!cloudCaptureRevokePending;
+  if(!cloudCaptureEnabled)$('tCloudCapture').textContent=pending?'重試刪除雲端畫面':'共享 AI 巡查畫面';
+  cloudSay(pending?'已停止擷取，但仍有雲端畫面未能刪除（未確認刪除成功）。超過 90 秒不能讀取；實際刪除時間取決於清理是否成功，未保證刪除時限。請按「重試刪除雲端畫面」。':'已刪除全部待撤銷的雲端畫面（已確認刪除成功）');
+  return ok;
+ };
+ const sb=cloudSupabase();
+ entry.promise=Promise.resolve().then(()=>sb?sb.rpc('lizhi_viewer_cloud_snapshot_revoke',{
+  p_model_key:entry.target.key,p_model_sha:entry.target.sha
+ }):null).then(r=>done(!r?.error&&r?.data?.revoked===true)).catch(()=>done(false));
+ return entry.promise;
+}
+function cloudCaptureSet(on){
+ const was=cloudCaptureEnabled;
+ if(on&&!was){cloudCaptureLastAt=0;cloudCaptureCount=0;}
+ cloudCaptureEnabled=!!on;cloudCaptureUntil=on?Date.now()+CLOUD_CAPTURE_WINDOW_MS:0;
+ if(!on){cloudCaptureLastRevision=-1;if(was)cloudCaptureRevoke({key:modelKey,sha:sourceInfo?.actualSHA});}
+ $('tCloudCapture').setAttribute('aria-pressed',String(cloudCaptureEnabled));
+ $('tCloudCapture').textContent=on?'停止分享巡查畫面':'共享 AI 巡查畫面';
+}
+async function cloudCaptureFrame(sb,key){
+ if(!cloudCaptureEnabled||cloudCaptureBusy)return;
+ if(Date.now()>cloudCaptureUntil||cloudCaptureCount>=80){cloudCaptureSet(false);return;}
+ if(document.hidden||agentActive||window.GLBPreview.active||!cloudOn||!cloudFollowOn||!model||!sourceInfo?.manifestVerified)return;
+ if(cloudRev<0||cloudCaptureLastRevision===cloudRev||!cloudSelected||!cloudFigs.has(cloudSelected))return;
+ // Limit storage writes and egress (one 640x360 frame per 10 seconds, at most 80 per consent).
+ if(Date.now()-cloudCaptureLastAt<10000)return;
+ // Capture only after client-side walking animation reaches the committed server position.
+ if(cloudFigs.get(cloudSelected).route.length)return;
+ const captureTarget={key:modelKey,sha:sourceInfo.actualSHA};
+ cloudCaptureBusy=true;
+ try{
+  // Wait for the followed cloud-avatar pose and draw the actual WebGL scene.
+  await new Promise(resolve=>requestAnimationFrame(resolve));
+  if(!cloudCaptureEnabled||document.hidden||key!==cloudKey||!cloudFollowOn||Date.now()>cloudCaptureUntil)return;
+  cloudStep(0);
+  const sz=renderer.getSize(new THREE.Vector2()),pr=renderer.getPixelRatio(),asp=camera.aspect;
+  let jpeg;
+  try{
+   renderer.setPixelRatio(1);renderer.setSize(640,360,false);
+   camera.aspect=640/360;camera.updateProjectionMatrix();
+   renderer.render(scene,camera);
+   jpeg=renderer.domElement.toDataURL('image/jpeg',.82);
+  }finally{
+   renderer.setPixelRatio(pr);renderer.setSize(sz.x,sz.y,false);
+   camera.aspect=asp;camera.updateProjectionMatrix();
+  }
+  if(!jpeg.startsWith('data:image/jpeg;base64,')||jpeg.length<1024||jpeg.length>350050)throw Error('INVALID_BROWSER_JPEG');
+  const revision=cloudRev,avatarId=cloudSelected,base64=jpeg.split(',')[1];
+  const {data,error}=await sb.rpc('lizhi_viewer_cloud_snapshot_submit',{
+   p_model_key:captureTarget.key,p_model_sha:captureTarget.sha,p_revision:revision,
+   p_avatar_id:avatarId,p_jpeg_base64:base64
+  });
+  if(error)throw error;
+  if(!data?.ok)throw Error('FRAME_UPLOAD_REJECTED');
+  cloudCaptureLastRevision=revision;cloudCaptureLastAt=Date.now();cloudCaptureCount++;
+ }catch(e){
+  console.warn('Browser WebGL capture not committed:',e);
+  cloudSay('巡查畫面上傳失敗（僅瀏覽器中顯示，不代表 AI 已取得圖片）');
+ }finally{cloudCaptureBusy=false;if(!cloudCaptureEnabled||captureTarget.key!==modelKey||captureTarget.sha!==sourceInfo?.actualSHA)cloudCaptureRevoke(captureTarget);}
+}
 function cloudSupabase(){
   if(cloudClient)return cloudClient;
   try{cloudClient=window.LizhiModels.client();}catch(_e){return null;}
@@ -1191,6 +1276,7 @@ async function cloudPoll(){
     if(!data?.unchanged){cloudApply(data?.state);cloudRev=data?.revision??0;}
     const n=cloudFigs.size,sel=cloudFigs.get(cloudSelected);
     cloudSay(n?`雲端 ${n} 個人偶 · rev ${cloudRev}${sel?' · 選取：'+esc(sel.name||'未命名'):''}`:`雲端沒有人偶（rev ${cloudRev}）`);
+    if(cloudCaptureEnabled)cloudCaptureFrame(sb,key);
   }catch(e){console.warn('cloud avatars',e);cloudSay('雲端讀取失敗，稍後自動重試');}
   finally{cloudBusy=false;}
 }
@@ -1199,16 +1285,26 @@ function cloudSet(on){
   try{localStorage.setItem('mv-cloud-avatars',on?'1':'0');}catch(e){}
   clearInterval(cloudTimer);cloudTimer=null;
   if(on){cloudSay('雲端人偶：連線中…');cloudPoll();cloudTimer=setInterval(cloudPoll,2000);}
-  else{cloudFollowSet(false);cloudClear();cloudRev=-1;cloudKey=null;}
+  else{cloudCaptureSet(false);cloudFollowSet(false);cloudClear();cloudRev=-1;cloudKey=null;}
 }
 function cloudFollowSet(on){
   if(on&&pov)exitPov();
   cloudFollowOn=on;$('cloudFollow').setAttribute('aria-pressed',String(on));controls.enabled=!on;
   if(on){anim=null;setCut(1);}
-  else for(const f of cloudFigs.values())f.mesh.visible=true;
+  else{cloudCaptureSet(false);for(const f of cloudFigs.values())f.mesh.visible=true;}
 }
 $('tCloud').onclick=()=>cloudSet(!cloudOn);
 $('cloudFollow').onclick=()=>cloudFollowSet(!cloudFollowOn);
+$('tCloudCapture').onclick=()=>{
+ if(cloudCaptureEnabled){cloudCaptureSet(false);cloudSay('正在停止並刪除雲端畫面…');return;}
+ if(cloudCaptureRevokePending){cloudSay('正在重試刪除雲端畫面…');cloudCaptureRevoke();return;}
+ if(!model||!sourceInfo?.manifestVerified||window.GLBPreview.active){cloudSay('請先登入並載入已登記版本的 GLB');return;}
+ if(!cloudOn)cloudSet(true);
+ if(!cloudFollowOn)cloudFollowSet(true);
+ cloudCaptureSet(true);cloudCaptureLastRevision=-1;
+ cloudSay('已授權 30 分鐘瀏覽器畫面分享；保持本頁開啟，僅新場景版本擷取 640×360 JPEG。圖片超過90秒拒讀；實體刪除無保證時限，意外關頁可能持續留存');
+ cloudPoll();
+};
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cloudOn)cloudPoll();});
 function cloudStep(dt){
   for(const f of cloudFigs.values()){

@@ -10,12 +10,14 @@ const hex=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new T
 const tokenHash=await hex(token);
 let current={revision:0,state:{avatars:[],selected_id:null,camera:{mode:'free'},checkpoints:[]}};
 const requests=new Map();
+let screenshot=null;
 globalThis.Deno={env:{get:k=>k==='SUPABASE_URL'?'https://test.supabase.co':k==='SUPABASE_SERVICE_ROLE_KEY'?'TEST_ONLY_SERVICE_KEY':undefined},serve(){}};
 globalThis.fetch=async(url,options={})=>{
  const u=String(url);
  if(u.includes('current-models.json'))return Response.json({models:[{model:'lahudi-academy.glb',version:'R09',current_sha256:sha}]});
  if(u.includes('/rest/v1/lizhi_viewer_config'))return Response.json([{token_hash:tokenHash}]);
  if(u.includes('/rest/v1/lizhi_viewer_cloud_scenes'))return Response.json([{model_key:'lahudi-academy',model_sha:sha,revision:current.revision}]);
+ if(u.includes('/rest/v1/lizhi_viewer_cloud_snapshots?'))return Response.json(screenshot?[screenshot]:[]);
  if(u.includes('/rest/v1/lizhi_viewer_cloud_requests?')){
   const match=u.match(/request_id=eq\.([0-9a-f-]+)/);
   return Response.json(requests.has(match?.[1])?[requests.get(match[1])]:[]);
@@ -67,11 +69,67 @@ test('create, idempotence, CAS, independent avatars and camera transitions',asyn
  assert.equal(camera.state.camera.mode,'third');
  const scene=(await invoke('viewer_get_scene',{model_key:'lahudi-academy'})).data;assert.equal(scene.revision,4);
 });
-test('screenshot fails explicitly and checkpoint evidence cannot be fabricated',async()=>{
- assert.equal((await invoke('viewer_get_screenshot')).data.code,'CLOUD_3D_RENDERER_NOT_IMPLEMENTED');
+test('browser screenshot is opt-in, tied to revision/avatar and cannot be invented',async()=>{
+ const model={model_key:'lahudi-academy',model_sha:sha};
+ const empty=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(empty.code,'BROWSER_CAPTURE_NOT_CONNECTED');
+ assert.equal(empty.requires_browser,true);assert.equal(empty.real_screenshot,false);
+ screenshot={revision:current.revision-1,avatar_id:current.state.selected_id,
+  jpeg_b64:'/9j/'+'A'.repeat(1200),captured_at:new Date().toISOString()};
+ const stale=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(stale.code,'BROWSER_FRAME_STALE');
+ assert.equal(stale.real_screenshot,false);
+ // Verify the success path with a deliberately synthetic fixture; it is NOT a rendered image.
+ const avatar=current.state.selected_id;
+ screenshot={revision:current.revision,avatar_id:avatar,
+  jpeg_b64:'/9j/'+'A'.repeat(1200),captured_at:new Date().toISOString()};
+ const valid=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(valid.ok,true);
+ assert.equal(valid.revision,current.revision);
+ assert.equal(valid.avatar_id,avatar);
+ assert.equal(valid.real_screenshot,true);
+ assert.equal(valid.render_attested,false);
+ assert.equal(valid.requires_browser,true);
+ assert.equal(valid.image.mimeType,'image/jpeg');
+ assert.equal(valid.image.data,screenshot.jpeg_b64);
+ const {viewerCloudToMcpContent}=await import('../sites-migration/viewer-cloud-direct/site-cloud-direct-mcp.mjs');
+ const blocks=viewerCloudToMcpContent(valid);
+ assert.equal(blocks[1].type,'image');
+ assert.equal(blocks[1].data,screenshot.jpeg_b64);
+ assert.equal(JSON.parse(blocks[0].text).model_sha,sha);
+ screenshot={...screenshot,avatar_id:'not-the-selected-avatar'};
+ const wrongAvatar=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(wrongAvatar.code,'BROWSER_FRAME_STALE');
+ assert.equal(wrongAvatar.real_screenshot,false);
+ screenshot={...screenshot,avatar_id:avatar,captured_at:new Date(Date.now()-91_000).toISOString()};
+ const expired=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(expired.code,'BROWSER_FRAME_STALE');
+ assert.equal(expired.real_screenshot,false);
+ screenshot={...screenshot,captured_at:new Date().toISOString(),jpeg_b64:'invalid'};
+ const invalidFrame=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(invalidFrame.code,'INVALID_BROWSER_FRAME');
+ screenshot=null;
  const f=(await invoke('viewer_save_checkpoint',{model_key:'lahudi-academy',model_sha:sha,request_id:crypto.randomUUID(),expected_revision:4,note:'manual note',findings:[{screenshot_id:crypto.randomUUID(),finding:'hall clear'}]})).data;
  assert.equal(f.code,'REAL_SCREENSHOT_EVIDENCE_REQUIRED');assert.equal(current.revision,4);
  const stop=(await invoke('viewer_stop')).data;assert.equal(stop.mode,'cloud_direct');assert.equal(stop.pending_operations,0);
+});
+test('browser image opt-in and renderer evidence are explicit in viewer source',()=>{
+ const html=readFileSync('model-viewer/index.html','utf8');
+ assert.match(html,/id="tCloudCapture"/);
+ assert.match(html,/let cloudCaptureEnabled=false/);
+ assert.match(html,/p_jpeg_base64:base64/);
+ assert.match(html,/window\.GLBPreview\.active/);
+});
+
+test('Site MCP exposes JPEG as an actual image block, not as base64 text',async()=>{
+ const {viewerCloudToMcpContent}=await import('../sites-migration/viewer-cloud-direct/site-cloud-direct-mcp.mjs');
+ const sample={ok:true,real_screenshot:true,image:{mimeType:'image/jpeg',data:'/9j/'+'A'.repeat(1100)},revision:5};
+ const blocks=viewerCloudToMcpContent(sample);
+ assert.equal(blocks.length,2);assert.equal(blocks[1].type,'image');
+ assert.equal(blocks[1].mimeType,'image/jpeg');assert.equal(JSON.parse(blocks[0].text).revision,5);
+ assert.equal(blocks[0].text.includes(sample.image.data),false);
+ const fail=viewerCloudToMcpContent({ok:false,code:'BROWSER_FRAME_STALE'});
+ assert.equal(fail.length,1);assert.equal(fail[0].type,'text');
 });
 
 test('Site adapter exposes 15 cloud-native tools without online session fields',async()=>{
@@ -91,4 +149,44 @@ test('Site adapter exposes 15 cloud-native tools without online session fields',
   assert.equal(opts.redirect,'manual');return Response.json({ok:true,mode:'cloud_direct'});
  }});
  assert(called);assert.equal(result.mode,'cloud_direct');
+});
+
+// Execute the actual browser revocation functions, with controlled delayed RPC responses.
+test('revoke retries preserve original model/SHA and delayed successes cannot erase other targets',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const html=readFileSync('model-viewer/index.html','utf8');
+ const source=html.slice(html.indexOf('let cloudCaptureRevokePending=null;'),html.indexOf('function cloudCaptureSet(on)'));
+ const calls=[],button={},messages=[];
+ const ctx={modelKey:'model-a',sourceInfo:{manifestVerified:true,actualSHA:'a'.repeat(64)},cloudCaptureEnabled:false,
+  $:()=>button,cloudSay:s=>messages.push(s),cloudSupabase:()=>({rpc:(_name,args)=>new Promise(resolve=>calls.push({args,resolve}))})};
+ runInNewContext(source+'\nthis.revoke=cloudCaptureRevoke;this.pending=()=>cloudCaptureRevokePending;this.count=()=>cloudCaptureRevokeTargets.size;',ctx);
+ const tick=()=>new Promise(resolve=>setImmediate(resolve));
+ const a=ctx.revoke();await tick();calls[0].resolve({error:{message:'offline'}});assert.equal(await a,false);
+ ctx.modelKey='model-b';ctx.sourceInfo.actualSHA='b'.repeat(64);
+ const retry=ctx.revoke();await tick();assert.equal(calls[1].args.p_model_key,'model-a');assert.equal(calls[1].args.p_model_sha,'a'.repeat(64));
+ const b=ctx.revoke({key:'model-b',sha:'b'.repeat(64)});await tick();
+ calls[2].resolve({error:{message:'offline'}});await b;
+ calls[1].resolve({data:{revoked:true}});await retry;
+ assert.equal(ctx.count(),1);assert.equal(ctx.pending().key,'model-b');assert.match(messages.at(-1),/未確認刪除/);
+ const last=ctx.revoke();const same=ctx.revoke();assert.equal(last,same);await tick();assert.equal(calls.length,4);
+ calls[3].resolve({data:{revoked:true}});await last;assert.equal(ctx.count(),0);assert.equal(ctx.pending(),null);
+ assert.match(messages.at(-1),/已確認刪除/);
+});
+test('retention copy does not promise unsupported five-minute physical deletion',()=>{
+ const html=readFileSync('model-viewer/index.html','utf8');
+ assert(!html.includes('最多保留 5 分鐘'));
+ const policy=readFileSync('docs/ai-agent-guides/VIEWER_BROWSER_CAPTURE_DRAFT_20261031.md','utf8');
+ assert.match(policy,/remain indefinitely/);assert.match(policy,/nearly ten minutes/);assert.match(policy,/cron.job_run_details/);
+});
+test('delayed capture completion revokes captured model after stop and model switch',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const html=readFileSync('model-viewer/index.html','utf8');
+ const source=html.slice(html.indexOf('async function cloudCaptureFrame(sb,key)'),html.indexOf('function cloudSupabase()'));
+ let resume;const revoked=[];
+ const ctx={cloudCaptureEnabled:true,cloudCaptureBusy:false,cloudCaptureUntil:Date.now()+60000,cloudCaptureCount:0,document:{hidden:false},agentActive:false,window:{GLBPreview:{active:false}},cloudOn:true,cloudFollowOn:true,model:{},sourceInfo:{manifestVerified:true,actualSHA:'a'.repeat(64)},modelKey:'model-a',cloudRev:1,cloudCaptureLastRevision:-1,cloudSelected:'avatar',cloudFigs:new Map([['avatar',{route:[]}]]),cloudCaptureLastAt:0,cloudKey:'model-a|sha',requestAnimationFrame:f=>{resume=f;},cloudCaptureRevoke:t=>revoked.push(t),cloudCaptureSet:()=>{}};
+ runInNewContext(source+'\nthis.capture=cloudCaptureFrame;',ctx);
+ const capture=ctx.capture({},ctx.cloudKey);
+ ctx.cloudCaptureEnabled=false;ctx.modelKey='model-b';ctx.sourceInfo={manifestVerified:true,actualSHA:'b'.repeat(64)};ctx.cloudKey='model-b|sha';
+ resume();await capture;
+ assert.equal(revoked.length,1);assert.equal(revoked[0].key,'model-a');assert.equal(revoked[0].sha,'a'.repeat(64));
 });

@@ -205,7 +205,33 @@ async function run(owner,name,a){
   const models=await listManifest();
   return {ok:true,models:models.map(m=>({key:m.model.slice(0,-4),model:m.model,version:m.version,current_sha256:m.current_sha256,author_full_item_approval:m.author_full_item_approval}))};
  }
- if(name==='viewer_get_screenshot')return {ok:false,code:'CLOUD_3D_RENDERER_NOT_IMPLEMENTED',real_screenshot:false,requires_browser:false};
+ if(name==='viewer_get_screenshot'){
+  // Optional browser JPEG bridge: all movement/state remains cloud_direct.
+  // A real logged-in owner browser must explicitly opt in and upload one frame
+  // for the SAME canonical GLB SHA, scene revision and selected cloud avatar.
+  fields(a,['model_key','model_sha']);
+  const key=nameKey(a.model_key),m=await modelOf(key,a.model_sha);
+  // Delete frames older than the 90 s read window before reading (best effort; pg_cron also sweeps).
+  try{await rpc('lizhi_viewer_cloud_snapshot_purge',{p_max_age_seconds:90});}catch(_e){}
+  const rows=await rest('lizhi_viewer_cloud_snapshots?owner_id=eq.'+encodeURIComponent(owner)
+   +'&model_key=eq.'+encodeURIComponent(key)
+   +'&model_sha=eq.'+m.current_sha256
+   +'&select=revision,avatar_id,jpeg_b64,captured_at&limit=1');
+  if(!rows.length)return {ok:false,code:'BROWSER_CAPTURE_NOT_CONNECTED',requires_browser:true,real_screenshot:false};
+  const shot=rows[0],current=await scene(owner,key,m.current_sha256);
+  const age=Date.now()-Date.parse(shot.captured_at);
+  if(!Number.isFinite(age)||age<0||age>90000||shot.revision!==current.revision
+    ||shot.avatar_id!==current.state.selected_id
+    ||!current.state.avatars.some(x=>x.id===shot.avatar_id))
+   return {ok:false,code:'BROWSER_FRAME_STALE',requires_browser:true,real_screenshot:false,current_revision:current.revision};
+  if(typeof shot.jpeg_b64!=='string'||shot.jpeg_b64.length<1000||shot.jpeg_b64.length>350000||!shot.jpeg_b64.startsWith('/9j/'))
+   failure('INVALID_BROWSER_FRAME');
+  return {ok:true,real_screenshot:true,render_attested:false,requires_browser:true,
+    source:'owner_browser_uploaded_jpeg',model_key:key,model_sha:m.current_sha256,
+    revision:shot.revision,avatar_id:shot.avatar_id,captured_at:shot.captured_at,
+    image:{mimeType:'image/jpeg',data:shot.jpeg_b64},
+    limitations:'Authenticated owner browser upload; not cloud GPU rendering or tamper-proof visual verification'};
+ }
  if(name==='viewer_stop')return {ok:true,mode:'cloud_direct',pending_operations:0,details:'No persistent browser session. Each cloud write is synchronous and atomic.'};
  const key=nameKey(a.model_key);const m=await modelOf(key,a.model_sha);
  if(name==='viewer_get_scene'||name==='viewer_list_avatars'){
