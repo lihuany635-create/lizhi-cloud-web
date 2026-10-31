@@ -77,7 +77,7 @@ export function parseModel(arrayBuffer, {deadline=Infinity}={}) {
     if (meshCache.has(i)) return meshCache.get(i);
     if(!gltf.meshes?.[i]||(gltf.meshes[i].primitives||[]).some(p=>(p.mode??4)!==4||p.targets||p.extensions?.KHR_draco_mesh_compression))throw Error('GLB_PRIMITIVE_UNSUPPORTED');
     const prims = gltf.meshes[i].primitives.filter((p) => (p.mode ?? 4) === 4 && p.attributes?.POSITION !== undefined)
-      .map((p) => ({ pos: readAccessor(gltf, bin, p.attributes.POSITION), idx: p.indices !== undefined ? readAccessor(gltf, bin, p.indices) : null, mat: materials[p.material] || fallback }));
+      .map((p) => {const a=gltf.accessors?.[p.attributes.POSITION],ix=p.indices===undefined?null:gltf.accessors?.[p.indices];if(a?.type!=='VEC3'||a.componentType!==5126||(ix&&(ix.type!=='SCALAR'||![5121,5123,5125].includes(ix.componentType))))throw Error('GLB_ACCESSOR_UNSUPPORTED');return {pos:readAccessor(gltf,bin,p.attributes.POSITION),idx:p.indices!==undefined?readAccessor(gltf,bin,p.indices):null,mat:materials[p.material]||fallback};});
     meshCache.set(i, prims); return prims;
   };
   const visit = (index, parent, depth) => {
