@@ -79,6 +79,35 @@ test('browser screenshot is opt-in, tied to revision/avatar and cannot be invent
  const stale=(await invoke('viewer_get_screenshot',model)).data;
  assert.equal(stale.code,'BROWSER_FRAME_STALE');
  assert.equal(stale.real_screenshot,false);
+ // Verify the success path with a deliberately synthetic fixture; it is NOT a rendered image.
+ const avatar=current.state.selected_id;
+ screenshot={revision:current.revision,avatar_id:avatar,
+  jpeg_b64:'/9j/'+'A'.repeat(1200),captured_at:new Date().toISOString()};
+ const valid=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(valid.ok,true);
+ assert.equal(valid.revision,current.revision);
+ assert.equal(valid.avatar_id,avatar);
+ assert.equal(valid.real_screenshot,true);
+ assert.equal(valid.render_attested,false);
+ assert.equal(valid.requires_browser,true);
+ assert.equal(valid.image.mimeType,'image/jpeg');
+ assert.equal(valid.image.data,screenshot.jpeg_b64);
+ const {viewerCloudToMcpContent}=await import('../sites-migration/viewer-cloud-direct/site-cloud-direct-mcp.mjs');
+ const blocks=viewerCloudToMcpContent(valid);
+ assert.equal(blocks[1].type,'image');
+ assert.equal(blocks[1].data,screenshot.jpeg_b64);
+ assert.equal(JSON.parse(blocks[0].text).model_sha,sha);
+ screenshot={...screenshot,avatar_id:'not-the-selected-avatar'};
+ const wrongAvatar=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(wrongAvatar.code,'BROWSER_FRAME_STALE');
+ assert.equal(wrongAvatar.real_screenshot,false);
+ screenshot={...screenshot,avatar_id:avatar,captured_at:new Date(Date.now()-91_000).toISOString()};
+ const expired=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(expired.code,'BROWSER_FRAME_STALE');
+ assert.equal(expired.real_screenshot,false);
+ screenshot={...screenshot,captured_at:new Date().toISOString(),jpeg_b64:'invalid'};
+ const invalidFrame=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(invalidFrame.code,'INVALID_BROWSER_FRAME');
  screenshot=null;
  const f=(await invoke('viewer_save_checkpoint',{model_key:'lahudi-academy',model_sha:sha,request_id:crypto.randomUUID(),expected_revision:4,note:'manual note',findings:[{screenshot_id:crypto.randomUUID(),finding:'hall clear'}]})).data;
  assert.equal(f.code,'REAL_SCREENSHOT_EVIDENCE_REQUIRED');assert.equal(current.revision,4);
