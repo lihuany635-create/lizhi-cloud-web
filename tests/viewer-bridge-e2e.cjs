@@ -23,7 +23,7 @@ async function main(){
  const page=await browser.newPage({viewport:{width:1360,height:1100}});
  page.on('pageerror',error=>console.error('PLAYWRIGHT_PAGE_ERROR',error.message));
  page.on('console',msg=>{if(msg.type()==='error')console.error('PLAYWRIGHT_CONSOLE_ERROR',msg.text());});
- await page.goto(PARENT);await page.waitForFunction(()=>window.ready?.render_ready,{timeout:90000});
+ await page.goto(PARENT);await page.waitForFunction(()=>window.ready?.render_ready,null,{timeout:90000});
  let state=await page.evaluate(()=>window.ready);assert.equal(state.model_key,'lahudi-academy');assert.equal(state.source.manifestVerified,true);
  const overview={position:state.camera.position,target:state.camera.target};
  const expected=JSON.parse(await fs.readFile('model-viewer/current-models.json','utf8')).models.find(x=>x.model==='lahudi-academy.glb').current_sha256;assert.equal(state.source.actualSHA,expected);
