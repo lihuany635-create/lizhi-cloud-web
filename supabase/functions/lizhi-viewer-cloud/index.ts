@@ -129,7 +129,7 @@ function put(state,name,a,nav=null){
   return {movement:finishMove(target,nav,walkSegment(nav,start.position,start.position[0]+d[0],start.position[2]+d[2]))};
  }
  if(name==='viewer_walk_path'){
-  // Straight segments through explicit [x,z] or [x,y,z] waypoints; stops at the first wall/ledge.
+  // Straight segments through [x,z] or [x,y,z] waypoints; 3D heights guide safe stair treads without bypassing step limits.
   const target=takeAvatar(state,str(a.avatar_id,200));state.selected_id=target.id;
   if(!nav)failure('NAV_GRID_UNAVAILABLE');
   const wps=a.waypoints;if(!Array.isArray(wps)||wps.length<1||wps.length>30)failure('INVALID_WAYPOINTS');
@@ -139,7 +139,7 @@ function put(state,name,a,nav=null){
   for(const w of wps){
    if(!Array.isArray(w)||(w.length!==2&&w.length!==3)||w.some(n=>typeof n!=='number'||!Number.isFinite(n)||Math.abs(n)>10000))failure('INVALID_WAYPOINTS');
    const [x,z]=w.length===2?w:[w[0],w[2]];
-   const seg=walkSegment(nav,cur,x,z);total+=seg.travelled;cur=seg.position;path.push(r3(cur));
+   const seg=walkSegment(nav,cur,x,z,w.length===3?w[1]:null);total+=seg.travelled;cur=seg.position;path.push(r3(cur));
    if(total>300)failure('PATH_LIMIT_300M');
    if(seg.blocked){blocked=seg.blocked;break;}
   }
