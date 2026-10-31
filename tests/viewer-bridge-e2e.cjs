@@ -21,6 +21,14 @@ async function main(){
  const browser=await chromium.launch({headless:true,args:['--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--no-sandbox']});
  try{
  const page=await browser.newPage({viewport:{width:1360,height:1100}});
+ // Models are owner-only in production (private storage + login). This test has no real login,
+ // so supabase-js is replaced in-memory by a stub whose "signed URL" points at the local repo copy.
+ // Production code paths (private-assets.js, SHA check, cache) still run; RLS itself is not exercised here.
+ await page.route('**/@supabase/supabase-js**',route=>route.fulfill({contentType:'text/javascript',body:`window.supabase={createClient(){return {
+  auth:{getSession:async()=>({data:{session:{access_token:'test-only'}},error:null}),onAuthStateChange(){return {data:{subscription:{unsubscribe(){}}}};}},
+  storage:{from(){return {createSignedUrl:async p=>({data:{signedUrl:'${CHILD}/model-viewer/'+p},error:null})};}},
+  rpc:async()=>({data:null,error:{message:'TEST_STUB_NO_DATABASE'}}),
+  from(){return {select(){return this;},eq(){return this;},maybeSingle:async()=>({data:null,error:null})};}};}};`}));
  page.on('pageerror',error=>console.error('PLAYWRIGHT_PAGE_ERROR',error.message));
  page.on('console',msg=>{if(msg.type()==='error')console.error('PLAYWRIGHT_CONSOLE_ERROR',msg.text());});
  await page.goto(PARENT);await page.waitForFunction(()=>window.ready?.render_ready,null,{timeout:90000});
