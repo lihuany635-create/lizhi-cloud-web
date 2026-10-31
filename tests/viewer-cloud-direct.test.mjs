@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {webcrypto} from 'node:crypto';
 if(!globalThis.crypto)Object.defineProperty(globalThis,'crypto',{value:webcrypto,configurable:true});
+import {encodeJpeg} from '../supabase/functions/lizhi-viewer-cloud/jpeg-encoder.mjs';
+const TEST_JPEG=Buffer.from(encodeJpeg(new Uint8Array(640*360*4).fill(128),640,360,60)).toString('base64');
 const SITE='appgprj_6ae0c336243881919e9ba2bbf450f1fb';
 const sha='80b4390068b5f78e805de7386ef53b9489d57f31f52e9a09ab1c01557fdf1c52';
 const token='a'.repeat(96);
@@ -10,13 +12,21 @@ const hex=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new T
 const tokenHash=await hex(token);
 let current={revision:0,state:{avatars:[],selected_id:null,camera:{mode:'free'},checkpoints:[]}};
 const requests=new Map();
-let screenshot=null;
+let screenshot=null,sceneReadHook=null,sceneReadCount=0,manifestSha=sha,glbFault=null,streamCancelled=false;
 const testEnv={SUPABASE_URL:'https://test.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'TEST_ONLY_SERVICE_KEY'};let glbDownloads=0;
 globalThis.Deno={env:{get:k=>testEnv[k]},serve(){}};
 globalThis.fetch=async(url,options={})=>{
  const u=String(url);
- if(u.endsWith('/storage/v1/object/lizhi-models/lahudi-academy.glb')){glbDownloads++;return new Response(readFileSync('model-viewer/lahudi-academy.glb'));}
- if(u.includes('current-models.json'))return Response.json({models:[{model:'lahudi-academy.glb',version:'R09',current_sha256:sha}]});
+ if(u.endsWith('/storage/v1/object/lizhi-models/lahudi-academy.glb')){
+  glbDownloads++;assert.equal(options.redirect,'manual');
+  if(glbFault==='header')return new Response('',{headers:{'content-length':'16777217'}});
+  if(glbFault==='redirect')return new Response('',{status:302,headers:{location:'https://unapproved.invalid/'}});
+  if(glbFault==='network')throw Error('TEST_ONLY_SERVICE_KEY');
+  if(glbFault==='stream'){let n=0;const chunk=new Uint8Array(1024*1024);return new Response(new ReadableStream({pull(c){if(n++<100)c.enqueue(chunk);else c.close();},cancel(){streamCancelled=true;}}));}
+  const data=readFileSync('model-viewer/lahudi-academy.glb');if(glbFault==='sha')data[0]^=1;
+  return new Response(data);
+ }
+ if(u.includes('current-models.json'))return Response.json({models:[{model:'lahudi-academy.glb',version:'R09',current_sha256:manifestSha}]});
  if(u.includes('/rest/v1/lizhi_viewer_config'))return Response.json([{token_hash:tokenHash}]);
  if(u.includes('/rest/v1/lizhi_viewer_cloud_scenes'))return Response.json([{model_key:'lahudi-academy',model_sha:sha,revision:current.revision}]);
  if(u.includes('/rest/v1/lizhi_viewer_cloud_snapshots?'))return Response.json(screenshot?[screenshot]:[]);
@@ -24,7 +34,7 @@ globalThis.fetch=async(url,options={})=>{
   const match=u.match(/request_id=eq\.([0-9a-f-]+)/);
   return Response.json(requests.has(match?.[1])?[requests.get(match[1])]:[]);
  }
- if(u.endsWith('/rpc/lizhi_viewer_cloud_read'))return Response.json({ok:true,...current,model_key:'lahudi-academy',model_sha:sha});
+ if(u.endsWith('/rpc/lizhi_viewer_cloud_read')){const answer={ok:true,...structuredClone(current),model_key:'lahudi-academy',model_sha:sha};if(sceneReadHook)await sceneReadHook(++sceneReadCount);return Response.json(answer);}
  if(u.endsWith('/rpc/lizhi_viewer_cloud_write')){
   const b=JSON.parse(options.body);
   if(requests.has(b.p_request))return Response.json(requests.get(b.p_request).response);
@@ -40,11 +50,11 @@ const renderURL=new URL('../supabase/functions/lizhi-viewer-cloud/render.mjs',im
 const source=readFileSync('supabase/functions/lizhi-viewer-cloud/index.ts','utf8').replace("'./nav.mjs'",JSON.stringify(navURL)).replace("'./render.mjs'",JSON.stringify(renderURL));
 const {handler}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
 const owner=SITE+':test-user';
-async function invoke(name,args={},withToken=true){
+async function invoke(name,args={},withToken=true,selectedHandler=handler){
  const req=new Request('https://test.supabase.co/functions/v1/lizhi-viewer-cloud',{method:'POST',
   headers:{authorization:'Bearer '+(withToken?token:'invalid'),'content-type':'application/json'},
   body:JSON.stringify({kind:'tool',owner,name,args})});
- const r=await handler(req);return {status:r.status,data:await r.json()};
+ const r=await selectedHandler(req);return {status:r.status,data:await r.json()};
 }
 test('rejects missing or invalid Site token',async()=>{
  const {status,data}=await invoke('viewer_status',{},false);
@@ -134,7 +144,7 @@ test('browser image opt-in and renderer evidence are explicit in viewer source',
 
 test('Site MCP exposes JPEG as an actual image block, not as base64 text',async()=>{
  const {viewerCloudToMcpContent}=await import('../sites-migration/viewer-cloud-direct/site-cloud-direct-mcp.mjs');
- const sample={ok:true,real_screenshot:true,image:{mimeType:'image/jpeg',data:'/9j/'+'A'.repeat(1100)},revision:5};
+ const sample={ok:true,real_screenshot:true,image:{mimeType:'image/jpeg',data:TEST_JPEG},revision:5};
  const blocks=viewerCloudToMcpContent(sample);
  assert.equal(blocks.length,2);assert.equal(blocks[1].type,'image');
  assert.equal(blocks[1].mimeType,'image/jpeg');assert.equal(JSON.parse(blocks[0].text).revision,5);
@@ -200,4 +210,55 @@ test('delayed capture completion revokes captured model after stop and model swi
  ctx.cloudCaptureEnabled=false;ctx.modelKey='model-b';ctx.sourceInfo={manifestVerified:true,actualSHA:'b'.repeat(64)};ctx.cloudKey='model-b|sha';
  resume();await capture;
  assert.equal(revoked.length,1);assert.equal(revoked[0].key,'model-a');assert.equal(revoked[0].sha,'a'.repeat(64));
+});
+
+test('Edge screenshot enforces the same required model fields as Site schema',async()=>{
+ for(const args of [{},{model_key:'lahudi-academy'},{model_sha:sha},{model_key:7,model_sha:sha}]){
+  const r=(await invoke('viewer_get_screenshot',args)).data;
+  assert.equal(r.ok,false);assert.equal(r.code,'MODEL_KEY_AND_SHA_REQUIRED');assert(!r.image);
+ }
+});
+test('cloud render refuses scene changes and revocation during an in-flight request',async()=>{
+ const saved=current;const base={revision:101,state:{avatars:[{id:'qa',position:[0,2.2,-120],mode:'first',yaw:0,pitch:0}],selected_id:'qa'}};
+ const args={model_key:'lahudi-academy',model_sha:sha,expected_revision:101};
+ try{
+  current=structuredClone(base);sceneReadCount=0;sceneReadHook=n=>{if(n===1)current.revision++;};
+  const changed=(await invoke('viewer_get_screenshot',args)).data;assert.equal(changed.code,'REVISION_CONFLICT');assert(!changed.image);
+  current=structuredClone(base);sceneReadCount=0;sceneReadHook=n=>{if(n===1)testEnv.LIZHI_VIEWER_RENDER_DISABLED='1';};
+  const stopped=(await invoke('viewer_get_screenshot',args)).data;assert.equal(stopped.code,'CLOUD_RENDER_REVOKED');assert(!stopped.image);
+  const stop=(await invoke('viewer_stop')).data;assert.equal(stop.render_revoked,true);
+ }finally{current=saved;sceneReadHook=null;delete testEnv.LIZHI_VIEWER_RENDER_DISABLED;}
+});
+test('only one render is admitted per isolate; no queue or browser fallback',async()=>{
+ const saved=current;let reached,release;
+ const entered=new Promise(r=>reached=r),gate=new Promise(r=>release=r);
+ current={revision:111,state:{avatars:[{id:'qa',position:[0,2.2,-120],mode:'first',yaw:0,pitch:0}],selected_id:'qa'}};
+ sceneReadCount=0;sceneReadHook=async n=>{if(n===1){reached();await gate;}};
+ const args={model_key:'lahudi-academy',model_sha:sha};
+ try{
+  const pending=invoke('viewer_get_screenshot',args);await entered;
+  const busy=(await invoke('viewer_get_screenshot',args)).data;assert.equal(busy.code,'CLOUD_RENDER_BUSY');assert(!busy.image);assert.equal(busy.requires_browser,false);
+  release();const done=(await pending).data;assert.equal(done.ok,true);assert.equal(done.source,'cloud_cpu_render');
+ }finally{release();current=saved;sceneReadHook=null;}
+});
+test('canonical manifest SHA is rechecked before returning a rendered frame',async()=>{
+ const saved=current;current={revision:112,state:{avatars:[{id:'qa',position:[0,2.2,-120],mode:'first',yaw:0,pitch:0}],selected_id:'qa'}};
+ sceneReadCount=0;sceneReadHook=n=>{if(n===2)manifestSha='c'.repeat(64);};
+ try{const r=(await invoke('viewer_get_screenshot',{model_key:'lahudi-academy',model_sha:sha})).data;assert.equal(r.code,'MODEL_VERSION_CONFLICT');assert(!r.image);}
+ finally{manifestSha=sha;sceneReadHook=null;current=saved;}
+});
+
+test('private GLB download failures and resource limits are bounded, sanitized and release render lock',async()=>{
+ const saved=current;current={revision:121,state:{avatars:[{id:'qa',position:[0,2.2,-120],mode:'first',yaw:0,pitch:0}],selected_id:'qa'}};
+ const args={model_key:'lahudi-academy',model_sha:sha};
+ try{
+  for(const [fault,code] of [['header','GLB_TOO_LARGE_FOR_EDGE'],['stream','GLB_TOO_LARGE_FOR_EDGE'],['sha','GLB_SHA_MISMATCH'],['redirect','GLB_DOWNLOAD_FAILED'],['network','VIEWER_CLOUD_ERROR']]){
+   const {handler:fresh}=await import('data:text/javascript;base64,'+Buffer.from(source+'\n// isolated resource fault '+fault).toString('base64'));
+   glbFault=fault;streamCancelled=false;const before=glbDownloads;
+   const r=(await invoke('viewer_get_screenshot',args,true,fresh)).data;
+   assert.equal(r.code,code);assert(!r.image);assert(!JSON.stringify(r).includes('TEST_ONLY_SERVICE_KEY'));assert.equal(glbDownloads,before+1);
+   if(fault==='stream')assert.equal(streamCancelled,true);
+   glbFault=null;const recovered=(await invoke('viewer_get_screenshot',args,true,fresh)).data;assert.equal(recovered.ok,true);
+  }
+ }finally{current=saved;glbFault=null;}
 });

@@ -8,15 +8,19 @@ import { encodeJpeg } from './jpeg-encoder.mjs';
 
 export const WIDTH = 640, HEIGHT = 360, VFOV_DEG = 45, EYE_HEIGHT = 1.6, THIRD_DISTANCE = 3.2, THIRD_LIFT = 0.5;
 
+export const MAX_TRIANGLES = 300000;
 const COMPONENT = { 5120: Int8Array, 5121: Uint8Array, 5122: Int16Array, 5123: Uint16Array, 5125: Uint32Array, 5126: Float32Array };
 const WIDTH_OF = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4, MAT4: 16 };
 
 function readAccessor(gltf, bin, index) {
   const a = gltf.accessors[index];
   if (!a || a.bufferView === undefined || a.sparse) throw Error('GLB_ACCESSOR_UNSUPPORTED');
-  const view = gltf.bufferViews[a.bufferView], Type = COMPONENT[a.componentType], n = WIDTH_OF[a.type];
-  if (!Type || !n) throw Error('GLB_ACCESSOR_UNSUPPORTED');
+  const view = gltf.bufferViews?.[a.bufferView], Type = COMPONENT[a.componentType], n = WIDTH_OF[a.type];
+  if (!view || (view.buffer ?? 0)!==0 || !Type || !n || a.normalized) throw Error('GLB_ACCESSOR_UNSUPPORTED');
+  if(!Number.isSafeInteger(a.count)||a.count<0||a.count*n>3000000)throw Error('MODEL_TOO_LARGE_FOR_CLOUD_RENDER');
   const size = Type.BYTES_PER_ELEMENT, start = (view.byteOffset || 0) + (a.byteOffset || 0), stride = view.byteStride || n * size;
+  const end = start + Math.max(0,a.count-1)*stride+n*size;
+  if(!Number.isSafeInteger(start)||start<0||!Number.isSafeInteger(stride)||stride<n*size||end>bin.byteLength||end>(view.byteOffset||0)+view.byteLength)throw Error('INVALID_GLB_ACCESSOR_BOUNDS');
   const out = new Type(a.count * n);
   if (stride === n * size && (bin.byteOffset + start) % size === 0) {
     out.set(new Type(bin.buffer, bin.byteOffset + start, a.count * n));
@@ -56,31 +60,38 @@ function materialInfo(m) {
 }
 
 /** Parse a GLB into flat world-space triangles in viewer coordinates. */
-export function parseModel(arrayBuffer) {
+export function parseModel(arrayBuffer, {deadline=Infinity}={}) {
+  if(!(arrayBuffer instanceof ArrayBuffer)||arrayBuffer.byteLength<28)throw Error('INVALID_GLB');
   const bytes = new Uint8Array(arrayBuffer), dv = new DataView(arrayBuffer);
-  if (dv.getUint32(0, true) !== 0x46546c67 || dv.getUint32(4, true) !== 2) throw Error('INVALID_GLB');
+  if (dv.getUint32(0, true) !== 0x46546c67 || dv.getUint32(4, true) !== 2 || dv.getUint32(8,true)!==arrayBuffer.byteLength || dv.getUint32(16,true)!==0x4e4f534a) throw Error('INVALID_GLB');
   const jsonLength = dv.getUint32(12, true);
+  if(jsonLength>bytes.byteLength-28)throw Error('INVALID_GLB');
   const gltf = JSON.parse(new TextDecoder().decode(bytes.subarray(20, 20 + jsonLength)));
   const binStart = 20 + jsonLength, binLength = dv.getUint32(binStart, true);
+  if(dv.getUint32(binStart+4,true)!==0x004e4942||binStart+8+binLength>bytes.byteLength||(gltf.buffers||[]).some(b=>b.uri))throw Error('INVALID_GLB');
   const bin = bytes.subarray(binStart + 8, binStart + 8 + binLength);
   const materials = (gltf.materials || []).map(materialInfo), fallback = materialInfo(null);
   const meshCache = new Map(), parts = [];
   let total = 0;
   const meshOf = (i) => {
     if (meshCache.has(i)) return meshCache.get(i);
+    if(!gltf.meshes?.[i]||(gltf.meshes[i].primitives||[]).some(p=>(p.mode??4)!==4||p.targets||p.extensions?.KHR_draco_mesh_compression))throw Error('GLB_PRIMITIVE_UNSUPPORTED');
     const prims = gltf.meshes[i].primitives.filter((p) => (p.mode ?? 4) === 4 && p.attributes?.POSITION !== undefined)
       .map((p) => ({ pos: readAccessor(gltf, bin, p.attributes.POSITION), idx: p.indices !== undefined ? readAccessor(gltf, bin, p.indices) : null, mat: materials[p.material] || fallback }));
     meshCache.set(i, prims); return prims;
   };
   const visit = (index, parent, depth) => {
     if (depth > 64) throw Error('GLB_NODE_DEPTH');
-    const node = gltf.nodes[index], world = multiply(parent, localMatrix(node));
-    if (node.mesh !== undefined) for (const p of meshOf(node.mesh)) { parts.push([world, p]); total += (p.idx ? p.idx.length : p.pos.length / 3) / 3; }
+    if(performance.now()>deadline)throw Error('CLOUD_RENDER_BUDGET_EXCEEDED');
+    const node = gltf.nodes?.[index];if(!node||node.skin!==undefined)throw Error('GLB_NODE_UNSUPPORTED');
+    const world = multiply(parent, localMatrix(node));
+    if (node.mesh !== undefined) for (const p of meshOf(node.mesh)) { parts.push([world, p]); const count=p.idx?p.idx.length:p.pos.length/3;if(count%3)throw Error('GLB_PRIMITIVE_UNSUPPORTED');total += count/3;if(total>MAX_TRIANGLES)throw Error('MODEL_TOO_LARGE_FOR_CLOUD_RENDER'); }
     for (const child of node.children || []) visit(child, world, depth + 1);
   };
   const identity = Float64Array.from([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
   for (const root of gltf.scenes?.[gltf.scene || 0]?.nodes || []) visit(root, identity, 0);
-  if (total > 1_500_000) throw Error('MODEL_TOO_LARGE_FOR_CLOUD_RENDER');
+  if(total===0)throw Error('GLB_NO_RENDERABLE_TRIANGLES');
+  if(total>MAX_TRIANGLES)throw Error('MODEL_TOO_LARGE_FOR_CLOUD_RENDER');
 
   const tris = new Float32Array(total * 9), colors = new Float32Array(total * 3), emissive = new Float32Array(total * 3), translucent = new Uint8Array(total);
   let t = 0, minY = Infinity;
@@ -88,9 +99,12 @@ export function parseModel(arrayBuffer) {
   for (const [m, p] of parts) {
     const a = p.pos, ix = p.idx, count = ix ? ix.length : a.length / 3;
     for (let i = 0; i + 2 < count; i += 3, t++) {
+      if((t&255)===0&&performance.now()>deadline)throw Error('CLOUD_RENDER_BUDGET_EXCEEDED');
       for (let v = 0; v < 3; v++) {
         const k = (ix ? ix[i + v] : i + v) * 3, x = a[k], y = a[k + 1], z = a[k + 2], o = t * 9 + v * 3;
+        if(!Number.isSafeInteger(k)||k<0||k+2>=a.length)throw Error('INVALID_GLB_INDEX');
         const wx = m[0] * x + m[4] * y + m[8] * z + m[12], wy = m[1] * x + m[5] * y + m[9] * z + m[13], wz = m[2] * x + m[6] * y + m[10] * z + m[14];
+        if(![wx,wy,wz].every(Number.isFinite))throw Error('INVALID_GLB_POSITION');
         tris[o] = wx; tris[o + 1] = wy; tris[o + 2] = wz;
         if (wy < minY) minY = wy;
         if (wx < min[0]) min[0] = wx; if (wx > max[0]) max[0] = wx; if (wz < min[2]) min[2] = wz; if (wz > max[2]) max[2] = wz; if (wy > max[1]) max[1] = wy;
@@ -106,9 +120,11 @@ export function parseModel(arrayBuffer) {
 
 /** Camera that matches the web viewer's cloud-follow mode for this avatar. */
 export function avatarCamera(avatar) {
+  if(!Array.isArray(avatar?.position)||avatar.position.length!==3||!avatar.position.every(n=>Number.isFinite(n)&&Math.abs(n)<=10000)||![avatar.yaw??0,avatar.pitch??0].every(Number.isFinite))throw Error('INVALID_AVATAR_CAMERA');
   const yaw = Number(avatar.yaw) || 0, pitch = Number(avatar.pitch) || 0, [x, y, z] = avatar.position;
   const eye = [x, y + EYE_HEIGHT, z], d = [Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch)];
   const mode = ['first', 'third', 'free', 'top'].includes(avatar.mode) ? avatar.mode : 'first';
+  if(mode==='top')return {mode,position:[eye[0],eye[1]+10,eye[2]],target:eye,hide_selected:false};
   if (mode === 'first') return { mode, position: eye, target: [eye[0] + d[0], eye[1] + d[1], eye[2] + d[2]], hide_selected: true };
   return { mode, position: [eye[0] - THIRD_DISTANCE * d[0], eye[1] - THIRD_DISTANCE * d[1] + THIRD_LIFT, eye[2] - THIRD_DISTANCE * d[2]], target: eye, hide_selected: false };
 }
@@ -137,7 +153,7 @@ function avatarBoxes(avatars, hideId, selectedId) {
 }
 
 /** Render one frame. Returns RGBA pixels plus the camera actually used. */
-export function renderFrame(model, camera, avatars = [], selectedId = null, width = WIDTH, height = HEIGHT) {
+export function renderFrame(model, camera, avatars = [], selectedId = null, width = WIDTH, height = HEIGHT, {deadline=Infinity}={}) {
   const eye = camera.position, f = norm([camera.target[0] - eye[0], camera.target[1] - eye[1], camera.target[2] - eye[2]]);
   let s = cross(f, [0, 1, 0]); if (Math.hypot(...s) < 1e-6) s = [1, 0, 0]; s = norm(s);
   const u = cross(s, f), fy = 1 / Math.tan(VFOV_DEG * Math.PI / 360), fx = fy * height / width, NEAR = 0.05;
@@ -150,7 +166,9 @@ export function renderFrame(model, camera, avatars = [], selectedId = null, widt
   const cam = new Float64Array(9), clip = [], poly = [];
   let drawn = 0;
 
+  let rasterCalls=0;
   const raster = (wv, base, emit, alpha) => {
+    if((rasterCalls++&63)===0&&performance.now()>deadline)throw Error('CLOUD_RENDER_BUDGET_EXCEEDED');
     // wv: 9 world coords. Flat shading with a camera-facing normal (double-sided surfaces).
     const e1 = [wv[3] - wv[0], wv[4] - wv[1], wv[5] - wv[2]], e2 = [wv[6] - wv[0], wv[7] - wv[1], wv[8] - wv[2]];
     let n = norm(cross(e1, e2));
@@ -184,6 +202,7 @@ export function renderFrame(model, camera, avatars = [], selectedId = null, widt
       if (minX > maxX || minY > maxY) continue;
       const inv = 1 / area;
       for (let py = minY; py <= maxY; py++) {
+        if((py&31)===0&&performance.now()>deadline)throw Error('CLOUD_RENDER_BUDGET_EXCEEDED');
         const qy = py + 0.5;
         for (let px = minX; px <= maxX; px++) {
           const qx = px + 0.5;
@@ -221,11 +240,11 @@ export function renderFrame(model, camera, avatars = [], selectedId = null, widt
 }
 
 /** Render the current avatar view and encode it as JPEG. */
-export function renderAvatarJpeg(model, state, avatarId, quality = 82) {
+export function renderAvatarJpeg(model, state, avatarId, quality = 82, options={}) {
   const avatar = state.avatars.find((a) => a.id === avatarId);
   if (!avatar) throw Error('AVATAR_NOT_FOUND');
   const camera = avatarCamera(avatar);
-  const frame = renderFrame(model, camera, state.avatars, avatarId);
+  const frame = renderFrame(model, camera, state.avatars, avatarId, WIDTH, HEIGHT, options);
   const jpeg = encodeJpeg(frame.rgba, frame.width, frame.height, quality);
   const round = (v) => v.map((n) => Math.round(n * 1000) / 1000);
   return { jpeg, triangles_drawn: frame.triangles_drawn,

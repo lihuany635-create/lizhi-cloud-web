@@ -1,9 +1,9 @@
 // Drop-in contract for the ORIGINAL private "立之 3D 檢視器代理" Site.
 // Replace existing browser-session viewer tools; do NOT create a new Site.
 // The Site MUST establish authenticated owner; never accept owner from MCP args.
-const str=(maxLength=200)=>({type:'string',maxLength});
+const str=(maxLength=200)=>({type:'string',minLength:1,maxLength});
 const num={type:'number',minimum:-10000,maximum:10000},vec={type:'array',items:num,minItems:3,maxItems:3};
-const model={model_key:{type:'string',maxLength:80},model_sha:{type:'string',pattern:'^[a-f0-9]{64}$'}};
+const model={model_key:{type:'string',minLength:2,maxLength:80,pattern:'^[a-z0-9_-]{2,80}$'},model_sha:{type:'string',pattern:'^[a-f0-9]{64}$'}};
 const write={...model,request_id:{type:'string',format:'uuid'},expected_revision:{type:'integer',minimum:0}};
 const defs=[
  ['viewer_status','直接讀取雲端模型操作狀態；不需瀏覽器或連線按鈕。',{},[],true],
@@ -20,7 +20,7 @@ const defs=[
  ['viewer_get_screenshot','由雲端伺服器載入正式 GLB，依目前雲端場景與所選人偶的鏡頭（第一人稱／第三人稱）即時渲染一張 640×360 JPEG 並以圖片回傳；不需電腦或瀏覽器在線。可帶 expected_revision 確認狀態，不符即拒絕；可帶 avatar_id 指定人偶（預設為目前選取）。簡化渲染：基本色與光照，無貼圖、陰影、反射。',{...model,expected_revision:{type:'integer',minimum:0},avatar_id:str()},['model_key','model_sha'],true],
  ['viewer_save_checkpoint','儲存雲端巡查位置及未視覺驗證筆記；截圖綁定的發現目前拒絕。',{...write,note:{type:'string',maxLength:2000},findings:{type:'array',maxItems:30,items:{type:'object'}}},['model_key','model_sha','expected_revision','request_id'],false],
  ['viewer_delete_avatar','從雲端狀態中刪除指定人偶，不修改 GLB。',{...write,avatar_id:str()},['model_key','model_sha','expected_revision','request_id','avatar_id'],false],
- ['viewer_stop','確認此雲端模式沒有待執行的瀏覽器操作或持續工作階段。',{},[],true]
+ ['viewer_stop','讀取無持續佇列的狀態及管理停用結果；此唯讀工具不會自行撤銷雲端渲染。需停止截圖時由 AI 依授權操作既有 Sites 管理停用設定，再驗證截圖拒絕。',{},[],true]
 ];
 export const VIEWER_CLOUD_TOOLS=defs.map(([name,description,properties,required,readonly])=>({name,description,inputSchema:{type:'object',properties,required,additionalProperties:false},annotations:{readOnlyHint:readonly,destructiveHint:name==='viewer_delete_avatar',idempotentHint:readonly}}));
 export const VIEWER_CLOUD_EDGE='https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-viewer-cloud';

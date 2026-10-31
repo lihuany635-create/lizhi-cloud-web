@@ -24,6 +24,7 @@ export function validate(name,args){
 export async function invoke(name,args,identity,env,fetcher=fetch){
  validate(name,args);
  if(!identity)throw Error('OWNER_AUTH_REQUIRED');
+ if(name==='viewer_get_screenshot'&&env.VIEWER_RENDER_DISABLED==='1')throw Error('CLOUD_RENDER_REVOKED');
  const boundedFetch=async(url,options)=>{
   if(url!==VIEWER_CLOUD_EDGE||options.method!=='POST'||options.redirect!=='manual')throw Error('UPSTREAM_ROUTE_REJECTED');
   let response;
@@ -41,12 +42,19 @@ export async function invoke(name,args,identity,env,fetcher=fetch){
  catch(e){if(e instanceof SyntaxError)throw Error('UPSTREAM_INVALID_RESULT_DO_NOT_RETRY');throw e;}
  if(!value||typeof value.ok!=='boolean'||(name!=='viewer_get_screenshot'&&Object.hasOwn(value,'image')))throw Error('UPSTREAM_INVALID_RESULT_DO_NOT_RETRY');
  if(name==='viewer_get_screenshot'&&value.ok){
-  if(value.real_screenshot!==true||value.model_key!==args.model_key||value.model_sha!==args.model_sha
+  if(value.real_screenshot!==true||value.source!=='cloud_cpu_render'||value.requires_browser!==false||value.render_attested!==true||value.model_key!==args.model_key||value.model_sha!==args.model_sha
+   ||(args.expected_revision!==undefined&&value.revision!==args.expected_revision)
+   ||(args.avatar_id!==undefined&&value.avatar_id!==args.avatar_id)
+   ||!value.camera||!['first','third','top','free'].includes(value.camera.mode)||value.camera.width!==640||value.camera.height!==360
+   ||![value.camera.position,value.camera.target].every(v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite))
+   ||typeof value.limitations!=='string'||!value.limitations
    ||!Number.isSafeInteger(value.revision)||value.revision<0||typeof value.avatar_id!=='string'||!value.avatar_id
    ||!Number.isFinite(Date.parse(value.captured_at))||Date.now()-Date.parse(value.captured_at)>90000
    ||Date.parse(value.captured_at)>Date.now()+5000||viewerCloudToMcpContent(value).length!==2)
    throw Error('UPSTREAM_INVALID_SCREENSHOT');
  }
+ if(name==='viewer_status'&&env.VIEWER_RENDER_DISABLED==='1')return {...value,cloud_rendering:false,render_revoked:true};
+ if(name==='viewer_stop'&&env.VIEWER_RENDER_DISABLED==='1')return {...value,render_revoked:true,details:'Site render gate is disabled by owner-managed runtime setting; navigation remains available. Delivered images and committed writes cannot be recalled.'};
  return value;
 }
 export async function handle(request,env,page,fetcher=fetch){
@@ -71,7 +79,7 @@ export async function handle(request,env,page,fetcher=fetch){
   result={tools:TOOLS};
   if(u.pathname==='/mcp'){
    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(TOOLS)));
-   console.info(JSON.stringify({event:'viewer_mcp_discovery',release:'v9',count:TOOLS.length,names:TOOLS.map(t=>t.name),schema_sha256:[...new Uint8Array(digest)].map(n=>n.toString(16).padStart(2,'0')).join('')}));
+   console.info(JSON.stringify({event:'viewer_mcp_discovery',release:'cloud-cpu-candidate',count:TOOLS.length,names:TOOLS.map(t=>t.name),schema_sha256:[...new Uint8Array(digest)].map(n=>n.toString(16).padStart(2,'0')).join('')}));
   }
  }
  else if(b.method==='tools/call'){

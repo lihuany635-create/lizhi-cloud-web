@@ -756,7 +756,9 @@ function JPEGEncoder(quality) {
 	
 			writeWord(0xFFD9); //EOI
 
-			return new Uint8Array(byteout);
+			var encoded = new Uint8Array(byteout);
+      byteout = [];
+      return encoded;
 
 			var jpegDataUri = 'data:image/jpeg;base64,' + btoa(byteout.join(''));
 			
@@ -811,7 +813,11 @@ function JPEGEncoder(quality) {
 };
 
 
+// Encoding is synchronous. Reuse lookup tables rather than allocating ~65k bitcode arrays per frame.
+let sharedEncoder=null;
 /** Encode RGBA pixels (Uint8Array/Uint8ClampedArray, width*height*4) as a baseline JPEG. */
 export function encodeJpeg(data, width, height, quality = 82) {
-  return new JPEGEncoder(quality).encode({ data, width, height }, quality);
+  if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||width>640||height>360||!ArrayBuffer.isView(data)||data.byteLength!==width*height*4||!Number.isFinite(quality)||quality<1||quality>100)throw Error('INVALID_JPEG_INPUT');
+  sharedEncoder ||= new JPEGEncoder(quality);
+  return sharedEncoder.encode({ data, width, height }, quality);
 }
