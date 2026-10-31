@@ -1148,9 +1148,17 @@ const CLOUD_WALK=1.6; // m/s along the returned path
 // Optional authenticated owner-browser capture. OFF by default and never persisted.
 let cloudCaptureEnabled=false,cloudCaptureUntil=0,cloudCaptureBusy=false,cloudCaptureLastRevision=-1;
 const CLOUD_CAPTURE_WINDOW_MS=30*60*1000;
+function cloudCaptureRevoke(){
+ if(!modelKey||!sourceInfo?.manifestVerified)return;
+ const sb=cloudSupabase();
+ if(sb)sb.rpc('lizhi_viewer_cloud_snapshot_revoke',{p_model_key:modelKey,p_model_sha:sourceInfo.actualSHA})
+  .then(({error})=>{if(error)console.warn('Snapshot revocation failed:',error);})
+  .catch(e=>console.warn('Snapshot revocation failed:',e));
+}
 function cloudCaptureSet(on){
+ const was=cloudCaptureEnabled;
  cloudCaptureEnabled=!!on;cloudCaptureUntil=on?Date.now()+CLOUD_CAPTURE_WINDOW_MS:0;
- if(!on)cloudCaptureLastRevision=-1;
+ if(!on){cloudCaptureLastRevision=-1;if(was)cloudCaptureRevoke();}
  $('tCloudCapture').setAttribute('aria-pressed',String(cloudCaptureEnabled));
  $('tCloudCapture').textContent=on?'停止分享巡查畫面':'共享 AI 巡查畫面';
 }
@@ -1190,7 +1198,7 @@ async function cloudCaptureFrame(sb,key){
  }catch(e){
   console.warn('Browser WebGL capture not committed:',e);
   cloudSay('巡查畫面上傳失敗（僅瀏覽器中顯示，不代表 AI 已取得圖片）');
- }finally{cloudCaptureBusy=false;}
+ }finally{cloudCaptureBusy=false;if(!cloudCaptureEnabled)cloudCaptureRevoke();}
 }
 function cloudSupabase(){
   if(cloudClient)return cloudClient;
