@@ -23,6 +23,8 @@ AS $$
 DECLARE s record; frame bytea; matching_owners bigint;
 BEGIN
   IF auth.uid() IS NULL OR NOT public.lizhi_web_is_allowed() THEN RAISE EXCEPTION 'FORBIDDEN'; END IF;
+  -- Every upload also sweeps expired frames, so storage never accumulates.
+  PERFORM public.lizhi_viewer_cloud_snapshot_purge(300);
   IF p_model_key !~ '^[a-z0-9_-]{2,80}$'
      OR p_model_sha !~ '^[a-f0-9]{64}$'
      OR p_revision IS NULL OR p_revision < 0
@@ -94,3 +96,31 @@ END;
 $$;
 REVOKE ALL ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) TO authenticated;
+
+-- Retention: frames are short-lived evidence, never an archive. Anything older than the
+-- given age (minimum 60 s) is deleted. Not callable by browsers; used by submit, the Edge
+-- read path (90 s, same window it accepts) and a 5-minute pg_cron sweep when available.
+CREATE OR REPLACE FUNCTION public.lizhi_viewer_cloud_snapshot_purge(p_max_age_seconds integer DEFAULT 300)
+RETURNS integer
+LANGUAGE sql SECURITY DEFINER SET search_path=''
+AS $$
+ WITH gone AS (
+  DELETE FROM public.lizhi_viewer_cloud_snapshots
+  WHERE captured_at < pg_catalog.now()
+    - pg_catalog.make_interval(secs => GREATEST(coalesce(p_max_age_seconds,300),60))
+  RETURNING 1)
+ SELECT pg_catalog.count(*)::integer FROM gone;
+$$;
+REVOKE ALL ON FUNCTION public.lizhi_viewer_cloud_snapshot_purge(integer) FROM PUBLIC, anon, authenticated;
+DO $grant$ BEGIN
+ IF EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname='service_role') THEN
+  GRANT EXECUTE ON FUNCTION public.lizhi_viewer_cloud_snapshot_purge(integer) TO service_role;
+ END IF;
+END $grant$;
+DO $cron$ BEGIN
+ CREATE EXTENSION IF NOT EXISTS pg_cron;
+ PERFORM cron.schedule('lizhi-viewer-snapshot-purge','*/5 * * * *',
+   'SELECT public.lizhi_viewer_cloud_snapshot_purge(300)');
+EXCEPTION WHEN OTHERS THEN
+ RAISE NOTICE 'pg_cron unavailable (%); frames are still purged on upload and on MCP read', SQLERRM;
+END $cron$;

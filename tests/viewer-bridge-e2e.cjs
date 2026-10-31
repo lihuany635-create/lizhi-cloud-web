@@ -30,7 +30,7 @@ async function main(){
   rpc:async(name,args)=>{
     if(name==='lizhi_viewer_cloud_browser_read')return {data:window.__bridgeCloudState||{ok:true,revision:0,state:{avatars:[],selected_id:null}},error:null};
     if(name==='lizhi_viewer_cloud_snapshot_submit'){window.__bridgeCloudFrame=args;return {data:{ok:true},error:null};}
-    if(name==='lizhi_viewer_cloud_snapshot_revoke'){window.__bridgeCloudRevokes=(window.__bridgeCloudRevokes||0)+1;return {data:{ok:true},error:null};}
+    if(name==='lizhi_viewer_cloud_snapshot_revoke'){window.__bridgeCloudRevokes=(window.__bridgeCloudRevokes||0)+1;return window.__bridgeRevokeFail?{data:null,error:{message:'TEST_REVOKE_FAILURE'}}:{data:{ok:true,revoked:true},error:null};}
     return {data:null,error:{message:'TEST_STUB_NO_DATABASE'}};
   },
   from(){return {select(){return this;},eq(){return this;},maybeSingle:async()=>({data:null,error:null})};}};}};`}));
@@ -94,13 +94,16 @@ async function main(){
  // renderer and actual academy GLB, but mocks the authenticated browser RPC.
  const child=page.frames().find(f=>f.url().includes('/model-viewer/'));
  assert(child,'loaded academy iframe');
+ // Poll with plain evaluate calls: Playwright's in-frame waitForFunction can starve while the
+ // software WebGL renderer keeps the iframe busy (observed locally; CI passed by timing luck).
+ const until=async(fn,arg,ms,what)=>{const end=Date.now()+ms;while(Date.now()<end){if(await child.evaluate(fn,arg))return;await child.waitForTimeout(250);}throw Error('Timed out waiting for '+what);};
  const activePosition=state.avatars[0].position;
  await child.evaluate(pos=>{window.__bridgeCloudState={ok:true,revision:101,
    state:{selected_id:'bridge-cloud-avatar',avatars:[{id:'bridge-cloud-avatar',name:'Capture QA',
    position:pos,yaw:0,pitch:0,mode:'first',last_path:null}]}};},activePosition);
  assert.equal(await child.locator('#tCloudCapture').getAttribute('aria-pressed'),'false');
  await child.locator('#tCloudCapture').click();
- await child.waitForFunction(()=>!!window.__bridgeCloudFrame,null,{timeout:30000});
+ await until(()=>!!window.__bridgeCloudFrame,null,30000,'browser frame upload');
  const sent=await child.evaluate(()=>window.__bridgeCloudFrame);
  assert.equal(sent.p_model_key,'lahudi-academy');
  assert.equal(sent.p_model_sha,expected);
@@ -111,10 +114,20 @@ async function main(){
  assert.equal(uploadedJpeg[0],0xff);assert.equal(uploadedJpeg[1],0xd8);
  assert.equal(uploadedJpeg.at(-2),0xff);assert.equal(uploadedJpeg.at(-1),0xd9);
  await fs.writeFile('viewer-qa-evidence/academy-cloud-browser-frame.jpg',uploadedJpeg);
+ // Stop sharing while the cloud delete fails: the page must say so and offer a retry.
+ await child.evaluate(()=>{window.__bridgeRevokeFail=true;});
  await child.locator('#tCloudCapture').click();
- await child.waitForFunction(()=>window.__bridgeCloudRevokes>0,null,{timeout:15000});
+ await until(()=>window.__bridgeCloudRevokes>0&&document.getElementById('cloudText').textContent.includes('未能刪除'),null,15000,'failed-revoke notice');
  assert.equal(await child.locator('#tCloudCapture').getAttribute('aria-pressed'),'false');
- console.log('PASS CLOUD BROWSER WEBGL: 640x360 owner-consent image submitted and revoked (mock RPC, actual GLB).');
+ assert.equal((await child.locator('#tCloudCapture').textContent()).trim(),'重試刪除雲端畫面');
+ // Retry succeeds: confirmed deletion is reported and the button returns to normal.
+ await child.evaluate(()=>{window.__bridgeRevokeFail=false;});
+ const before=await child.evaluate(()=>window.__bridgeCloudRevokes);
+ await child.locator('#tCloudCapture').click();
+ await until(n=>window.__bridgeCloudRevokes>n&&document.getElementById('cloudText').textContent.includes('已刪除'),before,15000,'confirmed delete');
+ assert.equal((await child.locator('#tCloudCapture').textContent()).trim(),'共享 AI 巡查畫面');
+ assert.equal(await child.locator('#tCloudCapture').getAttribute('aria-pressed'),'false');
+ console.log('PASS CLOUD BROWSER WEBGL: 640x360 owner-consent image submitted; failed revoke shown with retry; retry confirmed delete (mock RPC, actual GLB).');
  await fs.writeFile('viewer-qa-evidence/report.json',JSON.stringify({status:'PASS',scope:'real academy GLB + Chromium WebGL + postMessage bridge; production Site/DB chain NOT covered',model_sha:expected,checks:['5 avatars','isolated movement','camera first/third/top/free','real JPEG','screenshot-bound findings','unknown evidence rejected','stale revision rejected','delete','STOP blocks new commands']},null,2));
  console.log('PASS REAL WEBGL BRIDGE: academy SHA, five avatars, cameras, movement, JPEG, screenshot-bound checkpoint payload, stale CAS rejection, delete, STOP. Production Site E2E remains separate.');
  }finally{await browser.close();server.close();parent.close();}

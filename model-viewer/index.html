@@ -1150,12 +1150,24 @@ const CLOUD_WALK=1.6; // m/s along the returned path
 // Optional authenticated owner-browser capture. OFF by default and never persisted.
 let cloudCaptureEnabled=false,cloudCaptureUntil=0,cloudCaptureBusy=false,cloudCaptureLastRevision=-1,cloudCaptureLastAt=0,cloudCaptureCount=0;
 const CLOUD_CAPTURE_WINDOW_MS=30*60*1000;
+// Revocation deletes the last shared frame in the cloud. The result is shown on screen:
+// a failed delete is never reported as "stopped", and the button offers a retry.
+let cloudCaptureRevokePending=null;
 function cloudCaptureRevoke(){
- if(!modelKey||!sourceInfo?.manifestVerified)return;
+ if(!modelKey||!sourceInfo?.manifestVerified)return Promise.resolve(true);
+ const target={key:modelKey,sha:sourceInfo.actualSHA};
  const sb=cloudSupabase();
- if(sb)sb.rpc('lizhi_viewer_cloud_snapshot_revoke',{p_model_key:modelKey,p_model_sha:sourceInfo.actualSHA})
-  .then(({error})=>{if(error)console.warn('Snapshot revocation failed:',error);})
-  .catch(e=>console.warn('Snapshot revocation failed:',e));
+ const done=ok=>{
+  cloudCaptureRevokePending=ok?null:target;
+  const b=$('tCloudCapture');
+  if(!cloudCaptureEnabled)b.textContent=ok?'共享 AI 巡查畫面':'重試刪除雲端畫面';
+  cloudSay(ok?'已停止共享，雲端最後一張畫面已刪除':'已停止擷取，但雲端最後一張畫面未能刪除（最多保留 5 分鐘後自動清除）。請按「重試刪除雲端畫面」。');
+  return ok;
+ };
+ if(!sb)return Promise.resolve(done(false));
+ return sb.rpc('lizhi_viewer_cloud_snapshot_revoke',{p_model_key:target.key,p_model_sha:target.sha})
+  .then(({data,error})=>done(!error&&data?.revoked===true))
+  .catch(()=>done(false));
 }
 function cloudCaptureSet(on){
  const was=cloudCaptureEnabled;
@@ -1167,7 +1179,7 @@ function cloudCaptureSet(on){
 }
 async function cloudCaptureFrame(sb,key){
  if(!cloudCaptureEnabled||cloudCaptureBusy)return;
- if(Date.now()>cloudCaptureUntil||cloudCaptureCount>=80){cloudCaptureSet(false);cloudSay('巡查畫面分享已自動停止（時限或80張上限）');return;}
+ if(Date.now()>cloudCaptureUntil||cloudCaptureCount>=80){cloudCaptureSet(false);return;}
  if(document.hidden||agentActive||window.GLBPreview.active||!cloudOn||!cloudFollowOn||!model||!sourceInfo?.manifestVerified)return;
  if(cloudRev<0||cloudCaptureLastRevision===cloudRev||!cloudSelected||!cloudFigs.has(cloudSelected))return;
  // Limit storage writes and egress (one 640x360 frame per 10 seconds, at most 80 per consent).
@@ -1272,7 +1284,8 @@ function cloudFollowSet(on){
 $('tCloud').onclick=()=>cloudSet(!cloudOn);
 $('cloudFollow').onclick=()=>cloudFollowSet(!cloudFollowOn);
 $('tCloudCapture').onclick=()=>{
- if(cloudCaptureEnabled){cloudCaptureSet(false);cloudSay('已停止共享巡查畫面');return;}
+ if(cloudCaptureEnabled){cloudCaptureSet(false);cloudSay('正在停止並刪除雲端畫面…');return;}
+ if(cloudCaptureRevokePending){cloudSay('正在重試刪除雲端畫面…');cloudCaptureRevoke();return;}
  if(!model||!sourceInfo?.manifestVerified||window.GLBPreview.active){cloudSay('請先登入並載入已登記版本的 GLB');return;}
  if(!cloudOn)cloudSet(true);
  if(!cloudFollowOn)cloudFollowSet(true);

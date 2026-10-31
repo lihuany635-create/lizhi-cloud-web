@@ -120,4 +120,38 @@ DO $test$ BEGIN
   RAISE EXCEPTION 'FRAME_STILL_STORED_AFTER_REVOKE';
  END IF;
 END $test$;
+-- Retention: browsers cannot call purge; expired frames are removed, fresh ones kept,
+-- and a new upload sweeps expired frames by itself.
+DO $test$ BEGIN
+ IF has_function_privilege('authenticated','public.lizhi_viewer_cloud_snapshot_purge(integer)','EXECUTE')
+   OR has_function_privilege('anon','public.lizhi_viewer_cloud_snapshot_purge(integer)','EXECUTE') THEN
+  RAISE EXCEPTION 'PURGE_CALLABLE_FROM_BROWSER';
+ END IF;
+END $test$;
+INSERT INTO public.lizhi_viewer_cloud_snapshots(owner_id,model_key,model_sha,revision,avatar_id,jpeg_b64,captured_at)
+ VALUES ('appgprj_6ae0c336243881919e9ba2bbf450f1fb:only-owner','old-model',repeat('b',64),1,'x','/9j/old',now()-interval '10 minutes'),
+        ('appgprj_6ae0c336243881919e9ba2bbf450f1fb:only-owner','fresh-model',repeat('c',64),1,'x','/9j/new',now());
+DO $test$ DECLARE n integer; BEGIN
+ n := public.lizhi_viewer_cloud_snapshot_purge(300);
+ IF n <> 1 OR EXISTS (SELECT 1 FROM public.lizhi_viewer_cloud_snapshots WHERE model_key='old-model')
+   OR NOT EXISTS (SELECT 1 FROM public.lizhi_viewer_cloud_snapshots WHERE model_key='fresh-model') THEN
+  RAISE EXCEPTION 'PURGE_WRONG_ROWS';
+ END IF;
+ IF public.lizhi_viewer_cloud_snapshot_purge(1) <> 0 THEN RAISE EXCEPTION 'PURGE_BELOW_60S_FLOOR'; END IF;
+END $test$;
+UPDATE public.lizhi_viewer_cloud_snapshots SET captured_at=now()-interval '10 minutes' WHERE model_key='fresh-model';
+SET ROLE authenticated;
+SET request.jwt.claim.sub = '11111111-1111-4111-8111-111111111111';
+SET request.jwt.claim.email = 'approved@example.invalid';
+DO $test$ DECLARE picture text; BEGIN
+ picture := replace(pg_catalog.encode(pg_catalog.decode('ffd8ff','hex')
+  || pg_catalog.decode(repeat('00',1100),'hex') || pg_catalog.decode('ffd9','hex'),'base64'), E'\n','');
+ PERFORM public.lizhi_viewer_cloud_snapshot_submit('lahudi-academy',repeat('a',64),5,'avatar-one',picture);
+END $test$;
+RESET ROLE;
+DO $test$ BEGIN
+ IF EXISTS (SELECT 1 FROM public.lizhi_viewer_cloud_snapshots WHERE model_key='fresh-model') THEN
+  RAISE EXCEPTION 'UPLOAD_DID_NOT_SWEEP_EXPIRED';
+ END IF;
+END $test$;
 SELECT 'VIEWER_SNAPSHOT_SQL_ISOLATION_PASS' AS result;

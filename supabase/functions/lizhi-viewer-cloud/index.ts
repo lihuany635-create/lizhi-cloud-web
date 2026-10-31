@@ -211,6 +211,8 @@ async function run(owner,name,a){
   // for the SAME canonical GLB SHA, scene revision and selected cloud avatar.
   fields(a,['model_key','model_sha']);
   const key=nameKey(a.model_key),m=await modelOf(key,a.model_sha);
+  // Delete frames older than the 90 s read window before reading (best effort; pg_cron also sweeps).
+  try{await rpc('lizhi_viewer_cloud_snapshot_purge',{p_max_age_seconds:90});}catch(_e){}
   const rows=await rest('lizhi_viewer_cloud_snapshots?owner_id=eq.'+encodeURIComponent(owner)
    +'&model_key=eq.'+encodeURIComponent(key)
    +'&model_sha=eq.'+m.current_sha256
