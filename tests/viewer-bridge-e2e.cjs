@@ -63,6 +63,13 @@ async function main(){
  // whole-model camera for image-content assertions, without altering geometry.
  await write('viewer_set_camera',{avatar_id:created[1],mode:'free',position:overview.position,target:overview.target});
  const shot=await command('viewer_get_screenshot');assert.equal(shot.image.mimeType,'image/jpeg');const bytes=Buffer.from(shot.image.data,'base64');
+ // Test the production-bound MCP output encoder against actual rendered JPEG bytes.
+ // This is the adapter's image block shape, not an end-to-end deployed Site result.
+ const {viewerCloudToMcpContent}=await import('../sites-migration/viewer-cloud-direct/site-cloud-direct-mcp.mjs');
+ const mcpContent=viewerCloudToMcpContent({ok:true,source:'test_webgl_frame',image:shot.image});
+ assert.equal(mcpContent[1]?.type,'image');assert.equal(mcpContent[1].mimeType,'image/jpeg');
+ assert.deepEqual(Buffer.from(mcpContent[1].data,'base64'),bytes);
+ assert.equal(mcpContent[0].text.includes(shot.image.data),false);
  await fs.mkdir('viewer-qa-evidence',{recursive:true});await fs.writeFile('viewer-qa-evidence/academy-real-frame.jpg',bytes);
  assert.equal(bytes[0],255);assert.equal(bytes[1],216);
  const pixels=await page.evaluate(async data=>{const image=await createImageBitmap(await(await fetch('data:image/jpeg;base64,'+data)).blob());const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);const p=ctx.getImageData(0,0,image.width,image.height).data;const colors=new Set();for(let i=0;i<p.length;i+=64)colors.add([p[i]>>3,p[i+1]>>3,p[i+2]>>3].join(','));return {width:image.width,height:image.height,colors:colors.size};},shot.image.data);
