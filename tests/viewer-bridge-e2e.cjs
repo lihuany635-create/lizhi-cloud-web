@@ -20,13 +20,22 @@ async function main(){
  await new Promise(r=>server.listen(8771,'127.0.0.1',r));await new Promise(r=>parent.listen(8772,'127.0.0.1',r));
  const browser=await chromium.launch({headless:true,args:['--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--no-sandbox']});
  try{
- const page=await browser.newPage({viewport:{width:1360,height:1100}});await page.goto(PARENT);await page.waitForFunction(()=>window.ready?.render_ready,{timeout:90000});
+ const page=await browser.newPage({viewport:{width:1360,height:1100}});
+ page.on('pageerror',error=>console.error('PLAYWRIGHT_PAGE_ERROR',error.message));
+ page.on('console',msg=>{if(msg.type()==='error')console.error('PLAYWRIGHT_CONSOLE_ERROR',msg.text());});
+ await page.goto(PARENT);await page.waitForFunction(()=>window.ready?.render_ready,{timeout:90000});
  let state=await page.evaluate(()=>window.ready);assert.equal(state.model_key,'lahudi-academy');assert.equal(state.source.manifestVerified,true);
  const overview={position:state.camera.position,target:state.camera.target};
  const expected=JSON.parse(await fs.readFile('model-viewer/current-models.json','utf8')).models.find(x=>x.model==='lahudi-academy.glb').current_sha256;assert.equal(state.source.actualSHA,expected);
  async function command(name,args={},expect=true,id=randomUUID()){
+   console.log('BRIDGE_COMMAND',name,'revision',state.revision);
    await page.evaluate(c=>window.send(c),{name,args:{...args,request_id:id},request_id:id,deadline:new Date(Date.now()+20000).toISOString()});
-   await page.waitForFunction(id=>window.results[id]||window.stopped,id,{timeout:30000});const r=await page.evaluate(id=>window.results[id],id);assert(r,'controller stopped: '+await page.evaluate(()=>window.stopReason));if(expect)assert.equal(r.ok,true,JSON.stringify(r));if(r.scene)state=r.scene;return r;
+   try{await page.waitForFunction(id=>window.results[id]||window.stopped,id,{timeout:30000});}
+   catch(e){console.error('BRIDGE_TIMEOUT',name,
+     await page.evaluate(id=>({ready:!!window.ready,stopped:window.stopped,stopReason:window.stopReason,
+        resultCount:Object.keys(window.results).length,requested:id,frameVisible:!!document.querySelector('iframe')}),id));
+     throw e;
+   }const r=await page.evaluate(id=>window.results[id],id);assert(r,'controller stopped: '+await page.evaluate(()=>window.stopReason));if(expect)assert.equal(r.ok,true,JSON.stringify(r));if(r.scene)state=r.scene;return r;
  }
  const write=(name,args)=>command(name,{revision:state.revision,model_sha:state.source.actualSHA,...args});
  // Real academy gate/grounds grid. Rejected placements do not create avatars.
