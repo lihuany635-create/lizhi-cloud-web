@@ -74,27 +74,8 @@ AS $$
 DECLARE matching_owners bigint;
 BEGIN
  IF auth.uid() IS NULL OR NOT public.lizhi_web_is_allowed() THEN RAISE EXCEPTION 'FORBIDDEN'; END IF;
- IF p_model_key !~ '^[a-z0-9_-]{2,80}
- WHERE f.model_key=p_model_key AND f.model_sha=p_model_sha
-   AND EXISTS (SELECT 1 FROM public.lizhi_viewer_cloud_scenes AS s
-     WHERE s.owner_id=f.owner_id AND s.model_key=f.model_key AND s.model_sha=f.model_sha
-       AND pg_catalog.left(s.owner_id,pg_catalog.length('appgprj_6ae0c336243881919e9ba2bbf450f1fb:'))
-         = 'appgprj_6ae0c336243881919e9ba2bbf450f1fb:');
- RETURN pg_catalog.jsonb_build_object('ok',true,'revoked',true);
-END;
-$$;
-REVOKE ALL ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) TO authenticated;
- OR p_model_sha !~ '^[a-f0-9]{64}
- WHERE f.model_key=p_model_key AND f.model_sha=p_model_sha
-   AND EXISTS (SELECT 1 FROM public.lizhi_viewer_cloud_scenes AS s
-     WHERE s.owner_id=f.owner_id AND s.model_key=f.model_key AND s.model_sha=f.model_sha
-       AND s.owner_id LIKE 'appgprj\_6ae0c336243881919e9ba2bbf450f1fb:%');
- RETURN pg_catalog.jsonb_build_object('ok',true,'revoked',true);
-END;
-$$;
-REVOKE ALL ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) TO authenticated;
+ IF p_model_key !~ '^[a-z0-9_-]{2,80}$'
+    OR p_model_sha !~ '^[a-f0-9]{64}$'
  THEN RAISE EXCEPTION 'INVALID_ARGUMENTS'; END IF;
  SELECT pg_catalog.count(DISTINCT owner_id) INTO matching_owners
    FROM public.lizhi_viewer_cloud_scenes
@@ -106,7 +87,8 @@ GRANT EXECUTE ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) T
  WHERE f.model_key=p_model_key AND f.model_sha=p_model_sha
    AND EXISTS (SELECT 1 FROM public.lizhi_viewer_cloud_scenes AS s
      WHERE s.owner_id=f.owner_id AND s.model_key=f.model_key AND s.model_sha=f.model_sha
-       AND s.owner_id LIKE 'appgprj\_6ae0c336243881919e9ba2bbf450f1fb:%');
+       AND pg_catalog.left(s.owner_id,pg_catalog.length('appgprj_6ae0c336243881919e9ba2bbf450f1fb:'))
+         = 'appgprj_6ae0c336243881919e9ba2bbf450f1fb:');
  RETURN pg_catalog.jsonb_build_object('ok',true,'revoked',true);
 END;
 $$;
