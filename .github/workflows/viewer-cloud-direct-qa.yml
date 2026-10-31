@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Cloud direct contract verification
-        run: node --test tests/viewer-cloud-direct.test.mjs tests/viewer-cloud-nav.test.mjs tests/viewer-cloud-render-safety.test.mjs sites-migration/viewer-cloud-direct/original-site-integration/cloud-site-server.test.mjs
+        run: node --test tests/viewer-cloud-direct.test.mjs tests/viewer-cloud-nav.test.mjs tests/viewer-academy-l04-nav.test.mjs tests/viewer-cloud-render-safety.test.mjs sites-migration/viewer-cloud-direct/original-site-integration/cloud-site-server.test.mjs
       - name: Check browser-based original not overwritten
         run: |
           grep -q "const agentOrigin=" model-viewer/index.html

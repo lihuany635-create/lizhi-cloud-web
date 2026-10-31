@@ -2,7 +2,10 @@
 // Built offline by model-viewer/nav/build_nav_grid.py from the canonical GLB,
 // in viewer coordinates. Static screening only: no doors, no dynamic objects,
 // no rendered/visual verification.
-export const STEP_UP = 0.25;   // max climb between samples/cells (stair risers ~0.19 m, thresholds); beds and sofas block
+// Match model-viewer/nav/build_nav_grid.py STEP_UP and *.nav.json step_up_m.
+// On the R09 academy entrance, a 0.25 m cell can bridge 0.31 m of stair rise;
+// retaining 0.25 here incorrectly makes L04 unreachable even though the generated grid is walkable.
+export const STEP_UP = 0.35;   // maximum step-up between sampled cells; still static navigation, not physical safety validation
 export const MAX_DROP = 0.6;   // larger drops are ledges: stop instead of falling
 const SAMPLE = 0.1;
 
