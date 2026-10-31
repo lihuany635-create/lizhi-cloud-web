@@ -1159,6 +1159,8 @@ async function cloudCaptureFrame(sb,key){
  if(Date.now()>cloudCaptureUntil){cloudCaptureSet(false);cloudSay('巡查畫面分享已自動停止（30 分鐘）');return;}
  if(document.hidden||agentActive||window.GLBPreview.active||!cloudOn||!cloudFollowOn||!model||!sourceInfo?.manifestVerified)return;
  if(cloudRev<0||cloudCaptureLastRevision===cloudRev||!cloudSelected||!cloudFigs.has(cloudSelected))return;
+ // Capture only after client-side walking animation reaches the committed server position.
+ if(cloudFigs.get(cloudSelected).route.length)return;
  cloudCaptureBusy=true;
  try{
   // Wait for the followed cloud-avatar pose and draw the actual WebGL scene.
