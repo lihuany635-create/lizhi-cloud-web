@@ -1,0 +1,22 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {TOOLS,validate,handle,invoke} from './cloud-site-server.mjs';
+const ORIGIN='https://lizhi-viewer-agent-20261027.lihuany635.chatgpt.site';
+const env={VIEWER_CONTROL_TOKEN:'a'.repeat(96)};
+const owner='appgprj_6ae0c336243881919e9ba2bbf450f1fb:owner-fixture';
+const write={model_key:'lahudi-academy',model_sha:'b'.repeat(64),expected_revision:0,request_id:'a1111111-1111-4111-8111-111111111111',name:'TEST ONLY',position:[0,0,0]};
+const request=(path,body,auth=true,extra={})=>new Request(ORIGIN+path,{method:'POST',headers:{'content-type':'application/json',...(auth?{'oai-authenticated-user-id':'owner-fixture','oai-authenticated-user-email':'owner@example.test'}:{}),...extra},body:JSON.stringify(body)});
+const call=(name,args={})=>({jsonrpc:'2.0',id:'test-id',method:'tools/call',params:{name,arguments:args}});
+test('original MCP route delivers image with bound metadata and keeps UI JSON compatibility',async()=>{
+ const args={model_key:'lahudi-academy',model_sha:'b'.repeat(64)};
+ const value={ok:true,real_screenshot:true,...args,revision:4,avatar_id:'fixture-avatar',captured_at:new Date().toISOString(),image:{mimeType:'image/jpeg',data:'/9j/'+'A'.repeat(1100)}};
+ const f=async()=>Response.json(value);
+ const rpc=await(await handle(request('/mcp',call('viewer_get_screenshot',args)),env,'',f)).json();
+ assert.equal(rpc.result.isError,false);assert.equal(rpc.result.content[1].type,'image');assert.equal(rpc.result.content[1].mimeType,'image/jpeg');
+ const metadata=JSON.parse(rpc.result.content[0].text);for(const k of ['model_key','model_sha','revision','avatar_id','captured_at'])assert.equal(metadata[k],value[k]);
+ assert(!rpc.result.content[0].text.includes(value.image.data));
+ const ui=await(await handle(request('/api/tool',call('viewer_get_screenshot',args),true,{origin:ORIGIN,'x-viewer-ui':'1'}),env,'',f)).json();
+ assert.equal(ui.result.content.length,1);assert.equal(JSON.parse(ui.result.content[0].text).image.data,value.image.data);
+ for(const bad of [{model_sha:'c'.repeat(64)},{captured_at:new Date(Date.now()-91000).toISOString()},{revision:-1},{avatar_id:''}])await assert.rejects(invoke('viewer_get_screenshot',args,owner,env,async()=>Response.json({...value,...bad})),/INVALID_SCREENSHOT/);
+});

@@ -23,7 +23,7 @@ AS $$
 DECLARE s record; frame bytea; matching_owners bigint;
 BEGIN
   IF auth.uid() IS NULL OR NOT public.lizhi_web_is_allowed() THEN RAISE EXCEPTION 'FORBIDDEN'; END IF;
-  -- Every upload also sweeps expired frames, so storage never accumulates.
+  -- Every successful upload sweeps frames older than 300 s. No wall-clock deletion guarantee.
   PERFORM public.lizhi_viewer_cloud_snapshot_purge(300);
   IF p_model_key !~ '^[a-z0-9_-]{2,80}$'
      OR p_model_sha !~ '^[a-f0-9]{64}$'

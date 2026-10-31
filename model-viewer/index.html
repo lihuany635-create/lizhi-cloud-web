@@ -1153,27 +1153,38 @@ const CLOUD_CAPTURE_WINDOW_MS=30*60*1000;
 // Revocation deletes the last shared frame in the cloud. The result is shown on screen:
 // a failed delete is never reported as "stopped", and the button offers a retry.
 let cloudCaptureRevokePending=null;
-function cloudCaptureRevoke(){
- if(!modelKey||!sourceInfo?.manifestVerified)return Promise.resolve(true);
- const target={key:modelKey,sha:sourceInfo.actualSHA};
- const sb=cloudSupabase();
+const cloudCaptureRevokeTargets=new Map();
+function cloudCaptureRevoke(target=cloudCaptureRevokePending){
+ if(!target){
+  if(!modelKey||!sourceInfo?.manifestVerified)return Promise.resolve(false);
+  target={key:modelKey,sha:sourceInfo.actualSHA};
+ }
+ const id=target.key+'|'+target.sha;
+ let entry=cloudCaptureRevokeTargets.get(id);
+ if(!entry){entry={target:{...target},promise:null};cloudCaptureRevokeTargets.set(id,entry);}
+ cloudCaptureRevokePending=cloudCaptureRevokeTargets.values().next().value?.target||null;
+ if(entry.promise)return entry.promise;
  const done=ok=>{
-  cloudCaptureRevokePending=ok?null:target;
-  const b=$('tCloudCapture');
-  if(!cloudCaptureEnabled)b.textContent=ok?'共享 AI 巡查畫面':'重試刪除雲端畫面';
-  cloudSay(ok?'已停止共享，雲端最後一張畫面已刪除':'已停止擷取，但雲端最後一張畫面未能刪除（最多保留 5 分鐘後自動清除）。請按「重試刪除雲端畫面」。');
+  // Only this exact attempt may remove its target; another model remains pending.
+  if(ok&&cloudCaptureRevokeTargets.get(id)===entry)cloudCaptureRevokeTargets.delete(id);
+  entry.promise=null;
+  cloudCaptureRevokePending=cloudCaptureRevokeTargets.values().next().value?.target||null;
+  const pending=!!cloudCaptureRevokePending;
+  if(!cloudCaptureEnabled)$('tCloudCapture').textContent=pending?'重試刪除雲端畫面':'共享 AI 巡查畫面';
+  cloudSay(pending?'已停止擷取，但仍有雲端畫面未能刪除（未確認刪除成功）。超過 90 秒不能讀取；實際刪除時間取決於清理是否成功，未保證刪除時限。請按「重試刪除雲端畫面」。':'已刪除全部待撤銷的雲端畫面（已確認刪除成功）');
   return ok;
  };
- if(!sb)return Promise.resolve(done(false));
- return sb.rpc('lizhi_viewer_cloud_snapshot_revoke',{p_model_key:target.key,p_model_sha:target.sha})
-  .then(({data,error})=>done(!error&&data?.revoked===true))
-  .catch(()=>done(false));
+ const sb=cloudSupabase();
+ entry.promise=Promise.resolve().then(()=>sb?sb.rpc('lizhi_viewer_cloud_snapshot_revoke',{
+  p_model_key:entry.target.key,p_model_sha:entry.target.sha
+ }):null).then(r=>done(!r?.error&&r?.data?.revoked===true)).catch(()=>done(false));
+ return entry.promise;
 }
 function cloudCaptureSet(on){
  const was=cloudCaptureEnabled;
  if(on&&!was){cloudCaptureLastAt=0;cloudCaptureCount=0;}
  cloudCaptureEnabled=!!on;cloudCaptureUntil=on?Date.now()+CLOUD_CAPTURE_WINDOW_MS:0;
- if(!on){cloudCaptureLastRevision=-1;if(was)cloudCaptureRevoke();}
+ if(!on){cloudCaptureLastRevision=-1;if(was)cloudCaptureRevoke({key:modelKey,sha:sourceInfo?.actualSHA});}
  $('tCloudCapture').setAttribute('aria-pressed',String(cloudCaptureEnabled));
  $('tCloudCapture').textContent=on?'停止分享巡查畫面':'共享 AI 巡查畫面';
 }
@@ -1186,6 +1197,7 @@ async function cloudCaptureFrame(sb,key){
  if(Date.now()-cloudCaptureLastAt<10000)return;
  // Capture only after client-side walking animation reaches the committed server position.
  if(cloudFigs.get(cloudSelected).route.length)return;
+ const captureTarget={key:modelKey,sha:sourceInfo.actualSHA};
  cloudCaptureBusy=true;
  try{
   // Wait for the followed cloud-avatar pose and draw the actual WebGL scene.
@@ -1206,7 +1218,7 @@ async function cloudCaptureFrame(sb,key){
   if(!jpeg.startsWith('data:image/jpeg;base64,')||jpeg.length<1024||jpeg.length>350050)throw Error('INVALID_BROWSER_JPEG');
   const revision=cloudRev,avatarId=cloudSelected,base64=jpeg.split(',')[1];
   const {data,error}=await sb.rpc('lizhi_viewer_cloud_snapshot_submit',{
-   p_model_key:modelKey,p_model_sha:sourceInfo.actualSHA,p_revision:revision,
+   p_model_key:captureTarget.key,p_model_sha:captureTarget.sha,p_revision:revision,
    p_avatar_id:avatarId,p_jpeg_base64:base64
   });
   if(error)throw error;
@@ -1215,7 +1227,7 @@ async function cloudCaptureFrame(sb,key){
  }catch(e){
   console.warn('Browser WebGL capture not committed:',e);
   cloudSay('巡查畫面上傳失敗（僅瀏覽器中顯示，不代表 AI 已取得圖片）');
- }finally{cloudCaptureBusy=false;if(!cloudCaptureEnabled)cloudCaptureRevoke();}
+ }finally{cloudCaptureBusy=false;if(!cloudCaptureEnabled||captureTarget.key!==modelKey||captureTarget.sha!==sourceInfo?.actualSHA)cloudCaptureRevoke(captureTarget);}
 }
 function cloudSupabase(){
   if(cloudClient)return cloudClient;

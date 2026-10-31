@@ -150,3 +150,43 @@ test('Site adapter exposes 15 cloud-native tools without online session fields',
  }});
  assert(called);assert.equal(result.mode,'cloud_direct');
 });
+
+// Execute the actual browser revocation functions, with controlled delayed RPC responses.
+test('revoke retries preserve original model/SHA and delayed successes cannot erase other targets',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const html=readFileSync('model-viewer/index.html','utf8');
+ const source=html.slice(html.indexOf('let cloudCaptureRevokePending=null;'),html.indexOf('function cloudCaptureSet(on)'));
+ const calls=[],button={},messages=[];
+ const ctx={modelKey:'model-a',sourceInfo:{manifestVerified:true,actualSHA:'a'.repeat(64)},cloudCaptureEnabled:false,
+  $:()=>button,cloudSay:s=>messages.push(s),cloudSupabase:()=>({rpc:(_name,args)=>new Promise(resolve=>calls.push({args,resolve}))})};
+ runInNewContext(source+'\nthis.revoke=cloudCaptureRevoke;this.pending=()=>cloudCaptureRevokePending;this.count=()=>cloudCaptureRevokeTargets.size;',ctx);
+ const tick=()=>new Promise(resolve=>setImmediate(resolve));
+ const a=ctx.revoke();await tick();calls[0].resolve({error:{message:'offline'}});assert.equal(await a,false);
+ ctx.modelKey='model-b';ctx.sourceInfo.actualSHA='b'.repeat(64);
+ const retry=ctx.revoke();await tick();assert.equal(calls[1].args.p_model_key,'model-a');assert.equal(calls[1].args.p_model_sha,'a'.repeat(64));
+ const b=ctx.revoke({key:'model-b',sha:'b'.repeat(64)});await tick();
+ calls[2].resolve({error:{message:'offline'}});await b;
+ calls[1].resolve({data:{revoked:true}});await retry;
+ assert.equal(ctx.count(),1);assert.equal(ctx.pending().key,'model-b');assert.match(messages.at(-1),/未確認刪除/);
+ const last=ctx.revoke();const same=ctx.revoke();assert.equal(last,same);await tick();assert.equal(calls.length,4);
+ calls[3].resolve({data:{revoked:true}});await last;assert.equal(ctx.count(),0);assert.equal(ctx.pending(),null);
+ assert.match(messages.at(-1),/已確認刪除/);
+});
+test('retention copy does not promise unsupported five-minute physical deletion',()=>{
+ const html=readFileSync('model-viewer/index.html','utf8');
+ assert(!html.includes('最多保留 5 分鐘'));
+ const policy=readFileSync('docs/ai-agent-guides/VIEWER_BROWSER_CAPTURE_DRAFT_20261031.md','utf8');
+ assert.match(policy,/remain indefinitely/);assert.match(policy,/nearly ten minutes/);assert.match(policy,/cron.job_run_details/);
+});
+test('delayed capture completion revokes captured model after stop and model switch',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const html=readFileSync('model-viewer/index.html','utf8');
+ const source=html.slice(html.indexOf('async function cloudCaptureFrame(sb,key)'),html.indexOf('function cloudSupabase()'));
+ let resume;const revoked=[];
+ const ctx={cloudCaptureEnabled:true,cloudCaptureBusy:false,cloudCaptureUntil:Date.now()+60000,cloudCaptureCount:0,document:{hidden:false},agentActive:false,window:{GLBPreview:{active:false}},cloudOn:true,cloudFollowOn:true,model:{},sourceInfo:{manifestVerified:true,actualSHA:'a'.repeat(64)},modelKey:'model-a',cloudRev:1,cloudCaptureLastRevision:-1,cloudSelected:'avatar',cloudFigs:new Map([['avatar',{route:[]}]]),cloudCaptureLastAt:0,cloudKey:'model-a|sha',requestAnimationFrame:f=>{resume=f;},cloudCaptureRevoke:t=>revoked.push(t),cloudCaptureSet:()=>{}};
+ runInNewContext(source+'\nthis.capture=cloudCaptureFrame;',ctx);
+ const capture=ctx.capture({},ctx.cloudKey);
+ ctx.cloudCaptureEnabled=false;ctx.modelKey='model-b';ctx.sourceInfo={manifestVerified:true,actualSHA:'b'.repeat(64)};ctx.cloudKey='model-b|sha';
+ resume();await capture;
+ assert.equal(revoked.length,1);assert.equal(revoked[0].key,'model-a');assert.equal(revoked[0].sha,'a'.repeat(64));
+});
