@@ -113,7 +113,12 @@ export function findPath(nav, start, goal, maxExpand = 400000) {
   const gls = levelsAtCell(nav, gc);
   if (!gls.length) return { ok: false, code: 'GOAL_NOT_WALKABLE', near: nearestWalkable(nav, goal[0], goal[2], goal[1] ?? s.position[1]) };
   const goalY = Number.isFinite(goal[1]) ? goal[1] : null;
-  const isGoal = (c, h) => c === gc && (goalY === null || Math.abs(h - goalY) <= 1.0);
+  // Avoid confusing a furniture top with an explicitly requested ground floor.
+  // The navigation grid is quantized to centimetres; allow a 5cm tolerance.
+  const GOAL_HEIGHT_EPS = 0.05;
+  if (goalY !== null && !gls.some(h => Math.abs(h - goalY) <= GOAL_HEIGHT_EPS))
+    return { ok: false, code: 'GOAL_HEIGHT_NOT_WALKABLE', near: nearestWalkable(nav, goal[0], goal[2], goalY) };
+  const isGoal = (c, h) => c === gc && (goalY === null || Math.abs(h - goalY) <= GOAL_HEIGHT_EPS);
   const { nz, L, cell } = nav;
   const key = (c, l) => c * L + l;
   const levelIndex = (c, h) => { for (let l = 0; l < L; l++) if (nav.data[c * L + l] === Math.round(h * 100)) return l; return -1; };
