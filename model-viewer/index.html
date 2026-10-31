@@ -1146,7 +1146,7 @@ const cloudRingMat=new THREE.MeshBasicMaterial({color:0x3f7fe8,transparent:true,
 const cloudFigs=new Map();let cloudOn=false,cloudFollowOn=false,cloudRev=-1,cloudTimer=null,cloudClient=null,cloudSelected=null,cloudBusy=false,cloudKey=null;
 const CLOUD_WALK=1.6; // m/s along the returned path
 // Optional authenticated owner-browser capture. OFF by default and never persisted.
-let cloudCaptureEnabled=false,cloudCaptureUntil=0,cloudCaptureBusy=false,cloudCaptureLastRevision=-1;
+let cloudCaptureEnabled=false,cloudCaptureUntil=0,cloudCaptureBusy=false,cloudCaptureLastRevision=-1,cloudCaptureLastAt=0,cloudCaptureCount=0;
 const CLOUD_CAPTURE_WINDOW_MS=30*60*1000;
 function cloudCaptureRevoke(){
  if(!modelKey||!sourceInfo?.manifestVerified)return;
@@ -1157,6 +1157,7 @@ function cloudCaptureRevoke(){
 }
 function cloudCaptureSet(on){
  const was=cloudCaptureEnabled;
+ if(on&&!was){cloudCaptureLastAt=0;cloudCaptureCount=0;}
  cloudCaptureEnabled=!!on;cloudCaptureUntil=on?Date.now()+CLOUD_CAPTURE_WINDOW_MS:0;
  if(!on){cloudCaptureLastRevision=-1;if(was)cloudCaptureRevoke();}
  $('tCloudCapture').setAttribute('aria-pressed',String(cloudCaptureEnabled));
@@ -1164,9 +1165,11 @@ function cloudCaptureSet(on){
 }
 async function cloudCaptureFrame(sb,key){
  if(!cloudCaptureEnabled||cloudCaptureBusy)return;
- if(Date.now()>cloudCaptureUntil){cloudCaptureSet(false);cloudSay('巡查畫面分享已自動停止（30 分鐘）');return;}
+ if(Date.now()>cloudCaptureUntil||cloudCaptureCount>=80){cloudCaptureSet(false);cloudSay('巡查畫面分享已自動停止（時限或80張上限）');return;}
  if(document.hidden||agentActive||window.GLBPreview.active||!cloudOn||!cloudFollowOn||!model||!sourceInfo?.manifestVerified)return;
  if(cloudRev<0||cloudCaptureLastRevision===cloudRev||!cloudSelected||!cloudFigs.has(cloudSelected))return;
+ // Limit storage writes and egress (one 640x360 frame per 10 seconds, at most 80 per consent).
+ if(Date.now()-cloudCaptureLastAt<10000)return;
  // Capture only after client-side walking animation reaches the committed server position.
  if(cloudFigs.get(cloudSelected).route.length)return;
  cloudCaptureBusy=true;
@@ -1194,7 +1197,7 @@ async function cloudCaptureFrame(sb,key){
   });
   if(error)throw error;
   if(!data?.ok)throw Error('FRAME_UPLOAD_REJECTED');
-  cloudCaptureLastRevision=revision;
+  cloudCaptureLastRevision=revision;cloudCaptureLastAt=Date.now();cloudCaptureCount++;
  }catch(e){
   console.warn('Browser WebGL capture not committed:',e);
   cloudSay('巡查畫面上傳失敗（僅瀏覽器中顯示，不代表 AI 已取得圖片）');
