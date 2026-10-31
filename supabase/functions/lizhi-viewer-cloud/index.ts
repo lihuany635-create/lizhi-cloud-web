@@ -4,6 +4,7 @@
 // Movement is checked against a static walkable-floor grid (model-viewer/nav/*.nav.json)
 // built from the same canonical GLB: floors, stairs, walls and ledges. Not a physics or visual check.
 import {decodeNav,snap,walkSegment,findPath,nearestWalkable} from './nav.mjs';
+import {parseModel,renderAvatarJpeg} from './render.mjs';
 const SITE_ID='appgprj_6ae0c336243881919e9ba2bbf450f1fb';
 // Models live in the private lizhi-models bucket (owner-only); read here with the service role.
 async function asset(path,timeout=15000){
@@ -170,22 +171,29 @@ function put(state,name,a,nav=null){
  }
  failure('UNKNOWN_CLOUD_TOOL');
 }
-// One verified GLB kept per warm isolate so paging the node index does not re-download it (egress).
-let glbCache=null;
+// One verified GLB (and its parsed render geometry) kept per warm isolate, so paging the node
+// index or taking several screenshots does not re-download the model (storage egress).
+let glbCache=null,renderCache=null;
+async function loadGLB(key,sha){
+ if(glbCache&&glbCache.key===key&&glbCache.sha===sha)return glbCache.bytes;
+ const r=await asset(key+'.glb',20000);
+ if(!r.ok)failure('GLB_DOWNLOAD_FAILED');
+ if(+(r.headers.get('content-length')||0)>35000000)failure('GLB_TOO_LARGE_FOR_EDGE');
+ const bytes=await r.arrayBuffer();
+ if(bytes.byteLength>35000000)failure('GLB_TOO_LARGE_FOR_EDGE');
+ const actual=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');
+ if(actual!==sha)failure('GLB_SHA_MISMATCH');
+ glbCache={key,sha,bytes};renderCache=null;return bytes;
+}
+async function renderModel(key,sha){
+ const bytes=await loadGLB(key,sha);
+ if(renderCache&&renderCache.key===key&&renderCache.sha===sha)return renderCache.model;
+ renderCache={key,sha,model:parseModel(bytes)};return renderCache.model;
+}
+function base64(bytes){let s='';for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(s);}
 async function inspectGLB(key,sha,offset=0,limit=50){
  // Explicit real GLB binary load; geometry index is NOT raster rendering or collision test.
- let bytes,actual;
- if(glbCache&&glbCache.key===key&&glbCache.sha===sha){bytes=glbCache.bytes;actual=sha;}
- else{
-  const r=await asset(key+'.glb',20000);
-  if(!r.ok)failure('GLB_DOWNLOAD_FAILED');
-  if(+(r.headers.get('content-length')||0)>35000000)failure('GLB_TOO_LARGE_FOR_EDGE');
-  bytes=await r.arrayBuffer();
-  if(bytes.byteLength>35000000)failure('GLB_TOO_LARGE_FOR_EDGE');
-  actual=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');
-  if(actual!==sha)failure('GLB_SHA_MISMATCH');
-  glbCache={key,sha,bytes};
- }
+ const bytes=await loadGLB(key,sha),actual=sha;
  const dv=new DataView(bytes);if(bytes.byteLength<20||dv.getUint32(0,true)!==0x46546c67||dv.getUint32(4,true)!==2||dv.getUint32(8,true)!==bytes.byteLength||dv.getUint32(16,true)!==0x4e4f534a)failure('INVALID_GLB');
  const count=dv.getUint32(12,true);if(count+20>bytes.byteLength)failure('INVALID_GLB');
  const gltf=JSON.parse(new TextDecoder().decode(new Uint8Array(bytes,20,count)));
@@ -197,7 +205,7 @@ async function inspectGLB(key,sha,offset=0,limit=50){
 async function run(owner,name,a){
  if(name==='viewer_status'){
   const list=await rest('lizhi_viewer_cloud_scenes?owner_id=eq.'+encodeURIComponent(owner)+'&select=model_key,model_sha,revision,updated_at');
-  return {ok:true,mode:'cloud_direct',requires_browser:false,requires_connection_button:false,cloud_rendering:false,geometry_collision:false,
+  return {ok:true,mode:'cloud_direct',requires_browser:false,requires_connection_button:false,cloud_rendering:true,geometry_collision:false,
    movement_check:'static_floor_grid (stairs, walls, ledges; doors/dynamic objects not modelled)',
    scenes:list,model_documents:'Canonical GLBs in the private lizhi-models store (owner-only)'};
  }
@@ -206,31 +214,27 @@ async function run(owner,name,a){
   return {ok:true,models:models.map(m=>({key:m.model.slice(0,-4),model:m.model,version:m.version,current_sha256:m.current_sha256,author_full_item_approval:m.author_full_item_approval}))};
  }
  if(name==='viewer_get_screenshot'){
-  // Optional browser JPEG bridge: all movement/state remains cloud_direct.
-  // A real logged-in owner browser must explicitly opt in and upload one frame
-  // for the SAME canonical GLB SHA, scene revision and selected cloud avatar.
-  fields(a,['model_key','model_sha']);
+  // Cloud render: the server loads the canonical GLB and rasterises the CURRENT cloud scene
+  // from the selected avatar's camera (same coordinates and camera rules as the web viewer).
+  // No browser, GPU or owner device is involved; nothing is stored.
+  fields(a,['model_key','model_sha','expected_revision','avatar_id']);
+  if(Deno.env.get('LIZHI_VIEWER_RENDER_DISABLED')==='1')return {ok:false,code:'CLOUD_RENDER_REVOKED',real_screenshot:false};
   const key=nameKey(a.model_key),m=await modelOf(key,a.model_sha);
-  // Delete frames older than the 90 s read window before reading (best effort; pg_cron also sweeps).
-  try{await rpc('lizhi_viewer_cloud_snapshot_purge',{p_max_age_seconds:90});}catch(_e){}
-  const rows=await rest('lizhi_viewer_cloud_snapshots?owner_id=eq.'+encodeURIComponent(owner)
-   +'&model_key=eq.'+encodeURIComponent(key)
-   +'&model_sha=eq.'+m.current_sha256
-   +'&select=revision,avatar_id,jpeg_b64,captured_at&limit=1');
-  if(!rows.length)return {ok:false,code:'BROWSER_CAPTURE_NOT_CONNECTED',requires_browser:true,real_screenshot:false};
-  const shot=rows[0],current=await scene(owner,key,m.current_sha256);
-  const age=Date.now()-Date.parse(shot.captured_at);
-  if(!Number.isFinite(age)||age<0||age>90000||shot.revision!==current.revision
-    ||shot.avatar_id!==current.state.selected_id
-    ||!current.state.avatars.some(x=>x.id===shot.avatar_id))
-   return {ok:false,code:'BROWSER_FRAME_STALE',requires_browser:true,real_screenshot:false,current_revision:current.revision};
-  if(typeof shot.jpeg_b64!=='string'||shot.jpeg_b64.length<1000||shot.jpeg_b64.length>350000||!shot.jpeg_b64.startsWith('/9j/'))
-   failure('INVALID_BROWSER_FRAME');
-  return {ok:true,real_screenshot:true,render_attested:false,requires_browser:true,
-    source:'owner_browser_uploaded_jpeg',model_key:key,model_sha:m.current_sha256,
-    revision:shot.revision,avatar_id:shot.avatar_id,captured_at:shot.captured_at,
-    image:{mimeType:'image/jpeg',data:shot.jpeg_b64},
-    limitations:'Authenticated owner browser upload; not cloud GPU rendering or tamper-proof visual verification'};
+  const current=await scene(owner,key,m.current_sha256);
+  if(a.expected_revision!==undefined&&(!Number.isSafeInteger(a.expected_revision)||a.expected_revision!==current.revision))
+   return {ok:false,code:'REVISION_CONFLICT',actual_revision:current.revision,real_screenshot:false};
+  const avatarId=a.avatar_id===undefined?current.state.selected_id:str(a.avatar_id,200);
+  if(!avatarId||!current.state.avatars.some(x=>x.id===avatarId))
+   return {ok:false,code:'NO_AVATAR_FOR_SCREENSHOT',revision:current.revision,real_screenshot:false};
+  const model=await renderModel(key,m.current_sha256);
+  const shot=renderAvatarJpeg(model,current.state,avatarId);
+  const data=base64(shot.jpeg);
+  if(data.length<1000||data.length>350000||!data.startsWith('/9j/'))failure('CLOUD_RENDER_INVALID_JPEG');
+  return {ok:true,real_screenshot:true,render_attested:true,requires_browser:false,
+    source:'cloud_cpu_render',model_key:key,model_sha:m.current_sha256,revision:current.revision,
+    avatar_id:avatarId,camera:shot.camera,captured_at:new Date().toISOString(),triangles_drawn:shot.triangles_drawn,
+    image:{mimeType:'image/jpeg',data},
+    limitations:'Server-side CPU render of the canonical GLB: base colours and simple lighting; no textures, shadows, reflections or glass refraction. Same model, coordinates and camera rules as the web viewer.'};
  }
  if(name==='viewer_stop')return {ok:true,mode:'cloud_direct',pending_operations:0,details:'No persistent browser session. Each cloud write is synchronous and atomic.'};
  const key=nameKey(a.model_key);const m=await modelOf(key,a.model_sha);

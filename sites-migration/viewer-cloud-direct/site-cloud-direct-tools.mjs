@@ -17,7 +17,7 @@ const defs=[
  ['viewer_walk_to','只給目的地 [x,z] 或 [x,y,z]，雲端自動找路（含上下樓梯、繞過牆和家具）並走過去；回傳實際路徑。y 用來選樓層。',{...write,avatar_id:str(),target:{type:'array',items:num,minItems:2,maxItems:3}},['model_key','model_sha','expected_revision','request_id','avatar_id','target'],false],
  ['viewer_walk_path','依序直線走過最多30個路點 [x,z] 或 [x,y,z]，遇牆或落差即停在最後可達位置並回報 blocked。',{...write,avatar_id:str(),waypoints:{type:'array',minItems:1,maxItems:30,items:{type:'array',items:num,minItems:2,maxItems:3}}},['model_key','model_sha','expected_revision','request_id','avatar_id','waypoints'],false],
  ['viewer_set_camera','儲存該人偶第一／第三人稱、自由或俯視的鏡頭配置。',{...write,avatar_id:str(),mode:{type:'string',enum:['first','third','top','free']},yaw:{type:'number',minimum:-7,maximum:7},pitch:{type:'number',minimum:-1.35,maximum:1.35}},['model_key','model_sha','expected_revision','request_id','avatar_id','mode'],false],
- ['viewer_get_screenshot','讀取本人已登入瀏覽器主動分享的最近一張 640×360 WebGL JPEG，需開著原檢視器並啟用30分鐘分享；若未連接、過期或模型版本不符會明確拒絕。非雲端 GPU 渲染。',{...model},[],true],
+ ['viewer_get_screenshot','由雲端伺服器載入正式 GLB，依目前雲端場景與所選人偶的鏡頭（第一人稱／第三人稱）即時渲染一張 640×360 JPEG 並以圖片回傳；不需電腦或瀏覽器在線。可帶 expected_revision 確認狀態，不符即拒絕；可帶 avatar_id 指定人偶（預設為目前選取）。簡化渲染：基本色與光照，無貼圖、陰影、反射。',{...model,expected_revision:{type:'integer',minimum:0},avatar_id:str()},['model_key','model_sha'],true],
  ['viewer_save_checkpoint','儲存雲端巡查位置及未視覺驗證筆記；截圖綁定的發現目前拒絕。',{...write,note:{type:'string',maxLength:2000},findings:{type:'array',maxItems:30,items:{type:'object'}}},['model_key','model_sha','expected_revision','request_id'],false],
  ['viewer_delete_avatar','從雲端狀態中刪除指定人偶，不修改 GLB。',{...write,avatar_id:str()},['model_key','model_sha','expected_revision','request_id','avatar_id'],false],
  ['viewer_stop','確認此雲端模式沒有待執行的瀏覽器操作或持續工作階段。',{},[],true]

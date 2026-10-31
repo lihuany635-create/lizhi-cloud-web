@@ -28,7 +28,8 @@ globalThis.fetch=async(url,options={})=>{
  throw Error('UNMOCKED_URL: '+u);
 };
 const navURL=new URL('../supabase/functions/lizhi-viewer-cloud/nav.mjs',import.meta.url).href;
-const source=readFileSync('supabase/functions/lizhi-viewer-cloud/index.ts','utf8').replace("'./nav.mjs'",JSON.stringify(navURL));
+const renderURL=new URL('../supabase/functions/lizhi-viewer-cloud/render.mjs',import.meta.url).href;
+const source=readFileSync('supabase/functions/lizhi-viewer-cloud/index.ts','utf8').replace("'./nav.mjs'",JSON.stringify(navURL)).replace("'./render.mjs'",JSON.stringify(renderURL));
 const {handler}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
 async function call(name,args={}){
  const write=!['viewer_get_scene','viewer_status'].includes(name);
