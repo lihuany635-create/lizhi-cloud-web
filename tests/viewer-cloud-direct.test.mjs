@@ -10,12 +10,14 @@ const hex=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new T
 const tokenHash=await hex(token);
 let current={revision:0,state:{avatars:[],selected_id:null,camera:{mode:'free'},checkpoints:[]}};
 const requests=new Map();
+let screenshot=null;
 globalThis.Deno={env:{get:k=>k==='SUPABASE_URL'?'https://test.supabase.co':k==='SUPABASE_SERVICE_ROLE_KEY'?'TEST_ONLY_SERVICE_KEY':undefined},serve(){}};
 globalThis.fetch=async(url,options={})=>{
  const u=String(url);
  if(u.includes('current-models.json'))return Response.json({models:[{model:'lahudi-academy.glb',version:'R09',current_sha256:sha}]});
  if(u.includes('/rest/v1/lizhi_viewer_config'))return Response.json([{token_hash:tokenHash}]);
  if(u.includes('/rest/v1/lizhi_viewer_cloud_scenes'))return Response.json([{model_key:'lahudi-academy',model_sha:sha,revision:current.revision}]);
+ if(u.includes('/rest/v1/lizhi_viewer_cloud_snapshots?'))return Response.json(screenshot?[screenshot]:[]);
  if(u.includes('/rest/v1/lizhi_viewer_cloud_requests?')){
   const match=u.match(/request_id=eq\.([0-9a-f-]+)/);
   return Response.json(requests.has(match?.[1])?[requests.get(match[1])]:[]);
@@ -67,11 +69,27 @@ test('create, idempotence, CAS, independent avatars and camera transitions',asyn
  assert.equal(camera.state.camera.mode,'third');
  const scene=(await invoke('viewer_get_scene',{model_key:'lahudi-academy'})).data;assert.equal(scene.revision,4);
 });
-test('screenshot fails explicitly and checkpoint evidence cannot be fabricated',async()=>{
- assert.equal((await invoke('viewer_get_screenshot')).data.code,'CLOUD_3D_RENDERER_NOT_IMPLEMENTED');
+test('browser screenshot is opt-in, tied to revision/avatar and cannot be invented',async()=>{
+ const model={model_key:'lahudi-academy',model_sha:sha};
+ const empty=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(empty.code,'BROWSER_CAPTURE_NOT_CONNECTED');
+ assert.equal(empty.requires_browser,true);assert.equal(empty.real_screenshot,false);
+ screenshot={revision:current.revision-1,avatar_id:current.state.selected_id,
+  jpeg_b64:'/9j/'+'A'.repeat(1200),captured_at:new Date().toISOString()};
+ const stale=(await invoke('viewer_get_screenshot',model)).data;
+ assert.equal(stale.code,'BROWSER_FRAME_STALE');
+ assert.equal(stale.real_screenshot,false);
+ screenshot=null;
  const f=(await invoke('viewer_save_checkpoint',{model_key:'lahudi-academy',model_sha:sha,request_id:crypto.randomUUID(),expected_revision:4,note:'manual note',findings:[{screenshot_id:crypto.randomUUID(),finding:'hall clear'}]})).data;
  assert.equal(f.code,'REAL_SCREENSHOT_EVIDENCE_REQUIRED');assert.equal(current.revision,4);
  const stop=(await invoke('viewer_stop')).data;assert.equal(stop.mode,'cloud_direct');assert.equal(stop.pending_operations,0);
+});
+test('browser image opt-in and renderer evidence are explicit in viewer source',()=>{
+ const html=readFileSync('model-viewer/index.html','utf8');
+ assert.match(html,/id="tCloudCapture"/);
+ assert.match(html,/let cloudCaptureEnabled=false/);
+ assert.match(html,/p_jpeg_base64:base64/);
+ assert.match(html,/window\.GLBPreview\.active/);
 });
 
 test('Site adapter exposes 15 cloud-native tools without online session fields',async()=>{
