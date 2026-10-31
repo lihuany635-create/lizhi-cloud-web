@@ -60,14 +60,23 @@ function nextLevel(ls, cur) {
 }
 
 // Walk in a straight line on the floor, climbing stairs, stopping at walls/ledges.
-export function walkSegment(nav, from, toX, toZ) {
+export function walkSegment(nav, from, toX, toZ, targetY = null) {
   let [x, y, z] = from;
   const dx = toX - x, dz = toZ - z, dist = Math.hypot(dx, dz);
   const n = Math.max(1, Math.ceil(dist / SAMPLE));
   let travelled = 0;
   for (let i = 1; i <= n; i++) {
     const nx = from[0] + dx * i / n, nz = from[2] + dz * i / n;
-    const h = nextLevel(levelsAt(nav, nx, nz), y);
+    const levels = levelsAt(nav, nx, nz);
+    let h = nextLevel(levels, y);
+    // Explicit 3D waypoints may guide stair selection; 2D movement keeps old behaviour.
+    // Every candidate still obeys the same STEP_UP/MAX_DROP limits.
+    if (Number.isFinite(targetY)) {
+      const allowed = levels.filter(v => v - y <= STEP_UP + 1e-6 && y - v <= MAX_DROP + 1e-6);
+      if (allowed.length) {
+        h = allowed.reduce((best, v) => Math.abs(v - targetY) < Math.abs(best - targetY) ? v : best);
+      }
+    }
     if (h === null) {
       const ls = levelsAt(nav, nx, nz);
       const reason = !ls.length ? 'WALL_OR_NO_FLOOR' : ls.some(v => v - y > STEP_UP) ? 'STEP_TOO_HIGH' : 'LEDGE_DROP';
@@ -129,11 +138,18 @@ export function findPath(nav, start, goal, maxExpand = 400000) {
       if (jx < 0 || jz < 0 || jx >= nav.nx || jz >= nz) continue;
       const nc = jx * nz + jz;
       if (dx && dz && (!passable(ix * nz + jz, h) || !passable(jx * nz + iz, h))) continue;
-      const nh = nextLevel(levelsAtCell(nav, nc), h);
-      if (nh === null) continue;
-      const nk = key(nc, levelIndex(nc, nh));
-      const cost = gk + Math.hypot(dx, dz) * cell + Math.abs(nh - h) * 0.5;
-      if (cost < (g.get(nk) ?? Infinity)) { g.set(nk, cost); prev.set(nk, k); heap.push(cost + hfun(nc), nk); }
+      // Preserve all reachable floor-height states. Picking just the nearest one
+      // at a stair cell silently stays on the lower overlapping floor and misses
+      // the 0.18 m tread that makes the next step reachable.
+      for (let nl = 0; nl < L; nl++) {
+        const raw = nav.data[nc * L + nl];
+        if (raw === nav.empty) continue;
+        const nh = raw / 100;
+        if (nh - h > STEP_UP + 1e-6 || h - nh > MAX_DROP + 1e-6) continue;
+        const nk = key(nc, nl);
+        const cost = gk + Math.hypot(dx, dz) * cell + Math.abs(nh - h) * 0.5;
+        if (cost < (g.get(nk) ?? Infinity)) { g.set(nk, cost); prev.set(nk, k); heap.push(cost + hfun(nc), nk); }
+      }
     }
     void l;
   }
