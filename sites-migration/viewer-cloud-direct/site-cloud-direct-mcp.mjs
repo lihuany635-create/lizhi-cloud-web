@@ -13,3 +13,21 @@ export async function callViewerCloud({name,args,owner,token,fetcher=fetch}){
  if(!data||typeof data!=='object')throw Error('VIEWER_CLOUD_RESPONSE_INVALID');
  return data;
 }
+
+/**
+ * Site MCP tools/call response mapping. A base64 JSON string is NOT a
+ * vision-readable screenshot: emit a real MCP image content block.
+ * Wire this helper into the original private Site after owner auth and
+ * callViewerCloud; do not use it for HTTP /api/tool JSON responses.
+ */
+export function viewerCloudToMcpContent(result){
+ if(result?.ok===true&&result?.image?.mimeType==='image/jpeg'
+   &&typeof result.image.data==='string'
+   &&result.image.data.startsWith('/9j/')
+   &&result.image.data.length<=350000){
+  const {image,...metadata}=result;
+  return [{type:'text',text:JSON.stringify(metadata)},
+   {type:'image',mimeType:'image/jpeg',data:image.data}];
+ }
+ return [{type:'text',text:JSON.stringify(result)}];
+}
