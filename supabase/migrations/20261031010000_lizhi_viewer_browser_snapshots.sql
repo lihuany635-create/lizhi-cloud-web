@@ -54,3 +54,24 @@ END;
 $$;
 REVOKE ALL ON FUNCTION public.lizhi_viewer_cloud_snapshot_submit(text,text,bigint,text,text) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.lizhi_viewer_cloud_snapshot_submit(text,text,bigint,text,text) TO authenticated;
+
+-- Explicit revocation: turning off sharing removes the last frame immediately.
+-- Closing a tab without revocation leaves at most a stale, short-lived MCP-visible frame.
+CREATE OR REPLACE FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(
+ p_model_key text,p_model_sha text
+) RETURNS jsonb
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
+AS $$
+BEGIN
+ IF NOT public.lizhi_web_is_allowed() THEN RAISE EXCEPTION 'FORBIDDEN'; END IF;
+ IF p_model_key !~ '^[a-z0-9_-]{2,80}$' OR p_model_sha !~ '^[a-f0-9]{64}$' THEN RAISE EXCEPTION 'INVALID_ARGUMENTS'; END IF;
+ DELETE FROM public.lizhi_viewer_cloud_snapshots AS f
+ WHERE f.model_key=p_model_key AND f.model_sha=p_model_sha
+   AND EXISTS (SELECT 1 FROM public.lizhi_viewer_cloud_scenes AS s
+     WHERE s.owner_id=f.owner_id AND s.model_key=f.model_key AND s.model_sha=f.model_sha
+       AND s.owner_id LIKE 'appgprj\_6ae0c336243881919e9ba2bbf450f1fb:%');
+ RETURN pg_catalog.jsonb_build_object('ok',true,'revoked',true);
+END;
+$$;
+REVOKE ALL ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.lizhi_viewer_cloud_snapshot_revoke(text,text) TO authenticated;
