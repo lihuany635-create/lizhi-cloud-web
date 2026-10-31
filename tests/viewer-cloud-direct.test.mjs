@@ -92,6 +92,17 @@ test('browser image opt-in and renderer evidence are explicit in viewer source',
  assert.match(html,/window\.GLBPreview\.active/);
 });
 
+test('Site MCP exposes JPEG as an actual image block, not as base64 text',async()=>{
+ const {viewerCloudToMcpContent}=await import('../sites-migration/viewer-cloud-direct/site-cloud-direct-mcp.mjs');
+ const sample={ok:true,real_screenshot:true,image:{mimeType:'image/jpeg',data:'/9j/'+'A'.repeat(1100)},revision:5};
+ const blocks=viewerCloudToMcpContent(sample);
+ assert.equal(blocks.length,2);assert.equal(blocks[1].type,'image');
+ assert.equal(blocks[1].mimeType,'image/jpeg');assert.equal(JSON.parse(blocks[0].text).revision,5);
+ assert.equal(blocks[0].text.includes(sample.image.data),false);
+ const fail=viewerCloudToMcpContent({ok:false,code:'BROWSER_FRAME_STALE'});
+ assert.equal(fail.length,1);assert.equal(fail[0].type,'text');
+});
+
 test('Site adapter exposes 15 cloud-native tools without online session fields',async()=>{
  const {VIEWER_CLOUD_TOOLS}=await import('../sites-migration/viewer-cloud-direct/site-cloud-direct-tools.mjs');
  assert.equal(VIEWER_CLOUD_TOOLS.length,15);
