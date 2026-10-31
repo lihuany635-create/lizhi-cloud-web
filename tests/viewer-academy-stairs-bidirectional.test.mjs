@@ -48,7 +48,8 @@ test('3D waypoints guide the 0.18m stair tread; 2D retains safe legacy behavior'
   assert.equal(withoutHeight.blocked?.reason, 'STEP_TOO_HIGH');
 });
 
-test('no walkable cells in the library atrium void at its interior target height', () => {
-  const result = findPath(nav, [-14.125,7.6,-128.125], [-6.125,7.6,-128.125]);
-  assert.equal(result.ok, false, 'nav must not permit walking across the upper-level atrium void');
+test('L08 atrium void has no second-floor walkable surface at its center', () => {
+  const heights = levelsAt(nav, -6.125, -128.125);
+  assert(heights.length > 0, 'first floor remains represented');
+  assert(!heights.some(h => Math.abs(h - 7.6) <= 0.35), 'atrium must not have a floor near 2F height');
 });
