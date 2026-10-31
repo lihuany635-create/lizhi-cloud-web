@@ -32,8 +32,8 @@ BEGIN
   THEN RAISE EXCEPTION 'INVALID_FRAME'; END IF;
   frame := pg_catalog.decode(p_jpeg_base64,'base64');
   IF pg_catalog.octet_length(frame)>262144
-     OR pg_catalog.substring(frame FROM 1 FOR 3) <> pg_catalog.decode('ffd8ff','hex')
-     OR pg_catalog.substring(frame FROM pg_catalog.octet_length(frame)-1 FOR 2) <> pg_catalog.decode('ffd9','hex')
+     OR pg_catalog.substring(frame,1,3) <> pg_catalog.decode('ffd8ff','hex')
+     OR pg_catalog.substring(frame,pg_catalog.octet_length(frame)-1,2) <> pg_catalog.decode('ffd9','hex')
   THEN RAISE EXCEPTION 'INVALID_JPEG'; END IF;
   -- Browser account is approved separately from the private Site principal.
   -- Fail closed rather than select an arbitrary principal if Site ownership grows.
