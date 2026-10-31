@@ -53,3 +53,25 @@ test('L08 atrium void has no second-floor walkable surface at its center', () =>
   assert(heights.length > 0, 'first floor remains represented');
   assert(!heights.some(h => Math.abs(h - 7.6) <= 0.35), 'atrium must not have a floor near 2F height');
 });
+
+test('L08 1F furniture tops are not valid explicit floor-level destinations', () => {
+  const from = [-5.125, 2.2, -134.125];
+  for (const [label, target] of [
+    ['archive shelf', [-25.125,2.2,-134.125]],
+    ['group reading furniture', [13.125,2.2,-134.125]]
+  ]) {
+    const levels = levelsAt(nav, target[0], target[2]);
+    assert(!levels.some(h => Math.abs(h - 2.2) <= 0.05), label);
+    const blocked = findPath(nav, from, target);
+    assert.equal(blocked.ok, false, label);
+    assert.equal(blocked.code, 'GOAL_HEIGHT_NOT_WALKABLE', label);
+  }
+  for (const [label, target] of [
+    ['archive aisle', [-23.125,2.2,-132.125]],
+    ['group reading aisle', [16.125,2.2,-134.125]]
+  ]) {
+    const result = findPath(nav, from, target);
+    assert.equal(result.ok, true, label + ': ' + result.code);
+    assert(Math.abs(result.path.at(-1)[1]-2.2) <= 0.05, label);
+  }
+});
