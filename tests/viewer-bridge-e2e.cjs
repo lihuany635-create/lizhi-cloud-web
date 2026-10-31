@@ -27,7 +27,12 @@ async function main(){
  await page.route('**/@supabase/supabase-js**',route=>route.fulfill({contentType:'text/javascript',body:`window.supabase={createClient(){return {
   auth:{getSession:async()=>({data:{session:{access_token:'test-only'}},error:null}),onAuthStateChange(){return {data:{subscription:{unsubscribe(){}}}};}},
   storage:{from(){return {createSignedUrl:async p=>({data:{signedUrl:'${CHILD}/model-viewer/'+p},error:null})};}},
-  rpc:async()=>({data:null,error:{message:'TEST_STUB_NO_DATABASE'}}),
+  rpc:async(name,args)=>{
+    if(name==='lizhi_viewer_cloud_browser_read')return {data:window.__bridgeCloudState||{ok:true,revision:0,state:{avatars:[],selected_id:null}},error:null};
+    if(name==='lizhi_viewer_cloud_snapshot_submit'){window.__bridgeCloudFrame=args;return {data:{ok:true},error:null};}
+    if(name==='lizhi_viewer_cloud_snapshot_revoke'){window.__bridgeCloudRevokes=(window.__bridgeCloudRevokes||0)+1;return {data:{ok:true},error:null};}
+    return {data:null,error:{message:'TEST_STUB_NO_DATABASE'}};
+  },
   from(){return {select(){return this;},eq(){return this;},maybeSingle:async()=>({data:null,error:null})};}};}};`}));
  page.on('pageerror',error=>console.error('PLAYWRIGHT_PAGE_ERROR',error.message));
  page.on('console',msg=>{if(msg.type()==='error')console.error('PLAYWRIGHT_CONSOLE_ERROR',msg.text());});
@@ -84,6 +89,32 @@ async function main(){
  const stale=await command('viewer_select_avatar',{avatar_id:created[0],revision:-1,model_sha:state.source.actualSHA},false);assert.equal(stale.code,'SCENE_REVISION_CONFLICT');
  await write('viewer_delete_avatar',{avatar_id:created[4]});assert.equal(state.avatars.length,4);
  await page.evaluate(()=>window.stopAgent());await page.waitForFunction(()=>window.stopped);const rid=randomUUID();await page.evaluate(c=>window.send(c),{name:'viewer_create_avatar',args:{position:[0,0,0],name:'should not happen'},request_id:rid,deadline:new Date(Date.now()+5000).toISOString()});await page.waitForTimeout(300);assert.equal(await page.evaluate(id=>window.results[id],rid),undefined);
+ // The NEW opt-in cloud-avatar screenshot sender must be exercised separately
+ // from the legacy parent-iframe AI capture. This uses the SAME real WebGL
+ // renderer and actual academy GLB, but mocks the authenticated browser RPC.
+ const child=page.frames().find(f=>f.url().includes('/model-viewer/'));
+ assert(child,'loaded academy iframe');
+ const activePosition=state.avatars[0].position;
+ await child.evaluate(pos=>{window.__bridgeCloudState={ok:true,revision:101,
+   state:{selected_id:'bridge-cloud-avatar',avatars:[{id:'bridge-cloud-avatar',name:'Capture QA',
+   position:pos,yaw:0,pitch:0,mode:'first',last_path:null}]}};},activePosition);
+ assert.equal(await child.locator('#tCloudCapture').getAttribute('aria-pressed'),'false');
+ await child.locator('#tCloudCapture').click();
+ await child.waitForFunction(()=>!!window.__bridgeCloudFrame,null,{timeout:30000});
+ const sent=await child.evaluate(()=>window.__bridgeCloudFrame);
+ assert.equal(sent.p_model_key,'lahudi-academy');
+ assert.equal(sent.p_model_sha,expected);
+ assert.equal(sent.p_revision,101);
+ assert.equal(sent.p_avatar_id,'bridge-cloud-avatar');
+ const uploadedJpeg=Buffer.from(sent.p_jpeg_base64,'base64');
+ assert(uploadedJpeg.length>500,'browser shared a non-empty JPEG');
+ assert.equal(uploadedJpeg[0],0xff);assert.equal(uploadedJpeg[1],0xd8);
+ assert.equal(uploadedJpeg.at(-2),0xff);assert.equal(uploadedJpeg.at(-1),0xd9);
+ await fs.writeFile('viewer-qa-evidence/academy-cloud-browser-frame.jpg',uploadedJpeg);
+ await child.locator('#tCloudCapture').click();
+ await child.waitForFunction(()=>window.__bridgeCloudRevokes>0,null,{timeout:15000});
+ assert.equal(await child.locator('#tCloudCapture').getAttribute('aria-pressed'),'false');
+ console.log('PASS CLOUD BROWSER WEBGL: 640x360 owner-consent image submitted and revoked (mock RPC, actual GLB).');
  await fs.writeFile('viewer-qa-evidence/report.json',JSON.stringify({status:'PASS',scope:'real academy GLB + Chromium WebGL + postMessage bridge; production Site/DB chain NOT covered',model_sha:expected,checks:['5 avatars','isolated movement','camera first/third/top/free','real JPEG','screenshot-bound findings','unknown evidence rejected','stale revision rejected','delete','STOP blocks new commands']},null,2));
  console.log('PASS REAL WEBGL BRIDGE: academy SHA, five avatars, cameras, movement, JPEG, screenshot-bound checkpoint payload, stale CAS rejection, delete, STOP. Production Site E2E remains separate.');
  }finally{await browser.close();server.close();parent.close();}
