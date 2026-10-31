@@ -211,7 +211,7 @@ button,label.btn{font:inherit;cursor:pointer}
     <button class="tog" id="tPlace" aria-pressed="false">放置人偶</button>
     <button class="tog" id="tPov" disabled>人偶視角</button>
     <button class="tog" id="tCloud" aria-pressed="false" title="顯示 ChatGPT 在雲端移動的人偶（藍色）；需先登入立之雲端庫">雲端人偶</button>
-     <button class="tog" id="tCloudCapture" aria-pressed="false" title="登入後主動開啟 30 分鐘 AI 巡查截圖分享；需保持本頁開啟，僅雲端人偶跟隨視角及新 revision 會擷取一張">共享 AI 巡查畫面</button>
+     <button class="tog" id="tCloudCapture" aria-pressed="false" title="登入後主動開啟 30 分鐘 AI 巡查截圖分享；需保持本頁開啟，僅雲端人偶跟隨視角及新 revision 會擷取一張；圖片超過90秒拒讀，實體刪除無保證時限，意外關頁可能持續留存">共享 AI 巡查畫面</button>
     <button class="tog" id="tFit">重新置中</button>
     <button class="tog" id="tTop" aria-pressed="false">俯視</button>
     <button class="tog" id="tRot" aria-pressed="false">自動旋轉</button>
@@ -1302,7 +1302,7 @@ $('tCloudCapture').onclick=()=>{
  if(!cloudOn)cloudSet(true);
  if(!cloudFollowOn)cloudFollowSet(true);
  cloudCaptureSet(true);cloudCaptureLastRevision=-1;
- cloudSay('已授權 30 分鐘瀏覽器畫面分享；保持本頁開啟，僅新場景版本擷取 640×360 JPEG');
+ cloudSay('已授權 30 分鐘瀏覽器畫面分享；保持本頁開啟，僅新場景版本擷取 640×360 JPEG。圖片超過90秒拒讀；實體刪除無保證時限，意外關頁可能持續留存');
  cloudPoll();
 };
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cloudOn)cloudPoll();});
