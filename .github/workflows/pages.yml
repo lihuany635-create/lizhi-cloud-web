@@ -227,19 +227,8 @@ jobs:
       - name: Remove temporary Hew source and build dependencies from Pages payload
         run: rm -rf .hew-model-build
 
-      # Rebuild the native production workspace from reviewed source on each Pages publish.
-      # The two policy Markdown files remain regular same-origin static documents.
-      - name: Build Employee Essentials into native production workspace
-        working-directory: production/source
-        run: |
-          npm install --no-package-lock --no-audit --no-fund
-          npm test
-          npm run build
-          test -s native-dist/production-workspace.js
-          grep -q '員工必知' native-dist/production-workspace.js
-          test -s ../../docs/AI_EMPLOYEE_HANDBOOK_v1.0.md
-          test -s ../../docs/APP_REQUIREMENTS_INTERVIEW_v1.0.md
-          cp native-dist/production-workspace.js ../production-workspace.js
+      # 舊 React 製作工作台已由 production/ai-workbench.js（AI 工作台 v2）取代，不再建置。
+      # production/source 保留作歷史參考，不發佈。
 
       # Publish only runtime files. Source, docs, SQL, CI, tests, scripts,
       # model backups/candidates/revisions and build inputs stay in the repo only.
@@ -274,7 +263,7 @@ jobs:
         run: |
           set -euo pipefail
           for f in index.html app.js sw.js auth.js supabase-config.js media-manifest.json upload-status.json \
-                   schemas/weaving-proposal.schema.json production/production-workspace.js \
+                   schemas/weaving-proposal.schema.json production/ai-workbench.js \
                    cad/runtime/index.html hew-editor/index.html model-viewer/index.html \
                    model-viewer/private-assets.js model-viewer/private-page.html \
                    docs/AI_EMPLOYEE_HANDBOOK_v1.0.md; do

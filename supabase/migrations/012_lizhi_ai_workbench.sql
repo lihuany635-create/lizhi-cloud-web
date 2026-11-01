@@ -94,15 +94,16 @@ create index if not exists aiwb_events_task on public.aiwb_events(task_id, at);
 create or replace function public.aiwb_events_append_only() returns trigger
 language plpgsql set search_path = '' as $$
 begin
+  -- 僅供資料庫管理者清除測試資料：同一交易內 set_config('aiwb.allow_purge','on',true)
+  if tg_op = 'DELETE' and current_setting('aiwb.allow_purge', true) = 'on' then return old; end if;
   raise exception 'aiwb_events is append-only';
 end $$;
-drop trigger if exists aiwb_events_no_change on public.aiwb_events;
 create trigger aiwb_events_no_change before update or delete on public.aiwb_events
   for each row execute function public.aiwb_events_append_only();
 
--- 任務代號 TASK-001 依專案遞增
+-- 任務代號 TASK-001 依專案遞增（invoker：受 RLS 限制，只有 service role 能成功呼叫）
 create or replace function public.aiwb_next_task_code(p_project uuid, p_owner uuid) returns text
-language plpgsql security definer set search_path = '' as $$
+language plpgsql security invoker set search_path = '' as $$
 declare n integer;
 begin
   update public.aiwb_projects set task_seq = task_seq + 1, updated_at = now()
@@ -111,7 +112,6 @@ begin
   if n is null then raise exception 'project not found'; end if;
   return 'TASK-' || lpad(n::text, 3, '0');
 end $$;
-revoke all on function public.aiwb_next_task_code(uuid, uuid) from public, anon, authenticated;
 
 alter table public.aiwb_projects enable row level security;
 alter table public.aiwb_tasks enable row level security;
@@ -119,4 +119,4 @@ alter table public.aiwb_checks enable row level security;
 alter table public.aiwb_reports enable row level security;
 alter table public.aiwb_notices enable row level security;
 alter table public.aiwb_events enable row level security;
-revoke all on public.aiwb_projects, public.aiwb_tasks, public.aiwb_checks, public.aiwb_reports, public.aiwb_notices, public.aiwb_events from anon, authenticated;
+-- RLS 開啟且無任何 policy：anon／authenticated 讀寫皆被拒，只有 service role（Edge）可存取。

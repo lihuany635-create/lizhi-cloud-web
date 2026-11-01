@@ -25,12 +25,11 @@
 
 家中電腦要提供 Finance AI 時，可直接點兩下專案根目錄的 `啟動理財AI.cmd`。啟動檔會依序確認 Ollama、啟動僅綁定 `127.0.0.1:4181` 的 Finance AI Gateway、執行健康檢查，並開啟家中 AI Host 頁面；完成後會以 Windows 對話框明確顯示「已連線」或錯誤原因。
 
-## 動畫與模型流程入口
+## AI 工作台 v2（2026-11-01）
 
-主站 `?open=animationflow` 提供製作工作台與 3D 模型流程入口，工作台以同分頁開啟並使用 ChatGPT 登入。請勿將私有工作台放在 iframe 中，以免瀏覽器阻擋登入；模型入口使用 `?view=models`，登入後保留目的頁。工作台左上角可返回主站流程入口。
+`?open=animationflow`（「工作」選單的「AI 工作台」）載入 `production/ai-workbench.js`：給專案經理／顧問／工程師三個 AI 角色用的待辦板，只放任務、勾選與完成狀態，詳細內容放 Google Drive 報告書。本人在網頁看進度、批准重大決定。
 
-## 內建製作工作台
-
-`?open=animationflow` 直接掛載主站內的 React 工作台，不使用 iframe 或外站登入。使用既有 Google／Supabase session；動畫、模型、採用版與 AI 交接集中於 Supabase `lizhi_production_state`。獨立 Site 只保留 ChatGPT OAuth／MCP 轉接，AI 與主站讀寫同一份資料。
-
-資料寫入由 `lizhi-production` Edge Function 驗證登入、使用者、AI 角色、專案版本及狀態版本；瀏覽器沒有伺服器金鑰。原 D1 保留作搬移備份。完整前端與後端來源由製作工作台 Site 的同一份來源庫維護，建置入口 `native/build.mjs`，主站發佈資產 `production/production-workspace.js`。
+- 後端：Supabase Edge `lizhi-ai-workbench`，資料表 `aiwb_*`（migration 012）。
+- ChatGPT：原工作台私人 Site 轉接到 Edge `/mcp`，見 `sites-migration/ai-workbench/`。
+- AI 規則：`docs/AI_WORKBENCH_v2.md`。
+- 舊 React 製作工作台（`production/source`）已停用；舊資料備份在 `lizhi_production_state_backup_20261101`。舊 Edge `lizhi-production` 仍供施工照片工具使用。
