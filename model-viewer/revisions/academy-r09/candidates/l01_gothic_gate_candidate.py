@@ -116,6 +116,14 @@ for n, m in loaded.geometry.items():
     lo, hi = m.bounds
     if lo[0] < 0 < hi[0] and lo[1] < GROUND+3.8 and hi[1] > GROUND+0.15 and lo[2] < Z_GATE < hi[2]:
         raise AssertionError(f"Central low passage occluded by {n}: {m.bounds}")
+# More conservative static portal prism: leave 7.2 m width, 3.5 m height,
+# and 3.6 m depth unobstructed (still NOT a human/door collision test).
+portal_min = np.array([-3.6, GROUND + .02, -7.8])
+portal_max = np.array([ 3.6, GROUND + 3.50, -4.2])
+for n, m in loaded.geometry.items():
+    lo, hi = m.bounds
+    if np.all(lo < portal_max) and np.all(hi > portal_min):
+        raise AssertionError(f"Portal prism occluded by {n}: {m.bounds}")
 meta = {"status":"CANDIDATE_ONLY_NOT_APPROVED",
         "source":"O01 author-selected campus aerial (visual reference only)",
         "canonical_model_sha256":"80b4390068b5f78e805de7386ef53b9489d57f31f52e9a09ab1c01557fdf1c52",
