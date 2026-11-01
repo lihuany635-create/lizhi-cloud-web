@@ -10,11 +10,12 @@
 
 ## 待本人操作：更新原工作台私人 Site
 1. 在 ChatGPT 打開原「工作台」私人 Site 的編輯對話。
-2. 把 Site 的 `app/mcp/route.ts` 整個換成本資料夾的 [`route.ts`](./route.ts)。其他檔案、Secrets、網址都不要改。
+2. 把 Site 原本的 `app/mcp/route.ts` **改名**為 `app/mcp/legacy-route.ts`（內容不動），再新增本資料夾的 [`route.ts`](./route.ts) 為 `app/mcp/route.ts`。其他檔案、Secrets、網址都不要改。
+   新 route 會把 `aiwb_*` 轉到 Edge `lizhi-ai-workbench`，並保留施工照片要用的 7 個舊工具（`list_projects`、`get_project`、`create_project`、`list_project_images`、`read_project_image`、`import_project_image`、`update_project_image`），照舊走 `legacy-route` → `lizhi-production`。
 3. 確認 Site 原有 Secrets 還在：`PRODUCTION_BRIDGE_KEY`（lzp_ 開頭）、`PRODUCTION_CHATGPT_OWNER`。
    `PRODUCTION_CHATGPT_OWNER` 必須等於 `lizhi_production_ai_keys.chatgpt_owner`（原 Site 就是這樣設定）。
 4. 部署到同一個 Site（不要建新站）。
-5. 開新的 ChatGPT 對話選用這個 Site，呼叫 `aiwb_overview`（role 任選），應回傳空的專案清單。
+5. 開新的 ChatGPT 對話選用這個 Site，呼叫 `aiwb_overview`（role 任選），應回傳空的專案清單；工具清單應有 10 個 `aiwb_*` 加 7 個施工照片工具。
 
 ## 之後改工具
 工具清單與規則都在 `supabase/functions/lizhi-ai-workbench/index.ts`，重新部署 Edge 即可，Site 不必再動。

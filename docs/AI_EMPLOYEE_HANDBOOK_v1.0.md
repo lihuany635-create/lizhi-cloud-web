@@ -42,7 +42,7 @@
 
 **第 13 條｜跨 AI 接手標準。** 下一位 AI 開始工作應：
 1. 讀取本守則及其版本（若無法讀取，誠實告知）。
-2. 讀 `list_projects → get_project_context／get_project_handoff` 或該專業模組的等效工具。
+2. 讀 AI 工作台 `aiwb_overview → aiwb_get_task`（見 [AI 工作台 v2](AI_WORKBENCH_v2.md)）或該專業模組的等效工具。
 3. 核對專案、任務、最近 revision、採用版本、未結阻礙、工具權限。
 4. 執行允許的最小下一步，必要時驗證裝置／站點在線。
 5. 留下結果證據與下一步；**不得自行聲稱其他 AI 已閱讀或已同意**。

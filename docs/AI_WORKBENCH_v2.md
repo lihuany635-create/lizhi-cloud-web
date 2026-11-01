@@ -21,6 +21,8 @@
 | `aiwb_notify` | 全部 | 通知下一位：任務、報告、下一步；`dedupe_key` 防重送 |
 | `aiwb_inbox` | 全部 | 讀自己的通知，**實際打開報告後**才用 `ack_ids` 標已讀 |
 
+施工照片工作區另外保留 7 個舊工具（`list_projects`、`get_project`、`create_project`、`list_project_images`、`read_project_image`、`import_project_image`、`update_project_image`），只供施工照片填表使用，見 `docs/PHOTO_SHEET_DRIVE_MCP_v1.md`；其他工作一律用 `aiwb_*`。
+
 ## 狀態
 待辦 todo → 進行中 doing → 待驗收 review → 完成 done；卡住 blocked。
 
