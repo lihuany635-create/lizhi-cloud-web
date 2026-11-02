@@ -56,6 +56,7 @@ dispatch 觸發後 Actions 開機約 20–40 秒，加上下載 hew-cli 與執�
 
 - PostgreSQL 16：`tests/sql/hew_model_cloud_hew_isolated.test.sql` → `LIZHI_MODEL_CLOUD_HEW_SQL_TEST_PASS`（本機）
 - Node：`tests/hew-cloud-hew.test.mjs`（worker 以假 hew-cli 測試、worker Edge、Site 雲端工具）PASS（本機）
+- 真實 hew-cli 1.3.0（本機 release 編譯）＋ `worker.mjs`（假網路、真 Hew）：新文件矩形＋推拉＋命名交易 → 產生 r1；`hew.query.scene` 唯讀不改 revision；`hew.view.snapshot` 存成 PNG 檔；`hew.doc.export glb` 存成 `model/gltf-binary`；錯誤參數回傳核心錯誤訊息 → 全部 PASS（本機）
 - **NOT_TESTED**：正式部署、真實 GitHub Actions 執行、ChatGPT 端到端
 
 ## 上線步驟（需使用者同意與操作）
