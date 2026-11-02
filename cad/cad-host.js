@@ -413,6 +413,10 @@
   }
   function validateCadCommand(name, params) {
     if (!params || typeof params !== "object" || Array.isArray(params)) return false;
+    // Full command surface: the CAD engine (lizhi_call.rs) re-checks paths, blocked and
+    // destructive commands; the Site Edge and database check them too.
+    if (name === "lizhi.call") return JSON.stringify(params).length <= 32768 &&
+      ["execute","cmdline","script","commands","inspect","render"].includes(params.op);
     if (JSON.stringify(params).length > 8192) return false;
     const keys = Object.keys(params);
     // Explicitly bounded native geometry read; remote exposure remains gated.
@@ -463,7 +467,7 @@
         const timer = setTimeout(() => {
           pendingCadCommands.delete(requestId);
           reject(new Error("CAD 指令逾時，未自動重試以避免重複畫圖"));
-        }, 25000);
+        }, name === "lizhi.call" ? 60000 : 25000);
         pendingCadCommands.set(requestId, { resolve, reject, timer });
         try {
           frame.contentWindow.postMessage({ type: "cadcraft:command", requestId, command: name, params }, location.origin);
