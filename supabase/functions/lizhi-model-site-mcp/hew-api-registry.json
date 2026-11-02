@@ -1,0 +1,7139 @@
+{
+ "source": "lihuany635-create/lizhi-hew@14a669f",
+ "generated_from": "docs/API_REFERENCE.gen.md",
+ "count": 105,
+ "methods": [
+  {
+   "method": "hew.attr.delete",
+   "namespace": "attr",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Delete one attribute key or a whole namespace.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "key": {
+      "type": "string"
+     },
+     "ns": {
+      "type": "string"
+     },
+     "target": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "target",
+     "ns"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "invalid_attr_name"
+   ]
+  },
+  {
+   "method": "hew.attr.get",
+   "namespace": "attr",
+   "tier": "Required",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "Read a target's attribute dictionaries.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "ns": {
+      "type": "string"
+     },
+     "target": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "target"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_object"
+   ]
+  },
+  {
+   "method": "hew.attr.set",
+   "namespace": "attr",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Write one attribute key.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "key": {
+      "type": "string"
+     },
+     "ns": {
+      "type": "string"
+     },
+     "target": {
+      "type": "string"
+     },
+     "value": {}
+    },
+    "required": [
+     "target",
+     "ns",
+     "key",
+     "value"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "invalid_attr_name"
+   ]
+  },
+  {
+   "method": "hew.component.create",
+   "namespace": "component",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Fold a selection into a definition plus one instance.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "members": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "members"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "component": {
+      "type": "string"
+     },
+     "instance": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "component",
+     "instance"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "empty_component"
+   ]
+  },
+  {
+   "method": "hew.component.explode",
+   "namespace": "component",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Bake an instance into world geometry.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "instance": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "instance"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "objects": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "objects"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_instance"
+   ]
+  },
+  {
+   "method": "hew.component.make_unique",
+   "namespace": "component",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Deep-copy an instance's definition into a private one.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "instance": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "instance"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "component": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "component"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_instance"
+   ]
+  },
+  {
+   "method": "hew.component.place",
+   "namespace": "component",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Place an instance of a definition at a pose.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "component": {
+      "type": "string"
+     },
+     "pose": {}
+    },
+    "required": [
+     "component"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "instance": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "instance"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_component"
+   ]
+  },
+  {
+   "method": "hew.context.enter",
+   "namespace": "context",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Open a group/component editing frame (transaction-balanced only).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "explode_session_open"
+   ]
+  },
+  {
+   "method": "hew.context.exit",
+   "namespace": "context",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Close the innermost frame this envelope opened.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "explode_session_not_open"
+   ]
+  },
+  {
+   "method": "hew.doc.attach",
+   "namespace": "doc",
+   "tier": "Required",
+   "class": "solitary",
+   "served": "kernel",
+   "summary": "Bind this connection to one open document, named by `document` (id, path, label, or title; see hew.meta.documents). With no `document`, the connection's current document.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "document": {
+      "description": "a document id (doc_N), or its exact path, label, or title when unambiguous",
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "document": {
+      "properties": {
+       "attached": {
+        "description": "this is the connection's current document",
+        "type": "boolean"
+       },
+       "dirty": {
+        "type": "boolean"
+       },
+       "front": {
+        "description": "this is the user's front-most document window",
+        "type": "boolean"
+       },
+       "id": {
+        "description": "doc_N, unique for the host's lifetime and never reused",
+        "type": "string"
+       },
+       "label": {
+        "description": "the client-chosen label given at hew.doc.new/open, if any",
+        "type": "string"
+       },
+       "path": {
+        "description": "the file last opened from or saved to; null while unsaved",
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "title": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "title",
+       "path",
+       "dirty"
+      ],
+      "type": "object"
+     }
+    },
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_document",
+    "ambiguous_document"
+   ]
+  },
+  {
+   "method": "hew.doc.close",
+   "namespace": "doc",
+   "tier": "Standard",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Close an open document window (the attached one, or the named `document`). Refuses unsaved changes unless `discard` is set.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "discard": {
+      "description": "close even with unsaved changes (they are lost); default false",
+      "type": "boolean"
+     },
+     "document": {
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "closed": {
+      "properties": {
+       "attached": {
+        "description": "this is the connection's current document",
+        "type": "boolean"
+       },
+       "dirty": {
+        "type": "boolean"
+       },
+       "front": {
+        "description": "this is the user's front-most document window",
+        "type": "boolean"
+       },
+       "id": {
+        "description": "doc_N, unique for the host's lifetime and never reused",
+        "type": "string"
+       },
+       "label": {
+        "description": "the client-chosen label given at hew.doc.new/open, if any",
+        "type": "string"
+       },
+       "path": {
+        "description": "the file last opened from or saved to; null while unsaved",
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "title": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "title",
+       "path",
+       "dirty"
+      ],
+      "type": "object"
+     }
+    },
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "unknown_document",
+    "ambiguous_document",
+    "unsaved_changes",
+    "last_document"
+   ]
+  },
+  {
+   "method": "hew.doc.export",
+   "namespace": "doc",
+   "tier": "Required",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Export the attached document — STL, 3MF, glTF/GLB, USDZ (solids only), or a SketchUp .skp (\"skp\", 2026 container; \"skp2017\") — bytes base64, or a path on hosts with filesystem access.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "format": {
+      "description": "\"gltf\" is an alias for \"glb\" — every host that implements one implements both. \"skp\" is the SketchUp 2026 container, \"skp2017\" the 2017 format; exporting never changes the document's own file",
+      "enum": [
+       "stl",
+       "3mf",
+       "glb",
+       "gltf",
+       "usdz",
+       "skp",
+       "skp2017"
+      ],
+      "type": "string"
+     },
+     "path": {
+      "type": "string"
+     },
+     "segments_per_turn": {
+      "maximum": 512,
+      "minimum": 8,
+      "type": "integer"
+     },
+     "units": {
+      "description": "SketchUp formats only: the display units the file opens in (hew.view.units's formats). Absent: the host's display units (the app's preference live; meters headless).",
+      "enum": [
+       "m",
+       "cm",
+       "mm",
+       "arch",
+       "frac_in",
+       "dec_in"
+      ],
+      "type": "string"
+     }
+    },
+    "required": [
+     "format"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "bytes_base64": {
+      "type": "string"
+     },
+     "format": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "format"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "export_failed",
+    "host_capability_missing",
+    "nothing_to_export",
+    "save_failed"
+   ]
+  },
+  {
+   "method": "hew.doc.focus",
+   "namespace": "doc",
+   "tier": "Standard",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Raise a document's window to the front. Every other command leaves the user's focus alone; this is the explicit opt-in.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "document": {
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "document": {
+      "properties": {
+       "attached": {
+        "description": "this is the connection's current document",
+        "type": "boolean"
+       },
+       "dirty": {
+        "type": "boolean"
+       },
+       "front": {
+        "description": "this is the user's front-most document window",
+        "type": "boolean"
+       },
+       "id": {
+        "description": "doc_N, unique for the host's lifetime and never reused",
+        "type": "string"
+       },
+       "label": {
+        "description": "the client-chosen label given at hew.doc.new/open, if any",
+        "type": "string"
+       },
+       "path": {
+        "description": "the file last opened from or saved to; null while unsaved",
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "title": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "title",
+       "path",
+       "dirty"
+      ],
+      "type": "object"
+     }
+    },
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "unknown_document",
+    "ambiguous_document"
+   ]
+  },
+  {
+   "method": "hew.doc.health",
+   "namespace": "doc",
+   "tier": "Standard",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "Model health: every open object (world or component member) with its verdict, open rims and seam family, and counts by kind.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "objects": {
+      "description": "obj_ ids to diagnose; omitted = every live object, component members included",
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "counts": {
+      "description": "objects, solids, flat_sheets, bent_sheets, cappable, holes, mixed, non_manifold, seam_families",
+      "type": "object"
+     },
+     "families": {
+      "description": "objects an importer split from one shape, joined by shared rims",
+      "items": {
+       "properties": {
+        "members": {
+         "items": {
+          "type": "string"
+         },
+         "type": "array"
+        },
+        "shared_rims": {
+         "type": "integer"
+        }
+       },
+       "type": "object"
+      },
+      "type": "array"
+     },
+     "rows": {
+      "description": "one per open (non-solid) object; a component member is one row however often it is placed",
+      "items": {
+       "properties": {
+        "accepted": {
+         "description": "marked as a surface with hew.solid.mark_surface",
+         "type": "boolean"
+        },
+        "branching_vertices": {
+         "type": "integer"
+        },
+        "definition": {
+         "description": "cmp_ id when the object is a component member",
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "definition_name": {
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "faces": {
+         "description": "how many faces the object has",
+         "type": "integer"
+        },
+        "family": {
+         "description": "index into families",
+         "type": [
+          "integer",
+          "null"
+         ]
+        },
+        "instances": {
+         "description": "outermost ins_ ids that place the member",
+         "items": {
+          "type": "string"
+         },
+         "type": "array"
+        },
+        "islands": {
+         "type": "integer"
+        },
+        "name": {
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "object": {
+         "type": "string"
+        },
+        "placements": {
+         "type": "integer"
+        },
+        "rims": {
+         "description": "open rims; their order is what hew.solid.cap's rims index",
+         "items": {
+          "properties": {
+           "cappable": {
+            "description": "a face can close it: closed, planar, not the edge of a flat part of the surface, no branching vertex",
+            "type": "boolean"
+           },
+           "closed": {
+            "type": "boolean"
+           },
+           "edges": {
+            "type": "integer"
+           },
+           "extent": {
+            "type": "number"
+           },
+           "perimeter": {
+            "type": "number"
+           },
+           "planar": {
+            "type": "boolean"
+           },
+           "role": {
+            "enum": [
+             "outer",
+             "hole"
+            ],
+            "type": "string"
+           },
+           "shared": {
+            "description": "another row's rim coincides with it: a seam between pieces of one shape the importer split (see family)",
+            "type": "boolean"
+           },
+           "sheet_edge": {
+            "description": "planar, but runs along the edge of a flat part of the surface on its plane (a basin's lip), so a face there would lie on that part's back",
+            "type": "boolean"
+           }
+          },
+          "type": "object"
+         },
+         "type": "array"
+        },
+        "verdict": {
+         "properties": {
+          "holes": {
+           "description": "flat_sheet: holes in the sheet",
+           "type": "integer"
+          },
+          "kind": {
+           "enum": [
+            "flat_sheet",
+            "bent_sheet",
+            "cappable",
+            "holes",
+            "mixed",
+            "non_manifold"
+           ],
+           "type": "string"
+          },
+          "planar": {
+           "description": "holes: how many are flat (a face can close each)",
+           "type": "integer"
+          },
+          "warped": {
+           "description": "holes: how many are not flat",
+           "type": "integer"
+          }
+         },
+         "required": [
+          "kind"
+         ],
+         "type": "object"
+        }
+       },
+       "required": [
+        "object",
+        "verdict",
+        "rims",
+        "accepted",
+        "placements"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "rows",
+     "families",
+     "counts"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity"
+   ]
+  },
+  {
+   "method": "hew.doc.import",
+   "namespace": "doc",
+   "tier": "Standard",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Merge a foreign-format file (STL, glTF/GLB, COLLADA, SketchUp) into the attached document through the shared healing pipeline, or place a PNG/JPEG picture (a component holding one face painted with it, at origin/u/v, width meters wide). Additive: existing geometry is untouched.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "bytes_base64": {
+      "description": "the file's bytes, for a host with no filesystem (the desktop app); `path` then only names the file. hew-cli supplies this for you",
+      "type": "string"
+     },
+     "images": {
+      "additionalProperties": {
+       "type": "object"
+      },
+      "description": "COLLADA texture images by the uri the file uses: {bytes_base64, format: png|jpeg}",
+      "type": "object"
+     },
+     "origin": {
+      "description": "a picture's (.png/.jpg/.jpeg) lower-left corner, meters; default [0,0,0]",
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     },
+     "path": {
+      "type": "string"
+     },
+     "u": {
+      "description": "a picture's width direction; default [1,0,0]",
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     },
+     "units": {
+      "enum": [
+       "m",
+       "mm",
+       "cm",
+       "in"
+      ],
+      "type": "string"
+     },
+     "v": {
+      "description": "toward a picture's top (not parallel to u); default [0,1,0]",
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     },
+     "width": {
+      "description": "a picture's width in meters (its height follows from its proportions); default 1",
+      "exclusiveMinimum": 0,
+      "type": "number"
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "report": {
+      "type": "object"
+     }
+    },
+    "required": [
+     "report"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "units_required",
+    "load_failed",
+    "unsupported_format"
+   ]
+  },
+  {
+   "method": "hew.doc.new",
+   "namespace": "doc",
+   "tier": "Required",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Create a fresh document. The desktop app opens it in a new window — behind the user's current one unless `focus` says otherwise — and attaches the connection to it; headless hosts replace the working document.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "focus": {
+      "description": "where the new window goes; background (the default) never takes the user's focus",
+      "enum": [
+       "background",
+       "front"
+      ],
+      "type": "string"
+     },
+     "label": {
+      "description": "a name to find the document by later, resolvable by hew.doc.attach and listed by hew.meta.documents",
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "document": {
+      "properties": {
+       "attached": {
+        "description": "this is the connection's current document",
+        "type": "boolean"
+       },
+       "dirty": {
+        "type": "boolean"
+       },
+       "front": {
+        "description": "this is the user's front-most document window",
+        "type": "boolean"
+       },
+       "id": {
+        "description": "doc_N, unique for the host's lifetime and never reused",
+        "type": "string"
+       },
+       "label": {
+        "description": "the client-chosen label given at hew.doc.new/open, if any",
+        "type": "string"
+       },
+       "path": {
+        "description": "the file last opened from or saved to; null while unsaved",
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "title": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "title",
+       "path",
+       "dirty"
+      ],
+      "type": "object"
+     }
+    },
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "window_not_ready"
+   ]
+  },
+  {
+   "method": "hew.doc.open",
+   "namespace": "doc",
+   "tier": "Required",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Open a .hew or SketchUp .skp document. The desktop app opens it in a new window (or attaches to the window that already has that file open), behind the user's current window unless `focus` says otherwise; headless hosts replace the working document.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "focus": {
+      "description": "where the new window goes; background (the default) never takes the user's focus",
+      "enum": [
+       "background",
+       "front"
+      ],
+      "type": "string"
+     },
+     "label": {
+      "description": "a name to find the document by later, resolvable by hew.doc.attach and listed by hew.meta.documents",
+      "type": "string"
+     },
+     "path": {
+      "description": "a .hew file, or a SketchUp .skp file (either container) when the extension is .skp; a later hew.doc.save with no format writes the same container back",
+      "type": "string"
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "already_open": {
+      "description": "the file was already open in a window; the connection was attached to it instead of opening a second copy",
+      "type": "boolean"
+     },
+     "document": {
+      "properties": {
+       "attached": {
+        "description": "this is the connection's current document",
+        "type": "boolean"
+       },
+       "dirty": {
+        "type": "boolean"
+       },
+       "front": {
+        "description": "this is the user's front-most document window",
+        "type": "boolean"
+       },
+       "id": {
+        "description": "doc_N, unique for the host's lifetime and never reused",
+        "type": "string"
+       },
+       "label": {
+        "description": "the client-chosen label given at hew.doc.new/open, if any",
+        "type": "string"
+       },
+       "path": {
+        "description": "the file last opened from or saved to; null while unsaved",
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "title": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "title",
+       "path",
+       "dirty"
+      ],
+      "type": "object"
+     }
+    },
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "load_failed",
+    "window_not_ready"
+   ]
+  },
+  {
+   "method": "hew.doc.purge_unused",
+   "namespace": "doc",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Delete every unused material and component definition, as one undo entry.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {
+     "definitions": {
+      "type": "integer"
+     },
+     "materials": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "materials",
+     "definitions"
+    ],
+    "type": "object"
+   },
+   "refusals": []
+  },
+  {
+   "method": "hew.doc.revert",
+   "namespace": "doc",
+   "tier": "Standard",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Revert to Saved: re-read the document's saved file in place, discarding every change since the last save. The undo and redo history is cleared and the document reads clean. Refuses `nothing_to_revert` when the document has no saved file or has no changes since the last save. There is no confirmation step: the caller is deliberate.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "document": {
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "load_failed",
+    "nothing_to_revert",
+    "unknown_document",
+    "ambiguous_document"
+   ]
+  },
+  {
+   "method": "hew.doc.save",
+   "namespace": "doc",
+   "tier": "Required",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Save the attached document (Save / Save As) as .hew or SketchUp .skp: the file is written, the unsaved mark cleared, and the document bound to it. `copy` writes a copy without any of that. With no `path` it re-saves in place; a document with no file yet, in a host that cannot ask where, hands the bytes back instead.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "copy": {
+      "description": "write a copy to `path` — the document is not rebound to it and keeps its unsaved mark; requires `path`",
+      "type": "boolean"
+     },
+     "format": {
+      "description": "\"skp\" is the 2026 container (what current SketchUp saves), \"skp2017\" the 2017 format (opens in SketchUp Make 2017 and later). Absent: a .skp path keeps the working file's own .skp container (the 2026 one for a document that did not come from a .skp), any other path writes .hew, and no path uses the working file's own format. A format that contradicts the path's extension is refused (format_mismatch).",
+      "enum": [
+       "hew",
+       "skp",
+       "skp2017"
+      ],
+      "type": "string"
+     },
+     "path": {
+      "type": "string"
+     },
+     "return_bytes": {
+      "description": "hand the document's bytes back and write nothing: no file, no binding, no saved mark; takes no `path`",
+      "type": "boolean"
+     },
+     "units": {
+      "description": "The display units a SketchUp file opens in (hew.view.units's formats), a save back over a .skp included. Absent: a save back keeps the file's own units and a new file takes the host's display units (the app's preference live; meters headless). A .hew ignores it.",
+      "enum": [
+       "m",
+       "cm",
+       "mm",
+       "arch",
+       "frac_in",
+       "dec_in"
+      ],
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {
+     "bytes_base64": {
+      "type": "string"
+     },
+     "format": {
+      "description": "the format the document was saved in",
+      "enum": [
+       "hew",
+       "skp",
+       "skp2017"
+      ],
+      "type": "string"
+     },
+     "simplified": {
+      "description": "present for a .skp: what the file could not hold exactly",
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "writer_notes": {
+      "description": "present for a .skp: what the 2017 writer dropped",
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "type": "object"
+   },
+   "refusals": [
+    "file_open_elsewhere",
+    "format_mismatch",
+    "host_capability_missing",
+    "path_required",
+    "save_failed"
+   ]
+  },
+  {
+   "method": "hew.doc.transact",
+   "namespace": "doc",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Execute commands in order, atomically, as one labeled undo entry.",
+   "params": {
+    "properties": {
+     "commands": {
+      "items": {
+       "properties": {
+        "as": {
+         "type": "string"
+        },
+        "method": {
+         "type": "string"
+        },
+        "params": {
+         "type": "object"
+        }
+       },
+       "required": [
+        "method"
+       ],
+       "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "label": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "commands"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "label": {
+      "type": "string"
+     },
+     "results": {
+      "type": "array"
+     }
+    },
+    "required": [
+     "results",
+     "label"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "ref_resolution_failed"
+   ]
+  },
+  {
+   "method": "hew.entity.delete",
+   "namespace": "entity",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Delete an entity.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "description": "any public id; a sketch edge id (\"edg_…\") erases just that one edge — the eraser's own kernel path (Sketch::remove_edge) — as one undo entry, rather than the whole sketch",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_object"
+   ]
+  },
+  {
+   "method": "hew.entity.move",
+   "namespace": "entity",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Translate (with copy/array forms) by vector or from→to points.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "copy": {
+      "additionalProperties": false,
+      "properties": {
+       "count": {
+        "maximum": 1000,
+        "minimum": 1,
+        "type": "integer"
+       }
+      },
+      "type": "object"
+     },
+     "from": {},
+     "ids": {
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "to": {},
+     "translation": {
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     }
+    },
+    "required": [
+     "ids"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "ids": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "mixed_selection_unsupported",
+    "sketch_copy_unsupported",
+    "array_count_too_large",
+    "empty_selection"
+   ]
+  },
+  {
+   "method": "hew.entity.rename",
+   "namespace": "entity",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Rename an entity.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "name": {
+      "type": [
+       "string",
+       "null"
+      ]
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "rename_unsupported",
+    "unknown_object"
+   ]
+  },
+  {
+   "method": "hew.entity.rotate",
+   "namespace": "entity",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Rotate about a pivot and axis by an angle.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "angle": {
+      "type": "number"
+     },
+     "axis": {
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     },
+     "copy": {
+      "additionalProperties": false,
+      "properties": {
+       "count": {
+        "maximum": 1000,
+        "minimum": 1,
+        "type": "integer"
+       }
+      },
+      "type": "object"
+     },
+     "ids": {
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "pivot": {}
+    },
+    "required": [
+     "ids",
+     "pivot",
+     "axis",
+     "angle"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "ids": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "mixed_selection_unsupported",
+    "sketch_copy_unsupported",
+    "array_count_too_large",
+    "empty_selection"
+   ]
+  },
+  {
+   "method": "hew.entity.scale",
+   "namespace": "entity",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Scale about an anchor with per-axis factors.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "anchor": {},
+     "factors": {
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     },
+     "ids": {
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "ids",
+     "anchor",
+     "factors"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "mixed_selection_unsupported",
+    "empty_selection"
+   ]
+  },
+  {
+   "method": "hew.group.create",
+   "namespace": "group",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Group sibling nodes non-destructively.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "members": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "members"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "group": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "group"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "empty_group"
+   ]
+  },
+  {
+   "method": "hew.group.explode",
+   "namespace": "group",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Dissolve a group, re-homing its members.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_group"
+   ]
+  },
+  {
+   "method": "hew.group.reparent",
+   "namespace": "group",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Move live nodes into a group, or out to the top level, without touching their geometry.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "ids": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "parent": {
+      "type": [
+       "string",
+       "null"
+      ]
+     }
+    },
+    "required": [
+     "ids"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "empty_ids",
+    "group_cycle"
+   ]
+  },
+  {
+   "method": "hew.guide.angular",
+   "namespace": "guide",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Add an angular construction guide.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "angle": {
+      "description": "radians, right-handed about plane_normal",
+      "type": "number"
+     },
+     "base_dir": {
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     },
+     "origin": {},
+     "plane_normal": {
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     }
+    },
+    "required": [
+     "origin",
+     "plane_normal",
+     "base_dir",
+     "angle"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "guide": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "guide"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "degenerate_guide"
+   ]
+  },
+  {
+   "method": "hew.guide.clear",
+   "namespace": "guide",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Delete all guides.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": []
+  },
+  {
+   "method": "hew.guide.line",
+   "namespace": "guide",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Add an infinite construction guide line.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "direction": {},
+     "origin": {}
+    },
+    "required": [
+     "origin",
+     "direction"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "guide": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "guide"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "degenerate_guide"
+   ]
+  },
+  {
+   "method": "hew.guide.point",
+   "namespace": "guide",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Add a construction guide point.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "position": {}
+    },
+    "required": [
+     "position"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "guide": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "guide"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "degenerate_guide"
+   ]
+  },
+  {
+   "method": "hew.history.redo",
+   "namespace": "history",
+   "tier": "Required",
+   "class": "solitary",
+   "served": "kernel",
+   "summary": "Redo the most recently undone entry.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "nothing_to_redo"
+   ]
+  },
+  {
+   "method": "hew.history.status",
+   "namespace": "history",
+   "tier": "Required",
+   "class": "solitary",
+   "served": "kernel",
+   "summary": "History depth, the top entry's label and origin, the saved depth, and every undo/redo entry's label and origin.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "entries": {
+      "properties": {
+       "redo": {
+        "items": {
+         "properties": {
+          "bookkeeping": {
+           "type": "boolean"
+          },
+          "label": {
+           "type": "string"
+          },
+          "origin": {}
+         },
+         "required": [
+          "label",
+          "origin",
+          "bookkeeping"
+         ],
+         "type": "object"
+        },
+        "type": "array"
+       },
+       "undo": {
+        "items": {
+         "properties": {
+          "bookkeeping": {
+           "type": "boolean"
+          },
+          "label": {
+           "type": "string"
+          },
+          "origin": {}
+         },
+         "required": [
+          "label",
+          "origin",
+          "bookkeeping"
+         ],
+         "type": "object"
+        },
+        "type": "array"
+       }
+      },
+      "required": [
+       "undo",
+       "redo"
+      ],
+      "type": "object"
+     },
+     "redo_depth": {
+      "type": "integer"
+     },
+     "saved_depth": {},
+     "top": {},
+     "undo_depth": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "undo_depth",
+     "redo_depth",
+     "top",
+     "saved_depth",
+     "entries"
+    ],
+    "type": "object"
+   },
+   "refusals": []
+  },
+  {
+   "method": "hew.history.undo",
+   "namespace": "history",
+   "tier": "Required",
+   "class": "solitary",
+   "served": "kernel",
+   "summary": "Undo the top history entry (optionally guarded by expected_label).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "expected_label": {
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "expected_label_mismatch",
+    "nothing_to_undo"
+   ]
+  },
+  {
+   "method": "hew.library.describe",
+   "namespace": "library",
+   "tier": "Standard",
+   "class": "read-only",
+   "served": "host",
+   "summary": "One library item's full metadata, manifest summary, and document attributes.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "item": {
+      "description": "the item's id or relative path",
+      "type": "string"
+     }
+    },
+    "required": [
+     "item"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "attrs": {
+      "description": "the item's full document attribute dictionaries, namespace -> key -> value",
+      "type": "object"
+     },
+     "category": {
+      "enum": [
+       "component",
+       "material",
+       "model"
+      ],
+      "type": "string"
+     },
+     "collection": {
+      "type": "string"
+     },
+     "error": {
+      "description": "present only when the file failed to parse",
+      "type": "string"
+     },
+     "id": {
+      "type": "string"
+     },
+     "keywords": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "mtime_ms": {
+      "type": "integer"
+     },
+     "name": {
+      "type": "string"
+     },
+     "path": {
+      "type": "string"
+     },
+     "saved_at": {
+      "type": "string"
+     },
+     "size": {
+      "type": "integer"
+     },
+     "summary": {
+      "description": "manifest counts (objects, materials, components, ...); absent when error is present",
+      "type": "object"
+     }
+    },
+    "required": [
+     "path",
+     "name",
+     "category",
+     "keywords",
+     "size",
+     "mtime_ms",
+     "attrs"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "unknown_library_item"
+   ]
+  },
+  {
+   "method": "hew.library.insert",
+   "namespace": "library",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Insert a library item into the attached document, wired for idempotent re-insert exactly like the UI's own placement; a material item goes into the palette instead, recording no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "at": {
+      "description": "a translation applied to the item's world roots; identity when omitted",
+      "oneOf": [
+       {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       {
+        "type": "object"
+       }
+      ]
+     },
+     "bytes_base64": {
+      "description": "the item's raw .hew bytes — exactly one of item/bytes_base64",
+      "type": "string"
+     },
+     "content_hash": {
+      "description": "sha256 hex of bytes_base64, for idempotent re-insert matching; ignored (and provenance is skipped) without it",
+      "type": "string"
+     },
+     "item": {
+      "description": "the item's id or relative path — exactly one of item/bytes_base64",
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "annotations_skipped": {
+      "type": "integer"
+     },
+     "definitions_added": {
+      "type": "integer"
+     },
+     "definitions_reused": {
+      "type": "integer"
+     },
+     "guides_added": {
+      "type": "integer"
+     },
+     "materials": {
+      "description": "a material item only: its palette materials, added or reused, in item order",
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "materials_added": {
+      "type": "integer"
+     },
+     "materials_reused": {
+      "type": "integer"
+     },
+     "objects_added": {
+      "type": "integer"
+     },
+     "roots": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "world_sketches_skipped": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "roots",
+     "definitions_added",
+     "definitions_reused",
+     "materials_added",
+     "materials_reused",
+     "objects_added",
+     "guides_added",
+     "world_sketches_skipped",
+     "annotations_skipped"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "unknown_library_item",
+    "load_failed",
+    "component_expansion_exceeded"
+   ]
+  },
+  {
+   "method": "hew.library.list",
+   "namespace": "library",
+   "tier": "Standard",
+   "class": "read-only",
+   "served": "host",
+   "summary": "List items in the Hew Library, optionally filtered by category, collection, or a text query.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "category": {
+      "enum": [
+       "component",
+       "material",
+       "model"
+      ],
+      "type": "string"
+     },
+     "collection": {
+      "description": "matches this collection path and its subtree",
+      "type": "string"
+     },
+     "query": {
+      "description": "case-insensitive substring match against name and keywords",
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "folder": {
+      "type": "string"
+     },
+     "items": {
+      "items": {
+       "properties": {
+        "category": {
+         "enum": [
+          "component",
+          "material",
+          "model"
+         ],
+         "type": "string"
+        },
+        "collection": {
+         "type": "string"
+        },
+        "error": {
+         "description": "present only when the file failed to parse",
+         "type": "string"
+        },
+        "id": {
+         "type": "string"
+        },
+        "keywords": {
+         "items": {
+          "type": "string"
+         },
+         "type": "array"
+        },
+        "mtime_ms": {
+         "type": "integer"
+        },
+        "name": {
+         "type": "string"
+        },
+        "path": {
+         "type": "string"
+        },
+        "saved_at": {
+         "type": "string"
+        },
+        "size": {
+         "type": "integer"
+        },
+        "summary": {
+         "description": "manifest counts (objects, materials, components, ...); absent when error is present",
+         "type": "object"
+        }
+       },
+       "required": [
+        "path",
+        "name",
+        "category",
+        "keywords",
+        "size",
+        "mtime_ms"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "folder",
+     "items"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing"
+   ]
+  },
+  {
+   "method": "hew.library.remove",
+   "namespace": "library",
+   "tier": "Standard",
+   "class": "read-only",
+   "served": "host",
+   "summary": "Delete a library item.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "item": {
+      "description": "the item's id or relative path",
+      "type": "string"
+     }
+    },
+    "required": [
+     "item"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "removed": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "removed"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "unknown_library_item"
+   ]
+  },
+  {
+   "method": "hew.library.save",
+   "namespace": "library",
+   "tier": "Standard",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "Save a selection, one material, or the whole document to the library. Records no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "category": {
+      "description": "defaults to component (a selection), material (a material), or model (the whole document)",
+      "enum": [
+       "component",
+       "material",
+       "model"
+      ],
+      "type": "string"
+     },
+     "collection": {
+      "type": "string"
+     },
+     "keywords": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "material": {
+      "description": "one palette material to save alone as a material item, as the palette's Save to Library does — not with selection",
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     },
+     "return_bytes": {
+      "description": "also return the saved item's bytes base64",
+      "type": "boolean"
+     },
+     "selection": {
+      "description": "node ids to save as a component item; omitted saves the whole document as a model item",
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "source_doc": {
+      "description": "display-only \"saved from\" bookkeeping; defaults to the host's current document path when known (e.g. hew-cli --file), else omitted",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "bytes_base64": {
+      "description": "present only when return_bytes was true",
+      "type": "string"
+     },
+     "id": {
+      "type": "string"
+     },
+     "path": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "path",
+     "id"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "unknown_entity",
+    "empty_component"
+   ]
+  },
+  {
+   "method": "hew.library.update_meta",
+   "namespace": "library",
+   "tier": "Standard",
+   "class": "read-only",
+   "served": "host",
+   "summary": "Edit a library item's name, keywords, or collection in place.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "collection": {
+      "type": "string"
+     },
+     "item": {
+      "description": "the item's id or relative path",
+      "type": "string"
+     },
+     "keywords": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "name": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "item"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "category": {
+      "enum": [
+       "component",
+       "material",
+       "model"
+      ],
+      "type": "string"
+     },
+     "collection": {
+      "type": "string"
+     },
+     "id": {
+      "type": "string"
+     },
+     "keywords": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "name": {
+      "type": "string"
+     },
+     "saved_at": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "name",
+     "category",
+     "keywords"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "unknown_library_item",
+    "save_failed"
+   ]
+  },
+  {
+   "method": "hew.material.create",
+   "namespace": "material",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Add a color or texture material to the palette. Registry-state: records no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "color": {
+      "description": "required without a texture; with one it tints the image (default white: the image as-is)",
+      "items": {
+       "maximum": 255,
+       "minimum": 0,
+       "type": "integer"
+      },
+      "maxItems": 4,
+      "minItems": 3,
+      "type": "array"
+     },
+     "name": {
+      "type": "string"
+     },
+     "texture": {
+      "additionalProperties": false,
+      "description": "an image texture: a PNG or JPEG, inline or a file path (hew-cli reads it), and the meters one tile covers",
+      "properties": {
+       "bytes_base64": {
+        "description": "the encoded PNG/JPEG — exactly one of bytes_base64/path",
+        "type": "string"
+       },
+       "path": {
+        "description": "an image file, read by hew-cli — exactly one of bytes_base64/path",
+        "type": "string"
+       },
+       "world_size": {
+        "description": "[width, height] in meters of one tile",
+        "items": {
+         "exclusiveMinimum": 0,
+         "type": "number"
+        },
+        "maxItems": 2,
+        "minItems": 2,
+        "type": "array"
+       }
+      },
+      "required": [
+       "world_size"
+      ],
+      "type": "object"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "material": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "material"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "load_failed",
+    "host_capability_missing"
+   ]
+  },
+  {
+   "method": "hew.material.paint",
+   "namespace": "material",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Paint a face or entity.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "face": {},
+     "id": {
+      "type": "string"
+     },
+     "material": {
+      "type": [
+       "string",
+       "null"
+      ]
+     }
+    },
+    "required": [
+     "material"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_object"
+   ]
+  },
+  {
+   "method": "hew.material.position_texture",
+   "namespace": "material",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Position a face's texture by three tile-corner pins, or reset it to the default projection.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "face": {
+      "description": "a face locator (§5.2)"
+     },
+     "pins": {
+      "additionalProperties": false,
+      "description": "three corners of one texture tile, in the face's object frame (as a locator's `at`), projected onto the face: origin, one tile along the width (u), one tile along the height (v) — exactly one of pins/reset",
+      "properties": {
+       "origin": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "u": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "v": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       }
+      },
+      "required": [
+       "origin",
+       "u",
+       "v"
+      ],
+      "type": "object"
+     },
+     "reset": {
+      "description": "true: back to the default projection at the material's tile size — exactly one of pins/reset",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "face"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_object"
+   ]
+  },
+  {
+   "method": "hew.material.replace",
+   "namespace": "material",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Replace one material with another everywhere it is painted, or within one object.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "from": {
+      "description": "the material to replace; null: unpainted object bases",
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "object": {
+      "description": "only within this object; omitted: the whole document",
+      "type": "string"
+     },
+     "to": {
+      "description": "the material it becomes; null: unpaint",
+      "type": [
+       "string",
+       "null"
+      ]
+     }
+    },
+    "required": [
+     "from",
+     "to"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_object"
+   ]
+  },
+  {
+   "method": "hew.material.set_default",
+   "namespace": "material",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Set an object's default material.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "material": {
+      "type": [
+       "string",
+       "null"
+      ]
+     }
+    },
+    "required": [
+     "id",
+     "material"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_object"
+   ]
+  },
+  {
+   "method": "hew.material.set_opacity",
+   "namespace": "material",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Set a material's opacity.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "alpha": {
+      "maximum": 255,
+      "minimum": 0,
+      "type": "integer"
+     },
+     "material": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "material",
+     "alpha"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_material"
+   ]
+  },
+  {
+   "method": "hew.meta.capabilities",
+   "namespace": "meta",
+   "tier": "Required",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "The registry as data: every granted command's schemas, summary, and refusal inventory.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "commands": {
+      "items": {
+       "properties": {
+        "class": {
+         "enum": [
+          "model_mutating",
+          "read_only",
+          "solitary"
+         ],
+         "type": "string"
+        },
+        "implemented": {
+         "type": "boolean"
+        },
+        "name": {
+         "type": "string"
+        },
+        "params": {
+         "type": "object"
+        },
+        "refusals": {
+         "items": {
+          "type": "string"
+         },
+         "type": "array"
+        },
+        "result": {
+         "type": "object"
+        },
+        "summary": {
+         "type": "string"
+        },
+        "version": {
+         "type": "integer"
+        }
+       },
+       "required": [
+        "name",
+        "version",
+        "summary",
+        "class",
+        "params",
+        "result",
+        "refusals",
+        "implemented"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "commands"
+    ],
+    "type": "object"
+   },
+   "refusals": []
+  },
+  {
+   "method": "hew.meta.documents",
+   "namespace": "meta",
+   "tier": "Required",
+   "class": "read-only",
+   "served": "host",
+   "summary": "The host's open documents: id, title, path, dirty, and — in the desktop app — label, front, and attached.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "documents": {
+      "items": {
+       "properties": {
+        "attached": {
+         "description": "this is the connection's current document",
+         "type": "boolean"
+        },
+        "dirty": {
+         "type": "boolean"
+        },
+        "front": {
+         "description": "this is the user's front-most document window",
+         "type": "boolean"
+        },
+        "id": {
+         "description": "doc_N, unique for the host's lifetime and never reused",
+         "type": "string"
+        },
+        "label": {
+         "description": "the client-chosen label given at hew.doc.new/open, if any",
+         "type": "string"
+        },
+        "path": {
+         "description": "the file last opened from or saved to; null while unsaved",
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "title": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "id",
+        "title",
+        "path",
+        "dirty"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "documents"
+    ],
+    "type": "object"
+   },
+   "refusals": []
+  },
+  {
+   "method": "hew.meta.hello",
+   "namespace": "meta",
+   "tier": "Required",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "Open the connection: negotiate protocol and encoding, learn the granted profile and open documents.",
+   "params": {
+    "properties": {
+     "client": {
+      "properties": {
+       "name": {
+        "type": "string"
+       },
+       "version": {
+        "type": "string"
+       }
+      },
+      "type": "object"
+     },
+     "encodings": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "protocol": {
+      "type": "integer"
+     },
+     "token": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "protocol"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "app": {
+      "properties": {
+       "name": {
+        "type": "string"
+       },
+       "version": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "name",
+       "version"
+      ],
+      "type": "object"
+     },
+     "documents": {
+      "items": {
+       "properties": {
+        "attached": {
+         "description": "this is the connection's current document",
+         "type": "boolean"
+        },
+        "dirty": {
+         "type": "boolean"
+        },
+        "front": {
+         "description": "this is the user's front-most document window",
+         "type": "boolean"
+        },
+        "id": {
+         "description": "doc_N, unique for the host's lifetime and never reused",
+         "type": "string"
+        },
+        "label": {
+         "description": "the client-chosen label given at hew.doc.new/open, if any",
+         "type": "string"
+        },
+        "path": {
+         "description": "the file last opened from or saved to; null while unsaved",
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "title": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "id",
+        "title",
+        "path",
+        "dirty"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     },
+     "encoding": {
+      "type": "string"
+     },
+     "profile": {
+      "enum": [
+       "core",
+       "app"
+      ],
+      "type": "string"
+     },
+     "protocol": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "protocol",
+     "app",
+     "profile",
+     "encoding",
+     "documents"
+    ],
+    "type": "object"
+   },
+   "refusals": []
+  },
+  {
+   "method": "hew.print.pdf",
+   "namespace": "print",
+   "tier": "Standard",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Print the document to a PDF the way File ▸ Print… does: standard (one page, the view as-is) or scaled (parallel projection at an exact drawing scale, tiled across pages with overlap bands, crop/trim marks, a scale bar, and a title block). Line art is vector (hidden lines removed); shaded is a software-rasterized bitmap per page. Bytes base64 inline, or written to path.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "camera": {
+      "description": "as hew.view.snapshot; scaled prints use its direction with parallel projection",
+      "type": "object"
+     },
+     "include_hidden": {
+      "description": "line art: dashed hidden lines",
+      "type": "boolean"
+     },
+     "margin_mm": {
+      "description": "defaults to 12.7 (½ in)",
+      "type": "number"
+     },
+     "marks": {
+      "description": "crop/trim marks and neighbour labels; defaults to true",
+      "type": "boolean"
+     },
+     "mode": {
+      "description": "defaults to scaled",
+      "enum": [
+       "scaled",
+       "standard"
+      ],
+      "type": "string"
+     },
+     "orientation": {
+      "description": "defaults to auto (fewer tiles; standard follows the view's aspect)",
+      "enum": [
+       "auto",
+       "portrait",
+       "landscape"
+      ],
+      "type": "string"
+     },
+     "overlap_mm": {
+      "description": "tile overlap band, defaults to 10; 0 for none",
+      "type": "number"
+     },
+     "paper": {
+      "description": "\"letter\" | \"legal\" | \"tabloid\" | \"a5\" | \"a4\" | \"a3\" (default a4) or {w_mm, h_mm}",
+      "oneOf": [
+       {
+        "type": "string"
+       },
+       {
+        "properties": {
+         "h_mm": {
+          "type": "number"
+         },
+         "w_mm": {
+          "type": "number"
+         }
+        },
+        "required": [
+         "w_mm",
+         "h_mm"
+        ],
+        "type": "object"
+       }
+      ]
+     },
+     "path": {
+      "description": "write the PDF here instead of returning it inline",
+      "type": "string"
+     },
+     "scale": {
+      "description": "scaled: paper/model, defaults to 0.1 (1:10)",
+      "type": "number"
+     },
+     "scale_bar": {
+      "description": "defaults to true",
+      "type": "boolean"
+     },
+     "scale_label": {
+      "description": "title-block scale text; defaults to the ratio (\"1:10\")",
+      "type": "string"
+     },
+     "scene": {
+      "type": "string"
+     },
+     "style": {
+      "description": "defaults to line_art (vector)",
+      "enum": [
+       "line_art",
+       "shaded"
+      ],
+      "type": "string"
+     },
+     "title": {
+      "description": "title-block document name; defaults to the document's",
+      "type": "string"
+     },
+     "title_block": {
+      "description": "defaults to true",
+      "type": "boolean"
+     },
+     "units": {
+      "description": "scale-bar family, defaults to metric",
+      "enum": [
+       "metric",
+       "imperial"
+      ],
+      "type": "string"
+     },
+     "view": {
+      "enum": [
+       "iso",
+       "front",
+       "back",
+       "left",
+       "right",
+       "top",
+       "bottom"
+      ],
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "cols": {
+      "type": "integer"
+     },
+     "pages": {
+      "type": "integer"
+     },
+     "path": {
+      "type": "string"
+     },
+     "pdf_base64": {
+      "description": "present only when path was not given",
+      "type": "string"
+     },
+     "rows": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "pages",
+     "cols",
+     "rows"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "nothing_to_render",
+    "too_complex",
+    "save_failed",
+    "unknown_scene"
+   ]
+  },
+  {
+   "method": "hew.query.context",
+   "namespace": "query",
+   "tier": "Required",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "The open editing-context frame stack.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "direct_members": {},
+     "stack": {
+      "type": "array"
+     }
+    },
+    "required": [
+     "stack"
+    ],
+    "type": "object"
+   },
+   "refusals": []
+  },
+  {
+   "method": "hew.query.entity",
+   "namespace": "query",
+   "tier": "Required",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "One entity's details.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "description": "any public id, including a sketch's own edge id (\"edg_…\", HEW_API.md §5.2) — a sketch's `hew.query.scene`/`hew.query.entity` listing hands these out, and this command answers them directly with `{kind:\"edge\", sketch, from, to, length, curve}`",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "kind": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "kind",
+     "id"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity"
+   ]
+  },
+  {
+   "method": "hew.query.faces",
+   "namespace": "query",
+   "tier": "Required",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "A solid's faces: planes, areas, centroids, boundary loops.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "object": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "faces": {
+      "type": "array"
+     },
+     "object": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object",
+     "faces"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity"
+   ]
+  },
+  {
+   "method": "hew.query.measure",
+   "namespace": "query",
+   "tier": "Required",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "Distances and angles between points, edges, and faces.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "from": {},
+     "to": {}
+    },
+    "required": [
+     "from",
+     "to"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "delta": {
+      "type": "array"
+     },
+     "distance": {
+      "type": "number"
+     }
+    },
+    "required": [
+     "distance",
+     "delta"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "locator_missed",
+    "ambiguous_locator",
+    "no_such_point"
+   ]
+  },
+  {
+   "method": "hew.query.raycast",
+   "namespace": "query",
+   "tier": "Required",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "First hit along a ray — the programmatic form of clicking.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "dir": {
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     },
+     "origin": {
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     }
+    },
+    "required": [
+     "origin",
+     "dir"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "distance": {
+      "type": "number"
+     },
+     "kind": {
+      "enum": [
+       "object",
+       "instance"
+      ],
+      "type": "string"
+     },
+     "normal": {
+      "type": "array"
+     },
+     "object": {
+      "description": "the world object's or, for an instance hit, the instance's public id",
+      "type": "string"
+     },
+     "point": {
+      "type": "array"
+     }
+    },
+    "required": [
+     "object",
+     "kind",
+     "point",
+     "distance",
+     "normal"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "locator_missed",
+    "ambiguous_locator"
+   ]
+  },
+  {
+   "method": "hew.query.resolve",
+   "namespace": "query",
+   "tier": "Required",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "Resolve any locator (point, face, edge) to its concrete value without mutating.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "edge": {
+      "description": "HEW_API.md §5.2's edge locator: a solid edge by {object,at}, a sketch edge's own public id (\"edg_…\") as a bare string, or a sketch edge by {sketch,at} / {sketch,from,to}"
+     },
+     "face": {},
+     "point": {}
+    },
+    "type": "object"
+   },
+   "result": {
+    "description": "a resolved \"edge\" carries \"kind\": \"solid\" ({object,from,to}) or \"sketch\" ({id,sketch,from,to,curve})",
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "locator_missed",
+    "ambiguous_locator",
+    "no_such_point",
+    "face_token_unknown",
+    "face_token_stale"
+   ]
+  },
+  {
+   "method": "hew.query.scene",
+   "namespace": "query",
+   "tier": "Required",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "The document tree with per-entity summaries.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "components": {
+      "type": "array"
+     },
+     "document": {
+      "type": "object"
+     },
+     "guides": {
+      "type": "array"
+     },
+     "materials": {
+      "type": "array"
+     },
+     "sketches": {
+      "type": "array"
+     },
+     "tags": {
+      "type": "array"
+     },
+     "tree": {
+      "type": "array"
+     }
+    },
+    "required": [
+     "document",
+     "tree",
+     "sketches",
+     "guides",
+     "materials",
+     "tags",
+     "components"
+    ],
+    "type": "object"
+   },
+   "refusals": []
+  },
+  {
+   "method": "hew.scenes.add",
+   "namespace": "scenes",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Add a Scene capturing the document's current view state. Records no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "after": {
+      "description": "insert after this Scene's id; appended at the end when omitted",
+      "type": "string"
+     },
+     "camera": {
+      "additionalProperties": false,
+      "description": "an explicit camera to capture — no named-view shorthand, a Scene captures a concrete eye/target, not a fitted view; when omitted and the camera property is captured, falls back to the document's own saved working camera",
+      "properties": {
+       "eye": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "fov_deg": {
+        "description": "perspective only; defaults to 35",
+        "type": "number"
+       },
+       "parallel_height": {
+        "description": "the height the view spans at the target, meters (what a parallel view frames); defaults to what the perspective view spans there",
+        "type": "number"
+       },
+       "projection": {
+        "enum": [
+         "perspective",
+         "parallel"
+        ],
+        "type": "string"
+       },
+       "target": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "up": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       }
+      },
+      "required": [
+       "eye",
+       "target"
+      ],
+      "type": "object"
+     },
+     "description": {
+      "type": "string"
+     },
+     "display": {
+      "additionalProperties": false,
+      "description": "opaque editor display toggles: stored and returned, never interpreted by the kernel",
+      "properties": {
+       "axes": {
+        "type": "boolean"
+       },
+       "grid": {
+        "type": "boolean"
+       },
+       "guides": {
+        "type": "boolean"
+       }
+      },
+      "required": [
+       "grid",
+       "axes",
+       "guides"
+      ],
+      "type": "object"
+     },
+     "name": {
+      "description": "must be non-empty and unused; auto-named \"Scene N\" when omitted",
+      "type": "string"
+     },
+     "properties": {
+      "additionalProperties": false,
+      "description": "which of the five capturable properties to (re-)capture; each defaults to true",
+      "properties": {
+       "camera": {
+        "type": "boolean"
+       },
+       "display": {
+        "type": "boolean"
+       },
+       "hidden_nodes": {
+        "type": "boolean"
+       },
+       "hidden_tags": {
+        "type": "boolean"
+       },
+       "section": {
+        "type": "boolean"
+       }
+      },
+      "type": "object"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     },
+     "sid": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "sid",
+     "name"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "duplicate_scene_name"
+   ]
+  },
+  {
+   "method": "hew.scenes.apply",
+   "namespace": "scenes",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Apply a Scene: write its captured camera/hidden-set/section state into the document. Records no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "description": "each key present only when the Scene captured that property; hidden_object_ids/hidden_instance_ids appear as a pair (possibly empty arrays) whenever hidden_nodes or hidden_tags is captured, and are OMITTED entirely — not empty-arrayed — when neither is, so a partial-capture Scene can never read as \"show everything\"",
+    "properties": {
+     "camera": {
+      "properties": {
+       "eye": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "fov_deg": {
+        "type": "number"
+       },
+       "parallel_height": {
+        "description": "the height the view spans at the target, meters",
+        "type": "number"
+       },
+       "projection": {
+        "enum": [
+         "perspective",
+         "parallel"
+        ],
+        "type": "string"
+       },
+       "target": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "up": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       }
+      },
+      "required": [
+       "eye",
+       "target",
+       "up",
+       "projection",
+       "fov_deg",
+       "parallel_height"
+      ],
+      "type": "object"
+     },
+     "hidden_instance_ids": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "hidden_object_ids": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "section": {
+      "description": "null means captured-but-no-plane-placed",
+      "oneOf": [
+       {
+        "type": "null"
+       },
+       {
+        "properties": {
+         "active": {
+          "type": "boolean"
+         },
+         "normal": {
+          "items": {
+           "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+         },
+         "origin": {
+          "items": {
+           "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+         }
+        },
+        "required": [
+         "origin",
+         "normal",
+         "active"
+        ],
+        "type": "object"
+       }
+      ]
+     }
+    },
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_scene"
+   ]
+  },
+  {
+   "method": "hew.scenes.describe",
+   "namespace": "scenes",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Set a Scene's free-text description. Records no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "description": {
+      "type": "string"
+     },
+     "id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "description"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_scene"
+   ]
+  },
+  {
+   "method": "hew.scenes.list",
+   "namespace": "scenes",
+   "tier": "Standard",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "Every Scene, in tab order.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "scenes": {
+      "items": {
+       "description": "camera/display are present only when that property is captured AND has something to report; section is present (possibly null) whenever the section property is captured",
+       "properties": {
+        "camera": {
+         "properties": {
+          "eye": {
+           "items": {
+            "type": "number"
+           },
+           "maxItems": 3,
+           "minItems": 3,
+           "type": "array"
+          },
+          "fov_deg": {
+           "type": "number"
+          },
+          "parallel_height": {
+           "description": "the height the view spans at the target, meters",
+           "type": "number"
+          },
+          "projection": {
+           "enum": [
+            "perspective",
+            "parallel"
+           ],
+           "type": "string"
+          },
+          "target": {
+           "items": {
+            "type": "number"
+           },
+           "maxItems": 3,
+           "minItems": 3,
+           "type": "array"
+          },
+          "up": {
+           "items": {
+            "type": "number"
+           },
+           "maxItems": 3,
+           "minItems": 3,
+           "type": "array"
+          }
+         },
+         "required": [
+          "eye",
+          "target",
+          "up",
+          "projection",
+          "fov_deg",
+          "parallel_height"
+         ],
+         "type": "object"
+        },
+        "description": {
+         "type": "string"
+        },
+        "display": {
+         "additionalProperties": false,
+         "description": "opaque editor display toggles: stored and returned, never interpreted by the kernel",
+         "properties": {
+          "axes": {
+           "type": "boolean"
+          },
+          "grid": {
+           "type": "boolean"
+          },
+          "guides": {
+           "type": "boolean"
+          }
+         },
+         "required": [
+          "grid",
+          "axes",
+          "guides"
+         ],
+         "type": "object"
+        },
+        "id": {
+         "type": "string"
+        },
+        "name": {
+         "type": "string"
+        },
+        "props": {
+         "properties": {
+          "camera": {
+           "type": "boolean"
+          },
+          "display": {
+           "type": "boolean"
+          },
+          "hidden_nodes": {
+           "type": "boolean"
+          },
+          "hidden_tags": {
+           "type": "boolean"
+          },
+          "section": {
+           "type": "boolean"
+          }
+         },
+         "required": [
+          "camera",
+          "hidden_nodes",
+          "hidden_tags",
+          "section",
+          "display"
+         ],
+         "type": "object"
+        },
+        "section": {
+         "description": "null means captured-but-no-plane-placed",
+         "oneOf": [
+          {
+           "type": "null"
+          },
+          {
+           "properties": {
+            "active": {
+             "type": "boolean"
+            },
+            "normal": {
+             "items": {
+              "type": "number"
+             },
+             "maxItems": 3,
+             "minItems": 3,
+             "type": "array"
+            },
+            "origin": {
+             "items": {
+              "type": "number"
+             },
+             "maxItems": 3,
+             "minItems": 3,
+             "type": "array"
+            }
+           },
+           "required": [
+            "origin",
+            "normal",
+            "active"
+           ],
+           "type": "object"
+          }
+         ]
+        },
+        "sid": {
+         "type": "integer"
+        },
+        "view_style": {
+         "description": "the look the Scene restores with its display property: backdrop (sRGB background, sky and ground or null) and whether the model axes are drawn; captured from the document's own view style, so absent for a document shown Hew's way",
+         "properties": {
+          "axes": {
+           "type": "boolean"
+          },
+          "background": {
+           "items": {
+            "type": "integer"
+           },
+           "maxItems": 3,
+           "minItems": 3,
+           "type": "array"
+          },
+          "ground": {
+           "oneOf": [
+            {
+             "items": {
+              "type": "integer"
+             },
+             "maxItems": 3,
+             "minItems": 3,
+             "type": "array"
+            },
+            {
+             "type": "null"
+            }
+           ]
+          },
+          "sky": {
+           "oneOf": [
+            {
+             "items": {
+              "type": "integer"
+             },
+             "maxItems": 3,
+             "minItems": 3,
+             "type": "array"
+            },
+            {
+             "type": "null"
+            }
+           ]
+          }
+         },
+         "required": [
+          "background",
+          "sky",
+          "ground",
+          "axes"
+         ],
+         "type": "object"
+        }
+       },
+       "required": [
+        "id",
+        "sid",
+        "name",
+        "description",
+        "props"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "scenes"
+    ],
+    "type": "object"
+   },
+   "refusals": []
+  },
+  {
+   "method": "hew.scenes.remove",
+   "namespace": "scenes",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Delete a Scene. Records no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_scene"
+   ]
+  },
+  {
+   "method": "hew.scenes.rename",
+   "namespace": "scenes",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Rename a Scene. Records no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "name"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_scene"
+   ]
+  },
+  {
+   "method": "hew.scenes.reorder",
+   "namespace": "scenes",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Move a Scene to a new position in tab order. Records no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "index": {
+      "description": "tab-order position; clamped to the end for an out-of-range index, never refused",
+      "minimum": 0,
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "index"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_scene"
+   ]
+  },
+  {
+   "method": "hew.scenes.update",
+   "namespace": "scenes",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Re-capture a Scene's properties from the document's current state. Records no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "description": "properties defaults to the Scene's currently captured set (re-capture, never widen) when omitted",
+    "properties": {
+     "camera": {
+      "additionalProperties": false,
+      "description": "an explicit camera to capture — no named-view shorthand, a Scene captures a concrete eye/target, not a fitted view; when omitted and the camera property is captured, falls back to the document's own saved working camera",
+      "properties": {
+       "eye": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "fov_deg": {
+        "description": "perspective only; defaults to 35",
+        "type": "number"
+       },
+       "parallel_height": {
+        "description": "the height the view spans at the target, meters (what a parallel view frames); defaults to what the perspective view spans there",
+        "type": "number"
+       },
+       "projection": {
+        "enum": [
+         "perspective",
+         "parallel"
+        ],
+        "type": "string"
+       },
+       "target": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "up": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       }
+      },
+      "required": [
+       "eye",
+       "target"
+      ],
+      "type": "object"
+     },
+     "display": {
+      "additionalProperties": false,
+      "description": "opaque editor display toggles: stored and returned, never interpreted by the kernel",
+      "properties": {
+       "axes": {
+        "type": "boolean"
+       },
+       "grid": {
+        "type": "boolean"
+       },
+       "guides": {
+        "type": "boolean"
+       }
+      },
+      "required": [
+       "grid",
+       "axes",
+       "guides"
+      ],
+      "type": "object"
+     },
+     "id": {
+      "type": "string"
+     },
+     "properties": {
+      "additionalProperties": false,
+      "description": "which of the five capturable properties to (re-)capture; each defaults to true",
+      "properties": {
+       "camera": {
+        "type": "boolean"
+       },
+       "display": {
+        "type": "boolean"
+       },
+       "hidden_nodes": {
+        "type": "boolean"
+       },
+       "hidden_tags": {
+        "type": "boolean"
+       },
+       "section": {
+        "type": "boolean"
+       }
+      },
+      "type": "object"
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_scene"
+   ]
+  },
+  {
+   "method": "hew.sketch.copy",
+   "namespace": "sketch",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Copy drawing units on a plane by an offset.",
+   "params": {
+    "properties": {
+     "offset": {
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     },
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     },
+     "units": {
+      "description": "unit keys from hew.sketch.units: isl_<hex16> (an island: all its edges), edg_<hex16> (one edge), crv_<hex16> (every facet of one circle), rgn_<hex16> (a region's ring edges that are drawing edges)",
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "plane",
+     "units",
+     "offset"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "description": "the plane units the edit made (new keys after the edit); empty for delete",
+    "properties": {
+     "units": {
+      "description": "the plane units the call touched: every drawing edge lying along what was drawn, then every region whose boundary carries it",
+      "items": {
+       "properties": {
+        "key": {
+         "description": "edg_<hex16> or rgn_<hex16>, as hew.sketch.units lists them",
+         "type": "string"
+        },
+        "kind": {
+         "enum": [
+          "edge",
+          "region"
+         ],
+         "type": "string"
+        },
+        "object_id": {
+         "description": "the owning solid, for topology and owned",
+         "type": "string"
+        },
+        "sketch_id": {
+         "description": "the sketch holding the drawing, for owned and free when it has one",
+         "type": "string"
+        },
+        "store": {
+         "description": "topology: the solid's own face structure; owned: drawing kept on the solid's face; free: drawing over no face",
+         "enum": [
+          "topology",
+          "owned",
+          "free"
+         ],
+         "type": "string"
+        }
+       },
+       "required": [
+        "kind",
+        "key",
+        "store"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "units"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_unit",
+    "draft_boundary_edge_touched"
+   ]
+  },
+  {
+   "method": "hew.sketch.delete",
+   "namespace": "sketch",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Delete drawing units from a plane.",
+   "params": {
+    "properties": {
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     },
+     "units": {
+      "description": "unit keys from hew.sketch.units: isl_<hex16> (an island: all its edges), edg_<hex16> (one edge), crv_<hex16> (every facet of one circle), rgn_<hex16> (a region's ring edges that are drawing edges)",
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "plane",
+     "units"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "description": "the plane units the edit made (new keys after the edit); empty for delete",
+    "properties": {
+     "units": {
+      "description": "the plane units the call touched: every drawing edge lying along what was drawn, then every region whose boundary carries it",
+      "items": {
+       "properties": {
+        "key": {
+         "description": "edg_<hex16> or rgn_<hex16>, as hew.sketch.units lists them",
+         "type": "string"
+        },
+        "kind": {
+         "enum": [
+          "edge",
+          "region"
+         ],
+         "type": "string"
+        },
+        "object_id": {
+         "description": "the owning solid, for topology and owned",
+         "type": "string"
+        },
+        "sketch_id": {
+         "description": "the sketch holding the drawing, for owned and free when it has one",
+         "type": "string"
+        },
+        "store": {
+         "description": "topology: the solid's own face structure; owned: drawing kept on the solid's face; free: drawing over no face",
+         "enum": [
+          "topology",
+          "owned",
+          "free"
+         ],
+         "type": "string"
+        }
+       },
+       "required": [
+        "kind",
+        "key",
+        "store"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "units"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_unit",
+    "draft_boundary_edge_touched"
+   ]
+  },
+  {
+   "method": "hew.sketch.draw_arc",
+   "namespace": "sketch",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Draw an arc on a plane spec.",
+   "params": {
+    "properties": {
+     "center": {
+      "oneOf": [
+       {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       {
+        "description": "a derived-point locator (HEW_API.md §5.3)",
+        "type": "object"
+       }
+      ]
+     },
+     "close": {
+      "description": "how the arc's ends are closed: \"open\" (default, a bare arc), \"pie\" (closed wedge — two radii to the center), or \"segment\" (closed circular segment — the chord). \"pie\"/\"segment\" commit a closed profile (a region in plane/sketch mode, a SplitFaceInner loop in face mode) like draw_rect/draw_circle, and need at least 2 segments (see \"segments\"). Must be \"open\" when the sweep is a full turn (already closed).",
+      "enum": [
+       "open",
+       "pie",
+       "segment"
+      ],
+      "type": "string"
+     },
+     "end_angle": {
+      "description": "radians",
+      "type": "number"
+     },
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     },
+     "radius": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+     },
+     "segments": {
+      "description": "facet count; defaults proportionally to the sweep, capped at MAX_CIRCLE_SEGMENTS = 1024. A single chord (1) is fine for close: \"open\", but close: \"pie\"/\"segment\" needs at least 2 — a single chord can't form a non-degenerate closed loop — and the proportional default is floored at 2 for those modes too.",
+      "type": "integer"
+     },
+     "start_angle": {
+      "description": "radians",
+      "type": "number"
+     }
+    },
+    "required": [
+     "plane",
+     "center",
+     "radius",
+     "start_angle",
+     "end_angle"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "oneOf": [
+     {
+      "properties": {
+       "curve_id": {
+        "description": "present when this command began a curve chain",
+        "type": "string"
+       },
+       "region_id": {
+        "description": "present when exactly one region resulted (HEW_API.md §6.1's example)",
+        "type": "string"
+       },
+       "region_ids": {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       "sketch": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "sketch",
+       "region_ids"
+      ],
+      "type": "object"
+     },
+     {
+      "description": "on-face drawing (plane spec {\"face\": <locator>}) draws through the drafting engine instead of creating a sketch region; `units` lists the plane units the draw touched; mints transaction-scoped face tokens \"a\"/\"b\" (an open sweep — a plain boundary-to-boundary cut) or \"face\"/\"parent\" (a full-turn sweep, or a pie/segment close — closed, imprinted like a circle) (HEW_API.md §5.2/§5.4) when the draw produced a face",
+      "properties": {
+       "object_id": {
+        "type": "string"
+       },
+       "units": {
+        "description": "the plane units the call touched: every drawing edge lying along what was drawn, then every region whose boundary carries it",
+        "items": {
+         "properties": {
+          "key": {
+           "description": "edg_<hex16> or rgn_<hex16>, as hew.sketch.units lists them",
+           "type": "string"
+          },
+          "kind": {
+           "enum": [
+            "edge",
+            "region"
+           ],
+           "type": "string"
+          },
+          "object_id": {
+           "description": "the owning solid, for topology and owned",
+           "type": "string"
+          },
+          "sketch_id": {
+           "description": "the sketch holding the drawing, for owned and free when it has one",
+           "type": "string"
+          },
+          "store": {
+           "description": "topology: the solid's own face structure; owned: drawing kept on the solid's face; free: drawing over no face",
+           "enum": [
+            "topology",
+            "owned",
+            "free"
+           ],
+           "type": "string"
+          }
+         },
+         "required": [
+          "kind",
+          "key",
+          "store"
+         ],
+         "type": "object"
+        },
+        "type": "array"
+       }
+      },
+      "required": [
+       "object_id",
+       "units"
+      ],
+      "type": "object"
+     }
+    ]
+   },
+   "refusals": [
+    "point_off_plane"
+   ]
+  },
+  {
+   "method": "hew.sketch.draw_circle",
+   "namespace": "sketch",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Draw a circle on a plane spec.",
+   "params": {
+    "properties": {
+     "center": {
+      "oneOf": [
+       {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       {
+        "description": "a derived-point locator (HEW_API.md §5.3)",
+        "type": "object"
+       }
+      ]
+     },
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     },
+     "radius": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+     },
+     "segments": {
+      "description": "facet count; defaults to 48, must fall in [MIN_CIRCLE_SEGMENTS, MAX_CIRCLE_SEGMENTS] = [24, 1024]",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "plane",
+     "center",
+     "radius"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "oneOf": [
+     {
+      "properties": {
+       "curve_id": {
+        "description": "present when this command began a curve chain",
+        "type": "string"
+       },
+       "region_id": {
+        "description": "present when exactly one region resulted (HEW_API.md §6.1's example)",
+        "type": "string"
+       },
+       "region_ids": {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       "sketch": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "sketch",
+       "region_ids"
+      ],
+      "type": "object"
+     },
+     {
+      "description": "on-face drawing (plane spec {\"face\": <locator>}) draws through the drafting engine instead of creating a sketch region; `units` lists the plane units the draw touched; mints transaction-scoped face tokens \"face\" (the new sub-face) and \"parent\" (the reshaped parent, now carrying the loop as a hole) (HEW_API.md §5.2/§5.4) when the draw produced a face",
+      "properties": {
+       "object_id": {
+        "type": "string"
+       },
+       "units": {
+        "description": "the plane units the call touched: every drawing edge lying along what was drawn, then every region whose boundary carries it",
+        "items": {
+         "properties": {
+          "key": {
+           "description": "edg_<hex16> or rgn_<hex16>, as hew.sketch.units lists them",
+           "type": "string"
+          },
+          "kind": {
+           "enum": [
+            "edge",
+            "region"
+           ],
+           "type": "string"
+          },
+          "object_id": {
+           "description": "the owning solid, for topology and owned",
+           "type": "string"
+          },
+          "sketch_id": {
+           "description": "the sketch holding the drawing, for owned and free when it has one",
+           "type": "string"
+          },
+          "store": {
+           "description": "topology: the solid's own face structure; owned: drawing kept on the solid's face; free: drawing over no face",
+           "enum": [
+            "topology",
+            "owned",
+            "free"
+           ],
+           "type": "string"
+          }
+         },
+         "required": [
+          "kind",
+          "key",
+          "store"
+         ],
+         "type": "object"
+        },
+        "type": "array"
+       }
+      },
+      "required": [
+       "object_id",
+       "units"
+      ],
+      "type": "object"
+     }
+    ]
+   },
+   "refusals": [
+    "point_off_plane"
+   ]
+  },
+  {
+   "method": "hew.sketch.draw_line",
+   "namespace": "sketch",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Draw a line (chain) on a plane spec.",
+   "params": {
+    "properties": {
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     },
+     "points": {
+      "items": {
+       "oneOf": [
+        {
+         "items": {
+          "type": "number"
+         },
+         "maxItems": 3,
+         "minItems": 3,
+         "type": "array"
+        },
+        {
+         "description": "a derived-point locator (HEW_API.md §5.3)",
+         "type": "object"
+        }
+       ]
+      },
+      "minItems": 2,
+      "type": "array"
+     }
+    },
+    "required": [
+     "plane",
+     "points"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "oneOf": [
+     {
+      "properties": {
+       "curve_id": {
+        "description": "present when this command began a curve chain",
+        "type": "string"
+       },
+       "region_id": {
+        "description": "present when exactly one region resulted (HEW_API.md §6.1's example)",
+        "type": "string"
+       },
+       "region_ids": {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       "sketch": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "sketch",
+       "region_ids"
+      ],
+      "type": "object"
+     },
+     {
+      "description": "on-face drawing (plane spec {\"face\": <locator>}) draws through the drafting engine instead of creating a sketch region; `units` lists the plane units the draw touched; mints transaction-scoped face tokens \"a\"/\"b\" naming the faces either side of the path's last cut — for a single cut, the two faces it produced (HEW_API.md §5.2/§5.4) when the draw produced a face",
+      "properties": {
+       "object_id": {
+        "type": "string"
+       },
+       "units": {
+        "description": "the plane units the call touched: every drawing edge lying along what was drawn, then every region whose boundary carries it",
+        "items": {
+         "properties": {
+          "key": {
+           "description": "edg_<hex16> or rgn_<hex16>, as hew.sketch.units lists them",
+           "type": "string"
+          },
+          "kind": {
+           "enum": [
+            "edge",
+            "region"
+           ],
+           "type": "string"
+          },
+          "object_id": {
+           "description": "the owning solid, for topology and owned",
+           "type": "string"
+          },
+          "sketch_id": {
+           "description": "the sketch holding the drawing, for owned and free when it has one",
+           "type": "string"
+          },
+          "store": {
+           "description": "topology: the solid's own face structure; owned: drawing kept on the solid's face; free: drawing over no face",
+           "enum": [
+            "topology",
+            "owned",
+            "free"
+           ],
+           "type": "string"
+          }
+         },
+         "required": [
+          "kind",
+          "key",
+          "store"
+         ],
+         "type": "object"
+        },
+        "type": "array"
+       }
+      },
+      "required": [
+       "object_id",
+       "units"
+      ],
+      "type": "object"
+     }
+    ]
+   },
+   "refusals": [
+    "point_off_plane"
+   ]
+  },
+  {
+   "method": "hew.sketch.draw_polygon",
+   "namespace": "sketch",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Draw a regular N-gon on a plane spec.",
+   "params": {
+    "properties": {
+     "center": {
+      "oneOf": [
+       {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       {
+        "description": "a derived-point locator (HEW_API.md §5.3)",
+        "type": "object"
+       }
+      ]
+     },
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     },
+     "radius": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+     },
+     "sides": {
+      "maximum": 120,
+      "minimum": 3,
+      "type": "integer"
+     }
+    },
+    "required": [
+     "plane",
+     "center",
+     "radius",
+     "sides"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "oneOf": [
+     {
+      "properties": {
+       "curve_id": {
+        "description": "present when this command began a curve chain",
+        "type": "string"
+       },
+       "region_id": {
+        "description": "present when exactly one region resulted (HEW_API.md §6.1's example)",
+        "type": "string"
+       },
+       "region_ids": {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       "sketch": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "sketch",
+       "region_ids"
+      ],
+      "type": "object"
+     },
+     {
+      "description": "on-face drawing (plane spec {\"face\": <locator>}) draws through the drafting engine instead of creating a sketch region; `units` lists the plane units the draw touched; mints transaction-scoped face tokens \"face\" (the new sub-face) and \"parent\" (the reshaped parent, now carrying the loop as a hole) (HEW_API.md §5.2/§5.4) when the draw produced a face",
+      "properties": {
+       "object_id": {
+        "type": "string"
+       },
+       "units": {
+        "description": "the plane units the call touched: every drawing edge lying along what was drawn, then every region whose boundary carries it",
+        "items": {
+         "properties": {
+          "key": {
+           "description": "edg_<hex16> or rgn_<hex16>, as hew.sketch.units lists them",
+           "type": "string"
+          },
+          "kind": {
+           "enum": [
+            "edge",
+            "region"
+           ],
+           "type": "string"
+          },
+          "object_id": {
+           "description": "the owning solid, for topology and owned",
+           "type": "string"
+          },
+          "sketch_id": {
+           "description": "the sketch holding the drawing, for owned and free when it has one",
+           "type": "string"
+          },
+          "store": {
+           "description": "topology: the solid's own face structure; owned: drawing kept on the solid's face; free: drawing over no face",
+           "enum": [
+            "topology",
+            "owned",
+            "free"
+           ],
+           "type": "string"
+          }
+         },
+         "required": [
+          "kind",
+          "key",
+          "store"
+         ],
+         "type": "object"
+        },
+        "type": "array"
+       }
+      },
+      "required": [
+       "object_id",
+       "units"
+      ],
+      "type": "object"
+     }
+    ]
+   },
+   "refusals": [
+    "point_off_plane"
+   ]
+  },
+  {
+   "method": "hew.sketch.draw_rect",
+   "namespace": "sketch",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Draw an axis-aligned rectangle on a plane spec.",
+   "params": {
+    "properties": {
+     "corner_a": {
+      "oneOf": [
+       {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       {
+        "description": "a derived-point locator (HEW_API.md §5.3)",
+        "type": "object"
+       }
+      ]
+     },
+     "corner_b": {
+      "oneOf": [
+       {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       {
+        "description": "a derived-point locator (HEW_API.md §5.3)",
+        "type": "object"
+       }
+      ]
+     },
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     }
+    },
+    "required": [
+     "plane",
+     "corner_a",
+     "corner_b"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "oneOf": [
+     {
+      "properties": {
+       "curve_id": {
+        "description": "present when this command began a curve chain",
+        "type": "string"
+       },
+       "region_id": {
+        "description": "present when exactly one region resulted (HEW_API.md §6.1's example)",
+        "type": "string"
+       },
+       "region_ids": {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       "sketch": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "sketch",
+       "region_ids"
+      ],
+      "type": "object"
+     },
+     {
+      "description": "on-face drawing (plane spec {\"face\": <locator>}) draws through the drafting engine instead of creating a sketch region; `units` lists the plane units the draw touched; mints transaction-scoped face tokens \"face\" (the new sub-face) and \"parent\" (the reshaped parent, now carrying the loop as a hole) (HEW_API.md §5.2/§5.4) when the draw produced a face",
+      "properties": {
+       "object_id": {
+        "type": "string"
+       },
+       "units": {
+        "description": "the plane units the call touched: every drawing edge lying along what was drawn, then every region whose boundary carries it",
+        "items": {
+         "properties": {
+          "key": {
+           "description": "edg_<hex16> or rgn_<hex16>, as hew.sketch.units lists them",
+           "type": "string"
+          },
+          "kind": {
+           "enum": [
+            "edge",
+            "region"
+           ],
+           "type": "string"
+          },
+          "object_id": {
+           "description": "the owning solid, for topology and owned",
+           "type": "string"
+          },
+          "sketch_id": {
+           "description": "the sketch holding the drawing, for owned and free when it has one",
+           "type": "string"
+          },
+          "store": {
+           "description": "topology: the solid's own face structure; owned: drawing kept on the solid's face; free: drawing over no face",
+           "enum": [
+            "topology",
+            "owned",
+            "free"
+           ],
+           "type": "string"
+          }
+         },
+         "required": [
+          "kind",
+          "key",
+          "store"
+         ],
+         "type": "object"
+        },
+        "type": "array"
+       }
+      },
+      "required": [
+       "object_id",
+       "units"
+      ],
+      "type": "object"
+     }
+    ]
+   },
+   "refusals": [
+    "point_off_plane"
+   ]
+  },
+  {
+   "method": "hew.sketch.move",
+   "namespace": "sketch",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Move drawing units (islands, edges, circles, regions) on a plane by an offset.",
+   "params": {
+    "properties": {
+     "offset": {
+      "description": "translation [x, y, z] in meters; must stay in the plane",
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     },
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     },
+     "units": {
+      "description": "unit keys from hew.sketch.units: isl_<hex16> (an island: all its edges), edg_<hex16> (one edge), crv_<hex16> (every facet of one circle), rgn_<hex16> (a region's ring edges that are drawing edges)",
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "plane",
+     "units",
+     "offset"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "description": "the plane units the edit made (new keys after the edit); empty for delete",
+    "properties": {
+     "units": {
+      "description": "the plane units the call touched: every drawing edge lying along what was drawn, then every region whose boundary carries it",
+      "items": {
+       "properties": {
+        "key": {
+         "description": "edg_<hex16> or rgn_<hex16>, as hew.sketch.units lists them",
+         "type": "string"
+        },
+        "kind": {
+         "enum": [
+          "edge",
+          "region"
+         ],
+         "type": "string"
+        },
+        "object_id": {
+         "description": "the owning solid, for topology and owned",
+         "type": "string"
+        },
+        "sketch_id": {
+         "description": "the sketch holding the drawing, for owned and free when it has one",
+         "type": "string"
+        },
+        "store": {
+         "description": "topology: the solid's own face structure; owned: drawing kept on the solid's face; free: drawing over no face",
+         "enum": [
+          "topology",
+          "owned",
+          "free"
+         ],
+         "type": "string"
+        }
+       },
+       "required": [
+        "kind",
+        "key",
+        "store"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "units"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_unit",
+    "draft_boundary_edge_touched"
+   ]
+  },
+  {
+   "method": "hew.sketch.offset",
+   "namespace": "sketch",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Offset a region boundary within its sketch, or a face or plane region by its unit key.",
+   "params": {
+    "properties": {
+     "distance": {
+      "description": "positive grows the material, negative shrinks it",
+      "type": "number"
+     },
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     },
+     "region": {
+      "description": "a sketch region id; with `plane`, a region unit key rgn_<hex16> from hew.sketch.units (a face or plane region)",
+      "type": "string"
+     }
+    },
+    "required": [
+     "region",
+     "distance"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "oneOf": [
+     {
+      "properties": {
+       "curve_ids": {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       "region_id": {
+        "description": "present when exactly one region resulted",
+        "type": "string"
+       },
+       "region_ids": {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       "sketch": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "sketch",
+       "region_ids",
+       "curve_ids"
+      ],
+      "type": "object"
+     },
+     {
+      "description": "the unit-key form (`plane` given): the plane units the offset made",
+      "properties": {
+       "units": {
+        "description": "the plane units the call touched: every drawing edge lying along what was drawn, then every region whose boundary carries it",
+        "items": {
+         "properties": {
+          "key": {
+           "description": "edg_<hex16> or rgn_<hex16>, as hew.sketch.units lists them",
+           "type": "string"
+          },
+          "kind": {
+           "enum": [
+            "edge",
+            "region"
+           ],
+           "type": "string"
+          },
+          "object_id": {
+           "description": "the owning solid, for topology and owned",
+           "type": "string"
+          },
+          "sketch_id": {
+           "description": "the sketch holding the drawing, for owned and free when it has one",
+           "type": "string"
+          },
+          "store": {
+           "description": "topology: the solid's own face structure; owned: drawing kept on the solid's face; free: drawing over no face",
+           "enum": [
+            "topology",
+            "owned",
+            "free"
+           ],
+           "type": "string"
+          }
+         },
+         "required": [
+          "kind",
+          "key",
+          "store"
+         ],
+         "type": "object"
+        },
+        "type": "array"
+       }
+      },
+      "required": [
+       "units"
+      ],
+      "type": "object"
+     }
+    ]
+   },
+   "refusals": [
+    "unknown_region"
+   ]
+  },
+  {
+   "method": "hew.sketch.rotate",
+   "namespace": "sketch",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Rotate drawing units on a plane about the plane normal through a point.",
+   "params": {
+    "properties": {
+     "angle": {
+      "description": "radians, counter-clockwise seen from the plane normal side",
+      "type": "number"
+     },
+     "axis_point": {
+      "oneOf": [
+       {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       {
+        "description": "a derived-point locator (HEW_API.md §5.3)",
+        "type": "object"
+       }
+      ]
+     },
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     },
+     "units": {
+      "description": "unit keys from hew.sketch.units: isl_<hex16> (an island: all its edges), edg_<hex16> (one edge), crv_<hex16> (every facet of one circle), rgn_<hex16> (a region's ring edges that are drawing edges)",
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "plane",
+     "units",
+     "axis_point",
+     "angle"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "description": "the plane units the edit made (new keys after the edit); empty for delete",
+    "properties": {
+     "units": {
+      "description": "the plane units the call touched: every drawing edge lying along what was drawn, then every region whose boundary carries it",
+      "items": {
+       "properties": {
+        "key": {
+         "description": "edg_<hex16> or rgn_<hex16>, as hew.sketch.units lists them",
+         "type": "string"
+        },
+        "kind": {
+         "enum": [
+          "edge",
+          "region"
+         ],
+         "type": "string"
+        },
+        "object_id": {
+         "description": "the owning solid, for topology and owned",
+         "type": "string"
+        },
+        "sketch_id": {
+         "description": "the sketch holding the drawing, for owned and free when it has one",
+         "type": "string"
+        },
+        "store": {
+         "description": "topology: the solid's own face structure; owned: drawing kept on the solid's face; free: drawing over no face",
+         "enum": [
+          "topology",
+          "owned",
+          "free"
+         ],
+         "type": "string"
+        }
+       },
+       "required": [
+        "kind",
+        "key",
+        "store"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "units"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_unit",
+    "draft_boundary_edge_touched"
+   ]
+  },
+  {
+   "method": "hew.sketch.scale",
+   "namespace": "sketch",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Scale drawing units on a plane about a center, uniformly or per axis.",
+   "params": {
+    "properties": {
+     "center": {
+      "oneOf": [
+       {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       {
+        "description": "a derived-point locator (HEW_API.md §5.3)",
+        "type": "object"
+       }
+      ]
+     },
+     "factor": {
+      "description": "uniform scale; give this or `factors`",
+      "type": "number"
+     },
+     "factors": {
+      "description": "per-axis [sx, sy, sz] in world axes; must keep the drawing in its plane",
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     },
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     },
+     "units": {
+      "description": "unit keys from hew.sketch.units: isl_<hex16> (an island: all its edges), edg_<hex16> (one edge), crv_<hex16> (every facet of one circle), rgn_<hex16> (a region's ring edges that are drawing edges)",
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "plane",
+     "units",
+     "center"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "description": "the plane units the edit made (new keys after the edit); empty for delete",
+    "properties": {
+     "units": {
+      "description": "the plane units the call touched: every drawing edge lying along what was drawn, then every region whose boundary carries it",
+      "items": {
+       "properties": {
+        "key": {
+         "description": "edg_<hex16> or rgn_<hex16>, as hew.sketch.units lists them",
+         "type": "string"
+        },
+        "kind": {
+         "enum": [
+          "edge",
+          "region"
+         ],
+         "type": "string"
+        },
+        "object_id": {
+         "description": "the owning solid, for topology and owned",
+         "type": "string"
+        },
+        "sketch_id": {
+         "description": "the sketch holding the drawing, for owned and free when it has one",
+         "type": "string"
+        },
+        "store": {
+         "description": "topology: the solid's own face structure; owned: drawing kept on the solid's face; free: drawing over no face",
+         "enum": [
+          "topology",
+          "owned",
+          "free"
+         ],
+         "type": "string"
+        }
+       },
+       "required": [
+        "kind",
+        "key",
+        "store"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "units"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_unit",
+    "draft_boundary_edge_touched"
+   ]
+  },
+  {
+   "method": "hew.sketch.units",
+   "namespace": "sketch",
+   "tier": "Standard",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "List a plane's drawing as units: islands of edges (with where each is stored) and regions.",
+   "params": {
+    "properties": {
+     "plane": {
+      "description": "HEW_API.md §7 plane spec: {ground:true} | {origin,normal[,x_axis]} | {face:<locator>} | {sketch:<id>}",
+      "type": "object"
+     }
+    },
+    "required": [
+     "plane"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "regions": {
+      "items": {
+       "properties": {
+        "extrudable": {
+         "description": "true when the region lies over no face and hew.solid.extrude takes it as a new Object",
+         "type": "boolean"
+        },
+        "face": {
+         "description": "a face locator ({object, at}) for the region when it IS a face of that solid — pass it to hew.solid.push_pull",
+         "type": "object"
+        },
+        "holes": {
+         "items": {
+          "items": {
+           "items": {
+            "type": "number"
+           },
+           "maxItems": 3,
+           "minItems": 3,
+           "type": "array"
+          },
+          "type": "array"
+         },
+         "type": "array"
+        },
+        "key": {
+         "description": "rgn_<hex16>",
+         "type": "string"
+        },
+        "object_id": {
+         "description": "the solid under the region, when one is",
+         "type": "string"
+        },
+        "outer": {
+         "items": {
+          "items": {
+           "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+         },
+         "type": "array"
+        }
+       },
+       "required": [
+        "key",
+        "outer",
+        "holes",
+        "extrudable"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     },
+     "units": {
+      "items": {
+       "properties": {
+        "edges": {
+         "items": {
+          "properties": {
+           "a": {
+            "items": {
+             "type": "number"
+            },
+            "maxItems": 3,
+            "minItems": 3,
+            "type": "array"
+           },
+           "b": {
+            "items": {
+             "type": "number"
+            },
+            "maxItems": 3,
+            "minItems": 3,
+            "type": "array"
+           },
+           "curve": {
+            "description": "present when the edge is a facet of an analytic circle",
+            "properties": {
+             "center": {
+              "items": {
+               "type": "number"
+              },
+              "maxItems": 3,
+              "minItems": 3,
+              "type": "array"
+             },
+             "key": {
+              "description": "crv_<hex16>",
+              "type": "string"
+             },
+             "radius": {
+              "type": "number"
+             }
+            },
+            "type": "object"
+           },
+           "key": {
+            "description": "edg_<hex16>",
+            "type": "string"
+           },
+           "object_id": {
+            "type": "string"
+           },
+           "sketch_id": {
+            "type": "string"
+           },
+           "store": {
+            "enum": [
+             "topology",
+             "owned",
+             "free"
+            ],
+            "type": "string"
+           }
+          },
+          "required": [
+           "key",
+           "a",
+           "b",
+           "store"
+          ],
+          "type": "object"
+         },
+         "type": "array"
+        },
+        "key": {
+         "description": "isl_<hex16>",
+         "type": "string"
+        }
+       },
+       "required": [
+        "key",
+        "edges"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "units",
+     "regions"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_sketch"
+   ]
+  },
+  {
+   "method": "hew.solid.cap",
+   "namespace": "solid",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Close an open object's flat openings with faces; an object closed all round becomes a solid.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "object": {
+      "description": "obj_ id (a world object or a component member)",
+      "type": "string"
+     },
+     "rims": {
+      "description": "indices into the object's hew.doc.health rims; omitted = every cappable rim (when none is, all of them, so the refusal says why)",
+      "items": {
+       "minimum": 0,
+       "type": "integer"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "object"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "closed": {
+      "description": "the object is now a solid",
+      "type": "boolean"
+     },
+     "faces": {
+      "description": "faces added (face tokens cap.1, cap.2, ... in a transaction)",
+      "type": "integer"
+     },
+     "object_id": {
+      "type": "string"
+     },
+     "reversed": {
+      "description": "an island the caps closed was inside out, so that island's faces were turned over (a cavity inside another island is left as is)",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "object_id",
+     "faces",
+     "closed",
+     "reversed"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "object_is_solid"
+   ]
+  },
+  {
+   "method": "hew.solid.delete_faces",
+   "namespace": "solid",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Remove faces from an open object; islands cut loose become objects of their own. Solids refuse.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "faces": {
+      "description": "faces of that object; omitted = every face, which deletes the object (a component member too, unless it is its component's last object: last_definition_member)",
+      "items": {
+       "description": "HEW_API.md §5.2 face locator: {object,at} | {object,ray} | {\"$face\":\"label#key\"}",
+       "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "object": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "deleted": {
+      "description": "every face went, so the object was deleted",
+      "type": "boolean"
+     },
+     "object_id": {
+      "type": "string"
+     },
+     "object_ids": {
+      "description": "islands cut loose, now objects of their own",
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "object_id",
+     "deleted",
+     "object_ids"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "object_is_solid"
+   ]
+  },
+  {
+   "method": "hew.solid.delete_imprint",
+   "namespace": "solid",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Kept for compatibility: delete a drawn shape (sub-face or chord island) back into its face; hew.sketch.delete is the general form.",
+   "params": {
+    "properties": {
+     "imprint": {
+      "description": "HEW_API.md §5.2 face locator ({object,at} | {object,ray} | {\"$face\":\"label#key\"}) naming a sub-face; {object,at} also picks a CHORD when the point lies on one of its lines (a chord is tried first, then the sub-face containing the point)",
+      "type": "object"
+     }
+    },
+    "required": [
+     "imprint"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "object_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object_id"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "not_in_plane"
+   ]
+  },
+  {
+   "method": "hew.solid.extrude",
+   "namespace": "solid",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Extrude a region into a new Object, consuming the profile.",
+   "params": {
+    "properties": {
+     "distance": {
+      "type": "number"
+     },
+     "plane": {
+      "description": "HEW_API.md §7 plane spec naming the drafting context a unit-key `region` belongs to. A region over no face extrudes as a new Object; a region that is a face of a solid push/pulls that face (result as hew.solid.push_pull); a region over a face that cannot hold it refuses region_not_pushable",
+      "type": "object"
+     },
+     "region": {
+      "description": "a sketch region id; with `plane`, a region unit key rgn_<hex16> from hew.sketch.units",
+      "type": "string"
+     }
+    },
+    "required": [
+     "region",
+     "distance"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "description": "mints face tokens \"base\", \"top\", \"side.<n>\" (boundary-loop order) — HEW_API.md §5.4's normative example — when a new Object results",
+    "properties": {
+     "object_id": {
+      "type": "string"
+     },
+     "object_ids": {
+      "description": "a through-cut's resulting pieces (unit-key form over a face, as hew.solid.push_pull)",
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "type": "object"
+   },
+   "refusals": [
+    "distance_too_small"
+   ]
+  },
+  {
+   "method": "hew.solid.follow_me",
+   "namespace": "solid",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Sweep a profile along an edge-chain path, as the tool does.",
+   "params": {
+    "properties": {
+     "path": {
+      "oneOf": [
+       {
+        "description": "Reserved: no kernel mapping yet — refuses unimplemented",
+        "properties": {
+         "edges": {
+          "type": "array"
+         }
+        },
+        "required": [
+         "edges"
+        ],
+        "type": "object"
+       },
+       {
+        "properties": {
+         "face": {
+          "description": "HEW_API.md §5.2 face locator: {object,at} | {object,ray} | {\"$face\":\"label#key\"}",
+          "type": "object"
+         }
+        },
+        "required": [
+         "face"
+        ],
+        "type": "object"
+       },
+       {
+        "properties": {
+         "curve": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "curve"
+        ],
+        "type": "object"
+       }
+      ]
+     },
+     "profile": {
+      "oneOf": [
+       {
+        "description": "a sketch region id",
+        "type": "string"
+       },
+       {
+        "properties": {
+         "face": {
+          "description": "HEW_API.md §5.2 face locator: {object,at} | {object,ray} | {\"$face\":\"label#key\"}",
+          "type": "object"
+         }
+        },
+        "required": [
+         "face"
+        ],
+        "type": "object"
+       }
+      ]
+     }
+    },
+    "required": [
+     "profile",
+     "path"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "object_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object_id"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "empty_path"
+   ]
+  },
+  {
+   "method": "hew.solid.imprints",
+   "namespace": "solid",
+   "tier": "Standard",
+   "class": "read-only",
+   "served": "kernel",
+   "summary": "Kept for compatibility: list an object's drawn shapes (sub-faces and chords) per drawing plane; hew.sketch.units is the general form.",
+   "params": {
+    "properties": {
+     "object": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "curve_units": {
+      "description": "drawn circles and arcs (whole or cut by other drawing into several runs) on the object's drawing planes: each {closed, curve: {center, radius}, runs: [{at, path}]}, a run that is a chord above carrying that chord's at locator — the whole drawn curve, a circle when closed, else an arc",
+      "items": {
+       "properties": {
+        "closed": {
+         "type": "boolean"
+        },
+        "curve": {
+         "type": "object"
+        },
+        "runs": {
+         "items": {
+          "type": "object"
+         },
+         "type": "array"
+        }
+       },
+       "required": [
+        "closed",
+        "curve",
+        "runs"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     },
+     "imprints": {
+      "items": {
+       "properties": {
+        "at": {
+         "description": "sub_face: an interior point clear of any nested sub-face; chord: the midpoint of the run's first segment — the locator to pass to move_imprint/rotate_imprint/scale_imprint/delete_imprint",
+         "items": {
+          "type": "number"
+         },
+         "maxItems": 3,
+         "minItems": 3,
+         "type": "array"
+        },
+        "curve": {
+         "description": "sub_face only: {center, radius} when the whole loop is one drawn circle, else null"
+        },
+        "curves": {
+         "description": "per edge of the loop (sub_face) or run (chord), in order: {center, radius} when that edge is a facet of a drawn circle or arc, else null — a pie, segment, or edge-to-edge arc reports its arc here",
+         "type": "array"
+        },
+        "holes": {
+         "description": "sub_face only: the hole loops' positions",
+         "items": {
+          "type": "array"
+         },
+         "type": "array"
+        },
+        "kind": {
+         "enum": [
+          "sub_face",
+          "chord"
+         ],
+         "type": "string"
+        },
+        "loop": {
+         "description": "sub_face only: the outer loop's positions, cycle order",
+         "items": {
+          "type": "array"
+         },
+         "type": "array"
+        },
+        "nested": {
+         "description": "sub_face only: count of sub-faces lying inside this one",
+         "type": "integer"
+        },
+        "normal": {
+         "description": "the drawing plane's normal",
+         "items": {
+          "type": "number"
+         },
+         "type": "array"
+        },
+        "path": {
+         "description": "chord only: the run's vertex positions, first to last",
+         "items": {
+          "type": "array"
+         },
+         "type": "array"
+        },
+        "region": {
+         "description": "sub_face only: the region's unit key (rgn_…) on that plane, as hew.sketch.units reports it",
+         "type": "string"
+        },
+        "unit": {
+         "description": "the island's unit key (isl_…) on that plane, as hew.sketch.units reports it",
+         "type": "string"
+        }
+       },
+       "required": [
+        "kind",
+        "at"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "imprints",
+     "curve_units"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_object"
+   ]
+  },
+  {
+   "method": "hew.solid.intersect",
+   "namespace": "solid",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Boolean intersection of two solids.",
+   "params": {
+    "properties": {
+     "a": {
+      "description": "a node id: obj_/grp_/ins_",
+      "type": "string"
+     },
+     "b": {
+      "description": "a node id: obj_/grp_/ins_",
+      "type": "string"
+     }
+    },
+    "required": [
+     "a",
+     "b"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "result": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "result"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "boolean_operand_has_instance"
+   ]
+  },
+  {
+   "method": "hew.solid.mark_surface",
+   "namespace": "solid",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Mark an open object as a surface on purpose (or clear the mark); hew.doc.health keeps listing it, flagged accepted.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "accepted": {
+      "default": true,
+      "description": "false clears the mark",
+      "type": "boolean"
+     },
+     "object": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "accepted": {
+      "type": "boolean"
+     },
+     "object_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object_id",
+     "accepted"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "object_is_solid"
+   ]
+  },
+  {
+   "method": "hew.solid.move_imprint",
+   "namespace": "solid",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Kept for compatibility: slide a drawn shape (sub-face or chord island) in its plane; hew.sketch.move is the general form.",
+   "params": {
+    "properties": {
+     "imprint": {
+      "description": "HEW_API.md §5.2 face locator ({object,at} | {object,ray} | {\"$face\":\"label#key\"}) naming a sub-face; {object,at} also picks a CHORD when the point lies on one of its lines (a chord is tried first, then the sub-face containing the point)",
+      "type": "object"
+     },
+     "offset": {
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+     }
+    },
+    "required": [
+     "imprint",
+     "offset"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "object_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object_id"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "not_in_plane"
+   ]
+  },
+  {
+   "method": "hew.solid.push_pull",
+   "namespace": "solid",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Push/pull a face of a solid with the tool's full semantics.",
+   "params": {
+    "properties": {
+     "distance": {
+      "type": "number"
+     },
+     "face": {
+      "description": "HEW_API.md §5.2 face locator: {object,at} | {object,ray} | {\"$face\":\"label#key\"}",
+      "type": "object"
+     }
+    },
+    "required": [
+     "face",
+     "distance"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "description": "exactly one of object_id / object_ids is present, depending on the tool's three-way branch (HEW_API.md §7 semantics notes)",
+    "properties": {
+     "object_id": {
+      "description": "the pushed/pulled object, still standing (in-place or sub-face case)",
+      "type": "string"
+     },
+     "object_ids": {
+      "description": "a through-cut's resulting pieces, replacing the source object",
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "type": "object"
+   },
+   "refusals": [
+    "object_not_solid"
+   ]
+  },
+  {
+   "method": "hew.solid.rotate_imprint",
+   "namespace": "solid",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Kept for compatibility: turn a drawn shape about its plane's normal through a pivot; hew.sketch.rotate is the general form.",
+   "params": {
+    "properties": {
+     "about": {
+      "oneOf": [
+       {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       {
+        "description": "a derived-point locator (HEW_API.md §5.3)",
+        "type": "object"
+       }
+      ]
+     },
+     "angle": {
+      "description": "radians",
+      "type": "number"
+     },
+     "imprint": {
+      "description": "HEW_API.md §5.2 face locator ({object,at} | {object,ray} | {\"$face\":\"label#key\"}) naming a sub-face; {object,at} also picks a CHORD when the point lies on one of its lines (a chord is tried first, then the sub-face containing the point)",
+      "type": "object"
+     }
+    },
+    "required": [
+     "imprint",
+     "angle",
+     "about"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "object_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object_id"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "not_in_plane"
+   ]
+  },
+  {
+   "method": "hew.solid.scale_imprint",
+   "namespace": "solid",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Kept for compatibility: uniformly scale a drawn shape about an anchor in its plane; hew.sketch.scale is the general form.",
+   "params": {
+    "properties": {
+     "about": {
+      "oneOf": [
+       {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       {
+        "description": "a derived-point locator (HEW_API.md §5.3)",
+        "type": "object"
+       }
+      ]
+     },
+     "factor": {
+      "description": "uniform scale factor",
+      "exclusiveMinimum": 0,
+      "type": "number"
+     },
+     "imprint": {
+      "description": "HEW_API.md §5.2 face locator ({object,at} | {object,ray} | {\"$face\":\"label#key\"}) naming a sub-face; {object,at} also picks a CHORD when the point lies on one of its lines (a chord is tried first, then the sub-face containing the point)",
+      "type": "object"
+     }
+    },
+    "required": [
+     "imprint",
+     "factor",
+     "about"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "object_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object_id"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "not_in_plane"
+   ]
+  },
+  {
+   "method": "hew.solid.slice",
+   "namespace": "solid",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Slice a solid by a plane into two solids.",
+   "params": {
+    "properties": {
+     "object": {
+      "type": "string"
+     },
+     "plane": {
+      "properties": {
+       "normal": {
+        "oneOf": [
+         {
+          "items": {
+           "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+         },
+         {
+          "description": "a derived-point locator (HEW_API.md §5.3)",
+          "type": "object"
+         }
+        ]
+       },
+       "origin": {
+        "oneOf": [
+         {
+          "items": {
+           "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+         },
+         {
+          "description": "a derived-point locator (HEW_API.md §5.3)",
+          "type": "object"
+         }
+        ]
+       }
+      },
+      "required": [
+       "origin",
+       "normal"
+      ],
+      "type": "object"
+     }
+    },
+    "required": [
+     "object",
+     "plane"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "negative": {
+      "type": "string"
+     },
+     "positive": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "positive",
+     "negative"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "not_solid"
+   ]
+  },
+  {
+   "method": "hew.solid.subtract",
+   "namespace": "solid",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Boolean subtraction of two solids.",
+   "params": {
+    "properties": {
+     "a": {
+      "description": "a node id: obj_/grp_/ins_",
+      "type": "string"
+     },
+     "b": {
+      "description": "a node id: obj_/grp_/ins_",
+      "type": "string"
+     }
+    },
+    "required": [
+     "a",
+     "b"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "result": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "result"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "boolean_operand_has_instance"
+   ]
+  },
+  {
+   "method": "hew.solid.thicken",
+   "namespace": "solid",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Pull a flat surface into a solid of the given thickness.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "centered": {
+      "default": false,
+      "description": "split the thickness evenly on both sides of the surface",
+      "type": "boolean"
+     },
+     "distance": {
+      "description": "meters along each face's front normal (negative: behind it)",
+      "type": "number"
+     },
+     "object": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "object",
+     "distance"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "object_id": {
+      "description": "the surface, now a solid",
+      "type": "string"
+     },
+     "object_ids": {
+      "description": "further separate pieces of the surface, each now a solid of its own",
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "object_id",
+     "object_ids"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "object_is_solid"
+   ]
+  },
+  {
+   "method": "hew.solid.union",
+   "namespace": "solid",
+   "tier": "Required",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Boolean union of two solids.",
+   "params": {
+    "properties": {
+     "a": {
+      "description": "a node id: obj_/grp_/ins_",
+      "type": "string"
+     },
+     "b": {
+      "description": "a node id: obj_/grp_/ins_",
+      "type": "string"
+     }
+    },
+    "required": [
+     "a",
+     "b"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "result": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "result"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "boolean_operand_has_instance"
+   ]
+  },
+  {
+   "method": "hew.tag.assign",
+   "namespace": "tag",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Assign a tag to nodes.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "path": {
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "remove": {
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "id",
+     "path"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_entity",
+    "unknown_object"
+   ]
+  },
+  {
+   "method": "hew.tag.create",
+   "namespace": "tag",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Register a tag path. Registry-state: records no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "hidden": {
+      "type": "boolean"
+     },
+     "path": {
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "tag": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "tag"
+    ],
+    "type": "object"
+   },
+   "refusals": []
+  },
+  {
+   "method": "hew.tag.delete",
+   "namespace": "tag",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Delete a tag path, unassigning it everywhere.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "path": {
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_tag"
+   ]
+  },
+  {
+   "method": "hew.tag.rename",
+   "namespace": "tag",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Rename a tag path (and every tag nested under it), keeping its identity.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "new_path": {
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "path": {
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     }
+    },
+    "required": [
+     "path",
+     "new_path"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "unknown_tag"
+   ]
+  },
+  {
+   "method": "hew.tag.set_visible",
+   "namespace": "tag",
+   "tier": "Standard",
+   "class": "model-mutating",
+   "served": "kernel",
+   "summary": "Toggle a tag's visibility. Registry-state: records no undo entry (§6.4).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "path": {
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+     },
+     "visible": {
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "path",
+     "visible"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": []
+  },
+  {
+   "method": "hew.view.camera",
+   "namespace": "view",
+   "tier": "Standard",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Set the live desktop viewport's camera. A host effect on the view, not a document edit (mutates_document = false: never recorded, never resyncs the document). Headless clients pass a camera per hew.view.snapshot call instead.",
+   "params": {
+    "additionalProperties": false,
+    "description": "exactly one of camera or view is required",
+    "properties": {
+     "camera": {
+      "additionalProperties": false,
+      "description": "mutually exclusive with view; identical vocabulary to hew.view.snapshot's camera",
+      "properties": {
+       "eye": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "fov_deg": {
+        "description": "perspective only; defaults to 35",
+        "type": "number"
+       },
+       "parallel_height": {
+        "description": "the height the view spans at the target, meters (what a parallel view frames); defaults to what the perspective view spans there",
+        "type": "number"
+       },
+       "projection": {
+        "enum": [
+         "perspective",
+         "parallel"
+        ],
+        "type": "string"
+       },
+       "target": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "up": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       }
+      },
+      "required": [
+       "eye",
+       "target"
+      ],
+      "type": "object"
+     },
+     "view": {
+      "description": "a named standard view; mutually exclusive with camera",
+      "enum": [
+       "iso",
+       "front",
+       "back",
+       "left",
+       "right",
+       "top",
+       "bottom"
+      ],
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing"
+   ]
+  },
+  {
+   "method": "hew.view.line_drawing",
+   "namespace": "view",
+   "tier": "Standard",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Hidden-line drawing of the visible document from a camera (crates/hlr): hard edges, curved-wall silhouettes, section-cut outlines, optionally dashed hidden lines — as a true-size SVG at a drawing scale (inline or written to path), or as raw segments in view-plane meters.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "camera": {
+      "description": "identical vocabulary to hew.view.snapshot's camera; mutually exclusive with view and scene",
+      "type": "object"
+     },
+     "format": {
+      "description": "defaults to svg",
+      "enum": [
+       "svg",
+       "segments"
+      ],
+      "type": "string"
+     },
+     "include_hidden": {
+      "description": "defaults to false; when true, hidden pieces are returned too (kind \"hidden\", dashed in SVG)",
+      "type": "boolean"
+     },
+     "include_soft": {
+      "description": "defaults to false; when true, non-silhouette curved-wall facet seams are returned (kind \"soft\")",
+      "type": "boolean"
+     },
+     "path": {
+      "description": "svg only: write the file here instead of returning it inline (hosts with filesystem access)",
+      "type": "string"
+     },
+     "scale": {
+      "description": "svg only: paper/model drawing scale, defaults to 1 (full size); the SVG's width/height are millimeters at that scale",
+      "type": "number"
+     },
+     "scene": {
+      "description": "a Scene's id: its camera and hidden sets, as hew.view.snapshot",
+      "type": "string"
+     },
+     "view": {
+      "description": "a named standard view (parallel projection); mutually exclusive with camera and scene",
+      "enum": [
+       "iso",
+       "front",
+       "back",
+       "left",
+       "right",
+       "top",
+       "bottom"
+      ],
+      "type": "string"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "properties": {
+     "bounds": {
+      "description": "[min_x, min_y, max_x, max_y] in view-plane meters; null when empty",
+      "items": {
+       "type": "number"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array"
+     },
+     "count": {
+      "type": "integer"
+     },
+     "ids": {
+      "description": "public id of the entity each segment belongs to",
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "kinds": {
+      "items": {
+       "enum": [
+        "hard",
+        "silhouette",
+        "soft",
+        "section",
+        "hidden"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "path": {
+      "description": "format svg with path",
+      "type": "string"
+     },
+     "segments": {
+      "description": "format segments: [ax, ay, bx, by] in view-plane meters, y up, origin at the camera target",
+      "items": {
+       "items": {
+        "type": "number"
+       },
+       "maxItems": 4,
+       "minItems": 4,
+       "type": "array"
+      },
+      "type": "array"
+     },
+     "svg": {
+      "description": "format svg without path",
+      "type": "string"
+     }
+    },
+    "required": [
+     "count"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "nothing_to_render",
+    "too_complex",
+    "save_failed",
+    "unknown_scene"
+   ]
+  },
+  {
+   "method": "hew.view.snapshot",
+   "namespace": "view",
+   "tier": "Standard",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Render the attached document to PNG, headless-rendered via a software rasterizer (a live host may render through its viewport instead) — bytes base64 by default, or a path on hosts with filesystem access.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "camera": {
+      "additionalProperties": false,
+      "description": "mutually exclusive with view",
+      "properties": {
+       "eye": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "fov_deg": {
+        "description": "perspective only; defaults to 35",
+        "type": "number"
+       },
+       "parallel_height": {
+        "description": "the height the view spans at the target, meters (what a parallel view frames); defaults to what the perspective view spans there",
+        "type": "number"
+       },
+       "projection": {
+        "enum": [
+         "perspective",
+         "parallel"
+        ],
+        "type": "string"
+       },
+       "target": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       },
+       "up": {
+        "items": {
+         "type": "number"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+       }
+      },
+      "required": [
+       "eye",
+       "target"
+      ],
+      "type": "object"
+     },
+     "depth_bits": {
+      "description": "bits per pixel of the depth PNG (default 8); only with include_depth",
+      "enum": [
+       8,
+       16
+      ],
+      "type": "integer"
+     },
+     "height": {
+      "description": "defaults to 512; out-of-range values are clamped, not refused",
+      "maximum": 2048,
+      "minimum": 16,
+      "type": "integer"
+     },
+     "include_depth": {
+      "description": "defaults to false; when true, also returns a depth pass as a grayscale PNG — NEAR is WHITE, background 0 — with depth_near/depth_far (meters from the eye along the view axis) so absolute depth is recoverable: depth = depth_far - (v - 1) / (max - 1) * (depth_far - depth_near), max = 255 or 65535. The conditioning input depth-aware image models expect",
+      "type": "boolean"
+     },
+     "include_ids": {
+      "description": "defaults to false; when true, also returns a per-pixel id-buffer and its palette",
+      "type": "boolean"
+     },
+     "include_normals": {
+      "description": "defaults to false; when true, also returns a camera-space normals pass as an RGB PNG: (n * 0.5 + 0.5) * 255 per axis, x right, y up, z toward the viewer, background (128, 128, 255)",
+      "type": "boolean"
+     },
+     "path": {
+      "description": "when given, the PNG is written here instead of returned inline, honored by hosts with filesystem access and refused typed elsewhere (mirrors hew.doc.export)",
+      "type": "string"
+     },
+     "scene": {
+      "description": "a Scene's id: renders through its resolved camera and hidden sets (Document::resolve_scene) instead of the document's own — falls back to the usual cameraless resolution when the Scene captures no camera. Mutually exclusive with camera and view. The Scene's section plane, if any, is NOT rendered headlessly at 1.0.",
+      "type": "string"
+     },
+     "view": {
+      "description": "a named standard view fitted to the scene bounding box; mutually exclusive with camera and scene",
+      "enum": [
+       "iso",
+       "front",
+       "back",
+       "left",
+       "right",
+       "top",
+       "bottom"
+      ],
+      "type": "string"
+     },
+     "width": {
+      "description": "defaults to 512; out-of-range values are clamped, not refused",
+      "maximum": 2048,
+      "minimum": 16,
+      "type": "integer"
+     }
+    },
+    "type": "object"
+   },
+   "result": {
+    "description": "two shapes depending on whether path was given: bytes base64 inline (default), or a path plus a sidecar path for each extra pass asked for (id-buffer, depth, normals)",
+    "properties": {
+     "depth_bits": {
+      "description": "with a depth pass: 8 or 16",
+      "type": "integer"
+     },
+     "depth_far": {
+      "description": "with a depth pass: the farthest drawn surface",
+      "type": "number"
+     },
+     "depth_near": {
+      "description": "with a depth pass: meters from the eye, along the view axis, of the nearest drawn surface",
+      "type": "number"
+     },
+     "depth_path": {
+      "description": "present only when include_depth and path were both given: \"<path>.depth.png\"",
+      "type": "string"
+     },
+     "depth_png_base64": {
+      "description": "present only when include_depth was true and path was not given",
+      "type": "string"
+     },
+     "height": {
+      "type": "integer"
+     },
+     "id_buffer_base64": {
+      "description": "present only when include_ids was true and path was not given: u16 little-endian per pixel, index into id_palette (0 = background)",
+      "type": "string"
+     },
+     "id_buffer_path": {
+      "description": "present only when include_ids and path were both given: \"<path>.ids.bin\", the same u16 little-endian per-pixel encoding written to disk",
+      "type": "string"
+     },
+     "id_palette": {
+      "description": "public ids; id_palette[i] is what the id-buffer (inline or on disk) reports as index i+1",
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "normals_path": {
+      "description": "present only when include_normals and path were both given: \"<path>.normals.png\"",
+      "type": "string"
+     },
+     "normals_png_base64": {
+      "description": "present only when include_normals was true and path was not given",
+      "type": "string"
+     },
+     "path": {
+      "description": "present only when path was given: echoes it back",
+      "type": "string"
+     },
+     "png_base64": {
+      "description": "present only when path was not given",
+      "type": "string"
+     },
+     "width": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "width",
+     "height"
+    ],
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing",
+    "nothing_to_render",
+    "save_failed",
+    "unknown_scene"
+   ]
+  },
+  {
+   "method": "hew.view.units",
+   "namespace": "view",
+   "tier": "Standard",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Set the app's displayed length-unit format (app/src/settings/units.ts's LengthFormat) — an app-level display PREFERENCE, never document state or file-format data.",
+   "params": {
+    "additionalProperties": false,
+    "properties": {
+     "format": {
+      "description": "metric: m, cm, mm; imperial: arch (feet+inches, e.g. 5' 3-1/8\"), frac_in (fractional inches), dec_in (decimal inches)",
+      "enum": [
+       "m",
+       "cm",
+       "mm",
+       "arch",
+       "frac_in",
+       "dec_in"
+      ],
+      "type": "string"
+     }
+    },
+    "required": [
+     "format"
+    ],
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing"
+   ]
+  },
+  {
+   "method": "hew.view.zoom_extents",
+   "namespace": "view",
+   "tier": "Standard",
+   "class": "solitary",
+   "served": "host",
+   "summary": "Frame all visible geometry in the live viewport (View > Zoom Extents). A view effect, not a document edit (mutates_document = false).",
+   "params": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "result": {
+    "additionalProperties": false,
+    "properties": {},
+    "type": "object"
+   },
+   "refusals": [
+    "host_capability_missing"
+   ]
+  }
+ ]
+}

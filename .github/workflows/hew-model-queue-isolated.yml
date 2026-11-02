@@ -3,15 +3,19 @@
 name: Hew 3D isolated PostgreSQL queue
 on:
   push:
-    branches: [feature/hew-3d-mcp-v1-20261025, feature/hew-one-button-30min-20261025]
+    branches: [feature/hew-3d-mcp-v1-20261025, feature/hew-one-button-30min-20261025, feature/hew-full-api-20261102]
     paths:
       - 'hew/sql/**'
       - 'tests/sql/hew_model_queue_isolated.test.sql'
+      - 'tests/sql/hew_model_full_api_isolated.test.sql'
+      - 'tests/sql/hew_model_cloud_hew_isolated.test.sql'
       - '.github/workflows/hew-model-queue-isolated.yml'
   pull_request:
     paths:
       - 'hew/sql/**'
       - 'tests/sql/hew_model_queue_isolated.test.sql'
+      - 'tests/sql/hew_model_full_api_isolated.test.sql'
+      - 'tests/sql/hew_model_cloud_hew_isolated.test.sql'
       - '.github/workflows/hew-model-queue-isolated.yml'
 permissions:
   contents: read
@@ -48,3 +52,14 @@ jobs:
           PGPASSWORD: postgres
           PGDATABASE: postgres
         run: psql -X -v ON_ERROR_STOP=1 -f tests/sql/hew_model_queue_isolated.test.sql
+      - name: Test full Hew API call jobs, same-revision reads, result read-back and private storage
+        env:
+          PGHOST: localhost
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: |
+          psql -X -d postgres -c 'create database full_api'
+          psql -X -d full_api -v ON_ERROR_STOP=1 -f tests/sql/hew_model_full_api_isolated.test.sql
+          psql -X -d postgres -c 'create database cloud_hew'
+          psql -X -d cloud_hew -v ON_ERROR_STOP=1 -f tests/sql/hew_model_cloud_hew_isolated.test.sql

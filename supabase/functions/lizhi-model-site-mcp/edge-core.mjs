@@ -1,10 +1,16 @@
 /**
  * Candidate *server-only* Lizhi 3D upstream MCP Edge handler.
- * No deployment, no browser CORS, no general-purpose Hew dispatcher.
+ * No browser CORS. Generic Hew calls are validated by the contract (registry
+ * allowlist, destructive confirmation, no paths) and only QUEUED here; the
+ * owner's authorized browser host executes them.
  * Server secrets and service_role client must be provided only by Deno index.ts.
  * Local Site owner auth happens independently BEFORE this upstream bearer.
  */
-import {MODEL_SITE_TOOLS,validateModelSiteTool} from "./model-site-contract.mjs";
+import {MODEL_SITE_TOOLS,validateModelSiteTool,hewApiReference} from "./model-site-contract.mjs";
+const MODEL_FILES_BUCKET="lizhi-model-files";
+const SIGNED_URL_SECONDS=3600;
+const INLINE_IMAGE_MAX_BYTES=1_500_000;
+const ARTIFACT_PATH=/^[0-9a-f-]{36}\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.[a-z0-9.]+$/i;
 const HEX=/^[0-9a-f]{64,128}$/i;
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const HEADER={"Cache-Control":"private, no-store","Pragma":"no-cache","X-Content-Type-Options":"nosniff"};
@@ -13,7 +19,47 @@ const json=(obj,status=200)=>Response.json(obj,{status,headers:HEADER});
 const response=(id,result)=>json({jsonrpc:"2.0",id,result});
 const rpcError=(id,code,message)=>json({jsonrpc:"2.0",id,error:{code,message}});
 const fail=(id,code)=>response(id,{isError:true,content:[{type:"text",text:code}]});
-const success=(id,body)=>response(id,{isError:false,content:[{type:"text",text:JSON.stringify(body)}]});
+const success=(id,body,extra=[])=>response(id,{isError:false,
+ content:[{type:"text",text:JSON.stringify(body)},...extra]});
+function toBase64(bytes){
+ let bin="";const step=0x8000;
+ for(let i=0;i<bytes.length;i+=step)bin+=String.fromCharCode(...bytes.subarray(i,i+step));
+ return btoa(bin);
+}
+/**
+ * Replaces private storage references in a job result with short-lived
+ * signed links, and returns the first small PNG as inline MCP image content
+ * so ChatGPT can actually see a snapshot. Only paths inside the owner's own
+ * folder of the private bucket are ever signed.
+ */
+async function presentArtifacts(db,ownerUid,result){
+ const images=[];
+ if(!object(result)||!object(result.artifacts)||!db?.storage)return {result,images};
+ const artifacts={};
+ for(const [key,a] of Object.entries(result.artifacts)){
+  if(!object(a)||a.bucket!==MODEL_FILES_BUCKET||typeof a.path!=="string"||
+     !ARTIFACT_PATH.test(a.path)||!a.path.startsWith(ownerUid+"/")){
+   artifacts[key]=object(a)&&typeof a.dropped==="string"?{dropped:a.dropped}:{unavailable:true};
+   continue;
+  }
+  const entry={mime:typeof a.mime==="string"?a.mime:null,bytes:Number.isSafeInteger(a.bytes)?a.bytes:null};
+  try{
+   const {data,error}=await db.storage.from(MODEL_FILES_BUCKET).createSignedUrl(a.path,SIGNED_URL_SECONDS);
+   if(!error&&typeof data?.signedUrl==="string"){entry.url=data.signedUrl;entry.expires_in_s=SIGNED_URL_SECONDS;}
+  }catch{/* link optional */}
+  if(!images.length&&entry.mime==="image/png"&&entry.bytes!==null&&entry.bytes<=INLINE_IMAGE_MAX_BYTES){
+   try{
+    const {data,error}=await db.storage.from(MODEL_FILES_BUCKET).download(a.path);
+    if(!error&&data){
+     const bytes=new Uint8Array(await data.arrayBuffer());
+     if(bytes.length<=INLINE_IMAGE_MAX_BYTES)images.push({type:"image",data:toBase64(bytes),mimeType:"image/png"});
+    }
+   }catch{/* inline preview optional */}
+  }
+  artifacts[key]=entry;
+ }
+ return {result:{...result,artifacts},images};
+}
 async function secureEqual(a,b){
  if(!HEX.test(a)||!HEX.test(b))return false;
  const enc=new TextEncoder();
@@ -22,7 +68,7 @@ async function secureEqual(a,b){
  let diff=0;for(let i=0;i<one.length;i++)diff|=one[i]^two[i];
  return diff===0;
 }
-async function readJsonLimited(req,max=16384){
+async function readJsonLimited(req,max=65536){
  const declared=req.headers.get("content-length");
  if(declared!==null&&(!/^\d+$/.test(declared)||Number(declared)>max))throw Error("TOO_LARGE");
  if(!req.body)throw Error("EMPTY_BODY");
@@ -46,7 +92,7 @@ async function call(db,name,params){
  if(error)throw Error("MODEL_RPC_DENIED_OR_UNAVAILABLE");
  return data;
 }
-export async function handleModelEdgeRequest(req,{token,ownerUid,db,verifyBearer=secureEqual}){
+export async function handleModelEdgeRequest(req,{token,ownerUid,db,verifyBearer=secureEqual,dispatchWorker=null}){
  if(req.headers.has("origin"))return json({error:"MODEL_BROWSER_ORIGIN_NOT_ALLOWED"},403);
  if(req.method!=="POST")return json({error:"POST_ONLY"},405);
  if(!HEX.test(token??"")||!UUID.test(ownerUid??"")||!db?.rpc)
@@ -76,6 +122,48 @@ export async function handleModelEdgeRequest(req,{token,ownerUid,db,verifyBearer
  if(!checked.ok)return fail(id,checked.code);
  if(p.name==="model_new_document")
   return fail(id,"MODEL_NEW_DOCUMENT_NOT_IMPLEMENTED_UNSAVED_GUARD");
+ if(checked.kind==="cloud_read"||checked.kind==="cloud_write"){
+  try{
+   if(p.name==="model_cloud_documents"){
+    const list=await call(db,"lizhi_model_cloud_hew_list",{p_owner:ownerUid});
+    return success(id,{ok:true,mode:"cloud_hew",requires_browser:false,documents:Array.isArray(list)?list.slice(0,200):[]});
+   }
+   if(p.name==="model_cloud_new_document"){
+    const doc=await call(db,"lizhi_model_cloud_hew_new",{p_owner:ownerUid,p_name:checked.args.name});
+    if(!object(doc)||!UUID.test(doc.document_id??""))return fail(id,"MODEL_CLOUD_CREATE_UNKNOWN");
+    return success(id,{ok:true,...doc});
+   }
+   if(p.name==="model_cloud_job_status"){
+    const job=await call(db,"lizhi_model_cloud_hew_job",{p_owner:ownerUid,p_job:checked.args.job_id});
+    if(!object(job)||!UUID.test(job.job_id??""))return fail(id,"MODEL_JOB_NOT_FOUND");
+    const shown=await presentArtifacts(db,ownerUid,job.result??null);
+    return success(id,{ok:true,job:{job_id:job.job_id,state:job.state,method:job.method,
+     mutated:typeof job.mutated==="boolean"?job.mutated:null,
+     new_revision:Number.isSafeInteger(job.new_revision)?job.new_revision:null,
+     error:typeof job.error==="string"?job.error.slice(0,300):null,result:shown.result}},shown.images);
+   }
+   const a=checked.args;
+   let jobId;
+   try{
+    jobId=await call(db,"lizhi_model_cloud_hew_enqueue",{p_owner:ownerUid,p_request:a.request_id,
+     p_document:a.document_id,p_revision:a.revision,p_method:a.method,p_params:a.params,p_confirmed:a.confirmed});
+   }catch{return fail(id,"MODEL_CLOUD_ENQUEUE_REFUSED_CHECK_REVISION_DO_NOT_BLIND_RETRY")}
+   if(!UUID.test(jobId??""))return fail(id,"MODEL_UPSTREAM_ENQUEUE_UNKNOWN_DO_NOT_RETRY");
+   let worker="not_configured";
+   if(typeof dispatchWorker==="function"){
+    try{worker=(await dispatchWorker())?"started":"start_failed"}catch{worker="start_failed"}
+   }
+   return success(id,{ok:true,queued:true,completed:false,job_id:jobId,mode:"cloud_hew",worker,
+    automaticRetryAllowed:false,
+    note:"Queued for the cloud Hew worker. Poll model_cloud_job_status (usually 1-3 minutes); never retry an unknown write."});
+  }catch{
+   return fail(id,"MODEL_UPSTREAM_RESULT_UNKNOWN_DO_NOT_RETRY");
+  }
+ }
+ if(p.name==="model_api_reference"){
+  const ref=hewApiReference(checked.args);
+  return ref.ok?success(id,ref):fail(id,ref.code);
+ }
  try{
   if(p.name==="model_status"){
    const sessions=properSessions(await call(db,"lizhi_model_site_sessions",{p_owner:ownerUid}));
@@ -85,8 +173,13 @@ export async function handleModelEdgeRequest(req,{token,ownerUid,db,verifyBearer
   if(p.name==="model_job_status"){
    const job=await call(db,"lizhi_model_site_job",{p_owner:ownerUid,p_job:checked.args.job_id});
    if(!object(job)||!UUID.test(job.job_id??""))return fail(id,"MODEL_JOB_NOT_FOUND");
+   const shown=await presentArtifacts(db,ownerUid,job.result??null);
    return success(id,{ok:true,job:{job_id:job.job_id,state:job.state,
-    error:typeof job.error==="string"?job.error.slice(0,200):null}});
+    command:typeof job.command==="string"?job.command:null,
+    method:typeof job.method==="string"?job.method:null,
+    mutated:typeof job.mutated==="boolean"?job.mutated:null,
+    error:typeof job.error==="string"?job.error.slice(0,200):null,
+    result:shown.result}},shown.images);
   }
   if(p.name==="model_scene"){
    const scene=await call(db,"lizhi_model_site_scene",

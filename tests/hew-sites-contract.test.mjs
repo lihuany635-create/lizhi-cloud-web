@@ -8,10 +8,10 @@ const job_id="33333333-3333-4333-8333-333333333333";
 const owner={signedIn:true,verifiedUserEmail:"owner@example.test"};
 const secrets={ownerEmail:"owner@example.test",siteMcpToken:"a".repeat(64)};
 const box={session_id,request_id,origin_mm:[0,0,0],width_mm:1200,depth_mm:600,height_mm:750,object_name:"Table"};
-test("model Site exposes exactly six bounded tools",()=>{
+test("model Site exposes the twelve bounded tools",()=>{
  assert.deepEqual(MODEL_SITE_TOOLS.map(x=>x.name),[
  "model_status","model_new_document","model_create_box",
- "model_move","model_scene","model_job_status"]);
+ "model_move","model_scene","model_job_status","model_api_reference","model_call","model_cloud_documents","model_cloud_new_document","model_cloud_call","model_cloud_job_status"]);
  for(const tool of MODEL_SITE_TOOLS)assert.equal(tool.inputSchema.additionalProperties,false);
 });
 test("mm -> m converts rectangular solid into atomic official Hew transact",()=>{
