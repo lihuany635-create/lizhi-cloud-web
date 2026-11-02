@@ -92,7 +92,7 @@ async function call(db,name,params){
  if(error)throw Error("MODEL_RPC_DENIED_OR_UNAVAILABLE");
  return data;
 }
-export async function handleModelEdgeRequest(req,{token,ownerUid,db,verifyBearer=secureEqual}){
+export async function handleModelEdgeRequest(req,{token,ownerUid,db,verifyBearer=secureEqual,dispatchWorker=null}){
  if(req.headers.has("origin"))return json({error:"MODEL_BROWSER_ORIGIN_NOT_ALLOWED"},403);
  if(req.method!=="POST")return json({error:"POST_ONLY"},405);
  if(!HEX.test(token??"")||!UUID.test(ownerUid??"")||!db?.rpc)
@@ -122,6 +122,44 @@ export async function handleModelEdgeRequest(req,{token,ownerUid,db,verifyBearer
  if(!checked.ok)return fail(id,checked.code);
  if(p.name==="model_new_document")
   return fail(id,"MODEL_NEW_DOCUMENT_NOT_IMPLEMENTED_UNSAVED_GUARD");
+ if(checked.kind==="cloud_read"||checked.kind==="cloud_write"){
+  try{
+   if(p.name==="model_cloud_documents"){
+    const list=await call(db,"lizhi_model_cloud_hew_list",{p_owner:ownerUid});
+    return success(id,{ok:true,mode:"cloud_hew",requires_browser:false,documents:Array.isArray(list)?list.slice(0,200):[]});
+   }
+   if(p.name==="model_cloud_new_document"){
+    const doc=await call(db,"lizhi_model_cloud_hew_new",{p_owner:ownerUid,p_name:checked.args.name});
+    if(!object(doc)||!UUID.test(doc.document_id??""))return fail(id,"MODEL_CLOUD_CREATE_UNKNOWN");
+    return success(id,{ok:true,...doc});
+   }
+   if(p.name==="model_cloud_job_status"){
+    const job=await call(db,"lizhi_model_cloud_hew_job",{p_owner:ownerUid,p_job:checked.args.job_id});
+    if(!object(job)||!UUID.test(job.job_id??""))return fail(id,"MODEL_JOB_NOT_FOUND");
+    const shown=await presentArtifacts(db,ownerUid,job.result??null);
+    return success(id,{ok:true,job:{job_id:job.job_id,state:job.state,method:job.method,
+     mutated:typeof job.mutated==="boolean"?job.mutated:null,
+     new_revision:Number.isSafeInteger(job.new_revision)?job.new_revision:null,
+     error:typeof job.error==="string"?job.error.slice(0,300):null,result:shown.result}},shown.images);
+   }
+   const a=checked.args;
+   let jobId;
+   try{
+    jobId=await call(db,"lizhi_model_cloud_hew_enqueue",{p_owner:ownerUid,p_request:a.request_id,
+     p_document:a.document_id,p_revision:a.revision,p_method:a.method,p_params:a.params,p_confirmed:a.confirmed});
+   }catch{return fail(id,"MODEL_CLOUD_ENQUEUE_REFUSED_CHECK_REVISION_DO_NOT_BLIND_RETRY")}
+   if(!UUID.test(jobId??""))return fail(id,"MODEL_UPSTREAM_ENQUEUE_UNKNOWN_DO_NOT_RETRY");
+   let worker="not_configured";
+   if(typeof dispatchWorker==="function"){
+    try{worker=(await dispatchWorker())?"started":"start_failed"}catch{worker="start_failed"}
+   }
+   return success(id,{ok:true,queued:true,completed:false,job_id:jobId,mode:"cloud_hew",worker,
+    automaticRetryAllowed:false,
+    note:"Queued for the cloud Hew worker. Poll model_cloud_job_status (usually 1-3 minutes); never retry an unknown write."});
+  }catch{
+   return fail(id,"MODEL_UPSTREAM_RESULT_UNKNOWN_DO_NOT_RETRY");
+  }
+ }
  if(p.name==="model_api_reference"){
   const ref=hewApiReference(checked.args);
   return ref.ok?success(id,ref):fail(id,ref.code);

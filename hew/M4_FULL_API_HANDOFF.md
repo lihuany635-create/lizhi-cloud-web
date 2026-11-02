@@ -51,4 +51,4 @@ Hew 核心本身已具備 SketchUp 的主要功能（元件、場景、路徑跟
 4. 以本分支的 `site-tools.mjs` 重新發布私人 Site「立之 3D 建模代理」（同一個 Site）。
 5. 在立之雲端庫開 Hew、按「連線 AI」，從 ChatGPT 依序測：`model_api_reference` → `model_call hew.query.scene` → 畫矩形＋推拉的交易 → `hew.view.snapshot`（確認看得到圖）→ `hew.doc.export glb`（確認連結可下載）。
 
-電腦關機也能操控的雲端執行器見 `hew/cloud-hew/DESIGN.md`。
+電腦關機也能操控的雲端執行器（`model_cloud_*` 工具、SQL 005、worker）見 `hew/cloud-hew/DESIGN.md`。

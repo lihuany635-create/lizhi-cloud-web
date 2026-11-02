@@ -63,7 +63,7 @@ export async function handleModelSiteTool(name,args,trustedAuth,serverSecrets,fe
   const image=body.result.content[1];
   const images=[];
   if(image!==undefined){
-   if(name!=="model_job_status"||!obj(image)||image.type!=="image"||image.mimeType!=="image/png"||
+   if((name!=="model_job_status"&&name!=="model_cloud_job_status")||!obj(image)||image.type!=="image"||image.mimeType!=="image/png"||
       typeof image.data!=="string"||image.data.length>MAX_IMAGE_B64||!/^[A-Za-z0-9+/]+={0,2}$/.test(image.data))
     return fail("MODEL_RESULT_UNKNOWN_DO_NOT_RETRY");
    images.push({type:"image",data:image.data,mimeType:"image/png"});
@@ -76,7 +76,14 @@ export async function handleModelSiteTool(name,args,trustedAuth,serverSecrets,fe
      sessions:value.sessions.filter(v=>obj(v)&&typeof v.session_id==="string"&&typeof v.document_id==="string")
      .slice(0,8).map(v=>({session_id:v.session_id,document_id:v.document_id}))});
   }
-  if(name==="model_api_reference")return success(value);
+  if(name==="model_api_reference"||name==="model_cloud_documents"||name==="model_cloud_new_document")
+   return success(value);
+  if(name==="model_cloud_job_status"){
+   const j=value.job;
+   const states=["queued","claimed","succeeded","failed","cancelled","expired"];
+   if(!obj(j)||typeof j.job_id!=="string"||!states.includes(j.state))return fail("MODEL_BAD_JOB");
+   return success({ok:true,...j,completed:j.state==="succeeded",automaticRetryAllowed:false},images);
+  }
   if(name==="model_job_status"){
    const j=value.job;
    const states=["queued","claimed","succeeded","failed","cancelled","expired"];
@@ -98,7 +105,9 @@ export async function handleModelSiteTool(name,args,trustedAuth,serverSecrets,fe
   if(value.queued!==true||value.completed!==false||typeof value.job_id!=="string")
     return fail("MODEL_RESULT_UNKNOWN_DO_NOT_RETRY");
   return success({ok:true,queued:true,completed:false,job_id:value.job_id,
-    automaticRetryAllowed:false,note:"Only queued. Read model_job_status and verify succeeded before claiming geometry created."});
+    automaticRetryAllowed:false,...(value.mode==="cloud_hew"?{mode:"cloud_hew",worker:value.worker}:{}),
+    note:value.mode==="cloud_hew"?"Only queued for the cloud worker. Poll model_cloud_job_status.":
+     "Only queued. Read model_job_status and verify succeeded before claiming geometry created."});
  }catch(e){
   if(e instanceof Error&&e.name==="AbortError")return fail("MODEL_TIMEOUT_DO_NOT_RETRY");
   return fail("MODEL_RESULT_UNKNOWN_DO_NOT_RETRY");

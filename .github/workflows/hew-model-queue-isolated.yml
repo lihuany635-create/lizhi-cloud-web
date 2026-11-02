@@ -8,12 +8,14 @@ on:
       - 'hew/sql/**'
       - 'tests/sql/hew_model_queue_isolated.test.sql'
       - 'tests/sql/hew_model_full_api_isolated.test.sql'
+      - 'tests/sql/hew_model_cloud_hew_isolated.test.sql'
       - '.github/workflows/hew-model-queue-isolated.yml'
   pull_request:
     paths:
       - 'hew/sql/**'
       - 'tests/sql/hew_model_queue_isolated.test.sql'
       - 'tests/sql/hew_model_full_api_isolated.test.sql'
+      - 'tests/sql/hew_model_cloud_hew_isolated.test.sql'
       - '.github/workflows/hew-model-queue-isolated.yml'
 permissions:
   contents: read
@@ -59,3 +61,5 @@ jobs:
         run: |
           psql -X -d postgres -c 'create database full_api'
           psql -X -d full_api -v ON_ERROR_STOP=1 -f tests/sql/hew_model_full_api_isolated.test.sql
+          psql -X -d postgres -c 'create database cloud_hew'
+          psql -X -d cloud_hew -v ON_ERROR_STOP=1 -f tests/sql/hew_model_cloud_hew_isolated.test.sql

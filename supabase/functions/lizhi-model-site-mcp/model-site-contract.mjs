@@ -35,6 +35,7 @@ export const DESTRUCTIVE_METHODS = new Set([
  "hew.scenes.remove","hew.library.remove","hew.attr.delete","hew.guide.clear",
 ]);
 const MAX_CALL_BYTES = 30000;
+export const CLOUD_LIFECYCLE_METHODS = new Set(["hew.doc.new","hew.doc.open","hew.doc.close","hew.doc.save","hew.doc.revert","hew.doc.import"]);
 const MAX_TRANSACT_COMMANDS = 200;
 const METHOD = /^hew\.[a-z]+\.[a-z_]+$/;
 function hasPath(v,depth=0){
@@ -109,7 +110,11 @@ export const MODEL_SITE_TOOLS = Object.freeze([
  {name:"model_scene",description:"Read only geometry scene summary for an explicitly authorized model session.",inputSchema:input({session_id:session},["session_id"])},
  {name:"model_job_status",description:"Read only. Verify a prior job state and read its result (Hew reply, kernel error detail, private file links, inline snapshot image). Do not retry unknown mutations.",inputSchema:input({job_id:job},["job_id"])},
  {name:"model_api_reference",description:"Read only, no session needed. Without arguments: every Hew API namespace and method name. With namespace: its methods and summaries. With method: the full params/result schema and refusals. Read before using model_call.",inputSchema:input({namespace:{type:"string",maxLength:40},method:{type:"string",maxLength:80}},[])},
- {name:"model_call",description:"Queue ONE Hew API call (any method from model_api_reference, e.g. hew.solid.push_pull, hew.solid.follow_me, hew.sketch.offset, hew.component.place, hew.scenes.add, hew.material.paint, hew.view.snapshot, hew.doc.export) against the user's authorized open model. Params follow the method's schema in metres. Wrap multi-step edits in hew.doc.transact. Destructive methods (delete, new/open/close/revert/import document, explode, purge) need confirm_destructive=true ONLY after the user explicitly agreed in chat. Queued only: read model_job_status for the result; never retry an unknown write.",inputSchema:input({...common,method:{type:"string",maxLength:80,pattern:"^hew\\.[a-z]+\\.[a-z_]+$"},params:{type:"object"},confirm_destructive:{type:"boolean",const:true}},["session_id","request_id","method"])}
+ {name:"model_call",description:"Queue ONE Hew API call (any method from model_api_reference, e.g. hew.solid.push_pull, hew.solid.follow_me, hew.sketch.offset, hew.component.place, hew.scenes.add, hew.material.paint, hew.view.snapshot, hew.doc.export) against the user's authorized open model. Params follow the method's schema in metres. Wrap multi-step edits in hew.doc.transact. Destructive methods (delete, new/open/close/revert/import document, explode, purge) need confirm_destructive=true ONLY after the user explicitly agreed in chat. Queued only: read model_job_status for the result; never retry an unknown write.",inputSchema:input({...common,method:{type:"string",maxLength:80,pattern:"^hew\\.[a-z]+\\.[a-z_]+$"},params:{type:"object"},confirm_destructive:{type:"boolean",const:true}},["session_id","request_id","method"])},
+ {name:"model_cloud_documents",description:"Read only. List the user's cloud 3D documents (real .hew files kept in private cloud storage, every revision kept). Cloud mode needs no open browser or computer.",inputSchema:input({},[])},
+ {name:"model_cloud_new_document",description:"Create a new empty cloud 3D document by name. Its first model_cloud_call writes revision 1.",inputSchema:input({name:{type:"string",minLength:1,maxLength:80}},["name"])},
+ {name:"model_cloud_call",description:"Queue ONE Hew API call (same methods and params as model_call, metres) against a cloud document at its current revision. A headless Hew worker runs it in the cloud within a few minutes, even with the user's computer off, and writes the next revision. Document lifecycle methods (new/open/close/save/revert/import) are not allowed here. Destructive methods need confirm_destructive=true only after the user agreed in chat. Then poll model_cloud_job_status; never retry an unknown write.",inputSchema:input({document_id:session,revision:{type:"integer",minimum:0},request_id:session,method:{type:"string",maxLength:80,pattern:"^hew\\.[a-z]+\\.[a-z_]+$"},params:{type:"object"},confirm_destructive:{type:"boolean",const:true}},["document_id","revision","request_id","method"])},
+ {name:"model_cloud_job_status",description:"Read only. State and result of a cloud job: Hew reply or kernel error, new revision, private file links, inline snapshot image.",inputSchema:input({job_id:job},["job_id"])}
 ]);
 export function validateModelSiteTool(tool,args){
  if(!MODEL_SITE_TOOLS.some(t=>t.name===tool))return error("UNKNOWN_MODEL_TOOL");
@@ -119,6 +124,25 @@ export function validateModelSiteTool(tool,args){
  if(tool==="model_status")return exact(args,[])?{ok:true,kind:"read",args:{}}:error("INVALID_ARGUMENTS");
  if(tool==="model_job_status")return exact(args,["job_id"])&&id(args.job_id)
    ?{ok:true,kind:"read",args:{job_id:args.job_id}}:error("INVALID_JOB_ID");
+ if(tool==="model_cloud_documents")return exact(args,[])?{ok:true,kind:"cloud_read",args:{}}:error("INVALID_ARGUMENTS");
+ if(tool==="model_cloud_job_status")return exact(args,["job_id"])&&id(args.job_id)
+   ?{ok:true,kind:"cloud_read",args:{job_id:args.job_id}}:error("INVALID_JOB_ID");
+ if(tool==="model_cloud_new_document")
+   return exact(args,["name"])&&typeof args.name==="string"&&args.name.trim().length>0&&args.name.length<=80
+     ?{ok:true,kind:"cloud_write",args:{name:args.name.trim()}}:error("INVALID_ARGUMENTS");
+ if(tool==="model_cloud_call"){
+   if(!exact(args,["document_id","revision","request_id","method"],["params","confirm_destructive"])||
+      !id(args.document_id)||!id(args.request_id)||!Number.isSafeInteger(args.revision)||args.revision<0||
+      (args.confirm_destructive!==undefined&&args.confirm_destructive!==true))
+     return error("INVALID_ARGUMENTS");
+   if(CLOUD_LIFECYCLE_METHODS.has(args.method))return error("MODEL_CLOUD_WORKER_OWNS_DOCUMENT_LIFECYCLE");
+   const params=args.params===undefined?{}:args.params;
+   const checked=checkHewCall(args.method,params,args.confirm_destructive);
+   if(!checked.ok)return checked;
+   if(new TextEncoder().encode(JSON.stringify(params)).byteLength>MAX_CALL_BYTES)return error("MODEL_CALL_TOO_LARGE");
+   return {ok:true,kind:"cloud_write",args:{document_id:args.document_id,revision:args.revision,
+     request_id:args.request_id,method:args.method,params,confirmed:args.confirm_destructive===true}};
+ }
  if(tool==="model_api_reference"){
    if(!exact(args,[],["namespace","method"])||
       (args.namespace!==undefined&&(typeof args.namespace!=="string"||!/^[a-z]{1,40}$/.test(args.namespace)))||

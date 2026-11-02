@@ -44,13 +44,13 @@ test("private M3 site route rejects unauthenticated, wrong owner, origin and GET
   assert.equal(get.status,405);
   assert.equal(count,0);
 });
-test("MCP initialize, tools/list exposes the eight registered 3D tools",async()=>{
+test("MCP initialize, tools/list exposes the twelve registered 3D tools",async()=>{
   count=0;
   const init=await (await handleSiteModelMcpRequest(request("initialize"),valid,secrets,forward)).json();
   assert.equal(init.result.serverInfo.name,"lizhi-hew-model-private-site");
   const listing=await (await handleSiteModelMcpRequest(request("tools/list"),valid,secrets,forward)).json();
   assert.deepEqual(listing.result.tools.map(t=>t.name),
-    ["model_status","model_new_document","model_create_box","model_move","model_scene","model_job_status","model_api_reference","model_call"]);
+    ["model_status","model_new_document","model_create_box","model_move","model_scene","model_job_status","model_api_reference","model_call","model_cloud_documents","model_cloud_new_document","model_cloud_call","model_cloud_job_status"]);
   assert.equal(count,0);
 });
 test("Site /mcp to real Edge core returns a queued 3D job once, not created geometry",async()=>{
