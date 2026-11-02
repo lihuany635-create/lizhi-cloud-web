@@ -26,11 +26,11 @@ function fixture(){
 }
 const box=()=>rpc("model_create_box",{session_id:session,request_id:requestId,
  origin_mm:[0,0,0],width_mm:1200,depth_mm:600,height_mm:750});
-test("MCP handshake exposes exactly six bounded tools",async()=>{
+test("MCP handshake exposes the eight bounded tools",async()=>{
  const f=fixture();
  const res=await result(await handleModelEdgeRequest(req({jsonrpc:"2.0",id:1,method:"tools/list"}),f.config));
  assert.deepEqual(res.result.tools.map(x=>x.name),["model_status","model_new_document",
-   "model_create_box","model_move","model_scene","model_job_status"]);
+   "model_create_box","model_move","model_scene","model_job_status","model_api_reference","model_call"]);
  assert.equal(f.calls.length,0);
 });
 test("wrong bearer and browser Origin are denied before SQL",async()=>{
@@ -69,7 +69,7 @@ test("new document and invalid geometry are rejected without SQL calls",async()=
 });
 test("oversized request is rejected without using database",async()=>{
  const f=fixture();const oversized=new Request("https://example.test/edge",{method:"POST",
- headers:{Authorization:"Bearer "+bearer},body:"x".repeat(20000)});
+ headers:{Authorization:"Bearer "+bearer},body:"x".repeat(70000)});
  assert.equal((await handleModelEdgeRequest(oversized,f.config)).status,413);
  assert.equal(f.calls.length,0);
 });

@@ -17,7 +17,7 @@ const respond=(payload,status=200)=>Response.json(payload,{status,headers:jsonHe
 const rpcError=(id,code,message,status=200)=>respond({jsonrpc:"2.0",id,
   error:{code,message}},status);
 const isObject=x=>x!==null&&typeof x==="object"&&!Array.isArray(x);
-const MAX_REQUEST_BYTES=16*1024;
+const MAX_REQUEST_BYTES=64*1024;
 async function boundedRequestText(request){
   const length=request.headers.get("content-length");
   if(length!==null&&(!/^[0-9]+$/.test(length)||Number(length)>MAX_REQUEST_BYTES))

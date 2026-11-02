@@ -1,7 +1,7 @@
 name: Hew 3D MCP contract (isolated)
 on:
   push:
-    branches: [feature/hew-3d-mcp-v1-20261025]
+    branches: [feature/hew-3d-mcp-v1-20261025, feature/hew-full-api-20261102]
     paths:
       - 'hew/sites/**'
       - 'sites-migration/hew/**'
@@ -9,6 +9,7 @@ on:
       - 'tests/hew-model-edge-upstream.test.mjs'
       - 'tests/hew-site-edge-chain.test.mjs'
       - 'tests/hew-site-mcp-route.test.mjs'
+      - 'tests/hew-full-api.test.mjs'
       - 'sites-migration/hew/site-mcp-route.mjs'
       - 'supabase/functions/lizhi-model-site-mcp/**'
       - '.github/workflows/hew-mcp-contract.yml'
@@ -20,6 +21,7 @@ on:
       - 'tests/hew-model-edge-upstream.test.mjs'
       - 'tests/hew-site-edge-chain.test.mjs'
       - 'tests/hew-site-mcp-route.test.mjs'
+      - 'tests/hew-full-api.test.mjs'
       - 'sites-migration/hew/site-mcp-route.mjs'
       - 'supabase/functions/lizhi-model-site-mcp/**'
       - '.github/workflows/hew-mcp-contract.yml'
@@ -35,7 +37,7 @@ jobs:
         with:
           node-version: '24'
       - name: Node tool contract regression
-        run: node --test tests/hew-sites-contract.test.mjs tests/hew-model-edge-upstream.test.mjs tests/hew-site-edge-chain.test.mjs tests/hew-site-mcp-route.test.mjs
+        run: node --test tests/hew-sites-contract.test.mjs tests/hew-model-edge-upstream.test.mjs tests/hew-site-edge-chain.test.mjs tests/hew-site-mcp-route.test.mjs tests/hew-full-api.test.mjs
       - name: Syntax check
         run: |
           node --check hew/sites/model-site-contract.mjs
@@ -43,3 +45,4 @@ jobs:
           node --check sites-migration/hew/site-mcp-route.mjs
           node --check supabase/functions/lizhi-model-site-mcp/edge-core.mjs
           node --check supabase/functions/lizhi-model-site-mcp/model-site-contract.mjs
+          node --check hew/tools/build-hew-registry.mjs

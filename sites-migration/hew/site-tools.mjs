@@ -9,8 +9,10 @@ export const MODEL_UPSTREAM="https://hrdzywkihfqggiwjgavi.supabase.co/functions/
 const hex=/^[0-9a-f]{64,128}$/i;
 const obj=v=>!!v&&typeof v==="object"&&!Array.isArray(v);
 const fail=code=>({isError:true,content:[{type:"text",text:code}]});
-const success=v=>({isError:false,content:[{type:"text",text:JSON.stringify(v)}]});
-async function readBoundedJson(resp,max=32768){
+const success=(v,extra=[])=>({isError:false,content:[{type:"text",text:JSON.stringify(v)},...extra]});
+const MAX_TEXT_CHARS=320000;
+const MAX_IMAGE_B64=2100000;
+async function readBoundedJson(resp,max=4*1024*1024){
  const h=resp.headers.get("content-length");
  if(h!==null&&(!/^\d+$/.test(h)||Number(h)>max))throw Error("UPSTREAM_TOO_LARGE");
  if(!resp.body)throw Error("EMPTY_UPSTREAM");
@@ -52,11 +54,20 @@ export async function handleModelSiteTool(name,args,trustedAuth,serverSecrets,fe
   const body=await readBoundedJson(response);
   if(!obj(body)||body.jsonrpc!=="2.0"||body.id!==rpcId||
     !obj(body.result)||typeof body.result.isError!=="boolean"||
-    !Array.isArray(body.result.content)||body.result.content.length!==1)
+    !Array.isArray(body.result.content)||body.result.content.length<1||body.result.content.length>2)
     return fail("MODEL_RESULT_UNKNOWN_DO_NOT_RETRY");
   const payload=body.result.content[0];
   if(!obj(payload)||payload.type!=="text"||typeof payload.text!=="string"||
-    payload.text.length>8192)return fail("MODEL_RESULT_UNKNOWN_DO_NOT_RETRY");
+    payload.text.length>MAX_TEXT_CHARS)return fail("MODEL_RESULT_UNKNOWN_DO_NOT_RETRY");
+  // Optional second item: one inline PNG snapshot, only on job status.
+  const image=body.result.content[1];
+  const images=[];
+  if(image!==undefined){
+   if(name!=="model_job_status"||!obj(image)||image.type!=="image"||image.mimeType!=="image/png"||
+      typeof image.data!=="string"||image.data.length>MAX_IMAGE_B64||!/^[A-Za-z0-9+/]+={0,2}$/.test(image.data))
+    return fail("MODEL_RESULT_UNKNOWN_DO_NOT_RETRY");
+   images.push({type:"image",data:image.data,mimeType:"image/png"});
+  }
   let value;try{value=JSON.parse(payload.text)}catch{return fail("MODEL_RESULT_UNKNOWN_DO_NOT_RETRY")}
   if(body.result.isError||!obj(value)||value.ok!==true)return fail("MODEL_UPSTREAM_REJECTED");
   if(name==="model_status"){
@@ -65,12 +76,16 @@ export async function handleModelSiteTool(name,args,trustedAuth,serverSecrets,fe
      sessions:value.sessions.filter(v=>obj(v)&&typeof v.session_id==="string"&&typeof v.document_id==="string")
      .slice(0,8).map(v=>({session_id:v.session_id,document_id:v.document_id}))});
   }
+  if(name==="model_api_reference")return success(value);
   if(name==="model_job_status"){
    const j=value.job;
    const states=["queued","claimed","succeeded","failed","cancelled","expired"];
    if(!obj(j)||typeof j.job_id!=="string"||!states.includes(j.state))return fail("MODEL_BAD_JOB");
    return success({ok:true,job_id:j.job_id,state:j.state,completed:j.state==="succeeded",
-     automaticRetryAllowed:false,error:typeof j.error==="string"?j.error.slice(0,200):null});
+     method:typeof j.method==="string"?j.method:null,
+     mutated:typeof j.mutated==="boolean"?j.mutated:null,
+     automaticRetryAllowed:false,error:typeof j.error==="string"?j.error.slice(0,200):null,
+     result:j.result??null},images);
   }
   if(name==="model_scene"){
    if(!Array.isArray(value.entities)||typeof value.document_id!=="string"||
