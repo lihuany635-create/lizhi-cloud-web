@@ -72,7 +72,7 @@ for side, cx in (("W", TOWER_CENTERS[0]), ("E", TOWER_CENTERS[1])):
     body_y = GROUND + TOWER_BODY_HEIGHT / 2
     box(f"L01_{side}_TOWER_STONE_CANDIDATE", (cx, body_y, Z_GATE),
         (TOWER_WIDTH, TOWER_BODY_HEIGHT, TOWER_DEPTH), "stone")
-    for dx in (-1.08, 1.08):
+    for dx in (-1.04, 1.04):
         for dz in (-1.45, 1.45):
             box(f"L01_{side}_BUTTRESS_{'L' if dx<0 else 'R'}_{'F' if dz<0 else 'B'}",
                 (cx+dx, GROUND+3.3, Z_GATE+dz), (.50, 6.60, .55), "trim")
@@ -124,11 +124,32 @@ for n, m in loaded.geometry.items():
     lo, hi = m.bounds
     if np.all(lo < portal_max) and np.all(hi > portal_min):
         raise AssertionError(f"Portal prism occluded by {n}: {m.bounds}")
+# Verify the advertised 7.90m low-height opening across the entire portal depth.
+# The earlier ±1.08m buttresses reduced local AABB clearance to 7.84m.
+# This is static mesh-bounds QA, not a human/collision/door-motion test.
+sampled_min_width = float("inf")
+for z in np.linspace(Z_GATE - 1.65, Z_GATE + 1.65, 9):
+    for y in (GROUND + 0.50, GROUND + 1.50, GROUND + 3.20):
+        left_edges, right_edges = [], []
+        for name, mesh in loaded.geometry.items():
+            lo, hi = mesh.bounds
+            if lo[1] <= y <= hi[1] and lo[2] <= z <= hi[2]:
+                if hi[0] <= 0:
+                    left_edges.append(hi[0])
+                elif lo[0] >= 0:
+                    right_edges.append(lo[0])
+                else:
+                    raise AssertionError(f"Central portal obstruction: {name}")
+        assert left_edges and right_edges, (y, z)
+        sampled_min_width = min(sampled_min_width, min(right_edges) - max(left_edges))
+assert sampled_min_width >= INNER_CLEAR - 0.01, sampled_min_width
+
 meta = {"status":"CANDIDATE_ONLY_NOT_APPROVED",
         "source":"O01 author-selected campus aerial (visual reference only)",
         "canonical_model_sha256":"80b4390068b5f78e805de7386ef53b9489d57f31f52e9a09ab1c01557fdf1c52",
         "candidate_file":str(path),"sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
         "bytes":path.stat().st_size,"parts":len(parts),"portal_clear_width_m":INNER_CLEAR,
+        "portal_sampled_min_aabb_width_m":round(float(sampled_min_width), 3),
         "ground_y_m":GROUND,"tower_height_m":TOWER_BODY_HEIGHT+SPIRE_HEIGHT,
         "arch_spring_above_ground_m":ARCH_SPRING,"arch_apex_above_ground_m":ARCH_APEX,
         "limitations":["O01 not to scale","not integrated into R09","no 3D collision/capsule validation",
