@@ -52,6 +52,15 @@ test("write RLS separated from read, all paths require owner identity",()=>{
   assert.doesNotMatch(sql,/create policy[\s\S]*to public[\s\S]*using \(true\)/i);
 });
 
+test("supersedes already deployed read-only OAuth hotfix without leaving restrictive write blockers",()=>{
+  for (const policy of ["library_chatgpt_owner_read","library_oauth_no_insert",
+    "library_oauth_no_update","library_oauth_no_delete"]) {
+    assert.match(sql, new RegExp('DROP POLICY IF EXISTS "'+policy+'"'));
+  }
+  assert.match(sql, /DROP FUNCTION IF EXISTS public\.lizhi_library_chatgpt_read_allowed\(\)/);
+  assert.match(sql, /CREATE POLICY "library_items_owner_update"[\s\S]*lizhi_library_mcp_client_allowed\(true\)/);
+});
+
 test("candidate preserves existing web auth and does not access other services",()=>{
   assert.match(sql,/public\.lizhi_web_is_allowed\(\) OR public\.lizhi_library_mcp_client_allowed\(false\)/);
   assert.match(sql,/public\.lizhi_web_is_allowed\(\) OR public\.lizhi_library_mcp_client_allowed\(true\)/);
