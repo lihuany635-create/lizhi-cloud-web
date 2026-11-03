@@ -99,7 +99,7 @@ const S = { type: "string" };
 function tool(name: string, description: string, properties: Record<string, unknown>, required: string[], readOnly: boolean) {
   return { name, description, inputSchema: { type: "object", properties: { role: roleProp, ...properties }, required: ["role", ...required], additionalProperties: false }, annotations: { readOnlyHint: readOnly, destructiveHint: false } };
 }
-const TOOLS = [
+const TOOLS: any[] = [
   tool("aiwb_overview", "總覽：所有進行中專案、每個專案的任務進度，以及寄給你這個角色的未讀通知與指派給你的待辦。每次開工先呼叫。", {}, [], true),
   tool("aiwb_save_project", "（限專案經理）建立或更新專案。只放專案名稱、目標、Drive 報告資料夾連結；詳細規劃寫在 Drive。", { project_id: S, title: S, goal: S, drive_folder_url: S }, ["title"], false),
   tool("aiwb_list_tasks", "列出任務（可依專案、狀態、負責角色篩選），含勾選進度。預設不含已完成。", { project_id: S, status: { type: "string", enum: [...STATUSES] }, assignee: { type: "string", enum: [...ROLES, "user"] }, include_done: { type: "boolean" } }, [], true),
@@ -135,7 +135,7 @@ const LICUT_OPS = [
   "set_captions","update_caption","add_caption","remove_caption","clear_captions",
   "set_caption_style","add_caption_track","update_caption_track","remove_caption_track"
 ] as const;
-const LICUT_ACTIONS = ["seek","play","pause","undo","redo","frame","export_open"] as const;
+const LICUT_ACTIONS = ["seek","play","pause","undo","redo","frame","export_open","export_configure","export_start","export_save","export_status"] as const;
 const LICUT_OP_SET = new Set<string>(LICUT_OPS);
 function licutTool(name: string, description: string, properties: Record<string, unknown> = {}, required: string[] = [], readOnly = true) {
   return { name, description, inputSchema: { type: "object", properties, required, additionalProperties: false },
@@ -155,8 +155,8 @@ const LICUT_TOOLS = [
     expected_rev: {type:"integer",minimum:0,description:"可選的現有時間軸 rev；如變更過就拒絕，以免改錯版本。"},
     ops: {type:"array", minItems:1,maxItems:200,items:{type:"object",properties:{op:{type:"string",enum:[...LICUT_OPS]},args:{type:"object"}},required:["op"],additionalProperties:false}}
   }, ["label","ops"], false),
-  licutTool("licut_transport", "遠端預覽播放、暫停、跳轉、復原、重做、擷取畫面，或在手機打開匯出對話框；裝置需開啟立剪。export_open 只開對話框，不代表已儲存影片。", {
-    action:{type:"string",enum:[...LICUT_ACTIONS]},time:{type:"number",minimum:0},
+  licutTool("licut_transport", "遠端預覽播放、暫停、跳轉、復原、重做、擷取畫面，或操作匯出視窗（export_open/configure/start/save/status）。裝置需開啟立剪；瀏覽器可能阻擋背景下載，done 只表示已執行 UI 指令。", {
+    action:{type:"string",enum:[...LICUT_ACTIONS]},time:{type:"number",minimum:0},choices:{type:"array",items:{type:"string"},maxItems:8,description:"export_configure 對匯出視窗 chip 按鈕的顯示標籤，逐一點選（如1080p、30fps）。"},
     expected_rev:{type:"integer",minimum:0}
   }, ["action"], false),
   licutTool("licut_align_voice", "要求立剪以裝置上的語音對齊引擎重排字幕時間；可能需要下載 VAD 模型，需於裝置執行。", {
@@ -182,7 +182,7 @@ async function runLicutTool(name: string, a: Record<string, unknown>, owner: str
   };
   const queue = async (label: string, ops: Record<string,unknown>[], rev?: unknown) => {
     const p = await getProject();
-    if (rev !== undefined && (!Number.isSafeInteger(rev) || Number(rev) !== Number(p.rev))) {
+    if (rev !== undefined && (typeof rev !== "number" || !Number.isSafeInteger(rev) || rev !== Number(p.rev))) {
       throw new Fail("立剪時間軸版本已變更，先用 licut_status 重新讀取 rev。",409);
     }
     const text = JSON.stringify(ops);
@@ -222,7 +222,7 @@ async function runLicutTool(name: string, a: Record<string, unknown>, owner: str
     case "licut_capabilities":
       return {editing_ops:LICUT_OPS,edit_count:LICUT_OPS.length,remote_actions:LICUT_ACTIONS,
         storage:"原始影片仍在裝置本機；ChatGPT 只讀摘要與已同步縮圖。",
-        limitations:["新增本機影片、麥克風錄音與 .cube 選檔需要裝置授權","匯出選單可遠端打開，但瀏覽器可能要求使用者按儲存","編碼與解析度受裝置 WebCodecs/MediaRecorder 限制","只在立剪開啟且本人登入後才接收命令"]};
+        limitations:["新增本機影片、麥克風錄音與 .cube 選檔需要裝置授權","匯出 UI 可遠端操作，但 WebCodecs/檔案儲存的裝置權限可能要求手動確認，不能以按鈕已點表示影片已存檔","編碼與解析度受裝置 WebCodecs/MediaRecorder 限制","只在立剪開啟且本人登入後才接收命令"]};
     case "licut_edit": {
       const raw=a.ops;
       if (!Array.isArray(raw)||raw.length<1||raw.length>200) throw new Fail("ops 必須是1至200項");
@@ -241,6 +241,10 @@ async function runLicutTool(name: string, a: Record<string, unknown>, owner: str
       if (action==="seek"||action==="frame") {
         if (typeof a.time!=="number"||!Number.isFinite(a.time)||a.time<0) throw new Fail("seek/frame 須提供非負 time（秒）");
         args.time=a.time;
+      }
+      if (action==="export_configure") {
+        if (!Array.isArray(a.choices)||a.choices.length<1||a.choices.length>8) throw new Fail("export_configure 須提供 choices 標籤陣列");
+        args.choices=a.choices.map((x,i)=>str(x,"choices["+i+"]",100));
       }
       return await queue("立剪控制："+action,[{op:"@transport",args}],a.expected_rev);
     }
