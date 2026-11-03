@@ -13,7 +13,7 @@
 
   const fileInput=document.createElement("input");
   fileInput.type="file";fileInput.multiple=true;fileInput.hidden=true;
-  fileInput.accept=".pdf,.doc,.docx,.xls,.xlsx,.ods,.ppt,.pptx,.txt,.md,.csv,.tsv,.json,.html,.xml,.yaml,.yml,image/*,video/mp4,video/webm,video/quicktime";
+  fileInput.accept=".pdf,.doc,.docx,.xls,.xlsx,.ods,.ppt,.pptx,.txt,.md,.csv,.tsv,.json,.html,.xml,.yaml,.yml,image/*";
 
   const esc=value=>String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[char]);
   const bytes=n=>n>=1048576?`${(n/1048576).toFixed(1)} MB`:n>=1024?`${Math.round(n/1024)} KB`:`${n} B`;
