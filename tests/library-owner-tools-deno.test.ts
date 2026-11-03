@@ -79,3 +79,22 @@ Deno.test("cloud original is never offered for a local-only file",async()=>{
   assertEquals(out.isError,true);
   assertMatch(out.content[0].text,/沒有可遠端下載的雲端原檔/);
 });
+
+
+Deno.test("approved OAuth writer can update only the requested library fields",async()=>{
+  const sample={id:"11111111-1111-4111-8111-111111111111",title:"更新分類",shelf:"建築設計",updated_at:"2026-11-03T00:00:00Z"};
+  const {handlers,getQueries}=makeServer({write:true,row:sample});
+  const value=await handlers.get("update_library_item")!({
+    item_id:sample.id,expected_updated_at:sample.updated_at,title:"更新分類",shelf:"建築設計"
+  });
+  assertEquals(value.structuredContent?.updated,true);
+  assertEquals(value.structuredContent?.item?.title,"更新分類");
+  assertEquals(getQueries(),1);
+});
+Deno.test("Cloud upload ticket disallows invalid MIME and oversized files before service access",()=>{
+  const {definitions}=makeServer({write:true});
+  const schema=definitions.get("cloud_upload_ticket").inputSchema;
+  assertEquals(schema.safeParse({file_name:"x.exe",mime:"application/x-msdownload",size:400}).success,false);
+  assertEquals(schema.safeParse({file_name:"x.pdf",mime:"application/pdf",size:52428801}).success,false);
+  assertEquals(schema.safeParse({file_name:"x.pdf",mime:"application/pdf",size:1024}).success,true);
+});
