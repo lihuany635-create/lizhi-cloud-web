@@ -5,6 +5,7 @@
 (function(){
 'use strict';
 const OWNER_EMAIL='lihuany635@gmail.com';
+const ALREADY_APPROVED_HOSTS=new Set(['chatgpt.com','chat.openai.com']);
 // Retain the existing key so mobile OAuth flows in progress remain compatible.
 const PENDING_KEY='lizhi_mobile_pending_oauth_authorization_v1';
 const id=new URL(location.href).searchParams.get('authorization_id');
@@ -49,10 +50,17 @@ async function load(){
   }
   const {data,error}=await db.auth.oauth.getAuthorizationDetails(id);
   if(error||!data)throw new Error(error?.message||'無法取得授權資料');
-  // Already-approved requests may redirect automatically according to Supabase protocol.
-  // Fail closed instead: require explicit reauthorization from client if details are absent.
+  // Already-approved requests: Supabase returns only a redirect URL because the owner consented earlier.
+  // Forward the verified owner back only to known ChatGPT hosts; anything else still fails closed.
   if(!('authorization_id' in data)) {
-   msg('這個用戶端可能已取得授權。如需確認授權，請到 Supabase 後台檢視已連線的應用程式；本頁不會自動重新核發。');
+   const back=String(data.redirect_url||data.redirect_to||'');
+   if(trustedRedirect(back) && ALREADY_APPROVED_HOSTS.has(new URL(back).hostname)) {
+    msg('ChatGPT 先前已授權，正在帶你回到 ChatGPT 完成連線…');
+    sessionStorage.removeItem(PENDING_KEY);
+    location.assign(back);
+    return;
+   }
+   msg('這個用戶端可能已取得授權，但回呼網址不是已知的 ChatGPT 網址，為安全起見不自動跳轉。請到 Supabase 後台檢視已連線的應用程式。');
    return;
   }
   const dest=String(data.redirect_uri||'');
