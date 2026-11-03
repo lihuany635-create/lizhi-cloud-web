@@ -9,6 +9,7 @@ on:
       - "oauth/consent/**"
       - "tests/library-mcp-contract.test.mjs"
       - "tests/library-mcp-owner-actions.test.mjs"
+      - "tests/library-owner-tools-deno.test.ts"
       - ".github/workflows/library-mcp-checks.yml"
   workflow_dispatch:
 
@@ -27,6 +28,8 @@ jobs:
           deno-version: v2.9.6
       - name: Check Edge Function types and pinned dependencies
         run: deno check --frozen --node-modules-dir=auto supabase/functions/library-mcp/index.ts
+      - name: Test owner operation handlers without writing production data
+        run: deno test --frozen --node-modules-dir=auto tests/library-owner-tools-deno.test.ts
       - name: Check OAuth page and security contract
         run: |
           node --check oauth/consent/consent.js
