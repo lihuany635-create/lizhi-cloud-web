@@ -6,10 +6,16 @@
 //  POST /approve 本人批准／退回「待本人批准」任務
 //  POST /archive 本人封存／還原專案
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { LiCutPrivateInbox, LiCutInboxError, parseLicutKey } from "./licut-inbox.ts";
 
 const URL_BASE = Deno.env.get("SUPABASE_URL")!;
 const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ORIGINS = new Set(["https://lihuany635-create.github.io"]);
+const privateInbox = new LiCutPrivateInbox(URL_BASE,SERVICE);
+async function assertLicutOwner(owner: string) {
+  const rows=await db("lizhi_production_ai_keys?owner_id=eq."+q(owner)+"&select=owner_id&limit=1");
+  if (!rows.length) throw new Fail("此帳號尚未啟用本人專用立剪收件匣",403);
+}
 const admin = { apikey: SERVICE, Authorization: "Bearer " + SERVICE, "Content-Type": "application/json" };
 
 const ROLES = ["manager", "advisor", "engineer"] as const;
@@ -170,6 +176,18 @@ const LICUT_TOOLS = [
     limit:{type:"integer",minimum:1,maximum:30}
   }, [], true)
 ];
+LICUT_TOOLS.push(
+  licutTool("licut_cloud_inbox", "只讀查詢本人私人影片收件匣，尚未加入手機素材庫。最多列最近100筆。",{},[],true),
+  licutTool("licut_cloud_upload_ticket", "對指定影片檔名、確切大小、SHA256 建立一次性路徑的2小時上傳簽章。這不會實際傳輸影片位元組；需要具備原檔的上傳程式 PUT，然後再查收件匣。",{
+    name:{type:"string",maxLength:100},size:{type:"integer",minimum:1,maximum:52428800},
+    sha256:{type:"string",pattern:"^[a-fA-F0-9]{64}$"},
+    mime:{type:"string",enum:["video/mp4","video/webm","video/quicktime"]}
+  },["name","size","sha256","mime"],false),
+  licutTool("licut_cloud_import", "將已完成上傳的本人雲端影片排入立剪本機匯入佇列。手機需開啟立剪；pending 不代表成功，匯入成功不自動放入時間軸。",{
+    key:{type:"string",minLength:100,maxLength:260},
+    expected_rev:{type:"integer",minimum:0}
+  },["key"],false)
+);
 TOOLS.push(...LICUT_TOOLS);
 
 async function runLicutTool(name: string, a: Record<string, unknown>, owner: string): Promise<unknown> {
@@ -193,6 +211,16 @@ async function runLicutTool(name: string, a: Record<string, unknown>, owner: str
     return {id:cmd.id,status:cmd.status,submitted_rev:p.rev,queue:"pending",note:"已寫入本人佇列；必須由登入中的立剪接收執行，再以 licut_command_status 查驗。"};
   };
   switch (name) {
+    case "licut_cloud_inbox":
+      return await privateInbox.list(owner);
+    case "licut_cloud_upload_ticket":
+      return await privateInbox.ticket(owner,a);
+    case "licut_cloud_import": {
+      const key=str(a.key,"key",260);
+      parseLicutKey(owner,key);
+      const item=await privateInbox.ensureExists(owner,key);
+      return await queue("匯入雲端素材："+item.name,[{op:"@cloud_import",args:{key}}],a.expected_rev);
+    }
     case "licut_status": {
       const rows = await projectRows();
       const history = await db(table+"commands?user_id=eq."+q(owner)+"&select=id,status,label,created_at,done_at,error&order=id.desc&limit=5");
@@ -221,7 +249,7 @@ async function runLicutTool(name: string, a: Record<string, unknown>, owner: str
     }
     case "licut_capabilities":
       return {editing_ops:LICUT_OPS,edit_count:LICUT_OPS.length,remote_actions:LICUT_ACTIONS,
-        storage:"原始影片仍在裝置本機；ChatGPT 只讀摘要與已同步縮圖。",
+        storage:"原本的影片仍留在裝置本機；可選用本人私人雲端收件匣，雲端存在不代表手機已匯入。",
         limitations:["新增本機影片、麥克風錄音與 .cube 選檔需要裝置授權","匯出 UI 可遠端操作，但 WebCodecs/檔案儲存的裝置權限可能要求手動確認，不能以按鈕已點表示影片已存檔","編碼與解析度受裝置 WebCodecs/MediaRecorder 限制","只在立剪開啟且本人登入後才接收命令"]};
     case "licut_edit": {
       const raw=a.ops;
@@ -523,6 +551,20 @@ async function handler(req: Request): Promise<Response> {
     if (!user.id || !user.email || user.is_anonymous) throw new Fail("需要已核准的雲端庫帳號", 403);
     const owner = user.id, who = "user";
 
+    if (part === "licut-inbox" && req.method === "GET") {
+      await assertLicutOwner(owner);
+      return json(await privateInbox.list(owner));
+    }
+    if (part === "licut-download" && req.method === "GET") {
+      await assertLicutOwner(owner);
+      const key=str(new URL(req.url).searchParams.get("key"),"key",260);
+      return json(await privateInbox.download(owner,key));
+    }
+    if (part === "licut-ticket" && req.method === "POST") {
+      await assertLicutOwner(owner);
+      const body=await req.json().catch(()=>({}));
+      return json(await privateInbox.ticket(owner,body));
+    }
     if (part === "board" && req.method === "GET") return json(await board(owner));
     if (part === "task" && req.method === "GET") return json(await taskDetail(owner, id(new URL(req.url).searchParams.get("id"), "id"), 50));
     if (req.method !== "POST") throw new Fail("不支援的方法", 405);
@@ -550,8 +592,9 @@ async function handler(req: Request): Promise<Response> {
     }
     throw new Fail("找不到此介面", 404);
   } catch (e) {
-    const status = e instanceof Fail ? e.status : 500;
-    return json({ error: e instanceof Fail ? e.message : "工作台暫時無法使用" }, status);
+    const known=e instanceof Fail || e instanceof LiCutInboxError;
+    const status=known?e.status:500;
+    return json({error:known?e.message:"工作台暫時無法使用"},status);
   }
 }
 
