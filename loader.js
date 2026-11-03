@@ -4,6 +4,7 @@
 (function(){
   "use strict";
   const GROUPS={
+ "licut": [ "./licut/library-bridge.js?v=1" ],
  "weave": [
   "./knowledge-weaving-validator.js?v=20",
   "./knowledge-weaving.js?v=20",
@@ -208,7 +209,7 @@
   "./cad/cad-remote-relay.js?v=1"
  ]
 };
-  const ROUTE_GROUP={finance:"finance",knowledge:"knowledge",library:"knowledge",engineering:"engineering",weave:"weave",phoneagent:"phoneagent",cad:"cad"};
+  const ROUTE_GROUP={licut:"licut",finance:"finance",knowledge:"knowledge",library:"knowledge",engineering:"engineering",weave:"weave",phoneagent:"phoneagent",cad:"cad"};
   const pending=new Map();
   const ready=new Set();
   const activators={};
