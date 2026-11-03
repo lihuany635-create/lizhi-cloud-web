@@ -5,8 +5,10 @@ on:
     paths:
       - "supabase/functions/library-mcp/**"
       - "supabase/migrations/*library_readonly_mcp.sql"
+      - "supabase/migrations/*library_mcp_owner_actions.sql"
       - "oauth/consent/**"
       - "tests/library-mcp-contract.test.mjs"
+      - "tests/library-mcp-owner-actions.test.mjs"
       - ".github/workflows/library-mcp-checks.yml"
   workflow_dispatch:
 
@@ -28,4 +30,4 @@ jobs:
       - name: Check OAuth page and security contract
         run: |
           node --check oauth/consent/consent.js
-          node --test tests/library-mcp-contract.test.mjs
+          node --test tests/library-mcp-contract.test.mjs tests/library-mcp-owner-actions.test.mjs
