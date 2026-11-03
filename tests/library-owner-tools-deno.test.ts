@@ -1,4 +1,6 @@
-import { assert, assertEquals, assertMatch } from "jsr:@std/assert@1.0.16";
+import assert from "node:assert/strict";
+const assertEquals=(actual:unknown,expected:unknown)=>assert.deepEqual(actual,expected);
+const assertMatch=(actual:string,pattern:RegExp)=>assert.match(actual,pattern);
 import { registerLibraryOwnerTools } from "../supabase/functions/library-mcp/owner-tools.ts";
 
 function makeServer(options:{write?:boolean;row?:Record<string,unknown>}={}) {
