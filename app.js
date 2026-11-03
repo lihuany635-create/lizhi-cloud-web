@@ -123,6 +123,7 @@ function registerFeatureActivators(){
     });
     KnowledgeHome.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
     if(window.LibraryHome){LibraryHome.configure({rerender:()=>{if(state.route==="knowledge")render();}});LibraryHome.installEvents(app);}
+    if(window.LibraryWork){LibraryWork.configure({rerender:()=>{if(state.route==="knowledge")render();}});LibraryWork.installEvents(app);}
     KnowledgeHome.installEvents(app);
     KnowledgeEditor.configure({service:knowledgeService,rerender:()=>{if(state.route==="knowledge")render();}});
     KnowledgeEditor.installEvents(app);

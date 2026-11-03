@@ -231,10 +231,31 @@
     </div>`;
   }
 
+  // 館藏／工作專區切換：網址 ?open=library&zone=work 可直接進工作專區
+  const ZONE_KEY="lizhi.library.zone";
+  let zone=(()=>{try{const q=new URLSearchParams(location.search).get("zone");if(q==="work"||q==="books")return q;return localStorage.getItem(ZONE_KEY)==="work"?"work":"books";}catch{return "books";}})();
+  function setZone(next){
+    zone=next==="work"?"work":"books";
+    try{localStorage.setItem(ZONE_KEY,zone);}catch{}
+    try{const url=new URL(location.href);if(zone==="work")url.searchParams.set("zone","work");else url.searchParams.delete("zone");history.replaceState(history.state,"",url);}catch{}
+    rerender();
+  }
+  function zoneTabs(){
+    if(!global.LibraryWork)return "";
+    return `<div class="library-zone-tabs" role="tablist" aria-label="圖書館分區">
+      <button role="tab" class="${zone==="books"?"active":""}" aria-selected="${zone==="books"}" data-library-zone="books">📚 館藏</button>
+      <button role="tab" class="${zone==="work"?"active":""}" aria-selected="${zone==="work"}" data-library-zone="work">🗂️ 工作專區</button>
+    </div>`;
+  }
+
   function page(){
+    if(zone==="work"&&global.LibraryWork){
+      const workHeader=typeof head==="function"?head("LIZHI LIBRARY · WORK","圖書館｜工作專區","工作用的資料集中在這裡。第一個功能：公文放置。",""):`<h1>圖書館｜工作專區</h1>`;
+      return `${workHeader}<section class="section library-section">${zoneTabs()}${global.LibraryWork.render()}</section>`;
+    }
     const upload=`<button class="button primary" data-action="upload-library">↑ 上傳</button>`;
     const header=typeof head==="function"?head("LIZHI LIBRARY","圖書館","把檔案放進來，Claude 每天會讀過、取書名、寫摘要與重點，並排上書架。",upload):`<h1>圖書館</h1>`;
-    if(!global.LibraryStore?.available())return `${header}<section class="section library-section"><div class="empty">圖書館的檔案存在雲端，請從雲端版立之雲端庫登入後使用。</div></section>`;
+    if(!global.LibraryStore?.available())return `${header}<section class="section library-section">${zoneTabs()}<div class="empty">圖書館的檔案存在雲端，請從雲端版立之雲端庫登入後使用。</div></section>`;
     if(!loaded)load();
     scheduleContentSearch();
 
@@ -264,6 +285,7 @@
     }
 
     return `${header}<section class="section library-section">
+      ${zoneTabs()}
       <div class="library-intake">
         ${storagePanel()}
         ${computerPanel()}
@@ -459,6 +481,7 @@
     const stop=()=>{event.preventDefault();event.stopImmediatePropagation();};
     if(el.matches("[data-library-drop]")||el.dataset.action==="upload-library"){stop();if(dev()?.status==="needs-permission"){dev().grant().then(ok=>{rerender();if(ok)toast("已允許，再點一次選檔案");}).catch(err=>alert(err.message));return;}fileInput.click();return;}
     if(el.hasAttribute("data-library-refresh")){stop();load({force:true});return;}
+    if(el.hasAttribute("data-library-zone")){stop();setZone(el.dataset.libraryZone);return;}
     if(el.dataset.libraryRead){stop();Reader.open(el.dataset.libraryRead);return;}
     if(el.dataset.librarySource!==undefined){stop();sourceFilter=el.dataset.librarySource;rerender();return;}
     if(el.dataset.libraryShelf!==undefined){stop();shelfFilter=el.dataset.libraryShelf;rerender();return;}

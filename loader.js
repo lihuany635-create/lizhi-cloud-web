@@ -61,7 +61,8 @@
   "./library/library-device.js?v=1",
   "./library/library-computer.js?v=1",
   "./library/library-store.js?v=4",
-  "./library/library-home.js?v=5",
+  "./library/library-work.js?v=1",
+  "./library/library-home.js?v=6",
   "./knowledge/pages/knowledge-home.js?v=18",
   "./knowledge/pages/knowledge-editor.js?v=17"
  ],
