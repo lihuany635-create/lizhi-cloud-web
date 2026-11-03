@@ -57,4 +57,4 @@ jobs:
             echo "缺少 SUPABASE_ACCESS_TOKEN Secret，請先到 repo Settings → Secrets and variables → Actions 新增。"
             exit 1
           fi
-          supabase functions deploy library-mcp --project-ref "$PROJECT_REF" --no-verify-jwt --use-api
+          supabase functions deploy library-mcp --project-ref "$PROJECT_REF" --no-verify-jwt --use-api --yes
