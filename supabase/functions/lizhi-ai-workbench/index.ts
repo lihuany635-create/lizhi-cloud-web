@@ -122,6 +122,155 @@ const TOOLS = [
   }, ["task_id", "to_role", "next_step", "dedupe_key"], false),
   tool("aiwb_inbox", "讀取寄給你這個角色的通知。實際打開報告後，再用 ack_ids 標記已讀。", { ack_ids: { type: "array", items: S, maxItems: 50 }, include_read: { type: "boolean" } }, [], false),
 ];
+
+// ---------- 立剪 ChatGPT 操作（沿用原私人 Site、本人驗證及既有 Supabase 佇列） ----------
+const LICUT_OPS = [
+  "set_project","add_clip","update_clip","set_transition","remove_clip","move_clip",
+  "split_clip","make_mask_transition","cut_ranges","freeze_frame","ripple_delete",
+  "duplicate","set_keyframe","remove_keyframe","clear_keyframes","add_text",
+  "update_text","remove_text","add_music","update_music","remove_music",
+  "ripple_trim","slip_clip","split_all","shift_items","remove_items","tag_media",
+  "add_overlay","update_overlay","remove_overlay","add_lut","remove_lut",
+  "add_marker","update_marker","remove_marker","set_track","set_mix","set_ducking",
+  "set_captions","update_caption","add_caption","remove_caption","clear_captions",
+  "set_caption_style","add_caption_track","update_caption_track","remove_caption_track"
+] as const;
+const LICUT_ACTIONS = ["seek","play","pause","undo","redo","frame","export_open"] as const;
+const LICUT_OP_SET = new Set<string>(LICUT_OPS);
+function licutTool(name: string, description: string, properties: Record<string, unknown> = {}, required: string[] = [], readOnly = true) {
+  return { name, description, inputSchema: { type: "object", properties, required, additionalProperties: false },
+    annotations: { readOnlyHint: readOnly, destructiveHint: false } };
+}
+const LICUT_TOOLS = [
+  licutTool("licut_status", "讀立剪專案摘要、修訂版本、最後同步時間、已送指令狀態；修改前先讀。最後同步時間不是裝置在線心跳。"),
+  licutTool("licut_project", "讀取完整立剪專案的時間軸 JSON（只有資料，沒有手機本機影片檔）。"),
+  licutTool("licut_media", "查素材 ID、名稱、類型與時長；先取得 media_id 才能加入時間軸。"),
+  licutTool("licut_preview_media", "讀取指定素材已同步的縮圖或10格膠卷，直接以 MCP 圖片回傳。", {
+    media_id: { type: "string", minLength: 1, maxLength: 80 },
+    kind: { type: "string", enum: ["thumb","filmstrip"] }
+  }, ["media_id"], true),
+  licutTool("licut_capabilities", "取得立剪本機引擎可執行的 47 個剪輯操作名稱，及遠端操作、匯出限制。"),
+  licutTool("licut_edit", "提交立剪一批原生操作：47 種剪輯動作均可用；每一批原子套用、可在裝置復原。回傳 pending 不代表成功，需用 licut_command_status 查驗。", {
+    label: { type:"string", minLength:1,maxLength:100 },
+    expected_rev: {type:"integer",minimum:0,description:"可選的現有時間軸 rev；如變更過就拒絕，以免改錯版本。"},
+    ops: {type:"array", minItems:1,maxItems:200,items:{type:"object",properties:{op:{type:"string",enum:[...LICUT_OPS]},args:{type:"object"}},required:["op"],additionalProperties:false}}
+  }, ["label","ops"], false),
+  licutTool("licut_transport", "遠端預覽播放、暫停、跳轉、復原、重做、擷取畫面，或在手機打開匯出對話框；裝置需開啟立剪。export_open 只開對話框，不代表已儲存影片。", {
+    action:{type:"string",enum:[...LICUT_ACTIONS]},time:{type:"number",minimum:0},
+    expected_rev:{type:"integer",minimum:0}
+  }, ["action"], false),
+  licutTool("licut_align_voice", "要求立剪以裝置上的語音對齊引擎重排字幕時間；可能需要下載 VAD 模型，需於裝置執行。", {
+    from:{type:"number",minimum:0},to:{type:"number",minimum:0},
+    track:{type:"string"},dryRun:{type:"boolean"}
+  }, [], false),
+  licutTool("licut_command_status", "查看指定立剪指令是否 pending/done/error；frame 動作完成時回傳可視圖片。", {
+    command_id:{type:"integer",minimum:1}
+  }, ["command_id"], true),
+  licutTool("licut_recent_commands", "讀取最近立剪遠端命令的狀態和錯誤，不更改時間軸。", {
+    limit:{type:"integer",minimum:1,maximum:30}
+  }, [], true)
+];
+TOOLS.push(...LICUT_TOOLS);
+
+async function runLicutTool(name: string, a: Record<string, unknown>, owner: string): Promise<unknown> {
+  const table = "lizhi_licut_";
+  const projectRows = async () => await db(table+"projects?user_id=eq."+q(owner)+"&select=project,summary,rev,device,updated_at");
+  const getProject = async () => {
+    const rows = await projectRows();
+    if (!rows.length) throw new Fail("立剪尚未同步專案；請先用原帳號在裝置開啟立剪。",404);
+    return rows[0];
+  };
+  const queue = async (label: string, ops: Record<string,unknown>[], rev?: unknown) => {
+    const p = await getProject();
+    if (rev !== undefined && (!Number.isSafeInteger(rev) || Number(rev) !== Number(p.rev))) {
+      throw new Fail("立剪時間軸版本已變更，先用 licut_status 重新讀取 rev。",409);
+    }
+    const text = JSON.stringify(ops);
+    if (text.length > 60000) throw new Fail("單批指令過大，請拆成多次。");
+    const pending = await db(table+"commands?user_id=eq."+q(owner)+"&status=eq.pending&select=id&limit=30");
+    if (pending.length >= 20) throw new Fail("仍有太多待執行命令；請先檢查佇列或打開立剪。",409);
+    const cmd = await insert(table+"commands", {user_id:owner,label,ops});
+    return {id:cmd.id,status:cmd.status,submitted_rev:p.rev,queue:"pending",note:"已寫入本人佇列；必須由登入中的立剪接收執行，再以 licut_command_status 查驗。"};
+  };
+  switch (name) {
+    case "licut_status": {
+      const rows = await projectRows();
+      const history = await db(table+"commands?user_id=eq."+q(owner)+"&select=id,status,label,created_at,done_at,error&order=id.desc&limit=5");
+      if (!rows.length) return {connected:false,reason:"沒有立剪專案同步紀錄",history};
+      const p=rows[0];
+      return {connected:true,rev:p.rev,device:p.device,updated_at:p.updated_at,summary:p.summary,
+        recent_commands:history,online_verified:false,note:"updated_at 只代表專案最後修改，不是持續在線心跳。"};
+    }
+    case "licut_project": {
+      const p=await getProject();
+      return {rev:p.rev,device:p.device,updated_at:p.updated_at,project:p.project};
+    }
+    case "licut_media": {
+      const rows=await db(table+"thumbs?user_id=eq."+q(owner)+"&select=media_id,name,kind,duration,updated_at&order=name");
+      return {media:rows};
+    }
+    case "licut_preview_media": {
+      const media=str(a.media_id,"media_id",80);
+      const kind=a.kind===undefined?"filmstrip":oneOf(a.kind,["thumb","filmstrip"] as const,"kind");
+      const rows=await db(table+"thumbs?user_id=eq."+q(owner)+"&media_id=eq."+q(media)+"&select=media_id,name,kind,duration,thumb,filmstrip");
+      if (!rows.length) throw new Fail("查無此素材",404);
+      const source=rows[0][kind];
+      const m=typeof source==="string"?/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(source):null;
+      if (!m) throw new Fail("此素材沒有可用的同步圖片",404);
+      return {_licutImage:{mimeType:"image/"+m[1],data:m[2]},media_id:rows[0].media_id,name:rows[0].name,kind,duration:rows[0].duration};
+    }
+    case "licut_capabilities":
+      return {editing_ops:LICUT_OPS,edit_count:LICUT_OPS.length,remote_actions:LICUT_ACTIONS,
+        storage:"原始影片仍在裝置本機；ChatGPT 只讀摘要與已同步縮圖。",
+        limitations:["新增本機影片、麥克風錄音與 .cube 選檔需要裝置授權","匯出選單可遠端打開，但瀏覽器可能要求使用者按儲存","編碼與解析度受裝置 WebCodecs/MediaRecorder 限制","只在立剪開啟且本人登入後才接收命令"]};
+    case "licut_edit": {
+      const raw=a.ops;
+      if (!Array.isArray(raw)||raw.length<1||raw.length>200) throw new Fail("ops 必須是1至200項");
+      const ops=raw.map((item,i)=>{
+        if (!item||typeof item!=="object"||Array.isArray(item)) throw new Fail("ops["+i+"] 格式錯誤");
+        const v=item as Record<string,unknown>;
+        if (!LICUT_OP_SET.has(String(v.op))) throw new Fail("不支援的操作："+String(v.op));
+        if (v.args!==undefined && (v.args===null||typeof v.args!=="object"||Array.isArray(v.args))) throw new Fail("args 必須是物件");
+        return {op:String(v.op),args:v.args??{}};
+      });
+      return await queue(str(a.label,"label",100),ops,a.expected_rev);
+    }
+    case "licut_transport": {
+      const action=oneOf(a.action,LICUT_ACTIONS,"action");
+      const args:Record<string,unknown>={action};
+      if (action==="seek"||action==="frame") {
+        if (typeof a.time!=="number"||!Number.isFinite(a.time)||a.time<0) throw new Fail("seek/frame 須提供非負 time（秒）");
+        args.time=a.time;
+      }
+      return await queue("立剪控制："+action,[{op:"@transport",args}],a.expected_rev);
+    }
+    case "licut_align_voice": {
+      const args:Record<string,unknown>={};
+      for (const k of ["from","to"] as const) if (a[k]!==undefined) {
+        if (typeof a[k]!=="number"||!Number.isFinite(a[k])||a[k]<0) throw new Fail(k+" 必須是非負秒數");
+        args[k]=a[k];
+      }
+      if (a.track!==undefined) args.track=str(a.track,"track",80);
+      if (a.dryRun!==undefined) args.dryRun=a.dryRun===true;
+      return await queue("語音對齊字幕",[{op:"@align_voice",args}]);
+    }
+    case "licut_command_status": {
+      const cmd=Number(a.command_id);
+      if (!Number.isSafeInteger(cmd)||cmd<1) throw new Fail("command_id 格式錯誤");
+      const rows=await db(table+"commands?user_id=eq."+q(owner)+"&id=eq."+cmd+"&select=id,label,status,result,error,created_at,done_at");
+      if (!rows.length) throw new Fail("查無此命令",404);
+      return rows[0];
+    }
+    case "licut_recent_commands": {
+      const n=a.limit===undefined?10:Number(a.limit);
+      if (!Number.isSafeInteger(n)||n<1||n>30) throw new Fail("limit 必須介於1至30");
+      const rows=await db(table+"commands?user_id=eq."+q(owner)+"&select=id,label,status,error,created_at,done_at&order=id.desc&limit="+n);
+      return {commands:rows};
+    }
+  }
+  throw new Fail("未知的立剪工具",404);
+}
+
 const INSTRUCTIONS = [
   "立之 AI 工作台 v2：三角色（專案經理／顧問／工程師）協作。工作台只放待辦、勾選與完成狀態；詳細過程、測試結果與交接一律寫成 Google Drive 報告書，這裡只掛連結。",
   "每次呼叫都要帶 role，依你所在的 ChatGPT 專案判斷自己的角色。開工先 aiwb_overview，接手任務先 aiwb_get_task 並實際打開相關報告。",
@@ -131,6 +280,7 @@ const INSTRUCTIONS = [
 ].join("\n");
 
 async function runTool(name: string, a: Record<string, unknown>, ownerId: string): Promise<unknown> {
+  if (name.startsWith("licut_")) return await runLicutTool(name,a,ownerId);
   const role = oneOf(a.role, ROLES, "role");
   const c: Ctx = { owner: ownerId, role, actor: role };
   const managerOnly = (what: string) => { if (role !== "manager") throw new Fail(`只有專案經理可以${what}`, 403); };
@@ -305,6 +455,17 @@ async function handleMcp(body: any, owner: string) {
   const name = String(body?.params?.name ?? "");
   try {
     const result = await runTool(name, body?.params?.arguments ?? {}, owner);
+    const r = result as any;
+    let img = r?._licutImage;
+    let out: any = result;
+    if (!img && name === "licut_command_status" && typeof r?.result?.frame === "string") {
+      const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(r.result.frame);
+      if (m) { img = {mimeType:"image/"+m[1],data:m[2]}; out = {...r,result:{...r.result,frame:"[image in MCP content]"}}; }
+    }
+    if (img) {
+      if (r?._licutImage) {const {_licutImage,...meta}=r;out=meta;}
+      return reply({ content: [{type:"text",text:JSON.stringify(out)},{type:"image",mimeType:img.mimeType,data:img.data}],structuredContent:out });
+    }
     return reply({ content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result });
   } catch (e) {
     const msg = e instanceof Fail ? e.message : "工作台暫時無法處理：" + String((e as Error)?.message ?? e).slice(0, 200);
