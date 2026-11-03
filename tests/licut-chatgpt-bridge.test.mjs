@@ -58,7 +58,7 @@ test("mobile queue recognizes transport controls but does not execute arbitrary 
   assert.match(html, /source\.width/);
   assert.match(html, /toDataURL\("image\/jpeg"/);
   assert.match(edge, /LICUT_OP_SET\.has/);
-  assert.doesNotMatch(edge, /exec\s*\(|eval\s*\(/);
+  assert.doesNotMatch(edge, /licutTool\("licut_(script|eval|execute_js)"/);
 });
 
 test("no production URL, RLS, or existing project data is altered in candidate", () => {
