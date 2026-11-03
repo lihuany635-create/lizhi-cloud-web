@@ -97,3 +97,60 @@ body.library-reading{overflow:hidden}
 .library-source-tabs .chip.active{background:#2d2925;color:#fffaf0;border-color:#2d2925}
 .library-source-count{font-size:.8em;opacity:.7;font-variant-numeric:tabular-nums}
 @media(max-width:640px){.library-source-tabs{margin-left:-.35rem;margin-right:-.35rem;padding-left:.35rem;padding-right:.35rem}}
+
+/* 館藏／工作專區切換 */
+.library-zone-tabs{display:flex;gap:.3rem;padding:.3rem;margin:0 0 1rem;border-radius:14px;background:rgba(45,41,37,.07);width:max-content;max-width:100%}
+.library-zone-tabs button{border:0;border-radius:10px;background:none;padding:.55rem 1rem;font:inherit;font-weight:700;color:#6f6a60;cursor:pointer;white-space:nowrap}
+.library-zone-tabs button.active{background:#fffaf0;color:#2d2925;box-shadow:0 2px 8px rgba(70,50,30,.12)}
+
+/* 工作專區：公文 */
+.work-feature-head{display:flex;align-items:center;justify-content:space-between;gap:.7rem;flex-wrap:wrap;margin-bottom:.8rem}
+.work-feature-head h2{margin:0}
+.work-actions{display:flex;gap:.45rem;flex-wrap:wrap}
+.work-howto{margin-bottom:1rem}
+.work-howto a.button,.work-editor-actions a.button{text-decoration:none;color:inherit}
+.work-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem;margin:0 0 1rem}
+.work-stats .stat{border:1px solid var(--line,#d8d3c8);font:inherit;color:inherit;cursor:pointer;text-align:left}
+.work-stats .stat.warn b{color:#a3483d}
+.work-doc{cursor:pointer;min-width:0;display:flex;flex-direction:column;gap:.35rem;transition:transform .12s,box-shadow .12s}
+.work-doc:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(70,50,30,.12)}
+.work-doc:focus-visible{outline:3px solid #573f7e;outline-offset:2px}
+.work-doc.is-inbox{border-style:dashed}
+.work-doc.is-closed{opacity:.7}
+.work-doc h3{margin:.1rem 0;overflow-wrap:anywhere;line-height:1.5}
+.work-badges{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center}
+.work-badges .chip{font-size:.78rem}
+.work-dir.incoming{background:#e2ecf6;color:#2f5a86}
+.work-dir.outgoing{background:#e9f3e6;color:#3d6b34}
+.work-status.todo{background:#f4e6c4;color:#7a5a17}
+.work-status.doing{background:#e7e1f3;color:#573f7e}
+.work-status.closed{background:#e6e3dc;color:#6f6a60}
+.work-speed{background:#f6e3df;color:#8a3a31}
+.work-wait{background:#efe9dc;color:#765d42}
+.work-due{font-size:.78rem;font-weight:700;color:#6f6a60}
+.work-due.soon{color:#a06a12}
+.work-due.overdue{color:#a3483d}
+.work-line{margin:0;font-size:.85rem;color:var(--muted,#6f6a60);overflow-wrap:anywhere}
+.work-doc mark{background:#f5d97a;color:inherit;border-radius:3px;padding:0 .1em}
+.work-editor{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:1rem;background:rgba(30,24,18,.45)}
+.work-editor-panel{display:flex;flex-direction:column;width:min(760px,100%);max-height:100%;border-radius:16px;background:#fbf5ea;color:#2d2925;box-shadow:0 20px 50px rgba(0,0,0,.3);overflow:hidden}
+.work-editor-bar{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;border-bottom:1px solid #d8c8af}
+.work-editor-bar h2{margin:0;font-size:1.1rem}
+.work-editor-body{overflow:auto;padding:1rem}
+.work-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.work-field{display:grid;gap:.3rem;font-weight:700;font-size:.88rem;min-width:0}
+.work-field.wide{grid-column:1/-1}
+.work-field input,.work-field select,.work-field textarea{width:100%;box-sizing:border-box;border:1px solid #d8c8af;border-radius:10px;background:#fffaf0;padding:.55rem .65rem;font:inherit;font-weight:400;color:inherit}
+.work-field textarea{resize:vertical;line-height:1.6}
+.work-error{margin:.8rem 0 0;padding:.6rem .8rem;border-radius:10px;background:#f6e3df;color:#8a3a31;font-weight:700}
+.work-editor-actions{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;padding:.8rem 1rem;padding-bottom:max(.8rem,env(safe-area-inset-bottom));border-top:1px solid #d8c8af}
+.work-editor-actions a.button{text-decoration:none}
+.work-spacer{flex:1}
+@media(max-width:640px){
+  .work-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .work-grid{grid-template-columns:1fr}
+  .work-editor{padding:0;place-items:stretch}
+  .work-editor-panel{border-radius:0;width:100%}
+  .library-zone-tabs{width:100%}
+  .library-zone-tabs button{flex:1}
+}
