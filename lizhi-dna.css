@@ -1,0 +1,155 @@
+/* 立之 DNA｜全站共用「紋路」層  (規範見 DESIGN.md)
+   原則：各頁保留自己的配色，只統一五個識別紋路：
+   1 線格紋  2 角框  3 印章  4 方點眉標  5 襯線標題
+   本檔最後載入、只做加法；不改版面尺寸，不擋點擊（紋路一律 pointer-events:none）。 */
+
+:root{
+  --dna-grid:120px;                       /* 線格間距 */
+  --dna-line:rgba(70,54,38,.09);         /* 淺色頁的格線 */
+  --dna-line-dark:rgba(150,214,210,.11); /* 深色頁的格線 */
+  --dna-tick:#9a6b45;                     /* 角框色，各頁可覆寫 */
+  --dna-tick-dark:#79c8d0;
+  --dna-serif:Georgia,"Noto Serif TC","Songti TC",serif;
+  --dna-mono:ui-monospace,"SFMono-Regular",Consolas,"JetBrains Mono",monospace;
+}
+
+/* ---------- 1 線格紋 ---------- */
+.dna-grid,
+.shell:not(.route-home) .main{
+  background-image:
+    linear-gradient(90deg,var(--dna-line) 1px,transparent 1px),
+    linear-gradient(var(--dna-line) 1px,transparent 1px);
+  background-size:var(--dna-grid) var(--dna-grid);
+  background-position:-1px -1px;
+}
+/* 深色區塊：用覆蓋層畫格線，不動原本的漸層底色 */
+.dna-grid-dark,
+.eng2-top,
+.imagegraph-toolbar{position:relative;isolation:isolate}
+.finance-header{isolation:isolate}  /* 保留它原本的 sticky 定位 */
+.dna-grid-dark::after,
+.finance-header::after,
+.eng2-top::after,
+.imagegraph-toolbar::after{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
+  background-image:
+    linear-gradient(90deg,var(--dna-line-dark) 1px,transparent 1px),
+    linear-gradient(var(--dna-line-dark) 1px,transparent 1px);
+  background-size:var(--dna-grid) var(--dna-grid);
+  background-position:-1px -1px;
+}
+/* 覆蓋層放在內容之下、底色之上 */
+.finance-header>*,.eng2-top>*,.imagegraph-toolbar>*{position:relative}
+
+/* ---------- 2 角框（卡片左上角的一道折角線） ---------- */
+.dna-corner,
+.shell .section,
+.shell .settings-item,
+.shell .stat,
+.shell .library-card,
+.shell .media-card,
+.shell .podcast-card,
+.shell .study-card,
+.shell .relation-card,
+.shell .proposal-card,
+.shell .phone-agent-card,
+.shell .aic-todo-item,
+.shell .animationflow-entry-card,
+.shell .eng2-project,
+.shell .eng2-card,
+.shell .eng2-panel,
+.shell .finance-account-card,
+.shell .finance-form-card,
+.shell .finance-chart-card,
+.shell .finance-kpi{position:relative}
+.dna-corner::after,
+.shell .section::after,
+.shell .settings-item::after,
+.shell .stat::after,
+.shell .library-card::after,
+.shell .media-card::after,
+.shell .podcast-card::after,
+.shell .study-card::after,
+.shell .relation-card::after,
+.shell .proposal-card::after,
+.shell .phone-agent-card::after,
+.shell .aic-todo-item::after,
+.shell .animationflow-entry-card::after,
+.shell .eng2-project::after,
+.shell .eng2-card::after,
+.shell .eng2-panel::after,
+.shell .finance-account-card::after,
+.shell .finance-form-card::after,
+.shell .finance-chart-card::after,
+.shell .finance-kpi::after{
+  content:"";position:absolute;top:-1px;left:-1px;width:22px;height:22px;pointer-events:none;
+  border-top:2px solid var(--dna-tick);border-left:2px solid var(--dna-tick);
+  border-top-left-radius:inherit;opacity:.85;
+}
+.shell .finance-account-card,.shell .finance-form-card,.shell .finance-chart-card,.shell .finance-kpi{--dna-tick:#2f9c7a}
+
+/* ---------- 3 印章（品牌字放在方框裡，內有一道細框） ---------- */
+.dna-seal,
+.shell .brand-mark,
+.shell .nav-link>span,
+.shell .finance-rail-brand b,
+html[data-lizhi-page="a4"] .brand>span,
+html[data-lizhi-page="imagegraph"] .brandmark{
+  font-family:var(--dna-serif)!important;
+  border-radius:8px;
+  box-shadow:inset 0 0 0 3px transparent,inset 0 0 0 4px currentColor;
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,0),inset 0 0 0 4px color-mix(in srgb,currentColor 28%,transparent);
+}
+html[data-lizhi-page="a4"] .brand>span{border:1px solid #9fd8d0;border-radius:8px}
+html[data-lizhi-page="imagegraph"] .brandmark{
+  display:inline-grid;place-items:center;width:38px;height:38px;
+  font-size:22px!important;border:1px solid var(--accent);color:var(--accent)
+}
+
+/* ---------- 4 方點眉標（小字英文前面一顆方點） ---------- */
+.dna-eyebrow,
+.shell .eyebrow,
+.shell .eng2-kicker,
+.shell .nav-title{
+  font-family:var(--dna-mono);letter-spacing:.22em;text-transform:uppercase;
+}
+.dna-eyebrow::before,
+.shell .eyebrow::before,
+.shell .eng2-kicker::before{
+  content:"";display:inline-block;width:6px;height:6px;margin:0 9px 2px 0;
+  background:currentColor;vertical-align:middle;
+}
+
+/* ---------- 5 襯線標題 ---------- */
+.shell .page-head h1,
+.shell .eng2-top h1,
+.shell .finance-header h1,
+.shell .study-embedded-toolbar h1,
+html[data-lizhi-page="a4"] .brand strong,
+html[data-lizhi-page="imagegraph"] .brand>div,
+html[data-lizhi-page="photosheet"] h1,
+html[data-lizhi-page="modelviewer"] h1{font-family:var(--dna-serif)!important;letter-spacing:.01em}
+
+/* ---------- 獨立工具頁 ---------- */
+html[data-lizhi-page="a4"] .topbar,
+html[data-lizhi-page="photosheet"] header,
+html[data-lizhi-page="modelviewer"] .preview-head{position:relative;isolation:isolate}
+html[data-lizhi-page="a4"] .topbar::after,
+html[data-lizhi-page="photosheet"] header::after,
+html[data-lizhi-page="modelviewer"] .preview-head::after{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:
+    linear-gradient(90deg,var(--dna-line-dark) 1px,transparent 1px),
+    linear-gradient(var(--dna-line-dark) 1px,transparent 1px);
+  background-size:var(--dna-grid) var(--dna-grid);
+}
+html[data-lizhi-page="photosheet"] header::after{
+  background-image:
+    linear-gradient(90deg,var(--dna-line) 1px,transparent 1px),
+    linear-gradient(var(--dna-line) 1px,transparent 1px);
+}
+
+/* 減少動態／列印時拿掉紋路 */
+@media print{
+  .shell .main,.dna-grid{background-image:none!important}
+}

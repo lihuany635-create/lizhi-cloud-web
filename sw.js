@@ -1,5 +1,6 @@
-const CACHE="lizhi-cloud-v158";
+const CACHE="lizhi-cloud-v159";
 const FILES=[
+  "lizhi-dna.css?v=1",
   "production/ai-workbench.js?v=1",
   // BEGIN IMAGE GRAPH ASSETS
   "image-graph/?v=36",
