@@ -10,6 +10,10 @@ CREATE TABLE IF NOT EXISTS public.lizhi_library_mcp_clients (
   PRIMARY KEY (owner_id, client_id)
 );
 ALTER TABLE public.lizhi_library_mcp_clients ENABLE ROW LEVEL SECURITY;
+-- RLS does NOT protect TRUNCATE, REFERENCES, or TRIGGER privileges.
+-- Existing normal Library UI only needs SELECT/INSERT/UPDATE/DELETE.
+REVOKE TRUNCATE, REFERENCES, TRIGGER ON public.lizhi_library_items FROM authenticated;
+REVOKE TRUNCATE, REFERENCES, TRIGGER ON public.lizhi_library_official_docs FROM authenticated;
 REVOKE ALL ON public.lizhi_library_mcp_clients FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON public.lizhi_library_mcp_clients TO authenticated;
 DROP POLICY IF EXISTS "lizhi_library_mcp_clients_owner_read" ON public.lizhi_library_mcp_clients;
