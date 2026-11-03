@@ -62,7 +62,7 @@ test("mobile queue recognizes transport controls but does not execute arbitrary 
 });
 
 test("no production URL, RLS, or existing project data is altered in candidate", () => {
-  assert.match(edge, /lizhi_licut_commands/);
+  assert.match(edge, /const table = "lizhi_licut_"/);
   assert.match(html, /lizhi_licut_projects/);
   assert.match(html, /lizhi_licut_thumbs/);
   assert.match(html, /lizhi_licut_commands/);
