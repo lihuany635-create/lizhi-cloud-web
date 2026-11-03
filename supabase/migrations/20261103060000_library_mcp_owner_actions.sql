@@ -40,6 +40,13 @@ GRANT EXECUTE ON FUNCTION public.lizhi_library_mcp_client_allowed(boolean) TO au
 
 -- Keep exactly the existing owner and web whitelist conditions.
 -- The new OAuth branch requires a matching, manually approved client row.
+-- Reconcile the already deployed ChatGPT read-only OAuth hotfix (PR #57):
+-- its RESTRICTIVE INSERT/UPDATE/DELETE policies otherwise override can_write=true.
+-- Remove them only in the same transaction that installs the new, explicit owner/client RLS.
+DROP POLICY IF EXISTS "library_chatgpt_owner_read" ON public.lizhi_library_items;
+DROP POLICY IF EXISTS "library_oauth_no_insert" ON public.lizhi_library_items;
+DROP POLICY IF EXISTS "library_oauth_no_update" ON public.lizhi_library_items;
+DROP POLICY IF EXISTS "library_oauth_no_delete" ON public.lizhi_library_items;
 DROP POLICY IF EXISTS "deny_third_party_oauth_client" ON public.lizhi_library_items;
 DROP POLICY IF EXISTS "library_items_own" ON public.lizhi_library_items;
 DROP POLICY IF EXISTS "library_items_owner_read" ON public.lizhi_library_items;
@@ -127,6 +134,9 @@ END;
 $$;
 REVOKE ALL ON FUNCTION public.lizhi_library_mcp_take_rate_limit(integer) FROM PUBLIC,anon,authenticated,service_role;
 GRANT EXECUTE ON FUNCTION public.lizhi_library_mcp_take_rate_limit(integer) TO authenticated;
+-- The hotfix-only exact ChatGPT client helper is replaced by the explicit clients table.
+-- Release it after all dependent policies and functions have been updated.
+DROP FUNCTION IF EXISTS public.lizhi_library_chatgpt_read_allowed();
 COMMIT;
 
 -- Mandatory deployment checklist:
