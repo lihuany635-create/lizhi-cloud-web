@@ -365,7 +365,10 @@ async function runTool(name: string, a: Record<string, unknown>, ownerId: string
       if (a.assignee !== undefined) change.assignee = oneOf(a.assignee, [...ROLES, "user"] as const, "assignee");
       if (a.next_step !== undefined) change.next_step = str(a.next_step, "next_step", 1000, false);
       if (a.needs_approval !== undefined) {
-        if (a.needs_approval === false && t.needs_approval && role !== "manager") throw new Fail("只有專案經理可以取消『需本人批准』", 403);
+        if (typeof a.needs_approval !== "boolean") throw new Fail("needs_approval 必須是 true 或 false");
+        // Even a manager must not bypass owner approval by clearing the flag.
+        // Approval stays on the existing JWT-authenticated /approve route.
+        if (a.needs_approval === false && t.needs_approval) throw new Fail("AI 不可取消『需本人批准』；請等待本人批准", 403);
         change.needs_approval = a.needs_approval === true;
         if (change.needs_approval) change.approval_reason = str(a.approval_reason, "approval_reason", 1000);
         if (change.needs_approval && !t.needs_approval) change.approved_at = null;
