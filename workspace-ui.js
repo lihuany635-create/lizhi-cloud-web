@@ -97,7 +97,7 @@ function renderWorkspace() {
   }
   if(state.route === 'animationflow' && !panel.dataset.productionMounted) {
     panel.dataset.productionMounted = 'loading';
-    import('./production/ai-workbench.js?v=1').then(module => {
+    import('./production/ai-workbench.js?v=2').then(module => {
       const host = panel.querySelector('#production-root');
       if(!host) throw new Error('AI 工作台容器不存在');
       module.mount(host); panel.dataset.productionMounted = 'ready';

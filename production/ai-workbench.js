@@ -2,6 +2,7 @@
 const API = 'https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-ai-workbench/';
 const ROLE = { manager: '專案經理', advisor: '顧問', engineer: '工程師', user: '本人' };
 const STATUS = { todo: '待辦', doing: '進行中', blocked: '卡住', review: '待驗收', done: '完成' };
+const MCP_URL = API + 'agent-mcp';
 const KIND = { dispatch: '派工', analysis: '分析', execution: '執行', blocked: '阻礙', acceptance: '驗收' };
 const ACTION = { create_project: '建立專案', update_project: '更新專案', create_task: '建立任務', update_task: '更新任務', tick_check: '打勾', untick_check: '取消勾選', attach_report: '掛報告', notify: '通知', ack_notice: '已讀通知', user_approve: '本人批准', user_reject: '本人退回', archive_project: '封存專案', unarchive_project: '還原專案' };
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -9,6 +10,10 @@ const when = (s) => s ? new Date(s).toLocaleString('zh-TW', { timeZone: 'Asia/Ta
 const link = (url, text) => /^https:\/\//.test(url || '') ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(text)} ↗</a>` : esc(text);
 
 const CSS = `
+.aiwb-tabs{display:flex;gap:6px;margin:10px 0 4px;flex-wrap:wrap}.aiwb-tabs button{border-radius:999px}.aiwb-tabs button.on{background:var(--t);color:var(--bg);border-color:var(--t)}
+.aiwb-log{border-top:1px solid var(--b);padding:10px 0}.aiwb-log:first-of-type{border-top:0}.aiwb-log h3{font-size:15px;margin:0 0 4px}.aiwb-log dl{margin:6px 0 0;display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:14px}.aiwb-log dt{color:var(--m)}.aiwb-log dd{margin:0;white-space:pre-wrap;word-break:break-word}
+.aiwb-key{font-family:ui-monospace,monospace;word-break:break-all;background:var(--bg);border:1px dashed var(--warn);border-radius:8px;padding:8px}
+.aiwb-filter{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.aiwb-filter button{font-size:13px;padding:3px 10px;border-radius:999px}.aiwb-filter button.on{border-color:var(--acc);color:var(--acc)}
 .aiwb{--b:#d9dee5;--t:#1d2733;--m:#5f6b78;--bg:#f7f8fa;--card:#fff;--ok:#1f7a4d;--warn:#b25e00;--bad:#b42318;--acc:#2f5bd3;color:var(--t);background:var(--bg);min-height:calc(100dvh - 70px);padding:16px;box-sizing:border-box;font-size:15px}
 @media (prefers-color-scheme:dark){.aiwb{--b:#2d3540;--t:#e6eaef;--m:#9aa5b1;--bg:#12161b;--card:#1a2027;--acc:#7ea2ff}}
 .aiwb *{box-sizing:border-box}.aiwb h1{font-size:20px;margin:0}.aiwb h2{font-size:15px;margin:22px 0 8px;color:var(--m);font-weight:600}
@@ -31,7 +36,8 @@ const CSS = `
 `;
 
 export function mount(host) {
-  const state = { data: null, open: new Set(), details: {}, showDone: false, showArchived: false, busy: false, error: '' };
+  const state = { data: null, open: new Set(), details: {}, showDone: false, showArchived: false, busy: false, error: '', tab: 'roles', side: null, keys: null, newKey: null, project: '', openLog: new Set() };
+  try { if (localStorage.getItem('aiwb-tab') === 'side') state.tab = 'side'; } catch {}
   host.replaceChildren();
   const style = document.createElement('style'); style.textContent = CSS; host.append(style);
   const root = document.createElement('div'); root.className = 'aiwb'; host.append(root);
@@ -50,6 +56,7 @@ export function mount(host) {
     return v;
   }
   async function load() {
+    if (state.tab === 'side') return loadSide();
     try { state.data = await api('board'); state.error = ''; for (const id of state.open) state.details[id] = await api('task?id=' + id); }
     catch (e) { state.error = e.message; }
     render();
@@ -78,7 +85,54 @@ export function mount(host) {
     </div>`;
   }
 
+  async function loadSide() {
+    try { const [side, keys] = await Promise.all([api('side'), api('agent-keys')]); state.side = side; state.keys = keys.keys; state.error = ''; }
+    catch (e) { state.error = e.message; }
+    render();
+  }
+  const tabs = () => `<div class="aiwb-tabs"><button data-tab="roles" class="${state.tab === 'roles' ? 'on' : ''}">三角色任務</button><button data-tab="side" class="${state.tab === 'side' ? 'on' : ''}">其他 AI 紀錄</button></div>`;
+  function todoCard(t) {
+    const pct = t.checks_total ? Math.round(100 * t.checks_done / t.checks_total) : 0;
+    return `<div class="aiwb-task"><div class="row"><span class="title">${esc(t.title)}</span><span class="aiwb-chip ${t.status}">${STATUS[t.status]}</span>${t.project ? `<span class="aiwb-chip">${esc(t.project)}</span>` : ''}<span class="aiwb-chip">${esc(t.agent)}</span>
+      <span title="勾選進度"><span class="aiwb-bar"><i style="width:${pct}%"></i></span></span><small>${t.checks_done}/${t.checks_total}</small></div>
+      ${t.note ? `<p class="aiwb-next">${esc(t.note)}</p>` : ''}
+      ${t.checks?.length ? `<div class="aiwb-detail"><ul>${t.checks.map((c) => `<li><span class="ck ${c.done ? '' : 'no'}">${c.done ? '✓' : '○'}</span>${esc(c.text)}</li>`).join('')}</ul></div>` : ''}
+      <small>更新 ${when(t.updated_at)}</small> <button data-sidedel="todo:${t.id}">刪除</button></div>`;
+  }
+  function logCard(l) {
+    const open = state.openLog.has(l.id);
+    const row = (k, v) => v ? `<dt>${k}</dt><dd>${esc(v)}</dd>` : '';
+    return `<div class="aiwb-log"><h3 data-log="${l.id}" style="cursor:pointer">${open ? '▾' : '▸'} ${esc(l.title)}</h3>
+      <small>${when(l.created_at)} · ${esc(l.agent)}${l.project ? ' · ' + esc(l.project) : ''}${l.updated_at && l.updated_at !== l.created_at ? ' · 修改 ' + when(l.updated_at) : ''}</small>
+      ${l.next_step ? `<p class="aiwb-next">下一步：${esc(l.next_step)}</p>` : ''}
+      ${open ? `<dl>${row('已完成', l.done)}${row('證據', l.evidence)}${row('未完成', l.not_done)}</dl>${(l.links || []).length ? `<p>${l.links.map((u) => link(u, u.replace(/^https:\/\//, '').slice(0, 60))).join('<br>')}</p>` : ''}<p><button data-sidedel="log:${l.id}">刪除這筆</button></p>` : ''}
+    </div>`;
+  }
+  function renderSide() {
+    const s = state.side;
+    const head = `<div class="aiwb-top"><h1>AI 工作台</h1><span class="sp"></span><button data-act="refresh">重新整理</button></div>${tabs()}
+      <small>三角色以外的任何 AI（Claude、Codex、Gemini、一般 ChatGPT…）寫的工作日誌、交接與待辦。AI 可以新增、修改、刪除。</small>
+      ${state.error ? `<p class="aiwb-err">${esc(state.error)}</p>` : ''}`;
+    if (!s) { root.innerHTML = head + '<p class="aiwb-empty">讀取中…</p>'; return; }
+    const pick = (list) => state.project ? list.filter((x) => x.project === state.project) : list;
+    const todos = pick(s.todos), done = pick(s.done_todos), logs = pick(s.logs);
+    const keys = state.keys || [];
+    root.innerHTML = head + `
+      ${s.projects.length ? `<div class="aiwb-filter"><button data-proj="" class="${state.project ? '' : 'on'}">全部</button>${s.projects.map((p) => `<button data-proj="${esc(p)}" class="${state.project === p ? 'on' : ''}">${esc(p)}</button>`).join('')}</div>` : ''}
+      <h2>待辦（${todos.length}）</h2><div class="aiwb-card">${todos.length ? todos.map(todoCard).join('') : '<p class="aiwb-empty">沒有未完成的待辦</p>'}</div>
+      ${done.length ? `<details><summary><small>最近完成（${done.length}）</small></summary><div class="aiwb-card">${done.map(todoCard).join('')}</div></details>` : ''}
+      <h2>工作日誌與交接（${logs.length}）</h2><div class="aiwb-card">${logs.length ? logs.map(logCard).join('') : '<p class="aiwb-empty">還沒有紀錄</p>'}</div>
+      <h2>AI 金鑰</h2><div class="aiwb-card">
+        <small>給 Codex、Gemini 等能接 MCP 的 AI 用。連線網址：</small><div class="aiwb-key">${esc(MCP_URL)}</div>
+        <small>標頭：<code>Authorization: Bearer &lt;金鑰&gt;</code>。ChatGPT 用原本的工作台連接器、Claude 直接寫資料庫，都不需要金鑰。</small>
+        ${state.newKey ? `<p><b>${esc(state.newKey.agent)} 的新金鑰（只顯示這一次，請馬上複製）：</b></p><div class="aiwb-key">${esc(state.newKey.key)}</div><p><button data-act="copykey">複製</button> <button data-act="hidekey">我已存好</button></p>` : ''}
+        <p><button class="pri" data-act="newkey">產生新金鑰</button></p>
+        <ul style="list-style:none;padding:0;margin:0">${keys.map((k) => `<li class="aiwb-ev">${esc(k.agent)} · …${esc(k.key_hint)} · 建立 ${when(k.created_at)}${k.last_used_at ? ' · 最近使用 ' + when(k.last_used_at) : ''} ${k.revoked_at ? '<span class="aiwb-chip blocked">已撤銷</span>' : `<button data-revoke="${k.id}">撤銷</button>`}</li>`).join('') || '<li><small>還沒有金鑰</small></li>'}</ul>
+      </div>`;
+  }
+
   function render() {
+    if (state.tab === 'side') return renderSide();
     const d = state.data;
     if (!d) { root.innerHTML = `<div class="aiwb-top"><h1>AI 工作台</h1></div><p class="${state.error ? 'aiwb-err' : 'aiwb-empty'}">${esc(state.error || '讀取中…')}</p>`; return; }
     const projects = d.projects.filter((p) => state.showArchived || !p.archived);
@@ -88,7 +142,7 @@ export function mount(host) {
       <div class="aiwb-top"><h1>AI 工作台</h1><span class="sp"></span>
         <label><input type="checkbox" data-opt="showDone" ${state.showDone ? 'checked' : ''}>顯示已完成</label>
         <label><input type="checkbox" data-opt="showArchived" ${state.showArchived ? 'checked' : ''}>顯示封存</label>
-        <button data-act="refresh">重新整理</button></div>
+        <button data-act="refresh">重新整理</button></div>${tabs()}
       <small>給 AI 專用：專案經理／顧問／工程師透過 ChatGPT 讀寫；你在這裡看進度、批准重大決定。詳細內容在各任務的 Drive 報告書。</small>
       ${state.error ? `<p class="aiwb-err">${esc(state.error)}</p>` : ''}
       ${approvals.length ? `<h2>待你批准（${approvals.length}）</h2>${approvals.map((t) => `<div class="aiwb-card"><b>${esc(t.code)}</b> ${esc(t.title)}<p class="aiwb-next">${esc(t.approval_reason)}</p><button class="pri" data-approve="${t.id}">批准</button> <button data-reject="${t.id}">退回</button> <button data-toggle="${t.id}">看詳情</button></div>`).join('')}` : ''}
@@ -111,9 +165,17 @@ export function mount(host) {
 
   root.addEventListener('change', (e) => { const k = e.target.dataset.opt; if (k) { state[k] = e.target.checked; render(); } });
   root.addEventListener('click', async (e) => {
-    const el = e.target.closest('[data-toggle],[data-act],[data-approve],[data-reject],[data-ack],[data-archive]');
+    const el = e.target.closest('[data-toggle],[data-act],[data-approve],[data-reject],[data-ack],[data-archive],[data-tab],[data-proj],[data-log],[data-sidedel],[data-revoke]');
     if (!el || e.target.closest('a')) return;
     try {
+      if (el.dataset.tab) { state.tab = el.dataset.tab; state.error = ''; try { localStorage.setItem('aiwb-tab', state.tab); } catch {} render(); return load(); }
+      if (el.dataset.proj !== undefined) { state.project = el.dataset.proj; return render(); }
+      if (el.dataset.log) { const id = el.dataset.log; if (state.openLog.has(id)) state.openLog.delete(id); else state.openLog.add(id); return render(); }
+      if (el.dataset.sidedel) { const [kind, id] = el.dataset.sidedel.split(':'); if (!confirm(kind === 'log' ? '刪除這筆紀錄？' : '刪除這個待辦？')) return; await api('side-delete', { kind, id }); return loadSide(); }
+      if (el.dataset.revoke) { if (!confirm('撤銷這把金鑰？用它連線的 AI 會馬上失去權限。')) return; await api('agent-key-revoke', { id: el.dataset.revoke }); return loadSide(); }
+      if (el.dataset.act === 'newkey') { const name = prompt('這把金鑰給哪個 AI 用？（例如 Codex、Gemini）'); if (!name || !name.trim()) return; state.newKey = await api('agent-key', { agent: name.trim() }); return loadSide(); }
+      if (el.dataset.act === 'copykey') { await navigator.clipboard.writeText(state.newKey?.key || ''); el.textContent = '已複製'; return; }
+      if (el.dataset.act === 'hidekey') { state.newKey = null; return render(); }
       if (el.dataset.toggle) {
         const id = el.dataset.toggle;
         if (state.open.has(id)) state.open.delete(id); else { state.open.add(id); render(); state.details[id] = await api('task?id=' + id); }
@@ -128,5 +190,5 @@ export function mount(host) {
   });
 
   render(); load();
-  const timer = setInterval(() => { if (document.visibilityState === 'visible' && host.isConnected) load(); else if (!host.isConnected) clearInterval(timer); }, 60000);
+  const timer = setInterval(() => { if (document.visibilityState === 'visible' && host.isConnected && !state.newKey) load(); else if (!host.isConnected) clearInterval(timer); }, 60000);
 }

@@ -23,6 +23,9 @@
 
 施工照片工作區另外保留 7 個舊工具（`list_projects`、`get_project`、`create_project`、`list_project_images`、`read_project_image`、`import_project_image`、`update_project_image`），只供施工照片填表使用，見 `docs/PHOTO_SHEET_DRIVE_MCP_v1.md`；其他工作一律用 `aiwb_*`。
 
+## 三角色以外的 AI
+Claude、Codex、Gemini、一般 ChatGPT 對話等不屬於三角色的 AI，請用「其他 AI 紀錄」分頁與 `side_*` 工具，見 [AI_WORKBENCH_SIDE_v1.md](AI_WORKBENCH_SIDE_v1.md)。
+
 ## 狀態
 待辦 todo → 進行中 doing → 待驗收 review → 完成 done；卡住 blocked。
 

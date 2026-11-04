@@ -5,7 +5,10 @@
 //  GET  /task    網頁任務詳情
 //  POST /approve 本人批准／退回「待本人批准」任務
 //  POST /archive 本人封存／還原專案
+//  POST /agent-mcp  其他 AI（Codex、Gemini…）用 lza_ 金鑰連線，只開放「其他 AI 紀錄」工具
+//  GET  /side       網頁：其他 AI 紀錄；GET /agent-keys、POST /agent-key、/agent-key-revoke、/side-delete
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { SIDE_INSTRUCTIONS, SIDE_TOOLS, SideFail, checkAgentKey, createAgentKey, listAgentKeys, revokeAgentKey, runSideTool, sideData } from "./side.ts";
 
 const URL_BASE = Deno.env.get("SUPABASE_URL")!;
 const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -448,17 +451,20 @@ async function runTool(name: string, a: Record<string, unknown>, ownerId: string
   throw new Fail("未知的工具：" + name, 404);
 }
 
-async function handleMcp(body: any, owner: string) {
+async function handleMcp(body: any, owner: string, agentOnly?: string) {
   const rpcId = body?.id ?? null;
   const reply = (result: unknown) => ({ jsonrpc: "2.0", id: rpcId, result });
   const method = body?.method;
-  if (method === "initialize") return reply({ protocolVersion: body?.params?.protocolVersion ?? "2025-03-26", capabilities: { tools: {} }, serverInfo: { name: "lizhi-ai-workbench", version: "2.0.0" }, instructions: INSTRUCTIONS });
+  if (method === "initialize") return reply({ protocolVersion: body?.params?.protocolVersion ?? "2025-03-26", capabilities: { tools: {} }, serverInfo: { name: "lizhi-ai-workbench", version: "2.1.0" }, instructions: agentOnly ? SIDE_INSTRUCTIONS : INSTRUCTIONS + "\n" + SIDE_INSTRUCTIONS });
   if (method === "notifications/initialized" || method === "ping") return reply({});
-  if (method === "tools/list") return reply({ tools: TOOLS });
+  if (method === "tools/list") return reply({ tools: agentOnly ? SIDE_TOOLS : [...TOOLS, ...SIDE_TOOLS] });
   if (method !== "tools/call") return { jsonrpc: "2.0", id: rpcId, error: { code: -32601, message: "Method not found" } };
   const name = String(body?.params?.name ?? "");
   try {
-    const result = await runTool(name, body?.params?.arguments ?? {}, owner);
+    if (agentOnly && !name.startsWith("side_")) throw new Fail("這把 AI 金鑰只能使用「其他 AI 紀錄」工具（side_*）", 403);
+    const result = name.startsWith("side_")
+      ? await runSideTool(db, name, body?.params?.arguments ?? {}, owner, agentOnly)
+      : await runTool(name, body?.params?.arguments ?? {}, owner);
     const r = result as any;
     let img = r?._licutImage;
     let out: any = result;
@@ -472,7 +478,7 @@ async function handleMcp(body: any, owner: string) {
     }
     return reply({ content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result });
   } catch (e) {
-    const msg = e instanceof Fail ? e.message : "工作台暫時無法處理：" + String((e as Error)?.message ?? e).slice(0, 200);
+    const msg = e instanceof Fail || e instanceof SideFail ? e.message : "工作台暫時無法處理：" + String((e as Error)?.message ?? e).slice(0, 200);
     return reply({ content: [{ type: "text", text: msg }], isError: true });
   }
 }
@@ -516,7 +522,15 @@ async function handler(req: Request): Promise<Response> {
       return json(await handleMcp(JSON.parse(text || "{}"), keys[0].owner_id));
     }
 
-    if (token.startsWith("lzp_")) throw new Fail("工具憑證不可用於網頁介面", 403);
+    if (part === "agent-mcp") {
+      if (origin || !token.startsWith("lza_")) throw new Fail("此介面僅供已授權的 AI 使用（需要 lza_ 開頭的 AI 金鑰）", 403);
+      const k = await checkAgentKey(db, token);
+      const text = await req.text();
+      if (text.length > 200_000) throw new Fail("請求過大", 413);
+      return json(await handleMcp(JSON.parse(text || "{}"), k.owner, k.agent));
+    }
+
+    if (token.startsWith("lzp_") || token.startsWith("lza_")) throw new Fail("工具憑證不可用於網頁介面", 403);
     const u = await fetch(URL_BASE + "/auth/v1/user", { headers: { apikey: SERVICE, Authorization: "Bearer " + token } });
     if (!u.ok) throw new Fail("登入已失效，請重新登入雲端庫", 401);
     const user = await u.json() as { id?: string; email?: string; is_anonymous?: boolean };
@@ -524,6 +538,8 @@ async function handler(req: Request): Promise<Response> {
     const owner = user.id, who = "user";
 
     if (part === "board" && req.method === "GET") return json(await board(owner));
+    if (part === "side" && req.method === "GET") return json(await sideData(db, owner, { limit: 100 }));
+    if (part === "agent-keys" && req.method === "GET") return json({ keys: await listAgentKeys(db, owner) });
     if (part === "task" && req.method === "GET") return json(await taskDetail(owner, id(new URL(req.url).searchParams.get("id"), "id"), 50));
     if (req.method !== "POST") throw new Fail("不支援的方法", 405);
     const b = await req.json().catch(() => ({}));
@@ -542,6 +558,9 @@ async function handler(req: Request): Promise<Response> {
       if (ids.length) await patch("aiwb_notices", `owner_id=eq.${q(owner)}&to_role=eq.user&id=in.(${ids.join(",")})`, { status: "read", read_at: new Date().toISOString() });
       return json({ ok: true });
     }
+    if (part === "agent-key") return json(await createAgentKey(db, owner, b.agent));
+    if (part === "agent-key-revoke") return json(await revokeAgentKey(db, owner, b.id));
+    if (part === "side-delete") return json(await runSideTool(db, "side_delete", { kind: b.kind, id: b.id }, owner, "本人"));
     if (part === "archive") {
       const p = await getProject(owner, id(b.project_id, "project_id"));
       await patch("aiwb_projects", `id=eq.${q(p.id)}`, { archived: b.archived === true, updated_at: new Date().toISOString() });
@@ -550,8 +569,8 @@ async function handler(req: Request): Promise<Response> {
     }
     throw new Fail("找不到此介面", 404);
   } catch (e) {
-    const status = e instanceof Fail ? e.status : 500;
-    return json({ error: e instanceof Fail ? e.message : "工作台暫時無法使用" }, status);
+    const status = e instanceof Fail || e instanceof SideFail ? e.status : 500;
+    return json({ error: e instanceof Fail || e instanceof SideFail ? e.message : "工作台暫時無法使用" }, status);
   }
 }
 
