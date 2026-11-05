@@ -10,6 +10,31 @@
   let executingJob = null;
   let consentEpoch = 0;
   const POLL_MS = 2200;
+  const FILES_BUCKET = "lizhi-cad-files";
+  const MAX_RESULT_CHARS = 200000;
+  // Rendered PNGs go to the owner's private folder; the job row keeps only the reference.
+  async function storeCallResult(jobId, result) {
+    if (!result || typeof result !== "object" || Array.isArray(result)) return result;
+    const out = { ...result };
+    const client = auth();
+    if (typeof out.png_base64 === "string") {
+      const b64 = out.png_base64; delete out.png_base64;
+      const artifacts = {};
+      try {
+        const bin = atob(b64); const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        const path = window.LizhiAuth.user.id + "/" + jobId + "/" + crypto.randomUUID() + ".png";
+        const { error } = await client.storage.from(FILES_BUCKET)
+          .upload(path, new Blob([bytes], { type: "image/png" }), { contentType: "image/png", upsert: false });
+        artifacts.png_base64 = error ? { dropped: "UPLOAD_FAILED" } : { bucket: FILES_BUCKET, path, mime: "image/png", bytes: bytes.length };
+      } catch { artifacts.png_base64 = { dropped: "UPLOAD_FAILED" }; }
+      out.artifacts = artifacts;
+    }
+    const size = JSON.stringify(out).length;
+    if (size > MAX_RESULT_CHARS) return { truncated: true, size, artifacts: out.artifacts ?? null,
+      revisionBefore: out.revisionBefore, revisionAfter: out.revisionAfter, mutated: out.mutated };
+    return out;
+  }
   const LEASE_REFRESH_MS = 10000;
 
   const auth = () => window.LizhiAuth?.client || null;
@@ -47,6 +72,7 @@
         if(job.command==="new" && commandHost()?.commandStatus?.dirty)
           throw new Error("目前 CAD 圖面尚未保存，請先儲存後再允許遠端新建");
         result=await commandHost().command(job.command,job.params);
+        if(job.command==="lizhi.call") result=await storeCallResult(job.id,result);
         ok=true;
       }catch(e){error=String(e?.message||"CAD 指令執行失敗").slice(0,300);}
       if(active){
