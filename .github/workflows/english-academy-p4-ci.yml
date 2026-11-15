@@ -1,0 +1,55 @@
+name: English Academy P4 isolated adaptive learning CI
+on:
+  pull_request:
+    paths:
+      - 'english-academy/p4/**'
+      - '.github/workflows/english-academy-p4-ci.yml'
+permissions:
+  contents: read
+jobs:
+  adaptive-unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify P4 source and test syntax
+        run: |
+          node --check english-academy/p4/adaptive-planner.mjs
+          node --check english-academy/p4/curriculum.mjs
+          node --check english-academy/p4/learning-report.mjs
+          node --check english-academy/p4/error-drills.mjs
+          node --check english-academy/p4/preview/app.mjs
+          node --check english-academy/p4/tests/adaptive-planner.test.mjs
+          node --check english-academy/p4/tests/curriculum.test.mjs
+          node --check english-academy/p4/tests/learning-report.test.mjs
+          node --check english-academy/p4/tests/error-drills.test.mjs
+      - name: Run anonymous-data adaptation, assessment and privacy tests
+        run: |
+          node --test english-academy/p4/tests/adaptive-planner.test.mjs english-academy/p4/tests/curriculum.test.mjs english-academy/p4/tests/learning-report.test.mjs english-academy/p4/tests/error-drills.test.mjs
+
+  adaptive-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install isolated browser test dependency
+        working-directory: english-academy/p4
+        run: |
+          npm install --no-save --ignore-scripts --no-audit --no-fund playwright@1.55.1
+          npx playwright install --with-deps chromium
+      - name: Browser smoke tests with synthetic learner
+        run: node --test english-academy/p4/tests/browser.test.mjs
+      - name: Keep mobile and desktop screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: english-academy-p4-browser-evidence
+          path: english-academy/p4/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
