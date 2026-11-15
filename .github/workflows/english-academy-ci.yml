@@ -25,9 +25,11 @@ jobs:
           node --check english-academy/tests/browser-smoke.test.mjs
           node --check english-academy/tests/routing.test.mjs
           node --check english-academy/tests/schema-contract.test.mjs
+          node --check english-academy/api/p1-handler.mjs
+          node --check english-academy/tests/p1-api.test.mjs
       - name: P0 and P1 pure unit tests (no credentials)
         run: |
-          node --test english-academy/poc/learning-gateway.test.mjs english-academy/preview/state.test.mjs english-academy/tests/routing.test.mjs english-academy/tests/schema-contract.test.mjs
+          node --test english-academy/poc/learning-gateway.test.mjs english-academy/preview/state.test.mjs english-academy/tests/routing.test.mjs english-academy/tests/schema-contract.test.mjs english-academy/tests/p1-api.test.mjs
       - name: Install isolated browser test dependencies
         working-directory: english-academy
         run: |
