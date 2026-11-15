@@ -1,0 +1,27 @@
+name: English Academy P11 existing Site MCP extension (candidate)
+on:
+  pull_request:
+    paths:
+      - 'english-academy/p11/**'
+      - '.github/workflows/english-academy-p11-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  site-mcp-synthetic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify original private-Site tooling and synthetic English MCP
+        run: node --test english-academy/p11/tests/*.test.mjs
+      - name: Confirm P11 files contain no real owner or production writer
+        run: |
+          if grep -R -n -E 'SUPABASE_SERVICE_ROLE|PRODUCTION_BRIDGE_KEY|service_role\s*=|https://[^ ]*supabase\.co/functions/v1' english-academy/p11 --include='*.mjs'; then
+            echo "Unexpected secret or live endpoint in candidate"
+            exit 1
+          fi
