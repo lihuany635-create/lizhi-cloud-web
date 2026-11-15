@@ -9,7 +9,8 @@ const screenshots=new URL('../test-results/',import.meta.url);
 let server,origin,db;
 test.before(async()=>{
   db={cards:[{id:'dddddddd-dddd-4ddd-8ddd-dddddddddddd',term:'rice',meaning_zh:'米飯',example_en:'I eat rice.'}],
-      candidates:[{id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',term:'hungry',meaning_zh:'飢餓的',example_en:'I am hungry.',status:'pending'}]};
+      candidates:[{id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',term:'hungry',meaning_zh:'飢餓的',example_en:'I am hungry.',status:'pending'}],
+      errors:[{id:'fake-error-1',original_sentence:'He go yesterday.',corrected_sentence:'He went yesterday.',explanation:'Use past tense.'}]};
   server=createServer(async(req,res)=>{
     const url=new URL(req.url,'http://127.0.0.1');
     if(url.pathname==='/host-test'){
@@ -34,12 +35,14 @@ test.before(async()=>{
       }
       if(action==='status')return json({ownerVerified:true});
       if(action==='cards')return json({items:db.cards});
-      if(action==='candidates')return json({items:db.candidates});
-      if(action==='card'){
-        const card={id:'fffffff0-ffff-4fff-8fff-ffffffffffff',term:body.term,meaning_zh:body.meaningZh};
-        db.cards.push(card);return json({id:card.id,status:'active'},201);
+      if(action==='candidates')return json({items:db.candidates.filter(x=>x.status==='pending')});
+      if(action==='errors')return json({items:db.errors});
+      if(action==='candidate'){
+        const item={id:'fffffff0-ffff-4fff-8fff-ffffffffffff',term:body.term,meaning_zh:body.meaningZh,status:'pending'};
+        db.candidates.push(item);return json({id:item.id,status:'pending'},201);
       }
       if(action==='accept'){
+        if('userConfirmed' in body||'ownerId' in body)return json({code:'INVALID_APPROVAL'},400);
         const item=db.candidates.find(x=>x.id===body.candidateId);
         if(!item)return json({code:'CANDIDATE_NOT_PENDING'},409);
         item.status='accepted';db.cards.push({id:'fffffff1-ffff-4fff-8fff-ffffffffffff',term:item.term,meaning_zh:item.meaning_zh});
@@ -72,6 +75,7 @@ test('authenticated host iframe fetches private cards with bearer and can review
  try{
    const page=await browser.newPage({viewport:{width:360,height:780}});
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
+   page.on('dialog',dialog=>dialog.accept());
    await page.goto(origin+'/host-test');
    const f=page.frameLocator('iframe[title="英文學習教室"]');
    await f.locator('.bottom-nav button[data-tab="cards"]').waitFor({timeout:10000});
@@ -85,7 +89,13 @@ test('authenticated host iframe fetches private cards with bearer and can review
    await f.locator('#live-meaning').fill('蘋果');
    await f.locator('#live-add-card button[type="submit"]').click();
    await f.locator('text=apple').first().waitFor();
+   assert.ok(db.candidates.some(x=>x.term==='apple'&&x.status==='pending'));
+   assert.ok(!db.cards.some(x=>x.term==='apple'),'manual addition must stay pending');
+   await f.locator('button[data-accept="fffffff0-ffff-4fff-8fff-ffffffffffff"]').click();
+   await f.locator('text=apple').first().waitFor();
    assert.ok(db.cards.some(x=>x.term==='apple'));
+   await f.locator('button[data-tab="errors"]').first().click();
+   assert.match(await f.locator('body').innerText(),/He went yesterday/);
    const overflow=await f.locator('html').evaluate(el=>({
      width:el.clientWidth,scroll:el.scrollWidth
    }));
