@@ -17,6 +17,21 @@ spec.loader.exec_module(backup)
 
 
 class BackupSafetyTests(unittest.TestCase):
+    def test_fresh_psycopg_acl_immutable_tuples_normalize_without_mutation_error(self):
+        sample = {"objects": [
+            ("table_acl", "public.example",
+             '["postgres", ["postgres=arwdDxt/postgres"]]'),
+            ("function", "public.func()", "unchanged")
+        ]}
+        normalized = backup.normalize_default_relation_acls(
+            sample, lambda *_: (_ for _ in ()).throw(AssertionError("should not call SQL")))
+        self.assertEqual(normalized["objects"][0][0], "table_acl")
+        self.assertEqual(normalized["objects"][0][2],
+                         '["postgres",["postgres=arwdDxt/postgres"]]')
+        self.assertEqual(normalized["objects"][1],
+                         ("function", "public.func()", "unchanged"))
+
+
     def test_archived_sequence_set_sql_matches_valid_pg_restore(self):
         sql = """-- archive sequence statements
 SELECT pg_catalog.setval('public.example_id_seq', 42, true);
