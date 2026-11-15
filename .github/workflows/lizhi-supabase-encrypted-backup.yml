@@ -13,6 +13,16 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
+      - name: Require both owner-managed backup secrets
+        shell: bash
+        env:
+          BACKUP_URL_PRESENT: ${{ secrets.LIZHI_SUPABASE_BACKUP_URL != '' }}
+          BACKUP_KEY_PRESENT: ${{ secrets.LIZHI_BACKUP_PASSPHRASE != '' }}
+        run: |
+          if [ "$BACKUP_URL_PRESENT" != true ] || [ "$BACKUP_KEY_PRESENT" != true ]; then
+            echo '::error::Required backup secrets are missing. Save LIZHI_SUPABASE_BACKUP_URL and LIZHI_BACKUP_PASSPHRASE in this repository.'
+            exit 1
+          fi
       - name: Checkout reviewed workflow revision
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -62,4 +72,3 @@ jobs:
           esac
           rm -rf -- "$RUNNER_TEMP/lizhi-backup-private" "$RUNNER_TEMP/lizhi-backup-venv"
           echo 'Actions capture is temporary. A durable private copy and separate Storage/config review are required before deployment.' >> "$GITHUB_STEP_SUMMARY"
-
