@@ -58,8 +58,8 @@ function fixture({user=actor,verifyThrows=false,leak=false}={}){
 async function ask(api,action,{method='GET',body,token='test-token',
  requestOrigin=origin,headers={}}={}){
  const req=new Request(endpoint+action,{
-  method,headers:{...requestOrigin?{origin:requestOrigin}:{},
-   ...token?{authorization:'Bearer '+token}:{},
+  method,headers:{...(requestOrigin?{origin:requestOrigin}:{}),
+   ...(token?{authorization:'Bearer '+token}:{}),
    ...(body?{'content-type':'application/json'}:{}),...headers},
   body:body?JSON.stringify(body):undefined
  });
