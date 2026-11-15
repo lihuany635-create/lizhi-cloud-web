@@ -15,6 +15,8 @@ let search = '';
 const names = {home:'首頁',cards:'單字',practice:'練習',courses:'課程',analytics:'分析',settings:'設定'};
 const symbols = {home:'⌂',cards:'▣',practice:'✎',courses:'◇',analytics:'▥',settings:'⚙'};
 const modeNames = {flip:'翻卡',choice:'選擇題',spelling:'拼字',listening:'聽力',sentence:'造句'};
+const feedback = {APPROVED:'已加入示範單字庫',IGNORED:'已略過候選單字',DUPLICATE:'示範單字庫已存在此單字',CREATED:'已新增示範單字',INVALID_CARD:'請輸入有效的單字與中文意思'};
+const actionLabels = {approve_candidate:'核准候選單字',ignore_candidate:'略過候選單字',add_demo_card:'新增示範單字',demo_practice:'完成示範練習'};
 const h = value => String(value ?? '').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
 function navigate(next) {
@@ -141,7 +143,7 @@ function analytics() {
  '<div class="metric"><div class="flex-row"><strong>'+x+'</strong><span class="muted small">尚未正式評估</span></div><div class="bar"><div style="width:0"></div></div></div>').join('')+
  '</section><section class="card"><h2>最近展示操作</h2>'+
  (model.audit.length?'<div class="list">'+model.audit.slice(-8).reverse().map(a=>
- '<div class="list-row"><div><strong>#'+a.seq+' '+h(a.action)+'</strong><p>'+h(a.detail)+'</p></div></div>').join('')+'</div>':
+ '<div class="list-row"><div><strong>#'+a.seq+' '+h(actionLabels[a.action]||a.action)+'</strong><p>'+h((model.cards.find(c=>c.id===a.detail)||model.candidates.find(c=>c.id===a.detail))?.term||a.detail)+'</p></div></div>').join('')+'</div>':
  '<p class="muted">尚無作答或審核紀錄。</p>')+
  '<div class="gap"></div><div class="notice">此處不是 Supabase 的 audit_logs。正式版必須由受信任後端保存。</div></section></div>';
 }
@@ -173,10 +175,10 @@ app.addEventListener('click',event=>{
  if(!el) return;
  if(el.dataset.tab) return navigate(el.dataset.tab);
  if(el.dataset.accept){
-   const r=candidateDecision(model,el.dataset.accept,'accept');model=r.state;message=r.code;return render();
+   const r=candidateDecision(model,el.dataset.accept,'accept');model=r.state;message=feedback[r.code]||r.code;return render();
  }
  if(el.dataset.ignore){
-   const r=candidateDecision(model,el.dataset.ignore,'ignore');model=r.state;message=r.code;return render();
+   const r=candidateDecision(model,el.dataset.ignore,'ignore');model=r.state;message=feedback[r.code]||r.code;return render();
  }
  if(el.dataset.mode){mode=el.dataset.mode;flipped=false;answer='';message='';return render();}
  if(el.dataset.flip){flipped=true;return render();}
@@ -206,7 +208,7 @@ app.addEventListener('submit',event=>{
  if(event.target.id==='add-word'){
    event.preventDefault();const d=new FormData(event.target);
    const r=addExplicitDemoCard(model,{term:String(d.get('term')||''),meaning:String(d.get('meaning')||'')});
-   model=r.state;message=r.code;render();return;
+   model=r.state;message=feedback[r.code]||r.code;render();return;
  }
  if(event.target.id==='practice-form'){
    event.preventDefault();const d=new FormData(event.target);
