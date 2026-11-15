@@ -1,6 +1,6 @@
 # 立之 Supabase 流量監控 MCP｜操作手冊（待正式發布）
 
-版本 v0.2.0，2026-11-15。使用者網頁、MCP 與前置限流閘道是三個**不同的層次**。本手冊的程式只在 Draft PR #77；尚無正式 MCP 可供 ChatGPT 呼叫。
+版本 v0.2.1，2026-11-16。使用者網頁、MCP 與前置限流閘道是三個**不同的層次**。**監控 DB Migration 已正式部署並驗收**；MCP Edge 程式仍在 Draft PR #77，尚無正式 MCP 可供 ChatGPT 呼叫。
 
 ## 1. 用途
 - 透過既有私人 Site 的本人驗證，讓 ChatGPT 查詢流量監控。
@@ -56,11 +56,11 @@ psql -v ON_ERROR_STOP=1 -f usage-monitor/sql-regression.sql
 - MCP 未連接：先查 Edge 是否已部署及 401/403/503，再查原 Site 是否已實際加入六工具，不要任意開新 Site。
 - RLS 或事件表錯誤：停止正式部署，保留原業務表，使用隔離資料庫修正再測。
 - 任何原 Site 工具缺失：立刻退回原 Site 版本，不刪舊 MCP。
-- 正式切換需先完成備份/還原與本人批准；目前尚未取得。
+- **已取得本人核准並完成 DB 階段備份/還原與正式 Migration**；後續 Edge／私人 Site 部署為獨立授權及驗收範圍。
 
 ## 8. 尚待正式驗收
 - 原 Site 本人身分、多帳號/退出授權回歸、CORS 及端對端實機。
-- 正式 DB migration、正式 Secret、Edge 發布、監控 DB 容量／延遲。
+- **正式 DB migration 已 PASS**；尚待正式 Secret、Edge 發布、監控 DB 容量／延遲的長期驗收。
 - 與 Supabase 官方 Usage 對帳；外部閘道與原子預算預留。
 - 所有現有工作台、手機、CAD、理財、圖書館、LINE、模型工具回歸。
 
