@@ -1,0 +1,35 @@
+name: English Academy G09 external CodeQL automated scan (candidate)
+on:
+  pull_request:
+    paths:
+      - 'english-academy/**'
+      - 'sites-migration/english-academy-p12/**'
+      - 'supabase/functions/lizhi-english-academy/**'
+      - '.github/workflows/english-academy-g09-codeql.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  codeql-external-static-scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout selected PR snapshot
+        uses: actions/checkout@v4
+      - name: Initialize independent GitHub CodeQL engine
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+          config: |
+            paths:
+              - english-academy
+              - sites-migration/english-academy-p12
+              - supabase/functions/lizhi-english-academy
+      - name: Upload CodeQL findings for external reviewer
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: /language:javascript-typescript
