@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {initialDemoState,candidateDecision,addExplicitDemoCard,recordDemoPractice,getDemoSummary,normalizeTerm} from './state.mjs';
+import {initialDemoState,candidateDecision,addExplicitDemoCard,recordDemoPractice,getDemoSummary,normalizeTerm,filterDemoCards} from './state.mjs';
 
 test('starts as explicitly unassessed demo profile',()=>{
  const s=initialDemoState();
@@ -45,4 +45,19 @@ test('review history and audit trail are append-only in reducer',()=>{
  const b=recordDemoPractice(a,{cardId:'card-1',mode:'spelling',correct:true}).state;
  assert.equal(b.practice.length,2);assert.equal(b.audit.length,2);
  assert.equal(s.practice.length,0);assert.equal(getDemoSummary(b).accuracy,50);
+});
+
+test('ignoring an already-present term is correctly reported as ignored',()=>{
+  const s=initialDemoState();
+  s.cards.push({id:'duplicate-rice',term:'hungry',meaning:'餓',type:'custom'});
+  const r=candidateDecision(s,'cand-1','ignore');
+  assert.equal(r.code,'IGNORED');
+  assert.equal(r.state.candidates.find(x=>x.id==='cand-1').status,'ignored');
+});
+test('live selector filters English case-insensitively and Chinese by substring',()=>{
+  const s=initialDemoState();
+  const r=addExplicitDemoCard(s,{term:'Have Eaten',meaning:'已經吃過'}).state;
+  assert.deepEqual(filterDemoCards(r,'EATEN').map(c=>c.term),['Have Eaten']);
+  assert.deepEqual(filterDemoCards(r,'飯').map(c=>c.term),['rice']);
+  assert.equal(filterDemoCards(r,'not-exist').length,0);
 });
