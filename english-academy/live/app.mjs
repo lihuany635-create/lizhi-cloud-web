@@ -32,10 +32,10 @@ function hostContext(){
   const trustedUrl=typeof supabaseUrl==='string' && (/^https:\/\/[^/]+$/.test(supabaseUrl) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(supabaseUrl));
   if(!auth?.auth?.getSession||!trustedUrl)
     throw new Error('請從已登入的立之雲端庫開啟此頁');
-  return {auth,endpoint:supabaseUrl.replace(/\/$/,'')+'/functions/v1/lizhi-english-academy'};
+  return {auth,endpoint:supabaseUrl.replace(/\/$/,'')+'/functions/v1/lizhi-english-academy',publicKey:host.LIZHI_SUPABASE_PUBLISHABLE_KEY||''};
 }
 async function buildClient(){
- const {auth,endpoint}=hostContext();
+ const {auth,endpoint,publicKey}=hostContext();
  async function call(path,method='GET',payload=null){
    const {data,error}=await auth.auth.getSession();
    if(error||!data?.session?.access_token)throw {code:'AUTH_REQUIRED'};
@@ -43,6 +43,7 @@ async function buildClient(){
       method,
       headers:{
         authorization:'Bearer '+data.session.access_token,
+        ...(publicKey?{apikey:publicKey}:{}),
         'content-type':'application/json',
       },
       body:payload?JSON.stringify(payload):undefined,
