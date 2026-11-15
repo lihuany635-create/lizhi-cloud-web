@@ -43,7 +43,7 @@ jobs:
           set -euo pipefail
           if [ ! -x /usr/lib/postgresql/17/bin/pg_dump ]; then
             sudo install -d /usr/share/postgresql-common/pgdg
-            curl --fail --silent --show-error https://www.postgresql.org/media/keys/ACCC4CF8.asc -o "$RUNNER_TEMP/postgresql.asc"
+            curl --fail --silent --show-error --retry 5 --retry-all-errors --retry-delay 4 --connect-timeout 15 --max-time 60 https://www.postgresql.org/media/keys/ACCC4CF8.asc -o "$RUNNER_TEMP/postgresql.asc"
             fingerprint=$(gpg --show-keys --with-colons "$RUNNER_TEMP/postgresql.asc" | awk -F: '$1 == "fpr" { print $10; exit }')
             test "$fingerprint" = B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
             sudo install -m 644 "$RUNNER_TEMP/postgresql.asc" /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
