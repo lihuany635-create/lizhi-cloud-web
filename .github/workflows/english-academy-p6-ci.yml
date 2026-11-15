@@ -22,10 +22,12 @@ jobs:
           node --check english-academy/p6/sample-bank.mjs
           node --check english-academy/p6/diagnostic-engine.mjs
           node --check english-academy/p6/preview/app.mjs
+          node --check english-academy/p6/persistent-mcp-adapter.mjs
+          node --check english-academy/p6/tests/persistent-adapter.test.mjs
           node --check english-academy/p6/tests/practice-diagnostic.test.mjs
           node --check english-academy/p6/tests/browser.test.mjs
       - name: Run P6 exercise, human-review and diagnostic contracts
-        run: node --test english-academy/p6/tests/practice-diagnostic.test.mjs
+        run: node --test english-academy/p6/tests/practice-diagnostic.test.mjs english-academy/p6/tests/persistent-adapter.test.mjs
 
   p6-browser:
     runs-on: ubuntu-24.04
