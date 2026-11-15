@@ -52,7 +52,7 @@ test('owner-verified MCP tools require no second website-consent ID',async()=>{
   assert.equal(data.result.isError,false,name);
   assert.equal(f.writes.length,1,name);
   assert.equal(f.writes[0].sourceSessionId,'mcp-direct-session',name);
- });
+ }
 });
 test('same convenience does not bypass verified owner write scope',async()=>{
  const f=fixture(['english:read']);
