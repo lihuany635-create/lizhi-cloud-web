@@ -1,6 +1,6 @@
 import {
  initialDemoState, candidateDecision, addExplicitDemoCard,
- recordDemoPractice, getDemoSummary, EXERCISE_MODES, COURSE_STAGES, normalizeTerm
+ recordDemoPractice, getDemoSummary, EXERCISE_MODES, COURSE_STAGES, normalizeTerm, filterDemoCards
 } from './state.mjs';
 
 const app = document.getElementById('app');
@@ -52,9 +52,14 @@ function home() {
  '<div class="notice">③ 正式 AI 自適應安排將在後續階段串接</div></div></section>'+
  '</div></div>';
 }
+function cardRows(cards) {
+ return cards.length ? cards.map(c=>
+ '<div class="list-row"><div><strong>'+h(c.term)+'</strong> · '+h(c.meaning)+'<p>'+h(c.example||'自訂單字')+'</p></div></div>').join('')
+ : '<div class="notice">沒有符合搜尋條件的單字。</div>';
+}
 function cards() {
  const pending=model.candidates.filter(c=>c.status==='pending');
- const filtered=model.cards.filter(c=>normalizeTerm(c.term).includes(normalizeTerm(search)) || String(c.meaning).includes(search.trim()));
+ const filtered=filterDemoCards(model,search);
  return title('單字中心','候選卡先審核，再進入正式複習庫。現在是純展示資料。')+
  '<div class="content-grid"><div class="list"><section class="card"><div class="flex-row"><h2>待審核候選 <span class="pill">'+pending.length+'</span></h2></div>'+
  '<div class="list">'+(pending.length?pending.map(c=>
@@ -65,9 +70,7 @@ function cards() {
  '<section class="card"><h2>正式單字庫（示範）</h2>'+
  '<label class="small muted" for="word-search">搜尋英文或中文</label>'+
  '<input class="input" id="word-search" placeholder="例如 hungry" value="'+h(search)+'">'+
- '<div class="gap"></div><div class="list">'+(filtered.length?filtered.map(c=>
- '<div class="list-row"><div><strong>'+h(c.term)+'</strong> · '+h(c.meaning)+'<p>'+h(c.example||'自訂單字')+'</p></div></div>').join(''):
- '<div class="notice">沒有符合搜尋條件的單字。</div>')+'</div></section></div>'+
+ '<div class="gap"></div><div class="list" id="demo-card-rows">'+cardRows(filtered)+'</div></section></div>'+
  '<section class="card"><h2>手動加入展示單字</h2>'+
  '<form id="add-word"><label class="small muted" for="word-term">英文</label>'+
  '<input id="word-term" name="term" class="input" required maxlength="120" placeholder="例如 apple">'+
@@ -101,8 +104,11 @@ function practice() {
    '<div class="gap"></div><button class="button primary">檢查答案</button></form>';
  } else {
    question='<div class="flashcard"><div class="letter">'+h(card.term)+'</div><div class="muted small">用這個字寫一句英文</div></div>'+
-   '<form id="practice-form"><textarea class="input" name="answer" rows="3" required placeholder="Write your sentence..."></textarea>'+
-   '<div class="gap"></div><button class="button primary">顯示自我評估</button></form>';
+   (flipped ? '<div class="notice">你的句子：'+h(answer)+'</div>'+
+     '<div class="notice">參考句：'+h(card.example||'請用這個單字組成自然的句子。')+'</div>'+
+     '<div class="gap"></div><div class="actions"><button class="button" data-grade="false">需再練習</button><button class="button primary" data-grade="true">自評通過</button></div>'
+     : '<form id="practice-form"><textarea class="input" name="answer" rows="3" required placeholder="Write your sentence..."></textarea>'+
+       '<div class="gap"></div><button class="button primary">查看參考句</button></form>');
  }
  return title('卡片練習','依你的目標挑選練習模式。FSRS 與 AI 評分會在後續階段提供。')+
  '<div class="content-grid"><section class="card"><div class="flex-row"><h2>今日練習</h2><span class="pill">第 '+(cardIndex%model.cards.length+1)+' / '+model.cards.length+' 張</span></div>'+
@@ -158,7 +164,7 @@ function render() {
  '<span class="pill">P1 · 開發候選版</span></header>'+
  '<div class="demo-banner"><strong>展示模式 · 尚未連接正式資料</strong><span>無 Google 登入、Supabase 寫入或 ChatGPT MCP 同步</span></div>'+
  navButtons('nav',['home','cards','practice','courses','analytics','settings'])+
- '<main id="main-content">'+summaries[tab]()+'</main>'+
+ '<main id="main-content">'+(message && tab!=='practice'?'<div class="notice" role="status">'+h(message)+'</div><div class="gap"></div>':'')+summaries[tab]()+'</main>'+
  '<footer class="footer">立之雲端庫整合候選模組 · 不代表實際英文程度評估或已完成部署</footer></div>'+
  navButtons('bottom-nav',['home','cards','practice','courses','analytics','settings']);
 }
@@ -172,9 +178,9 @@ app.addEventListener('click',event=>{
  if(el.dataset.ignore){
    const r=candidateDecision(model,el.dataset.ignore,'ignore');model=r.state;message=r.code;return render();
  }
- if(el.dataset.mode){mode=el.dataset.mode;flipped=false;message='';return render();}
+ if(el.dataset.mode){mode=el.dataset.mode;flipped=false;answer='';message='';return render();}
  if(el.dataset.flip){flipped=true;return render();}
- if(el.dataset.next){cardIndex++;flipped=false;message='';return render();}
+ if(el.dataset.next){cardIndex++;flipped=false;answer='';message='';return render();}
  if(el.dataset.grade){
    const card=model.cards[cardIndex % model.cards.length];
    const r=recordDemoPractice(model,{cardId:card.id,mode,correct:el.dataset.grade==='true'});
@@ -208,10 +214,10 @@ app.addEventListener('submit',event=>{
    const card=model.cards[cardIndex%model.cards.length];
    if(mode==='sentence'){
      if(!response){message='請輸入一個句子';render();return;}
+     answer=response;
      flipped=true;
-     message='參考例句：'+(card.example||'請使用這個單字造句。')+'；此候選版尚未支援 AI 自動評分。';
-     const rating=confirm('這個句子有合理使用 '+card.term+' 嗎？按「確定」記為自評正確。');
-     model=recordDemoPractice(model,{cardId:card.id,mode,correct:rating}).state;return render();
+     message='請對照參考句並自行評估。這不是 AI 自動評分。';
+     return render();
    }
    const correct=normalizeTerm(response)===normalizeTerm(card.term);
    model=recordDemoPractice(model,{cardId:card.id,mode,correct}).state;
@@ -222,10 +228,9 @@ app.addEventListener('submit',event=>{
 app.addEventListener('input',event=>{
  if(event.target.id==='word-search'){
    search=event.target.value;
-   const list=app.querySelector('#main-content .content-grid .list section.card:nth-child(2) .list');
-   // Keep focus and only replace the filtered portion using a narrowly scoped re-render.
-   // For this P1 candidate, search applies after Enter or blur to avoid focus jumps.
+   const list=app.querySelector('#demo-card-rows');
+   if(list)list.innerHTML=cardRows(filterDemoCards(model,search));
  }
 });
-app.addEventListener('change',event=>{if(event.target.id==='word-search'){search=event.target.value;render();}});
+// Search updates results immediately without removing the focused input.
 render();
