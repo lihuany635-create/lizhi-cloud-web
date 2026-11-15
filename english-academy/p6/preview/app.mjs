@@ -38,7 +38,10 @@ function questionForm(exercise,diagnostic=false){
     'data-flip="'+n+'"')).join('')+'</div>';
  if(m==='listening')return prompt+
    btn(spoken?'重播英語':'播放英語','data-play="1"')+
-   '<p class="p6-note">本機語音只能示範；沒有受信任的音訊驗證，因此不計正式聽力成績。</p>';
+   '<p class="p6-note">本機語音只能示範；沒有受信任的音訊驗證，因此不計正式聽力成績。</p>'+
+   '<form class="p6-form" id="'+(diagnostic?'diagnostic-answer':'practice-answer')+'">'+
+   '<input name="answer" class="input" required maxlength="500" autocomplete="off" placeholder="輸入你聽到的英文">'+
+   '<button class="button primary" type="submit">送出聽寫</button></form>';
  const element=m==='sentence'?
    '<textarea name="answer" class="input" rows="4" required maxlength="2000" placeholder="Write your own sentence"></textarea>':
    '<input name="answer" class="input" required maxlength="500" autocomplete="off" placeholder="輸入你的英文答案">';
@@ -95,7 +98,7 @@ function recordPractice(response,extra={}){
      response,createdAt:new Date(),...extra});
    current=event;localAttempts=[...localAttempts,event];
    if(event.status==='needs-human-review'){
-     proposal=proposeFeedback({draft:event,reviewerType:'ai',
+     proposal=proposeFeedback({draft:event,reviewerType:'template',
        comment:'Static demonstration reference only; no AI service was contacted.',
        rubricChecks:[null,null,null,null]});
      viewResult={title:'請自行覆核',message:'造句先保存為未評分草稿，需確認用字與文法。'};
