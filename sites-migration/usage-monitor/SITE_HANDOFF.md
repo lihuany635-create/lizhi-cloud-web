@@ -1,5 +1,5 @@
 # 立之 Supabase 流量監控 MCP｜接 Site 前交接文件
-日期：2026-11-15　狀態：GitHub 候選，未正式發布／未接入任何 Site
+日期：2026-11-16　狀態：**DB Migration 已獲本人核准並部署 PASS；MCP Edge 與原私人 Site 仍未發布**
 
 ## 範圍與嚴格邊界
 - 只更新原 GitHub 倉庫的 Draft PR #77；不得先改私人 Site、主站 main、22 個正式 Edge 或正式 Supabase schema。
@@ -12,7 +12,7 @@
 - `supabase/functions/_shared/lizhi-usage-mcp-core.mjs`：Stateless JSON-RPC 2.0、tools/list、tools/call、initialize、ping、notifications/initialized。
 - `supabase/functions/_shared/lizhi-usage-mcp-bridge-auth.mjs`：Server-to-server shared-secret + 經 Site 驗證的 principal 兩項都正確才允許。
 - `usage-monitor/site-bridge-relay.mjs`：Site 側候選代理，主動限定 6 個 usage_* 工具、檢查 owner、20 秒 timeout、固定 Edge 上游 URL。
-- `usage-monitor/schema.draft.sql`：初步事件表／日彙總；僅供隔離測試，正式 migration 要經 Supabase CLI 建立、獨立安全審核。
+- `usage-monitor/schema.draft.sql`：保留隔離測試草案；**正式 Migration `20261115182955` 已套用**。已核對兩表 RLS、對匿名/登入者撤權、service_role 授權、原子 Trigger 及回滾驗收。正式對應檔：`supabase/migrations/20261115182955_lizhi_usage_monitor_tables_and_rollup_20261116.sql`。
 - `usage-monitor/sql-regression.sql`：隔離 Postgres 17 RLS/grants/trigger/replay/NULL/拒絕敏感 route 的測試。
 - `.github/workflows/usage-monitor-qa.yml`：PR 候選 CI：Node tests、Postgres 17、Deno Edge check，不部署正式服務。
 
@@ -33,7 +33,7 @@ Edge 新增：`LIZHI_USAGE_OWNER_UID`（Supabase Auth 本人 UID），`LIZHI_USA
 
 ## 待本人核定後的正式執行順序
 1. 取得完整隔離 PG/RLS／端對端 Auth/Edge/CORS/回退證據，對任何 FAIL/NOT_TESTED 修正後才能下一步。
-2. Supabase CLI 產生可追溯 migration，先確認備份與還原演練，再批准正式 apply migration。
+2. **已完成**：本人批准、最新加密備份、隔離 PostgreSQL 17 還原比對 PASS、正式 apply migration `20261115182955`、RLS/grants/Trigger/去重及回滾驗證 PASS。**不得再次套用相同 DDL**。
 3. 以只含本人唯讀 GET /snapshot 與 POST /mcp 的正式 `lizhi-usage-monitor` Edge 發布，應配置 `verify_jwt=false` **僅在應用程式層的本人 JWT 或可信 Site 雙重秘密驗證確實經隔離驗收後**。未完成不能開放正式入口。
 4. 首先直接用完整授權環境測 Edge 的 MCP initialize、tools/list、六工具呼叫、非本人、匿名、無效轉接密鑰及 CORS。不把 6 工具被列出當成真實官方帳務已接通。
 5. 核對原私人 Site 在該次時間點的所有工具名稱，改原路由的 `tools/list` 為既有清單與新增 6 項的聯集，禁止刪掉任何既有工具。
@@ -50,7 +50,7 @@ Edge 新增：`LIZHI_USAGE_OWNER_UID`（Supabase Auth 本人 UID），`LIZHI_USA
 - 不接受內容本文中的 actor、owner ID 或前端自稱 critical，不能用官方不明用量推算精確餘額。
 
 ## 接 Site 的硬性驗收阻擋條件
-- 正式 DB 尚未套用／驗證 → STOP。
+- **已解決**：正式 DB 已套用並實測；若未來出現結構或權限回歸 FAIL → STOP。
 - 本人 Auth 或 Site bridge 無效 → STOP。
 - MCP 非本人可讀／service role 或 PAT 暴露到網頁 → STOP。
 - Node、Postgres、Deno/Edge CI 未全部 PASS → STOP。
