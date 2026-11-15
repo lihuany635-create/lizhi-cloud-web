@@ -52,6 +52,7 @@ const digest=async(obj)=>{
   return Array.from(hash,b=>b.toString(16).padStart(2,'0')).join('');
 };
 
+/** @param {{verifyOwner?: Function, trustedDb?: {select: Function,rpc: Function}, allowedOrigin?: string}} [options] */
 export function createP11WebCardApi({
   verifyOwner,trustedDb,allowedOrigin='https://lihuany635-create.github.io'
 }={}){
