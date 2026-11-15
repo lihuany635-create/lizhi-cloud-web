@@ -160,7 +160,7 @@ test('all seven exercise modes and all 14 diagnostic stages stay usable without 
   assert.match(await frame.locator('body').innerText(),/不是 AI 實際分析/);
   await frame.locator('button[data-page="diagnostic"]').click();
   for(let i=0;i<14;i++){
-   assert.match(await frame.locator('body').innerText(),new RegExp('\\\\b'+(i+1)+' / 14'));
+   assert.match(await frame.locator('body').innerText(),new RegExp('(?:^|[^0-9])'+(i+1)+' / 14'));
    await frame.locator('button[data-diag-next]').click();
   }
   assert.match(await frame.locator('body').innerText(),/測驗結果（非官方）/);
