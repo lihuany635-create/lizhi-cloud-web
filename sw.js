@@ -1,4 +1,4 @@
-const CACHE="lizhi-cloud-v160";
+const CACHE="lizhi-cloud-v161";
 const FILES=[
   "production/ai-workbench.js?v=2",
   // BEGIN IMAGE GRAPH ASSETS
@@ -43,7 +43,7 @@ const FILES=[
   "image-graph/workspace-ui.mjs?v=28",
   "image-graph/source-manifest.json",
   // END IMAGE GRAPH ASSETS
-  "","index.html","styles.css?v=15","theme.css?v=15","study.css?v=16","chat.css?v=15",
+  "","index.html","styles.css?v=15","theme.css?v=15","study.css?v=17","chat.css?v=15",
   "knowledge-weaving.css?v=20","finance/styles/home.css?v=62","workspace-ui.css?v=35","engineering/engineering.css?v=10","engineering/sync/sync.css?v=1","engineering/modules/supervision/supervision.css?v=1",
   "supabase-config.js?v=2","auth.js?v=9","home-stage/home-stage.css?v=3","home-stage/characters.js?v=4","home-stage/stage.js?v=4","sync.js?v=1","cloud-chat.js?v=18",
   "knowledge-weaving-validator.js?v=20","knowledge-weaving.js?v=20",
