@@ -1,5 +1,6 @@
 .route-study .main,
-.route-english .main {
+.route-english .main,
+.route-usage .main {
   height: calc(100vh - 76px);
   padding: 0;
   overflow: hidden;
@@ -34,7 +35,8 @@
 }
 
 /* Match the actual workspace panel layer between .main and the lesson. */
-.route-english .workspace-panel {
+.route-english .workspace-panel,
+.route-usage .workspace-panel {
   height: 100%;
   min-height: 0;
 }
@@ -92,6 +94,7 @@
 @media (max-width: 680px) {
   .route-study .main,
   .route-english .main,
+  .route-usage .main,
   .route-a4 .main,
   .route-licut .main {
     height: calc(100dvh - 68px);
@@ -127,3 +130,6 @@
     display: none;
   }
 }
+
+/* Keep the usage dashboard usable inside the original library on narrow screens. */
+@media(max-width:680px){.route-usage .study-embedded-toolbar p,.route-usage .study-embedded-toolbar .chip{display:none}.route-usage .study-embedded-toolbar a{font-size:12px;padding:7px 9px}}
