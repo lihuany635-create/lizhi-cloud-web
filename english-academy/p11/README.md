@@ -51,3 +51,16 @@ node --test english-academy/p11/tests/*.test.mjs
 測試使用 synthetic ChatGPT owner UUID、假單字與英文句子，沒有真實對話、憑證、正式服務或請求。測試結果僅為合成資料證據，不能代表 P8-B 正式驗收 PASS。
 
 工作台：TASK-016。Drive 專案：https://drive.google.com/drive/folders/117PWBFCdEbioh6zFYxe453XsUa_czjPm
+
+## 六、P11-B｜網站單字卡／錯句與授權同步候選（2026-11-15 增量）
+
+> 此增量僅**候選**。正式資料庫、Edge、Site、main、Pages 一律未修改。P8-B 真實 G01～G12 尚待完成。
+
+- `schema/20261115_p11_web_cards_candidate.sql`：在既有 P1/P5/P6/P7 資料表及私有 consent schema 上加服務端原子 RPC：`english_web_session_active`（比對 `auth.sessions`）、`english_web_create_candidate`（手動加入待審）、`english_web_promote_candidate`（一筆交易核准、建卡、審計、去重）、`english_web_ignore_candidate`（略過但保留歷史）、`english_web_grant_chat_session`／`english_web_revoke_chat_session`（網站本人授權 24 小時來源並允許撤銷）。全部只允許 service_role RPC；不可由瀏覽器直接執行。
+- `supabase-verified-web.mjs`：受信任的伺服器端 Google JWT 查驗（Auth user API + token issuer/audience/sub/expiry/session）與 Supabase Auth session 有效性、本人 allowlist、RPC/owner 限制，金鑰只取伺服器環境，不放瀏覽器或 GitHub。這是未部署程式，正式環境仍待真實登出與不同帳號測試。
+- `web-card-api.mjs`：既有網站 `GET status/cards/candidates/errors/sessions`、`POST candidate/accept/ignore/authorize-session/revoke-session` 的可信簽入入口，拒絕偽造 owner/批准、重送或未授權動作。
+- 既有 `supabase/functions/lizhi-english-academy/index.ts`：接入 P11 Web handler，但保留原 P10 fail-closed 作為預設；只有經個別批准的伺服器端 `ENGLISH_P11_WEB_WRITES_APPROVED=true` 才能執行寫入，不可因合併程式就誤開。
+- 既有 `english-academy/live/app.mjs`：原單字中心改成「先候選→網站本人確認→正式單字卡」；新增「錯句紀錄」、設定中的 24 小時 ChatGPT 學習對話來源授權、複製代碼與撤銷。沒有後端時顯示不可用，不會假裝儲存。
+- 測試：P11 Node 身分／RPC 契約、一次性 PostgreSQL17 P1→P11 真實 SQL、既有 Playwright 360px 手機及桌面瀏覽器回歸（合成資料），所有 PR CI 不含正式 deploy。
+
+**仍未完成正式工作：** P3 MCP 可信 bearer／Site→Google owner 原生雙向連結、原私人 Site 工具清單安全快照與正式接線、真實 P1→P11 migration、正式 Edge 部署、網站切換現有靜態體驗入口、真實 Google/A22/跨裝置驗收與獨立資安複核。尤其 ChatGPT 目前仍未能在正式網站寫單字或錯句。
