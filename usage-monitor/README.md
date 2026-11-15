@@ -13,7 +13,19 @@
 - `supabase/functions/lizhi-usage-monitor/index.ts`：本人唯讀 `GET /snapshot?month=YYYY-MM`。無寫入/刪除功能；不暴露 service role key。
 - `usage-monitor/schema.draft.sql`：事件表、日統計及事件插入 trigger，草案**尚未套用**。合格的正式 migration 應由 Supabase CLI `supabase migration new` 建立並經過審核。
 - `supabase/functions/_shared/lizhi-usage-meter.ts`：在**既有 Edge 的同一次呼叫**中記錄一次 PostgREST INSERT；不能直接保證量測完整，且每次會增加 DB 寫入、傳輸及延遲。
-- `usage-monitor/budget-policy.mjs`：在 Supabase **外部閘道**使用的純計算策略與 `budget-policy.test.mjs` 單元測試。尚未接入任何正式入口，也不能在現階段保證防超額。
+- `usage-monitor/budget-policy.mjs`：在 Supabase **外部閘道**使用的純計算策略，官方數字缺失／超過 60 分鐘時對非必要流量 fail-closed；尚未接入正式入口，也沒有分散式原子預留。
+- `usage-monitor/monitor-core.mjs`、`official-usage-contract.mjs`：區分觀測值／官方帳務、核對月份與帳單週期、處理過期快照及未知數據。
+- `supabase/functions/_shared/lizhi-usage-payload.mjs`：去識別化事件 payload，加入隨機 request_id 與敏感路由輸入限制。
+- 上述四個純模組各有 12 個 Node 測試，共 48/48 PASS；這不是資料庫、Edge 或網頁端到端驗收。
+
+## 階段報告與進度（2026-11-15）
+
+- P0 盤點：已完成唯讀盤點，部分大型匯出 Edge 內容／真實官方帳務仍 NOT_TESTED。[P0 Drive 報告](https://docs.google.com/document/d/1Y5aJcPZMoY20GlIln5QPFTVn10IAa7CEc5I12k8x9kw/edit)
+- P1 儀表板：候選修正／12 個純模組測試 PASS；真正登入及手機實機 NOT_TESTED。[P1 Drive 報告](https://docs.google.com/document/d/19qkEE8C_rxuufR_mTe66nzAiweLAlkFXC6LOLbwwg2c/edit)
+- P2 逐筆／彙總：候選 schema、資料最小化與去重；12 個 payload 測試 PASS；SQL/交易/自耗量 NOT_TESTED。[P2 Drive 報告](https://docs.google.com/document/d/1GvBQWyq_HLGzE_E51-YyLjt142D3apnv81AHfJQSP7M/edit)
+- P3 官方對帳：官方 API 盤點與快照契約，12 個測試 PASS；真實官方帳務接線 NOT_TESTED。[P3 Drive 報告](https://docs.google.com/document/d/1n1VXduxyy9pH19rPPtw--jzhnthaL-5yUhJErH7wHa4/edit)
+- P4 限流：只完成純政策候選／12 個測試 PASS；外部閘道、原子計數、繞過防護 NOT_TESTED。[P4 Drive 報告](https://docs.google.com/document/d/1N7xnTZHD-2d69BqNyO8eYzYRquiToYaxLbTVQ0p1GH4/edit)
+- P5 全部 22 Edge 接線、P6 正式上線：**BLOCKED**。沒有使用者對正式部署及高風險路由變更的明確核定、資料庫／Edge 隔離驗收及外部閘道實測時，不得自行發布。
 
 ## 後端安全與部署前置作業
 
@@ -33,19 +45,19 @@
 | 項目 | 初始設定 |
 | --- | --- |
 | Edge Function Invocations | 500,000 次 |
-| Uncached Egress | 5 GiB 參考（平台標示 GB，使用前須核對十進位/二進位） |
-| Cached Egress | 5 GiB 參考（同上） |
-| Database size | 500 MiB 參考 |
-| Storage size | 1 GiB 參考 |
+| Uncached Egress | 5 GB／月，候選使用十進位 bytes（仍需依官方 Billing 校對） |
+| Cached Egress | 5 GB／月，與一般 Egress 分開 |
+| Database size | 500 MB／專案參考 |
+| Storage size | 1 GB 參考 |
 | Realtime messages | 2,000,000 則 |
 
-> 重要：以上數字是尚未部署的參考設定，且使用了程式的 1024 制近似值；正式保護閘道應改用官方一致的單位與即時讀回的帳務上限。Data API 請求數通常沒有固定免費「次數上限」，但仍受平台速率／資源政策所限。
+> 重要：以上數字是尚未部署的參考設定。候選 UI 對一般 Egress 已採 1000 進位 GB，但須依官方 Usage 實際計量單位與帳單週期重驗。Data API 請求數通常沒有固定免費「次數上限」，但仍受平台速率／資源政策所限。
 
 ## 使用者看到的數字
 
 - `已觀測`：有導入記錄器的 Edge 請求，非全站呼叫數。
 - `response_bytes_known`：只有回應存在可用 `Content-Length` 時才有計算；未知的數量用 `unknown_response_count` 另外累積。並非實際 Supabase Egress。
-- `official_used`：現在全部 **null**；必須經官方 Usage reconciliation 才能改。
+- `official_used`：現在全部 **null**；必須經官方 Usage reconciliation 才能改。官方 Management API 可提供某些專案 API count，不可自動視為完整組織級 Edge/Egress 計費數據。
 - `日期`：候選版按 UTC 月份歸檔。正式版本需先核對帳單週期與用量重設邊界；不能假設每月 1 日零時清零。
 - `逐筆`：有 72 小時保存限制的規劃，觸發早退/崩潰或未接入服務可能漏記，不能保證 100%。
 - 監控網站自己打 `/snapshot` 也會消耗一次 Edge invocation，預設只在手動更新或切換月份時查一次，不自動秒級輪詢。
@@ -54,14 +66,14 @@
 
 - 70% 警告，85% 背景請求限流，95% 非必要請求阻擋。
 - 保留經過嚴格本人驗證的緊急登入、修復和救援通道；任何白名單不得可由匿名者自我宣告。
-- `officialUsed` 不可得時，已記錄用量只是下限。完全未知時，背景和非必要流量可採 fail closed；關鍵救援入口可保留，但這也意味不保證 100% 不超額。
+- `officialUsed` 不可得或官方快照超過 60 分鐘時，已記錄用量只能視為下限；候選政策對 background/optional 直接 fail closed，僅可信的 critical 救援入口可保留。這不保證 100% 不超額，而且未導入原子預留。
 - Edge Function 內判斷 429 **已消耗 invocation**，不能代替前置閘道。Direct PostgREST、Realtime、Storage、未改入口和其他客戶端仍可繞過；需逐項切換成真正受保護的入口並驗證。
 - 前置閘道需獨立的高可用執行環境和可靠計數器；不應再放一個 Supabase Edge 當前置閘道，以免反而增加用量。導入其他提供商或付費服務前必須取得使用者批准。
 
 ## 驗收清單
 
 - [ ] SQL 備份／還原 PASS，RLS / grants / owner 驗證 PASS。
-- [ ] `node --test usage-monitor/budget-policy.test.mjs` PASS。
+- [x] 純模組 Node 回歸：48/48 PASS（Git blob SHA 已核對；包含 P1/P2/P3/P4），但未通過 Edge/DB/實機。
 - [ ] 前端手機／電腦版、登出失效、非本人、匿名及跨來源 PASS。
 - [ ] 模擬事件的每日計數、重複事件、未知 response size、72h 清理 PASS。
 - [ ] 監控本身的資料庫容量和 Edge 自耗量已測試並低於自訂上限。
@@ -75,3 +87,7 @@
 - https://supabase.com/docs/guides/platform/manage-your-usage/edge-function-invocations
 - https://supabase.com/docs/guides/platform/cost-control
 - https://supabase.com/docs/guides/observability/reports
+- https://supabase.com/docs/reference/api/v1-get-project-usage-api-count
+- https://supabase.com/docs/reference/api/v1-get-project-usage-request-count
+- https://supabase.com/docs/guides/observability/metrics
+- https://supabase.com/docs/guides/platform/personal-access-tokens
