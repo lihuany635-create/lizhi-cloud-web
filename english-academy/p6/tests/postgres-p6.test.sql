@@ -114,4 +114,30 @@ begin
  end if;
 end $$;
 reset role;
+
+-- Sense-specific candidate survives formal promotion without being collapsed.
+set role service_role;
+do $
+declare
+ c_id uuid;
+ r jsonb;
+begin
+ perform public.english_p6_ingest_batch(
+  '11111111-1111-4111-8111-111111111111','approved-session-001',
+  'p6-sync-000000000005','[{"term":"beam","meaningZh":"樑","senseKey":"engineering"}]'::jsonb,'[]'::jsonb);
+ select id into c_id from public.english_card_candidates
+  where owner_id='11111111-1111-4111-8111-111111111111'
+    and normalized_term='beam' and sense_key='engineering';
+ if c_id is null then raise exception 'P6_SENSE_NOT_SAVED'; end if;
+ r=public.english_promote_candidate(
+  '11111111-1111-4111-8111-111111111111',c_id,
+  'p6-promote-000000001','digest-beam-engineering-001');
+ if r->>'status'<>'accepted' then raise exception 'P6_PROMOTE_FAILED %',r;end if;
+ if not exists(select 1 from public.english_cards
+  where owner_id='11111111-1111-4111-8111-111111111111'
+    and normalized_term='beam' and sense_key='engineering') then
+   raise exception 'P6_SENSE_LOST_DURING_PROMOTION';
+ end if;
+end $;
+reset role;
 select 'P6_ATOMIC_SESSION_SYNC_RLS_PASS' as result;
