@@ -10,7 +10,7 @@ let server,origin,db;
 test.before(async()=>{
   db={cards:[{id:'dddddddd-dddd-4ddd-8ddd-dddddddddddd',term:'rice',meaning_zh:'米飯',example_en:'I eat rice.'}],
       candidates:[{id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',term:'hungry',meaning_zh:'飢餓的',example_en:'I am hungry.',status:'pending'}],
-      errors:[{id:'fake-error-1',original_sentence:'He go yesterday.',corrected_sentence:'He went yesterday.',explanation:'Use past tense.'}]};
+      errors:[{id:'fake-error-1',original_sentence:'He go yesterday.',corrected_sentence:'He went yesterday.',explanation:'Use past tense.'}],sessions:[]};
   server=createServer(async(req,res)=>{
     const url=new URL(req.url,'http://127.0.0.1');
     if(url.pathname==='/host-test'){
@@ -37,6 +37,17 @@ test.before(async()=>{
       if(action==='cards')return json({items:db.cards});
       if(action==='candidates')return json({items:db.candidates.filter(x=>x.status==='pending')});
       if(action==='errors')return json({items:db.errors});
+      if(action==='sessions')return json({items:db.sessions});
+      if(action==='authorize-session'){
+        const row={owner_id:'synthetic-owner',source_session_id:'chat-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+          enabled:true,expires_at:'2099-12-31T00:00:00Z'};
+        db.sessions.push(row);return json({status:'authorized',sourceSessionId:row.source_session_id});
+      }
+      if(action==='revoke-session'){
+        const row=db.sessions.find(x=>x.source_session_id===body.sourceSessionId);
+        if(!row)return json({code:'CHAT_SESSION_NOT_FOUND'},404);
+        row.enabled=false;return json({status:'revoked',sourceSessionId:row.source_session_id});
+      }
       if(action==='candidate'){
         const item={id:'fffffff0-ffff-4fff-8fff-ffffffffffff',term:body.term,meaning_zh:body.meaningZh,status:'pending'};
         db.candidates.push(item);return json({id:item.id,status:'pending'},201);
@@ -96,6 +107,11 @@ test('authenticated host iframe fetches private cards with bearer and can review
    assert.ok(db.cards.some(x=>x.term==='apple'));
    await f.locator('button[data-tab="errors"]').first().click();
    assert.match(await f.locator('body').innerText(),/He went yesterday/);
+   await f.locator('button[data-tab="settings"]').first().click();
+   await f.locator('button[data-authorize-session]').click();
+   assert.match(await f.locator('body').innerText(),/chat-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/);
+   await f.locator('button[data-revoke-session]').click();
+   assert.equal(db.sessions[0].enabled,false);
    const overflow=await f.locator('html').evaluate(el=>({
      width:el.clientWidth,scroll:el.scrollWidth
    }));
