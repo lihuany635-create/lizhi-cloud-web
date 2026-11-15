@@ -2,6 +2,9 @@
 -- Requires P1 schema and P5 aggregate schema installed in a disposable PG17 database.
 begin;
 
+alter table public.english_card_candidates
+ add column if not exists sense_key text not null default '' check (char_length(sense_key)<=80);
+
 create table if not exists public.english_p6_sync_requests(
  owner_id uuid not null,
  request_id text not null check (char_length(request_id) between 12 and 100),
@@ -84,7 +87,7 @@ declare
  term_text text;
  normalized text;
  meaning text;
- sense_key text;
+ v_sense_key text;
  orig_text text;
  corrected text;
  explanation text;
@@ -130,21 +133,21 @@ begin
    if jsonb_typeof(item)<>'object' then raise exception 'INVALID_CANDIDATE'; end if;
    term_text=pg_catalog.btrim(item->>'term');
    meaning=pg_catalog.btrim(item->>'meaningZh');
-   sense_key=coalesce(pg_catalog.btrim(item->>'senseKey'),'');
+   v_sense_key=coalesce(pg_catalog.btrim(item->>'senseKey'),'');
    normalized=pg_catalog.lower(pg_catalog.regexp_replace(term_text,'[[:space:]]+',' ','g'));
    if term_text is null or meaning is null or char_length(term_text) not between 1 and 120 or
-     char_length(meaning) not between 1 and 500 or char_length(sense_key)>80
+     char_length(meaning) not between 1 and 500 or char_length(v_sense_key)>80
       then raise exception 'INVALID_CANDIDATE'; end if;
    -- Existing active card or pending candidate is a duplicate.
    if exists(select 1 from public.english_cards where owner_id=p_owner_id and
-        normalized_term=normalized and sense_key=sense_key) or
+        normalized_term=normalized and sense_key=v_sense_key) or
       exists(select 1 from public.english_card_candidates where owner_id=p_owner_id and
-        normalized_term=normalized and status='pending') then
+        normalized_term=normalized and sense_key=v_sense_key and status='pending') then
       duplicate_count=duplicate_count+1;
    else
      insert into public.english_card_candidates(
-       owner_id,source_event_id,term,normalized_term,meaning_zh,status)
-     values(p_owner_id,'p6:'||p_request_id||':'||i,term_text,normalized,meaning,'pending');
+       owner_id,source_event_id,term,normalized_term,meaning_zh,sense_key,status)
+     values(p_owner_id,'p6:'||p_request_id||':'||i,term_text,normalized,meaning,v_sense_key,'pending');
      added=added+1;
    end if;
  end loop;
