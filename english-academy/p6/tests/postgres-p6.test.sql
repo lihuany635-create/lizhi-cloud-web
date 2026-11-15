@@ -117,7 +117,7 @@ reset role;
 
 -- Sense-specific candidate survives formal promotion without being collapsed.
 set role service_role;
-do $
+do $$
 declare
  c_id uuid;
  r jsonb;
@@ -138,6 +138,6 @@ begin
     and normalized_term='beam' and sense_key='engineering') then
    raise exception 'P6_SENSE_LOST_DURING_PROMOTION';
  end if;
-end $;
+end $$;
 reset role;
 select 'P6_ATOMIC_SESSION_SYNC_RLS_PASS' as result;
