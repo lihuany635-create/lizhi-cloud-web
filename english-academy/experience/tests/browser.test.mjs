@@ -185,8 +185,11 @@ test('portal CSS cache versions and English panel sizing stay in sync',async()=>
  const css=await readFile(new URL('study.css',repoRoot),'utf8');
  const index=await readFile(new URL('index.html',repoRoot),'utf8');
  const sw=await readFile(new URL('sw.js',repoRoot),'utf8');
- assert.match(css,/\\.route-english\\s+\\.workspace-panel\\s*\\{[^}]*height:\\s*100%;[^}]*min-height:\\s*0;/s);
- const version=index.match(/study\\.css\\?v=(\\d+)/)?.[1];
+ const rule=css.match(/\.route-english\s+\.workspace-panel\s*\{([^}]*)\}/s)?.[1];
+ assert.ok(rule,'Missing English-only workspace panel height rule');
+ assert.match(rule,/height:\s*100%/);
+ assert.match(rule,/min-height:\s*0/);
+ const version=index.match(/study\.css\?v=(\d+)/)?.[1];
  assert.ok(version,'Missing versioned study.css in portal HTML');
  assert.ok(sw.includes('study.css?v='+version),'Service worker must cache the same English lesson stylesheet version');
 });
