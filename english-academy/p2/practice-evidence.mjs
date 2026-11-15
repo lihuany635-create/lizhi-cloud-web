@@ -11,7 +11,7 @@ const objective = new Set(['choice','spelling','fill','translation','listening']
 
 export function normalizeEnglish(value) {
   return String(value??'').normalize('NFKC').toLocaleLowerCase('en')
-    .replace(/[.,!?;:]+$/gu,'').trim().replace(/\s+/gu,' ');
+    .trim().replace(/\s+/gu,' ').replace(/[.,!?;:]+$/gu,'');
 }
 export function gradePractice({mode,expected,answer}){
   if(!PRACTICE_SET.has(mode))throw new TypeError('UNSUPPORTED_PRACTICE');
