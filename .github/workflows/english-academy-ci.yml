@@ -43,3 +43,27 @@ jobs:
           path: english-academy/test-results/
           if-no-files-found: ignore
           retention-days: 7
+
+  postgres-rls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      pg:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: temporary-ci-test-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test unapplied migration in disposable PostgreSQL 17 service
+        run: |
+          set -euo pipefail
+          DB_CONTAINER=$(docker ps --filter ancestor=postgres:17 --format '{{.ID}}' | head -1)
+          test -n "$DB_CONTAINER"
+          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-fixture.sql
+          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/schema/20261115_p1_candidate.sql
+          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-rls.test.sql
