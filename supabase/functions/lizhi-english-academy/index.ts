@@ -20,7 +20,10 @@ Deno.serve(async(req:Request)=>{
  // The original private Site supplies its existing server-only bridge key.
  // SQL resolves/rechecks the original owner binding and English consent.
  if(new URL(req.url).pathname.split('/').filter(Boolean).at(-1)==='mcp'){
-  if(Deno.env.get('ENGLISH_P12_MCP_APPROVED')!=='true')
+  // Explicitly approved owner-only MCP backend. The SQL bridge resolver
+  // still denies every unlinked/unauthorized key; a server env setting can
+  // shut this namespace down without changing the legacy Site.
+  if(Deno.env.get('ENGLISH_P12_MCP_APPROVED')==='false')
    return Response.json({code:'ENGLISH_MCP_NOT_ENABLED'},{status:503});
   try{return await createProductionEnglishMcp({env})(req);}
   catch{return Response.json({code:'ENGLISH_BACKEND_UNAVAILABLE'},{status:503});}
