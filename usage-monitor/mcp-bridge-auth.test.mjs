@@ -1,6 +1,6 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
-import {verifySiteBridge} from "./mcp-bridge-auth.mjs";
+import {verifySiteBridge} from "../supabase/functions/_shared/lizhi-usage-mcp-bridge-auth.mjs";
 const secret="a".repeat(64);
 const actor="chatgpt:verified-owner-123";
 const config={secret,actor};
