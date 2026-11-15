@@ -15,6 +15,11 @@ test.before(async()=>{
    res.end('<!doctype html><html><meta name="viewport" content="width=device-width,initial-scale=1"><body><script>window.LizhiAuth={user:{email:"test-owner@example.invalid"},allowedEmail:"test-owner@example.invalid"};</script><iframe id="english-frame" src="/english-academy/experience/" style="border:0;width:100%;height:730px"></iframe></body></html>');
    return;
   }
+  if(path==='/__english_portal_layout__'){
+   res.writeHead(200,{'content-type':'text/html; charset=utf-8'});
+   res.end(`<!doctype html><html lang="zh-Hant"><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/study.css"></head><body><script>window.LizhiAuth={user:{email:"test-owner@example.invalid"},allowedEmail:"test-owner@example.invalid"};</script><div class="shell route-english"><header class="topbar">立之雲端庫</header><main class="main"><section class="study-embedded english-academy-embedded"><header class="study-embedded-toolbar"><div><div class="eyebrow">ENGLISH LEARNING · EXPERIENCE</div><h1>英文學習教室</h1><p>七種練習題型與入門測驗；目前為不儲存資料的體驗版。</p></div><div class="actions"><span class="chip">限本人從主站登入使用</span></div></header><div class="study-frame-wrap"><iframe id="english-frame" title="英文學習教室" src="/english-academy/experience/"></iframe></div></section></main></div></body></html>`);
+   return;
+  }
   const relative=path.endsWith('/')?path.slice(1)+'index.html':path.slice(1);
   if(!/^[A-Za-z0-9._/-]+$/.test(relative)||relative.includes('..')){
    res.writeHead(403);res.end();return;
@@ -97,5 +102,31 @@ test('diagnostic route and dark theme remain operable with no cloud writes',asyn
   assert.ok(requests.every(q=>q.method==='GET'));
   assert.ok(requests.every(q=>q.url.startsWith(base)));
   await p.screenshot({path:new URL('english-experience-desktop.png',screenshots).pathname,fullPage:true});
+ }finally{await browser.close();}
+});
+
+test('real portal CSS gives English lessons the remaining viewport on phones, landscape and desktop',async()=>{
+ const browser=await chromium.launch({headless:true});
+ try{
+  for(const [width,height] of [[320,640],[360,780],[393,852],[667,375],[1280,900]]){
+   const p=await browser.newPage({viewport:{width,height},isMobile:width<700,hasTouch:width<700});
+   const errors=[];p.on('pageerror',e=>errors.push(e.message));
+   await p.goto(base+'/__english_portal_layout__');
+   const frame=p.frameLocator('#english-frame');
+   await frame.getByText('七種英文練習').waitFor();
+   const d=await p.locator('#english-frame').evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    return {top:r.top,bottom:r.bottom,height:r.height,viewport:innerHeight,
+      parentHeight:el.parentElement.clientHeight,
+      documentWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth};
+   });
+   assert.ok(d.height>=d.viewport*.52,'Lesson frame too small for '+width+'x'+height+': '+JSON.stringify(d));
+   assert.ok(Math.abs(d.viewport-d.bottom)<=4,'Unused blank space below iframe at '+width+'x'+height+': '+JSON.stringify(d));
+   assert.ok(d.documentWidth<=d.clientWidth+1,'Portal horizontal overflow at '+width+'x'+height+': '+JSON.stringify(d));
+   await frame.locator('button[data-flip="3"]').click();
+   assert.match(await frame.locator('[role="status"]').innerText(),/已記錄示範操作/);
+   assert.deepEqual(errors,[],'Page errors at '+width+'x'+height);
+   await p.close();
+  }
  }finally{await browser.close();}
 });
