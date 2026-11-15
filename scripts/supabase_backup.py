@@ -428,7 +428,7 @@ def local_inventory(local_sql):
     tree = ast.parse(Path(__file__).read_text())
     fn = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "inventory")
     assignment = next(n for n in fn.body if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "objects" for t in n.targets))
-    query = assignment.value.func.value.args[0].value
+    query = assignment.value.args[0].value
     objects = json.loads(local_sql("select coalesce(json_agg(row_to_json(x)), '[]') from (" + query + ") x;", "postgres"))
     large_objects = json.loads(local_sql("select coalesce(json_agg(row_to_json(x)), '[]') from (" + LARGE_OBJECT_SQL + ") x;", "postgres"))
     return {"tables": tables, "objects": [[r["kind"], r["name"], r["definition"]] for r in objects],
