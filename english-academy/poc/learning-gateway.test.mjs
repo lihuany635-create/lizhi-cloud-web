@@ -60,3 +60,15 @@ test('invalid idempotency token and blank term rejected without side effects', (
   assert.equal(createCandidateInMemory({ store, ...context, requestId: 'valid-request-000005', term: '  ' }).code, 'INVALID_TERM');
   assert.equal(store.candidates.size, 0);
 });
+
+test('reused request ID with a different term is rejected rather than silently replayed', () => {
+  const store = { candidates: new Map(), requests: new Map() };
+  const common = { store, ...context, requestId: 'valid-request-000006' };
+  const original = createCandidateInMemory({ ...common, term: 'apple' });
+  const conflict = createCandidateInMemory({ ...common, term: 'orange' });
+  assert.equal(original.candidate.term, 'apple');
+  assert.equal(conflict.allowed, false);
+  assert.equal(conflict.code, 'IDEMPOTENCY_CONFLICT');
+  assert.equal(store.candidates.size, 1);
+  assert.equal(store.requests.size, 1);
+});
