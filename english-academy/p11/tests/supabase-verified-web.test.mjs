@@ -22,6 +22,8 @@ function fixture({revoked=false,provider='google',ownerAllowed=true}={}){
   if(url.endsWith('/rpc/english_web_session_active'))return Response.json(!revoked);
   if(url.includes('/rpc/english_web_create_candidate'))
    return Response.json({status:'pending',id:'fake-candidate'});
+  if(url.includes('english_session_authorizations?'))
+   return Response.json([{owner_id:owner,source_session_id:'chat-fake-session',enabled:true}]);
   if(url.includes('english_card_candidates?'))
    return Response.json([{id:'fake-candidate',owner_id:owner,term:'museum',
     meaning_zh:'博物館',status:'pending'}]);
@@ -75,4 +77,14 @@ test('no env, host spoof or malformed access token may silently grant authorizat
   ...env,SUPABASE_URL:'https://attacker.example'}}),/ENV_REQUIRED/);
  const f=fixture();
  await assert.rejects(f.adapter.verifyOwner({bearer:'not-a-jwt'}));
+});
+
+test('authorized chat sessions remain owner-scoped and use grant-time ordering',async()=>{
+ const f=fixture();
+ const sessions=await f.adapter.trustedDb.select('english_session_authorizations',
+  {ownerId:owner,limit:10});
+ assert.equal(sessions.length,1);
+ const url=new URL(f.calls.at(-1).url);
+ assert.equal(url.searchParams.get('order'),'granted_at.desc');
+ assert.equal(url.searchParams.get('owner_id'),'eq.'+owner);
 });
