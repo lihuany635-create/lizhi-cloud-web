@@ -1,0 +1,107 @@
+{
+  "kind": "english-academy-p10-candidate-chain",
+  "recordedDate": "2026-11-15",
+  "environment": "isolated",
+  "mainSnapshotSha": "0f2753df339595c044cc9497b59f5c6a53a3401e",
+  "p0": "P0 architecture included in P1 draft; no independent P0 PR",
+  "upstream": [
+    {
+      "stage": "P1",
+      "pr": 60,
+      "base": "main",
+      "head": "feature/english-academy-p1-20261115",
+      "headSha": "0df61f31ba4cb935e65f6c88ed584d1d170e51ce",
+      "draft": true,
+      "merged": false
+    },
+    {
+      "stage": "P2",
+      "pr": 61,
+      "base": "feature/english-academy-p1-20261115",
+      "head": "feature/english-academy-p2-parallel-20261115",
+      "headSha": "c96a555f118249bbfb0f492e11564381e6b03016",
+      "draft": true,
+      "merged": false
+    },
+    {
+      "stage": "P3",
+      "pr": 62,
+      "base": "feature/english-academy-p2-parallel-20261115",
+      "head": "feature/english-academy-p3-parallel-20261115",
+      "headSha": "33d62e9c7124c083ae7c734359b947c02d0c05f1",
+      "draft": true,
+      "merged": false
+    },
+    {
+      "stage": "P4",
+      "pr": 63,
+      "base": "feature/english-academy-p3-parallel-20261115",
+      "head": "feature/english-academy-p4-parallel-20261115",
+      "headSha": "49a7ab0f069ffab070d5dff2adccb9920dac83a3",
+      "draft": true,
+      "merged": false
+    },
+    {
+      "stage": "P5",
+      "pr": 64,
+      "base": "feature/english-academy-p4-parallel-20261115",
+      "head": "feature/english-academy-p5-isolated-20261115",
+      "headSha": "6795df735f33cdd89f61e12cae8c17bfdf3d11b7",
+      "draft": true,
+      "merged": false
+    },
+    {
+      "stage": "P6",
+      "pr": 65,
+      "base": "feature/english-academy-p5-isolated-20261115",
+      "head": "feature/english-academy-p6-parallel-20261115",
+      "headSha": "1ef83fdf8c790120e6549963752e5a3bb8724cfd",
+      "draft": true,
+      "merged": false
+    },
+    {
+      "stage": "P7",
+      "pr": 66,
+      "base": "feature/english-academy-p6-parallel-20261115",
+      "head": "feature/english-academy-p7-integration-20261115",
+      "headSha": "315cbaacf65d9b0cb3419ea64322ee60fc82981b",
+      "draft": true,
+      "merged": false
+    },
+    {
+      "stage": "P8",
+      "pr": 67,
+      "base": "feature/english-academy-p7-integration-20261115",
+      "head": "feature/english-academy-p8-acceptance-20261115",
+      "headSha": "c8f3655920bdaacec6c87f10df5909cbb9de28d5",
+      "draft": true,
+      "merged": false
+    },
+    {
+      "stage": "P9",
+      "pr": 69,
+      "base": "feature/english-academy-p8-acceptance-20261115",
+      "head": "feature/english-academy-p9-release-readiness-20261115",
+      "headSha": "2163f3ae8ef5968339042b87b8a8b3e68c28705c",
+      "draft": true,
+      "merged": false
+    }
+  ],
+  "p10": {
+    "branch": "feature/english-academy-p10-integrate-audit-20261115",
+    "base": "feature/english-academy-p9-release-readiness-20261115"
+  },
+  "formalAcceptance": {
+    "required": 12,
+    "passed": 0,
+    "status": "NOT_YET_VERIFIED"
+  },
+  "approvalScopes": {
+    "supabaseSchema": false,
+    "supabaseEdge": false,
+    "privateSite": false,
+    "mainMerge": false,
+    "pages": false
+  },
+  "note": "Snapshot, not a claim all branches are merge-ready. Git history and current PR metadata must be independently checked before any authorized merge."
+}

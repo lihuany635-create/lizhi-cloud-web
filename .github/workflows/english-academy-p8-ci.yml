@@ -1,0 +1,154 @@
+name: English Academy P8 isolated full acceptance
+on:
+  pull_request:
+    paths:
+      - 'english-academy/**'
+      - 'supabase/functions/lizhi-english-academy/index.ts'
+      - '.github/workflows/english-academy-p8-ci.yml'
+permissions:
+  contents: read
+
+jobs:
+  all-stage-contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install pinned FSRS library without running scripts
+        working-directory: english-academy/p2
+        run: npm install --ignore-scripts --no-audit --no-fund --no-package-lock
+      - name: Validate P8 acceptance gate syntax
+        run: |
+          node --check english-academy/p8/acceptance-matrix.mjs
+          node --check english-academy/p8/tests/acceptance.test.mjs
+          node --check english-academy/p8/scripts/generate-status.mjs
+      - name: Run P0-P8 unit and safety contract suites with synthetic owners
+        run: |
+          node --test \
+            english-academy/poc/*.test.mjs \
+            english-academy/preview/state.test.mjs \
+            english-academy/tests/p1-api.test.mjs \
+            english-academy/tests/routing.test.mjs \
+            english-academy/tests/schema-contract.test.mjs \
+            english-academy/p2/tests/*.test.mjs \
+            english-academy/p3/tests/*.test.mjs \
+            english-academy/p4/tests/adaptive-planner.test.mjs \
+            english-academy/p4/tests/curriculum.test.mjs \
+            english-academy/p4/tests/error-drills.test.mjs \
+            english-academy/p4/tests/learning-report.test.mjs \
+            english-academy/p5/tests/*.test.mjs \
+            english-academy/p6/tests/practice-diagnostic.test.mjs \
+            english-academy/p6/tests/persistent-adapter.test.mjs \
+            english-academy/p7/tests/integration.test.mjs \
+            english-academy/p8/tests/acceptance.test.mjs
+      - name: Export non-authoritative P8 formal acceptance matrix
+        run: node english-academy/p8/scripts/generate-status.mjs
+      - name: Retain machine-readable G01-G12 pending matrix
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p8-twelve-formal-gates-pending
+          path: english-academy/p8/test-results/formal-gates.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  browser-all-pages:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install temporary Chromium only
+        working-directory: english-academy
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.55.1
+          npx playwright install --with-deps chromium
+      - name: Recheck P1/P4/P6 mobile and desktop UIs
+        run: |
+          node --test \
+            english-academy/tests/browser-smoke.test.mjs \
+            english-academy/tests/live-browser.test.mjs \
+            english-academy/p4/tests/browser.test.mjs \
+            english-academy/p6/tests/browser.test.mjs
+      - name: Store synthetic screenshots without tokens
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p8-all-stages-synthetic-screenshots
+          path: |
+            english-academy/test-results/
+            english-academy/p4/test-results/
+            english-academy/p6/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  postgres-rls-consent-and-restore:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      pg:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: temporary-ci-test-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create only synthetic P1/P5 schema, tests, and restore proof
+        run: |
+          set -euo pipefail
+          CID=$(docker ps --filter ancestor=postgres:17 --format '{{.ID}}' | head -1)
+          test -n "$CID"
+          echo "$CID" > /tmp/p8-pg-id
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-fixture.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/schema/20261115_p1_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-rls.test.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p5/schema/20261115_p5_aggregate_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-aggregate-fixture.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-aggregate-assert.sql
+          docker exec "$CID" pg_dump -U postgres -d postgres -Fc --data-only \
+            --no-owner --no-acl -t 'public.english_*' -f /tmp/p8-synthetic.backup
+          docker exec "$CID" createdb -U postgres english_p8_restore
+          docker exec -i "$CID" psql -U postgres -d english_p8_restore -v ON_ERROR_STOP=1 < english-academy/tests/postgres-fixture.sql
+          docker exec -i "$CID" psql -U postgres -d english_p8_restore -v ON_ERROR_STOP=1 < english-academy/schema/20261115_p1_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d english_p8_restore -v ON_ERROR_STOP=1 < english-academy/p5/schema/20261115_p5_aggregate_candidate.sql
+          docker exec "$CID" pg_restore -U postgres -d english_p8_restore \
+            --data-only --single-transaction --exit-on-error /tmp/p8-synthetic.backup
+          docker exec -i "$CID" psql -U postgres -d english_p8_restore -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-restore-assert.sql
+          docker exec -i "$CID" psql -U postgres -d english_p8_restore -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-aggregate-assert.sql
+          echo P8_DISPOSABLE_P1_P5_BACKUP_RESTORE_PASS
+      - name: Verify subsequent P6/P7 transactions and private consent
+        run: |
+          set -euo pipefail
+          CID=$(cat /tmp/p8-pg-id)
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p6/schema/20261115_p6_learning_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p6/tests/postgres-p6.test.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p7/schema/20261115_p7_owner_link_and_consent_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p7/tests/postgres-p7.test.sql
+          echo P8_P1_TO_P7_SYNTHETIC_SCHEMA_RLS_AND_CONSENT_PASS
+      - name: Destroy synthetic backup in container
+        if: always()
+        run: |
+          if test -f /tmp/p8-pg-id; then
+            CID=$(cat /tmp/p8-pg-id)
+            docker exec "$CID" rm -f /tmp/p8-synthetic.backup || true
+          fi
+
+  deno-edge-nondeployment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check undeployed English Edge only
+        run: deno check supabase/functions/lizhi-english-academy/index.ts
