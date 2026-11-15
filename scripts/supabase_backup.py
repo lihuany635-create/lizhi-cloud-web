@@ -297,9 +297,13 @@ def main():
     PHASE = "isolated-replay-archived-relation-permissions"
     before_acl = local_inventory(local_sql)
     restore_snapshot_relation_acls(local_sql, source, before_acl)
-    PHASE = "complete-data-and-object-comparison"
-    actual = normalize_default_relation_acls(local_inventory(local_sql), local_sql)
+    PHASE = "isolated-second-inventory"
+    current_inventory = local_inventory(local_sql)
+    PHASE = "isolated-normalize-restored-acls"
+    actual = normalize_default_relation_acls(current_inventory, local_sql)
+    PHASE = "snapshot-normalize-archived-acls"
     source = normalize_default_relation_acls(source, local_sql)
+    PHASE = "complete-data-and-object-comparison"
     if json.loads(json.dumps(actual)) != json.loads(json.dumps(source)):
         # Log only aggregate diagnostics, never identifiers, definitions or rows.
         src_tables, dst_tables = source["tables"], actual["tables"]
@@ -428,7 +432,7 @@ def local_inventory(local_sql):
     tree = ast.parse(Path(__file__).read_text())
     fn = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "inventory")
     assignment = next(n for n in fn.body if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "objects" for t in n.targets))
-    query = assignment.value.args[0].value
+    query = assignment.value.func.value.args[0].value
     objects = json.loads(local_sql("select coalesce(json_agg(row_to_json(x)), '[]') from (" + query + ") x;", "postgres"))
     large_objects = json.loads(local_sql("select coalesce(json_agg(row_to_json(x)), '[]') from (" + LARGE_OBJECT_SQL + ") x;", "postgres"))
     return {"tables": tables, "objects": [[r["kind"], r["name"], r["definition"]] for r in objects],
@@ -442,4 +446,5 @@ if __name__ == "__main__":
         # Never print exception repr, connection URIs, SQL or plaintext values.
         print("::error::Backup/restore gate FAIL in " + PHASE + ". Private exception details suppressed.", flush=True)
         print("Safe failure category: " + getattr(error, "safe_category", "unclassified"), flush=True)
+        print("Safe Python exception type: " + type(error).__name__, flush=True)
         sys.exit(1)
