@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Supabase 流量監控｜立之雲端庫</title>
+  <link rel="stylesheet" href="./monitor.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div><div class="eyebrow">LIZHI · PRIVATE OPERATIONS</div><h1>Supabase 流量監控</h1>
+      <p>逐筆追蹤已接入的服務，核對用量，提前保護免費額度。</p></div>
+      <div class="actions"><a class="small-button" href="../?open=home">返回雲端庫</a><button id="refresh" class="primary" type="button" disabled>更新資料</button></div>
+    </header>
+    <div id="status" class="notice" role="status" aria-live="polite">正在驗證本人身分…</div>
+    <section aria-label="統計區" class="stats">
+      <div class="stat"><div>已監測 Edge 呼叫</div><strong id="invocations">—</strong><span id="invocationLimit">免費參考上限：500,000／月</span></div>
+      <div class="stat"><div>已記錄傳出量</div><strong id="egress">—</strong><span>不是 Supabase 官方 Egress 數字</span></div>
+      <div class="stat"><div>已阻擋請求</div><strong id="blocked">—</strong><span>應用層保護紀錄</span></div>
+      <div class="stat"><div>本次資料範圍</div><strong id="coverage">未接入</strong><span>只有導入紀錄器的服務會出現</span></div>
+    </section>
+    <div class="row-head"><div><h2>用量概況</h2><p>所有預估資料和官方計費指標必須分開呈現。</p></div>
+      <label for="month">月份 <input id="month" type="month"></label></div>
+    <section id="resources" class="resources" aria-live="polite"></section>
+    <div class="row-head"><div><h2>服務流量</h2><p>依已接入的 Edge 服務彙總；不是全部 Supabase 流量。</p></div></div>
+    <div class="table-scroll"><table><thead><tr><th>服務</th><th>呼叫</th><th>記錄傳出量</th><th>已阻擋</th><th>失敗</th></tr></thead><tbody id="services"><tr><td colspan="5">尚無資料</td></tr></tbody></table></div>
+    <div class="row-head"><div><h2>最近 100 筆事件</h2><p>不保存密碼、授權標頭、請求內容或個人帳本。</p></div></div>
+    <div class="table-scroll"><table><thead><tr><th>時間</th><th>服務</th><th>路由</th><th>狀態</th><th>傳出位元組</th><th>決策</th></tr></thead><tbody id="events"><tr><td colspan="6">尚無資料</td></tr></tbody></table></div>
+    <footer>目前僅為開發候選版。未完成正式部署、全部服務接入及官方用量對帳前，不得宣稱能精準避免超額。
+      <a href="https://supabase.com/dashboard/org/_/usage" target="_blank" rel="noopener noreferrer">開啟 Supabase 官方用量頁</a>
+    </footer>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase-config.js"></script>
+  <script src="../auth.js"></script>
+  <script src="./monitor.js" defer></script>
+</body>
+</html>
