@@ -3,7 +3,7 @@
 ## 目標與目前驗收狀態
 
 - 目標：使用現有「立之雲端庫」Supabase 專案，逐筆記錄**已接入**的請求、每日彙總、展示風險；依額度在 Supabase **入口之前**保護非必要流量。
-- **CANDIDATE ONLY**：所有檔案只在開發分支，沒有合併 main、沒有部署 Edge、沒有套用 SQL、沒有串接正式 22 個 Edge Functions、沒有查到真實帳務用量。
+- **混合狀態（2026-11-16 即時核對）**：已在原 Supabase 專案正式建立 `lz_usage_events`、`lz_usage_daily` 與 `private_lz.usage_rollup()`，Migration `20261115182955` 完成，RLS/匿名拒絕與回滾測試 PASS。**其他候選檔案仍只在 Draft PR #77**，尚未合併 main、未部署監控 Edge 或 Site、未串接既有 22 個 Edge，尚未取得官方帳務用量。
 - 現有 Supabase 組織已讀取為 Free，僅用於初始參考額度；部署前仍須核對官方 Dashboard 中的實際方案、帳務週期與每個用量分類。
 - GitHub Pages 服務的是靜態程式碼（公開可讀）；登入之後的監控資料由後端 OWNER UID 強制驗證，只有本人可取得。這**不是**把完整網站檔案隱藏起來的 Private Site；如需網站本身 Private，須另使用受本人驗證的私人 Site。
 
@@ -11,7 +11,7 @@
 
 - `usage-monitor/index.html`、`monitor.js`、`monitor.css`：獨立響應式管理頁。只有在後端確實存在且本人驗證通過後，才會顯示真實已記錄的監測數字；不製造假的用量。
 - `supabase/functions/lizhi-usage-monitor/index.ts`：本人唯讀 `GET /snapshot?month=YYYY-MM` 與 `POST /mcp`，六個 MCP 工具皆為唯讀；不暴露 service role key。
-- `usage-monitor/schema.draft.sql`：事件表、日統計及事件插入 trigger，草案**尚未套用**。合格的正式 migration 應由 Supabase CLI `supabase migration new` 建立並經過審核。
+- `usage-monitor/schema.draft.sql`：保留隔離測試用草案；正式 SQL 經已批准的 Supabase Migration 工具部署，版本 `20261115182955`，且已存到 `supabase/migrations/20261115182955_lizhi_usage_monitor_tables_and_rollup_20261116.sql`。不要再次執行草案。
 - `supabase/functions/_shared/lizhi-usage-meter.ts`：在**既有 Edge 的同一次呼叫**中記錄一次 PostgREST INSERT；不能直接保證量測完整，且每次會增加 DB 寫入、傳輸及延遲。
 - `usage-monitor/budget-policy.mjs`：在 Supabase **外部閘道**使用的純計算策略，官方數字缺失／超過 60 分鐘時對非必要流量 fail-closed；尚未接入正式入口，也沒有分散式原子預留。
 - `usage-monitor/monitor-core.mjs`、`official-usage-contract.mjs`：區分觀測值／官方帳務、核對月份與帳單週期、處理過期快照及未知數據。
@@ -39,8 +39,8 @@
 ## 後端安全與部署前置作業
 
 1. 先讀最新正式《AI 員工手冊》、路徑總索引、AI 工作台操作手冊與工作台目前任務；對齊既有生產維運。
-2. 建立備份、驗證還原；確認 GitHub PR 沒有觸發自動合併、main 發布或正式 Edge 操作。
-3. 以 CLI 新建正式 migration，對草案做安全審查及 transaction/rollback 測試；確認每個 public 表 RLS 開啟，`anon`、`authenticated` 對兩表沒有授權。
+2. **PASS 2026-11-16**：已完成加密完整備份、私人 Drive 保存、隔離 PostgreSQL 17 實際還原與全資料／物件比對；PR 仍 Draft，無 Site／Edge 發布。
+3. **PASS 2026-11-16**：原 Supabase 專案 Migration `20261115182955` 已部署並驗證兩表 RLS、deny anon/authenticated、service_role 授權、Trigger 統計、去重及子交易回滾；無測試殘留資料。
 4. 將 owner 的 **Supabase Auth User ID** 僅設在正式 Edge Secret `LIZHI_USAGE_OWNER_UID`，不提交到 GitHub；函式也依靠既有 `SUPABASE_URL`、`SUPABASE_ANON_KEY`、`SUPABASE_SERVICE_ROLE_KEY`。絕不可把 service_role 放前端。
 5. 依序在隔離環境測試 401（匿名）、403（他人）、503（缺少 Secret 或 DB 不可用）、200（本人）、CORS、防洩漏、安全性及效能。
 6. 人工批准後才部署第一階段的唯讀後端及登入頁。首頁不能把「已接入」的數據當作整個 Supabase 的官方使用量。
@@ -81,7 +81,7 @@
 
 ## 驗收清單
 
-- [ ] SQL 備份／還原 PASS，RLS / grants / owner 驗證 PASS。
+- [x] 正式加密資料庫備份／隔離還原 PASS，RLS / grants PASS，Edge owner HTTP 身分端對端另待驗證。
 - [x] 純模組 Node 回歸：48/48 PASS（Git blob SHA 已核對；包含 P1/P2/P3/P4），但未通過 Edge/DB/實機。
 - [ ] 前端手機／電腦版、登出失效、非本人、匿名及跨來源 PASS。
 - [ ] 模擬事件的每日計數、重複事件、未知 response size、72h 清理 PASS。
