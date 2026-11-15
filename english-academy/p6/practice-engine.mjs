@@ -11,6 +11,7 @@ const SKILLS=Object.freeze({
 });
 const isText=(x,max=500)=>typeof x==='string'&&x.trim().length>0&&x.length<=max;
 const unique=(arr)=>new Set(arr).size===arr.length;
+const asciiApostrophe=value=>String(value).replace(/[‘’]/gu,"'");
 
 export function validateExercise(q) {
   if(!q||typeof q!=='object'||Array.isArray(q)||!isText(q.id,80)||!SET.has(q.mode)||
@@ -64,9 +65,9 @@ export function gradeExercise({exercise,response,ownerId,attemptId,audioDelivere
     throw new TypeError('CHOICE_NOT_OFFERED');
   let outcome;
   if(q.mode==='translation'){
-    outcome=q.acceptedAnswers.some(a=>normalizeEnglish(a)===normalizeEnglish(response));
+    outcome=q.acceptedAnswers.some(a=>normalizeEnglish(asciiApostrophe(a))===normalizeEnglish(asciiApostrophe(response)));
   }else{
-    outcome=gradePractice({mode:q.mode,expected:q.expected,answer:response}).correct;
+    outcome=gradePractice({mode:q.mode,expected:asciiApostrophe(q.expected),answer:asciiApostrophe(response)}).correct;
   }
   return {...base,status:'objective-graded',correct:outcome,
     evidenceStatus:'observed',grader:'exact-match-v1',
