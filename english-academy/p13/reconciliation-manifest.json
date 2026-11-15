@@ -1,0 +1,29 @@
+{
+  "schema": "lizhi-english-main-reconcile/v1",
+  "baseMainCommit": "b720d57dc63247a39d4afa3afa7782908a8c1d02",
+  "p12CandidateCommit": "0be2d5cb38c96c355a233f2c72823ffabf62cfcb",
+  "sourceBranch": "feature/english-academy-p12-production-relay-20261115",
+  "importedNewBlobs": 124,
+  "matchingExistingBlobs": 7,
+  "sourcePrefixes": [
+    "english-academy/",
+    ".github/workflows/english-academy-",
+    "supabase/functions/lizhi-english-academy/index.ts",
+    "sites-migration/english-academy-p12/"
+  ],
+  "reviewedLocalChanges": [
+    "english-academy/tests/routing.test.mjs",
+    ".github/workflows/english-academy-p10-ci.yml"
+  ],
+  "mustPreserve": [
+    "app.js",
+    "auth.js",
+    "workspace-ui.js",
+    "index.html",
+    "english-academy/experience/app.mjs",
+    "english-academy/experience/index.html",
+    "english-academy/experience/styles.css"
+  ],
+  "status": "draft-not-deployed",
+  "independentSecurityApproval": "PENDING"
+}
