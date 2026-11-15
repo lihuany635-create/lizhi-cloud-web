@@ -18,8 +18,8 @@ const d=()=>DIAGNOSTIC_BANK[diagnosticPos];
 const btn=(label,action,extra='')=>'<button type="button" class="button '+extra+'" '+action+'>'+label+'</button>';
 function header(){
  return '<header class="p6-header"><div class="p6-logo">E · 英文學習教室</div>'+
-  '<span class="pill">練習體驗版 · ChatGPT MCP 已可同步候選單字</span></header>'+
-  '<div class="notice">本頁使用示範題目，不會自動儲存測驗作答或評估 CEFR。你可以直接在 ChatGPT 請我整理並同步單字或錯句到待審核區；不需要再次授權。正式單字卡仍須由你在網站審核。</div>'+
+  '<span class="pill">練習體驗版 · 雲端紀錄已接通</span></header>'+
+  '<div class="notice">本頁使用示範題目，作答不會自動存檔或評估 CEFR。你可以直接在 ChatGPT 請我同步單字與錯句，不必另行授權；上方能查看實際已保存的雲端紀錄。正式單字卡的審核功能尚未整合到這個練習頁面。</div>'+
   '<nav class="p6-switch" aria-label="學習模式">'+
   btn('七題型練習','data-page="practice"',page==='practice'?'active':'')+
   btn('初始程度測驗','data-page="diagnostic"',page==='diagnostic'?'active':'')+

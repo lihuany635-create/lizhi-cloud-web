@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f3f6fb">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="立之英文學習教室：經雲端庫登入使用的靜態練習體驗版。">
-<title>立之英文學習教室｜體驗版</title>
+<meta name="description" content="立之英文學習教室：示範練習與雲端單字、錯句紀錄查詢。">
+<title>立之英文學習教室｜練習與雲端紀錄</title>
 <link rel="stylesheet" href="../preview/styles.css?v=1">
-<link rel="stylesheet" href="./styles.css?v=1">
+<link rel="stylesheet" href="./styles.css?v=2">
 </head>
 <body>
 <div id="app" role="main" aria-live="polite">正在確認立之雲端庫登入狀態…</div>
@@ -26,9 +26,13 @@
       return;
     }
     const s=document.createElement('script');
-    s.type='module';s.src='./app.mjs?v=1';
+    s.type='module';s.src='./app.mjs?v=2';
     s.onerror=()=>{root.textContent='英文練習載入失敗，請重新整理或回到雲端庫。';};
     document.body.append(s);
+    const cloud=document.createElement('script');
+    cloud.type='module';cloud.src='./cloud-records.mjs?v=1';
+    cloud.onerror=()=>{root.insertAdjacentText('beforebegin','雲端學習紀錄無法載入，練習功能仍可使用。');};
+    document.body.append(cloud);
   }catch{
     root.textContent='請從立之雲端庫登入後使用英文學習教室。';
   }
