@@ -48,11 +48,16 @@ export async function POST(req: Request) {
       (body.id !== undefined && body.id !== null && typeof body.id !== 'string' && typeof body.id !== 'number')) throw new RelayError('無效的 MCP 請求', -32600);
     id = body.id ?? null;
     method = body.method;
-    if (method === 'tools/call') {
+    // All private tool discovery and calls share the same trusted Site
+    // identity boundary. Server discovery/ping remain protocol-only.
+    if (method === 'tools/list' || method === 'tools/call') {
       const e = env as unknown as Record<string, string>;
       if (!e.PRODUCTION_CHATGPT_OWNER) throw new RelayError('工作台轉接尚未設定');
       const who = identity(req, 'ai');
-      if (who.id !== e.PRODUCTION_CHATGPT_OWNER) throw new RelayError('此帳號尚未連接 AI 工作台');
+      if (!who || who.id !== e.PRODUCTION_CHATGPT_OWNER)
+        throw new RelayError('此帳號尚未連接 AI 工作台');
+    }
+    if (method === 'tools/call') {
       if(String(body.params?.name??'').startsWith('english_')){
         try{return reply(await englishRelay.call(body));}
         catch{throw new RelayError('英文學習後端尚未啟用或暫時無法使用');}
