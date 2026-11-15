@@ -1,0 +1,27 @@
+name: English Academy P3 isolated MCP tests
+on:
+  pull_request:
+    paths:
+      - 'english-academy/p3/**'
+      - '.github/workflows/english-academy-p3-ci.yml'
+permissions:
+  contents: read
+
+jobs:
+  mcp-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Syntax-check private MCP candidate
+        run: |
+          node --check english-academy/p3/mcp-server.mjs
+          node --check english-academy/p3/memory-backend.mjs
+          node --check english-academy/p3/auth-boundary.mjs
+          node --check english-academy/p3/tests/mcp.test.mjs
+          node --check english-academy/p3/tests/auth-boundary.test.mjs
+      - name: Protocol, permission and sync test suite with synthetic data
+        run: node --test english-academy/p3/tests/*.test.mjs
