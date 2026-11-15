@@ -220,4 +220,102 @@ revoke all on function public.english_web_ignore_candidate(uuid,uuid,text)
 grant execute on function public.english_web_ignore_candidate(uuid,uuid,text)
   to service_role;
 
+
+-- Website-confirmed, short-lived English conversation authorization. Only a
+-- user with an ACTIVE Google web auth.sessions row can approve this chat scope.
+-- A model may subsequently name the session, but can never authorize it.
+create or replace function public.english_web_grant_chat_session(
+ p_owner_id uuid,p_web_session_id uuid,p_source_session_id text,p_request_id text
+) returns jsonb language plpgsql security definer set search_path=''
+as $$
+declare
+ v_prior public.english_sync_events%rowtype;
+ v_digest text;
+ v_expiry timestamptz:=pg_catalog.now()+interval '24 hours';
+begin
+ if p_owner_id is null or p_web_session_id is null or
+    p_source_session_id is null or
+    p_source_session_id !~ '^chat-[0-9a-f-]{36}$' or
+    p_request_id is null or p_request_id !~ '^[A-Za-z0-9_-]{12,100}$'
+  then raise exception 'INVALID_CHAT_GRANT_INPUT'; end if;
+ if not public.english_web_session_active(p_owner_id,p_web_session_id)
+  then raise exception 'WEB_SESSION_INACTIVE';end if;
+ v_digest:=pg_catalog.encode(pg_catalog.sha256(pg_catalog.convert_to(
+  'chat-grant:'||p_owner_id::text||':'||p_request_id,'UTF8')),'hex');
+ perform pg_catalog.pg_advisory_xact_lock(
+   pg_catalog.hashtextextended(p_owner_id::text||':'||p_request_id,0));
+ select * into v_prior from public.english_sync_events
+   where owner_id=p_owner_id and request_id=p_request_id;
+ if found then
+   if v_prior.action<>'web_grant_chat_session' or
+      v_prior.payload_digest<>v_digest then raise exception 'IDEMPOTENCY_CONFLICT';end if;
+   return pg_catalog.jsonb_build_object('status','replay',
+      'sourceSessionId',v_prior.result_reference);
+ end if;
+ insert into public.english_session_authorizations(
+  owner_id,source_session_id,explicitly_confirmed,verified_actor_id,enabled,expires_at
+ )values(p_owner_id,p_source_session_id,true,
+  'verified-google-web:'||p_web_session_id::text,true,v_expiry);
+ insert into public.english_sync_events(owner_id,source,request_id,payload_digest,
+  action,status,result_reference)
+ values(p_owner_id,'web',p_request_id,v_digest,'web_grant_chat_session',
+  'success',p_source_session_id);
+ insert into public.english_audit_events(owner_id,actor_type,action,resource_id,request_id)
+ values(p_owner_id,'verified-google-web','web_grant_chat_session',p_source_session_id,p_request_id);
+ return pg_catalog.jsonb_build_object('status','authorized',
+  'sourceSessionId',p_source_session_id,'expiresAt',v_expiry);
+end;
+$$;
+revoke all on function public.english_web_grant_chat_session(uuid,uuid,text,text)
+  from public,anon,authenticated;
+grant execute on function public.english_web_grant_chat_session(uuid,uuid,text,text)
+  to service_role;
+
+-- Revocation is an append-only audit plus a change to the scoped authorization,
+-- not deletion of the learner's historical mistakes or cards.
+create or replace function public.english_web_revoke_chat_session(
+ p_owner_id uuid,p_web_session_id uuid,p_source_session_id text,p_request_id text
+) returns jsonb language plpgsql security definer set search_path=''
+as $$
+declare
+ v_prior public.english_sync_events%rowtype;
+ v_digest text;
+begin
+ if p_owner_id is null or p_web_session_id is null or
+    p_source_session_id is null or length(p_source_session_id) not between 1 and 100 or
+    p_request_id is null or p_request_id !~ '^[A-Za-z0-9_-]{12,100}$'
+  then raise exception 'INVALID_CHAT_REVOKE_INPUT';end if;
+ if not public.english_web_session_active(p_owner_id,p_web_session_id)
+  then raise exception 'WEB_SESSION_INACTIVE';end if;
+ v_digest:=pg_catalog.encode(pg_catalog.sha256(pg_catalog.convert_to(
+  'chat-revoke:'||p_owner_id::text||':'||p_source_session_id,'UTF8')),'hex');
+ perform pg_catalog.pg_advisory_xact_lock(
+  pg_catalog.hashtextextended(p_owner_id::text||':'||p_request_id,0));
+ select * into v_prior from public.english_sync_events
+  where owner_id=p_owner_id and request_id=p_request_id;
+ if found then
+   if v_prior.action<>'web_revoke_chat_session' or
+      v_prior.payload_digest<>v_digest then raise exception 'IDEMPOTENCY_CONFLICT';end if;
+   return pg_catalog.jsonb_build_object('status','replay',
+      'sourceSessionId',v_prior.result_reference);
+ end if;
+ update public.english_session_authorizations
+  set enabled=false
+  where owner_id=p_owner_id and source_session_id=p_source_session_id;
+ if not found then raise exception 'CHAT_SESSION_NOT_FOUND';end if;
+ insert into public.english_sync_events(owner_id,source,request_id,payload_digest,
+  action,status,result_reference)
+ values(p_owner_id,'web',p_request_id,v_digest,'web_revoke_chat_session',
+  'success',p_source_session_id);
+ insert into public.english_audit_events(owner_id,actor_type,action,resource_id,request_id)
+ values(p_owner_id,'verified-google-web','web_revoke_chat_session',
+  p_source_session_id,p_request_id);
+ return pg_catalog.jsonb_build_object('status','revoked','sourceSessionId',p_source_session_id);
+end;
+$$;
+revoke all on function public.english_web_revoke_chat_session(uuid,uuid,text,text)
+ from public,anon,authenticated;
+grant execute on function public.english_web_revoke_chat_session(uuid,uuid,text,text)
+ to service_role;
+
 commit;
