@@ -57,7 +57,7 @@ export function createCandidateInMemory({
   const idempotencyKey = resourceOwnerId + ':' + requestId;
   if (store.requests.has(idempotencyKey))
     return { ...store.requests.get(idempotencyKey), replay: true };
-  const normalized = term.normalize('NFKC').trim().replace(/\\s+/g, ' ').toLocaleLowerCase('en');
+  const normalized = term.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
   const uniqueKey = resourceOwnerId + ':' + normalized;
   let card = store.candidates.get(uniqueKey);
   if (!card) {
