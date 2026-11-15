@@ -48,7 +48,7 @@ test('mobile candidate flow: responsive layout, review, search, sentence practic
    await page.locator('.bottom-nav button[data-tab="cards"]').click();
    assert.equal(await page.locator('[data-accept="cand-1"]').count(),1);
    await page.locator('[data-accept="cand-1"]').click();
-   assert.match(await page.locator('[role="status"]').innerText(),/APPROVED/);
+   assert.match(await page.locator('[role="status"]').innerText(),/已加入示範單字庫/);
    await page.locator('#word-search').fill('HUNGRY');
    assert.match(await page.locator('#demo-card-rows').innerText(),/hungry/);
    assert.doesNotMatch(await page.locator('#demo-card-rows').innerText(),/rice/);
