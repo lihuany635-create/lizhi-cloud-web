@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'english-academy/p11/**'
+      - 'english-academy/conversation/**'
       - '.github/workflows/english-academy-p11-ci.yml'
   workflow_dispatch:
 
@@ -18,7 +19,7 @@ jobs:
         with:
           node-version: '22'
       - name: Verify original private-Site tooling and synthetic English MCP
-        run: node --test english-academy/p11/tests/*.test.mjs
+        run: node --test english-academy/p11/tests/*.test.mjs english-academy/conversation/tests/*.test.mjs
       - name: Confirm P11 files contain no real owner or production writer
         run: |
           if grep -R -n -E 'SUPABASE_SERVICE_ROLE|PRODUCTION_BRIDGE_KEY|service_role\s*=|https://[^ ]*supabase\.co/functions/v1' english-academy/p11 --include='*.mjs'; then
