@@ -94,8 +94,8 @@ jobs:
         with:
           name: lizhi-supabase-encrypted-backup
           path: |
-            [object Object] runner.temp }}/lizhi-backup.tar.gz.gpg
-            [object Object] runner.temp }}/lizhi-backup.sha256
+            ${{ runner.temp }}/lizhi-backup.tar.gz.gpg
+            ${{ runner.temp }}/lizhi-backup.sha256
           if-no-files-found: error
           retention-days: 7
 
