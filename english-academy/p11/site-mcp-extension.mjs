@@ -24,6 +24,19 @@ export function createExistingSiteEnglishExtension({
    throw new TypeError('TRUSTED_SITE_DEPENDENCIES_REQUIRED');
 
  const englishTools=MCP_TOOLS.filter(t=>t.name!=='add_vocabulary');
+ const readTools=new Set(['get_learning_profile','get_review_summary',
+   'list_card_candidates','get_sync_status']);
+ async function ready(request){
+   try{return await isReady({request})===true;}catch{return false;}
+ }
+ async function verifiedActor(request){
+   try{
+     const actor=await verifySiteOwner({request});
+     if(actor?.serverVerified!==true||typeof actor.ownerId!=='string'||
+        !Array.isArray(actor.scopes)||!actor.scopes.includes('english:read'))return null;
+     return actor;
+   }catch{return null;}
+ }
  const toolNames=new Set(englishTools.map(t=>'english_'+t.name));
  const dispatch=createPrivateSiteEnglishDispatcher({
    verifySiteOwner,invokeEnglish,formalWriteEnabled:false
@@ -35,10 +48,14 @@ export function createExistingSiteEnglishExtension({
    // legacy catalog or discard images/structured tool metadata.
    const base=existingReply.result?.tools;
    if(!Array.isArray(base))throw new TypeError('ORIGINAL_SITE_CATALOG_UNAVAILABLE');
-   if(await isReady({request})!==true)return existingReply;
+   if(!await ready(request))return existingReply;
+   const actor=await verifiedActor(request);
+   if(!actor)return existingReply;
+   const allowed=englishTools.filter(t=>readTools.has(t.name)||
+     actor.scopes.includes('english:candidate'));
    const catalog=composePrivateSiteCatalog({
      existingTools:base,legacyBaselineNames:baselineNames,
-     englishTools,includeFormalWrites:false
+     englishTools:allowed,includeFormalWrites:false
    });
    return {...existingReply,result:{...existingReply.result,tools:catalog.tools}};
  }
@@ -49,7 +66,7 @@ export function createExistingSiteEnglishExtension({
       !(request instanceof Request))return fail(id,'INVALID_MCP_CALL');
    if(!name.startsWith('english_'))return null; // Do not intercept existing tools.
    if(!toolNames.has(name))return fail(id,'ENGLISH_TOOL_NOT_EXPOSED');
-   if(await isReady({request})!==true)return fail(id,'ENGLISH_NOT_CONFIGURED');
+   if(!await ready(request))return fail(id,'ENGLISH_NOT_CONFIGURED');
    const args=body.params?.arguments??{};
    if(!validated(args))return fail(id,'INVALID_ARGUMENTS');
    const out=await dispatch({request,toolName:name,arguments:args});
