@@ -1,6 +1,6 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
-import {USAGE_MCP_TOOLS,usageMonth,usageAlerts,dispatchUsageMcp} from "./mcp-core.mjs";
+import {USAGE_MCP_TOOLS,usageMonth,usageAlerts,dispatchUsageMcp} from "../supabase/functions/_shared/lizhi-usage-mcp-core.mjs";
 const fakeSnapshot=async month=>({
  month,coverage:"instrumented_only",source:"app_telemetry_not_official_billing",
  note:"Only instrumented services, not official.",
