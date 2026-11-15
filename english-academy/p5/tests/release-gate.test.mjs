@@ -52,7 +52,8 @@ test('even complete synthetic proof cannot authorize release without explicit ow
  assert.equal(result.readyToDeploy,false);
  const approval=await authorizeReleaseScope(result,{
    scope:'github_main_merge',approvalToken:'fake-token',
-   verifyOwnerApproval:async()=>false
+   verifyOwnerApproval:async()=>false,
+   verifyReleaseReview:async()=>true
  });
  assert.equal(approval.authorized,false);
  assert.equal(approval.noDeploymentPerformed,true);
@@ -64,6 +65,7 @@ test('authorization is scoped to an exact release action and commit, with no dep
  const calls=[];
  const approval=await authorizeReleaseScope(result,{
    scope:'supabase_schema',approvalToken:'synthetic-consent',
+   verifyReleaseReview:async()=>true,
    verifyOwnerApproval:async request=>{
      calls.push(request);
      return request.scope==='supabase_schema' && request.commitSha===sha &&
@@ -76,7 +78,8 @@ test('authorization is scoped to an exact release action and commit, with no dep
  assert.equal(calls[0].scope,'supabase_schema');
  assert.equal((await authorizeReleaseScope(result,{
     scope:'delete_private_data',approvalToken:'synthetic-consent',
-    verifyOwnerApproval:async()=>true
+    verifyOwnerApproval:async()=>true,
+    verifyReleaseReview:async()=>true
  })).authorized,false);
 });
 test('cannot authorize release when any required independent test remains blocked',async()=>{
@@ -87,10 +90,36 @@ test('cannot authorize release when any required independent test remains blocke
  assert.equal(result.state,'BLOCKED');
  assert.equal((await authorizeReleaseScope(result,{
     scope:'github_pages',approvalToken:'anything',
-    verifyOwnerApproval:async()=>true
+    verifyOwnerApproval:async()=>true,
+    verifyReleaseReview:async()=>true
  })).authorized,false);
 });
 test('missing trust verifier cannot produce passing review',async()=>{
  await assert.rejects(()=>reviewReleaseEvidence({version:'p5-test',
    commitSha:sha,proofs:proofs()}),/UNTRUSTED_RELEASE_REVIEW/);
+});
+
+test('forgeable ready state cannot authorize without independently trusted release review',async()=>{
+ const forged={state:'READY_FOR_OWNER_APPROVAL',commitSha:sha,
+   verifiedChecks:REQUIREMENTS.map(x=>x.id),missing:[],rejected:[]};
+ const noVerifier=await authorizeReleaseScope(forged,{
+   scope:'github_main_merge',approvalToken:'fake',
+   verifyOwnerApproval:async()=>true
+ });
+ assert.equal(noVerifier.authorized,false);
+ const rejected=await authorizeReleaseScope(forged,{
+   scope:'github_main_merge',approvalToken:'fake',
+   verifyReleaseReview:async()=>false,
+   verifyOwnerApproval:async()=>true
+ });
+ assert.equal(rejected.authorized,false);
+});
+test('production evidence must use HTTPS URLs without embedded credentials or query tokens',async()=>{
+ const p=proofs();
+ p[0].evidenceUrl='https://secret@trusted.example.invalid/record?token=oops';
+ const rejected=await reviewReleaseEvidence({version:'p5-test',commitSha:sha,proofs:p},{
+   verifyEvidence:mockVerifier
+ });
+ assert.equal(rejected.state,'BLOCKED');
+ assert.ok(rejected.rejected.some(x=>x.startsWith('p1_google_oauth')));
 });
