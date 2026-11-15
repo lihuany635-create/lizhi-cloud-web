@@ -296,6 +296,26 @@ def main():
     PHASE = "complete-data-and-object-comparison"
     actual = local_inventory(local_sql)
     if json.loads(json.dumps(actual)) != json.loads(json.dumps(source)):
+        # Log only aggregate diagnostics, never identifiers, definitions or rows.
+        src_tables, dst_tables = source["tables"], actual["tables"]
+        shared = src_tables.keys() & dst_tables.keys()
+        print("Inventory mismatch counts: " + json.dumps({
+            "missing_tables": len(src_tables.keys() - dst_tables.keys()),
+            "extra_tables": len(dst_tables.keys() - src_tables.keys()),
+            "row_count_changes": sum(src_tables[k][0] != dst_tables[k][0] for k in shared),
+            "row_hash_changes": sum(src_tables[k][1] != dst_tables[k][1] for k in shared),
+            "rls_changes": sum(src_tables[k][2:] != dst_tables[k][2:] for k in shared),
+            "large_objects_differ": source["large_objects"] != actual["large_objects"],
+        }, sort_keys=True), flush=True)
+        source_objects = {(r[0], r[1]): r[2] for r in source["objects"]}
+        actual_objects = {(r[0], r[1]): r[2] for r in actual["objects"]}
+        for kind in sorted({k[0] for k in source_objects} | {k[0] for k in actual_objects}):
+            sk = {k for k in source_objects if k[0] == kind}
+            ak = {k for k in actual_objects if k[0] == kind}
+            print("Object mismatch counts: " + json.dumps({"kind": kind,
+                "missing": len(sk - ak), "extra": len(ak - sk),
+                "changed": sum(source_objects[k] != actual_objects[k] for k in sk & ak)
+            }, sort_keys=True), flush=True)
         raise ValueError("Restored data or required object inventory differs")
     (out / "restore-status.txt").write_text(
         "PASS: PostgreSQL17 full archive decrypted, restored and table/object inventory matched.\n"
