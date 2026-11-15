@@ -73,11 +73,7 @@ jobs:
           set -euo pipefail
           test -f english-academy/p10/README.md
           grep -q 'NO-GO' english-academy/p10/README.md
-          if grep -Eiq '(supabase db push|supabase functions deploy|gh pr merge|deploy-pages|secrets\.)' .github/workflows/english-academy-p10-ci.yml; then
-            echo P10_FORBIDDEN_DEPLOYMENT_REFERENCE
-            exit 1
-          fi
-          echo P10_READ_ONLY_CI_PASS
+          node english-academy/p10/scripts/audit-ci.mjs
 
   p10-edge-compile:
     runs-on: ubuntu-24.04
