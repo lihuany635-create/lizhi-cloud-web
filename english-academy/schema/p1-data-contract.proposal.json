@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "English Academy P1 persistence design contract (proposal only)",
   "status": "draft-not-applied",
   "productionMigrationAllowed": false,
@@ -213,5 +212,6 @@
     "no DB service key in public files, clients or AI prompts",
     "FSRS state and scheduling additions belong to P2",
     "voice and objective/subjective grading records require versioned evidence in P2"
-  ]
+  ],
+  "contractVersion": 1
 }
