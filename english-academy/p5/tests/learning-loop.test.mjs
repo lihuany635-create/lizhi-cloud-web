@@ -2,10 +2,10 @@
 // Supabase tables, ChatGPT OAuth, private Site or production deploy.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Rating} from 'ts-fsrs';
+
 import {createMcpHandler,MCP_VERSION} from '../../p3/mcp-server.mjs';
 import {createCandidateBackend} from '../../p3/memory-backend.mjs';
-import {createEnglishScheduler,createReviewCard,reviewEnglishCard}
+import {Rating,createEnglishScheduler,createReviewCard,reviewEnglishCard}
   from '../../p2/fsrs-engine.mjs';
 import {gradePractice,makeSkillEvidence} from '../../p2/practice-evidence.mjs';
 import {createAdaptiveDailyPlan} from '../../p4/adaptive-planner.mjs';
