@@ -74,12 +74,12 @@ test('authenticated host iframe fetches private cards with bearer and can review
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(origin+'/host-test');
    const f=page.frameLocator('iframe[title="英文學習教室"]');
-   await f.locator('button[data-tab="cards"]').waitFor({timeout:10000});
-   await f.locator('button[data-tab="cards"]').click();
+   await f.locator('.nav button[data-tab="cards"]').waitFor({timeout:10000});
+   await f.locator('.nav button[data-tab="cards"]').click();
    assert.match(await f.locator('body').innerText(),/hungry/);
    assert.match(await f.locator('body').innerText(),/rice/);
    await f.locator('button[data-accept]').click();
-   await f.locator('button[data-tab="cards"]').click();
+   await f.locator('.nav button[data-tab="cards"]').click();
    assert.equal(await f.locator('button[data-accept]').count(),0);
    await f.locator('#live-term').fill('apple');
    await f.locator('#live-meaning').fill('蘋果');
