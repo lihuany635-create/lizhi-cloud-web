@@ -79,7 +79,7 @@ function quotaCards(s: ReturnType<typeof totals>["summary"]) {
   ];
 }
 async function snapshotForMonth(month: string) {
-  if (!/^20\\d{2}-(0[1-9]|1[0-2])$/.test(month)) throw new HttpError(400,"month 必須是 YYYY-MM。");
+  if (!/^20\d{2}-(0[1-9]|1[0-2])$/.test(month)) throw new HttpError(400,"month 必須是 YYYY-MM。");
   const start=month+"-01T00:00:00Z";
   const next=new Date(Date.UTC(Number(month.slice(0,4)), Number(month.slice(5)), 1)).toISOString().slice(0,10)+"T00:00:00Z";
   const dayStart=start.slice(0,10),dayEnd=next.slice(0,10);
