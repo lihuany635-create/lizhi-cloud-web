@@ -2,6 +2,7 @@
 // Instrument a function IN THE SAME INVOCATION. No second Edge Function invocation.
 // This adds one PostgREST INSERT and a daily-rollup database update per request;
 // do not deploy across all functions without a staged load/capacity test.
+import { meterPayload } from "./lizhi-usage-payload.mjs";
 export type MeterDecision = "allow" | "throttle" | "block";
 export type MeterHandler = (req: Request) => Promise<Response>;
 export type MeterOptions = {
@@ -9,12 +10,6 @@ export type MeterOptions = {
   route: string;
   // Optional budget decision made by the caller.
   decide?: (response: Response) => MeterDecision;
-};
-const length = (headers: Headers): number | null => {
-  const raw = headers.get("Content-Length");
-  if (raw === null || !/^\d+$/.test(raw)) return null;
-  const n=Number(raw);
-  return Number.isSafeInteger(n) && n>=0 ? n : null;
 };
 async function record(data: Record<string, unknown>): Promise<boolean> {
   const base=Deno.env.get("SUPABASE_URL")?.replace(/\/$/,"");
@@ -47,17 +42,18 @@ export async function withUsageMeter(
   try {
     result=await handler(request);
     status=result.status;
-    decision=options.decide?.(result)??"allow";
+    // A faulty optional policy callback must not corrupt a valid response.
+    try { decision=options.decide?.(result)??"allow"; }
+    catch { decision="allow"; }
     if(!["allow","throttle","block"].includes(decision))decision="allow";
     return result;
   } finally {
     // A metering failure must NOT change a successful business response.
-    const event={
-      source, route, status_code:status, decision,
-      request_bytes:length(request.headers),
-      response_bytes:result?length(result.headers):null,
-      duration_ms:Math.min(3600000,Math.max(0,Math.round(performance.now()-started)))
-    };
+    const event=meterPayload({
+      source,route,statusCode:status,decision,
+      requestHeaders:request.headers,responseHeaders:result?.headers,
+      durationMs:performance.now()-started,requestId:crypto.randomUUID()
+    });
     // We await to maximize observability. This increases DB load/latency and
     // still cannot provide 100% coverage if the function terminates early.
     await record(event);
