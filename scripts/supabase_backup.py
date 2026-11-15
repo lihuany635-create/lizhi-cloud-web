@@ -255,11 +255,16 @@ def main():
     run(["supabase", "db", "start", "--workdir", str(local)], env=clean)
     # No restored cron or database trigger can call the Internet.
     inspect = json.loads(run(["docker", "inspect", CONTAINER], env=clean))
+    local_env = dict(item.split("=", 1) for item in inspect[0]["Config"]["Env"] if "=" in item)
+    local_password = local_env.get("POSTGRES_PASSWORD")
+    if not local_password:
+        raise ValueError("Disposable database password unavailable")
     for network in inspect[0]["NetworkSettings"]["Networks"]:
         run(["docker", "network", "disconnect", network, CONTAINER], env=clean)
     PHASE = "isolated-full-archive-restore"
     def local_sql(query, db="template1"):
-        return run(["docker", "exec", "-i", CONTAINER, "psql", "-X", "-q", "-A", "-t",
+        return run(["docker", "exec", "-i", "-e", "PGPASSWORD=" + local_password,
+                    CONTAINER, "psql", "-X", "-q", "-A", "-t", "-h", "127.0.0.1",
                     "-v", "ON_ERROR_STOP=1", "-U", "supabase_admin", "-d", db],
                    env=clean, stdin=query.encode())
     PHASE = "isolated-disable-cron"
@@ -281,7 +286,8 @@ def main():
     local_sql(role_sql)
     run(["docker", "cp", str(recovered / "full.dump"), CONTAINER + ":/tmp/full.dump"], env=clean)
     PHASE = "isolated-pg-restore-archive"
-    run(["docker", "exec", CONTAINER, "pg_restore", "--exit-on-error", "--single-transaction",
+    run(["docker", "exec", "-e", "PGPASSWORD=" + local_password,
+         CONTAINER, "pg_restore", "-h", "127.0.0.1", "--exit-on-error", "--single-transaction",
          "-U", "supabase_admin", "-d", "postgres", "/tmp/full.dump"], env=clean)
     # Inventory inside the network-isolated container using its psql, not a
     # connection accidentally redirected to the hosted URL.
