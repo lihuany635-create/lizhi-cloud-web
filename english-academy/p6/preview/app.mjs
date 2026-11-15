@@ -106,7 +106,7 @@ function recordPractice(response,extra={}){
      viewResult={title:event.correct?'正確':'還可以再練習',
        message:event.explanation||'本題以預先設定的答案進行比對。'};
    } else {
-     viewResult={title:'已記錄示範操作',message:event.note||'此項不計入正式技能成績。'};
+     viewResult={title:'已記錄示範操作',message:event.status==='audio-unverified'?'音訊驗證尚未完成，因此不計入聽力能力成績。':(event.note||'此項不計入正式技能成績。')};
    }
  }catch(e){viewResult={title:'尚未記錄',message:e.message};}
  render();
