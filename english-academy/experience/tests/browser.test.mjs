@@ -130,3 +130,45 @@ test('real portal CSS gives English lessons the remaining viewport on phones, la
   }
  }finally{await browser.close();}
 });
+
+test('all seven exercise modes and all 14 diagnostic stages stay usable without persisted personal records',async()=>{
+ const browser=await chromium.launch({headless:true});
+ try{
+  const p=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+  const errors=[];p.on('pageerror',e=>errors.push(e.message));
+  await p.goto(base+'/__english_portal_layout__');
+  const frame=p.frameLocator('#english-frame');
+  await frame.getByText('七種英文練習').waitFor();
+  await frame.locator('button[data-flip="3"]').click();
+  assert.match(await frame.locator('[role="status"]').innerText(),/已記錄示範操作/);
+
+  await frame.locator('button[data-mode-index="1"]').click();
+  await frame.locator('button[data-choice="am"]').click();
+  assert.match(await frame.locator('[role="status"]').innerText(),/正確/);
+
+  const inputs=[
+   [2,'apple'],[3,'haven’t'],[4,"I haven't eaten anything."],
+   [5,'I am hungry'],[6,'I feel sleepy after lunch.']
+  ];
+  for(const [mode,answer] of inputs){
+   await frame.locator('button[data-mode-index="'+mode+'"]').click();
+   await frame.locator('#practice-answer [name="answer"]').fill(answer);
+   await frame.locator('#practice-answer button[type="submit"]').click();
+   assert.equal(await frame.locator('[role="status"]').count(),1,'Missing outcome for exercise mode '+mode);
+  }
+  assert.match(await frame.locator('body').innerText(),/已完成 7 次示範作答/);
+  assert.match(await frame.locator('body').innerText(),/不是 AI 實際分析/);
+  await frame.locator('button[data-page="diagnostic"]').click();
+  for(let i=0;i<14;i++){
+   assert.match(await frame.locator('body').innerText(),new RegExp('\\\\b'+(i+1)+' / 14'));
+   await frame.locator('button[data-diag-next]').click();
+  }
+  assert.match(await frame.locator('body').innerText(),/測驗結果（非官方）/);
+  assert.match(await frame.locator('body').innerText(),/尚未評估/);
+  await frame.locator('button[data-page="practice"]').click();
+  await p.reload();
+  await frame.getByText('七種英文練習').waitFor();
+  assert.match(await frame.locator('body').innerText(),/已完成 0 次示範作答/);
+  assert.deepEqual(errors,[]);
+ }finally{await browser.close();}
+});
