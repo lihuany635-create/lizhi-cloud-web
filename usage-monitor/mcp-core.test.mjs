@@ -9,7 +9,8 @@ const fakeSnapshot=async month=>({
    route:"/mcp",status_code:200,decision:"allow",occurred_at:"2026-11-15T00:00:00Z",sequence:i
  })),
  quotas:[{key:"edge_invocations",limit:500000,official_used:null},
-   {key:"egress",limit:100,official_used:96}]
+   {key:"egress",limit:100,official_used:96,
+    official_source:"supabase_dashboard_manual",official_as_of:"2026-11-15T11:30:00Z"}]
 });
 const rpc=(method,params={},id=1)=>dispatchUsageMcp({jsonrpc:"2.0",id,method,params},{
  snapshot:fakeSnapshot,now:new Date("2026-11-15T12:00:00Z")
@@ -98,5 +99,18 @@ test("Taipei month handles UTC rollover",()=>{
  assert.equal(usageMonth(new Date("2026-10-31T17:00:00Z")),"2026-11");
 });
 test("alerts don't silently treat zero official as unknown",()=>{
- assert.equal(usageAlerts([{key:"e",limit:100,official_used:0}])[0].state,"NORMAL");
+ assert.equal(usageAlerts([{key:"e",limit:100,official_used:0,
+   official_source:"supabase_dashboard_manual",official_as_of:"2026-11-15T11:30:00Z"}],
+   new Date("2026-11-15T12:00:00Z"))[0].state,"NORMAL");
+});
+
+test("stale official usage is UNKNOWN, not NORMAL",()=>{
+ const x=usageAlerts([{key:"e",limit:100,official_used:10,
+   official_source:"supabase_dashboard_manual",official_as_of:"2026-11-15T08:00:00Z"}],
+   new Date("2026-11-15T12:00:00Z"));
+ assert.equal(x[0].state,"UNKNOWN");
+});
+test("unverified official source cannot claim STOP/NORMAL",()=>{
+ const x=usageAlerts([{key:"e",limit:100,official_used:99}],new Date("2026-11-15T12:00:00Z"));
+ assert.equal(x[0].state,"UNKNOWN");
 });
