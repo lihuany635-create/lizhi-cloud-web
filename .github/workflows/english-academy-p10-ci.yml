@@ -49,7 +49,11 @@ jobs:
       - name: Verify immutable P1-P9 ancestor SHA chain
         run: |
           set -euo pipefail
-          node --input-type=module <<'NODE'
+          if test -f english-academy/p13/reconciliation-manifest.json; then
+            git fetch --no-tags origin feature/english-academy-p12-production-relay-20261115
+            node english-academy/p13/verify-reconciled.mjs
+          else
+            node --input-type=module <<'NODE'
           import {readFileSync} from 'node:fs';
           import {execFileSync} from 'node:child_process';
           const m=JSON.parse(readFileSync('english-academy/p10/upstream-lock.json','utf8'));
@@ -68,6 +72,7 @@ jobs:
           if(Object.values(m.approvalScopes).some(Boolean))throw Error('UNAUTHORIZED_PRODUCTION_APPROVAL');
           console.log('P10_P1_TO_P9_LOCKED_HISTORY_PASS');
           NODE
+          fi
       - name: Ensure no production write instructions in P10 workflow
         run: |
           set -euo pipefail
