@@ -139,6 +139,17 @@ begin
       'card_id',v_prior.result_reference);
   end if;
 
+  -- Ensure the candidate belongs to this verified owner BEFORE inserting
+  -- any private approval record; never leak FK or cross-owner details.
+  if not exists(select 1 from public.english_card_candidates
+    where id=p_candidate_id and owner_id=p_owner_id) then
+    raise exception 'CANDIDATE_NOT_FOUND';
+  end if;
+  if not exists(select 1 from public.english_card_candidates
+    where id=p_candidate_id and owner_id=p_owner_id and status='pending') then
+    raise exception 'CANDIDATE_NOT_PENDING';
+  end if;
+
   -- Only the verified Google web API can issue this consent record. There
   -- is no public endpoint to create it and the private schema isn't exposed.
   insert into english_internal.english_card_approvals(
