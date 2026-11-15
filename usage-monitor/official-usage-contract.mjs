@@ -13,11 +13,11 @@ export function evaluateOfficialUsage(snapshot, now=new Date()) {
     throw new Error("Untrusted official usage source.");
   if(![used,limit].every(Number.isFinite)||used<0||limit<=0)
     throw new Error("Invalid billed usage value.");
-  if(![asOf,cycleStart,cycleEnd].every(v=>typeof v==="string"&&/\d{4}-\d{2}-\d{2}T/.test(v)))
+  if(![asOf,cycleStart,cycleEnd].every(v=>typeof v==="string"&&/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$/.test(v)))
     throw new Error("Official timestamp and billing cycle are required.");
   const sampled=new Date(asOf),start=new Date(cycleStart),end=new Date(cycleEnd);
   if([sampled,start,end,now].some(d=>Number.isNaN(d.getTime()))||start>=end||
-     sampled<start||sampled>end||sampled>now)
+     sampled<start||sampled>=end||sampled>now)
     throw new Error("Official period or timestamp is invalid.");
   const ageMs=now.getTime()-sampled.getTime();
   const state=ageMs<=3600000?"recent":"stale";
