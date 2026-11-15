@@ -17,7 +17,14 @@ export const REQUIREMENTS = Object.freeze([
 ].map(([id,label])=>Object.freeze({id,label})));
 const ALLOWED_SCOPES=Object.freeze(['github_main_merge','supabase_schema','supabase_edge','private_site','github_pages']);
 const validSha=x=>typeof x==='string'&&/^[0-9a-f]{40}$/.test(x);
-const validHttps=x=>typeof x==='string'&&/^https:\/\/[^\s#?]+/.test(x);
+const validHttps=x=>{
+ if(typeof x!=='string')return false;
+ try{
+   const url=new URL(x);
+   return url.protocol==='https:' && !!url.hostname && !url.username && !url.password &&
+     !url.search && !url.hash && !['localhost','127.0.0.1'].includes(url.hostname);
+ }catch{return false;}
+};
 
 export async function reviewReleaseEvidence({version,commitSha,proofs=[]}={},{
  verifyEvidence,
@@ -50,12 +57,16 @@ export async function reviewReleaseEvidence({version,commitSha,proofs=[]}={},{
    readyToDeploy:false,releaseApproved:false,
    evaluatedWith:'trusted-evidence-callback-required'};
 }
-export async function authorizeReleaseScope(review,{scope,approvalToken,verifyOwnerApproval}={}){
+export async function authorizeReleaseScope(review,{scope,approvalToken,verifyOwnerApproval,verifyReleaseReview}={}){
  if(review?.state!=='READY_FOR_OWNER_APPROVAL'||!validSha(review.commitSha)||
     !ALLOWED_SCOPES.includes(scope)||typeof verifyOwnerApproval!=='function'||
+    typeof verifyReleaseReview!=='function'||
     typeof approvalToken!=='string'||!approvalToken){
    return {authorized:false,reason:'NOT_APPROVED'};
  }
+ let independentReviewVerified=false;
+ try{independentReviewVerified=await verifyReleaseReview({review,commitSha:review.commitSha})===true;}catch{}
+ if(!independentReviewVerified)return {authorized:false,reason:'RELEASE_REVIEW_NOT_VERIFIED'};
  let authorized=false;
  try{
    authorized=await verifyOwnerApproval({commitSha:review.commitSha,
