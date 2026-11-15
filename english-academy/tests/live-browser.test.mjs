@@ -109,8 +109,11 @@ test('authenticated host iframe fetches private cards with bearer and can review
    assert.match(await f.locator('body').innerText(),/He went yesterday/);
    await f.locator('.bottom-nav button[data-tab="settings"]').click();
    await f.locator('button[data-authorize-session]').click();
+   // Wait for the POST and subsequent refresh before inspecting the grant.
+   await f.locator('button[data-revoke-session="chat-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"]').waitFor({timeout:10000});
    assert.match(await f.locator('body').innerText(),/chat-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/);
    await f.locator('button[data-revoke-session]').click();
+   await f.locator('text=已撤銷').first().waitFor({timeout:10000});
    assert.equal(db.sessions[0].enabled,false);
    const overflow=await f.locator('html').evaluate(el=>({
      width:el.clientWidth,scroll:el.scrollWidth
