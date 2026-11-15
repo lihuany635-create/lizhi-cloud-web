@@ -105,9 +105,9 @@ test('authenticated host iframe fetches private cards with bearer and can review
    await f.locator('button[data-accept="fffffff0-ffff-4fff-8fff-ffffffffffff"]').click();
    await f.locator('text=apple').first().waitFor();
    assert.ok(db.cards.some(x=>x.term==='apple'));
-   await f.locator('button[data-tab="errors"]').first().click();
+   await f.locator('.bottom-nav button[data-tab="errors"]').click();
    assert.match(await f.locator('body').innerText(),/He went yesterday/);
-   await f.locator('button[data-tab="settings"]').first().click();
+   await f.locator('.bottom-nav button[data-tab="settings"]').click();
    await f.locator('button[data-authorize-session]').click();
    assert.match(await f.locator('body').innerText(),/chat-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/);
    await f.locator('button[data-revoke-session]').click();
