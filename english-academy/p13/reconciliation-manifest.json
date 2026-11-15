@@ -13,7 +13,8 @@
   ],
   "reviewedLocalChanges": [
     "english-academy/tests/routing.test.mjs",
-    ".github/workflows/english-academy-p10-ci.yml"
+    ".github/workflows/english-academy-p10-ci.yml",
+    "supabase/functions/lizhi-english-academy/index.ts"
   ],
   "mustPreserve": [
     "app.js",
