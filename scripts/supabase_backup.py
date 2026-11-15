@@ -309,6 +309,15 @@ def main():
         }, sort_keys=True), flush=True)
         source_objects = {(r[0], r[1]): r[2] for r in source["objects"]}
         actual_objects = {(r[0], r[1]): r[2] for r in actual["objects"]}
+        differences = [{"kind": k[0], "name": k[1],
+            "source": source_objects.get(k), "restored": actual_objects.get(k)}
+            for k in sorted(source_objects.keys() | actual_objects.keys())
+            if source_objects.get(k) != actual_objects.get(k)]
+        diagnostic = root / "restore-differences.json"
+        diagnostic.write_text(json.dumps(differences, ensure_ascii=True, indent=2))
+        run(gpg + ["--symmetric", "--cipher-algo", "AES256", "--output",
+            str(out / "restore-differences.json.gpg"), str(diagnostic)],
+            env=clean, stdin=(passphrase + "\n").encode())
         for kind in sorted({k[0] for k in source_objects} | {k[0] for k in actual_objects}):
             sk = {k for k in source_objects if k[0] == kind}
             ak = {k for k in actual_objects if k[0] == kind}
