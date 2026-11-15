@@ -1,16 +1,32 @@
-// Candidate Supabase Edge Function wrapper only. Not deployed.
-// Authentication and ownership checks live in p1-handler.mjs.
-// P10 safeguard: ALL non-transactional English writes (even candidates) blocked.
-// This intentionally limits the preview until a trusted atomic workflow exists.
-import { handleP1Request } from '../../../english-academy/api/p1-handler.mjs';
+// Existing English Academy Edge entrypoint. Candidate only; NOT deployed.
+// The P10 fail-closed guard remains the default. Enabling P11 requires an
+// explicitly approved production release AND deployed reviewed P1/P5/P6/P7/P11
+// schemas, so a code commit cannot activate data writes.
+import {handleP1Request} from '../../../english-academy/api/p1-handler.mjs';
 import {createP10FailClosedEdge} from '../../../english-academy/p10/fail-closed-edge.mjs';
-// No direct writes until the reviewed transactional session+approval endpoints exist.
-const guardedP1=createP10FailClosedEdge({delegate:handleP1Request});
+import {createP11WebCardApi} from '../../../english-academy/p11/web-card-api.mjs';
+import {createP11SupabaseTrustedWeb} from '../../../english-academy/p11/supabase-verified-web.mjs';
 
-Deno.serve((req:Request) => guardedP1(req,{
-  SUPABASE_URL:Deno.env.get('SUPABASE_URL')||'',
-  SUPABASE_ANON_KEY:Deno.env.get('SUPABASE_ANON_KEY')||'',
-  SUPABASE_SERVICE_ROLE_KEY:Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'',
-  ENGLISH_ALLOWED_ORIGIN:Deno.env.get('ENGLISH_ALLOWED_ORIGIN')||
-    'https://lihuany635-create.github.io'
-}));
+const guardedP1=createP10FailClosedEdge({delegate:handleP1Request});
+Deno.serve(async(req:Request)=>{
+ const env={
+   SUPABASE_URL:Deno.env.get('SUPABASE_URL')||'',
+   SUPABASE_ANON_KEY:Deno.env.get('SUPABASE_ANON_KEY')||'',
+   SUPABASE_SERVICE_ROLE_KEY:Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'',
+   ENGLISH_ALLOWED_ORIGIN:Deno.env.get('ENGLISH_ALLOWED_ORIGIN')||
+     'https://lihuany635-create.github.io'
+ };
+ // Deliberately OFF unless approved as a separate production change.
+ if(Deno.env.get('ENGLISH_P11_WEB_WRITES_APPROVED')!=='true')
+   return guardedP1(req,env);
+ try{
+   const {verifyOwner,trustedDb}=createP11SupabaseTrustedWeb({env});
+   const handle=createP11WebCardApi({
+     verifyOwner,trustedDb,allowedOrigin:env.ENGLISH_ALLOWED_ORIGIN
+   });
+   return await handle(req);
+ }catch{
+   return Response.json({code:'ENGLISH_BACKEND_UNAVAILABLE'},
+     {status:503,headers:{'cache-control':'no-store'}});
+ }
+});
