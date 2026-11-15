@@ -6,9 +6,10 @@ const RID=/^[A-Za-z0-9_-]{12,100}$/;
 const READ=new Map([
   ['cards','english_cards'],
   ['candidates','english_card_candidates'],
-  ['errors','english_error_records']
+  ['errors','english_error_records'],
+  ['sessions','english_session_authorizations']
 ]);
-const WRITE=new Set(['candidate','accept','ignore']);
+const WRITE=new Set(['candidate','accept','ignore','authorize-session','revoke-session']);
 const noCache={'content-type':'application/json; charset=utf-8',
   'cache-control':'no-store','vary':'Origin'};
 const limited=(s,max)=>typeof s==='string'&&s.trim().length>0&&s.trim().length<=max;
@@ -39,7 +40,8 @@ async function readBody(request){
 }
 const errorCode=(e)=>{
   const known=new Set(['IDEMPOTENCY_CONFLICT','CANDIDATE_NOT_PENDING',
-    'CANDIDATE_NOT_FOUND','OWNER_NOT_AUTHORIZED']);
+    'CANDIDATE_NOT_FOUND','OWNER_NOT_AUTHORIZED',
+    'WEB_SESSION_INACTIVE','CHAT_SESSION_NOT_FOUND']);
   const code=typeof e?.code==='string'?e.code:'';
   if(known.has(code))return code;
   const msg=String(e?.message||'');
@@ -76,7 +78,7 @@ export function createP11WebCardApi({
    try{actor=await verifyOwner({bearer:authorization.slice(7),request});}
    catch{return respondError(401,'AUTH_INVALID',allowedOrigin);}
    if(actor?.serverVerified!==true||actor.identityType!=='google-user'||
-     !UUID.test(actor.ownerId||'')||!limited(actor.sessionId,128)||
+     !UUID.test(actor.ownerId||'')||!UUID.test(actor.sessionId||'')||
      !Array.isArray(actor.scopes)||!actor.scopes.includes('english:read'))
      return respondError(403,'ACCOUNT_NOT_ALLOWED',allowedOrigin);
    const ownerId=actor.ownerId;
@@ -113,6 +115,19 @@ export function createP11WebCardApi({
      payload={p_owner_id:ownerId,p_request_id:data.requestId,
        p_term:data.term.trim(),p_meaning_zh:data.meaningZh.trim(),
        p_sense_key:(data.senseKey??'').trim()};
+   } else if(path==='authorize-session'){
+     if(!validateShape(data,['requestId']))
+       return respondError(400,'INVALID_BODY',allowedOrigin);
+     rpc='english_web_grant_chat_session';
+     payload={p_owner_id:ownerId,p_web_session_id:actor.sessionId,
+       p_source_session_id:'chat-'+crypto.randomUUID(),p_request_id:data.requestId};
+   } else if(path==='revoke-session'){
+     if(!validateShape(data,['requestId','sourceSessionId'])||
+       !/^chat-[0-9a-f-]{36}$/.test(data.sourceSessionId||''))
+       return respondError(400,'INVALID_CHAT_SESSION',allowedOrigin);
+     rpc='english_web_revoke_chat_session';
+     payload={p_owner_id:ownerId,p_web_session_id:actor.sessionId,
+       p_source_session_id:data.sourceSessionId,p_request_id:data.requestId};
    } else {
      if(!validateShape(data,['requestId','candidateId'])||
         !UUID.test(data.candidateId||''))
@@ -139,7 +154,8 @@ export function createP11WebCardApi({
      const code=errorCode(e);
      const status=code==='IDEMPOTENCY_CONFLICT'||code==='CANDIDATE_NOT_PENDING'?
        409:code==='OWNER_NOT_AUTHORIZED'?403:
-       code==='CANDIDATE_NOT_FOUND'?404:503;
+       code==='CANDIDATE_NOT_FOUND'||code==='CHAT_SESSION_NOT_FOUND'?404:
+       code==='WEB_SESSION_INACTIVE'?401:503;
      return respondError(status,code,allowedOrigin);
    }
  };
