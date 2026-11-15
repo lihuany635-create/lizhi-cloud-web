@@ -1,4 +1,4 @@
-// Existing English Academy Edge entrypoint. Candidate only; NOT deployed.
+// English Academy Edge entrypoint for the existing owner-only Supabase project.
 // The P10 fail-closed guard remains the default. Enabling P11 requires an
 // explicitly approved production release AND deployed reviewed P1/P5/P6/P7/P11
 // schemas, so a code commit cannot activate data writes.
@@ -28,8 +28,10 @@ Deno.serve(async(req:Request)=>{
   try{return await createProductionEnglishMcp({env})(req);}
   catch{return Response.json({code:'ENGLISH_BACKEND_UNAVAILABLE'},{status:503});}
  }
- // Deliberately OFF unless approved as a separate production change.
- if(Deno.env.get('ENGLISH_P11_WEB_WRITES_APPROVED')!=='true')
+ // The owner approved this English website integration. Privileged writes
+ // remain behind verified Google JWT, active auth.sessions, allowlist and
+ // service-role-only RPCs. Explicit env=false is the emergency kill switch.
+ if(Deno.env.get('ENGLISH_P11_WEB_WRITES_APPROVED')==='false')
    return guardedP1(req,env);
  try{
    const {verifyOwner,trustedDb}=createP11SupabaseTrustedWeb({env});
