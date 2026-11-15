@@ -5,11 +5,13 @@ const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]
 const readTables=new Map([
  ['english_cards','id,owner_id,term,meaning_zh,example_en,created_at'],
  ['english_card_candidates','id,owner_id,term,meaning_zh,status,example_en,created_at'],
- ['english_error_records','id,owner_id,original_sentence,corrected_sentence,explanation,skill,occurred_at']
+ ['english_error_records','id,owner_id,original_sentence,corrected_sentence,explanation,skill,occurred_at'],
+ ['english_session_authorizations','owner_id,source_session_id,enabled,expires_at,granted_at']
 ]);
 const writeRpc=new Set([
  'english_web_create_candidate','english_web_promote_candidate',
- 'english_web_ignore_candidate'
+ 'english_web_ignore_candidate','english_web_grant_chat_session',
+ 'english_web_revoke_chat_session'
 ]);
 function decodeClaims(bearer){
  const segments=bearer.split('.');
@@ -51,7 +53,8 @@ export function createP11SupabaseTrustedWeb({env,fetchImpl=fetch}={}){
      const qs=new URLSearchParams({
        owner_id:'eq.'+ownerId,
        select:readTables.get(table),
-       order:table==='english_error_records'?'occurred_at.desc':'created_at.desc',
+       order:table==='english_error_records'?'occurred_at.desc':
+         table==='english_session_authorizations'?'granted_at.desc':'created_at.desc',
        limit:String(limit)
      });
      if(filters.status)qs.set('status','eq.'+filters.status);
