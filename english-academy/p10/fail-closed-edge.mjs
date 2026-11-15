@@ -12,6 +12,9 @@ const response=(status,code,origin)=>new Response(JSON.stringify({code}),{
     ...(origin?{'access-control-allow-origin':origin}:{})
   }
 });
+/**
+ * @param {{ delegate?: (req: Request, env?: any, fetchImpl?: typeof fetch) => Promise<Response>, allowedOrigin?: string }} options
+ */
 export function createP10FailClosedEdge({
   delegate,allowedOrigin='https://lihuany635-create.github.io'
 }={}){
