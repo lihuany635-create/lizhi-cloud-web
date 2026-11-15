@@ -6,7 +6,7 @@ const BASE = (Deno.env.get("SUPABASE_URL") || "").replace(/\/$/, "");
 const ANON = Deno.env.get("SUPABASE_ANON_KEY") || "";
 const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const OWNER_UID = Deno.env.get("LIZHI_USAGE_OWNER_UID") || "";
-const BYTE_GB = 1024 ** 3;
+const BYTE_GB = 1000 ** 3;
 const allowOrigin = { "Access-Control-Allow-Origin": ORIGIN, "Vary": "Origin" };
 class HttpError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -40,7 +40,7 @@ async function readRows(path: string): Promise<Record<string, any>[]> {
 }
 function totals(rows: Record<string,any>[]) {
   const zero=()=>({request_count:0,request_bytes_known:0,response_bytes_known:0,
-    unknown_request_count:0,unknown_response_count:0,blocked_count:0,error_count:0});
+    unknown_request_count:0,unknown_response_count:0,blocked_count:0,throttled_count:0,error_count:0});
   const all=zero();
   const per=new Map<string,ReturnType<typeof zero>>();
   for(const r of rows){
@@ -63,7 +63,7 @@ function quotaCards(s: ReturnType<typeof totals>["summary"]) {
     {key:"edge_invocations",label:"Edge Invocations（已接入下限）",limit:500000,unit:" 次",observed:s.request_count,official_used:null},
     {key:"egress",label:"Egress（已知回應大小）",limit:5*BYTE_GB,unit:" B",observed:s.response_bytes_known,official_used:null},
     {key:"cached_egress",label:"Cached Egress",limit:5*BYTE_GB,unit:" B",observed:null,official_used:null},
-    {key:"db_storage",label:"Database Size",limit:500*1024*1024,unit:" B",observed:null,official_used:null},
+    {key:"db_storage",label:"Database Size",limit:500*1000*1000,unit:" B",observed:null,official_used:null},
     {key:"storage",label:"Storage Size",limit:BYTE_GB,unit:" B",observed:null,official_used:null},
     {key:"realtime_messages",label:"Realtime Messages",limit:2000000,unit:" 則",observed:null,official_used:null}
   ];
@@ -85,7 +85,7 @@ Deno.serve(async (req: Request) => {
     const start=month+"-01T00:00:00Z";
     const next=new Date(Date.UTC(Number(month.slice(0,4)), Number(month.slice(5)), 1)).toISOString().slice(0,10)+"T00:00:00Z";
     const dayStart=start.slice(0,10),dayEnd=next.slice(0,10);
-    const dailyPath="lz_usage_daily?select=source,request_count,request_bytes_known,response_bytes_known,unknown_request_count,unknown_response_count,blocked_count,error_count&and="+encodeURIComponent("(day.gte."+dayStart+",day.lt."+dayEnd+")")+"&limit=5000";
+    const dailyPath="lz_usage_daily?select=source,request_count,request_bytes_known,response_bytes_known,unknown_request_count,unknown_response_count,blocked_count,throttled_count,error_count&and="+encodeURIComponent("(day.gte."+dayStart+",day.lt."+dayEnd+")")+"&limit=5000";
     const eventsPath="lz_usage_events?select=occurred_at,source,route,status_code,request_bytes,response_bytes,duration_ms,decision&and="+encodeURIComponent("(occurred_at.gte."+start+",occurred_at.lt."+next+")")+"&order=occurred_at.desc&limit=100";
     const [daily,events]=await Promise.all([readRows(dailyPath),readRows(eventsPath)]);
     const t=totals(daily);
