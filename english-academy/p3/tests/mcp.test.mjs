@@ -295,7 +295,6 @@ test('JSON request rejects unknown methods, invalid batch, malformed JSON',async
   const unknown=await ctx.handle(req('session/delete'));
   assert.equal((await unknown.json()).error.code,-32601);
   const invalid=req('tools/list',{}, {body:[{jsonrpc:'2.0',id:1,method:'tools/list'}]});
-  assert.equal(invalid.status??null,undefined);
   const r=await ctx.handle(invalid);
   assert.equal(r.status,400);
   const malformed=await ctx.handle(req('tools/list',{}, {body:'{not-json'}));
