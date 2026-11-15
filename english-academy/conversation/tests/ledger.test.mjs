@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import { createLedger, addCandidate, recordReview, entryProgress,
   exportLedger, importLedger, LEDGER_SCHEMA } from '../ledger.mjs';
 
-const sentence = {kind:'sentence',original:'I am prefer salty.',correction:'I prefer salty food.',
-  meaning:'我比較喜歡鹹食',topic:'food'};
+const sentence = {kind:'sentence',original:'She go to school yesterday.',correction:'She went to school yesterday.',
+  meaning:'過去式 go 應改為 went',topic:'weekend'};
 const newSentence = (ledger,id='s1',at='2026-11-15T10:00:00.000Z') =>
   addCandidate(ledger,sentence,{id,at});
 const review = (ledger,{reviewId='r1',verdict='correct',reviewer='self',
-  at='2026-11-16T10:00:00.000Z',answer='I prefer salty food.'}={}) =>
+  at='2026-11-16T10:00:00.000Z',answer='She went to school yesterday.'}={}) =>
   recordReview(ledger,{entryId:'s1',reviewId,verdict,reviewer,at,answer});
 
 test('separates original, correction, meaning and topic without storing AI claims',()=>{
@@ -16,7 +16,7 @@ test('separates original, correction, meaning and topic without storing AI claim
  assert.equal(ledger.schema,LEDGER_SCHEMA);
  assert.equal(ledger.entries[0].original,sentence.original);
  assert.equal(ledger.entries[0].correction,sentence.correction);
- assert.equal(ledger.entries[0].topic,'food');
+ assert.equal(ledger.entries[0].topic,'weekend');
  assert.equal(ledger.events.length,0);
 });
 test('repeated mistake is a single candidate and ID collisions are rejected',()=>{
