@@ -109,7 +109,51 @@ begin
  exception when raise_exception then
    if SQLERRM<>'OWNER_NOT_AUTHORIZED' then raise;end if;
  end;
-end $$;
+end $;
+-- The website is the ONLY party allowed to authorize one scoped ChatGPT
+-- practice conversation. An MCP client may later reference its issued ID.
+do $
+declare
+ owner_a uuid:='11111111-1111-4111-8111-111111111111';
+ web_session uuid:='5cbf2e04-61ca-4c69-9d85-4ba11dcb6303';
+ source_id text:='chat-9c5f3ef2-86ec-44be-8a1b-45ba21d7fa5d';
+ out_json jsonb; replay jsonb; saved jsonb;
+begin
+ out_json=public.english_web_grant_chat_session(
+   owner_a,web_session,source_id,'p11-chat-grant-000001');
+ if out_json->>'status'<>'authorized' then
+   raise exception 'P11_WEB_CHAT_GRANT_FAILED %',out_json;end if;
+ replay=public.english_web_grant_chat_session(
+   owner_a,web_session,'chat-479f751a-7240-44a1-ad40-9eecebe1998b',
+   'p11-chat-grant-000001');
+ if replay->>'status'<>'replay' or replay->>'sourceSessionId'<>source_id then
+   raise exception 'P11_CHAT_GRANT_IDEMPOTENCY_FAILED %',replay; end if;
+ if not exists(select 1 from public.english_session_authorizations
+     where owner_id=owner_a and source_session_id=source_id
+       and enabled and explicitly_confirmed) then
+   raise exception 'P11_CHAT_SOURCE_NOT_AUTHORIZED';end if;
+ saved=public.english_p6_ingest_batch(owner_a,source_id,'p11-chat-sync-0000001',
+   '[{"term":"sketch","meaningZh":"草圖"}]'::jsonb,
+   '[{"original":"He draw yesterday.","corrected":"He drew yesterday.",
+      "explanation":"Use the past tense drew."}]'::jsonb);
+ if saved->>'status'<>'success' then
+   raise exception 'P11_AUTHORIZED_CHAT_SYNC_FAILED %',saved;end if;
+ out_json=public.english_web_revoke_chat_session(
+   owner_a,web_session,source_id,'p11-chat-revoke-0001');
+ if out_json->>'status'<>'revoked' then
+   raise exception 'P11_REVOKE_CHAT_FAILED %',out_json;end if;
+ if exists(select 1 from public.english_session_authorizations
+     where owner_id=owner_a and source_session_id=source_id and enabled) then
+   raise exception 'P11_CHAT_REVOKE_STILL_ACTIVE';end if;
+ begin
+   perform public.english_p6_ingest_batch(owner_a,source_id,
+     'p11-chat-sync-0000002',
+     '[{"term":"lunch","meaningZh":"午餐"}]'::jsonb,'[]'::jsonb);
+   raise exception 'P11_REVOKED_CHAT_STILL_WRITABLE';
+ exception when raise_exception then
+   if SQLERRM<>'LEARNING_SESSION_NOT_AUTHORIZED' then raise;end if;
+ end;
+end $;
 reset role;
 delete from auth.sessions where id='5cbf2e04-61ca-4c69-9d85-4ba11dcb6303';
 set role service_role;
