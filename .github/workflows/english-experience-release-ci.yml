@@ -43,7 +43,7 @@ jobs:
           const app=readFileSync('app.js','utf8');
           if(!idx.includes('window.parent.LizhiAuth'))throw Error('PORTAL_GATING_MISSING');
           if(!auth.includes('"english"')||!app.includes('renderEnglish'))throw Error('ROUTE_MISSING');
-          if(/fetch\\s*\\(|supabase\\.|\\/functions\\/v1\\//i.test(text))throw Error('EXPERIENCE_NETWORK_CALL');
+          if(['fetch(', 'supabase.', '/functions/v1/'].some(s=>text.includes(s)))throw Error('EXPERIENCE_NETWORK_CALL');
           if(!idx.includes('noindex, nofollow'))throw Error('NOINDEX_MISSING');
           console.log('ENGLISH_STATIC_NO_CLOUD_WRITE_PASS');
           NODE
