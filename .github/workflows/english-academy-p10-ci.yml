@@ -1,0 +1,91 @@
+name: English Academy P10 integration and security audit (no deployment)
+on:
+  pull_request:
+    paths:
+      - 'english-academy/p10/**'
+      - 'supabase/functions/lizhi-english-academy/index.ts'
+      - '.github/workflows/english-academy-p10-ci.yml'
+permissions:
+  contents: read
+jobs:
+  p10-owner-and-safety:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check P10 integration module syntax
+        run: |
+          node --check english-academy/p10/owner-contract.mjs
+          node --check english-academy/p10/fail-closed-edge.mjs
+          node --check english-academy/p10/tests/integration-security.test.mjs
+      - name: Test P3/P7/P6 owner binding and unsafe Edge write refusal
+        run: node --test english-academy/p10/tests/integration-security.test.mjs
+      - name: Re-run P9 release and privacy maintenance safety tests
+        run: node --test english-academy/p9/tests/release-maintenance.test.mjs
+      - name: Check P9 published NO_GO contract remains true
+        run: node english-academy/p9/scripts/create-prelaunch-report.mjs
+      - name: Retain isolated NO_GO artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: english-p10-p9-no-go-proof
+          path: english-academy/p9/test-results/prelaunch-blocked.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  p10-upstream-ancestry:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify immutable P1-P9 ancestor SHA chain
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          const m=JSON.parse(readFileSync('english-academy/p10/upstream-lock.json','utf8'));
+          if(m.upstream.length!==9)throw Error('WRONG_STAGE_COUNT');
+          let previous=null;
+          for(const row of m.upstream){
+            if(previous && row.base!==previous.head)throw Error('BROKEN_STAGE_BRANCH_CHAIN');
+            execFileSync('git',['cat-file','-e',row.headSha+'^{commit}']);
+            execFileSync('git',['merge-base','--is-ancestor',row.headSha,'HEAD']);
+            if(previous)execFileSync('git',['merge-base','--is-ancestor',previous.headSha,row.headSha]);
+            if(row.draft!==true||row.merged!==false)throw Error('UNEXPECTED_RELEASE_STATE');
+            previous=row;
+          }
+          if(previous.head!==m.p10.base)throw Error('P10_WRONG_PARENT');
+          if(m.formalAcceptance.passed!==0)throw Error('UNVERIFIED_FORMAL_ACCEPTANCE');
+          if(Object.values(m.approvalScopes).some(Boolean))throw Error('UNAUTHORIZED_PRODUCTION_APPROVAL');
+          console.log('P10_P1_TO_P9_LOCKED_HISTORY_PASS');
+          NODE
+      - name: Ensure no production write instructions in P10 workflow
+        run: |
+          set -euo pipefail
+          test -f english-academy/p10/README.md
+          grep -q 'NO-GO' english-academy/p10/README.md
+          if grep -Eiq '(supabase db push|supabase functions deploy|gh pr merge|deploy-pages|secrets\.)' .github/workflows/english-academy-p10-ci.yml; then
+            echo P10_FORBIDDEN_DEPLOYMENT_REFERENCE
+            exit 1
+          fi
+          echo P10_READ_ONLY_CI_PASS
+
+  p10-edge-compile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check non-deployed stricter Edge function
+        run: deno check supabase/functions/lizhi-english-academy/index.ts
