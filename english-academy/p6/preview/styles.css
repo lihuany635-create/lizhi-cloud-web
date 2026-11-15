@@ -1,0 +1,25 @@
+
+.p6-shell{max-width:980px;margin:0 auto;padding:16px 18px 110px}
+.p6-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.p6-logo{font-size:22px;font-weight:780}
+.p6-switch{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.p6-switch .button.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.p6-question{font-size:clamp(20px,4vw,28px);font-weight:700;line-height:1.4;overflow-wrap:anywhere}
+.p6-note{font-size:13px;color:var(--muted);line-height:1.6}
+.p6-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.p6-form{display:flex;flex-direction:column;gap:12px}
+.p6-form textarea{min-height:95px}
+.p6-rubric{display:flex;flex-direction:column;gap:12px;margin:12px 0}
+.p6-rubric label{display:flex;align-items:flex-start;gap:10px;font-size:14px}
+.p6-rubric input{width:19px;height:19px;accent-color:var(--accent)}
+.p6-result{border:1px solid var(--border);background:var(--soft);padding:14px;border-radius:12px;margin:14px 0;line-height:1.5;overflow-wrap:anywhere}
+.p6-result strong{display:block;margin-bottom:4px}
+.p6-mini-list{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.p6-mini-list .pill{background:var(--soft)}
+.p6-footer{text-align:center;font-size:12px;color:var(--muted);margin-top:26px}
+@media(max-width:420px){
+ .p6-shell{padding:12px 12px 100px}
+ .p6-options{grid-template-columns:1fr}
+ .p6-switch .button{font-size:12px;padding:9px 10px}
+ .p6-logo{font-size:17px}
+}
