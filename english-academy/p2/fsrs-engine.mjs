@@ -1,6 +1,7 @@
 // P2 isolated FSRS adapter. Zero production data access.
 // Uses open-spaced-repetition/ts-fsrs v6.0.0 + FSRS-7, Node >=24.
 import { DefaultScheduler, Rating } from 'ts-fsrs';
+export {Rating};
 
 export const ENGINE_VERSION = Object.freeze({
   library: 'ts-fsrs',
