@@ -32,7 +32,7 @@ export function candidateDecision(state, candidateId, decision) {
   const cards=decision==='accept' && !exists
     ? [...state.cards,{id:'card-'+candidate.id,term:candidate.term,meaning:candidate.meaning,type:candidate.type,example:candidate.example,status:'active'}]
     : state.cards;
-  return {state:{...state,candidates,cards,audit:audit(state,decision==='accept'?'approve_candidate':'ignore_candidate',candidateId)},code:exists?'DUPLICATE':decision==='accept'?'APPROVED':'IGNORED'};
+  return {state:{...state,candidates,cards,audit:audit(state,decision==='accept'?'approve_candidate':'ignore_candidate',candidateId)},code:decision==='accept' && exists?'DUPLICATE':decision==='accept'?'APPROVED':'IGNORED'};
 }
 export function addExplicitDemoCard(state,{term,meaning}) {
   const normalized=normalizeTerm(term);
@@ -54,4 +54,12 @@ export function getDemoSummary(state) {
   const done=state.practice.length;
   const correct=state.practice.filter(x=>x.correct).length;
   return {pending,cards:state.cards.length,done,accuracy:done?Math.round(correct/done*100):null};
+}
+
+// Pure selector keeps live search safe without re-rendering the focused input.
+export function filterDemoCards(state, query) {
+  const q = normalizeTerm(query);
+  if (!q) return state.cards;
+  return state.cards.filter(card =>
+    normalizeTerm(card.term).includes(q) || String(card.meaning).includes(String(query).trim()));
 }
