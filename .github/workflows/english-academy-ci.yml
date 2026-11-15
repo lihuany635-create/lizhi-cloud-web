@@ -71,3 +71,14 @@ jobs:
           docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-fixture.sql
           docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/schema/20261115_p1_candidate.sql
           docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-rls.test.sql
+
+  edge-type-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check undeployed Supabase Edge module imports
+        run: deno check supabase/functions/lizhi-english-academy/index.ts
