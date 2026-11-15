@@ -5,7 +5,7 @@ const h=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt
 const tabs={home:'首頁',cards:'單字中心',errors:'錯句紀錄',courses:'課程地圖',analytics:'學習分析',settings:'設定'};
 const ui={
  phase:'checking',error:null,section:'home',theme:'light',busy:false,
- cards:[],candidates:[],errors:[],notice:'',identity:null
+ cards:[],candidates:[],errors:[],sessions:[],notice:'',identity:null
 };
 const errorMessages={
  AUTH_REQUIRED:'登入逾期，請從立之雲端庫重新登入。',
@@ -60,11 +60,12 @@ async function buildClient(){
  return {call};
 }
 async function refresh(){
- const [cards,candidates,errors]=await Promise.all([api.call('cards'),api.call('candidates'),api.call('errors')]);
- if(!Array.isArray(cards.items)||!Array.isArray(candidates.items)||!Array.isArray(errors.items))throw {code:'DB_OPERATION_FAILED'};
+ const [cards,candidates,errors,sessions]=await Promise.all([api.call('cards'),api.call('candidates'),api.call('errors'),api.call('sessions')]);
+ if(!Array.isArray(cards.items)||!Array.isArray(candidates.items)||!Array.isArray(errors.items)||!Array.isArray(sessions.items))throw {code:'DB_OPERATION_FAILED'};
  ui.cards=cards.items;
  ui.candidates=candidates.items;
  ui.errors=errors.items;
+ ui.sessions=sessions.items;
 }
 async function initialize(){
  ui.phase='checking';render();
@@ -151,8 +152,22 @@ function viewAnalytics(){
 function viewSettings(){
  return '<h1 class="view-title">設定</h1><p class="view-subtitle">私人學習資料只讀取已授權帳號的內容。</p>'+
  '<section class="card"><h2>顯示模式</h2><button class="button" data-theme="1">'+(ui.theme==='light'?'切換深色模式':'切換淺色模式')+'</button>'+
- '<div class="gap"></div><div class="notice">登入由立之雲端庫 Google OAuth 處理，英文學習教室不儲存密碼。</div></section>';
+ '<div class="gap"></div><div class="notice">登入由立之雲端庫 Google OAuth 處理，英文學習教室不儲存密碼。</div></section>'+
+ '<div class="gap"></div><section class="card"><h2>ChatGPT 英文學習對話授權</h2>'+
+ '<p class="muted small">授權有效期間為 24 小時。只有使用該授權代碼、且通過本人 MCP 身分驗證的英文學習對話才能同步候選單字與錯句；其他聊天不會自動擷取。可隨時撤銷。</p>'+
+ '<button class="button primary" data-authorize-session="1">建立英文學習授權代碼</button>'+
+ '<div class="gap"></div><div class="list">'+
+ (ui.sessions.length?ui.sessions.map(s=>
+  '<article class="list-row"><div><strong>'+(s.enabled?'已授權':'已撤銷')+'</strong>'+
+  '<p class="muted">代碼（長按可複製）</p><code style="overflow-wrap:anywhere;user-select:text">'+h(s.source_session_id)+'</code>'+
+  '<p>到期時間：'+h(s.expires_at)+'</p></div>'+
+  '<div class="actions">'+
+  '<button class="button small-button" data-copy-session="'+h(s.source_session_id)+'">複製</button>'+
+  (s.enabled?'<button class="button small-button" data-revoke-session="'+h(s.source_session_id)+'">撤銷</button>':'')+
+  '</div></article>').join(''):'<div class="notice">尚未核准任何英文對話來源。</div>')+
+ '</div><div class="gap"></div><div class="notice">正式 MCP 與雲端資料庫驗收完成之前，這個功能不會將對話內容寫入網站。</div></section>';
 }
+
 function render(){
  document.documentElement.dataset.theme=ui.theme;
  const content=ui.phase!=='ready'?statusBox():({home:viewHome,cards:viewCards,errors:viewErrors,courses:viewCourse,analytics:viewAnalytics,settings:viewSettings})[ui.section]();
@@ -175,12 +190,28 @@ app.addEventListener('click',async event=>{
  if(btn.dataset.retry){await initialize();return;}
  if(btn.dataset.tab){ui.section=btn.dataset.tab;ui.notice='';render();return;}
  if(btn.dataset.theme){ui.theme=ui.theme==='light'?'dark':'light';render();return;}
+ if(btn.dataset.copySession){
+   try{await navigator.clipboard.writeText(btn.dataset.copySession);ui.notice='授權代碼已複製。';}
+   catch{ui.notice='此瀏覽器無法自動複製，請長按代碼複製。';}
+   render();return;
+ }
  if(btn.dataset.speak){
    if('speechSynthesis' in window){const s=new SpeechSynthesisUtterance(btn.dataset.speak);s.lang='en-US';speechSynthesis.speak(s);}
    else{ui.notice='此瀏覽器沒有語音播放功能';render();}
    return;
  }
  if(!api||ui.phase!=='ready')return;
+ if(btn.dataset.authorizeSession){
+   if(!window.confirm('確認授權本次英文練習對話同步候選單字與錯句，效期 24 小時？'))return;
+   await act(()=>api.call('authorize-session','POST',{requestId:randomId()}));
+   return;
+ }
+ if(btn.dataset.revokeSession){
+   if(!window.confirm('確認撤銷這段學習對話的後續同步權限？'))return;
+   await act(()=>api.call('revoke-session','POST',{
+     requestId:randomId(),sourceSessionId:btn.dataset.revokeSession}));
+   return;
+ }
  if(btn.dataset.accept){
    const c=ui.candidates.find(x=>x.id===btn.dataset.accept);
    if(!c||!window.confirm('確認把「'+c.term+'」加入正式單字卡嗎？'))return;
