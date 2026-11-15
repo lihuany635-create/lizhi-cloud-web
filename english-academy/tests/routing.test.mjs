@@ -14,11 +14,12 @@ test('route permitted by main cloud auth redirect allowlist',()=>{
 test('main route navigation links to English candidate without removing study',()=>{
  assert.match(app,/OPEN_ROUTES=\[[^\n]*"english"/);
  assert.match(app,/\["study","✎","立之讀書室"\]/);
- assert.match(app,/\["english","英","英文學習教室"\]/);
+ assert.match(app,/\["english","英","英文學習教室 · 體驗版"\]/);
 });
-test('English preview mounted in the existing workspace router',()=>{
+test('released static experience stays mounted in the existing workspace router',()=>{
  assert.match(app,/function renderEnglish\(\)/);
- assert.match(app,/english-academy\/preview\//);
+ assert.match(app,/english-academy\/experience\//);
+ assert.doesNotMatch(app,/src="\.\/english-academy\/preview\//);
  assert.match(workspace,/state\.route === 'english'/);
  assert.match(workspace,/renderEnglish\(\)/);
 });
