@@ -2,10 +2,10 @@
 // It remains inaccessible until the owner separately approves Supabase migration and Edge deployment.
 const app=document.getElementById('app');
 const h=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const tabs={home:'首頁',cards:'單字中心',courses:'課程地圖',analytics:'學習分析',settings:'設定'};
+const tabs={home:'首頁',cards:'單字中心',errors:'錯句紀錄',courses:'課程地圖',analytics:'學習分析',settings:'設定'};
 const ui={
  phase:'checking',error:null,section:'home',theme:'light',busy:false,
- cards:[],candidates:[],notice:'',identity:null
+ cards:[],candidates:[],errors:[],notice:'',identity:null
 };
 const errorMessages={
  AUTH_REQUIRED:'登入逾期，請從立之雲端庫重新登入。',
@@ -19,7 +19,10 @@ const errorMessages={
  EXPLICIT_CONFIRMATION_REQUIRED:'需由本人確認審核操作。',
  CANDIDATE_NOT_PENDING:'此候選單字已處理。',
  ORIGIN_NOT_ALLOWED:'網站來源未授權。',
- SERVER_UNAVAILABLE:'目前無法連接學習服務。'
+ SERVER_UNAVAILABLE:'目前無法連接學習服務。',
+ ENGLISH_BACKEND_UNAVAILABLE:'正式單字後端尚未啟用或暫時無法使用。',
+ CANDIDATE_NOT_PENDING:'這張候選卡已處理，請重新整理。',
+ SCOPE_DENIED:'帳號沒有此功能的權限。'
 };
 const randomId=()=>crypto.randomUUID();
 let api=null;
@@ -57,10 +60,11 @@ async function buildClient(){
  return {call};
 }
 async function refresh(){
- const [cards,candidates]=await Promise.all([api.call('cards'),api.call('candidates')]);
- if(!Array.isArray(cards.items)||!Array.isArray(candidates.items))throw {code:'DB_OPERATION_FAILED'};
+ const [cards,candidates,errors]=await Promise.all([api.call('cards'),api.call('candidates'),api.call('errors')]);
+ if(!Array.isArray(cards.items)||!Array.isArray(candidates.items)||!Array.isArray(errors.items))throw {code:'DB_OPERATION_FAILED'};
  ui.cards=cards.items;
  ui.candidates=candidates.items;
+ ui.errors=errors.items;
 }
 async function initialize(){
  ui.phase='checking';render();
@@ -80,7 +84,7 @@ function nav(){
   '<button type="button" data-tab="'+key+'" class="'+(ui.section===key?'active':'')+'">'+value+'</button>').join('')+'</nav>';
 }
 function bottomNav(){
- const icons={home:'⌂',cards:'▣',courses:'◇',analytics:'▥',settings:'⚙'};
+ const icons={home:'⌂',cards:'▣',errors:'✎',courses:'◇',analytics:'▥',settings:'⚙'};
  return '<nav class="bottom-nav" aria-label="手機英文學習導覽">'+Object.entries(tabs).map(([key,value])=>
   '<button type="button" data-tab="'+key+'" class="'+(ui.section===key?'active':'')+'" aria-current="'+(ui.section===key?'page':'false')+'">'+
   '<span class="emoji" aria-hidden="true">'+icons[key]+'</span>'+value+'</button>').join('')+'</nav>';
@@ -100,7 +104,7 @@ function viewHome(){
  '<div><div class="value">'+ui.cards.length+'</div><div class="label">正式單字</div></div>'+
  '<div><div class="value">'+pending+'</div><div class="label">待審核</div></div>'+
  '<div><div class="value">—</div><div class="label">尚未啟用 FSRS</div></div></div>'+
- '<div class="gap"></div><div class="notice">目前完成 P1 單字核心；FSRS 與 AI 自適應課程屬後續階段。</div></section></div>';
+ '<div class="gap"></div><div class="notice">僅顯示經正式後端讀回的資料；錯句與單字卡不會在離線或未授權時假裝保存。</div></section></div>';
 }
 function viewCards(){
  const pending=ui.candidates.filter(x=>x.status==='pending');
@@ -119,8 +123,19 @@ function viewCards(){
  '<label for="live-term">英文</label><input id="live-term" name="term" class="input" required maxlength="120" placeholder="hungry">'+
  '<div class="gap"></div><label for="live-meaning">中文意思</label>'+
  '<input id="live-meaning" name="meaningZh" class="input" required maxlength="500" placeholder="飢餓的">'+
- '<div class="gap"></div><button class="button primary" type="submit">確認新增</button></form>'+
- '<div class="gap"></div><p class="muted small">新增的是正式單字，並記錄操作來源。尚未提供 FSRS 排程。</p></section></div>';
+ '<div class="gap"></div><button class="button primary" type="submit">加入待審核單字</button></form>'+
+ '<div class="gap"></div><p class="muted small">手動輸入先進入候選庫；只有按「加入」並由正式後端確認，才會建立正式單字卡。</p></section></div';
+}
+function viewErrors(){
+ return '<h1 class="view-title">聊天錯句紀錄</h1>'+
+  '<p class="view-subtitle">保留你原本的英文、修正句及說明；只顯示正式後端已保存的紀錄。</p>'+
+  '<section class="card"><h2>已記錄 ('+ui.errors.length+')</h2><div class="list">'+
+   (ui.errors.length?ui.errors.map(e=>'<article class="list-row">'+
+    '<div><p class="muted">原句</p><strong>'+h(e.original_sentence)+'</strong>'+
+    '<p class="muted">建議修正</p><strong>'+h(e.corrected_sentence)+'</strong>'+
+    '<p>'+h(e.explanation)+'</p></div></article>').join(''):
+    '<div class="notice">尚無從已授權英文聊天同步的錯句。</div>')+
+   '</div></section>';
 }
 function viewCourse(){
  return '<h1 class="view-title">課程地圖</h1><p class="view-subtitle">階段與 AI 課程將在 P4 啟用，現在不產生未經測試的程度判定。</p>'+
@@ -131,7 +146,7 @@ function viewAnalytics(){
  return '<h1 class="view-title">學習分析</h1><p class="view-subtitle">目前只呈現已保存的正式單字數據。</p>'+
  '<section class="card"><div class="stats"><div><div class="value">'+ui.cards.length+'</div><div class="label">已建立單字</div></div>'+
  '<div><div class="value">'+ui.candidates.filter(x=>x.status==='pending').length+'</div><div class="label">待審核</div></div>'+
- '<div><div class="value">—</div><div class="label">正式程度待評估</div></div></div></section>';
+ '<div><div class="value">'+ui.errors.length+'</div><div class="label">已保存錯句</div></div></div></section>';
 }
 function viewSettings(){
  return '<h1 class="view-title">設定</h1><p class="view-subtitle">私人學習資料只讀取已授權帳號的內容。</p>'+
@@ -140,14 +155,14 @@ function viewSettings(){
 }
 function render(){
  document.documentElement.dataset.theme=ui.theme;
- const content=ui.phase!=='ready'?statusBox():({home:viewHome,cards:viewCards,courses:viewCourse,analytics:viewAnalytics,settings:viewSettings})[ui.section]();
+ const content=ui.phase!=='ready'?statusBox():({home:viewHome,cards:viewCards,errors:viewErrors,courses:viewCourse,analytics:viewAnalytics,settings:viewSettings})[ui.section]();
  app.innerHTML='<div class="app-shell"><header class="header"><div class="brand"><div class="brand-mark">E</div>'+
  '<div><strong>立之英文學習教室</strong><span class="small">PRIVATE ENGLISH LEARNING</span></div></div>'+
  '<span class="pill">P1 · 授權連線候選版</span></header>'+
- '<div class="demo-banner"><strong>正式資料模式（尚未核准部署）</strong><span>不會在登入失敗時改用示範資料</span></div>'+
+ '<div class="demo-banner"><strong>正式後端候選頁</strong><span>後端尚未核准部署時拒絕寫入；不會改用示範資料</span></div>'+
  (ui.phase==='ready'?nav():'')+
  (ui.notice?'<div class="notice" role="status">'+h(ui.notice)+'</div><div class="gap"></div>':'')+
- '<main>'+content+'</main><footer class="footer">ChatGPT MCP 與 FSRS 將由後續階段接續</footer></div>'+(ui.phase==='ready'?bottomNav():'');
+ '<main>'+content+'</main><footer class="footer">單字卡只有讀回後才算保存；ChatGPT MCP 與 FSRS 須正式驗收後啟用</footer></div>'+(ui.phase==='ready'?bottomNav():'');
 }
 async function act(fn){
  if(ui.busy)return; ui.busy=true;
@@ -166,10 +181,18 @@ app.addEventListener('click',async event=>{
    return;
  }
  if(!api||ui.phase!=='ready')return;
- if(btn.dataset.accept) await act(()=>api.call('accept','POST',{
-   requestId:randomId(),candidateId:btn.dataset.accept,userConfirmed:true}));
- if(btn.dataset.ignore) await act(()=>api.call('ignore','POST',{
-   requestId:randomId(),candidateId:btn.dataset.ignore,userConfirmed:true}));
+ if(btn.dataset.accept){
+   const c=ui.candidates.find(x=>x.id===btn.dataset.accept);
+   if(!c||!window.confirm('確認把「'+c.term+'」加入正式單字卡嗎？'))return;
+   await act(()=>api.call('accept','POST',{
+     requestId:randomId(),candidateId:btn.dataset.accept}));
+ }
+ if(btn.dataset.ignore){
+   const c=ui.candidates.find(x=>x.id===btn.dataset.ignore);
+   if(!c||!window.confirm('確定略過「'+c.term+'」？原始紀錄會保留。'))return;
+   await act(()=>api.call('ignore','POST',{
+     requestId:randomId(),candidateId:btn.dataset.ignore}));
+ }
 });
 app.addEventListener('submit',async event=>{
  if(event.target.id!=='live-add-card')return;
@@ -178,6 +201,6 @@ app.addEventListener('submit',async event=>{
  const values=new FormData(event.target);
  const payload={requestId:randomId(),term:String(values.get('term')||''),
    meaningZh:String(values.get('meaningZh')||'')};
- await act(()=>api.call('card','POST',payload));
+ await act(()=>api.call('candidate','POST',payload));
 });
 initialize();
