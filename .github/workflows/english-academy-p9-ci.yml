@@ -1,0 +1,37 @@
+name: English Academy P9 isolated operations and rollback readiness
+on:
+  pull_request:
+    paths:
+      - 'english-academy/p9/**'
+      - '.github/workflows/english-academy-p9-ci.yml'
+permissions:
+  contents: read
+
+jobs:
+  p9-operations:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate P9 monitoring, release and rollback source
+        run: |
+          node --check english-academy/p9/release-readiness.mjs
+          node --check english-academy/p9/health-monitor.mjs
+          node --check english-academy/p9/incident-rollback.mjs
+          node --check english-academy/p9/tests/operations.test.mjs
+          node --check english-academy/p9/scripts/run-rehearsal.mjs
+      - name: Verify fail-closed production readiness and no-op rollback contracts
+        run: node --test english-academy/p9/tests/operations.test.mjs
+      - name: Simulate alert and failed recovery step WITHOUT prod actions
+        run: node english-academy/p9/scripts/run-rehearsal.mjs
+      - name: Retain redacted operations rehearsal without secrets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: english-p9-synthetic-operations-evidence
+          path: english-academy/p9/test-results/operations-rehearsal.json
+          if-no-files-found: ignore
+          retention-days: 14
