@@ -1,4 +1,5 @@
-.route-study .main {
+.route-study .main,
+.route-english .main {
   height: calc(100vh - 76px);
   padding: 0;
   overflow: hidden;
@@ -84,6 +85,7 @@
 
 @media (max-width: 680px) {
   .route-study .main,
+  .route-english .main,
   .route-a4 .main,
   .route-licut .main {
     height: calc(100dvh - 68px);
