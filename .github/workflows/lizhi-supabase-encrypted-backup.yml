@@ -2,8 +2,15 @@
 name: Supabase encrypted manual backup
 on:
   workflow_dispatch:
+    inputs:
+      restore_run_id:
+        description: 'Existing capture run ID for restore only; blank creates a new backup'
+        required: false
+        type: string
+        default: ''
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: lizhi-supabase-manual-backup
   cancel-in-progress: false
@@ -50,10 +57,21 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/lizhi-backup-venv"
           "$RUNNER_TEMP/lizhi-backup-venv/bin/pip" install --disable-pip-version-check 'psycopg[binary]==3.2.13'
           python3 -m unittest discover -s scripts/tests -p 'test_supabase_backup.py' -v
+      - name: Download existing ciphertext for isolated restore only
+        if: ${{ inputs.restore_run_id != '' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESTORE_RUN_ID: ${{ inputs.restore_run_id }}
+        run: |
+          set -euo pipefail
+          case "$RESTORE_RUN_ID" in ''|*[!0-9]*) echo 'Invalid capture run ID'; exit 1;; esac
+          gh run download "$RESTORE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "lizhi-supabase-encrypted-backup-$RESTORE_RUN_ID-1" --dir "$RUNNER_TEMP/lizhi-backup-input"
       - name: Capture, encrypt, decrypt, restore and verify
         shell: bash
         env:
-          SUPABASE_DB_URL: ${{ secrets.LIZHI_SUPABASE_BACKUP_URL }}
+          SUPABASE_DB_URL: ${{ inputs.restore_run_id == '' && secrets.LIZHI_SUPABASE_BACKUP_URL || '' }}
+          LIZHI_RESTORE_CAPTURE_DIR: ${{ inputs.restore_run_id != '' && format('{0}/lizhi-backup-input', runner.temp) || '' }}
           LIZHI_BACKUP_PASSPHRASE: ${{ secrets.LIZHI_BACKUP_PASSPHRASE }}
         run: |
           set -euo pipefail
