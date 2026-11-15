@@ -54,10 +54,15 @@ export function createCandidateInMemory({
     return fail('INVALID_REQUEST_ID');
   if (typeof term !== 'string' || !term.trim() || term.length > 120)
     return fail('INVALID_TERM');
-  const idempotencyKey = resourceOwnerId + ':' + requestId;
-  if (store.requests.has(idempotencyKey))
-    return { ...store.requests.get(idempotencyKey), replay: true };
   const normalized = term.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en');
+  // A request ID is bound to its normalized payload. Different payloads may
+  // never silently reuse a cached response (HTTP 409 in a real API).
+  const idempotencyKey = resourceOwnerId + ':' + requestId;
+  const existingRequest = store.requests.get(idempotencyKey);
+  if (existingRequest) {
+    if (existingRequest.normalizedTerm !== normalized) return fail('IDEMPOTENCY_CONFLICT');
+    return { ...existingRequest.result, replay: true };
+  }
   const uniqueKey = resourceOwnerId + ':' + normalized;
   let card = store.candidates.get(uniqueKey);
   if (!card) {
@@ -65,6 +70,6 @@ export function createCandidateInMemory({
     store.candidates.set(uniqueKey, card);
   }
   const result = { allowed: true, code: 'CANDIDATE_RECORDED', candidate: { ...card }, replay: false };
-  store.requests.set(idempotencyKey, result);
+  store.requests.set(idempotencyKey, { normalizedTerm: normalized, result });
   return result;
 }
