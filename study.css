@@ -1,4 +1,5 @@
-.route-study .main {
+.route-study .main,
+.route-english .main {
   height: calc(100vh - 76px);
   padding: 0;
   overflow: hidden;
@@ -84,6 +85,7 @@
 
 @media (max-width: 680px) {
   .route-study .main,
+  .route-english .main,
   .route-a4 .main,
   .route-licut .main {
     height: calc(100dvh - 68px);
@@ -105,6 +107,17 @@
   }
 
   .study-online {
+    display: none;
+  }
+
+  /* English uses the viewport for the lesson, not an intrinsic-size iframe. */
+  .route-english .study-embedded-toolbar {
+    min-height: 62px;
+  }
+
+  /* The exercise itself already repeats the experience/authorization notice. */
+  .route-english .study-embedded-toolbar p,
+  .route-english .study-embedded-toolbar .actions {
     display: none;
   }
 }
