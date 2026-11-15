@@ -29,7 +29,8 @@ function hostContext(){
   try{host=window.parent||window;}catch{throw new Error('必須從立之雲端庫登入')}
   const auth=host.LizhiAuth?.client;
   const supabaseUrl=host.LIZHI_SUPABASE_URL;
-  if(!auth?.auth?.getSession||typeof supabaseUrl!=='string'||!/^https:\/\//.test(supabaseUrl))
+  const trustedUrl=typeof supabaseUrl==='string' && (/^https:\/\/[^/]+$/.test(supabaseUrl) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(supabaseUrl));
+  if(!auth?.auth?.getSession||!trustedUrl)
     throw new Error('請從已登入的立之雲端庫開啟此頁');
   return {auth,endpoint:supabaseUrl.replace(/\/$/,'')+'/functions/v1/lizhi-english-academy'};
 }
