@@ -33,6 +33,12 @@
   height: 100%;
 }
 
+/* Match the actual workspace panel layer between .main and the lesson. */
+.route-english .workspace-panel {
+  height: 100%;
+  min-height: 0;
+}
+
 .study-embedded {
   height: 100%;
   min-height: 0;
