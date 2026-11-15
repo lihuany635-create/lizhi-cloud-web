@@ -50,10 +50,6 @@ jobs:
           test -f english-academy/p9/recovery-runbook.mjs
           grep -q 'P8-B' english-academy/p9/README.md
           grep -q 'DRY_RUN_ONLY' english-academy/p9/recovery-runbook.mjs
-          # Audit the workflow itself. Ensure no production CLI or secret references.
-          if grep -Ein '(supabase (db push|functions deploy|migration up)|gh (pr merge|release create)|secrets\\.|GITHUB_TOKEN|pages-deploy)' \
-            .github/workflows/english-academy-p9-ci.yml; then
-            echo 'P9_FORBIDDEN_LIVE_ACTION_IN_CI'
-            exit 1
-          fi
+          # Verify CI is read-only; no production/secret actions.
+          node english-academy/p9/scripts/audit-workflow.mjs .github/workflows/english-academy-p9-ci.yml
           echo P9_DEPLOYMENT_ABSENT_IN_CI_PASS
