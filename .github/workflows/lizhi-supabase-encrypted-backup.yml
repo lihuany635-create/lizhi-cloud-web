@@ -1,0 +1,74 @@
+# No PR/push/schedule trigger; no hosted writes, deployment or paid resources.
+name: Supabase encrypted manual backup
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: lizhi-supabase-manual-backup
+  cancel-in-progress: false
+jobs:
+  dump-encrypt-and-verify:
+    name: Encrypted full logical dump and isolated PG17 restore
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Require both owner-managed backup secrets
+        shell: bash
+        env:
+          BACKUP_URL_PRESENT: ${{ secrets.LIZHI_SUPABASE_BACKUP_URL != '' }}
+          BACKUP_KEY_PRESENT: ${{ secrets.LIZHI_BACKUP_PASSPHRASE != '' }}
+        run: |
+          if [ "$BACKUP_URL_PRESENT" != true ] || [ "$BACKUP_KEY_PRESENT" != true ]; then
+            echo '::error::Required backup secrets are missing. Save LIZHI_SUPABASE_BACKUP_URL and LIZHI_BACKUP_PASSPHRASE in this repository.'
+            exit 1
+          fi
+      - name: Checkout reviewed workflow revision
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install pinned Supabase CLI for disposable local DB only
+        uses: supabase/setup-cli@1dedf2c611547ede7232d26866dd3c56ab903bbb
+        with:
+          version: 2.58.5
+      - name: Prepare PostgreSQL 17 client and pinned Python driver
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -x /usr/lib/postgresql/17/bin/pg_dump ]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y postgresql-client-17
+          fi
+          /usr/lib/postgresql/17/bin/pg_dump --version
+          supabase --version
+          python3 -m venv "$RUNNER_TEMP/lizhi-backup-venv"
+          "$RUNNER_TEMP/lizhi-backup-venv/bin/pip" install --disable-pip-version-check 'psycopg[binary]==3.2.13'
+          python3 -m unittest discover -s scripts/tests -p 'test_supabase_backup.py' -v
+      - name: Capture, encrypt, decrypt, restore and verify
+        shell: bash
+        env:
+          SUPABASE_DB_URL: ${{ secrets.LIZHI_SUPABASE_BACKUP_URL }}
+          LIZHI_BACKUP_PASSPHRASE: ${{ secrets.LIZHI_BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          # Never use set -x, dump environment, or print raw subprocess output.
+          "$RUNNER_TEMP/lizhi-backup-venv/bin/python" scripts/supabase_backup.py
+      - name: Preserve encrypted capture even if restore fails
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: lizhi-supabase-encrypted-backup-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/lizhi-backup-encrypted/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Remove disposable database and plaintext
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker rm -f supabase_db_lizhi-restore-check >/dev/null 2>&1 || true
+          case "$RUNNER_TEMP" in /home/runner/work/_temp|/home/runner/work/_temp/*) ;;
+            *) echo 'Unexpected runner temp path; runner teardown will clean up'; exit 1;;
+          esac
+          rm -rf -- "$RUNNER_TEMP/lizhi-backup-private" "$RUNNER_TEMP/lizhi-backup-venv"
+          echo 'Actions capture is temporary. A durable private copy and separate Storage/config review are required before deployment.' >> "$GITHUB_STEP_SUMMARY"
