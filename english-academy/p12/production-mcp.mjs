@@ -12,6 +12,7 @@ const TABLES=new Map([
 const fail=()=>Object.assign(new Error('ENGLISH_AUTH_DENIED'),{code:'ENGLISH_AUTH_DENIED'});
 const hash=async text=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text))),b=>b.toString(16).padStart(2,'0')).join('');
 
+/** @param {{env?:Record<string,string>,fetchImpl?:typeof fetch}} [options] */
 export function createProductionEnglishMcp({env,fetchImpl=fetch}={}){
  const base=String(env?.SUPABASE_URL||'').replace(/\/$/,'');
  const key=env?.SUPABASE_SERVICE_ROLE_KEY;
