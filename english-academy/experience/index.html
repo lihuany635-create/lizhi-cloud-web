@@ -29,6 +29,10 @@
     s.type='module';s.src='./app.mjs?v=1';
     s.onerror=()=>{root.textContent='英文練習載入失敗，請重新整理或回到雲端庫。';};
     document.body.append(s);
+    const consent=document.createElement('script');
+    consent.type='module';consent.src='./session-permission.mjs?v=1';
+    consent.onerror=()=>{root.insertAdjacentText('beforebegin','英文同步授權模組無法載入，請重新整理。');};
+    document.body.append(consent);
   }catch{
     root.textContent='請從立之雲端庫登入後使用英文學習教室。';
   }
