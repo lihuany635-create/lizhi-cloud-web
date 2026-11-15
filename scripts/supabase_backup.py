@@ -11,6 +11,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import shutil
 import tarfile
 from urllib.parse import urlsplit, unquote
 
@@ -49,7 +50,23 @@ def run(args, *, env=None, stdin=None, output=None):
     result = subprocess.run(args, env=env, input=stdin, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE, check=False)
     if result.returncode:
-        raise RuntimeError("Subprocess failed; private output suppressed")
+        private_error = result.stderr.decode("utf-8", errors="replace").lower()
+        category = next((label for pattern, label in (
+            ("password authentication failed", "authentication-failed"),
+            ("no password supplied", "password-required"),
+            ("peer authentication failed", "peer-authentication-failed"),
+            ("permission denied", "permission-denied"),
+            ("must be owner", "ownership-required"),
+            ("already exists", "object-already-exists"),
+            ("not available", "component-unavailable"),
+            ("unrecognized configuration parameter", "unknown-setting"),
+            ("cannot drop", "drop-failed"),
+            ("does not exist", "missing-object"),
+            ("syntax error", "sql-syntax-error"),
+        ) if pattern in private_error), "unclassified")
+        error = RuntimeError("Subprocess failed; private output suppressed")
+        error.safe_category = category
+        raise error
     if output:
         Path(output).write_bytes(result.stdout)
     return result.stdout
@@ -135,10 +152,12 @@ def main():
     global PHASE
     import psycopg
     os.umask(0o077)
-    require_secrets(os.environ)
-    backup_url = os.environ["SUPABASE_DB_URL"]
+    restore_capture = os.environ.get("LIZHI_RESTORE_CAPTURE_DIR")
+    if not restore_capture:
+        require_secrets(os.environ)
+    backup_url = os.environ.get("SUPABASE_DB_URL", "")
     passphrase = os.environ["LIZHI_BACKUP_PASSPHRASE"]
-    u = validate_url(backup_url)
+    u = validate_url(backup_url) if not restore_capture else None
     if len(passphrase) < 24 or "\n" in passphrase or "\r" in passphrase:
         raise ValueError("Passphrase must contain 24+ characters and no newline")
     root = Path(os.environ["RUNNER_TEMP"]) / "lizhi-backup-private"
@@ -148,58 +167,81 @@ def main():
     plain = root / "payload"
     plain.mkdir()
     clean = private_subprocess_env(os.environ)
-    pg = {**clean, "PGHOST": u.hostname, "PGPORT": "5432",
-          "PGUSER": unquote(u.username), "PGPASSWORD": unquote(u.password),
-          "PGDATABASE": "postgres", "PGSSLMODE": "require", "PGCONNECT_TIMEOUT": "30",
-          "PGOPTIONS": "-c default_transaction_read_only=on -c statement_timeout=600000"}
-    # Pass secrets only to the operations that need them, not to local restore.
-    pg_bin = Path("/usr/lib/postgresql/17/bin")
-    PHASE = "hosted-read-only-snapshot-and-dump"
-    with psycopg.connect(backup_url, sslmode="require", connect_timeout=30,
-                         options="-c default_transaction_read_only=on -c statement_timeout=600000") as conn:
-        conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
-        if int(conn.execute("show server_version_num").fetchone()[0]) // 10000 != 17:
-            raise ValueError("Hosted database must be PostgreSQL 17")
-        snapshot = conn.execute("select pg_export_snapshot()").fetchone()[0]
-        source = inventory(conn)
-        roles = [r[0] for r in conn.execute("select rolname from pg_roles where rolname !~ '^pg_' order by 1")]
-        extensions = conn.execute("select extname,extversion from pg_extension order by 1").fetchall()
-        # Raw custom archive includes managed schemas, history, large objects,
-        # ACLs and extension configuration data that CLI migration dumps omit.
-        run([str(pg_bin / "pg_dump"), "--format=custom", "--snapshot=" + snapshot,
-             "--file=" + str(plain / "full.dump")], env=pg)
-        run([str(pg_bin / "pg_dumpall"), "--roles-only", "--no-role-passwords"],
-            env=pg, output=plain / "roles.sql")
-        # Keep a separate schema export for review/recovery without exposing it.
-        run([str(pg_bin / "pg_restore"), "--schema-only", "--file=" + str(plain / "schema.sql"),
-             str(plain / "full.dump")], env=clean)
-        (plain / "manifest.json").write_text(json.dumps({"project": PROJECT,
-            "snapshot_inventory": source, "roles": roles, "extensions": extensions,
-            "scope": "Full pg_dump logical database. Role passwords, external Vault keys, Storage binaries, Auth provider configuration and Edge secrets are separate."},
-            ensure_ascii=True, sort_keys=True), encoding="utf-8")
-    # Encrypt before any real database restoration. Only this folder is uploaded.
-    PHASE = "encrypt-and-decrypt-verify"
-    archive = root / "backup.tar.gz"
-    with tarfile.open(archive, "w:gz") as tf:
-        tf.add(plain, arcname="payload")
-    encrypted = out / "backup.tar.gz.gpg"
     gpg = ["gpg", "--batch", "--yes", "--pinentry-mode", "loopback", "--passphrase-fd", "0"]
-    run(gpg + ["--symmetric", "--cipher-algo", "AES256", "--output", str(encrypted), str(archive)],
-        env=clean, stdin=(passphrase + "\n").encode())
-    (out / "backup.sha256").write_text(digest(encrypted) + "  backup.tar.gz.gpg\n", encoding="ascii")
-    reopened = root / "reopened.tar.gz"
-    run(gpg + ["--decrypt", "--output", str(reopened), str(encrypted)],
-        env=clean, stdin=(passphrase + "\n").encode())
-    if digest(archive) != digest(reopened):
-        raise ValueError("Decrypted archive differs")
-    restored = root / "reopened"
-    restored.mkdir()
-    extract_checked(reopened, restored)
-    recovered = restored / "payload"
-    if digest(plain / "full.dump") != digest(recovered / "full.dump"):
-        raise ValueError("Archive database digest differs")
-    (out / "capture-status.txt").write_text("CAPTURE_ONLY: encrypted and decrypt/hash verified; restore not yet passed.\n")
-    print("Encrypted database capture and decrypt/hash verification: PASS", flush=True)
+    if restore_capture:
+        PHASE = "reopen-existing-encrypted-capture"
+        incoming = Path(restore_capture)
+        encrypted = out / "backup.tar.gz.gpg"
+        shutil.copyfile(incoming / "backup.tar.gz.gpg", encrypted)
+        expected = (incoming / "backup.sha256").read_text().split()[0]
+        if digest(encrypted) != expected:
+            raise ValueError("Encrypted capture hash mismatch")
+        shutil.copyfile(incoming / "backup.sha256", out / "backup.sha256")
+        reopened = root / "reopened.tar.gz"
+        run(gpg + ["--decrypt", "--output", str(reopened), str(encrypted)],
+            env=clean, stdin=(passphrase + "\n").encode())
+        restored = root / "reopened"
+        restored.mkdir()
+        extract_checked(reopened, restored)
+        recovered = restored / "payload"
+        manifest = json.loads((recovered / "manifest.json").read_text())
+        if manifest.get("project") != PROJECT:
+            raise ValueError("Original project required")
+        source, roles = manifest["snapshot_inventory"], manifest["roles"]
+        (out / "capture-status.txt").write_text("CAPTURE_ONLY: existing encrypted capture reopened; restore not yet passed.\n")
+        print("Existing encrypted capture SHA256 and decryption: PASS", flush=True)
+    else:
+        pg = {**clean, "PGHOST": u.hostname, "PGPORT": "5432",
+              "PGUSER": unquote(u.username), "PGPASSWORD": unquote(u.password),
+              "PGDATABASE": "postgres", "PGSSLMODE": "require", "PGCONNECT_TIMEOUT": "30",
+              "PGOPTIONS": "-c default_transaction_read_only=on -c statement_timeout=600000"}
+        # Pass secrets only to the operations that need them, not to local restore.
+        pg_bin = Path("/usr/lib/postgresql/17/bin")
+        PHASE = "hosted-read-only-snapshot-and-dump"
+        with psycopg.connect(backup_url, sslmode="require", connect_timeout=30,
+                             options="-c default_transaction_read_only=on -c statement_timeout=600000") as conn:
+            conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
+            if int(conn.execute("show server_version_num").fetchone()[0]) // 10000 != 17:
+                raise ValueError("Hosted database must be PostgreSQL 17")
+            snapshot = conn.execute("select pg_export_snapshot()").fetchone()[0]
+            source = inventory(conn)
+            roles = [r[0] for r in conn.execute("select rolname from pg_roles where rolname !~ '^pg_' order by 1")]
+            extensions = conn.execute("select extname,extversion from pg_extension order by 1").fetchall()
+            # Raw custom archive includes managed schemas, history, large objects,
+            # ACLs and extension configuration data that CLI migration dumps omit.
+            run([str(pg_bin / "pg_dump"), "--format=custom", "--snapshot=" + snapshot,
+                 "--file=" + str(plain / "full.dump")], env=pg)
+            run([str(pg_bin / "pg_dumpall"), "--roles-only", "--no-role-passwords"],
+                env=pg, output=plain / "roles.sql")
+            # Keep a separate schema export for review/recovery without exposing it.
+            run([str(pg_bin / "pg_restore"), "--schema-only", "--file=" + str(plain / "schema.sql"),
+                 str(plain / "full.dump")], env=clean)
+            (plain / "manifest.json").write_text(json.dumps({"project": PROJECT,
+                "snapshot_inventory": source, "roles": roles, "extensions": extensions,
+                "scope": "Full pg_dump logical database. Role passwords, external Vault keys, Storage binaries, Auth provider configuration and Edge secrets are separate."},
+                ensure_ascii=True, sort_keys=True), encoding="utf-8")
+        # Encrypt before any real database restoration. Only this folder is uploaded.
+        PHASE = "encrypt-and-decrypt-verify"
+        archive = root / "backup.tar.gz"
+        with tarfile.open(archive, "w:gz") as tf:
+            tf.add(plain, arcname="payload")
+        encrypted = out / "backup.tar.gz.gpg"
+        run(gpg + ["--symmetric", "--cipher-algo", "AES256", "--output", str(encrypted), str(archive)],
+            env=clean, stdin=(passphrase + "\n").encode())
+        (out / "backup.sha256").write_text(digest(encrypted) + "  backup.tar.gz.gpg\n", encoding="ascii")
+        reopened = root / "reopened.tar.gz"
+        run(gpg + ["--decrypt", "--output", str(reopened), str(encrypted)],
+            env=clean, stdin=(passphrase + "\n").encode())
+        if digest(archive) != digest(reopened):
+            raise ValueError("Decrypted archive differs")
+        restored = root / "reopened"
+        restored.mkdir()
+        extract_checked(reopened, restored)
+        recovered = restored / "payload"
+        if digest(plain / "full.dump") != digest(recovered / "full.dump"):
+            raise ValueError("Archive database digest differs")
+        (out / "capture-status.txt").write_text("CAPTURE_ONLY: encrypted and decrypt/hash verified; restore not yet passed.\n")
+        print("Encrypted database capture and decrypt/hash verification: PASS", flush=True)
     # CLI is used only to bootstrap the disposable PG17 environment. Never link it.
     local = root / "restore-check"
     PHASE = "disposable-postgresql17-bootstrap"
@@ -220,11 +262,14 @@ def main():
         return run(["docker", "exec", "-i", CONTAINER, "psql", "-X", "-q", "-A", "-t",
                     "-v", "ON_ERROR_STOP=1", "-U", "supabase_admin", "-d", db],
                    env=clean, stdin=query.encode())
+    PHASE = "isolated-disable-cron"
     local_sql("ALTER SYSTEM SET cron.launch_active_jobs = 'off';\nSELECT pg_reload_conf();")
     # Only the fixed disposable container is a write target. Template0 prevents
     # baseline Auth/Storage migrations from concealing missing source objects.
+    PHASE = "isolated-create-clean-database"
     local_sql("DROP DATABASE postgres WITH (FORCE);")
     local_sql("CREATE DATABASE postgres WITH TEMPLATE template0;")
+    PHASE = "isolated-create-roles"
     for role in roles:
         ident = '"' + role.replace('"', '""') + '"'
         literal = "'" + role.replace("'", "''") + "'"
@@ -232,8 +277,10 @@ def main():
                   "' WHERE NOT EXISTS(SELECT FROM pg_roles WHERE rolname=" + literal + ");\n\\gexec\n")
     role_sql = (recovered / "roles.sql").read_text()
     role_sql = re.sub(r"^CREATE ROLE .*;\s*$", "", role_sql, flags=re.MULTILINE)
+    PHASE = "isolated-restore-role-attributes"
     local_sql(role_sql)
     run(["docker", "cp", str(recovered / "full.dump"), CONTAINER + ":/tmp/full.dump"], env=clean)
+    PHASE = "isolated-pg-restore-archive"
     run(["docker", "exec", CONTAINER, "pg_restore", "--exit-on-error", "--single-transaction",
          "-U", "supabase_admin", "-d", "postgres", "/tmp/full.dump"], env=clean)
     # Inventory inside the network-isolated container using its psql, not a
@@ -278,7 +325,8 @@ def local_inventory(local_sql):
 if __name__ == "__main__":
     try:
         main()
-    except Exception:
+    except Exception as error:
         # Never print exception repr, connection URIs, SQL or plaintext values.
         print("::error::Backup/restore gate FAIL in " + PHASE + ". Private exception details suppressed.", flush=True)
+        print("Safe failure category: " + getattr(error, "safe_category", "unclassified"), flush=True)
         sys.exit(1)
