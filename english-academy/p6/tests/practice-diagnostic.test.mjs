@@ -25,6 +25,7 @@ test('spelling and fill blanks distinguish correct and incorrect grammar',()=>{
  assert.equal(check(spell,'apply').correct,false);
  const fill=getDemoExercise('ex-fill-perfect');
  assert.equal(check(fill,fill.expected).correct,true);
+ assert.equal(check(fill,"haven't").correct,true);
  assert.equal(check(fill,'had').correct,false);
 });
 test('configured translation equivalents accepted; uncontrolled variants not certified',()=>{
