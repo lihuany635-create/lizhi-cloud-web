@@ -1,6 +1,5 @@
-# One-time production READ-ONLY encrypted backup, approved 2026-11-16.
-# This branch-specific push trigger does not run on main, pull requests or a schedule.
-name: Supabase isolated restore retry for monitoring
+# Approved one-time READ ONLY pre-migration capture; no hosted writes or deployments.
+name: Supabase monitoring fresh encrypted backup and isolated restore
 on:
   push:
     branches:
@@ -20,13 +19,14 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - name: Require existing encrypted capture passphrase
+      - name: Require both owner-managed backup secrets
         shell: bash
         env:
+          BACKUP_URL_PRESENT: ${{ secrets.LIZHI_SUPABASE_BACKUP_URL != '' }}
           BACKUP_KEY_PRESENT: ${{ secrets.LIZHI_BACKUP_PASSPHRASE != '' }}
         run: |
-          if [ "$BACKUP_KEY_PRESENT" != true ]; then
-            echo '::error::Backup passphrase secret missing.'
+          if [ "$BACKUP_URL_PRESENT" != true ] || [ "$BACKUP_KEY_PRESENT" != true ]; then
+            echo '::error::Required backup secrets are missing. Save LIZHI_SUPABASE_BACKUP_URL and LIZHI_BACKUP_PASSPHRASE in this repository.'
             exit 1
           fi
       - name: Checkout reviewed workflow revision
@@ -56,28 +56,20 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/lizhi-backup-venv"
           "$RUNNER_TEMP/lizhi-backup-venv/bin/pip" install --disable-pip-version-check 'psycopg[binary]==3.2.13'
           python3 -m unittest discover -s scripts/tests -p 'test_supabase_backup.py' -v
-      - name: Download previously captured ciphertext (no production DB access)
+      - name: Capture, encrypt, decrypt, restore and verify
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          gh run download 43739970383 --repo "$GITHUB_REPOSITORY" --name "lizhi-supabase-encrypted-backup-43739970383-1" --dir "$RUNNER_TEMP/lizhi-backup-input"
-          test -s "$RUNNER_TEMP/lizhi-backup-input/backup.tar.gz.gpg"
-          test -s "$RUNNER_TEMP/lizhi-backup-input/backup.sha256"
-      - name: Decrypt existing ciphertext and verify isolated PostgreSQL restore
-        shell: bash
-        env:
-          LIZHI_RESTORE_CAPTURE_DIR: ${{ runner.temp }}/lizhi-backup-input
+          SUPABASE_DB_URL: ${{ secrets.LIZHI_SUPABASE_BACKUP_URL }}
           LIZHI_BACKUP_PASSPHRASE: ${{ secrets.LIZHI_BACKUP_PASSPHRASE }}
         run: |
           set -euo pipefail
+          # Never use set -x, dump environment, or print raw subprocess output.
           "$RUNNER_TEMP/lizhi-backup-venv/bin/python" scripts/supabase_backup.py
       - name: Preserve encrypted capture even if restore fails
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: lizhi-supabase-encrypted-restore-${{ github.run_id }}-${{ github.run_attempt }}
+          name: lizhi-supabase-encrypted-backup-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/lizhi-backup-encrypted/
           if-no-files-found: warn
           retention-days: 7
