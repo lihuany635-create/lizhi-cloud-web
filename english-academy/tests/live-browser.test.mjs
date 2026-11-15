@@ -94,7 +94,10 @@ test('authenticated host iframe fetches private cards with bearer and can review
    assert.match(await f.locator('body').innerText(),/hungry/);
    assert.match(await f.locator('body').innerText(),/rice/);
    await f.locator('button[data-accept]').click();
-   await f.locator('.bottom-nav button[data-tab="cards"]').click();
+   // The Edge mock writes asynchronously, followed by a readback and rerender.
+   // Wait for the accepted candidate's action to disappear instead of
+   // inspecting the previous DOM before the readback completes.
+   await f.locator('button[data-accept="aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"]').waitFor({state:'detached',timeout:10000});
    assert.equal(await f.locator('button[data-accept]').count(),0);
    await f.locator('#live-term').fill('apple');
    await f.locator('#live-meaning').fill('蘋果');
