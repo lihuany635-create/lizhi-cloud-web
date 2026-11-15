@@ -1,0 +1,121 @@
+# Manual, owner-initiated encrypted logical backup of the EXISTING Supabase project.
+# No deployments, database writes, PR triggers or scheduled execution.
+name: Supabase encrypted manual backup
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lizhi-supabase-manual-backup
+  cancel-in-progress: false
+
+jobs:
+  dump-encrypt-and-verify:
+    name: Encrypted dump and isolated restore check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      SUPABASE_DB_URL: ${{ secrets.LIZHI_SUPABASE_BACKUP_URL }}
+      LIZHI_BACKUP_PASSPHRASE: ${{ secrets.LIZHI_BACKUP_PASSPHRASE }}
+    steps:
+      - name: Validate encrypted backup configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::Missing LIZHI_SUPABASE_BACKUP_URL repository secret"
+            exit 1
+          fi
+          if [ "$(printf '%s' "$LIZHI_BACKUP_PASSPHRASE" | wc -c)" -lt 24 ]; then
+            echo "::error::LIZHI_BACKUP_PASSPHRASE needs at least 24 characters"
+            exit 1
+          fi
+          # Fail if a non-project credential was accidentally configured.
+          case "$SUPABASE_DB_URL" in
+            postgresql://postgres.hrdzywkihfqggiwjgavi:*|postgres://postgres.hrdzywkihfqggiwjgavi:*) ;;
+            *) echo "::error::Expected original project's Session pooler connection URL"; exit 1 ;;
+          esac
+          umask 077
+          mkdir -p "$RUNNER_TEMP/lizhi-backup"
+      
+      - name: Install official Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Export roles, schema and data (read-only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          if ! supabase db dump --help | grep -q -- '--db-url'; then
+            echo "::error::CLI option changed; stop rather than guessing"
+            exit 1
+          fi
+          supabase db dump --db-url "$SUPABASE_DB_URL" \
+            -f "$RUNNER_TEMP/lizhi-backup/roles.sql" --role-only
+          supabase db dump --db-url "$SUPABASE_DB_URL" \
+            -f "$RUNNER_TEMP/lizhi-backup/schema.sql"
+          supabase db dump --db-url "$SUPABASE_DB_URL" \
+            -f "$RUNNER_TEMP/lizhi-backup/data.sql" --data-only --use-copy \
+            -x 'storage.buckets_vectors' -x 'storage.vector_indexes'
+          for part in roles schema data; do
+            test -s "$RUNNER_TEMP/lizhi-backup/$part.sql" || {
+              echo "::error::$part.sql is missing or empty"
+              exit 1
+            }
+          done
+          echo 'Database SQL dump generated. No plaintext will be uploaded.'
+
+      - name: Encrypt archive before publishing artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          tar -C "$RUNNER_TEMP" -czf - lizhi-backup |
+            gpg --batch --yes --pinentry-mode loopback --symmetric \
+                --cipher-algo AES256 --passphrase-fd 3 \
+                --output "$RUNNER_TEMP/lizhi-backup.tar.gz.gpg" \
+                3< <(printf '%s\n' "$LIZHI_BACKUP_PASSPHRASE")
+          test -s "$RUNNER_TEMP/lizhi-backup.tar.gz.gpg"
+          (cd "$RUNNER_TEMP" && sha256sum lizhi-backup.tar.gz.gpg > lizhi-backup.sha256)
+          # Verify the encrypted archive can be opened, without writing plaintext.
+          gpg --batch --yes --pinentry-mode loopback \
+              --passphrase-fd 3 --decrypt "$RUNNER_TEMP/lizhi-backup.tar.gz.gpg" \
+              3< <(printf '%s\n' "$LIZHI_BACKUP_PASSPHRASE") |
+            tar -tzf - >/dev/null
+          echo 'AES256-GPG archive integrity check: PASS.'
+
+      - name: Upload encrypted artifact only
+        uses: actions/upload-artifact@v4
+        with:
+          name: lizhi-supabase-encrypted-backup
+          path: |
+            [object Object] runner.temp }}/lizhi-backup.tar.gz.gpg
+            [object Object] runner.temp }}/lizhi-backup.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Restore check in disposable local Supabase database
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase init --workdir "$RUNNER_TEMP/restore-check"
+          supabase db start --workdir "$RUNNER_TEMP/restore-check"
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y postgresql-client
+          fi
+          psql \
+            --single-transaction \
+            --variable ON_ERROR_STOP=1 \
+            --file "$RUNNER_TEMP/lizhi-backup/roles.sql" \
+            --file "$RUNNER_TEMP/lizhi-backup/schema.sql" \
+            --command 'SET session_replication_role = replica' \
+            --file "$RUNNER_TEMP/lizhi-backup/data.sql" \
+            --dbname 'postgresql://postgres:postgres@127.0.0.1:54322/postgres'
+          echo 'Isolated restore check: PASS.'
+          echo 'Encrypted archive uploaded to Actions artifact; download to private storage before 7-day expiry.' >> "$GITHUB_STEP_SUMMARY"
