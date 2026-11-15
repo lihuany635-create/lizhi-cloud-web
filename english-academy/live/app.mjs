@@ -79,6 +79,12 @@ function nav(){
  return '<nav class="nav" aria-label="英文學習導覽">'+Object.entries(tabs).map(([key,value])=>
   '<button type="button" data-tab="'+key+'" class="'+(ui.section===key?'active':'')+'">'+value+'</button>').join('')+'</nav>';
 }
+function bottomNav(){
+ const icons={home:'⌂',cards:'▣',courses:'◇',analytics:'▥',settings:'⚙'};
+ return '<nav class="bottom-nav" aria-label="手機英文學習導覽">'+Object.entries(tabs).map(([key,value])=>
+  '<button type="button" data-tab="'+key+'" class="'+(ui.section===key?'active':'')+'" aria-current="'+(ui.section===key?'page':'false')+'">'+
+  '<span class="emoji" aria-hidden="true">'+icons[key]+'</span>'+value+'</button>').join('')+'</nav>';
+}
 function statusBox(){
  if(ui.phase==='checking')return '<section class="card" role="status"><h2>正在確認登入與學習資料…</h2></section>';
  if(ui.phase==='error')return '<section class="card"><h2>無法開啟學習資料</h2><p class="notice warn" role="alert">'+h(ui.error)+'</p><p class="muted">本頁不會以展示資料偽裝成你的正式單字庫。</p><button class="button" data-retry="1">重新檢查</button></section>';
@@ -141,7 +147,7 @@ function render(){
  '<div class="demo-banner"><strong>正式資料模式（尚未核准部署）</strong><span>不會在登入失敗時改用示範資料</span></div>'+
  (ui.phase==='ready'?nav():'')+
  (ui.notice?'<div class="notice" role="status">'+h(ui.notice)+'</div><div class="gap"></div>':'')+
- '<main>'+content+'</main><footer class="footer">ChatGPT MCP 與 FSRS 將由後續階段接續</footer></div>';
+ '<main>'+content+'</main><footer class="footer">ChatGPT MCP 與 FSRS 將由後續階段接續</footer></div>'+(ui.phase==='ready'?bottomNav():'');
 }
 async function act(fn){
  if(ui.busy)return; ui.busy=true;
