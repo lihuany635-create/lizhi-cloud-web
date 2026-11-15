@@ -103,3 +103,22 @@ test('duplicate existing tool names are refused and image content stays intact',
  const out=await ext.toolCall({request,body:call('english_get_review_summary')});
  assert.deepEqual(out.result.content,[{type:'image',data:'synthetic-image-base64',mimeType:'image/png'}]);
 });
+
+test('tool discovery hides English capabilities when owner unlinked or service readiness fails',async()=>{
+ const noOwner=make({verifySiteOwner:async()=>({serverVerified:false})});
+ assert.deepEqual(await noOwner.toolsList({request,existingReply:original}),original);
+ const failing=createExistingSiteEnglishExtension({
+  isReady:async()=>{throw new Error('backend offline');},
+  verifySiteOwner:async()=>actor,invokeEnglish:async()=>({ok:true}),baselineNames:baseNames
+ });
+ assert.deepEqual(await failing.toolsList({request,existingReply:original}),original);
+ assert.equal(result(await failing.toolCall({request,body:call('english_get_review_summary')})).code,'ENGLISH_NOT_CONFIGURED');
+});
+test('read-only owner sees no candidate-write names in discovery',async()=>{
+ const ext=make({verifySiteOwner:async()=>({...actor,scopes:['english:read']})});
+ const out=await ext.toolsList({request,existingReply:original});
+ const extra=out.result.tools.slice(existing.length).map(x=>x.name);
+ assert.equal(extra.length,4);
+ assert.ok(extra.includes('english_get_review_summary'));
+ assert.ok(!extra.includes('english_create_card_candidates'));
+});
