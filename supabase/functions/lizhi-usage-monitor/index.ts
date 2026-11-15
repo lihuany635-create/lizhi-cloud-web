@@ -1,8 +1,8 @@
 // 立之 Supabase 監控後端（開發候選）：僅本人唯讀快照。
 // IMPORTANT: No deployment, database migration or external request instrumentation is implied.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import {dispatchUsageMcp} from "../../../usage-monitor/mcp-core.mjs";
-import {verifySiteBridge} from "../../../usage-monitor/mcp-bridge-auth.mjs";
+import {dispatchUsageMcp} from "../_shared/lizhi-usage-mcp-core.mjs";
+import {verifySiteBridge} from "../_shared/lizhi-usage-mcp-bridge-auth.mjs";
 const ORIGIN = "https://lihuany635-create.github.io";
 const BASE = (Deno.env.get("SUPABASE_URL") || "").replace(/\/$/, "");
 const ANON = Deno.env.get("SUPABASE_ANON_KEY") || "";
