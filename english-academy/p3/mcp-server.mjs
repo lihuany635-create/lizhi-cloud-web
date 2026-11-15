@@ -30,30 +30,30 @@ export const MCP_TOOLS = Object.freeze([
  tool('get_review_summary','今日複習摘要','只讀取網站排程資料；不由模型自行編造到期數。',{},[]),
  tool('list_card_candidates','待審核單字','列出候選卡，供使用者在網站審核。',{limit:{type:'integer',minimum:1,maximum:50}},[]),
  tool('get_sync_status','同步狀態','按本人請求編號查詢同步結果、失敗及可重試原因。',{requestId:string('原始同步請求編號',100)},['requestId']),
- tool('sync_learning_session','同步英文練習','僅同步伺服器已授權為英文練習的 session 的有限單字候選與錯誤片段。', {
+ tool('sync_learning_session','同步英文練習','只同步已驗證本人要求的單字候選及錯句；原私人 Site MCP 不需重複網站授權。', {
    requestId:string('唯一同步請求編號',100),
-   sourceSessionId:string('已在網站授權為英文學習的 session',100),
+   sourceSessionId:string('選填；未填則由已驗證的本人 MCP 使用固定來源',100),
    candidates:{type:'array',maxItems:10,items:{type:'object',additionalProperties:false,
      properties:{term:string('英文單字／片語',120),meaningZh:string('中文說明',500),senseKey:string('語意區別，可空',80)},
      required:['term','meaningZh']}},
    errors:{type:'array',maxItems:10,items:{type:'object',additionalProperties:false,
      properties:{original:string('原始短句',500),corrected:string('更正短句',500),explanation:string('簡短解釋',500)},
      required:['original','corrected','explanation']}}
- },['requestId','sourceSessionId'],'candidate'),
+ },['requestId'],'candidate'),
  tool('create_card_candidates','提出候選單字','只新增待網站審核的候選，不會直接成為正式卡片。',{
    requestId:string('唯一同步請求編號',100),
-   sourceSessionId:string('已核准的英文練習 session',100),
+   sourceSessionId:string('選填；本人 MCP 可直接同步，無須另到網站授權',100),
    candidates:{type:'array',minItems:1,maxItems:10,items:{type:'object',additionalProperties:false,
      properties:{term:string('單字',120),meaningZh:string('中文說明',500),senseKey:string('語意區別',80)},
      required:['term','meaningZh']}}
- },['requestId','sourceSessionId','candidates'],'candidate'),
+ },['requestId','candidates'],'candidate'),
  tool('record_language_errors','紀錄英文錯誤','僅在指定學習對話內新增必要錯誤片段與修正說明。',{
    requestId:string('唯一同步請求編號',100),
-   sourceSessionId:string('已核准的英文練習 session',100),
+   sourceSessionId:string('選填；本人 MCP 可直接同步，無須另到網站授權',100),
    errors:{type:'array',minItems:1,maxItems:10,items:{type:'object',additionalProperties:false,
     properties:{original:string('原始句',500),corrected:string('修正句',500),explanation:string('說明',500)},
     required:['original','corrected','explanation']}}
- },['requestId','sourceSessionId','errors'],'candidate'),
+ },['requestId','errors'],'candidate'),
  tool('add_vocabulary','依本人指示正式入卡','只有受信任後端核對指定請求的本人批准後才允許直接入卡；模型自述批准無效。',{
    requestId:string('已在伺服器確認批准的請求編號',100),
    term:string('單字',120),
@@ -83,7 +83,7 @@ function validateToolInput(toolName,args) {
    return fail('INVALID_LIMIT','Limit must be 1..50');
  if('requestId' in schema.properties&&!requestIdOk(args.requestId))
    return fail('INVALID_REQUEST_ID','Expected 12..100 URL-safe chars');
- if('sourceSessionId' in schema.properties&&!str(args.sourceSessionId,100))
+ if('sourceSessionId' in args&&!str(args.sourceSessionId,100))
    return fail('INVALID_SESSION','Source session is required');
  if('term' in schema.properties&&!str(args.term,120))
    return fail('INVALID_TERM','Invalid term');
@@ -130,7 +130,7 @@ async function execute(name,args,actor,{backend,verifyApproval}){
      ownerId:actor.userId,
      action:name,
      requestId:args.requestId,
-     sourceSessionId:args.sourceSessionId,
+     sourceSessionId:args.sourceSessionId??'mcp-direct-session',
      candidates:args.candidates??[],
      errors:args.errors??[],
    });
