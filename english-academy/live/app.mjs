@@ -124,7 +124,7 @@ function viewCards(){
  '<div class="gap"></div><label for="live-meaning">中文意思</label>'+
  '<input id="live-meaning" name="meaningZh" class="input" required maxlength="500" placeholder="飢餓的">'+
  '<div class="gap"></div><button class="button primary" type="submit">加入待審核單字</button></form>'+
- '<div class="gap"></div><p class="muted small">手動輸入先進入候選庫；只有按「加入」並由正式後端確認，才會建立正式單字卡。</p></section></div';
+ '<div class="gap"></div><p class="muted small">手動輸入先進入候選庫；只有按「加入」並由正式後端確認，才會建立正式單字卡。</p></section></div>';
 }
 function viewErrors(){
  return '<h1 class="view-title">聊天錯句紀錄</h1>'+
