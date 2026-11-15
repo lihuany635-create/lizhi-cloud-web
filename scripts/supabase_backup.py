@@ -266,7 +266,7 @@ def main():
         return run(["docker", "exec", "-i", "-e", "PGPASSWORD=" + local_password,
                     CONTAINER, "psql", "-X", "-q", "-A", "-t", "-h", "127.0.0.1",
                     "-v", "ON_ERROR_STOP=1", "-U", "supabase_admin", "-d", db],
-                   env=clean, stdin=query.encode())
+                   env=clean, stdin=("SET search_path TO public, extensions;\n" + query).encode())
     PHASE = "isolated-disable-cron"
     local_sql("ALTER SYSTEM SET cron.launch_active_jobs = 'off';\nSELECT pg_reload_conf();")
     # Only the fixed disposable container is a write target. Template0 prevents
@@ -294,7 +294,12 @@ def main():
     # Compare complete table hashes and definitions via a local pg_dump-to-client
     # inventory helper, with its queries sent only through docker exec.
     PHASE = "complete-data-and-object-comparison"
-    actual = local_inventory(local_sql)
+    PHASE = "isolated-replay-archived-relation-permissions"
+    before_acl = local_inventory(local_sql)
+    restore_snapshot_relation_acls(local_sql, source, before_acl)
+    PHASE = "complete-data-and-object-comparison"
+    actual = normalize_default_relation_acls(local_inventory(local_sql), local_sql)
+    source = normalize_default_relation_acls(source, local_sql)
     if json.loads(json.dumps(actual)) != json.loads(json.dumps(source)):
         # Log only aggregate diagnostics, never identifiers, definitions or rows.
         src_tables, dst_tables = source["tables"], actual["tables"]
@@ -330,6 +335,79 @@ def main():
         "PASS: PostgreSQL17 full archive decrypted, restored and table/object inventory matched.\n"
         "BLOCKED: durable private copy, Storage binaries, external keys/config and independent security review require separate evidence.\n")
     print("Isolated PostgreSQL17 restore and complete table/object inventory: PASS", flush=True)
+
+
+def restore_snapshot_relation_acls(local_sql, source, current):
+    """Replay archived owners/ACLs only inside the fixed isolated container."""
+    current_acls = {r[1]: r[2] for r in current["objects"] if r[0] == "table_acl"}
+    expected = [{"name": row[1], "owner": json.loads(row[2])[0],
+                 "acl": json.loads(row[2])[1]}
+                for row in source["objects"] if row[0] == "table_acl" and current_acls.get(row[1]) != row[2]]
+    if any(not re.fullmatch(r"[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*", r["name"]) for r in expected):
+        raise ValueError("Unsupported archived relation identifier")
+    literal = "'" + json.dumps(expected).replace("'", "''") + "'::jsonb"
+    statement = """DO $restore_acl$
+DECLARE item jsonb; relation_oid oid; kind "char"; original_owner text;
+        desired_acl aclitem[]; entry record; grantee_name text; target text; object_type text;
+BEGIN
+ FOR item IN SELECT * FROM jsonb_array_elements(EXPECTED_JSON) LOOP
+  target := format('%I.%I', split_part(item->>'name','.',1),split_part(item->>'name','.',2));
+  relation_oid := to_regclass(target);
+  IF relation_oid IS NULL THEN RAISE EXCEPTION 'Missing archived relation'; END IF;
+  SELECT c.relkind,pg_get_userbyid(c.relowner) INTO kind,original_owner
+    FROM pg_class c WHERE c.oid=relation_oid;
+  IF original_owner IS DISTINCT FROM item->>'owner' THEN
+   EXECUTE format('ALTER %s %s OWNER TO %I',
+     CASE kind WHEN 'S' THEN 'SEQUENCE' WHEN 'v' THEN 'VIEW' WHEN 'm' THEN 'MATERIALIZED VIEW'
+       WHEN 'f' THEN 'FOREIGN TABLE' ELSE 'TABLE' END, target,item->>'owner');
+  END IF;
+  object_type := CASE kind WHEN 'S' THEN 'SEQUENCE' ELSE 'TABLE' END;
+  IF item->'acl' = 'null'::jsonb THEN
+   desired_acl := acldefault(CASE kind WHEN 'S' THEN 's'::"char" ELSE 'r'::"char" END,
+      (SELECT oid FROM pg_roles WHERE rolname=item->>'owner'));
+  ELSE
+   SELECT array_agg(value::aclitem) INTO desired_acl FROM jsonb_array_elements_text(item->'acl');
+  END IF;
+  IF EXISTS(SELECT FROM aclexplode(desired_acl) a
+      WHERE pg_get_userbyid(a.grantor) IS DISTINCT FROM item->>'owner') THEN
+   RAISE EXCEPTION 'Archived grant chains require explicit review';
+  END IF;
+  -- Use the archived owner as grantor; source grants are never widened.
+  EXECUTE format('SET LOCAL ROLE %I',item->>'owner');
+  FOR entry IN SELECT DISTINCT a.grantee FROM pg_class c,
+     LATERAL aclexplode(coalesce(c.relacl,acldefault(
+       CASE kind WHEN 'S' THEN 's'::"char" ELSE 'r'::"char" END,c.relowner))) a
+     WHERE c.oid=relation_oid LOOP
+   grantee_name := CASE entry.grantee WHEN 0 THEN 'PUBLIC' ELSE format('%I',pg_get_userbyid(entry.grantee)) END;
+   EXECUTE format('REVOKE ALL PRIVILEGES ON %s %s FROM %s CASCADE',object_type,target,grantee_name);
+  END LOOP;
+  FOR entry IN SELECT * FROM aclexplode(desired_acl) LOOP
+   grantee_name := CASE entry.grantee WHEN 0 THEN 'PUBLIC' ELSE format('%I',pg_get_userbyid(entry.grantee)) END;
+   EXECUTE format('GRANT %s ON %s %s TO %s%s',entry.privilege_type,object_type,target,grantee_name,
+     CASE entry.is_grantable WHEN true THEN ' WITH GRANT OPTION' ELSE '' END);
+  END LOOP;
+  RESET ROLE;
+ END LOOP;
+END $restore_acl$;
+""".replace("EXPECTED_JSON", literal)
+    local_sql("BEGIN;\n" + statement + "\nCOMMIT;", "postgres")
+
+
+def normalize_default_relation_acls(value, local_sql):
+    """NULL ACL is PostgreSQL's implicit owner default, not absence of rights."""
+    for row in value["objects"]:
+        if row[0] != "table_acl":
+            continue
+        owner, acl = json.loads(row[2])
+        if acl is None:
+            owner_literal = "'" + owner.replace("'", "''") + "'"
+            name_literal = "'" + row[1].replace("'", "''") + "'"
+            acl = json.loads(local_sql("select json_agg(x::text order by x::text) from pg_class c, "
+                "lateral unnest(acldefault(case c.relkind when 'S' then 's'::\"char\" else 'r'::\"char\" end, "
+                "(select oid from pg_roles where rolname=" + owner_literal + "))) x "
+                "where c.oid=" + name_literal + "::regclass;", "postgres"))
+        row[2] = json.dumps([owner, sorted(acl or [])], separators=(',', ':'))
+    return value
 
 
 def local_inventory(local_sql):
