@@ -22,6 +22,7 @@ async function jsonResponse(response){
  if(!response.ok)throw Error('REMOTE_SERVICE_UNAVAILABLE');
  try{return await response.json()}catch{throw Error('REMOTE_RESPONSE_INVALID');}
 }
+/** @param {{env?: Record<string,string>, fetchImpl?: typeof fetch}} [options] */
 export function createP11SupabaseTrustedWeb({env,fetchImpl=fetch}={}){
  const base=String(env?.SUPABASE_URL||'').replace(/\/$/,'');
  const anon=String(env?.SUPABASE_ANON_KEY||'');
