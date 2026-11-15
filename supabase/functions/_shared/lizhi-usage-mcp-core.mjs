@@ -57,6 +57,7 @@ export function usageAlerts(quotas,now=new Date()){
      officialUsedAsOf:used,officialAsOf:asOf,limit,ratio,reason:"recent_official_snapshot_not_realtime"};
  });
 }
+/** @param {any} message @param {{snapshot?: (month:string)=>Promise<any>, now?:Date}} [options] */
 export async function dispatchUsageMcp(message,{snapshot,now=new Date()}={}){
  const error=(id,code,message)=>({jsonrpc:"2.0",id, error:{code,message}});
  if(!object(message)||message.jsonrpc!=="2.0"||
