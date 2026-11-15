@@ -8,7 +8,7 @@
 <meta name="description" content="立之英文學習教室：示範練習與雲端單字、錯句紀錄查詢。">
 <title>立之英文學習教室｜練習與雲端紀錄</title>
 <link rel="stylesheet" href="../preview/styles.css?v=1">
-<link rel="stylesheet" href="./styles.css?v=2">
+<link rel="stylesheet" href="./styles.css?v=3">
 </head>
 <body>
 <div id="app" role="main" aria-live="polite">正在確認立之雲端庫登入狀態…</div>
@@ -30,7 +30,7 @@
     s.onerror=()=>{root.textContent='英文練習載入失敗，請重新整理或回到雲端庫。';};
     document.body.append(s);
     const cloud=document.createElement('script');
-    cloud.type='module';cloud.src='./cloud-records.mjs?v=1';
+    cloud.type='module';cloud.src='./cloud-records.mjs?v=2';
     cloud.onerror=()=>{root.insertAdjacentText('beforebegin','雲端學習紀錄無法載入，練習功能仍可使用。');};
     document.body.append(cloud);
   }catch{

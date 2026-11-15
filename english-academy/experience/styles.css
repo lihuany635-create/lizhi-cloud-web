@@ -37,3 +37,22 @@
 .p6-cloud-list strong{display:block}
 .p6-cloud-list small{color:var(--muted)}
 @media(max-width:640px){.p6-cloud-cols{grid-template-columns:1fr}}
+
+/* Flashcard preview: secure owner-scoped reads only; no progress writes. */
+.p6-deck{margin:18px 0 22px}
+.p6-deck-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.p6-deck-eyebrow{font-size:11px;font-weight:800;letter-spacing:.15em;color:var(--muted)}
+.p6-deck-head h3{margin:4px 0 0;font-size:clamp(18px,3vw,23px)}
+.p6-deck-counter{font-weight:700;font-size:13px;color:var(--muted);white-space:nowrap}
+.p6-deck-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;width:100%;min-height:240px;border:1px solid #bcd1e9;border-radius:22px;background:linear-gradient(135deg,#f2f7ff 0%,#e9f0ff 52%,#e5f4f2 100%);box-shadow:0 10px 25px #0c315a13;cursor:pointer;color:#14263e;padding:22px 16px;text-align:center;transition:transform .16s ease,box-shadow .16s ease}
+.p6-deck-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px #0c315a24}
+.p6-deck-card:focus-visible{outline:3px solid #4269da;outline-offset:3px}
+.p6-deck-card.is-flipped{background:linear-gradient(135deg,#e8f7f1 0%,#eff9fb 60%,#f6f7fd 100%)}
+.p6-deck-label{font-size:12px;font-weight:750;letter-spacing:.06em;color:#456b7a}
+.p6-deck-word{font-size:clamp(30px,5.4vw,45px);font-weight:850;line-height:1.2;overflow-wrap:anywhere}
+.p6-deck-help{font-size:14px;color:#52637c;line-height:1.5}
+.p6-deck-example{font-size:13px;color:#35586e;max-width:45ch;line-height:1.55}
+.p6-deck-example:empty{display:none}
+.p6-deck-actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin:14px 0 8px}
+.p6-deck-actions .button{flex:1 1 110px;max-width:220px}
+@media(max-width:500px){.p6-deck-card{min-height:208px;border-radius:16px}.p6-deck-actions .button{flex-basis:calc(50% - 9px)}}
