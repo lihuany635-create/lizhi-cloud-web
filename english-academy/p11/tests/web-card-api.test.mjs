@@ -13,13 +13,14 @@ const actor={serverVerified:true,identityType:'google-user',ownerId:owner,
  scopes:['english:read','english:candidate']};
 
 function fixture({user=actor,verifyThrows=false,leak=false}={}){
- const calls=[],candidates=[],cards=[],errors=[];
+ const calls=[],candidates=[],cards=[],errors=[],sessions=[];
  const db={
   async select(table,{ownerId,filters,limit}){
    calls.push({action:'select',table,ownerId,filters,limit});
    const entries={'english_cards':cards,
      'english_card_candidates':candidates,
-     'english_error_records':errors}[table];
+     'english_error_records':errors,
+     'english_session_authorizations':sessions}[table];
    return leak?[{owner_id:foreign,id:'injected'}]:
      entries.filter(x=>x.owner_id===ownerId&&
        (!filters.status||x.status===filters.status));
@@ -27,6 +28,18 @@ function fixture({user=actor,verifyThrows=false,leak=false}={}){
   async rpc(name,payload){
    calls.push({action:'rpc',name,payload});
    assert.equal(payload.p_owner_id,owner);
+   if(name==='english_web_grant_chat_session'){
+     const entry={owner_id:owner,source_session_id:payload.p_source_session_id,
+       enabled:true,expires_at:'2099-01-01T00:00:00Z'};
+     sessions.push(entry);
+     return {status:'authorized',sourceSessionId:entry.source_session_id};
+   }
+   if(name==='english_web_revoke_chat_session'){
+     const entry=sessions.find(x=>x.source_session_id===payload.p_source_session_id);
+     if(!entry)throw {code:'CHAT_SESSION_NOT_FOUND'};
+     entry.enabled=false;
+     return {status:'revoked',sourceSessionId:entry.source_session_id};
+   }
    if(name==='english_web_create_candidate'){
      const c={id:candidateId,owner_id:owner,term:payload.p_term,
        meaning_zh:payload.p_meaning_zh,status:'pending'};
@@ -53,7 +66,7 @@ function fixture({user=actor,verifyThrows=false,leak=false}={}){
   verifyOwner:async()=>{if(verifyThrows)throw Error('revoked');return user;},
   trustedDb:db,allowedOrigin:origin
  });
- return {api,calls,cards,candidates,errors};
+ return {api,calls,cards,candidates,errors,sessions};
 }
 async function ask(api,action,{method='GET',body,token='test-token',
  requestOrigin=origin,headers={}}={}){
@@ -144,5 +157,33 @@ test('CORS preflight does not authenticate or mutate, and no local fallback',asy
  const res=await ask(f.api,'candidate',{method:'OPTIONS',token:''});
  assert.equal(res.status,204);
  assert.equal(res.headers.get('access-control-allow-origin'),origin);
+ assert.equal(f.calls.length,0);
+});
+
+test('only a verified Google website action grants and revokes an explicit chat scope',async()=>{
+ const f=fixture();
+ const grant=await ask(f.api,'authorize-session',{method:'POST',body:{
+  requestId:'grant-web-chat-000001'
+ }});
+ assert.equal(grant.status,200);
+ assert.equal(grant.data.status,'authorized');
+ assert.match(grant.data.sourceSessionId,/^chat-[0-9a-f-]{36}$/);
+ assert.equal(f.sessions.length,1);
+ const row=(await ask(f.api,'sessions')).data.items[0];
+ assert.equal(row.enabled,true);
+ const call=f.calls.find(x=>x.name==='english_web_grant_chat_session');
+ assert.equal(call.payload.p_web_session_id,actor.sessionId);
+ assert.equal(call.payload.p_owner_id,owner);
+ const revoked=await ask(f.api,'revoke-session',{method:'POST',body:{
+  requestId:'revoke-chat-web-0001',sourceSessionId:grant.data.sourceSessionId
+ }});
+ assert.equal(revoked.status,200);
+ assert.equal(f.sessions[0].enabled,false);
+});
+test('web cannot declare its own approved source session ID or owner',async()=>{
+ const f=fixture();
+ assert.equal((await ask(f.api,'authorize-session',{method:'POST',body:{
+  requestId:'grant-web-chat-000002',sourceSessionId:'chat-forged'
+ }})).status,400);
  assert.equal(f.calls.length,0);
 });
