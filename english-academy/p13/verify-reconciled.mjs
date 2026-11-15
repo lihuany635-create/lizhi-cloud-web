@@ -55,7 +55,7 @@ for(const [path,blob] of candidate){
   shared++;
  }else added++;
 }
-if(added+shared!==exact||added < m.importedNewBlobs-2||
+if(added+shared!==exact||added < m.importedNewBlobs-m.reviewedLocalChanges.length||
  shared!==m.matchingExistingBlobs)
  throw Error('RECONCILIATION_COUNT_MISMATCH');
 for(const [path,blob] of baseline){
