@@ -51,15 +51,20 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
-          if ! supabase db dump --help | grep -q -- '--db-url'; then
-            echo "::error::CLI option changed; stop rather than guessing"
+          # Match the CLI's documented connection option without leaking the URL.
+          if supabase db dump --help | grep -q -- '--db-url'; then
+            connection_option=(--db-url "$SUPABASE_DB_URL")
+          elif supabase db dump --help | grep -q -- '--remote'; then
+            connection_option=("--remote=$SUPABASE_DB_URL")
+          else
+            echo "::error::CLI connection option changed; stop rather than guessing"
             exit 1
           fi
-          supabase db dump --db-url "$SUPABASE_DB_URL" \
+          supabase db dump "${connection_option[@]}" \
             -f "$RUNNER_TEMP/lizhi-backup/roles.sql" --role-only
-          supabase db dump --db-url "$SUPABASE_DB_URL" \
+          supabase db dump "${connection_option[@]}" \
             -f "$RUNNER_TEMP/lizhi-backup/schema.sql"
-          supabase db dump --db-url "$SUPABASE_DB_URL" \
+          supabase db dump "${connection_option[@]}" \
             -f "$RUNNER_TEMP/lizhi-backup/data.sql" --data-only --use-copy \
             -x 'storage.buckets_vectors' -x 'storage.vector_indexes'
           for part in roles schema data; do
