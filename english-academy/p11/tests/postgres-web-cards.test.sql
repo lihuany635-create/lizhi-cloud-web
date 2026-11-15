@@ -109,10 +109,10 @@ begin
  exception when raise_exception then
    if SQLERRM<>'OWNER_NOT_AUTHORIZED' then raise;end if;
  end;
-end $;
+end $$;
 -- The website is the ONLY party allowed to authorize one scoped ChatGPT
 -- practice conversation. An MCP client may later reference its issued ID.
-do $
+do $$
 declare
  owner_a uuid:='11111111-1111-4111-8111-111111111111';
  web_session uuid:='5cbf2e04-61ca-4c69-9d85-4ba11dcb6303';
@@ -153,7 +153,7 @@ begin
  exception when raise_exception then
    if SQLERRM<>'LEARNING_SESSION_NOT_AUTHORIZED' then raise;end if;
  end;
-end $;
+end $$;
 reset role;
 delete from auth.sessions where id='5cbf2e04-61ca-4c69-9d85-4ba11dcb6303';
 set role service_role;
