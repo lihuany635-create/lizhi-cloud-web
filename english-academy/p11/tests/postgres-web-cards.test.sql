@@ -4,7 +4,7 @@
 insert into auth.sessions(id,user_id,not_after) values
  ('5cbf2e04-61ca-4c69-9d85-4ba11dcb6303',
   '11111111-1111-4111-8111-111111111111',
-  '2026-12-01T00:00:00Z');
+  now()+interval '10 days');
 
 set role anon;
 do $$
