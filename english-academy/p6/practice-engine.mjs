@@ -75,11 +75,11 @@ export function gradeExercise({exercise,response,ownerId,attemptId,audioDelivere
 }
 export function proposeFeedback({draft,reviewerType='ai',comment,rubricChecks}){
   if(draft?.status!=='needs-human-review'||!isText(comment,500)||
-     reviewerType!=='ai'||!Array.isArray(rubricChecks)||rubricChecks.length!==4||
+     !['ai','template'].includes(reviewerType)||!Array.isArray(rubricChecks)||rubricChecks.length!==4||
      !rubricChecks.every(x=>x===true||x===false||x===null))
        throw new TypeError('INVALID_REVIEW_PROPOSAL');
   return {ownerId:draft.ownerId,attemptId:draft.attemptId,rubricId:draft.rubricId,
-    reviewerType:'ai-proposal',rubricChecks:[...rubricChecks],comment:comment.trim(),
+    reviewerType:reviewerType==='ai'?'ai-proposal':'template-proposal',rubricChecks:[...rubricChecks],comment:comment.trim(),
     state:'proposal-only',correct:null,evidenceStatus:'unassessed'};
 }
 export const RUBRIC=Object.freeze([
