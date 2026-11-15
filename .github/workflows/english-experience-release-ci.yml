@@ -1,0 +1,72 @@
+name: English Academy experience release smoke (static, no private data)
+on:
+  pull_request:
+    paths:
+      - 'auth.js'
+      - 'app.js'
+      - 'index.html'
+      - 'workspace-ui.js'
+      - 'sw.js'
+      - 'english-academy/**'
+      - '.github/workflows/english-experience-release-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check unchanged portal modules and new experience syntax
+        run: |
+          node --check auth.js
+          node --check app.js
+          node --check workspace-ui.js
+          node --check sw.js
+          node --check english-academy/experience/app.mjs
+          node --check english-academy/p6/practice-engine.mjs
+          node --check english-academy/p6/sample-bank.mjs
+          node --check english-academy/p6/diagnostic-engine.mjs
+      - name: Seven exercise modes and diagnostic contracts
+        run: node --test english-academy/p6/tests/practice-diagnostic.test.mjs
+      - name: Ensure static experience imports only local reviewed modules
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const text=readFileSync('english-academy/experience/app.mjs','utf8');
+          const idx=readFileSync('english-academy/experience/index.html','utf8');
+          const auth=readFileSync('auth.js','utf8');
+          const app=readFileSync('app.js','utf8');
+          if(!idx.includes('window.parent.LizhiAuth'))throw Error('PORTAL_GATING_MISSING');
+          if(!auth.includes('"english"')||!app.includes('renderEnglish'))throw Error('ROUTE_MISSING');
+          if(['fetch(', 'supabase.', '/functions/v1/'].some(s=>text.includes(s)))throw Error('EXPERIENCE_NETWORK_CALL');
+          if(!idx.includes('noindex, nofollow'))throw Error('NOINDEX_MISSING');
+          console.log('ENGLISH_STATIC_NO_CLOUD_WRITE_PASS');
+          NODE
+  browser-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install temporary Chromium and Playwright test dependency
+        working-directory: english-academy
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.55.1
+          npx playwright install --with-deps chromium
+      - name: Verify protected entry and interactive mobile/desktop demo
+        run: node --test english-academy/experience/tests/browser.test.mjs
+      - name: Keep synthetic screen evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: english-experience-release-smoke-synthetic
+          path: english-academy/experience/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
