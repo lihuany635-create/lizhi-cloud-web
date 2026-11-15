@@ -5,6 +5,8 @@ import { DIAGNOSTIC_BANK, createDiagnostic, recordDiagnosticAnswer,
   diagnosticSummary } from '../diagnostic-engine.mjs';
 const root=document.getElementById('app');
 const h=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const skillNames={vocabulary:'單字',grammar:'文法',reading:'閱讀',writing:'寫作',listening:'聽力',speaking:'口說'};
+const states={'observed-sample':'示範樣本','not-assessed':'尚未評估'};
 const names={flip:'翻卡',choice:'選擇題',spelling:'拼字',fill:'填空',
   translation:'翻譯',listening:'聽力',sentence:'造句'};
 let page='practice',index=0,diagnosticPos=0;
@@ -73,7 +75,7 @@ function diagnostic(){
  if(diagnosticPos>=DIAGNOSTIC_BANK.length){
    return '<h1 class="view-title">測驗結果（非官方）</h1><section class="card"><h2>示範作答 '+summary.answered+' / '+summary.total+'</h2>'+
      '<div class="list">'+Object.entries(summary.skills).map(([skill,value])=>
-     '<div class="list-row"><strong>'+h(skill)+'</strong><span>'+h(value.state)+
+     '<div class="list-row"><strong>'+h(skillNames[skill]||skill)+'</strong><span>'+h(states[value.state]||value.state)+
      ' · '+value.reviewed+' 已評分 / '+value.pendingReview+' 待覆核</span></div>').join('')+'</div>'+
      '<div class="gap"></div><div class="notice">這些題目不足以認證 CEFR 等級；口說及未經驗證的聽力不會自動給分。</div>'+
      btn('重新開始示範測驗','data-restart="1"','primary')+'</section>';
