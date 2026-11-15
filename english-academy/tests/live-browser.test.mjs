@@ -16,7 +16,7 @@ test.before(async()=>{
       res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
       res.end('<!doctype html><html><head><meta name="viewport" content="width=device-width"></head>'+
       '<body><script>window.LIZHI_SUPABASE_URL=location.origin;window.LizhiAuth={client:{auth:{getSession:async()=>({data:{session:{access_token:"test-session"}}})}}};</script>'+
-      '<iframe src="/english-academy/live/" title="英文學習教室" style="width:100%;height:880px;border:0"></iframe></body></html>');
+      '<iframe src="/english-academy/live/" title="英文學習教室" style="width:100%;height:calc(100dvh - 16px);border:0"></iframe></body></html>');
       return;
     }
     if(url.pathname.startsWith('/functions/v1/lizhi-english-academy/')){
