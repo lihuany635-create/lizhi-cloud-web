@@ -17,7 +17,7 @@ test.before(async()=>{
   }
   if(path==='/__english_portal_layout__'){
    res.writeHead(200,{'content-type':'text/html; charset=utf-8'});
-   res.end(`<!doctype html><html lang="zh-Hant"><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/study.css"></head><body><script>window.LizhiAuth={user:{email:"test-owner@example.invalid"},allowedEmail:"test-owner@example.invalid"};</script><div class="shell route-english"><header class="topbar">立之雲端庫</header><main class="main"><section class="study-embedded english-academy-embedded"><header class="study-embedded-toolbar"><div><div class="eyebrow">ENGLISH LEARNING · EXPERIENCE</div><h1>英文學習教室</h1><p>七種練習題型與入門測驗；目前為不儲存資料的體驗版。</p></div><div class="actions"><span class="chip">限本人從主站登入使用</span></div></header><div class="study-frame-wrap"><iframe id="english-frame" title="英文學習教室" src="/english-academy/experience/"></iframe></div></section></main></div></body></html>`);
+   res.end(`<!doctype html><html lang="zh-Hant"><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/study.css"><link rel="stylesheet" href="/workspace-ui.css"></head><body><script>window.LizhiAuth={user:{email:"test-owner@example.invalid"},allowedEmail:"test-owner@example.invalid"};</script><div class="shell route-english"><header class="topbar">立之雲端庫</header><main class="main"><div class="workspace-panel" data-panel="english"><section class="study-embedded english-academy-embedded"><header class="study-embedded-toolbar"><div><div class="eyebrow">ENGLISH LEARNING · EXPERIENCE</div><h1>英文學習教室</h1><p>七種練習題型與入門測驗；目前為不儲存資料的體驗版。</p></div><div class="actions"><span class="chip">限本人從主站登入使用</span></div></header><div class="study-frame-wrap"><iframe id="english-frame" title="英文學習教室" src="/english-academy/experience/"></iframe></div></section></div></main></div></body></html>`);
    return;
   }
   const relative=path.endsWith('/')?path.slice(1)+'index.html':path.slice(1);
@@ -116,10 +116,18 @@ test('real portal CSS gives English lessons the remaining viewport on phones, la
    await frame.getByText('七種英文練習').waitFor();
    const d=await p.locator('#english-frame').evaluate(el=>{
     const r=el.getBoundingClientRect();
+    const main=document.querySelector('.route-english .main');
+    const panel=el.closest('.workspace-panel');
+    const embedded=el.closest('.study-embedded');
     return {top:r.top,bottom:r.bottom,height:r.height,viewport:innerHeight,
       parentHeight:el.parentElement.clientHeight,
+      mainHeight:main.getBoundingClientRect().height,
+      panelHeight:panel.getBoundingClientRect().height,
+      sectionHeight:embedded.getBoundingClientRect().height,
       documentWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth};
    });
+   assert.ok(d.panelHeight>=d.mainHeight-2,'Workspace panel lost main viewport height at '+width+'x'+height+': '+JSON.stringify(d));
+   assert.ok(d.sectionHeight>=d.panelHeight-2,'Embedded lesson lost workspace panel height at '+width+'x'+height+': '+JSON.stringify(d));
    assert.ok(d.height>=d.viewport*.52,'Lesson frame too small for '+width+'x'+height+': '+JSON.stringify(d));
    assert.ok(Math.abs(d.viewport-d.bottom)<=4,'Unused blank space below iframe at '+width+'x'+height+': '+JSON.stringify(d));
    assert.ok(d.documentWidth<=d.clientWidth+1,'Portal horizontal overflow at '+width+'x'+height+': '+JSON.stringify(d));
