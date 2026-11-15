@@ -17,6 +17,58 @@ spec.loader.exec_module(backup)
 
 
 class BackupSafetyTests(unittest.TestCase):
+    def test_archived_sequence_set_sql_matches_valid_pg_restore(self):
+        sql = """-- archive sequence statements
+SELECT pg_catalog.setval('public.example_id_seq', 42, true);
+SELECT pg_catalog.setval('auth.identities_id_seq', 8, false);
+"""
+        self.assertEqual(backup.parse_archived_sequence_setvals(sql), {
+            "public.example_id_seq": 42, "auth.identities_id_seq": 8})
+
+    def test_unrelated_source_drift_is_not_waived(self):
+        expected = {"objects": [("sequence", "public.myseq",
+                         '[\"owner\", \"bigint\", 1, 1, 999, 1, false, 1, 10]'),
+                       ("function", "public.other()", "ORIGINAL")]}
+        actual = {"objects": [("sequence", "public.myseq",
+                       '[\"owner\", \"bigint\", 1, 1, 999, 1, false, 1, 11]'),
+                       ("function", "public.other()", "DIFFERENT")]}
+        count = backup.reconcile_sequence_snapshot_with_archive(
+            expected, actual, {"public.myseq": 11})
+        self.assertEqual(count, 1)
+        self.assertEqual(expected["objects"][0][2], actual["objects"][0][2])
+        self.assertNotEqual(expected["objects"][1][2], actual["objects"][1][2])
+
+    def test_archive_sequence_state_mismatch_fails_closed(self):
+        expected = {"objects": [("sequence", "public.myseq",
+                       '[\"owner\", \"bigint\", 1, 1, 999, 1, false, 1, 10]')]}
+        actual = {"objects": [("sequence", "public.myseq",
+                       '[\"owner\", \"bigint\", 1, 1, 999, 1, false, 1, 12]')]}
+        with self.assertRaisesRegex(ValueError, "does not match"):
+            backup.reconcile_sequence_snapshot_with_archive(expected, actual, {"public.myseq": 11})
+
+    def test_sequence_schema_drift_rejected_even_if_last_value_matches(self):
+        expected = {"objects": [("sequence", "public.myseq",
+                       '[\"owner\", \"bigint\", 1, 1, 999, 1, false, 1, 10]')]}
+        actual = {"objects": [("sequence", "public.myseq",
+                       '[\"owner\", \"bigint\", 1, 1, 1000, 1, false, 1, 11]')]}
+        backup.reconcile_sequence_snapshot_with_archive(expected, actual, {"public.myseq": 11})
+        self.assertNotEqual(expected["objects"], actual["objects"])
+
+    def test_missing_sequence_archive_entry_does_not_suppress_difference(self):
+        expected = {"objects": [("sequence", "public.myseq",
+                       '[\"owner\", \"bigint\", 1, 1, 999, 1, false, 1, 10]')]}
+        actual = {"objects": [("sequence", "public.myseq",
+                       '[\"owner\", \"bigint\", 1, 1, 999, 1, false, 1, 11]')]}
+        self.assertEqual(backup.reconcile_sequence_snapshot_with_archive(
+            expected, actual, {}), 0)
+        self.assertNotEqual(expected["objects"], actual["objects"])
+
+    def test_extra_archive_sequence_fails_closed(self):
+        with self.assertRaisesRegex(ValueError, "absent"):
+            backup.reconcile_sequence_snapshot_with_archive(
+                {"objects": []}, {"objects": []}, {"public.unknown_seq": 1})
+
+
     def test_restored_inventory_catalog_sql_ast_path(self):
         import ast
         source = (Path(__file__).resolve().parents[1] / "supabase_backup.py").read_text()
