@@ -40,6 +40,7 @@ jobs:
           run_sql() { docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < "$1"; }
           run_sql english-academy/tests/postgres-fixture.sql
           run_sql english-academy/schema/20261115_p1_candidate.sql
+          run_sql english-academy/tests/postgres-rls.test.sql
           run_sql english-academy/p5/schema/20261115_p5_aggregate_candidate.sql
           run_sql english-academy/p5/tests/postgres-aggregate-fixture.sql
           run_sql english-academy/p6/schema/20261115_p6_learning_candidate.sql
