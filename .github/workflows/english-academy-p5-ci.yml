@@ -93,6 +93,9 @@ jobs:
           docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-fixture.sql
           docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/schema/20261115_p1_candidate.sql
           docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-rls.test.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p5/schema/20261115_p5_aggregate_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-aggregate-fixture.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-aggregate-assert.sql
           echo "$CID" > /tmp/p5-postgres-cid
       - name: Export only synthetic English tables and restore in second isolated database
         run: |
@@ -103,9 +106,11 @@ jobs:
           docker exec "$CID" createdb -U postgres english_p5_restore
           docker exec -i "$CID" psql -U postgres -d english_p5_restore -v ON_ERROR_STOP=1 < english-academy/tests/postgres-fixture.sql
           docker exec -i "$CID" psql -U postgres -d english_p5_restore -v ON_ERROR_STOP=1 < english-academy/schema/20261115_p1_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d english_p5_restore -v ON_ERROR_STOP=1 < english-academy/p5/schema/20261115_p5_aggregate_candidate.sql
           docker exec "$CID" pg_restore -U postgres -d english_p5_restore \
             --data-only --single-transaction --exit-on-error /tmp/english-p5-synthetic.backup
           docker exec -i "$CID" psql -U postgres -d english_p5_restore -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-restore-assert.sql
+          docker exec -i "$CID" psql -U postgres -d english_p5_restore -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-aggregate-assert.sql
       - name: Remove synthetic backup (never upload database content)
         if: always()
         run: |
