@@ -17,6 +17,20 @@ spec.loader.exec_module(backup)
 
 
 class BackupSafetyTests(unittest.TestCase):
+    def test_restored_inventory_catalog_sql_ast_path(self):
+        import ast
+        source = (Path(__file__).resolve().parents[1] / "supabase_backup.py").read_text()
+        tree = ast.parse(source)
+        inventory = next(n for n in tree.body
+                         if isinstance(n, ast.FunctionDef) and n.name == "inventory")
+        assignment = next(n for n in inventory.body
+                          if isinstance(n, ast.Assign)
+                          and any(isinstance(t, ast.Name) and t.id == "objects"
+                                  for t in n.targets))
+        query = assignment.value.func.value.args[0].value
+        self.assertIn("select kind, name, definition", query)
+        self.assertIn("from pg_policies", query)
+
     def test_only_original_session_pooler_is_accepted(self):
         valid = "postgresql://postgres.hrdzywkihfqggiwjgavi:fake%40password@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres"
         self.assertEqual(backup.validate_url(valid).port, 5432)
