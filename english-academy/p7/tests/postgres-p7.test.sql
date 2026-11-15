@@ -1,22 +1,40 @@
 \set ON_ERROR_STOP on
 -- Disposable PostgreSQL 17 database only. No real user data or Supabase.
+-- The authenticated role must FAIL even when resolving private schema names;
+-- PostgreSQL may raise permission denied before has_table_privilege can answer.
 set role authenticated;
 do $$
 begin
- if has_schema_privilege(current_user,'english_internal','USAGE') or
-    has_table_privilege(current_user,'english_internal.site_owner_links','SELECT') or
-    has_function_privilege(current_user,
-      'english_internal.consume_and_promote_candidate(uuid,uuid,uuid,text,text)','EXECUTE')
- then raise exception 'P7_AUTHENTICATED_PRIVATE_SCHEMA_LEAK';end if;
+ if has_schema_privilege(current_user,'english_internal','USAGE') then
+   raise exception 'P7_AUTHENTICATED_SCHEMA_LEAK';
+ end if;
+ begin
+   perform count(*) from english_internal.site_owner_links;
+   raise exception 'P7_AUTHENTICATED_PRIVATE_READ_LEAK';
+ exception when insufficient_privilege then null;
+ end;
+ begin
+   perform english_internal.consume_and_promote_candidate(
+     '11111111-1111-4111-8111-111111111111',
+     '99999999-9999-4999-8999-999999999999',
+     'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+     'p7-approve-apple-0001','digest-apple-server-20261115');
+   raise exception 'P7_AUTHENTICATED_RPC_LEAK';
+ exception when insufficient_privilege then null;
+ end;
 end $$;
 reset role;
 set role anon;
 do $$
 begin
- if has_schema_privilege(current_user,'english_internal','USAGE') or
-    has_function_privilege(current_user,
-      'english_internal.consume_and_promote_candidate(uuid,uuid,uuid,text,text)','EXECUTE')
- then raise exception 'P7_ANON_PRIVATE_SCHEMA_LEAK';end if;
+ if has_schema_privilege(current_user,'english_internal','USAGE') then
+   raise exception 'P7_ANON_SCHEMA_LEAK';
+ end if;
+ begin
+   perform count(*) from english_internal.site_owner_links;
+   raise exception 'P7_ANON_READ_LEAK';
+ exception when insufficient_privilege then null;
+ end;
 end $$;
 reset role;
 
