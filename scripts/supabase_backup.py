@@ -17,6 +17,20 @@ from urllib.parse import urlsplit, unquote
 PROJECT = "hrdzywkihfqggiwjgavi"
 CONTAINER = "supabase_db_lizhi-restore-check"
 PHASE = "configuration"
+LARGE_OBJECT_SQL = """select oid::bigint, octet_length(lo_get(oid)), md5(lo_get(oid)),
+    pg_get_userbyid(lomowner), lomacl::text
+    from pg_largeobject_metadata order by oid"""
+
+
+def require_secrets(env):
+    required = ("SUPABASE_DB_URL", "LIZHI_BACKUP_PASSPHRASE")
+    if any(not env.get(key) for key in required):
+        raise ValueError("Required backup secrets are missing")
+
+
+def private_subprocess_env(env):
+    return {k: v for k, v in env.items()
+            if k not in ("SUPABASE_DB_URL", "LIZHI_BACKUP_PASSPHRASE", "PGPASSWORD")}
 
 
 def validate_url(value):
@@ -113,13 +127,15 @@ def inventory(conn):
         where c.relkind in ('r','p','v','m','S','f') and n.nspname !~ '^pg_'
         and n.nspname <> 'information_schema'
     ) objects order by 1,2""").fetchall()
-    return {"tables": result, "objects": objects}
+    large_objects = conn.execute(LARGE_OBJECT_SQL).fetchall()
+    return {"tables": result, "objects": objects, "large_objects": large_objects}
 
 
 def main():
     global PHASE
     import psycopg
     os.umask(0o077)
+    require_secrets(os.environ)
     backup_url = os.environ["SUPABASE_DB_URL"]
     passphrase = os.environ["LIZHI_BACKUP_PASSPHRASE"]
     u = validate_url(backup_url)
@@ -131,13 +147,12 @@ def main():
     out.mkdir(mode=0o700, exist_ok=False)
     plain = root / "payload"
     plain.mkdir()
-    pg = {**os.environ, "PGHOST": u.hostname, "PGPORT": "5432",
+    clean = private_subprocess_env(os.environ)
+    pg = {**clean, "PGHOST": u.hostname, "PGPORT": "5432",
           "PGUSER": unquote(u.username), "PGPASSWORD": unquote(u.password),
           "PGDATABASE": "postgres", "PGSSLMODE": "require", "PGCONNECT_TIMEOUT": "30",
           "PGOPTIONS": "-c default_transaction_read_only=on -c statement_timeout=600000"}
     # Pass secrets only to the operations that need them, not to local restore.
-    clean = {k: v for k, v in os.environ.items()
-             if k not in ("SUPABASE_DB_URL", "LIZHI_BACKUP_PASSPHRASE", "PGPASSWORD")}
     pg_bin = Path("/usr/lib/postgresql/17/bin")
     PHASE = "hosted-read-only-snapshot-and-dump"
     with psycopg.connect(backup_url, sslmode="require", connect_timeout=30,
@@ -255,7 +270,9 @@ def local_inventory(local_sql):
     assignment = next(n for n in fn.body if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "objects" for t in n.targets))
     query = assignment.value.func.value.args[0].value
     objects = json.loads(local_sql("select coalesce(json_agg(row_to_json(x)), '[]') from (" + query + ") x;", "postgres"))
-    return {"tables": tables, "objects": [[r["kind"], r["name"], r["definition"]] for r in objects]}
+    large_objects = json.loads(local_sql("select coalesce(json_agg(row_to_json(x)), '[]') from (" + LARGE_OBJECT_SQL + ") x;", "postgres"))
+    return {"tables": tables, "objects": [[r["kind"], r["name"], r["definition"]] for r in objects],
+            "large_objects": [list(r.values()) for r in large_objects]}
 
 
 if __name__ == "__main__":
@@ -265,4 +282,3 @@ if __name__ == "__main__":
         # Never print exception repr, connection URIs, SQL or plaintext values.
         print("::error::Backup/restore gate FAIL in " + PHASE + ". Private exception details suppressed.", flush=True)
         sys.exit(1)
-
