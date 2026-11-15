@@ -1,0 +1,28 @@
+name: English Academy P2 isolated tests
+on:
+  pull_request:
+    paths:
+      - 'english-academy/p2/**'
+      - '.github/workflows/english-academy-p2-ci.yml'
+permissions:
+  contents: read
+jobs:
+  fsrs-and-skills:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install pinned official FSRS library in isolated candidate
+        working-directory: english-academy/p2
+        run: npm install --ignore-scripts --no-audit --no-fund --no-package-lock
+      - name: Check candidate syntax
+        working-directory: english-academy/p2
+        run: |
+          node --check fsrs-engine.mjs
+          node --check practice-evidence.mjs
+      - name: Execute P2 unit and safety tests
+        working-directory: english-academy/p2
+        run: npm test
