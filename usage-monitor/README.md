@@ -10,13 +10,22 @@
 ## 檔案與路徑
 
 - `usage-monitor/index.html`、`monitor.js`、`monitor.css`：獨立響應式管理頁。只有在後端確實存在且本人驗證通過後，才會顯示真實已記錄的監測數字；不製造假的用量。
-- `supabase/functions/lizhi-usage-monitor/index.ts`：本人唯讀 `GET /snapshot?month=YYYY-MM`。無寫入/刪除功能；不暴露 service role key。
+- `supabase/functions/lizhi-usage-monitor/index.ts`：本人唯讀 `GET /snapshot?month=YYYY-MM` 與 `POST /mcp`，六個 MCP 工具皆為唯讀；不暴露 service role key。
 - `usage-monitor/schema.draft.sql`：事件表、日統計及事件插入 trigger，草案**尚未套用**。合格的正式 migration 應由 Supabase CLI `supabase migration new` 建立並經過審核。
 - `supabase/functions/_shared/lizhi-usage-meter.ts`：在**既有 Edge 的同一次呼叫**中記錄一次 PostgREST INSERT；不能直接保證量測完整，且每次會增加 DB 寫入、傳輸及延遲。
 - `usage-monitor/budget-policy.mjs`：在 Supabase **外部閘道**使用的純計算策略，官方數字缺失／超過 60 分鐘時對非必要流量 fail-closed；尚未接入正式入口，也沒有分散式原子預留。
 - `usage-monitor/monitor-core.mjs`、`official-usage-contract.mjs`：區分觀測值／官方帳務、核對月份與帳單週期、處理過期快照及未知數據。
 - `supabase/functions/_shared/lizhi-usage-payload.mjs`：去識別化事件 payload，加入隨機 request_id 與敏感路由輸入限制。
-- 上述四個純模組各有 12 個 Node 測試，共 48/48 PASS；這不是資料庫、Edge 或網頁端到端驗收。
+- 既有四組純模組 48 項，加上新 MCP core 21 項、Site bridge 授權 10 項及 Site relay 11 項，候選共 **90/90 Node 測試 PASS**；隔離 PostgreSQL 17 驗證 RLS/grants／原子 rollup／重送去重／NULL／路由限制 PASS，Deno Edge TypeScript check PASS（GitHub Actions run #43731246780）。這仍**不是正式 Edge、Site 或全站實機驗收**。
+
+## MCP 接私人 Site 前的交付（Draft PR #77）
+
+- `supabase/functions/_shared/lizhi-usage-mcp-core.mjs`：無狀態 JSON-RPC、六個唯讀工具 `usage_status`／`usage_summary`／`usage_services`／`usage_events`／`usage_alerts`／`usage_policy`。
+- `supabase/functions/_shared/lizhi-usage-mcp-bridge-auth.mjs`：未來只讓已驗證私人 Site 持有的密鑰加本人 actor 登入；也支援直接的 Supabase Auth 本人 JWT。
+- `usage-monitor/site-bridge-relay.mjs`：尚未發布的原 Site 導入候選；固定上游、只有 usage_* 六工具、本人身份與 Secret 檢查。
+- `sites-migration/usage-monitor/SITE_HANDOFF.md`：等正式審查與本人批准後才更動原私人 Site，必須保留全部既有工具與 Secrets。
+- `usage-monitor/MCP_OPERATIONS.md`：操作手冊、錯誤碼、權限範圍與回退規則。
+- `usage-monitor/sql-regression.sql`／`.github/workflows/usage-monitor-qa.yml`：完整候選自動測試，不觸及正式 Supabase 資料。
 
 ## 階段報告與進度（2026-11-15）
 
