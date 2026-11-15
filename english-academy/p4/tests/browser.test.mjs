@@ -4,7 +4,7 @@ import {createServer} from 'node:http';
 import {readFile,mkdir} from 'node:fs/promises';
 import {chromium} from 'playwright';
 
-const root=new URL('../../../../',import.meta.url);
+const root=new URL('../../../',import.meta.url);
 const evidence=new URL('../test-results/',import.meta.url);
 let server,origin;
 test.before(async()=>{
