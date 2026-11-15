@@ -148,6 +148,76 @@ def inventory(conn):
     return {"tables": result, "objects": objects, "large_objects": large_objects}
 
 
+def parse_archived_sequence_setvals(sql_text):
+    """Only parse the archived pg_restore SEQUENCE SET statements (not source snapshot values).
+    
+    SEQUENCE SET is non-MVCC: values legitimately move while a repeatable-read
+    pg_dump snapshot is held. The exact archive state is the restore authority.
+    """
+    matches = re.findall(
+        r"SELECT\s+pg_catalog\.setval\('((?:''|[^'])+)'(?:\s*::regclass)?\s*,\s*(-?\d+)\s*,\s*(?:true|false)\s*\);",
+        sql_text, flags=re.IGNORECASE)
+    result = {}
+    for quoted_name, value in matches:
+        name = quoted_name.replace("''", "'")
+        if name in result or not re.fullmatch(r'[A-Za-z_][A-Za-z_0-9]*\.[A-Za-z_][A-Za-z_0-9]*', name):
+            raise ValueError("Ambiguous or unsupported archived sequence identifier")
+        result[name] = int(value)
+    return result
+
+
+def archived_sequence_setvals(pg_bin, archive, scratch, env):
+    """Read only SEQUENCE SET entries from encrypted archive after private decryption."""
+    listing = run([str(pg_bin / "pg_restore"), "--list", str(archive)], env=env).decode("utf-8")
+    chosen = [line for line in listing.splitlines()
+              if re.match(r"^\d+;\s+\d+\s+\d+\s+SEQUENCE SET\s+", line)]
+    if not chosen:
+        return {}
+    list_file = scratch / "sequence-set.list"
+    list_file.write_text("\n".join(chosen) + "\n", encoding="utf-8")
+    sql_file = scratch / "archived-sequence-set.sql"
+    run([str(pg_bin / "pg_restore"), "--data-only", "--use-list", str(list_file),
+         "--file", str(sql_file), str(archive)], env=env)
+    results = parse_archived_sequence_setvals(sql_file.read_text(encoding="utf-8"))
+    if len(results) != len(chosen):
+        raise ValueError("Sequence entries in archive could not be fully verified")
+    return results
+
+
+def reconcile_sequence_snapshot_with_archive(source, actual, archive_setvals):
+    """Adjust expected *last_value only* to archive state and verify live-restored state.
+
+    All sequence schema/permissions/other fields still must match the original
+    source inventory. No unknown sequence mismatch is accepted.
+    """
+    original = {(kind, name): definition for kind, name, definition in source["objects"]}
+    restored = {(kind, name): definition for kind, name, definition in actual["objects"]}
+    changed = 0
+    used = set()
+    updated = []
+    for kind, name, definition in source["objects"]:
+        if kind == "sequence" and name in archive_setvals:
+            used.add(name)
+            source_data = json.loads(definition)
+            restored_data = json.loads(restored.get((kind, name), "null"))
+            archived_value = archive_setvals[name]
+            if not isinstance(source_data, list) or len(source_data) != 9:
+                raise ValueError("Unexpected source sequence catalog format")
+            if not isinstance(restored_data, list) or len(restored_data) != 9:
+                raise ValueError("Restored archive sequence is missing")
+            if restored_data[-1] != archived_value:
+                raise ValueError("Restored sequence value does not match encrypted archive")
+            if source_data[-1] != archived_value:
+                changed += 1
+            source_data[-1] = archived_value
+            definition = json.dumps(source_data, separators=(", ", ": "))
+        updated.append((kind, name, definition))
+    if used != set(archive_setvals):
+        raise ValueError("Archive contains sequences absent from the source inventory")
+    source["objects"] = updated
+    return changed
+
+
 def main():
     global PHASE
     import psycopg
@@ -303,6 +373,12 @@ def main():
     actual = normalize_default_relation_acls(current_inventory, local_sql)
     PHASE = "snapshot-normalize-archived-acls"
     source = normalize_default_relation_acls(source, local_sql)
+    PHASE = "read-archived-sequence-set-state"
+    archive_values = archived_sequence_setvals(
+        Path("/usr/lib/postgresql/17/bin"), recovered / "full.dump", root, clean)
+    PHASE = "verify-restored-sequence-state"
+    reconciled = reconcile_sequence_snapshot_with_archive(source, actual, archive_values)
+    print("Archive-backed non-MVCC sequence drift reconciled: " + str(reconciled), flush=True)
     PHASE = "complete-data-and-object-comparison"
     if json.loads(json.dumps(actual)) != json.loads(json.dumps(source)):
         # Log only aggregate diagnostics, never identifiers, definitions or rows.
