@@ -1,9 +1,11 @@
-name: English Academy P11 existing Site MCP extension (candidate)
+name: English Academy P11 existing Site MCP + owner-verified cards (candidate)
 on:
   pull_request:
     paths:
       - 'english-academy/p11/**'
       - 'english-academy/conversation/**'
+      - 'english-academy/live/**'
+      - 'supabase/functions/lizhi-english-academy/**'
       - '.github/workflows/english-academy-p11-ci.yml'
   workflow_dispatch:
 
@@ -11,18 +13,64 @@ permissions:
   contents: read
 
 jobs:
-  site-mcp-synthetic:
-    runs-on: ubuntu-latest
+  site-mcp-and-cards:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify original private-Site tooling and synthetic English MCP
-        run: node --test english-academy/p11/tests/*.test.mjs english-academy/conversation/tests/*.test.mjs
-      - name: Confirm P11 files contain no real owner or production writer
+      - name: Syntax check website and trusted server
         run: |
-          if grep -R -n -E 'SUPABASE_SERVICE_ROLE|PRODUCTION_BRIDGE_KEY|service_role\s*=|https://[^ ]*supabase\.co/functions/v1' english-academy/p11 --include='*.mjs'; then
-            echo "Unexpected secret or live endpoint in candidate"
+          node --check english-academy/live/app.mjs
+          node --check english-academy/p11/web-card-api.mjs
+          node --check english-academy/p11/supabase-verified-web.mjs
+          node --check english-academy/p11/site-mcp-extension.mjs
+          node --check english-academy/p11/mount-existing-site.mjs
+      - name: Synthetic chat-to-MCP, owner and one-use card approval contracts
+        run: node --test english-academy/p11/tests/*.test.mjs english-academy/conversation/tests/*.test.mjs
+      - name: Block accidental production endpoints and secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Environment-variable REFERENCES are expected. Never hardcode values.
+          if grep -R -n -E 'lzp_[a-zA-Z0-9]{20}|Bearer eyJ[a-zA-Z0-9._-]{70}|https://hrdzywkihfqggiwjgavi\.supabase\.co' \
+             english-academy/p11 --include='*.mjs'; then
+            echo "Hardcoded production secret / endpoint in public candidate"
             exit 1
           fi
+
+  disposable-pg17-web-card-rpc:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      pg:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: synthetic-ci-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Execute entire P1/P5/P6/P7/P11 schema and reject unsafe direct writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          CID=$(docker ps --filter ancestor=postgres:17 --format '{{.ID}}' | head -1)
+          test -n "$CID"
+          run_sql() { docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < "$1"; }
+          run_sql english-academy/tests/postgres-fixture.sql
+          run_sql english-academy/schema/20261115_p1_candidate.sql
+          run_sql english-academy/tests/postgres-rls.test.sql
+          run_sql english-academy/p5/schema/20261115_p5_aggregate_candidate.sql
+          run_sql english-academy/p5/tests/postgres-aggregate-fixture.sql
+          run_sql english-academy/p6/schema/20261115_p6_learning_candidate.sql
+          run_sql english-academy/p7/schema/20261115_p7_owner_link_and_consent_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            -c "create table auth.sessions(id uuid primary key,user_id uuid not null,not_after timestamptz);"
+          run_sql english-academy/p11/schema/20261115_p11_web_cards_candidate.sql
+          run_sql english-academy/p11/tests/postgres-web-cards.test.sql
