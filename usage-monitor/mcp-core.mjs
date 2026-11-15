@@ -37,15 +37,24 @@ export function usageMonth(now=new Date()){
    .formatToParts(now);
  return date.find(x=>x.type==="year").value+"-"+date.find(x=>x.type==="month").value;
 }
-export function usageAlerts(quotas){
+export function usageAlerts(quotas,now=new Date()){
  if(!Array.isArray(quotas))return [];
  return quotas.map(q=>{
-   const limit=q.limit,used=q.official_used;
-   if(used===null||used===undefined||!Number.isFinite(used)||!Number.isFinite(limit)||limit<=0)
-     return {key:q.key||"unknown",state:"UNKNOWN",reason:"official_usage_unavailable"};
+   const key=q?.key||"unknown";
+   const limit=q?.limit,used=q?.official_used,asOf=q?.official_as_of;
+   const source=q?.official_source;
+   if(used===null||used===undefined||!Number.isFinite(used)||used<0||
+      !Number.isFinite(limit)||limit<=0)
+     return {key,state:"UNKNOWN",reason:"official_usage_unavailable"};
+   if(!["supabase_dashboard_manual","management_api_verified"].includes(source)||
+      typeof asOf!=="string"||!/^20\d{2}-\d{2}-\d{2}T/.test(asOf))
+     return {key,state:"UNKNOWN",reason:"official_source_or_time_unverified"};
+   const date=new Date(asOf),age=now.getTime()-date.getTime();
+   if(Number.isNaN(date.getTime())||age<0||age>3600000)
+     return {key,state:"UNKNOWN",reason:"official_usage_stale_or_future"};
    const ratio=used/limit;
-   return {key:q.key||"unknown",state:ratio>=.95?"STOP":ratio>=.85?"THROTTLE":ratio>=.70?"WARNING":"NORMAL",
-     officialUsedAsOf:used,limit,ratio,reason:"official_snapshot_may_be_delayed"};
+   return {key,state:ratio>=.95?"STOP":ratio>=.85?"THROTTLE":ratio>=.70?"WARNING":"NORMAL",
+     officialUsedAsOf:used,officialAsOf:asOf,limit,ratio,reason:"recent_official_snapshot_not_realtime"};
  });
 }
 export async function dispatchUsageMcp(message,{snapshot,now=new Date()}={}){
@@ -99,7 +108,7 @@ export async function dispatchUsageMcp(message,{snapshot,now=new Date()}={}){
    if(name==="usage_services")return ok(text({month,coverage:snap.coverage,services:snap.sources}));
    if(name==="usage_events")return ok(text({month,coverage:snap.coverage,
      events:(snap.events||[]).slice(0,args.limit??100)}));
-   if(name==="usage_alerts")return ok(text({month,alerts:usageAlerts(snap.quotas),
+   if(name==="usage_alerts")return ok(text({month,alerts:usageAlerts(snap.quotas,now),
      note:"UNKNOWN 不等於安全；任何觀測下限都不能證明剩餘額度。"}));
    return error(message.id,-32601,"Method not found.");
  }catch{
