@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {readFile,mkdir} from 'node:fs/promises';
 import {chromium} from 'playwright';
-const root=new URL('../../',import.meta.url);
+const root=new URL('../../../',import.meta.url);
 const screenshots=new URL('../test-results/',import.meta.url);
 let server,base;
 test.before(async()=>{
@@ -15,7 +15,7 @@ test.before(async()=>{
      res.writeHead(403);res.end();return;
    }
    try{
-     const bytes=await readFile(new URL('../../'+relative,import.meta.url));
+     const bytes=await readFile(new URL(relative,root));
      const mime=relative.endsWith('.mjs')?'text/javascript; charset=utf-8':
        relative.endsWith('.css')?'text/css; charset=utf-8':'text/html; charset=utf-8';
      res.writeHead(200,{'content-type':mime,'cache-control':'no-store'});res.end(bytes);
