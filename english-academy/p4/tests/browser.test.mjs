@@ -62,7 +62,7 @@ test('desktop 1280px responsive dark-mode screen and report remain accurate',asy
   const page=await browser.newPage({viewport:{width:1280,height:800}});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(origin+'/english-academy/p4/preview/',{waitUntil:'load'});
-  await page.locator('[data-theme]').click();
+  await page.locator('button[data-theme="1"]').click();
   assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
   await page.locator('[data-tab="report"]').click();
   assert.match(await page.locator('body').innerText(),/示範練習紀錄/);
