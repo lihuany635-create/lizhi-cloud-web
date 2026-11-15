@@ -188,4 +188,67 @@ revoke execute on function public.english_p6_ingest_batch(uuid,text,text,jsonb,j
  from public,anon,authenticated;
 grant execute on function public.english_p6_ingest_batch(uuid,text,text,jsonb,jsonb) to service_role;
 
+
+-- Preserve distinct sense keys through the already approved-card promotion
+-- contract. Original P1 prototype did not transfer sense_key into formal cards.
+-- This is an UNAPPLIED candidate replacement; same server-only signature.
+create or replace function public.english_promote_candidate(
+  p_owner_id uuid,p_candidate_id uuid,p_request_id text,p_payload_digest text
+) returns jsonb
+language plpgsql security definer set search_path=''
+as $$
+declare
+ c public.english_card_candidates%rowtype;
+ existing public.english_sync_events%rowtype;
+ card_id uuid;
+ outcome text;
+begin
+ if p_owner_id is null or p_candidate_id is null or
+    p_request_id is null or length(p_request_id)<12 or
+    p_payload_digest is null or length(p_payload_digest)<8 then
+   raise exception 'INVALID_ARGUMENT';
+ end if;
+ if not exists(select 1 from public.english_authorized_users
+   where owner_id=p_owner_id and enabled) then
+   raise exception 'OWNER_NOT_AUTHORIZED';
+ end if;
+ perform pg_catalog.pg_advisory_xact_lock(
+   pg_catalog.hashtextextended(p_owner_id::text||':'||p_request_id,0));
+ select * into existing from public.english_sync_events
+  where owner_id=p_owner_id and request_id=p_request_id;
+ if found then
+   if existing.action<>'promote_candidate' or existing.payload_digest<>p_payload_digest
+    then raise exception 'IDEMPOTENCY_CONFLICT'; end if;
+   return pg_catalog.jsonb_build_object('status','replay','card_id',existing.result_reference);
+ end if;
+ select * into c from public.english_card_candidates
+  where id=p_candidate_id and owner_id=p_owner_id for update;
+ if not found then raise exception 'CANDIDATE_NOT_FOUND'; end if;
+ if c.status<>'pending' then raise exception 'CANDIDATE_NOT_PENDING'; end if;
+ insert into public.english_cards(owner_id,source_candidate_id,
+   term,normalized_term,meaning_zh,part_of_speech,example_en,sense_key)
+ values(p_owner_id,c.id,c.term,c.normalized_term,c.meaning_zh,
+   c.part_of_speech,c.example_en,c.sense_key)
+ on conflict (owner_id,normalized_term,sense_key) do nothing
+ returning id into card_id;
+ outcome=case when card_id is null then 'duplicate' else 'accepted' end;
+ if card_id is null then
+   select id into card_id from public.english_cards
+     where owner_id=p_owner_id and normalized_term=c.normalized_term
+       and sense_key=c.sense_key;
+ end if;
+ update public.english_card_candidates set status=outcome,reviewed_at=now()
+  where id=c.id and owner_id=p_owner_id;
+ insert into public.english_sync_events(owner_id,source,request_id,payload_digest,action,status,result_reference)
+ values(p_owner_id,'web',p_request_id,p_payload_digest,'promote_candidate','success',card_id::text);
+ insert into public.english_audit_events(owner_id,actor_type,action,resource_id,request_id)
+ values(p_owner_id,'verified_user','promote_candidate',c.id::text,p_request_id);
+ return pg_catalog.jsonb_build_object('status',outcome,'card_id',card_id);
+end;
+$$;
+revoke execute on function public.english_promote_candidate(uuid,uuid,text,text)
+  from public,anon,authenticated;
+grant execute on function public.english_promote_candidate(uuid,uuid,text,text)
+ to service_role;
+
 commit;
