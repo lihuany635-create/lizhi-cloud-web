@@ -475,9 +475,12 @@ END $restore_acl$;
 
 def normalize_default_relation_acls(value, local_sql):
     """NULL ACL is PostgreSQL's implicit owner default, not absence of rights."""
-    for row in value["objects"]:
-        if row[0] != "table_acl":
+    for i, original in enumerate(value["objects"]):
+        if original[0] != "table_acl":
             continue
+        # psycopg returns immutable tuples for fresh captures, whereas a
+        # decrypted manifest contains mutable JSON lists. Handle both safely.
+        row = list(original)
         owner, acl = json.loads(row[2])
         if acl is None:
             owner_literal = "'" + owner.replace("'", "''") + "'"
@@ -487,6 +490,7 @@ def normalize_default_relation_acls(value, local_sql):
                 "(select oid from pg_roles where rolname=" + owner_literal + "))) x "
                 "where c.oid=" + name_literal + "::regclass;", "postgres"))
         row[2] = json.dumps([owner, sorted(acl or [])], separators=(',', ':'))
+        value["objects"][i] = row
     return value
 
 
