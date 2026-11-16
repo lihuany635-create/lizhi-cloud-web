@@ -33,7 +33,7 @@ test("no readings mean unknown; never invent egress or safe state",()=>{
 test("warnings at 70%, 85% and 95% of Free 5 GB",()=>{
   for(const [gb,expected] of [
     [0,"WITHIN"],[3.5,"NOTICE"],[4.25,"WARNING"],
-    [4.75,"CRITICAL"],[5,"CRITICAL"],[5.5,"CRITICAL"]
+    [4.75,"CRITICAL"],[5,"LIMIT_REACHED"],[5.5,"LIMIT_REACHED"]
   ])assert.equal(parseEgressRows([reading(gb)],"2026-11").alert,expected);
 });
 test("sort newest first and retain append-only history",()=>{
@@ -59,6 +59,22 @@ test("readings are scoped to billing month and never official API verified",()=>
 });
 test("cap history at 100 entries, detect truncated 501 query",()=>{
   const x=parseEgressRows(Array.from({length:501},()=>reading(1)),"2026-11");
-  assert.equal(x.readings.length,100);
+  assert.equal(x.readings.length,1);
   assert.equal(x.complete,false);
+});
+test('MCP units, observation time and same-period confirmation are mandatory',()=>{
+ const input={month:'2026-11',total:4800,cached:1100,unit:'MB',observedAt:now.toISOString(),samePeriod:true};
+ assert.equal(validateEgressInput(input,now).uncachedBytes,3700000000);
+ for(const patch of [{samePeriod:false},{unit:'TB'},{observedAt:'tomorrow'},{observedAt:'2027-01-01T00:00:00Z'},{total:'4800'}])assert.throws(()=>validateEgressInput({...input,...patch},now));
+});
+test('snapshots are never summed; identical historical snapshots deduplicate',()=>{
+ const r=reading(3.5);const x=parseEgressRows([r,r], '2026-11');
+ assert.equal(x.readings.length,1);assert.equal(x.duplicateRows,1);assert.equal(x.uncachedGb,3.5);assert.equal(x.remainingGb,1.5);
+ assert.equal(x.sevenDayChange.status,'UNKNOWN');
+});
+test('seven-day change uses an actual baseline and flags decreasing readings',()=>{
+ const x=parseEgressRows([reading(1,'2026-11-01T00:00:00Z'),reading(3,'2026-11-08T00:00:00Z')],'2026-11');
+ assert.equal(x.sevenDayChange.deltaGb,2);
+ const y=parseEgressRows([reading(3,'2026-11-01T00:00:00Z'),reading(1,'2026-11-08T00:00:00Z')],'2026-11');
+ assert.equal(y.sevenDayChange.status,'DECREASE_REQUIRES_REVIEW');
 });

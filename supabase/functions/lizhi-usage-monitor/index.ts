@@ -2,7 +2,7 @@
 // IMPORTANT: No deployment, database migration or external request instrumentation is implied.
 import {usageMonth} from "../_shared/lizhi-usage-mcp-core.mjs";
 import {BRIDGE_SECRET_SHA256,BRIDGE_ACTOR_SHA256} from "../_shared/lizhi-usage-site-binding.mjs";
-import {dispatchAiUsageMcp} from "../_shared/lizhi-usage-ai-mcp.mjs";
+import {dispatchAiUsageMcp,stableUsageId} from "../_shared/lizhi-usage-ai-mcp.mjs";
 import {validateEgressInput,parseEgressRows} from "../_shared/lizhi-uncached-egress.mjs";
 import {authorizeUsage,UsageAccessError,TRUSTED_ORIGIN,originAllowed} from "../_shared/lizhi-usage-access.mjs";
 import {SIDE_PROJECT,SIDE_AGENT,buildAiSideSnapshot,createBudgetRow}
@@ -222,34 +222,31 @@ async function egressHistory(month:string,uid:string) {
   const rows=await readRows("aiwb_side_logs?"+q.toString());
   return parseEgressRows(rows,month);
 }
+async function saveEgress(value:unknown,uid:string) {
+  let snap;
+  try { snap=validateEgressInput(value); }
+  catch { throw new HttpError(400,"官方 Usage 讀數格式錯誤。"); }
+  const key=JSON.stringify([uid,snap.month,snap.observedAt,snap.totalBytes,snap.cachedBytes]);
+  const id=await stableUsageId('egress:'+key);
+  const record={id,owner_id:uid,agent:"Usage Monitor",project:SIDE_PROJECT,
+    title:"EGRESS_USAGE "+snap.month+" "+id,done:JSON.stringify(snap)};
+  const result=await fetch(BASE+"/rest/v1/aiwb_side_logs",{
+    method:"POST",headers:{apikey:SERVICE,Authorization:"Bearer "+SERVICE,
+      "Content-Type":"application/json",Prefer:"return=representation"},
+    body:JSON.stringify(record),signal:AbortSignal.timeout(10000),redirect:"manual"
+  });
+  if(!result.ok && result.status!==409)throw new HttpError(503,"用量快照保存失敗。");
+  const query=new URLSearchParams({select:"id,done",id:"eq."+id,owner_id:"eq."+uid,project:"eq."+SIDE_PROJECT});
+  const rows=await readRows("aiwb_side_logs?"+query.toString());
+  if(rows.length!==1||rows[0].id!==id||rows[0].done!==record.done)
+    throw new HttpError(503,"快照保存後讀回核對失敗。");
+  return {saved:true,verified:true,id,replayed:result.status===409,
+    source:snap.source,providerVerified:false,reading:snap};
+}
 async function egressRecord(req:Request,uid:string) {
   if(!req.headers.get("content-type")?.toLowerCase().startsWith("application/json"))
     throw new HttpError(415,"需要 JSON 內容。");
-  let snap;
-  try { snap=validateEgressInput(await boundedJson(req,512)); }
-  catch(e) {
-    if(e instanceof HttpError)throw e;
-    throw new HttpError(400,"官方 Usage 讀數格式錯誤。");
-  }
-  const record={
-    owner_id:uid,agent:"Usage Monitor",project:SIDE_PROJECT,
-    title:"EGRESS_USAGE "+snap.month+" "+crypto.randomUUID(),
-    done:JSON.stringify(snap)
-  };
-  const result=await fetch(BASE+"/rest/v1/aiwb_side_logs",{
-    method:"POST",headers:{
-      apikey:SERVICE,Authorization:"Bearer "+SERVICE,
-      "Content-Type":"application/json",Prefer:"return=representation"
-    },
-    body:JSON.stringify(record),signal:AbortSignal.timeout(10000),redirect:"manual"
-  });
-  if(!result.ok)throw new HttpError(503,"用量快照保存失敗。");
-  const rows=await result.json();
-  if(!Array.isArray(rows)||rows.length!==1||typeof rows[0]?.id!=="string"||
-      rows[0]?.done!==record.done)
-    throw new HttpError(503,"快照保存後核對失敗。");
-  return {saved:true,verified:true,id:rows[0].id,
-    source:snap.source,providerVerified:false,reading:snap};
+  return await saveEgress(await boundedJson(req,1024),uid);
 }
 
 Deno.serve(async (req: Request) => {
@@ -278,7 +275,8 @@ Deno.serve(async (req: Request) => {
         throw e;
       }
       const result=await dispatchAiUsageMcp(rpcBody,{store:aiMcpStore(uid),
-        siteConnected:req.headers.has("x-lizhi-usage-bridge")});
+        siteConnected:req.headers.has("x-lizhi-usage-bridge"),
+        egress:{history:(month:string)=>egressHistory(month,uid),record:(value:unknown)=>saveEgress(value,uid)}});
       return result===null?new Response(null,{status:202,headers:{...allowOrigin,"Cache-Control":"no-store"}}):json(result);
     }
     if(u.pathname.endsWith("/egress-history")) {

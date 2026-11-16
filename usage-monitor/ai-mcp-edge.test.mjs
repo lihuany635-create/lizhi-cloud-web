@@ -29,6 +29,7 @@ globalThis.fetch=async(url,init={})=>{
  }
  assert.equal(u.searchParams.get('owner_id'),'eq.'+owner);
  let result=rows.filter(r=>r.owner_id===owner);
+ const id=u.searchParams.get('id');if(id)result=result.filter(r=>r.id===id.slice(3));
  const title=u.searchParams.get('title');
  if(title?.startsWith('like.'))result=result.filter(x=>x.title.startsWith(title.slice(5).replace('*','')));
  if(title?.startsWith('eq.'))result=result.filter(x=>x.title===title.slice(3));
@@ -56,9 +57,9 @@ test('integrated Edge enforces owner auth, persists and reads Side, rejects dupl
   assert.equal((await rpc('tools/list',{}, {'x-lizhi-usage-bridge':bridge,'x-lizhi-usage-actor':'wrong-owner'})).status,403);
   assert.equal((await rpc('tools/list',{}, {origin:'https://untrusted.example'})).status,403);
  });
- await t.test('verified bridge lists exactly nine tools',async()=>{
+ await t.test('verified bridge lists exactly eleven tools',async()=>{
   const r=await rpc('tools/list',{}, {authorization:'','x-lizhi-usage-bridge':bridge,'x-lizhi-usage-actor':actor});
-  assert.equal(r.status,200);assert.equal(r.body.result.tools.length,9);
+  assert.equal(r.status,200);assert.equal(r.body.result.tools.length,11);
  });
  const month=new Intl.DateTimeFormat('sv',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit'}).format(new Date());
  const before={eventId:crypto.randomUUID(),at:new Date().toISOString(),service:'supabase',feature:'usage_monitor',taskLabel:'隔離端點驗收',actionDetail:'查詢監控服務狀態',operation:'edge_read',plannedCalls:1};
@@ -83,6 +84,17 @@ test('integrated Edge enforces owner auth, persists and reads Side, rejects dupl
   const after={...meta,completedAt:new Date().toISOString(),toolCalls:0,outcome:'failure'};
   assert.equal(value(await rpc('usage_log_after',after)).saved,true);
   const summary=value(await rpc('usage_summary'));assert.equal(summary.summary.failures,1);assert.equal(summary.summary.assistantObservedToolCalls,1);
+ });
+ await t.test('egress MCP persists, independent GET reads back and retry keeps one row',async()=>{
+  const args={month,total:4.8,cached:1.1,unit:'GB',observedAt:new Date().toISOString(),samePeriod:true};
+  const first=value(await rpc('usage_egress_record',args));assert.equal(first.verified,true);
+  assert.equal(value(await rpc('usage_egress_record',args)).id,first.id);
+  const history=value(await rpc('usage_egress_history',{month}));
+  assert.equal(history.readings.length,1);assert.equal(history.uncachedGb,3.7);
+  const web=await handler(new Request(root+'/egress-history?month='+month,{headers:{authorization:'Bearer synthetic-owner-session'}}));
+  assert.equal((await web.json()).latest.id,first.id);
+  assert.equal((await rpc('usage_egress_record',{...args,ownerId:owner})).body.error.code,-32602);
+  assert.equal(value(await rpc('usage_egress_history',{month:'2020-01'})).alert,'UNKNOWN');
  });
  await t.test('DB write errors are surfaced and never returned as saved',async()=>{
   breakWrite=true;

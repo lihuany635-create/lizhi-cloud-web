@@ -19,13 +19,13 @@ function makeStore(initial=[]){
 const call=async(store,name,args={})=>dispatchAiUsageMcp({jsonrpc:'2.0',id:1,method:'tools/call',params:{name,arguments:args}},{store,now});
 const data=x=>{assert.equal(x.result?.isError,false,JSON.stringify(x));return JSON.parse(x.result.content[0].text);};
 const budget=async(s,cap=10)=>data(await call(s,'usage_budget_set',{month:'2026-11',cap}));
-test('nine tools advertise six reads and three writes',()=>{
- assert.equal(AI_USAGE_TOOLS.length,9);assert.deepEqual(AI_USAGE_TOOLS.filter(x=>!x.annotations.readOnlyHint).map(x=>x.name),['usage_log_before','usage_log_after','usage_budget_set']);
+test('eleven tools retain original nine and add egress read/write',()=>{
+ assert.equal(AI_USAGE_TOOLS.length,11);assert.deepEqual(AI_USAGE_TOOLS.filter(x=>!x.annotations.readOnlyHint).map(x=>x.name),['usage_log_before','usage_log_after','usage_budget_set','usage_egress_record']);
 });
-test('discovery and list expose nine tools',async()=>{
+test('discovery and list expose eleven tools',async()=>{
  for(const method of ['server/discover','tools/list']){
  const r=await dispatchAiUsageMcp({jsonrpc:'2.0',id:1,method},{now});
- if(method==='tools/list')assert.equal(r.result.tools.length,9);else assert.ok(r.result.supportedVersions.includes('2026-07-28'));
+ if(method==='tools/list')assert.equal(r.result.tools.length,11);else assert.ok(r.result.supportedVersions.includes('2026-07-28'));
  }
 });
 test('before persists even when cap is unconfigured and holds optional work',async()=>{

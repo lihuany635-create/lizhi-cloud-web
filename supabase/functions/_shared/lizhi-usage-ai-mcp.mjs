@@ -21,7 +21,9 @@ export const AI_USAGE_TOOLS=Object.freeze([
  tool('usage_policy','查詢 AI 操作流程規則及跨對話、全域攔截限制。',object()),
  tool('usage_log_before','Supabase 操作前登記；只有 saved、verified 且 decision=allow 才能執行非必要操作；hold 不可執行。',object({...base,at:{type:'string',maxLength:40},plannedCalls:{...count,minimum:1}},[...Object.keys(base),'at','plannedCalls']),true),
  tool('usage_log_after','用同一 eventId 登記實際成功、失敗或未知結果；補登不能重跑操作。',object({...base,completedAt:{type:'string',maxLength:40},toolCalls:count,outcome:{type:'string',enum:['success','failure','unknown']},evidenceUrl:{type:['string','null'],maxLength:300}},[...Object.keys(base),'completedAt','toolCalls','outcome']),true),
- tool('usage_budget_set','僅已驗證本人可設定每月 AI 工具操作上限，寫入既有 Side 並讀回；不阻擋其他來源的計費流量。',object({month,cap:{type:'integer',minimum:1,maximum:1000000}},['month','cap']),true)
+ tool('usage_budget_set','僅已驗證本人可設定每月 AI 工具操作上限，寫入既有 Side 並讀回；不阻擋其他來源的計費流量。',object({month,cap:{type:'integer',minimum:1,maximum:1000000}},['month','cap']),true),
+ tool('usage_egress_history','查詢組織 Usage 人工讀數歷史、非快取 GB、5 GB 基準及趨勢；不是即時官方同步，需確認實際方案與帳期。',object({month},['month'])),
+ tool('usage_egress_record','僅保存本人提供或授權取得的官方 Usage Total Egress（包含 Cached）及 Cached；同組織同月份期間相減。不可使用已扣除 Cached 的帳單 Egress。必須先核對來源、期間和觀測時間；保存後讀回，重送不重複。',object({month,total:{type:'number',minimum:0,maximum:1e14},cached:{type:'number',minimum:0,maximum:1e14},unit:{type:'string',enum:['B','KB','MB','GB','KiB','MiB','GiB']},observedAt:{type:'string',maxLength:40},samePeriod:{type:'boolean',enum:[true]}},['month','total','cached','unit','observedAt','samePeriod']),true)
 ]);
 const specs=new Map(AI_USAGE_TOOLS.map(x=>[x.name,x]));
 const isObj=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
@@ -31,6 +33,8 @@ function validArgs(args,schema){
  return Object.entries(args).every(([k,v])=>{
   const p=schema.properties[k];if(!p)return false;
   if(v===null)return Array.isArray(p.type)&&p.type.includes('null');
+  if(p.type==='boolean')return typeof v==='boolean'&&(!p.enum||p.enum.includes(v));
+  if(p.type==='number')return typeof v==='number'&&Number.isFinite(v)&&v>=p.minimum&&v<=p.maximum;
   if(p.type==='integer')return Number.isSafeInteger(v)&&v>=p.minimum&&v<=p.maximum;
   return typeof v==='string'&&(!p.minLength||v.length>=p.minLength)&&(!p.maxLength||v.length<=p.maxLength)&&(!p.pattern||new RegExp(p.pattern).test(v))&&(!p.enum||p.enum.includes(v));
  });
@@ -98,9 +102,9 @@ async function after(args,store,now){
 }
 /** Authorization is performed by Edge, not by tool arguments.
  * @param {any} message
- * @param {{store?:any,now?:Date,siteConnected?:boolean}} options
+ * @param {{store?:any,now?:Date,siteConnected?:boolean,egress?:any}} options
  */
-export async function dispatchAiUsageMcp(message,{store,now=new Date(),siteConnected=false}={}){
+export async function dispatchAiUsageMcp(message,{store,now=new Date(),siteConnected=false,egress}={}){
  const err=(id,code,message)=>({jsonrpc:'2.0',id,error:{code,message}});
  if(!isObj(message)||message.jsonrpc!=='2.0'||typeof message.method!=='string'||(message.id!==undefined&&!['string','number'].includes(typeof message.id)))return err(null,-32600,'Invalid JSON-RPC request.');
  if(message.method==='notifications/initialized'&&message.id===undefined)return null;
@@ -108,7 +112,7 @@ export async function dispatchAiUsageMcp(message,{store,now=new Date(),siteConne
  const ok=result=>({jsonrpc:'2.0',id:message.id,result});
  const out=v=>ok({content:[{type:'text',text:JSON.stringify(v)}],isError:false});
  if(message.method==='server/discover')return ok({supportedVersions:['2026-07-28','2025-06-18'],capabilities:{tools:{}}});
- if(message.method==='initialize')return ok({protocolVersion:'2025-06-18',capabilities:{tools:{listChanged:false}},serverInfo:{name:'lizhi-supabase-usage-monitor',version:'0.3.0'}});
+ if(message.method==='initialize')return ok({protocolVersion:'2025-06-18',capabilities:{tools:{listChanged:false}},serverInfo:{name:'lizhi-supabase-usage-monitor',version:'0.4.0'}});
  if(message.method==='ping')return ok({});
  if(message.method==='tools/list')return ok({tools:AI_USAGE_TOOLS});
  if(message.method!=='tools/call')return err(message.id,-32601,'Method not found.');
@@ -118,6 +122,8 @@ export async function dispatchAiUsageMcp(message,{store,now=new Date(),siteConne
   if(name==='usage_policy')return out({source:'ai_self_registered_operations',globalInterception:false,automaticAcrossChats:false,
    rules:['先查用量與上限，再預估本次呼叫數','before 必須 saved=true、verified=true、decision=allow 才執行非必要操作','成功失敗皆以同一 eventId 登記 after，再讀回','補登不可重跑原操作','記帳工具本身不遞迴登記'],
    unconfiguredBudget:'hold_optional',pendingOrIncompleteLedger:'hold_optional',capScope:'assistant_workflow_only',officialBillingConnected:false,hasExternalGateway:false});
+  if(name==='usage_egress_history')return out(await egress.history(args.month));
+  if(name==='usage_egress_record')return out(await egress.record(args));
   if(!store)throw new Error('backend unavailable');
   if(name==='usage_log_before')return out(await before(args,store,now));
   if(name==='usage_log_after')return out(await after(args,store,now));
