@@ -99,7 +99,7 @@ async function snapshotForMonth(month: string) {
 // The AI itself wrote these entries to EXISTING Side logs. Reading them does
 // not depend on the Supabase official Usage/Management API.
 function aiMonthBounds(month: string) {
-  if(!/^20\\d{2}-(0[1-9]|1[0-2])$/.test(month))
+  if(!/^20\d{2}-(0[1-9]|1[0-2])$/.test(month))
     throw new HttpError(400,"month 必須是 YYYY-MM。");
   const y=Number(month.slice(0,4)),m=Number(month.slice(5));
   // Include an extra day on both sides for delayed before/after delivery,
@@ -113,7 +113,7 @@ async function aiLedgerSnapshot(month:string, uid:string) {
   const [start,end]=aiMonthBounds(month);
   const q=new URLSearchParams({select:"agent,project,title,done,created_at",
     owner_id:"eq."+uid,project:"eq."+SIDE_PROJECT,agent:"eq."+SIDE_AGENT,
-    title:"like.AI_USAGE*",created_at:"gte."+start,order:"created_at.desc"});
+    title:"like.AI_USAGE *",created_at:"gte."+start,order:"created_at.desc"});
   // Separate upper bound to avoid two PostgREST created_at keys.
   q.set("and","(created_at.gte."+start+",created_at.lt."+end+")");
   q.delete("created_at");
