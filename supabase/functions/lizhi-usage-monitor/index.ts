@@ -5,6 +5,8 @@ import {dispatchUsageMcp} from "../_shared/lizhi-usage-mcp-core.mjs";
 import {authorizeUsage,UsageAccessError,TRUSTED_ORIGIN,originAllowed} from "../_shared/lizhi-usage-access.mjs";
 import {SIDE_PROJECT,SIDE_AGENT,buildAiSideSnapshot,createBudgetRow}
   from "../_shared/lizhi-ai-side-ledger.mjs";
+import {resolveUsageOwner,WORKBENCH_USAGE_PROJECT_ID}
+  from "../_shared/lizhi-ai-owner-binding.mjs";
 const ORIGIN = TRUSTED_ORIGIN;
 const BASE = (Deno.env.get("SUPABASE_URL") || "").replace(/\/$/, "");
 const ANON = Deno.env.get("SUPABASE_ANON_KEY") || "";
@@ -23,19 +25,15 @@ function json(data: unknown, status = 200) {
 }
 // Bind owner to the exact existing AI Workbench project, not to browser
 // user_metadata or a client-supplied actor. No new secret or project is needed.
-const WORKBENCH_PROJECT = "879209cd-8c8a-46ba-903e-74ccaa93710f";
 async function owner(req: Request, forMcp = false): Promise<string> {
   if (!forMcp && !req.headers.get("Authorization")?.toLowerCase().startsWith("bearer "))
     throw new UsageAccessError(401,"缺少登入憑證。");
   if (!BASE || !ANON || !SERVICE) throw new UsageAccessError(503,"監控後端環境尚未設定。");
-  const items=await readRows("aiwb_projects?select=owner_id&id=eq."+
-    WORKBENCH_PROJECT+"&limit=2");
-  if (items.length!==1 || typeof items[0].owner_id!=="string" ||
-      !/^[0-9a-f-]{36}$/i.test(items[0].owner_id))
-    throw new UsageAccessError(503,"工作台本人綁定資料不完整。");
-  const linkedUid=items[0].owner_id;
-  if (OWNER_UID && OWNER_UID !== linkedUid)
-    throw new UsageAccessError(503,"工作台與設定的本人綁定不一致。");
+  const linkedUid=await resolveUsageOwner({
+    queryProject:()=>readRows("aiwb_projects?select=owner_id&id=eq."+
+      WORKBENCH_USAGE_PROJECT_ID+"&limit=2"),
+    ownerUid:OWNER_UID
+  });
   await authorizeUsage(req,{
     forMcp,base:BASE,anon:ANON,service:SERVICE,ownerUid:linkedUid,
     bridgeSecret:Deno.env.get("LIZHI_USAGE_MCP_BRIDGE_KEY"),
