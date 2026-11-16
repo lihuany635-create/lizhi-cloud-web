@@ -14,7 +14,7 @@ const routeName=x=>typeof x==="string"&&/^[a-zA-Z0-9_.:/-]{1,120}$/.test(x);
  * @param {string} options.expectedPrincipal Server-only principal allowlist
  * @param {string} options.route Fixed route from a server-side table, never URL query
  * @param {Record<string, {category:string,cost:number}>} options.routePolicy Immutable server route map
- * @param {{source:string,asOf:string,cycleStart:string,cycleEnd:string,metric:string,used:number,limit:number}|null} options.official
+ * @param {{source:string,scope:string,asOf:string,cycleStart:string,cycleEnd:string,metric:string,used:number,limit:number}|null} options.official
  * @param {{reserveIfWithin:(options:{key:string,amount:number,maxTotal:number,expireAt:string})=>Promise<boolean>}} options.atomicStore
  * @param {Date} [options.now]
  */
@@ -36,12 +36,13 @@ export async function authorizeBeforeSupabase({
   }
   if(official?.source!=="supabase_dashboard_manual"&&official?.source!=="management_api_verified")
     throw new GatewayDenied("official_usage_unavailable");
-  if(!["edge_invocations","egress_uncached","egress_cached","realtime_messages"].includes(official.metric)||
+  if(official.scope!=="organization"||
+    !["edge_invocations","egress_uncached","egress_cached","realtime_messages"].includes(official.metric)||
     !integer(official.used)||!integer(official.limit)||official.limit===0||
     !Number.isFinite(Date.parse(official.asOf))||
     !Number.isFinite(Date.parse(official.cycleStart))||
     !Number.isFinite(Date.parse(official.cycleEnd))||
-    !(new Date(official.cycleStart)<new Date(official.asOf))||
+    !(new Date(official.cycleStart)<=new Date(official.asOf))||
     !(new Date(official.asOf)<new Date(official.cycleEnd))||
     !(new Date(official.cycleStart)<=now&&now<new Date(official.cycleEnd)))
       throw new GatewayDenied("official_usage_invalid");
