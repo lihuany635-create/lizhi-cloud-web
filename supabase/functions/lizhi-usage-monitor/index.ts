@@ -3,6 +3,7 @@
 import {usageMonth} from "../_shared/lizhi-usage-mcp-core.mjs";
 import {BRIDGE_SECRET_SHA256,BRIDGE_ACTOR_SHA256} from "../_shared/lizhi-usage-site-binding.mjs";
 import {dispatchAiUsageMcp} from "../_shared/lizhi-usage-ai-mcp.mjs";
+import {validateEgressInput,parseEgressRows} from "../_shared/lizhi-uncached-egress.mjs";
 import {authorizeUsage,UsageAccessError,TRUSTED_ORIGIN,originAllowed} from "../_shared/lizhi-usage-access.mjs";
 import {SIDE_PROJECT,SIDE_AGENT,buildAiSideSnapshot,createBudgetRow}
   from "../_shared/lizhi-ai-side-ledger.mjs";
@@ -208,6 +209,49 @@ async function boundedJson(req: Request, limit=32768): Promise<unknown> {
   for(const item of chunks){all.set(item,offset);offset+=item.byteLength;}
   return JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(all));
 }
+// Organization-level, user-transcribed Usage snapshots; no official billing API access.
+async function egressHistory(month:string,uid:string) {
+  if(!/^20\d{2}-(0[1-9]|1[0-2])$/.test(month))
+    throw new HttpError(400,"月份格式不正確。");
+  const q=new URLSearchParams({
+    select:"id,done,created_at",owner_id:"eq."+uid,
+    project:"eq."+SIDE_PROJECT,
+    title:"like.EGRESS_USAGE "+month+" *",
+    order:"created_at.desc",limit:"501"
+  });
+  const rows=await readRows("aiwb_side_logs?"+q.toString());
+  return parseEgressRows(rows,month);
+}
+async function egressRecord(req:Request,uid:string) {
+  if(!req.headers.get("content-type")?.toLowerCase().startsWith("application/json"))
+    throw new HttpError(415,"需要 JSON 內容。");
+  let snap;
+  try { snap=validateEgressInput(await boundedJson(req,512)); }
+  catch(e) {
+    if(e instanceof HttpError)throw e;
+    throw new HttpError(400,"官方 Usage 讀數格式錯誤。");
+  }
+  const record={
+    owner_id:uid,agent:"Usage Monitor",project:SIDE_PROJECT,
+    title:"EGRESS_USAGE "+snap.month+" "+crypto.randomUUID(),
+    done:JSON.stringify(snap)
+  };
+  const result=await fetch(BASE+"/rest/v1/aiwb_side_logs",{
+    method:"POST",headers:{
+      apikey:SERVICE,Authorization:"Bearer "+SERVICE,
+      "Content-Type":"application/json",Prefer:"return=representation"
+    },
+    body:JSON.stringify(record),signal:AbortSignal.timeout(10000),redirect:"manual"
+  });
+  if(!result.ok)throw new HttpError(503,"用量快照保存失敗。");
+  const rows=await result.json();
+  if(!Array.isArray(rows)||rows.length!==1||typeof rows[0]?.id!=="string"||
+      rows[0]?.done!==record.done)
+    throw new HttpError(503,"快照保存後核對失敗。");
+  return {saved:true,verified:true,id:rows[0].id,
+    source:snap.source,providerVerified:false,reading:snap};
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     if (!originAllowed(req.headers)) return json({error:"來源不允許。"},403);
@@ -236,6 +280,16 @@ Deno.serve(async (req: Request) => {
       const result=await dispatchAiUsageMcp(rpcBody,{store:aiMcpStore(uid),
         siteConnected:req.headers.has("x-lizhi-usage-bridge")});
       return result===null?new Response(null,{status:202,headers:{...allowOrigin,"Cache-Control":"no-store"}}):json(result);
+    }
+    if(u.pathname.endsWith("/egress-history")) {
+      if(req.method!=="GET")throw new HttpError(405,"只允許 GET。");
+      const uid=await owner(req);
+      return json(await egressHistory(u.searchParams.get("month")||"",uid));
+    }
+    if(u.pathname.endsWith("/egress-record")) {
+      if(req.method!=="POST")throw new HttpError(405,"只允許 POST。");
+      const uid=await owner(req);
+      return json(await egressRecord(req,uid));
     }
     if(u.pathname.endsWith("/ai-ledger")) {
       if(req.method!=="GET")throw new HttpError(405,"AI 紀錄只允許 GET。");
