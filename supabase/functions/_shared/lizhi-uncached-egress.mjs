@@ -24,18 +24,27 @@ export function validateEgressInput(value, now = new Date()) {
       !Number.isFinite(totalGb) || !Number.isFinite(cachedGb) ||
       totalGb < 0 || cachedGb < 0 || totalGb > 100_000 || cachedGb > totalGb)
     throw new Error("總傳出量及快取流量必須是正確的 GB 數值，且快取不得超過總量。");
+  const periodStart=value.periodStart??month+'-01';
+  const [year,mon]=month.split('-').map(Number);
+  const periodEnd=value.periodEnd??new Date(Date.UTC(year,mon,1)).toISOString().slice(0,10);
+  const dateOk=x=>typeof x==='string'&&/^20\d{2}-\d{2}-\d{2}$/.test(x)&&Number.isFinite(Date.parse(x))&&new Date(x).toISOString().slice(0,10)===x;
+  if(!dateOk(periodStart)||!dateOk(periodEnd)||periodStart>=periodEnd||Boolean(value.periodStart)!==Boolean(value.periodEnd))throw new Error('帳期起訖無效。');
+  if(value.officialUncached!==undefined && (!modern||typeof value.officialUncached!=='number'||value.officialUncached<0||Math.abs(value.total-value.cached-value.officialUncached)>1e-8))throw new Error('官方未快取讀數與重建 Total 不一致。');
   const totalBytes = Math.round(totalGb * EGRESS_GB);
   const cachedBytes = Math.round(cachedGb * EGRESS_GB);
   if (!Number.isSafeInteger(totalBytes) || !Number.isSafeInteger(cachedBytes))
     throw new Error("讀數超出允許範圍。");
   return {
     source: EGRESS_SOURCE, verifiedByProvider: false,
-    month, observedAt: new Date(observedAt).toISOString(), totalBytes, cachedBytes,
+    month, periodStart,periodEnd,scope:'organization',
+    totalBasis:value.officialUncached===undefined?'official_total_including_cached':'reconstructed_from_official_uncached_plus_cached',
+    ...(value.officialUncached===undefined?{}:{officialUncached:value.officialUncached,originalUnit:value.unit}),
+    observedAt: new Date(observedAt).toISOString(), totalBytes, cachedBytes,
     uncachedBytes: totalBytes - cachedBytes
   };
 }
 
-export function parseEgressRows(rows, month) {
+export function parseEgressRows(rows, month, period={}) {
   if(!Array.isArray(rows)) throw new Error("歷史資料格式錯誤。");
   const snapshots=[];const seen=new Set();let duplicateRows=0;
   let invalid=0;
@@ -48,9 +57,11 @@ export function parseEgressRows(rows, month) {
             n=>Number.isSafeInteger(n)&&n>=0) ||
           data.totalBytes-data.cachedBytes!==data.uncachedBytes)
         throw new Error("invalid");
-      const key=JSON.stringify([data.month,new Date(data.observedAt).toISOString(),data.totalBytes,data.cachedBytes]);
+      if(period.periodStart&&(data.periodStart!==period.periodStart||data.periodEnd!==period.periodEnd))continue;
+      const key=JSON.stringify([data.periodStart,data.periodEnd,data.month,new Date(data.observedAt).toISOString(),data.totalBytes,data.cachedBytes]);
       if(seen.has(key)){duplicateRows++;continue;}seen.add(key);
       snapshots.push({
+        periodStart:data.periodStart??null,periodEnd:data.periodEnd??null,totalBasis:data.totalBasis??'legacy_period_unverified',
         id:String(row.id), observedAt:data.observedAt, month:data.month,
         totalBytes:data.totalBytes, cachedBytes:data.cachedBytes,
         uncachedBytes:data.uncachedBytes, source:EGRESS_SOURCE,
@@ -62,12 +73,13 @@ export function parseEgressRows(rows, month) {
   const latest=snapshots[0]||null;
   const ratio=latest ? latest.uncachedBytes/(FREE_UNCACHED_GB*EGRESS_GB) : null;
   const alert=ratio===null?"UNKNOWN":ratio>=1?"LIMIT_REACHED":ratio>=.95?"CRITICAL":ratio>=.85?"WARNING":ratio>=.70?"NOTICE":"WITHIN";
-  const oldest=snapshots.at(-1);
+  const comparable=snapshots.filter(r=>r.periodStart===latest?.periodStart&&r.periodEnd===latest?.periodEnd);
+  const oldest=comparable.at(-1);
   const target=latest?Date.parse(latest.observedAt)-7*86400000:0;
-  const baseline=snapshots.find(r=>Date.parse(r.observedAt)<=target);
+  const baseline=comparable.find(r=>Date.parse(r.observedAt)<=target);
   const trend=(base)=>!latest||!base?{status:'UNKNOWN'}:{status:latest.uncachedBytes<base.uncachedBytes?'DECREASE_REQUIRES_REVIEW':'AVAILABLE',from:base.observedAt,to:latest.observedAt,deltaGb:(latest.uncachedBytes-base.uncachedBytes)/EGRESS_GB};
   return {month,source:EGRESS_SOURCE,automatic:false,providerVerified:false,
-    quotaBasis:'Free 5 GB baseline; actual plan and billing period require owner verification',
+    quotaBasis:'Free 5 GB baseline; confirm actual plan',periodStart:latest?.periodStart??null,periodEnd:latest?.periodEnd??null,scope:'organization',
     uncachedGb:latest?latest.uncachedBytes/EGRESS_GB:null,freeQuotaGb:FREE_UNCACHED_GB,
     usedRatio:ratio,remainingGb:latest?Math.max(0,FREE_UNCACHED_GB-latest.uncachedBytes/EGRESS_GB):null,
     lastUpdated:latest?.observedAt??null,sevenDayChange:trend(baseline),availableHistoryChange:trend(oldest),duplicateRows,

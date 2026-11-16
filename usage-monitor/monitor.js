@@ -111,11 +111,12 @@ async function loadEgress(token,month,seq) {
   byId("egressStatus").textContent=label;
   byId("egressRemaining").textContent="依最後讀數剩餘 "+remain.toFixed(3)+" GB";
   byId("egressUpdated").textContent="最後抄錄："+stamp(last.observedAt)+
+    (last.periodStart?"｜帳期 "+last.periodStart+" 至 "+last.periodEnd:"｜舊讀數帳期待核對")+
     "｜已用 "+(ratio*100).toFixed(1)+"%；非即時官方 API 讀數";
   const stale=Date.now()-Date.parse(last.observedAt)>24*3600*1000;
   byId("egressNotice").textContent=stale?
     "距離最後一次讀數已超過 24 小時，不能據此判斷目前仍安全。":
-    "這是使用者抄錄自官方 Usage 的數值，系統未直接驗證；警戒值 70／85／95%。";
+    "這是使用者抄錄自官方 Usage 的數值，系統未直接驗證；警戒值 70／85／95／100%。";
   showRows("egressHistory",data.readings,4,"尚無歷史讀數",[
     x=>stamp(x.observedAt),
     x=>formatBytes(x.totalBytes),

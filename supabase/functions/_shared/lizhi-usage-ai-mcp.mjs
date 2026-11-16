@@ -12,6 +12,7 @@ const object=(properties={},required=[])=>({type:'object',properties,required,ad
 const tool=(name,description,inputSchema,write=false)=>({name,description,inputSchema,
  annotations:{readOnlyHint:!write,destructiveHint:false,openWorldHint:false}});
 const queries=object({month});
+const periodFields={periodStart:{type:'string',pattern:'^20[0-9]{2}-[0-9]{2}-[0-9]{2}$'},periodEnd:{type:'string',pattern:'^20[0-9]{2}-[0-9]{2}-[0-9]{2}$'}};
 export const AI_USAGE_TOOLS=Object.freeze([
  tool('usage_status','查詢 AI 自行記帳及連線狀態；不代表官方計費量。',queries),
  tool('usage_summary','查詢每日、每月 AI 自登記操作統計，官方計費未知。',queries),
@@ -22,8 +23,8 @@ export const AI_USAGE_TOOLS=Object.freeze([
  tool('usage_log_before','Supabase 操作前登記；只有 saved、verified 且 decision=allow 才能執行非必要操作；hold 不可執行。',object({...base,at:{type:'string',maxLength:40},plannedCalls:{...count,minimum:1}},[...Object.keys(base),'at','plannedCalls']),true),
  tool('usage_log_after','用同一 eventId 登記實際成功、失敗或未知結果；補登不能重跑操作。',object({...base,completedAt:{type:'string',maxLength:40},toolCalls:count,outcome:{type:'string',enum:['success','failure','unknown']},evidenceUrl:{type:['string','null'],maxLength:300}},[...Object.keys(base),'completedAt','toolCalls','outcome']),true),
  tool('usage_budget_set','僅已驗證本人可設定每月 AI 工具操作上限，寫入既有 Side 並讀回；不阻擋其他來源的計費流量。',object({month,cap:{type:'integer',minimum:1,maximum:1000000}},['month','cap']),true),
- tool('usage_egress_history','查詢組織 Usage 人工讀數歷史、非快取 GB、5 GB 基準及趨勢；不是即時官方同步，需確認實際方案與帳期。',object({month},['month'])),
- tool('usage_egress_record','僅保存本人提供或授權取得的官方 Usage Total Egress（包含 Cached）及 Cached；同組織同月份期間相減。不可使用已扣除 Cached 的帳單 Egress。必須先核對來源、期間和觀測時間；保存後讀回，重送不重複。',object({month,total:{type:'number',minimum:0,maximum:1e14},cached:{type:'number',minimum:0,maximum:1e14},unit:{type:'string',enum:['B','KB','MB','GB','KiB','MiB','GiB']},observedAt:{type:'string',maxLength:40},samePeriod:{type:'boolean',enum:[true]}},['month','total','cached','unit','observedAt','samePeriod']),true)
+ tool('usage_egress_history','查詢組織 Usage 人工讀數歷史、非快取 GB、5 GB 基準及趨勢；不是即時官方同步。month 為歸檔月份，可另指定 periodStart/periodEnd（結束邊界）。',object({month,...periodFields},['month'])),
+ tool('usage_egress_record','僅保存本人提供或授權取得的官方 Usage Total Egress（包含 Cached）及 Cached；同組織同月份期間相減。不可使用已扣除 Cached 的帳單 Egress。必須核對來源、期間和觀測時間；若官方只顯示未快取 Egress，Total 須由該值加 Cached 重建，並提供 officialUncached 保留計算依據。跨月帳期提供 periodStart/periodEnd。保存後讀回，重送不重複。',object({month,...periodFields,officialUncached:{type:'number',minimum:0,maximum:1e14},total:{type:'number',minimum:0,maximum:1e14},cached:{type:'number',minimum:0,maximum:1e14},unit:{type:'string',enum:['B','KB','MB','GB','KiB','MiB','GiB']},observedAt:{type:'string',maxLength:40},samePeriod:{type:'boolean',enum:[true]}},['month','total','cached','unit','observedAt','samePeriod']),true)
 ]);
 const specs=new Map(AI_USAGE_TOOLS.map(x=>[x.name,x]));
 const isObj=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
@@ -122,7 +123,7 @@ export async function dispatchAiUsageMcp(message,{store,now=new Date(),siteConne
   if(name==='usage_policy')return out({source:'ai_self_registered_operations',globalInterception:false,automaticAcrossChats:false,
    rules:['先查用量與上限，再預估本次呼叫數','before 必須 saved=true、verified=true、decision=allow 才執行非必要操作','成功失敗皆以同一 eventId 登記 after，再讀回','補登不可重跑原操作','記帳工具本身不遞迴登記'],
    unconfiguredBudget:'hold_optional',pendingOrIncompleteLedger:'hold_optional',capScope:'assistant_workflow_only',officialBillingConnected:false,hasExternalGateway:false});
-  if(name==='usage_egress_history')return out(await egress.history(args.month));
+  if(name==='usage_egress_history')return out(await egress.history(args.month,args));
   if(name==='usage_egress_record')return out(await egress.record(args));
   if(!store)throw new Error('backend unavailable');
   if(name==='usage_log_before')return out(await before(args,store,now));

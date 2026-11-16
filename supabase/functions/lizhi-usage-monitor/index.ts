@@ -210,7 +210,8 @@ async function boundedJson(req: Request, limit=32768): Promise<unknown> {
   return JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(all));
 }
 // Organization-level, user-transcribed Usage snapshots; no official billing API access.
-async function egressHistory(month:string,uid:string) {
+async function egressHistory(month:string,uid:string,period:any={}) {
+  if(Boolean(period.periodStart)!==Boolean(period.periodEnd))throw new HttpError(400,"帳期必須同時指定起訖。");
   if(!/^20\d{2}-(0[1-9]|1[0-2])$/.test(month))
     throw new HttpError(400,"月份格式不正確。");
   const q=new URLSearchParams({
@@ -220,13 +221,13 @@ async function egressHistory(month:string,uid:string) {
     order:"created_at.desc",limit:"501"
   });
   const rows=await readRows("aiwb_side_logs?"+q.toString());
-  return parseEgressRows(rows,month);
+  return parseEgressRows(rows,month,period);
 }
 async function saveEgress(value:unknown,uid:string) {
   let snap;
   try { snap=validateEgressInput(value); }
   catch { throw new HttpError(400,"官方 Usage 讀數格式錯誤。"); }
-  const key=JSON.stringify([uid,snap.month,snap.observedAt,snap.totalBytes,snap.cachedBytes]);
+  const key=JSON.stringify([uid,snap.month,snap.periodStart,snap.periodEnd,snap.observedAt,snap.totalBytes,snap.cachedBytes]);
   const id=await stableUsageId('egress:'+key);
   const record={id,owner_id:uid,agent:"Usage Monitor",project:SIDE_PROJECT,
     title:"EGRESS_USAGE "+snap.month+" "+id,done:JSON.stringify(snap)};
@@ -276,7 +277,7 @@ Deno.serve(async (req: Request) => {
       }
       const result=await dispatchAiUsageMcp(rpcBody,{store:aiMcpStore(uid),
         siteConnected:req.headers.has("x-lizhi-usage-bridge"),
-        egress:{history:(month:string)=>egressHistory(month,uid),record:(value:unknown)=>saveEgress(value,uid)}});
+        egress:{history:(month:string,args:unknown)=>egressHistory(month,uid,args),record:(value:unknown)=>saveEgress(value,uid)}});
       return result===null?new Response(null,{status:202,headers:{...allowOrigin,"Cache-Control":"no-store"}}):json(result);
     }
     if(u.pathname.endsWith("/egress-history")) {

@@ -78,3 +78,10 @@ test('seven-day change uses an actual baseline and flags decreasing readings',()
  const y=parseEgressRows([reading(3,'2026-11-01T00:00:00Z'),reading(1,'2026-11-08T00:00:00Z')],'2026-11');
  assert.equal(y.sevenDayChange.status,'DECREASE_REQUIRES_REVIEW');
 });
+test('cross-month official billing period and reconstructed Total preserve provenance',()=>{
+ const r=validateEgressInput({month:'2026-11',total:11.317,cached:.768,officialUncached:10.549,unit:'GB',observedAt:now.toISOString(),samePeriod:true,periodStart:'2026-10-26',periodEnd:'2026-11-26'},now);
+ assert.equal(r.uncachedBytes,10549000000);assert.equal(r.totalBasis,'reconstructed_from_official_uncached_plus_cached');
+ const h=parseEgressRows([{id:'one',done:JSON.stringify(r)}],'2026-11');assert.equal(h.periodStart,'2026-10-26');assert.equal(h.alert,'LIMIT_REACHED');
+ assert.equal(parseEgressRows([{id:'one',done:JSON.stringify(r)}],'2026-11',{periodStart:'2026-11-01',periodEnd:'2026-12-01'}).alert,'UNKNOWN');
+ assert.throws(()=>validateEgressInput({...r,total:11,cached:.768,officialUncached:10.549,unit:'GB',samePeriod:true},now));
+});
