@@ -57,3 +57,41 @@ export function errorForHttp(status) {
   if(status===429)return "目前請求過於頻繁，請稍後手動更新。";
   return "監控後端讀取失敗（HTTP "+String(status)+"）。";
 }
+
+export function validateAiSideSnapshot(raw,expectedMonth) {
+  if(!raw||raw.source!=="ai_self_registered_operations"||
+     raw.coverage!=="assistant_observed_actions_only"||
+     raw.month!==expectedMonth||typeof raw.complete!=="boolean"||
+     raw.officialBillingConnected!==false||raw.officialCost!==null||
+     raw.officialEdgeInvocations!==null||raw.officialEgressBytes!==null||
+     !raw.summary||!Array.isArray(raw.features)||!Array.isArray(raw.tasks)||
+     !Array.isArray(raw.events)||!raw.budget||!Array.isArray(raw.days))
+    throw new Error("AI 自登記資料來源或格式不正確。");
+  if(raw.features.length>5000||raw.tasks.length>5000||
+     raw.events.length>100||raw.days.length>33)
+    throw new Error("AI 紀錄回應超過安全的筆數上限。");
+  for(const k of ["assistantObservedToolCalls","finishedActions","unfinishedActions",
+      "missingBefore","failures","unknownResults","invalidRows","conflictRows"]){
+    if(!Number.isSafeInteger(raw.summary[k])||raw.summary[k]<0)
+      throw new Error("AI 操作次數格式不正確。");
+  }
+  for(const x of raw.features){
+    if(typeof x?.feature!=="string"||x.feature.length>80||
+       !Number.isSafeInteger(x.assistantObservedToolCalls)||x.assistantObservedToolCalls<0)
+       throw new Error("AI 功能統計資料無效。");
+  }
+  for(const x of raw.events){
+    if(!x||typeof x.at!=="string"||typeof x.feature!=="string"||
+       typeof x.taskLabel!=="string"||typeof x.actionDetail!=="string"||
+       typeof x.outcome!=="string"||
+       !Number.isSafeInteger(x.toolCalls)||x.toolCalls<0||
+       x.feature.length>80||x.taskLabel.length>140||x.actionDetail.length>140)
+       throw new Error("AI 操作事件資料無效。");
+  }
+  const cap=raw.budget.monthlyToolCap;
+  if(cap!==null&&(!Number.isSafeInteger(cap)||cap<1||cap>1000000))
+    throw new Error("AI 自訂上限格式不正確。");
+  if(!["UNCONFIGURED","INCOMPLETE","LIMIT_REACHED","NEAR_LIMIT","WITHIN_CAP"].includes(raw.budget.alert))
+    throw new Error("AI 自訂上限警報格式不正確。");
+  return raw;
+}
