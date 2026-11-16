@@ -1,6 +1,7 @@
 // 立之 Supabase 監控後端（開發候選）：僅本人唯讀快照。
 // IMPORTANT: No deployment, database migration or external request instrumentation is implied.
 import {usageMonth} from "../_shared/lizhi-usage-mcp-core.mjs";
+import {BRIDGE_SECRET_SHA256,BRIDGE_ACTOR_SHA256} from "../_shared/lizhi-usage-site-binding.mjs";
 import {dispatchAiUsageMcp} from "../_shared/lizhi-usage-ai-mcp.mjs";
 import {authorizeUsage,UsageAccessError,TRUSTED_ORIGIN,originAllowed} from "../_shared/lizhi-usage-access.mjs";
 import {SIDE_PROJECT,SIDE_AGENT,buildAiSideSnapshot,createBudgetRow}
@@ -37,7 +38,8 @@ async function owner(req: Request, forMcp = false): Promise<string> {
   await authorizeUsage(req,{
     forMcp,base:BASE,anon:ANON,service:SERVICE,ownerUid:linkedUid,
     bridgeSecret:Deno.env.get("LIZHI_USAGE_MCP_BRIDGE_KEY"),
-    bridgeActor:Deno.env.get("LIZHI_USAGE_MCP_ALLOWED_ACTOR")
+    bridgeActor:Deno.env.get("LIZHI_USAGE_MCP_ALLOWED_ACTOR"),
+    bridgeSecretDigest:BRIDGE_SECRET_SHA256,bridgeActorDigest:BRIDGE_ACTOR_SHA256
   });
   return linkedUid;
 }

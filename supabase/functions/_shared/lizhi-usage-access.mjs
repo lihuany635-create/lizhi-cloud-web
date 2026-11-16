@@ -12,16 +12,17 @@ export function originAllowed(headers,origin=TRUSTED_ORIGIN){
 }
 /**
  * @param {Request} req
- * @param {{forMcp?:boolean,base?:string,anon?:string,service?:string,ownerUid?:string,bridgeSecret?:string,bridgeActor?:string,fetchImpl?:typeof fetch}} [options]
+ * @param {{forMcp?:boolean,base?:string,anon?:string,service?:string,ownerUid?:string,bridgeSecret?:string,bridgeActor?:string,bridgeSecretDigest?:string,bridgeActorDigest?:string,fetchImpl?:typeof fetch}} [options]
  */
 export async function authorizeUsage(req,{
   forMcp=false,base,anon,service,ownerUid,
-  bridgeSecret,bridgeActor,fetchImpl=fetch
+  bridgeSecret,bridgeActor,bridgeSecretDigest,bridgeActorDigest,fetchImpl=fetch
 }={}){
   if(!base||!anon||!service||!ownerUid||!/^[0-9a-f-]{36}$/i.test(ownerUid))
     throw httpError(503,"監控權限尚未設定。");
   if(forMcp&&req.headers.has("x-lizhi-usage-bridge")){
-    if(!await verifySiteBridge(req.headers,{secret:bridgeSecret,actor:bridgeActor}))
+    if(!await verifySiteBridge(req.headers,{secret:bridgeSecret,actor:bridgeActor,
+      secretDigest:bridgeSecretDigest,actorDigest:bridgeActorDigest}))
       throw httpError(403,"私人 Site 轉接驗證失敗。");
     return;
   }

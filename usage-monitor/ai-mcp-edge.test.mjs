@@ -39,6 +39,7 @@ globalThis.fetch=async(url,init={})=>{
 };
 let source=await readFile(file,'utf8');
 source=source.replace('import "jsr:@supabase/functions-js/edge-runtime.d.ts";','');
+source=source.replace(/import \{BRIDGE_SECRET_SHA256,BRIDGE_ACTOR_SHA256\} from [^;]+;/,'const BRIDGE_SECRET_SHA256=undefined,BRIDGE_ACTOR_SHA256=undefined;');
 source=source.replace(/from "(\.\.\/[^\"]+)"/g,(_,p)=>'from "'+new URL(p,file).href+'"');
 await import('data:text/javascript;base64,'+Buffer.from(stripTypeScriptTypes(source,{mode:'transform'})).toString('base64'));
 const root='https://edge.invalid/functions/v1/lizhi-usage-monitor';
