@@ -9,6 +9,14 @@
 2. 針對每次即將使用的 Supabase 工具，產生 `eventId`（UUID），記錄時間、靜態服務名稱、操作類型、預計呼叫次數、操作理由與可追溯依據，狀態 `before/planned`。不可記錄 Token、SQL 內容、使用者資訊或本文。
 3. 僅以「AI 自行操作次數」作本地預算控制。沒有經使用者設定/核對的本地上限，不能假稱已得知 Supabase 官方剩餘額度，更不可用不完整歷史證明全站可繼續用量；應標示風險未知並依指示限制高風險額外操作。
 
+### 每筆紀錄必填：是哪個功能、為什麼產生操作
+
+每筆 AI 操作都必須有 `feature`（功能代碼，例如 `english_classroom`）、`taskLabel`（使用者這次交代的工作簡稱，例如「英文教室單字卡測試」）、`actionDetail`（當下具體操作目的，例如「查詢單字卡資料」），並與 `service`、`operation`、`at`、`toolCalls` 一起保存。**不能只有「Supabase 用了 1 次」這樣無法追溯的數字。**
+
+`before` 與 `after` 使用同一個 `eventId`，其功能、任務名稱和行為目的必須一致，不允許事後改標籤。不得把整段使用者原始對話、SQL 原文、Token、Email、金鑰、密碼、真實網址參數寫入標籤；一律由 AI 產生簡短、不含敏感資訊的描述。
+
+月報除操作總次數外，需列出依 `feature` 分組的已登記次數，且能追查每一筆的 `taskLabel`、`actionDetail`、`operation`、結果與證據。只有 AI 自行操作的部分可以計數，不能把工具呼叫次數冒充 Supabase 官方計費流量。
+
 ### 操作後：自行登記
 1. 在真正取得工具結果後，使用同一 `eventId` 追加 `after`：成功/失敗/未知，實際由 AI 送出的工具呼叫數，證據 URL（若有）。
 2. **執行失敗仍有機會消耗 Supabase 資源**；不要把失敗記為零消耗。只有已實際知道的工具呼叫次數可以填數字，無法得知的 Supabase Edge Invocation、Egress、DB Compute、讀寫次數及帳務費用都為 `null`，不可推算成零。
@@ -27,8 +35,8 @@
 - 不需新 Site、不需新 Supabase 專案，也不以 Supabase Management API 為前置依賴。
 
 ## 操作清單範例（非真實用量）
-- BEFORE：eventId=UUID、service=supabase、operation=sql_read、outcome=planned、toolCalls=0。
-- AFTER：相同 eventId、operation=sql_read、outcome=success/failure/unknown、toolCalls=1、帳務/Edge/Egress 一律未知。
+- BEFORE：eventId=UUID、service=supabase、feature=english_classroom、taskLabel=英文教室單字卡測試、actionDetail=查詢單字卡資料、operation=sql_read、outcome=planned、toolCalls=0。
+- AFTER：相同 eventId、相同 feature/taskLabel/actionDetail、operation=sql_read、outcome=success/failure/unknown、toolCalls=1、帳務/Edge/Egress 一律未知。
 - 顯示：本月「AI 已自行登記工具操作」；**不顯示**「官方剩餘額度」除非另有真實獨立來源。
 
 ## 目前驗收
