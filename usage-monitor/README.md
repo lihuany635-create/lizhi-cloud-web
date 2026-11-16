@@ -12,6 +12,17 @@
 - 正式監控站前端 **PR #82 已發布至原 GitHub Pages**，`?open=usage` 在原系統選單下；實機登入仍需驗收。不要再發布舊版前端以覆蓋 PR #82。
 - 此章只記錄 **候選程式與審查**，不是正式 Edge/Site 已部署、全部服務已接線或完整計費保護已完成的宣告。
 
+## P1-E｜需求更正：AI 自行登記為主要來源（2026-11-16）
+
+**使用者明確更正：原需求是 ChatGPT 在每次自己實際操作前、操作後自主登記使用紀錄，不是依靠 Supabase Usage API 或 Management API 來產生紀錄。** 本段取代此前將「官方 API 對帳」設為必備主記帳來源的假設。
+
+- **核心**：新增 `usage-monitor/ai-operation-ledger.mjs`（附測試）與 `usage-monitor/AI_SELF_LOGGING_RULES.md`。操作前記計畫，操作後記實際工具操作數及成功/失敗/未知，使用相同 UUID；追加至原 Side 日誌並在 AI 工作台連結證據。絕不記錄明文 Token、用戶資料、原始 SQL 或 URL 查詢參數。
+- **與計費數字區分**：已經觀測到的 AI 工具呼叫數 `assistantObservedToolCalls` 可以求和，但 `officialEdgeInvocations`、`officialEgressBytes`、`officialCost`、`measuredProviderRequestCount` 永遠標為未知 `null`，絕不把 AI 操作次數說成 Supabase 官方消耗。
+- **使用前阻擋**：已新增候選本地 AI 操作次數上限檢查，但需有真實完整日誌與使用者設定的上限才能對**AI 自己的下一筆操作**實際判定。這不能阻止其他使用者、排程或第三方直接使用 Supabase。
+- **舊 API 程式隔離**：`management-api-observer.mjs` 僅保留為不自動執行、非主流程的歷史研究候選。禁止以它為 AI 自記帳的依賴或部署前置條件；若要獨立交叉驗證須另行明確授權。
+- **目前狀態**：只是 Draft PR 候選程式與作業規格；尚未串接正式 Side 每次操作自動寫入，也未把已上線 PR #82 網站換成自記帳資料來源；未合併、未部署，不能宣稱系統已自動記錄全站流量。
+- **正式判定**：先驗證 AI 追加式登記、登入、跨對話接續、去重、同步、失敗補登與預檢，再評估網站顯示；不重新建立 Site、資料庫或另開正式服務。
+
 ## 目標與目前驗收狀態
 
 - 目標：使用現有「立之雲端庫」Supabase 專案，逐筆記錄**已接入**的請求、每日彙總、展示風險；依額度在 Supabase **入口之前**保護非必要流量。
