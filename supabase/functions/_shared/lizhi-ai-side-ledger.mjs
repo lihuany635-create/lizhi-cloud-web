@@ -67,7 +67,8 @@ export function createBudgetRow(month,cap,at) {
   return {agent:SIDE_AGENT,project:SIDE_PROJECT,title:"AI_USAGE_BUDGET "+month,
     done:JSON.stringify(payload)};
 }
-export function buildAiSideSnapshot({rows,budgets=[],month,moreRows=false}={}){
+/** @param {{rows:Record<string,any>[], budgets?:Record<string,any>[], month:string, moreRows?:boolean}} options */
+export function buildAiSideSnapshot({rows,budgets=[],month,moreRows=false}){
   if (!MONTH.test(month)||!Array.isArray(rows)||rows.length>5000||
       !Array.isArray(budgets)||budgets.length>100)
     throw new Error("Invalid AI Side ledger input");
