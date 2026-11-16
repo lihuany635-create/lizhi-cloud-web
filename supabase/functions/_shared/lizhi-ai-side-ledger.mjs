@@ -154,3 +154,21 @@ export function aiPreflight(snapshot,plannedCalls,{optional=true}={}){
     plannedCalls,cap:snapshot.budget.monthlyToolCap,optional
   });
 }
+
+/** Estimate a similar NEXT AI tool action from up to 100 actual self-reported events.
+ * This is a tool-call forecast, NOT Edge Invocations, egress, or billing.
+ */
+export function estimateAiTaskCalls(snapshot,{feature,taskLabel,operation}={}){
+  if(!snapshot||snapshot.source!=="ai_self_registered_operations"||
+     !snapshot.complete||!Array.isArray(snapshot.events))
+    return {state:"unknown",plannedCalls:null,sampleSize:0};
+  const samples=snapshot.events.filter(x=>x?.feature===feature&&
+    (!taskLabel||x.taskLabel===taskLabel)&&(!operation||x.operation===operation)&&
+    Number.isSafeInteger(x.toolCalls)&&x.toolCalls>=0&&x.toolCalls<=1000)
+    .map(x=>x.toolCalls).sort((a,b)=>a-b);
+  if(!samples.length)return {state:"unknown",plannedCalls:null,sampleSize:0};
+  const q90=samples[Math.ceil(samples.length*0.9)-1];
+  return {state:"estimated",plannedCalls:Math.max(1,q90),sampleSize:samples.length,
+    basis:"recent_ai_self_registered_tool_calls_p90",
+    note:"只預估 AI 工具操作數，不能推算 Supabase 官方計費額度。"};
+}
