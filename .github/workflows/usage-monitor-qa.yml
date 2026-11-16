@@ -1,0 +1,102 @@
+name: Usage Monitor Candidate QA
+on:
+  pull_request:
+    paths:
+      - "usage-monitor/**"
+      - "supabase/functions/lizhi-usage-monitor/**"
+      - "supabase/functions/_shared/lizhi-usage-*"
+      - ".github/workflows/usage-monitor-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Read-only MCP and metering unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check JS syntax
+        run: |
+          find usage-monitor -name '*.mjs' -print0 | xargs -0 -n1 node --check
+          find supabase/functions/_shared -maxdepth 1 -name 'lizhi-usage-*.mjs' -print0 | xargs -0 -n1 node --check
+      - name: Unit-test all quota, MCP, bridge, and telemetry modules
+        run: node --test usage-monitor/*.test.mjs supabase/functions/_shared/lizhi-usage-payload.test.mjs
+  postgres:
+    name: Isolated PostgreSQL 17 security and rollup
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: usage_qa_ephemeral
+          POSTGRES_DB: usage_qa
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d usage_qa"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGDATABASE: usage_qa
+      PGUSER: postgres
+      PGPASSWORD: usage_qa_ephemeral
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install psql client (no Supabase production access)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+      - name: Bootstrap isolated Supabase database roles
+        run: |
+          psql -X -v ON_ERROR_STOP=1 -c 'CREATE ROLE service_role LOGIN BYPASSRLS;'
+          psql -X -v ON_ERROR_STOP=1 -c 'CREATE ROLE anon NOLOGIN;'
+          psql -X -v ON_ERROR_STOP=1 -c 'CREATE ROLE authenticated NOLOGIN;'
+      - name: Apply candidate schema to disposable PostgreSQL
+        run: psql -X -v ON_ERROR_STOP=1 -f usage-monitor/schema.draft.sql
+      - name: Verify grants, replay, rollup and rollback
+        run: psql -X -v ON_ERROR_STOP=1 -f usage-monitor/sql-regression.sql
+  deno:
+    name: Edge TypeScript type-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check Edge without deploying
+        run: deno check supabase/functions/lizhi-usage-monitor/index.ts
+
+  live-anonymous:
+    name: Live deployed Edge anonymous and foreign-origin HTTP
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify production monitor endpoint denies anonymous calls
+        env:
+          ENDPOINT: https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-usage-monitor/ai-ledger?month=2026-11
+        run: |
+          set -euo pipefail
+          code=$(curl --silent --show-error --max-time 15 --output /tmp/anon.body --write-out '%{http_code}' "$ENDPOINT")
+          echo "Anonymous HTTP status: $code"
+          test "$code" = 401
+          test "$(wc -c </tmp/anon.body)" -lt 2000
+      - name: Verify foreign origin is rejected by Edge before authentication
+        env:
+          ENDPOINT: https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-usage-monitor/ai-ledger?month=2026-11
+        run: |
+          set -euo pipefail
+          code=$(curl --silent --show-error --max-time 15 --output /tmp/cors.body --write-out '%{http_code}' --header 'Origin: https://untrusted.example' "$ENDPOINT")
+          echo "Foreign Origin HTTP status: $code"
+          test "$code" = 403
+          test "$(wc -c </tmp/cors.body)" -lt 2000
