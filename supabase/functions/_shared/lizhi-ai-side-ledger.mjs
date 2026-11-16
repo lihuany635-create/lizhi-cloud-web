@@ -98,7 +98,7 @@ export function buildAiSideSnapshot({rows,budgets=[],month,moreRows=false}){
   const flat=validPairs.flatMap(x=>[x.before,x.after].filter(Boolean));
   const summary=summarizeAiActionEntries(flat);
   const budget=parseBudget(budgets,month);
-  const tasks=new Map(),days=new Map();
+  const tasks=new Map(),days=new Map(),features=new Map();
   const detail=[];
   for (const pair of validPairs) {
     if(!pair.after)continue;
@@ -117,6 +117,13 @@ export function buildAiSideSnapshot({rows,budgets=[],month,moreRows=false}){
     t.assistantObservedToolCalls+=v.toolCalls;
     if(v.outcome!=="success")t.failures++;
     tasks.set(taskKey,t);
+    const featureRow=features.get(v.feature)||{feature:v.feature,finishedActions:0,
+      assistantObservedToolCalls:0,failures:0,unknownResults:0};
+    featureRow.finishedActions++;
+    featureRow.assistantObservedToolCalls+=v.toolCalls;
+    if(v.outcome==="failure")featureRow.failures++;
+    if(v.outcome==="unknown")featureRow.unknownResults++;
+    features.set(v.feature,featureRow);
     const day=twParts(v.at).day;
     days.set(day,(days.get(day)||0)+v.toolCalls);
     detail.push({eventId:v.eventId,at:v.at,service:v.service,feature:v.feature,
@@ -124,7 +131,8 @@ export function buildAiSideSnapshot({rows,budgets=[],month,moreRows=false}){
       outcome:v.outcome,toolCalls:v.toolCalls,evidenceUrl:v.evidenceUrl});
   }
   detail.sort((a,b)=>Date.parse(b.at)-Date.parse(a.at));
-  const complete=!moreRows&&invalidRows===0&&conflictRows===0&&summary.missingBefore===0;
+  const complete=!moreRows&&invalidRows===0&&conflictRows===0&&
+    summary.missingBefore===0&&summary.unfinishedActions===0;
   // Counter is only ChatGPT self-reported tool calls, never billable consumption.
   const planned=Math.max(0,summary.unfinishedActions);
   const cap=budget.monthlyToolCap;
@@ -137,7 +145,7 @@ export function buildAiSideSnapshot({rows,budgets=[],month,moreRows=false}){
     officialBillingConnected:false,officialCost:null,
     officialEdgeInvocations:null,officialEgressBytes:null,
     summary:{...summary,invalidRows,duplicateRows,conflictRows},
-    features:summary.features,
+    features:[...features.values()].sort((a,b)=>b.assistantObservedToolCalls-a.assistantObservedToolCalls),
     tasks:[...tasks.values()].sort((a,b)=>b.assistantObservedToolCalls-a.assistantObservedToolCalls),
     days:[...days.entries()].map(([day,toolCalls])=>({day,toolCalls})).sort((a,b)=>a.day.localeCompare(b.day)),
     events:detail.slice(0,100),
