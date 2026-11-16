@@ -2,8 +2,8 @@
 // IMPORTANT: No deployment, database migration or external request instrumentation is implied.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {dispatchUsageMcp} from "../_shared/lizhi-usage-mcp-core.mjs";
-import {verifySiteBridge} from "../_shared/lizhi-usage-mcp-bridge-auth.mjs";
-const ORIGIN = "https://lihuany635-create.github.io";
+import {authorizeUsage,UsageAccessError,TRUSTED_ORIGIN,originAllowed} from "../_shared/lizhi-usage-access.mjs";
+const ORIGIN = TRUSTED_ORIGIN;
 const BASE = (Deno.env.get("SUPABASE_URL") || "").replace(/\/$/, "");
 const ANON = Deno.env.get("SUPABASE_ANON_KEY") || "";
 const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
@@ -20,23 +20,11 @@ function json(data: unknown, status = 200) {
   });
 }
 async function owner(req: Request, forMcp = false): Promise<void> {
-  if (!BASE || !SERVICE || !ANON || !OWNER_UID) throw new HttpError(503, "監控權限尚未設定。");
-  if (forMcp && req.headers.has("x-lizhi-usage-bridge")) {
-    const verified = await verifySiteBridge(req.headers, {
-      secret:Deno.env.get("LIZHI_USAGE_MCP_BRIDGE_KEY"),
-      actor:Deno.env.get("LIZHI_USAGE_MCP_ALLOWED_ACTOR")
-    });
-    if (!verified) throw new HttpError(403, "私人 Site 轉接驗證失敗。");
-    return;
-  }
-  const token = req.headers.get("Authorization")?.match(/^Bearer\s+(\S+)$/i)?.[1];
-  if (!token) throw new HttpError(401, "缺少登入憑證。");
-  const r = await fetch(BASE + "/auth/v1/user", {
-    headers: { apikey: ANON, Authorization:"Bearer " + token }, signal: AbortSignal.timeout(8000)
+  await authorizeUsage(req,{
+    forMcp,base:BASE,anon:ANON,service:SERVICE,ownerUid:OWNER_UID,
+    bridgeSecret:Deno.env.get("LIZHI_USAGE_MCP_BRIDGE_KEY"),
+    bridgeActor:Deno.env.get("LIZHI_USAGE_MCP_ALLOWED_ACTOR")
   });
-  if (!r.ok) throw new HttpError(401, "登入已失效。");
-  const user = await r.json();
-  if (!user?.id || user.id !== OWNER_UID) throw new HttpError(403, "只有本人可以查看監控紀錄。");
 }
 async function readRows(path: string): Promise<Record<string, any>[]> {
   const r=await fetch(BASE + "/rest/v1/" + path, {
@@ -112,10 +100,13 @@ async function boundedJson(req: Request, limit=32768): Promise<unknown> {
   return JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(all));
 }
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return new Response(null,{status:204,headers:{
+  if (req.method === "OPTIONS") {
+    if (!originAllowed(req.headers)) return json({error:"來源不允許。"},403);
+    return new Response(null,{status:204,headers:{
     ...allowOrigin,"Access-Control-Allow-Methods":"GET,OPTIONS",
     "Access-Control-Allow-Headers":"authorization,apikey,content-type","Access-Control-Max-Age":"600"
   }});
+  }
   try {
     const origin=req.headers.get("Origin");
     if (origin && origin !== ORIGIN) throw new HttpError(403,"來源不允許。");
@@ -141,7 +132,7 @@ Deno.serve(async (req: Request) => {
     await owner(req);
     return json(await snapshotForMonth(u.searchParams.get("month")||""));
   } catch(e) {
-    const code=e instanceof HttpError?e.status:503;
-    return json({error:e instanceof HttpError?e.message:"監控讀取暫時失敗。"},code);
+    const code=e instanceof HttpError||e instanceof UsageAccessError?e.status:503;
+    return json({error:e instanceof HttpError||e instanceof UsageAccessError?e.message:"監控讀取暫時失敗。"},code);
   }
 });
