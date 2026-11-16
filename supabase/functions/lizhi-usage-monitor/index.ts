@@ -3,6 +3,8 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {dispatchUsageMcp} from "../_shared/lizhi-usage-mcp-core.mjs";
 import {authorizeUsage,UsageAccessError,TRUSTED_ORIGIN,originAllowed} from "../_shared/lizhi-usage-access.mjs";
+import {SIDE_PROJECT,SIDE_AGENT,buildAiSideSnapshot,createBudgetRow}
+  from "../_shared/lizhi-ai-side-ledger.mjs";
 const ORIGIN = TRUSTED_ORIGIN;
 const BASE = (Deno.env.get("SUPABASE_URL") || "").replace(/\/$/, "");
 const ANON = Deno.env.get("SUPABASE_ANON_KEY") || "";
@@ -19,12 +21,27 @@ function json(data: unknown, status = 200) {
       "X-Content-Type-Options":"nosniff" }
   });
 }
-async function owner(req: Request, forMcp = false): Promise<void> {
+// Bind owner to the exact existing AI Workbench project, not to browser
+// user_metadata or a client-supplied actor. No new secret or project is needed.
+const WORKBENCH_PROJECT = "879209cd-8c8a-46ba-903e-74ccaa93710f";
+async function owner(req: Request, forMcp = false): Promise<string> {
+  if (!forMcp && !req.headers.get("Authorization")?.toLowerCase().startsWith("bearer "))
+    throw new UsageAccessError(401,"缺少登入憑證。");
+  if (!BASE || !ANON || !SERVICE) throw new UsageAccessError(503,"監控後端環境尚未設定。");
+  const items=await readRows("aiwb_projects?select=owner_id&id=eq."+
+    WORKBENCH_PROJECT+"&limit=2");
+  if (items.length!==1 || typeof items[0].owner_id!=="string" ||
+      !/^[0-9a-f-]{36}$/i.test(items[0].owner_id))
+    throw new UsageAccessError(503,"工作台本人綁定資料不完整。");
+  const linkedUid=items[0].owner_id;
+  if (OWNER_UID && OWNER_UID !== linkedUid)
+    throw new UsageAccessError(503,"工作台與設定的本人綁定不一致。");
   await authorizeUsage(req,{
-    forMcp,base:BASE,anon:ANON,service:SERVICE,ownerUid:OWNER_UID,
+    forMcp,base:BASE,anon:ANON,service:SERVICE,ownerUid:linkedUid,
     bridgeSecret:Deno.env.get("LIZHI_USAGE_MCP_BRIDGE_KEY"),
     bridgeActor:Deno.env.get("LIZHI_USAGE_MCP_ALLOWED_ACTOR")
   });
+  return linkedUid;
 }
 async function readRows(path: string): Promise<Record<string, any>[]> {
   const r=await fetch(BASE + "/rest/v1/" + path, {
@@ -79,6 +96,68 @@ async function snapshotForMonth(month: string) {
     summary:t.summary,sources:t.sources,quotas:quotaCards(t.summary),events,
     note:"只有已接入服務的觀測下限。官方帳務尚未同步，實際剩餘額度未知。"};
 }
+// The AI itself wrote these entries to EXISTING Side logs. Reading them does
+// not depend on the Supabase official Usage/Management API.
+function aiMonthBounds(month: string) {
+  if(!/^20\\d{2}-(0[1-9]|1[0-2])$/.test(month))
+    throw new HttpError(400,"month 必須是 YYYY-MM。");
+  const y=Number(month.slice(0,4)),m=Number(month.slice(5));
+  // Include an extra day on both sides for delayed before/after delivery,
+  // then filter the payload's original at time in Asia/Taipei.
+  return [
+    new Date(Date.UTC(y,m-1,1)-48*3600000).toISOString(),
+    new Date(Date.UTC(y,m,1)+24*3600000).toISOString()
+  ];
+}
+async function aiLedgerSnapshot(month:string, uid:string) {
+  const [start,end]=aiMonthBounds(month);
+  const q=new URLSearchParams({select:"agent,project,title,done,created_at",
+    owner_id:"eq."+uid,project:"eq."+SIDE_PROJECT,agent:"eq."+SIDE_AGENT,
+    title:"like.AI_USAGE*",created_at:"gte."+start,order:"created_at.desc"});
+  // Separate upper bound to avoid two PostgREST created_at keys.
+  q.set("and","(created_at.gte."+start+",created_at.lt."+end+")");
+  q.delete("created_at");
+  const rows:Record<string,any>[]=[];
+  const pageSize=500;
+  let moreRows=false;
+  for(let offset=0;offset<=5000;offset+=pageSize){
+    q.set("limit",String(offset===5000?1:pageSize));
+    q.set("offset",String(offset));
+    const page=await readRows("aiwb_side_logs?"+q.toString());
+    if(offset===5000){moreRows=page.length>0;break;}
+    rows.push(...page);
+    if(page.length<pageSize)break;
+  }
+  const bq=new URLSearchParams({select:"agent,project,title,done,created_at",
+    owner_id:"eq."+uid,project:"eq."+SIDE_PROJECT,agent:"eq."+SIDE_AGENT,
+    title:"eq.AI_USAGE_BUDGET "+month,order:"created_at.desc",limit:"10"});
+  const budgetRows=await readRows("aiwb_side_logs?"+bq.toString());
+  const snap=buildAiSideSnapshot({rows:rows.slice(0,5000),budgets:budgetRows,month,moreRows});
+  return snap;
+}
+async function addAiBudget(req:Request,uid:string) {
+  if(!req.headers.get("content-type")?.toLowerCase().startsWith("application/json"))
+    throw new HttpError(415,"需要 JSON 內容。");
+  const raw=await boundedJson(req,512);
+  if(!raw||typeof raw!=="object"||Array.isArray(raw))throw new HttpError(400,"預算格式不正確。");
+  const body=raw as Record<string,unknown>;
+  const month=body.month;
+  if(typeof month!=="string")throw new HttpError(400,"月份無效。");
+  const record=createBudgetRow(month,body.cap,new Date().toISOString());
+  const response=await fetch(BASE+"/rest/v1/aiwb_side_logs",{
+    method:"POST",
+    headers:{apikey:SERVICE,Authorization:"Bearer "+SERVICE,
+      "Content-Type":"application/json",Prefer:"return=representation"},
+    body:JSON.stringify({owner_id:uid,...record}),
+    signal:AbortSignal.timeout(10000)
+  });
+  if(!response.ok)throw new HttpError(503,"AI 自訂上限保存失敗。");
+  const saved=await response.json();
+  if(!Array.isArray(saved)||saved.length!==1||!saved[0]?.id)
+    throw new HttpError(503,"自訂上限沒有取得寫入回應。");
+  return {saved:true,month,monthlyToolCap:body.cap};
+}
+
 async function boundedJson(req: Request, limit=32768): Promise<unknown> {
   const claimed=Number(req.headers.get("content-length")||0);
   if (Number.isFinite(claimed) && claimed>limit) throw new HttpError(413,"MCP 請求過大。");
@@ -103,7 +182,7 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     if (!originAllowed(req.headers)) return json({error:"來源不允許。"},403);
     return new Response(null,{status:204,headers:{
-    ...allowOrigin,"Access-Control-Allow-Methods":"GET,OPTIONS",
+    ...allowOrigin,"Access-Control-Allow-Methods":"GET,POST,OPTIONS",
     "Access-Control-Allow-Headers":"authorization,apikey,content-type","Access-Control-Max-Age":"600"
   }});
   }
@@ -126,6 +205,16 @@ Deno.serve(async (req: Request) => {
       }
       const result=await dispatchUsageMcp(rpcBody,{snapshot:snapshotForMonth});
       return result===null?new Response(null,{status:202,headers:{...allowOrigin,"Cache-Control":"no-store"}}):json(result);
+    }
+    if(u.pathname.endsWith("/ai-ledger")) {
+      if(req.method!=="GET")throw new HttpError(405,"AI 紀錄只允許 GET。");
+      const uid=await owner(req);
+      return json(await aiLedgerSnapshot(u.searchParams.get("month")||"",uid));
+    }
+    if(u.pathname.endsWith("/ai-budget")) {
+      if(req.method!=="POST")throw new HttpError(405,"自訂上限只允許 POST。");
+      const uid=await owner(req);
+      return json(await addAiBudget(req,uid));
     }
     if(req.method!=="GET")throw new HttpError(405,"只允許唯讀查詢。");
     if(!u.pathname.endsWith("/snapshot"))throw new HttpError(404,"無此監控端點。");
