@@ -10,6 +10,10 @@ export function originAllowed(headers,origin=TRUSTED_ORIGIN){
   const supplied=headers?.get?.("Origin");
   return supplied===null||supplied===undefined||supplied===origin;
 }
+/**
+ * @param {Request} req
+ * @param {{forMcp?:boolean,base?:string,anon?:string,service?:string,ownerUid?:string,bridgeSecret?:string,bridgeActor?:string,fetchImpl?:typeof fetch}} [options]
+ */
 export async function authorizeUsage(req,{
   forMcp=false,base,anon,service,ownerUid,
   bridgeSecret,bridgeActor,fetchImpl=fetch
