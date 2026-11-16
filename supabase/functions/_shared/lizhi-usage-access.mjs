@@ -21,11 +21,12 @@ export async function authorizeUsage(req,{
       throw httpError(403,"私人 Site 轉接驗證失敗。");
     return;
   }
-  const token=req.headers.get("Authorization")?.match(/^Bearer\\s+(\\S+)$/i)?.[1];
+  const bearer=req.headers.get("Authorization")||"";
+  const token=bearer.toLowerCase().startsWith("bearer ") ? bearer.slice(7).trim() : "";
   if(!token)throw httpError(401,"缺少登入憑證。");
   let response;
   try{
-    response=await fetchImpl(String(base).replace(/\\/$/,"")+"/auth/v1/user",{
+    response=await fetchImpl((String(base).endsWith("/")?String(base).slice(0,-1):String(base))+"/auth/v1/user",{
       headers:{apikey:anon,Authorization:"Bearer "+token},
       signal:AbortSignal.timeout(8000),redirect:"manual"
     });
