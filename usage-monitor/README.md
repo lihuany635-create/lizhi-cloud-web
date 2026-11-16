@@ -1,9 +1,21 @@
 # 立之 Supabase 流量監控中心 — 候選版
 
+## P1-D｜Site 前置工程修復進度（2026-11-16）
+
+- **PR #77 目前已與 `main` 對齊、GitHub mergeable=true**。原 PR 分支採雙親合併 commit `c7a3b4b43dfd59c816d73bf36f35553377f9852e`，以 `main` 上已正式發布的 PR #82 前端資源為準，不再重複覆蓋。**目前仍是 Draft，未正式合併。**
+- 本輪增補 `lizhi-usage-access.mjs`：使用 Supabase Auth /user 實際驗證 JWT 與專屬 OWNER UID（不依賴可修改的 `user_metadata`）；缺少 Secret、非本人、驗證服務中斷、轉接密鑰錯誤及不可信 Origin 預檢皆 fail-closed。新增 15 項自動測試，Edge 檔案改以此模組驗證。
+- 本輪增補 `management-api-observer.mjs`：只支援 **Management API 的專案 Auth/REST/Realtime/Storage API 請求統計**，需要 server-only、具 `analytics_usage_read` 權限的有效憑證；**此數據不等於官方組織級帳務、Edge Invocation 或 Egress**。沒有憑證一律顯示 unavailable，不能宣稱已完成官方帳務對帳；新增 13 項資料來源/限流/失效測試。
+- 本輪增補 `pre-supabase-gate.mjs`：單純外部閘道核心程式；要求可信身分、已驗證組織級官方帳務快照、嚴格服務白名單、分散式原子預留（由外部實作注入），任何缺失對非必要服務 fail-closed。新增 17 項並發/偽造/失效/限額測試。**尚無外部閘道宿主及真正原子預留後端，不得宣稱正式阻擋生效。**
+- 正式資料庫 `lz_usage_events`／`lz_usage_daily` 與備份/隔離還原已完成；尚無正式記錄器接線，事件可能仍為 0。
+- **正式 Edge `lizhi-usage-monitor` 尚未部署**；仍需要本人確認專屬 `LIZHI_USAGE_OWNER_UID` Secret、原 Site 未來橋接 Secrets、使用者實機登入、匿名/跨帳號/撤權/跨裝置 HTTP 端到端驗收。不能提交 Secrets 到 GitHub。
+- **保留明確障礙**：自動串接 22 個既有 Edge、成本/壓力試驗、正式官方帳務對帳（缺乏可核實自動帳務來源及必要憑證）、真正入口前防繞過和外部原子預留均尚未 PASS。若無可靠正式流量閘道，不得啟用強制阻擋或宣稱可阻止超額；沒有足夠實測就不合併 PR 或大規模修改既有服務。
+- 正式監控站前端 **PR #82 已發布至原 GitHub Pages**，`?open=usage` 在原系統選單下；實機登入仍需驗收。不要再發布舊版前端以覆蓋 PR #82。
+- 此章只記錄 **候選程式與審查**，不是正式 Edge/Site 已部署、全部服務已接線或完整計費保護已完成的宣告。
+
 ## 目標與目前驗收狀態
 
 - 目標：使用現有「立之雲端庫」Supabase 專案，逐筆記錄**已接入**的請求、每日彙總、展示風險；依額度在 Supabase **入口之前**保護非必要流量。
-- **混合狀態（2026-11-16 即時核對）**：已在原 Supabase 專案正式建立 `lz_usage_events`、`lz_usage_daily` 與 `private_lz.usage_rollup()`，Migration `20261115182955` 完成，RLS/匿名拒絕與回滾測試 PASS。**其他候選檔案仍只在 Draft PR #77**，尚未合併 main、未部署監控 Edge 或 Site、未串接既有 22 個 Edge，尚未取得官方帳務用量。
+- **混合狀態（2026-11-16 即時核對）**：已在原 Supabase 專案正式建立 `lz_usage_events`、`lz_usage_daily` 與 `private_lz.usage_rollup()`，Migration `20261115182955` 完成，RLS/匿名拒絕與回滾測試 PASS。**前端 PR #82 已正式合併與發布；後端候選仍在 Draft PR #77**，尚未部署監控 Edge 或 Site、未串接既有 22 個 Edge，尚未取得官方帳務用量。
 - 現有 Supabase 組織已讀取為 Free，僅用於初始參考額度；部署前仍須核對官方 Dashboard 中的實際方案、帳務週期與每個用量分類。
 - GitHub Pages 服務的是靜態程式碼（公開可讀）；登入之後的監控資料由後端 OWNER UID 強制驗證，只有本人可取得。這**不是**把完整網站檔案隱藏起來的 Private Site；如需網站本身 Private，須另使用受本人驗證的私人 Site。
 
