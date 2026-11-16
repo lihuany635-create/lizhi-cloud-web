@@ -40,7 +40,8 @@
 - 顯示：本月「AI 已自行登記工具操作」；**不顯示**「官方剩餘額度」除非另有真實獨立來源。
 
 ## 目前驗收
-- 候選模組 / 單元測試：等待 CI 真實執行結果。
-- 原 Side 工作日誌：支援附加式寫入，但還不是每次 Supabase 工具呼叫自動綁定的資料收集器。
-- 正式流量監控頁面：目前仍使用已部署 PR #82 的前端，**尚未切換到 AI 自行登記報表**。
+- 候選模組 / 單元測試：現已由 GitHub Actions 完成 Node、Deno、隔離 PostgreSQL 及正式匿名/外部 Origin HTTP 測試，最新結果以 PR #77 所對應 SHA 為準。
+- 原 Side 工作日誌：2026-11-16 已實際寫入並讀回數組 before/after 單筆紀錄；已有 ai-self-log-runner.mjs 候選封裝，但沒有 ChatGPT 全平台、全對話的自動工具攔截能力，這項不能稱為全域自動記錄已驗收。
+- 正式流量監控頁面：PR #77 已加入以 GET /ai-ledger 讀取原 Side 記帳、POST /ai-budget 儲存個人自訂上限的新版介面；須該 PR 正式合併及 Pages 發布後才算網站接通。
+- 原 Supabase Edge：2026-11-16 已確認原專案 lizhi-usage-monitor ACTIVE v1，正式匿名 401、異站來源 403 測試 PASS；登入本人及跨裝置未完成正式驗收。
 - 原 Site：本階段禁止動。
