@@ -29,7 +29,7 @@ function parseRow(row,month) {
   if (!v || v.schema!=="lizhi.ai-operation-ledger.v1" ||
       v.source!=="ai_self_registered_operations" ||
       v.project!=="hrdzywkihfqggiwjgavi" ||
-      v.eventId.toLowerCase()!==match[2].toLowerCase() ||
+      typeof v.eventId!=="string" || v.eventId.toLowerCase()!==match[2].toLowerCase() ||
       v.phase!==match[1] || !Number.isFinite(Date.parse(v.at)) ||
       twParts(v.at).month!==month) return null;
   try {
@@ -83,7 +83,17 @@ export function buildAiSideSnapshot({rows,budgets=[],month,moreRows=false}={}){
       else {item.corrupt=true;conflictRows++;}
     }else item[v.phase]=v;
   }
-  const validPairs=[...entries.values()].filter(x=>!x.corrupt);
+  const validPairs=[...entries.values()].filter(x=>{
+    if(x.corrupt)return false;
+    if(x.before&&x.after&&(x.before.feature!==x.after.feature||
+      x.before.taskLabel!==x.after.taskLabel||
+      x.before.actionDetail!==x.after.actionDetail||
+      x.before.service!==x.after.service||
+      x.before.operation!==x.after.operation)){
+      conflictRows++;return false;
+    }
+    return true;
+  });
   const flat=validPairs.flatMap(x=>[x.before,x.after].filter(Boolean));
   const summary=summarizeAiActionEntries(flat);
   const budget=parseBudget(budgets,month);
