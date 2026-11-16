@@ -85,3 +85,9 @@ test('cross-month official billing period and reconstructed Total preserve prove
  assert.equal(parseEgressRows([{id:'one',done:JSON.stringify(r)}],'2026-11',{periodStart:'2026-11-01',periodEnd:'2026-12-01'}).alert,'UNKNOWN');
  assert.throws(()=>validateEgressInput({...r,total:11,cached:.768,officialUncached:10.549,unit:'GB',samePeriod:true},now));
 });
+test('append-only correction retains original and excludes known wrong-period snapshot',()=>{
+ const old=reading(1);old.id='11111111-1111-4111-8111-111111111111';
+ const good=reading(2);
+ const correction={id:'note',done:JSON.stringify({source:'manual_supabase_usage_dashboard_correction',month:'2026-11',reason:'wrong_period',invalidates:old.id,at:now.toISOString()})};
+ const h=parseEgressRows([old,good,correction],'2026-11');assert.equal(h.readings.length,1);assert.equal(h.uncachedGb,2);assert.equal(h.voidedRows[0].original.uncachedBytes,1e9);assert.equal(h.corrections.length,1);assert.equal(h.invalidRows,0);
+});

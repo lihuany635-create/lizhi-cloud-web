@@ -47,10 +47,20 @@ export function validateEgressInput(value, now = new Date()) {
 export function parseEgressRows(rows, month, period={}) {
   if(!Array.isArray(rows)) throw new Error("歷史資料格式錯誤。");
   const snapshots=[];const seen=new Set();let duplicateRows=0;
+  const corrections=[];const voided=new Set();
+  for(const row of rows){try{
+    const d=JSON.parse(row.done);
+    if(d.source==='manual_supabase_usage_dashboard_correction'&&d.month===month&&d.reason==='wrong_period'&&/^[0-9a-f-]{36}$/.test(d.invalidates)&&Number.isFinite(Date.parse(d.at))){
+      corrections.push({id:String(row.id),invalidates:d.invalidates,reason:d.reason,at:d.at});voided.add(d.invalidates);
+    }
+  }catch{}}
+
   let invalid=0;
   for(const row of rows) {
     try {
       const data=typeof row.done === "string" ? JSON.parse(row.done) : null;
+      if(data?.source==='manual_supabase_usage_dashboard_correction'&&corrections.some(c=>c.id===String(row.id)))continue;
+      if(voided.has(String(row.id)))continue;
       if (!data || data.source !== EGRESS_SOURCE || data.month !== month ||
           !Number.isFinite(Date.parse(data.observedAt)) ||
           ![data.totalBytes, data.cachedBytes, data.uncachedBytes].every(
@@ -82,6 +92,7 @@ export function parseEgressRows(rows, month, period={}) {
     quotaBasis:'Free 5 GB baseline; confirm actual plan',periodStart:latest?.periodStart??null,periodEnd:latest?.periodEnd??null,scope:'organization',
     uncachedGb:latest?latest.uncachedBytes/EGRESS_GB:null,freeQuotaGb:FREE_UNCACHED_GB,
     usedRatio:ratio,remainingGb:latest?Math.max(0,FREE_UNCACHED_GB-latest.uncachedBytes/EGRESS_GB):null,
+    corrections,voidedRows:rows.filter(r=>voided.has(String(r.id))).map(r=>({id:String(r.id),original:JSON.parse(r.done)})),
     lastUpdated:latest?.observedAt??null,sevenDayChange:trend(baseline),availableHistoryChange:trend(oldest),duplicateRows,
     limitBytes:FREE_UNCACHED_GB*EGRESS_GB,alert,latest,
     readings:snapshots.slice(0,100),invalidRows:invalid,complete:invalid===0&&rows.length<501};

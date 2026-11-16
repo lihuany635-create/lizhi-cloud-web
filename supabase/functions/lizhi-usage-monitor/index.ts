@@ -225,6 +225,7 @@ async function egressHistory(month:string,uid:string,period:any={}) {
 }
 async function saveEgress(value:unknown,uid:string) {
   let snap;
+  if(!value||typeof value!=="object"||!("total" in value))throw new HttpError(400,"請更新監控網站並提供帳期及觀測時間，舊版讀數格式不再接受。");
   try { snap=validateEgressInput(value); }
   catch { throw new HttpError(400,"官方 Usage 讀數格式錯誤。"); }
   const key=JSON.stringify([uid,snap.month,snap.periodStart,snap.periodEnd,snap.observedAt,snap.totalBytes,snap.cachedBytes]);
