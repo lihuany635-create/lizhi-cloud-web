@@ -20,3 +20,10 @@ verify_jwt = false
 [functions.lizhi-cad-mcp]
 # OAuth discovery must reach endpoint before bearer token; @supabase/server verifies user JWT.
 verify_jwt = false
+
+[functions.lizhi-usage-monitor]
+# Dual auth: browser bearer JWT and future server-to-server Site bridge.
+# Platform JWT is disabled ONLY for this function; the handler performs
+# fail-closed Auth /user OWNER_UID verification or signed Site bridge check.
+# Never deploy until OWNER_UID, secret management and HTTP negative tests PASS.
+verify_jwt = false
