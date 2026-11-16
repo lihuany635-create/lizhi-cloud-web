@@ -1,5 +1,18 @@
 # 立之 Supabase 流量監控中心 — 候選版
 
+## P1-F｜AI 自登記 1–5 實際接線進度（2026-11-16，正式交付驗收中）
+
+**本段是最新狀態；取代以下舊章節的「正式 Edge 尚未部署」「只剩候選規格」敘述。**
+
+- **真實登記與讀回 PASS（指定操作）**：我使用既有 AI 工作台 Side `side_log_save` 在自己操作 Supabase 前後各保存一筆 `AI_USAGE before/after <uuid>`，再使用 `side_log_list` 讀回確認；實際寫入正式 Side DB，原 project UUID、功能、任務、操作原因、成功/失敗、工具呼叫次數都記錄。已用管理端唯讀 SQL 查核原專案 1 筆、Side 有實際 AI_USAGE 紀錄。這不代表 ChatGPT 每個新對話自動觸發 Side 工具；沒有原生 global hook 時仍需要 AI 在呼叫工具時遵循流程。
+- **(1) 候選呼叫封裝** `ai-self-log-runner.mjs`：先寫 before，呼叫工具 1 次，再寫 after 並讀回；若 before 失敗不做事，若 after/readback 失敗不假裝 PASS；工具出錯仍計為已嘗試。封裝只對有使用它的 AI 呼叫生效。
+- **(2) 統計候選** `_shared/lizhi-ai-side-ledger.mjs`：由原 Side 日誌按臺灣時區的月份、日期、feature、taskLabel、actionDetail 加總，依 UUID 去重，標記缺寫、衝突、進行中、讀取截斷；不向官方 Usage API 查數字。
+- **(3) 原網站候選更新**：沿用 `usage-monitor/index.html`/`monitor.js`，顯示自登記工具操作數、功能、任務、目的、結果、未知官方流量及自訂操作上限，端點 `GET /ai-ledger`、`POST /ai-budget`；不建新網站或第二套 Site。發佈至原 GitHub Pages 以合併本 Draft PR 為準。
+- **(4) 預警候選**：使用已核對的 Side 帳本及由本人設定的 AI 工具呼叫月上限，逐次預檢，可用最近同類操作 p90 次數預估；未知、漏寫或無上限不能假裝有剩餘額度。**不能自動攔截其他 ChatGPT 對話、使用者瀏覽器或第三方直連，也不能保證 Supabase 全站不超額。**
+- **(5) Edge 已於 2026-11-16 正式建立並啟用**：原 Supabase 專案 `lizhi-usage-monitor` **ACTIVE v1**、`verify_jwt=false` 由 Edge 程式逐請求核對 Auth /user 與原 AI 工作台項目的 owner UUID；匿名 HTTP 401、異站 Origin HTTP 403 由正式 GitHub Actions #43785794100 PASS。新 Edge 與 Site 的 MCP 工具發布是不同件事，本階段不觸及 Site。
+- 候選 CI 目前覆蓋 Node 模組、Deno TypeScript、隔離 PostgreSQL 17 與部署後匿名／跨來源 HTTP；正式本人登入 200、非本人 403、撤權、手機真實讀回仍需本人可用的登入狀態與實測，不可用單元測試冒充。
+- 2026-11-16 使用者明確授權處理步驟 1–5；不新增其他專案、網域、服務或付費方案；**第 6 項 Site MCP 不在本次範圍。**
+
 ## P1-D｜Site 前置工程修復進度（2026-11-16）
 
 - **PR #77 目前已與 `main` 對齊、GitHub mergeable=true**。原 PR 分支採雙親合併 commit `c7a3b4b43dfd59c816d73bf36f35553377f9852e`，以 `main` 上已正式發布的 PR #82 前端資源為準，不再重複覆蓋。**目前仍是 Draft，未正式合併。**
