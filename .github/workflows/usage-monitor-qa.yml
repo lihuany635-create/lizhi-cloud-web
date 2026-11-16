@@ -76,3 +76,27 @@ jobs:
           deno-version: v2.x
       - name: Type-check Edge without deploying
         run: deno check supabase/functions/lizhi-usage-monitor/index.ts
+
+  live-anonymous:
+    name: Live deployed Edge anonymous and foreign-origin HTTP
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify production monitor endpoint denies anonymous calls
+        env:
+          ENDPOINT: https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-usage-monitor/ai-ledger?month=2026-11
+        run: |
+          set -euo pipefail
+          code=$(curl --silent --show-error --max-time 15 --output /tmp/anon.body --write-out '%{http_code}' "$ENDPOINT")
+          echo "Anonymous HTTP status: $code"
+          test "$code" = 401
+          test "$(wc -c </tmp/anon.body)" -lt 2000
+      - name: Verify foreign origin is rejected by Edge before authentication
+        env:
+          ENDPOINT: https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-usage-monitor/ai-ledger?month=2026-11
+        run: |
+          set -euo pipefail
+          code=$(curl --silent --show-error --max-time 15 --output /tmp/cors.body --write-out '%{http_code}' --header 'Origin: https://untrusted.example' "$ENDPOINT")
+          echo "Foreign Origin HTTP status: $code"
+          test "$code" = 403
+          test "$(wc -c </tmp/cors.body)" -lt 2000
