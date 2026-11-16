@@ -131,3 +131,17 @@ test("do not estimate from incomplete records",()=>{
  const r=read([event("after")]);
  assert.equal(estimateAiTaskCalls(r,{feature:"usage_monitor"}).state,"unknown");
 });
+
+test("unfinished before-only action makes cap assessment incomplete",()=>{
+ const r=read([event("before")]);
+ assert.equal(r.complete,false);
+ assert.equal(r.summary.unfinishedActions,1);
+ assert.equal(r.budget.alert,"UNCONFIGURED");
+ assert.equal(aiPreflight(r,1).decision,"hold");
+});
+test("feature summaries carry failures and unknown outcomes for UI",()=>{
+ const r=read([event("before"),event("after",{outcome:"failure"})]);
+ assert.equal(r.features[0].failures,1);
+ assert.equal(r.features[0].unknownResults,0);
+ assert.equal(r.features[0].assistantObservedToolCalls,1);
+});
