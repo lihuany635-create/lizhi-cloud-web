@@ -3,7 +3,8 @@
 // and provide the VERIFIED principal. Never read a principal directly from input.
 export const USAGE_TOOL_NAMES=new Set([
  "usage_status","usage_summary","usage_services",
- "usage_events","usage_alerts","usage_policy"
+ "usage_events","usage_alerts","usage_policy",
+ "usage_log_before","usage_log_after","usage_budget_set"
 ]);
 const upstream="https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-usage-monitor/mcp";
 export async function relayUsageRpc(body,{
@@ -16,7 +17,7 @@ export async function relayUsageRpc(body,{
    throw new Error("Server-side bridge key not configured.");
  if(!body||typeof body!=="object"||Array.isArray(body)||
     body.jsonrpc!=="2.0"||typeof body.method!=="string")throw new Error("Invalid MCP message.");
- const allowed=["initialize","ping","tools/list","tools/call"];
+ const allowed=["server/discover","initialize","ping","tools/list","tools/call"];
  if(!allowed.includes(body.method))throw new Error("Unsupported Site relay MCP method.");
  if(body.method==="tools/call" &&
     (!body.params||!USAGE_TOOL_NAMES.has(body.params.name)))throw new Error("Unknown usage tool.");

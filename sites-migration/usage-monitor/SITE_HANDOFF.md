@@ -1,65 +1,66 @@
-# 立之 Supabase 流量監控 MCP｜接 Site 前交接文件
-日期：2026-11-16　狀態：**DB Migration 已獲本人核准並部署 PASS；MCP Edge 與原私人 Site 仍未發布**
+# 流量監控中心｜專屬 Site MCP 接線交接 v0.3.0
 
-## 範圍與嚴格邊界
-- 只更新原 GitHub 倉庫的 Draft PR #77；不得先改私人 Site、主站 main、22 個正式 Edge 或正式 Supabase schema。
-- 正式站要沿用「AI 工作台」所在的原私人 Site，不建立新的 Site、不另行覆蓋原路由，不影響施工照片、aiwb、side、licut 等既有 MCP 工具。
-- 本 MCP 僅 6 個唯讀工具，無任何可修改保護設定、寫資料表、刪事件或部署的工具。
-- 接入前，先驗證本站原 Site 的最新工具數及現有 owner principal，不用歷史快照冒充即時證據。
+2026-11-16，本次使用者指示取代本檔舊版「加入 AI 工作台 Site」方案。
 
-## 已完成的候選檔案
-- `supabase/functions/lizhi-usage-monitor/index.ts`：GET /snapshot 及 POST /mcp，同一 Edge；授權後才能讀資料。
-- `supabase/functions/_shared/lizhi-usage-mcp-core.mjs`：Stateless JSON-RPC 2.0、tools/list、tools/call、initialize、ping、notifications/initialized。
-- `supabase/functions/_shared/lizhi-usage-mcp-bridge-auth.mjs`：Server-to-server shared-secret + 經 Site 驗證的 principal 兩項都正確才允許。
-- `usage-monitor/site-bridge-relay.mjs`：Site 側候選代理，主動限定 6 個 usage_* 工具、檢查 owner、20 秒 timeout、固定 Edge 上游 URL。
-- `usage-monitor/schema.draft.sql`：保留隔離測試草案；**正式 Migration `20261115182955` 已套用**。已核對兩表 RLS、對匿名/登入者撤權、service_role 授權、原子 Trigger 及回滾驗收。正式對應檔：`supabase/migrations/20261115182955_lizhi_usage_monitor_tables_and_rollup_20261116.sql`。
-- `usage-monitor/sql-regression.sql`：隔離 Postgres 17 RLS/grants/trigger/replay/NULL/拒絕敏感 route 的測試。
-- `.github/workflows/usage-monitor-qa.yml`：PR 候選 CI：Node tests、Postgres 17、Deno Edge check，不部署正式服務。
+## 已核對現況
 
-## 完整六項唯讀工具
-1. `usage_status`：取得候選連線與涵蓋狀態；不宣稱 Site 已接上。
-2. `usage_summary`：指定月已接入 Edge 的彙總、配額卡片，官方未取得時明確 null。
-3. `usage_services`：指定月已接入服務的流量統計。
-4. `usage_events`：指定月最近最多 100 筆最小化事件。
-5. `usage_alerts`：官方帳務未驗或逾一小時，回 UNKNOWN，不可宣稱安全。
-6. `usage_policy`：回傳 70%/85%/95% 候選政策及尚未強制執行的狀態。
+- 監控中心專屬 Site **不存在**：Sites owner 清單 8 項、cursor=null；editor 清單 0 項、cursor=null。沒有可沿用的監控 Site ID、網址或發布版本。未建立新 Site。
+- **禁止修改 AI 工作台或其他 Site**；工作台僅讀取進度並新增本專案交接紀錄。
+- 原倉庫 `lihuany635-create/lizhi-cloud-web`，原 PR #77 merged；基線 `19a1b8ae553c6e0177124c4715243fc3afb4c342`。
+- 原 Supabase `hrdzywkihfqggiwjgavi`，原 Edge `lizhi-usage-monitor` v2 是回退基線。
+- 原網站 `https://lihuany635-create.github.io/lizhi-cloud-web/?open=usage` 保留；無新資料庫、無第二套網站或付費服務。
 
-## 接線前需核實的 Secrets（**只列名稱，不填值**）
-Edge 內部原有：`SUPABASE_URL`、`SUPABASE_ANON_KEY`、`SUPABASE_SERVICE_ROLE_KEY`。
-Edge 新增：`LIZHI_USAGE_OWNER_UID`（Supabase Auth 本人 UID），`LIZHI_USAGE_MCP_BRIDGE_KEY`（長度 >=32 的機密隨機值），`LIZHI_USAGE_MCP_ALLOWED_ACTOR`（既有 Site identity(req,'ai').id）。
-原 Site 新增僅 `LIZHI_USAGE_MCP_BRIDGE_KEY`，需與 Edge 端完全一致；不修改現有 `PRODUCTION_BRIDGE_KEY`。
-若任一 Secret 未準備妥當，應在外部 Edge 上回 503／403，不能回匿名開放內容。
-注意：`x-lizhi-usage-actor` 本身不是本人證明；必須由 Site 使用自身的 `identity(req,'ai')` 驗證後產出，而且 Edge 同時驗證橋接密鑰和允許的 actor。
+## 本次後端增量
 
-## 待本人核定後的正式執行順序
-1. 取得完整隔離 PG/RLS／端對端 Auth/Edge/CORS/回退證據，對任何 FAIL/NOT_TESTED 修正後才能下一步。
-2. **已完成**：本人批准、最新加密備份、隔離 PostgreSQL 17 還原比對 PASS、正式 apply migration `20261115182955`、RLS/grants/Trigger/去重及回滾驗證 PASS。**不得再次套用相同 DDL**。
-3. 以只含本人唯讀 GET /snapshot 與 POST /mcp 的正式 `lizhi-usage-monitor` Edge 發布，應配置 `verify_jwt=false` **僅在應用程式層的本人 JWT 或可信 Site 雙重秘密驗證確實經隔離驗收後**。未完成不能開放正式入口。
-4. 首先直接用完整授權環境測 Edge 的 MCP initialize、tools/list、六工具呼叫、非本人、匿名、無效轉接密鑰及 CORS。不把 6 工具被列出當成真實官方帳務已接通。
-5. 核對原私人 Site 在該次時間點的所有工具名稱，改原路由的 `tools/list` 為既有清單與新增 6 項的聯集，禁止刪掉任何既有工具。
-6. 只將 `usage_*` 的 `tools/call` 送到使用 `site-bridge-relay.mjs` 的固定上游，其他工具完全保持原本路由；Site 需先比對 `identity(req,'ai').id === PRODUCTION_CHATGPT_OWNER`，對全部 usage 呼叫做驗證。
-7. 在原 Site 發布後，本人在一般 ChatGPT 對話呼叫 `usage_status`、`usage_summary` 並檢查只讀資料；同時抽驗原所有 aiwb、side、licut 及施工照片工具都未消失。
-8. 若失敗，回退既有 Site 舊路由與 Edge 舊發布版本，不動既有業務資料，不開放其他使用者。
+原 Edge `/mcp` 使用 `_shared/lizhi-usage-ai-mcp.mjs`，九工具皆使用既有 Side AI 自登記來源；原觀測 `/snapshot` 保留。舊 `_shared/lizhi-usage-mcp-core.mjs` 僅保留歷史相容函式及測試，不是正式 `/mcp` dispatcher。
 
-## MCP 傳輸契約
-- 上游：`https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-usage-monitor/mcp`
-- 方法：POST；JSON-RPC 2.0；Content-Type: application/json；Accept: application/json, text/event-stream
-- 已實作 methods：initialize、ping、tools/list、tools/call、notifications/initialized。
-- Site 端 HTTP header：`x-lizhi-usage-bridge`=私密 bridge secret，`x-lizhi-usage-actor`=已驗證的本人 principal。
-- 如用直接 Supabase Auth Bearer JWT 存取，Edge 將再向 Supabase auth/v1/user 查 UID，必須匹配 `LIZHI_USAGE_OWNER_UID`。
-- 不接受內容本文中的 actor、owner ID 或前端自稱 critical，不能用官方不明用量推算精確餘額。
+|工具|資料或行為|
+|---|---|
+|usage_status|來源、完整性、本人上限、連線限制|
+|usage_summary|AI 每月／每日操作、未知官方帳務|
+|usage_services|全已讀紀錄依服務、功能與任務統計|
+|usage_events|事件列表；帶 eventId 可讀 before/after 的 plannedCalls、實際次數、完成時間|
+|usage_alerts|已設定上限、已登記次數、未設定／接近／到達／不完整狀態|
+|usage_policy|AI 流程約束、無全域攔截、無跨對話自動化保證|
+|usage_log_before|實際 INSERT Side，讀回比較；回 saved/verified/decision；重送不另增|
+|usage_log_after|同 eventId 與原用途，成功／失敗／未知均留存；讀回、去重、拒絕改寫|
+|usage_budget_set|本人授權下追加每月 cap，重新查詢驗證；不改寫舊上限歷史|
 
-## 接 Site 的硬性驗收阻擋條件
-- **已解決**：正式 DB 已套用並實測；若未來出現結構或權限回歸 FAIL → STOP。
-- 本人 Auth 或 Site bridge 無效 → STOP。
-- MCP 非本人可讀／service role 或 PAT 暴露到網頁 → STOP。
-- Node、Postgres、Deno/Edge CI 未全部 PASS → STOP。
-- 原 Site 任何舊工具遺失／實際資料遭改寫 → STOP。
-- 正式部署、付費服務及修改既有路由未獲本人批准 → STOP。
+`usage_log_before` 必填 eventId、at、service、feature、taskLabel、actionDetail、operation、plannedCalls。
+`usage_log_after` 必填同一 eventId 及五項原用途欄位、completedAt、toolCalls、outcome；evidenceUrl 可選，限可信來源且不可含 query/hash/登入資料。
+`usage_budget_set` 必填 month（YYYY-MM）、cap（1～1000000 正整數）。驗證本人由 Edge 執行，不接受工具參數自稱 owner。
 
-## 目前已知限制
-- 即使這 6 個 MCP 上線，仍不等於已經在全部 Supabase 流量前安裝閘道。
-- 逐筆事件只包含已接入服務，並有監控自耗；官方帳務同步尚未完成，`official_used` 目前為 null。
-- 帳務週期不一定是日曆月；快照 UTC 月份僅為觀測彙總。
-- GitHub 候選 URL：https://github.com/lihuany635-create/lizhi-cloud-web/pull/77
-- Google Drive 階段報告：https://drive.google.com/drive/folders/1eRbwHussumM9TJU51ztxjkgKjPLCC-K6
+寫入只 INSERT `aiwb_side_logs`，owner_id 僅來自既有已核對專案的 owner；固定 agent=ChatGPT、project=Supabase 流量監控中心。事件 phase 對應穩定 UUID 主鍵，409 必須讀回比較，不使用 upsert/UPDATE/DELETE。紀錄官方 Edge/Egress/費用一律 null。完整月份查詢最多掃描 5000 筆，截斷時 fail-closed；晚送 after 與補登按原事件時間納入，不以資料列建立時間猜月份。
+
+## 使用流程及限制
+
+1. 查 status/summary/alerts，依已登記歷史預估 plannedCalls。
+2. before 返回 **saved=true、verified=true、decision=allow** 才執行非必要操作。
+3. 上限未設定、記帳不完整、其他 pending、已達上限均 hold；hold 仍保存 planned 紀錄，未執行時應以 after failure/unknown、toolCalls=0 完成，不刪紀錄。
+4. 真正執行後，同 eventId 登記 after；失敗也記，補登禁止重跑操作。
+5. 查 events(eventId) 讀回。記帳工具本身不遞迴記帳。
+
+上限僅管理遵守流程的 AI 操作。沒有全域攔截，不能限制外部程式；actual 超過預估仍誠實保存並回 overEstimate。並行 pending 採保守停止，不是官方計費原子閘道。既有 Side 管理介面仍有其原本權限，本次不能將其宣稱為資料庫不可竄改儲存。
+
+## 身分與唯一必要 Site 建立事項
+
+依使用者指示：**先回報需要建立監控中心唯一的專屬 Private Site；本次未擅自建立，也不借用工作台 Site。**
+
+Site 獲准建立後，只需部署薄轉接層，不重做監控網頁。manifest capabilities 加 mcp，POST /mcp 先驗證平台提供的本人身分，再用 server-only 專用 Secret 呼叫原 Edge。
+
+- Edge 固定上游 `https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-usage-monitor/mcp`。
+- Edge 專用 Secrets：`LIZHI_USAGE_MCP_BRIDGE_KEY`、`LIZHI_USAGE_MCP_ALLOWED_ACTOR`；Site 保管對應橋接密鑰與本站 owner principal。
+- 不借用其他 Site 的 Site-scoped actor；應在新 Site 取得平台核實身分後綁定，不接受請求本文或瀏覽器自報 actor。
+- Bridge Secret 與 actor 任一缺失或不符均拒絕。service_role 只在原 Edge。
+- Site 私人發布後原生工具安裝／連接、新對話載入、跨對話實際 before/after 都須另做真實驗收。
+
+## 已執行驗證
+
+- Node 230/230 PASS：原 204 項回歸，加九工具／持久重新載入／去重／失敗／上限及 Edge/Auth/PostgREST 隔離整合。
+- Deno check 原 Edge PASS；移除未使用且會要求遠端下載的 functions-js 型別匯入，保留 Deno 原生型別。
+- 正式唯讀 SQL PASS：Side、events、daily 三表 RLS=true；anon/authenticated 無 SELECT，service_role 有 INSERT；原監控專案 owner 綁定唯一。
+- 以上隔離成功不能取代正式本人 HTTP、Site 或跨對話驗收。
+
+## 回退
+
+保存的原 v2 來源對應 Git 基線 `19a1b8ae553c6e0177124c4715243fc3afb4c342`。若 v3 有回歸，只將 `lizhi-usage-monitor` 與所需 `_shared` 檔案重新部署為 v2 來源，verify_jwt 保留 false 並保留應用層本人驗證。不要回退全倉庫 main，不改工作台、不刪 Side 新增歷史、不重套 migration。因專屬 Site 尚未建立，無 Site 回退版本。

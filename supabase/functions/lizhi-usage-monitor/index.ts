@@ -1,7 +1,7 @@
 // 立之 Supabase 監控後端（開發候選）：僅本人唯讀快照。
 // IMPORTANT: No deployment, database migration or external request instrumentation is implied.
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import {dispatchUsageMcp} from "../_shared/lizhi-usage-mcp-core.mjs";
+import {usageMonth} from "../_shared/lizhi-usage-mcp-core.mjs";
+import {dispatchAiUsageMcp} from "../_shared/lizhi-usage-ai-mcp.mjs";
 import {authorizeUsage,UsageAccessError,TRUSTED_ORIGIN,originAllowed} from "../_shared/lizhi-usage-access.mjs";
 import {SIDE_PROJECT,SIDE_AGENT,buildAiSideSnapshot,createBudgetRow}
   from "../_shared/lizhi-ai-side-ledger.mjs";
@@ -107,14 +107,12 @@ function aiMonthBounds(month: string) {
     new Date(Date.UTC(y,m,1)+24*3600000).toISOString()
   ];
 }
-async function aiLedgerSnapshot(month:string, uid:string) {
-  const [start,end]=aiMonthBounds(month);
+async function aiLedgerSnapshot(month:string, uid:string, excludeEventId?:string) {
+  aiMonthBounds(month); // validate; late after/backfill rows may be created in later months.
   const q=new URLSearchParams({select:"agent,project,title,done,created_at",
     owner_id:"eq."+uid,project:"eq."+SIDE_PROJECT,agent:"eq."+SIDE_AGENT,
-    title:"like.AI_USAGE *",created_at:"gte."+start,order:"created_at.desc"});
-  // Separate upper bound to avoid two PostgREST created_at keys.
-  q.set("and","(created_at.gte."+start+",created_at.lt."+end+")");
-  q.delete("created_at");
+    title:"like.AI_USAGE *",order:"created_at.desc,id.desc"});
+
   const rows:Record<string,any>[]=[];
   const pageSize=500;
   let moreRows=false;
@@ -130,8 +128,40 @@ async function aiLedgerSnapshot(month:string, uid:string) {
     owner_id:"eq."+uid,project:"eq."+SIDE_PROJECT,agent:"eq."+SIDE_AGENT,
     title:"eq.AI_USAGE_BUDGET "+month,order:"created_at.desc",limit:"10"});
   const budgetRows=await readRows("aiwb_side_logs?"+bq.toString());
-  const snap=buildAiSideSnapshot({rows:rows.slice(0,5000),budgets:budgetRows,month,moreRows});
+  const filtered=rows.filter(r=>{
+    if(excludeEventId&&r.title.endsWith(" "+excludeEventId))return false;
+    try {const at=JSON.parse(r.done).at;
+      if(typeof at==="string"&&Number.isFinite(Date.parse(at)))return usageMonth(new Date(at))===month;
+    }catch{/* Keep invalid records visible so admission fails closed. */}
+    return true;
+  });
+  const snap=buildAiSideSnapshot({rows:filtered.slice(0,5000),budgets:budgetRows,month,moreRows});
   return snap;
+}
+// The uid is returned ONLY by owner(req); never read it from MCP input.
+function aiMcpStore(uid:string) {
+  return {
+    snapshot:(month:string,excludeEventId?:string)=>aiLedgerSnapshot(month,uid,excludeEventId),
+    event:async(eventId:string)=>{
+      const q=new URLSearchParams({select:"id,agent,project,title,done,created_at",
+        owner_id:"eq."+uid,project:"eq."+SIDE_PROJECT,agent:"eq."+SIDE_AGENT,
+        or:"(title.eq.AI_USAGE before "+eventId+",title.eq.AI_USAGE after "+eventId+")",
+        order:"created_at.asc",limit:"10"});
+      const rows=await readRows("aiwb_side_logs?"+q.toString());
+      if(rows.length===10)throw new HttpError(503,"事件記錄過多，需核對。");
+      return rows;
+    },
+    append:async(record:Record<string,unknown>)=>{
+      const r=await fetch(BASE+"/rest/v1/aiwb_side_logs",{
+        method:"POST",headers:{apikey:SERVICE,Authorization:"Bearer "+SERVICE,
+          "Content-Type":"application/json",Prefer:"return=minimal"},
+        body:JSON.stringify({...record,owner_id:uid}),signal:AbortSignal.timeout(10000),redirect:"error"
+      });
+      // A PK conflict is a retry candidate, NEVER an upsert. The caller must
+      // read the original row and compare its complete payload before success.
+      if(!r.ok&&r.status!==409)throw new HttpError(503,"AI 記帳保存失敗。");
+    }
+  };
 }
 async function addAiBudget(req:Request,uid:string) {
   if(!req.headers.get("content-type")?.toLowerCase().startsWith("application/json"))
@@ -194,14 +224,15 @@ Deno.serve(async (req: Request) => {
         throw new HttpError(415,"MCP 必須使用 application/json。");
       const accept=req.headers.get("accept")||"";
       if(!accept.includes("application/json"))throw new HttpError(406,"MCP client 必須接受 application/json。");
-      await owner(req,true);
+      const uid=await owner(req,true);
       let rpcBody:unknown;
       try{rpcBody=await boundedJson(req);}catch(e){
         if(e instanceof SyntaxError)return json({jsonrpc:"2.0",id:null,
           error:{code:-32700,message:"Parse error"}},400);
         throw e;
       }
-      const result=await dispatchUsageMcp(rpcBody,{snapshot:snapshotForMonth});
+      const result=await dispatchAiUsageMcp(rpcBody,{store:aiMcpStore(uid),
+        siteConnected:req.headers.has("x-lizhi-usage-bridge")});
       return result===null?new Response(null,{status:202,headers:{...allowOrigin,"Cache-Control":"no-store"}}):json(result);
     }
     if(u.pathname.endsWith("/ai-ledger")) {

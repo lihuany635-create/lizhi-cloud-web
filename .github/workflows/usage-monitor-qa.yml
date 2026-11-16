@@ -1,5 +1,13 @@
 name: Usage Monitor Candidate QA
 on:
+  push:
+    branches: [main]
+    paths:
+      - "usage-monitor/**"
+      - "supabase/functions/lizhi-usage-monitor/**"
+      - "supabase/functions/_shared/lizhi-usage-*"
+      - "supabase/functions/_shared/lizhi-ai-*.mjs"
+      - ".github/workflows/usage-monitor-qa.yml"
   pull_request:
     paths:
       - "usage-monitor/**"
@@ -13,7 +21,7 @@ permissions:
 
 jobs:
   unit:
-    name: Read-only MCP and metering unit tests
+    name: AI usage MCP read-write and metering unit tests
     runs-on: ubuntu-latest
     timeout-minutes: 7
     steps:

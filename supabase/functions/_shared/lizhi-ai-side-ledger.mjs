@@ -98,7 +98,7 @@ export function buildAiSideSnapshot({rows,budgets=[],month,moreRows=false}){
   const flat=validPairs.flatMap(x=>[x.before,x.after].filter(Boolean));
   const summary=summarizeAiActionEntries(flat);
   const budget=parseBudget(budgets,month);
-  const tasks=new Map(),days=new Map(),features=new Map();
+  const tasks=new Map(),days=new Map(),features=new Map(),services=new Map();
   const detail=[];
   for (const pair of validPairs) {
     if(!pair.after)continue;
@@ -124,6 +124,8 @@ export function buildAiSideSnapshot({rows,budgets=[],month,moreRows=false}){
     if(v.outcome==="failure")featureRow.failures++;
     if(v.outcome==="unknown")featureRow.unknownResults++;
     features.set(v.feature,featureRow);
+    const svc=services.get(v.service)||{service:v.service,finishedActions:0,assistantObservedToolCalls:0};
+    svc.finishedActions++;svc.assistantObservedToolCalls+=v.toolCalls;services.set(v.service,svc);
     const day=twParts(v.at).day;
     days.set(day,(days.get(day)||0)+v.toolCalls);
     detail.push({eventId:v.eventId,at:v.at,service:v.service,feature:v.feature,
@@ -146,6 +148,7 @@ export function buildAiSideSnapshot({rows,budgets=[],month,moreRows=false}){
     officialEdgeInvocations:null,officialEgressBytes:null,
     summary:{...summary,invalidRows,duplicateRows,conflictRows},
     features:[...features.values()].sort((a,b)=>b.assistantObservedToolCalls-a.assistantObservedToolCalls),
+    services:[...services.values()].sort((a,b)=>b.assistantObservedToolCalls-a.assistantObservedToolCalls),
     tasks:[...tasks.values()].sort((a,b)=>b.assistantObservedToolCalls-a.assistantObservedToolCalls),
     days:[...days.entries()].map(([day,toolCalls])=>({day,toolCalls})).sort((a,b)=>a.day.localeCompare(b.day)),
     events:detail.slice(0,100),

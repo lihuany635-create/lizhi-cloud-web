@@ -8,8 +8,8 @@ const mock=async(_url,init)=>({
  init
 });
 const opts=()=>({verifiedPrincipal:owner,expectedPrincipal:owner,bridgeSecret:key,fetchImpl:mock});
-test("exactly six usage tools are forwarded",()=>{
- assert.equal(USAGE_TOOL_NAMES.size,6);
+test("exactly nine usage tools are forwarded",()=>{
+ assert.equal(USAGE_TOOL_NAMES.size,9);
  assert.equal(USAGE_TOOL_NAMES.has("usage_create_transaction"),false);
 });
 test("verified principal can call a read-only usage tool",async()=>{
