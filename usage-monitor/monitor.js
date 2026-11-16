@@ -119,3 +119,12 @@ byId("month").value=taiwanMonth();
 byId("month").addEventListener("change",load);
 byId("refresh").addEventListener("click",load);
 load();
+
+// The main cloud-library logout broadcasts to embedded workspaces.
+window.addEventListener("message",event=>{
+  if(event.origin!==window.location.origin||event.data?.type!=="lizhi-account-logout")return;
+  readSequence++;
+  clearSnapshot();
+  byId("refresh").disabled=true;
+  setStatus("已登出立之雲端庫，請重新登入後查看監控資料。",true);
+});
