@@ -1,4 +1,4 @@
-import {isValidMonth,taiwanMonth,formatCount,validateAiSideSnapshot,errorForHttp}
+import {isValidMonth,taiwanMonth,formatCount,formatBytes,validateAiSideSnapshot,errorForHttp}
   from "./monitor-core.mjs";
 const byId=id=>document.getElementById(id);
 const status=byId("status");
@@ -10,6 +10,7 @@ const setStatus=(message,error=false)=>{
 function clearSnapshot(){
   byId("invocations").textContent="—";
   byId("egress").textContent="未知";
+  clearEgress();
   byId("blocked").textContent="—";
   byId("coverage").textContent="未確認";
   byId("capStatus").textContent="尚未載入";
@@ -48,7 +49,6 @@ function showRows(id,entries,count,emptyText,columns=[]){
 }
 function renderAiLedger(snap){
   byId("invocations").textContent=formatCount(snap.summary.assistantObservedToolCalls);
-  byId("egress").textContent="未知";
   byId("blocked").textContent=formatCount(snap.summary.unfinishedActions);
   byId("coverage").textContent=formatCount(snap.features.length)+" 項";
   showRows("services",snap.features,5,"目前尚無 AI 已完成的操作記錄。",[
@@ -74,6 +74,87 @@ function renderAiLedger(snap){
   byId("capExplanation").textContent=snap.complete
     ? "這是已核對的 AI 自行登記操作。其他直接使用 Supabase 的流量未納入，官方計費量未知。"
     : "有漏記、衝突、重複資料異常或超出查詢筆數限制；必須補齊紀錄，不得視為安全剩餘額度。";
+}
+function clearEgress() {
+  byId("egressStatus").textContent="尚無用量讀數";
+  byId("egressRemaining").textContent="官方流量未知";
+  byId("egressUpdated").textContent="尚未記錄，不能判定目前是否接近上限。";
+  byId("egressNotice").textContent="需以相同期間的官方 Total 與 Cached Egress 抄錄";
+  byId("saveEgress").disabled=true;
+  showRows("egressHistory",[],4,"尚無歷史讀數");
+}
+async function loadEgress(token,month,seq) {
+  const response=await fetch(endpoint("egress-history",month),{
+    cache:"no-store",headers:{Authorization:"Bearer "+token,
+      apikey:window.LIZHI_SUPABASE_PUBLISHABLE_KEY}
+  });
+  if(!response.ok)throw new Error(errorForHttp(response.status));
+  const data=await response.json();
+  if(data?.month!==month||data?.source!=="manual_supabase_usage_dashboard"||
+    data?.automatic!==false||!Array.isArray(data.readings)||
+    data.readings.length>100||data.limitBytes!==5000000000)
+    throw new Error("非快取流量歷史資料不符合格式。");
+  if(seq!==readSequence)return;
+  byId("saveEgress").disabled=false;
+  const last=data.latest;
+  if(!last)return;
+  if(!Number.isSafeInteger(last.uncachedBytes)||last.uncachedBytes<0)
+    throw new Error("非快取流量數值不正確。");
+  const gb=last.uncachedBytes/1e9;
+  const remain=Math.max(0,5-gb);
+  const ratio=gb/5;
+  const label=ratio>=1?"已超過 Free 額度":
+    ratio>=.95?"緊急：已達 95%":
+    ratio>=.85?"警告：已達 85%":
+    ratio>=.70?"提醒：已達 70%":"目前低於 70% 警戒值";
+  byId("egress").textContent=formatBytes(last.uncachedBytes);
+  byId("egressStatus").textContent=label;
+  byId("egressRemaining").textContent="依最後讀數剩餘 "+remain.toFixed(3)+" GB";
+  byId("egressUpdated").textContent="最後抄錄："+stamp(last.observedAt)+
+    "｜已用 "+(ratio*100).toFixed(1)+"%；非即時官方 API 讀數";
+  const stale=Date.now()-Date.parse(last.observedAt)>24*3600*1000;
+  byId("egressNotice").textContent=stale?
+    "距離最後一次讀數已超過 24 小時，不能據此判斷目前仍安全。":
+    "這是使用者抄錄自官方 Usage 的數值，系統未直接驗證；警戒值 70／85／95%。";
+  showRows("egressHistory",data.readings,4,"尚無歷史讀數",[
+    x=>stamp(x.observedAt),
+    x=>formatBytes(x.totalBytes),
+    x=>formatBytes(x.cachedBytes),
+    x=>formatBytes(x.uncachedBytes)
+  ]);
+}
+async function saveEgressReading() {
+  const month=byId("month").value;
+  const totalValue=byId("egressTotalGb").value.trim();
+  const cachedValue=byId("egressCachedGb").value.trim();
+  if(!isValidMonth(month)||totalValue===""||cachedValue===""||
+    !Number.isFinite(Number(totalValue))||!Number.isFinite(Number(cachedValue))||
+    Number(totalValue)<0||Number(cachedValue)<0||
+    Number(cachedValue)>Number(totalValue)) {
+    byId("egressNotice").textContent="請填寫相同期間的 Total 與 Cached GB，且快取不可大於總量。";
+    return;
+  }
+  const seq=++readSequence;
+  byId("saveEgress").disabled=true;
+  try {
+    const token=await authToken();if(!token)return;
+    const response=await fetch(endpoint("egress-record"),{
+      method:"POST",cache:"no-store",
+      headers:{Authorization:"Bearer "+token,
+        apikey:window.LIZHI_SUPABASE_PUBLISHABLE_KEY,
+        "Content-Type":"application/json"},
+      body:JSON.stringify({month,totalGb:Number(totalValue),cachedGb:Number(cachedValue)})
+    });
+    if(!response.ok)throw new Error(errorForHttp(response.status));
+    const result=await response.json();
+    if(!result?.saved||!result?.verified||result?.reading?.month!==month)
+      throw new Error("伺服器沒有確認保存成功。");
+    await loadEgress(token,month,seq);
+    if(seq===readSequence)byId("egressNotice").textContent=
+      "歷史讀數已保存並重新讀取；來源為人工抄錄官方 Usage，非自動同步。";
+  }catch(e){
+    if(seq===readSequence)byId("egressNotice").textContent=e?.message||"用量保存失敗";
+  }finally{if(seq===readSequence)byId("saveEgress").disabled=false;}
 }
 async function authToken(){
   const auth=window.LizhiAuth;
@@ -110,6 +191,8 @@ async function load(){
     const snap=validateAiSideSnapshot(await response.json(),month);
     if(seq!==readSequence)return;
     renderAiLedger(snap);
+    try { await loadEgress(token,month,seq); }
+    catch(e) { if(seq===readSequence)byId("egressNotice").textContent="非快取流量讀取失敗："+String(e?.message||e); }
     byId("savebudget").disabled=false;
     setStatus(snap.complete
       ?"已核對 AI 自行登記的 "+formatCount(snap.summary.assistantObservedToolCalls)+
@@ -153,6 +236,7 @@ byId("month").value=taiwanMonth();
 byId("month").addEventListener("change",load);
 byId("refresh").addEventListener("click",load);
 byId("savebudget").addEventListener("click",saveBudget);
+byId("saveEgress").addEventListener("click",saveEgressReading);
 load();
 window.addEventListener("message",event=>{
   if(event.origin!==window.location.origin||event.data?.type!=="lizhi-account-logout")return;
