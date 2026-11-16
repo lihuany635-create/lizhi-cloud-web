@@ -1,7 +1,7 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
 import {
-  isValidMonth,taiwanMonth,formatCount,formatBytes,quotaLabel,validateSnapshot,errorForHttp
+  isValidMonth,taiwanMonth,formatCount,formatBytes,quotaLabel,validateSnapshot,validateAiSideSnapshot,errorForHttp
 } from "./monitor-core.mjs";
 const sample=(month="2026-11")=>({
   month,coverage:"instrumented_only",source:"app_telemetry_not_official_billing",
@@ -56,4 +56,40 @@ test("authorization errors are separated",()=>{
   assert.match(errorForHttp(401),/登入/);
   assert.match(errorForHttp(403),/本人/);
   assert.match(errorForHttp(429),/頻繁/);
+});
+
+const aiSample=()=>({
+ month:"2026-11",source:"ai_self_registered_operations",
+ coverage:"assistant_observed_actions_only",complete:true,officialBillingConnected:false,
+ officialCost:null,officialEdgeInvocations:null,officialEgressBytes:null,
+ summary:{assistantObservedToolCalls:1,finishedActions:1,unfinishedActions:0,
+   missingBefore:0,failures:0,unknownResults:0,invalidRows:0,conflictRows:0},
+ features:[{feature:"english_classroom",assistantObservedToolCalls:1,finishedActions:1}],
+ tasks:[{feature:"english_classroom",taskLabel:"英文教室單字卡測試",
+   assistantObservedToolCalls:1,finishedActions:1}],
+ days:[{day:"2026-11-16",toolCalls:1}],
+ events:[{at:"2026-11-16T01:00:00Z",feature:"english_classroom",
+   taskLabel:"英文教室單字卡測試",actionDetail:"核對單字卡",
+   outcome:"success",toolCalls:1}],
+ budget:{monthlyToolCap:null,alert:"UNCONFIGURED"}
+});
+test("accepts AI self-ledger with purpose and unknown billing",()=>{
+ const r=validateAiSideSnapshot(aiSample(),"2026-11");
+ assert.equal(r.events[0].actionDetail,"核對單字卡");
+ assert.equal(r.officialCost,null);
+});
+test("rejects attempt to claim self-reported calls are official fees",()=>{
+ const r=aiSample();r.officialCost=0;
+ assert.throws(()=>validateAiSideSnapshot(r,"2026-11"),/格式|來源/);
+});
+test("rejects missing task label or invalid payload",()=>{
+ const r=aiSample();delete r.events[0].taskLabel;
+ assert.throws(()=>validateAiSideSnapshot(r,"2026-11"),/事件/);
+});
+test("rejects mismatched calendar month",()=>{
+ assert.throws(()=>validateAiSideSnapshot(aiSample(),"2026-12"),/格式|來源/);
+});
+test("rejects invented or out-of-range self-budget",()=>{
+ const r=aiSample();r.budget.monthlyToolCap=50000000;
+ assert.throws(()=>validateAiSideSnapshot(r,"2026-11"),/上限/);
 });
