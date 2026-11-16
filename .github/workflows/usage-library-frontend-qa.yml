@@ -1,0 +1,53 @@
+name: Usage monitor front-end integration QA
+on:
+  push:
+    branches:
+      - feat/usage-monitor-library-frontend-20261116
+    paths:
+      - "app.js"
+      - "auth.js"
+      - "workspace-ui.js"
+      - "study.css"
+      - "index.html"
+      - "sw.js"
+      - "usage-monitor/**"
+      - "tests/usage-library-route.test.mjs"
+      - ".github/workflows/usage-library-frontend-qa.yml"
+  pull_request:
+    paths:
+      - "app.js"
+      - "auth.js"
+      - "workspace-ui.js"
+      - "study.css"
+      - "index.html"
+      - "sw.js"
+      - "usage-monitor/**"
+      - "tests/usage-library-route.test.mjs"
+permissions:
+  contents: read
+concurrency:
+  group: usage-library-frontend-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    name: Static route and safe frontend tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout existing cloud-library branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Parse client JavaScript and ESM
+        run: |
+          node --check app.js
+          node --check auth.js
+          node --check workspace-ui.js
+          node --check usage-monitor/monitor.js
+          node --check usage-monitor/monitor-core.mjs
+      - name: Run monitor schema validation and integrated route regression
+        run: node --test usage-monitor/monitor-core.test.mjs tests/usage-library-route.test.mjs
