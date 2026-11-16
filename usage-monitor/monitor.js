@@ -135,6 +135,14 @@ async function saveEgressReading() {
     byId("egressNotice").textContent="請填寫相同期間的 Total 與 Cached GB，且快取不可大於總量。";
     return;
   }
+  const periodStart=byId("egressPeriodStart").value,periodEnd=byId("egressPeriodEnd").value;
+  const observedAt=byId("egressObservedAt").value.trim();
+  const original=byId("egressOfficialUncached").value.trim();
+  if(!periodStart||!periodEnd||periodStart>=periodEnd||!Number.isFinite(Date.parse(observedAt))||!byId("egressSamePeriod").checked){
+    byId("egressNotice").textContent="請核對並填寫官方帳期、觀測時間及同期間確認。";return;
+  }
+  const payload={month,total:Number(totalValue),cached:Number(cachedValue),unit:'GB',periodStart,periodEnd,observedAt:new Date(observedAt).toISOString(),samePeriod:true,
+    ...(original===''?{}:{officialUncached:Number(original)})};
   const seq=++readSequence;
   byId("saveEgress").disabled=true;
   try {
@@ -144,7 +152,7 @@ async function saveEgressReading() {
       headers:{Authorization:"Bearer "+token,
         apikey:window.LIZHI_SUPABASE_PUBLISHABLE_KEY,
         "Content-Type":"application/json"},
-      body:JSON.stringify({month,totalGb:Number(totalValue),cachedGb:Number(cachedValue)})
+      body:JSON.stringify(payload)
     });
     if(!response.ok)throw new Error(errorForHttp(response.status));
     const result=await response.json();
@@ -234,6 +242,7 @@ async function saveBudget(){
   finally{if(seq===readSequence)byId("savebudget").disabled=false;}
 }
 byId("month").value=taiwanMonth();
+byId("egressObservedAt").value=new Date().toISOString();
 byId("month").addEventListener("change",load);
 byId("refresh").addEventListener("click",load);
 byId("savebudget").addEventListener("click",saveBudget);

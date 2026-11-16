@@ -24,9 +24,14 @@
           <input id="egressTotalGb" type="number" min="0" step="0.000001" placeholder="例如 2.5" autocomplete="off"></label>
         <label for="egressCachedGb">官方「Cached Egress」GB
           <input id="egressCachedGb" type="number" min="0" step="0.000001" placeholder="例如 0.5" autocomplete="off"></label>
+        <label for="egressPeriodStart">官方帳期開始<input id="egressPeriodStart" type="date"></label>
+        <label for="egressPeriodEnd">官方帳期結束邊界<input id="egressPeriodEnd" type="date"></label>
+        <label for="egressObservedAt">觀測時間（含時區）<input id="egressObservedAt" type="text" placeholder="ISO 8601 時間"></label>
+        <label for="egressOfficialUncached">官方已扣快取 Egress GB（重建 Total 時填寫）<input id="egressOfficialUncached" type="number" min="0" step="0.000001"></label>
+        <label><input id="egressSamePeriod" type="checkbox">確認數值為同組織、同帳期</label>
         <button id="saveEgress" type="button" disabled>記錄本次用量</button>
       </div>
-      <p>非快取流量 = Total Egress − Cached Egress。請先在<a href="https://supabase.com/dashboard/org/_/usage" target="_blank" rel="noopener noreferrer"> Supabase 組織 Usage 頁</a>選好對應期間，再填入同期間兩個數值。手動抄錄不等於官方 API 已核驗。</p>
+      <p>非快取流量 = Total Egress − Cached Egress。請先在<a href="https://supabase.com/dashboard/org/_/usage" target="_blank" rel="noopener noreferrer"> Supabase 組織 Usage 頁</a>選好對應期間，再填入同期間兩個數值。若頁面 Egress 已是未快取量，不能再次扣 Cached；請以 Egress + Cached 重建 Total，並填寫原始 Egress。月份為歸檔月份，帳期依官方起訖填寫。手動抄錄不等於官方 API 已核驗。</p>
       <div id="egressNotice" class="notice" role="status" aria-live="polite">尚無資料</div>
       <div class="table-scroll"><table><thead><tr><th>記錄時間</th><th>總流量</th><th>快取流量</th><th>非快取流量</th></tr></thead>
         <tbody id="egressHistory"><tr><td colspan="4">尚無歷史讀數</td></tr></tbody></table></div>
