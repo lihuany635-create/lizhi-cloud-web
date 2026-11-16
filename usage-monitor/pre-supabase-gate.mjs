@@ -46,6 +46,7 @@ export async function authorizeBeforeSupabase({
     !(new Date(official.asOf)<new Date(official.cycleEnd))||
     !(new Date(official.cycleStart)<=now&&now<new Date(official.cycleEnd)))
       throw new GatewayDenied("official_usage_invalid");
+  if(Date.parse(official.asOf)>now.getTime())throw new GatewayDenied("official_usage_invalid");
   const ageMinutes=(now.getTime()-Date.parse(official.asOf))/60000;
   const proposed=budgetDecision({
     limit:official.limit,officialUsed:official.used,officialAgeMinutes:ageMinutes,
