@@ -1,7 +1,7 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
 import {createAiActionEntry} from "./ai-operation-ledger.mjs";
-import {buildAiSideSnapshot,createBudgetRow,aiPreflight,SIDE_PROJECT}
+import {buildAiSideSnapshot,createBudgetRow,aiPreflight,estimateAiTaskCalls,SIDE_PROJECT}
   from "../supabase/functions/_shared/lizhi-ai-side-ledger.mjs";
 const id="45a2fa13-8eed-4bb1-9be4-91fe576cfac7";
 const at="2026-11-16T01:11:23.620Z";
@@ -111,4 +111,23 @@ test("month boundary follows Taiwan timezone",()=>{
   const r=read([event("before",{at:shiftedAt}),event("after",{at:shiftedAt})]);
   assert.equal(r.summary.assistantObservedToolCalls,1);
   assert.equal(r.days[0].day,"2026-11-01");
+});
+
+test("estimate next call from a matching real task without inventing billing",()=>{
+ const r=read([event("before"),event("after")]);
+ const v=estimateAiTaskCalls(r,{feature:"usage_monitor",taskLabel:"流量監控實際記帳"});
+ assert.equal(v.state,"estimated");
+ assert.equal(v.plannedCalls,1);
+ assert.equal(v.sampleSize,1);
+ assert.match(v.note,/工具/);
+});
+test("do not guess from a task with no history",()=>{
+ const r=read([event("before"),event("after")]);
+ const v=estimateAiTaskCalls(r,{feature:"cad"});
+ assert.equal(v.state,"unknown");
+ assert.equal(v.plannedCalls,null);
+});
+test("do not estimate from incomplete records",()=>{
+ const r=read([event("after")]);
+ assert.equal(estimateAiTaskCalls(r,{feature:"usage_monitor"}).state,"unknown");
 });
