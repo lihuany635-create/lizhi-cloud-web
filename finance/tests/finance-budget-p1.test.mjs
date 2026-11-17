@@ -166,3 +166,25 @@ test("BP1-31 new local budget creates one cloud row and reads back",async()=>{
   assert.equal(res.ok,true);assert.equal(res.uploaded,1);
   assert.equal(synced[0][0],"x");
 });
+
+test("BP1-32 an actual category ID matching the legacy total sentinel cannot collide",()=>{
+  const a=calculate([tx("x","expense",50,"__TOTAL__")],
+    [budget(1000),budget(100,"__TOTAL__")]);
+  assert.equal(a.budget,1000);
+  assert.equal(a.by_category.find(x=>x.category_id==="__TOTAL__").budget,100);
+  assert.notEqual(Local.scopeKey(budget(1000)),Local.scopeKey(budget(100,"__TOTAL__")));
+});
+test("BP1-33 compact spending RPC retains owner scoping and no full ledger response",()=>{
+  const sql=read("finance/budget/sql/p1-spending-summary-candidate.sql");
+  assert.match(sql,/security invoker/i);
+  assert.match(sql,/r.user_id=owner_id/);
+  assert.match(sql,/finance_budget_month_spending/);
+  assert.match(sql,/grant execute.*public\.lizhi_finance_budget_month_spending/s);
+});
+test("BP1-34 deleted source budget is excluded when copying months",()=>{
+  let number=0;
+  const result=Domain.copyMonthBudgets({
+    budgets:[budget(300),{...budget(400,"food"),deletedAt:"2026-11-17"}],
+    fromMonth:"2026-11",toMonth:"2026-12",idFactory:()=>String(++number)});
+  assert.equal(result.length,1);
+});
