@@ -1,4 +1,6 @@
 import {FINANCE_SITE_TOOLS,validateFinanceSiteTool,FINANCE_UI_SITE_TOOLS,validateFinanceUiTool,FINANCE_CLOUD_TOOLS,validateFinanceCloudTool} from "./site-contract.mjs";
+import {FINANCE_BUDGET_TOOLS,validateFinanceBudgetTool} from "./finance-budget-contract.mjs";
+import {executeFinanceBudget} from "./finance-budget-edge.mjs";
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const HEX=/^[0-9a-f]{64,128}$/i;
@@ -149,10 +151,29 @@ export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBear
   if(frame.method==="initialize")return rpc(requestId,{protocolVersion:"2025-06-18",
     capabilities:{tools:{listChanged:false}},serverInfo:{name:"lizhi-finance-private-site",version:"0.1.0"}});
   if(frame.method==="ping")return rpc(requestId,{});
-  if(frame.method==="tools/list")return rpc(requestId,{tools:[...FINANCE_SITE_TOOLS,...FINANCE_CLOUD_TOOLS]});
+  if(frame.method==="tools/list")return rpc(requestId,{tools:[...FINANCE_SITE_TOOLS,...FINANCE_CLOUD_TOOLS,...FINANCE_BUDGET_TOOLS]});
   if(frame.method!=="tools/call")return err(requestId,-32601,"Method unavailable");
   const p=frame.params;
   if(!obj(p)||typeof p.name!=="string")return err(requestId,-32602,"Invalid tool call");
+  if(FINANCE_BUDGET_TOOLS.some(t=>t.name===p.name)){
+    const validated=validateFinanceBudgetTool(p.name,p.arguments??{});
+    if(!validated.ok)return fail(requestId,validated.code);
+    try{
+      const result=await executeFinanceBudget({db,owner:ownerUid},p.name,validated.args);
+      return success(requestId,result);
+    }catch(error){
+      const code=String(error?.code||"");
+      const allowed=[
+        "BUDGET_VERSION_CONFLICT","BUDGET_DUPLICATE_REQUEST",
+        "BUDGET_VALIDATION_ERROR","BUDGET_CATEGORY_NOT_FOUND",
+        "BUDGET_SCOPE_IMMUTABLE","BUDGET_OWNER_REQUIRED",
+        "BUDGET_INVALID_REMOTE_OWNER","BUDGET_INVALID_REMOTE_DATA",
+        "BUDGET_RECEIPT_INVALID","BUDGET_RESULT_LIMIT",
+        "BUDGET_DEPENDENCY_UNAVAILABLE"
+      ];
+      return fail(requestId,allowed.includes(code)?code:"BUDGET_DEPENDENCY_UNAVAILABLE");
+    }
+  }
   if(FINANCE_CLOUD_TOOLS.some(t=>t.name===p.name)) {
     const v=validateFinanceCloudTool(p.name,p.arguments??{});
     if(!v.ok)return fail(requestId,v.code);
