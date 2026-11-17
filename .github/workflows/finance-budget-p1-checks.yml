@@ -1,0 +1,40 @@
+name: Finance Budget P1 Candidate Checks
+on:
+  push:
+    branches:
+      - 'feat/finance-budget-p1-*'
+    paths:
+      - 'finance/budget/**'
+      - 'finance/storage/finance-db.js'
+      - 'finance/domain/backup.js'
+      - 'finance/tests/**'
+      - '.github/workflows/finance-budget-p1-checks.yml'
+  pull_request:
+    paths:
+      - 'finance/budget/**'
+      - 'finance/storage/finance-db.js'
+      - 'finance/domain/backup.js'
+      - 'finance/tests/**'
+      - '.github/workflows/finance-budget-p1-checks.yml'
+permissions:
+  contents: read
+jobs:
+  isolated-finance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax-check budget candidate modules
+        run: |
+          node --check finance/budget/budget-domain.js
+          node --check finance/budget/budget-local-store.js
+          node --check finance/budget/budget-cloud-store.js
+          node --check finance/budget/budget-sync.js
+          node --check finance/storage/finance-db.js
+          node --check finance/domain/backup.js
+      - name: Run new P1 budget tests and existing Finance Node regression
+        run: node --test finance/tests/*.test.mjs finance/tests/*.test.js
