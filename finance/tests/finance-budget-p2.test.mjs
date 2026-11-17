@@ -190,7 +190,8 @@ test("BU2-36 budget writes only use local store",()=>{
   assert.match(home,/FinanceBudgetLocalStore\.save/);
   assert.match(home,/FinanceBudgetLocalStore\.remove/);
   assert.doesNotMatch(home,/FinanceBudgetCloudStore\./);
-  assert.match(home,/const budgetCloudEnabled=false/);\n  assert.match(home,/FinanceBudgetSync\.create/);
+  assert.match(home,/const budgetCloudEnabled=false/);
+  assert.match(home,/FinanceBudgetSync\.create/);
 });
 test("BU2-37 separate status never asserts backend is deployed",()=>{
   assert.match(view(),/雲端預算服務尚待/);
