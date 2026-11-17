@@ -71,6 +71,12 @@
       count++;
     }
     const total=selected.get("@total")??null;
+    // Category budgets are independent allocations. Display an advisory only;
+    // a larger combined allocation must never block the user from saving.
+    const categoryAllocation=[...selected.entries()].filter(([key])=>key.startsWith("@cat:"))
+      .reduce((sum,[,row])=>sum+BigInt(row.amount),0n);
+    const categoryOverage=total&&categoryAllocation>BigInt(total.amount)
+      ?(categoryAllocation-BigInt(total.amount)).toString():null;
     const categoryIds=new Set([...used.keys(),...[...selected.keys()].filter(x=>x.startsWith("@cat:")).map(x=>x.slice(5))]);
     const byCategory=[...categoryIds].map(categoryId=>{
       const budget=selected.get("@cat:"+categoryId)??null,amountUsed=used.get(categoryId)||0;
@@ -89,6 +95,9 @@
       status:state(total,spent),
       percentage:total?(total.amount===0?(spent>0?null:0):spent/total.amount*100):null,
       by_category:byCategory,
+      category_budget_total:categoryAllocation.toString(),
+      category_budget_excess:categoryOverage,
+      category_budget_warning:categoryOverage!==null,
       counted_transactions:count,
       excluded_foreign_currency:unconverted,
       notice:unconverted?"存在未換算的外幣消費，未納入此幣別預算。":null
