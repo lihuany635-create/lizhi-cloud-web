@@ -61,9 +61,11 @@
   function render(input={}){
     const {month,rows=[],transactions=[],categories=[],accounts=[],creditCards=[],
       syncState="local",syncMessage="",cloudEnabled=false,ledgerSyncState="idle",editScope="total",deleteId=null,
+      defaults=[],defaultsState="idle",defaultsMessage="",
       busy=false,error=""}=input;
-    const summary=Domain.summary({month,budgets:rows,transactions,categories,accounts,creditCards});
-    const current=rows.filter(b=>!b.deletedAt&&b.month===month&&b.currency==="TWD");
+    const visibleRows=Domain.previewFutureDefaults({month,budgets:rows,defaults});
+    const summary=Domain.summary({month,budgets:visibleRows,transactions,categories,accounts,creditCards});
+    const current=visibleRows.filter(b=>!b.deletedAt&&b.month===month&&b.currency==="TWD");
     const byScope=new Map(current.map(b=>[scopeOf(b.categoryId),b]));
     const expenseCats=categories.filter(c=>!c.archived&&!c.deletedAt&&c.type==="expense")
       .slice().sort((a,b)=>String(a.name).localeCompare(String(b.name),"zh-TW"));
@@ -84,6 +86,9 @@
     const draftScope=editScope==="total"||expenseCats.some(c=>scopeOf(c.id)===editScope)
       ?editScope:"total";
     const edited=byScope.get(draftScope)||null;
+    const defaultCategory=draftScope==="total"?null:draftScope.slice(4);
+    const selectedDefault=defaults.find(x=>(x.category_id??null)===defaultCategory&&!x.disabled_at);
+    const hasVirtual=current.some(x=>x.virtual);
     const selectedMonth=escapeHtml(month);
     const pending=rows.filter(x=>x.dirty).length;
     const syncText=!cloudEnabled?"預算設定保留本機，雲端預算服務尚待 P1 驗收與正式啟用。"
@@ -111,6 +116,7 @@
       +'<div><small>預算上限</small><strong>'+money(summary.budget)+'</strong></div>'
       +'<div><small>已使用</small><strong>'+money(summary.used)+'</strong></div>'
       +'<div><small>剩餘額度</small><strong>'+money(summary.remaining)+'</strong></div></div>'
+      +(hasVirtual?'<p class="finance-budget-default-preview" role="status">本月未設定的額度顯示為「依未來月份預設沿用」候選；未自動新增或覆寫單月額度。</p>':"")
       +progress(summary.used,summary.budget,"每月總預算使用進度")
       +(summary.category_budget_warning?
         '<p class="finance-budget-allocation-warning" role="status">分類預算合計 '+money(BigInt(summary.category_budget_total))+
@@ -126,7 +132,7 @@
         +'<span>已使用 '+money(row.used)+'</span><span>剩餘 '+money(row.remaining)+'</span></div>'
         +progress(row.used,row.budget,row.category+"預算使用進度")
         +'<div class="finance-budget-category-actions">'+(scope?'<button type="button" class="finance-button" data-finance-action="budget-edit" data-scope="'+escapeHtml(scope)+'">設定</button>':'<small>待分類交易：請先補充分類</small>')
-        +(saved?'<button type="button" class="finance-button" data-finance-action="budget-remove-request" data-id="'+escapeHtml(saved.id)+'">移除額度</button>':"")
+        +(saved&&!saved.virtual?'<button type="button" class="finance-button" data-finance-action="budget-remove-request" data-id="'+escapeHtml(saved.id)+'">移除額度</button>':"")
         +'</div></article>';
     }).join("");
     const confirm=deleteId?'<div class="finance-budget-confirm" role="group" aria-label="確認移除預算">'
@@ -144,6 +150,7 @@
       +(cloudEnabled?'<button type="button" class="finance-button" data-finance-action="budget-sync"'
         +(busy?' disabled':'')+'>立即同步預算</button>':"")+'</div>'
       +(error?'<div class="finance-alert error" role="alert">'+escapeHtml(error)+'</div>':"")
+      +(defaultsState==="error"?'<p class="finance-alert error" role="alert">未來月份預設讀取失敗，本頁未套用任何預設；請勿誤認已同步。</p>':"")
       +totals
       +'<section class="finance-section finance-budget-groups"><div class="finance-section-head"><h2>分類預算</h2><small>'+categoryRows.length+' 個分類</small></div>'
       +(cards?'<div class="finance-budget-categories">'+cards+'</div>':'<p class="finance-budget-empty">尚無支出分類，請先至「分類」建立支出分類。</p>')+'</section>'
@@ -151,7 +158,15 @@
       +'<button class="finance-button" type="button" data-finance-action="budget-copy-previous"'+(busy?" disabled":"")+'>複製上月（只補未設定項目）</button></div>'
       +'<form data-finance-form="budget"><label>預算項目<select name="scope" aria-label="預算項目">'+selectable+'</select></label>'
       +'<label>額度（TWD 元）<input name="amount" inputmode="numeric" autocomplete="off" type="text" pattern="[0-9]*" value="'+(edited?edited.amount:"")+'" placeholder="例如：10000" aria-label="預算額度" required></label>'
-      +'<button class="finance-button primary" type="submit"'+(busy?" disabled":"")+'>儲存預算</button></form>'
+      +'<button class="finance-button primary" type="submit"'+(busy?" disabled":"")+'>儲存預算</button>'
+      +'<div class="finance-budget-default-actions"><button type="button" class="finance-button" data-finance-action="budget-default-save"'
+      +(busy||defaultsState!=="synced"?" disabled":"")+'>將此額度設為未來月份預設</button>'
+      +(selectedDefault?'<button type="button" class="finance-button" data-finance-action="budget-default-disable"'
+      +(busy||defaultsState!=="synced"?" disabled":"")+'>停用此項預設</button>':"")
+      +'</div><p class="finance-budget-default-notice">'+(selectedDefault?
+        '已啟用預設 '+money(selectedDefault.amount)+'（自 '+escapeHtml(selectedDefault.start_month)+' 起），僅用於尚未明確設定的月份。':
+        '尚未啟用此項未來月份預設；不會自動覆寫已設定月份。')
+      +(defaultsMessage?' '+escapeHtml(defaultsMessage):"")+'</p></form>'
       +'<p>支出包含一般消費及信用卡刷卡，不包含卡費繳款與帳戶互轉本金。'
       +(cloudEnabled?'預算先儲存在本機，通過本人驗證後才同步雲端。':'所有修改目前只會儲存在本機。')+'</p>'
       +confirm+'</section>'
