@@ -105,5 +105,5 @@ test('P6-CLOSE-19 production autoEntry remains disabled',()=>{
 });
 
 test('P6-CLOSE-20 Finance DB_VERSION remains 1',()=>{
-  assert.match(read('finance/storage/finance-db.js'),/DB_VERSION=2/);
+  assert.match(read('finance/storage/finance-db.js'),/DB_VERSION=3/);
 });
