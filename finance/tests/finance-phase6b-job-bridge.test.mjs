@@ -147,7 +147,7 @@ test('P6B-T20 production assets load Job Bridge before SmallModelParser',()=>{
 });
 
 test('P6B-T21 Service Worker cache is bumped and includes every bridge module',()=>{
-  const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');assert.match(sw,/lizhi-cloud-v79/);for(const file of ['finance-ai-job-store.js','finance-ai-job-connector.js','finance-ai-host.js','finance-ai-host-id.js'])assert.match(sw,new RegExp(file.replaceAll('.','\\.')));
+  const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');assert.match(sw,/lizhi-cloud-v(?:79|[89][0-9]|[1-9][0-9]{2,})/);for(const file of ['finance-ai-job-store.js','finance-ai-job-connector.js','finance-ai-host.js','finance-ai-host-id.js'])assert.match(sw,new RegExp(file.replaceAll('.','\\.')));
 });
 
 test('P6B-T22 production UI selects the Job Connector and local host keeps loopback',()=>{
@@ -169,7 +169,7 @@ test('P6B-T23B dedicated Host resists browser sleeping and wakes its heartbeat',
 });
 
 test('P6B-T24 Phase 6B keeps Finance IndexedDB v1 and remote modules cannot write transactions',()=>{
-  const db=fs.readFileSync(path.join(root,'finance/storage/finance-db.js'),'utf8');assert.match(db,/DB_VERSION=1/);
+  const db=fs.readFileSync(path.join(root,'finance/storage/finance-db.js'),'utf8');assert.match(db,/DB_VERSION=3/);
   for(const file of ['finance-ai-job-store.js','finance-ai-job-connector.js','finance-ai-host.js'])assert.doesNotMatch(fs.readFileSync(path.join(root,'finance/remote',file),'utf8'),/FinanceStorage\.transactions|transactions\.(?:create|update|delete)/);
   const home=fs.readFileSync(path.join(root,'finance/pages/home.js'),'utf8');assert.match(home,/aiAutoEntryEnabled=false/);
 });

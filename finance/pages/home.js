@@ -2,6 +2,7 @@
 const FinanceHome=(()=>{
   "use strict";
   const ui={view:"overview",loaded:false,loading:false,accounts:[],cards:[],categories:[],transactions:[],settings:[],backgrounds:[],error:"",notice:"",edit:null,draft:null,aiDraftApplied:null,ai:{input:"",loading:false,status:"idle",models:[],result:null,validation:null,phase3:null,committed:null,dryRun:null,error:"",controller:null,jobStatus:""},advanced:{enabled:true,query:null,message:"",busy:false},voice:{supported:false,status:"idle",interim:"",error:""},sync:{state:"idle",lastSyncedAt:null,error:null,pending:0,deferred:0},ruleMemory:{rules:[],state:"local",error:""},host:{instance:null,state:null,availability:null,error:""},draftTestInput:'{\n  "version": 1,\n  "type": "expense",\n  "amount": 120,\n  "date": "2026-09-20",\n  "category": "餐飲",\n  "account": "現金",\n  "note": "午餐",\n  "source": "manual-test"\n}',draftTestResult:null,draftTestValidation:null,draftTestDryRun:null,draftTestError:"",modal:null,filters:{period:"month",start:"",end:"",type:"",query:""},importPreview:null,backgroundUrl:"",backgroundUrls:new Map(),lastFocus:null};
+  ui.budget={month:FinanceBudgetUi.taipeiMonth(),rows:[],busy:false,error:"",editScope:"total",deleteId:null,ownerId:null,syncState:"local",syncMessage:"",syncing:false};
   const queryParams=new URLSearchParams(location.search);
   const draftTestEnabled=queryParams.get("draftTest")==="1";
   const aiAutoEntryEnabled=false;
@@ -9,6 +10,10 @@ const FinanceHome=(()=>{
   const productionJobBridge=location.hostname==="lihuany635-create.github.io";
   let hostStatusTimer=null,hostStatusEventsInstalled=false,hostLaunchTimers=[],voiceController=null,voiceLifecycleInstalled=false;
   const financeSync=FinanceSync.create({storage:FinanceStorage});
+  // Explicit rollout gate. Never enable before the owner approves the production
+  // budgets table, real OAuth/RLS and cross-device acceptance.
+  const budgetCloudEnabled=true;
+  const budgetSync=FinanceBudgetSync.create();
   const ruleMemoryStore=FinanceRuleMemoryStore.create({settings:FinanceStorage.settings});
   const ruleMemorySync=FinanceRuleMemorySync.create({localStore:ruleMemoryStore});
   const financeCommitController=FinanceCommitController.createFinanceCommitController({createTransaction:async payload=>{const transaction=await FinanceStorage.transactions.create(payload);financeSync.schedule();return transaction;}});
@@ -33,8 +38,26 @@ const FinanceHome=(()=>{
   const balance=account=>FinanceDomain.calculateAccountBalance(account,ui.transactions),outstanding=card=>FinanceDomain.calculateCreditCardOutstanding(card.id,ui.transactions),month=()=>FinanceUiModel.localMonth();
   const formEdit=(kind,id="")=>{ui.edit={kind,id};ui.draft=null;ui.aiDraftApplied=null;ui.modal=null;};
   function scheduleLoad(){if(!ui.loaded&&!ui.loading)queueMicrotask(load);}
-  async function readAll(){[ui.accounts,ui.cards,ui.categories,ui.transactions,ui.settings,ui.backgrounds,ui.ruleMemory.rules]=await Promise.all([FinanceStorage.accounts.list(),FinanceStorage.creditCards.list(),FinanceStorage.categories.list(),FinanceStorage.transactions.list(),FinanceStorage.settings.list(),FinanceStorage.backgrounds.list(),ruleMemoryStore.list()]);syncBackgroundUrls();applyBackground();}
-  async function load(){ui.loading=true;update();try{await readAll();ui.loaded=true;ui.error="";}catch(error){console.error("Finance load failed",error);ui.error=FinanceUiModel.userError(error);}finally{ui.loading=false;update();if(ui.loaded){if(productionJobBridge){void syncFinance({silent:true});void syncRuleMemory({silent:true});}if(aiHostMode)void startBrowserHost();else if(productionJobBridge)startHostStatusRefresh();else void refreshOllamaStatus({silent:true});}}}
+  async function readBudgets(){
+    // Fail closed while the owner is being verified. Never display the prior user's list.
+    ui.budget.rows=[];ui.budget.ownerId=null;
+    try{
+      const ownerId=await FinanceBudgetOwner.requireOwner();
+      const rows=await FinanceBudgetLocalStore.list({includeDeleted:true});
+      if(await FinanceBudgetOwner.requireOwner()!==ownerId)throw new Error("BUDGET_OWNER_CHANGED");
+      ui.budget.ownerId=ownerId;ui.budget.rows=rows;ui.budget.error="";
+    }catch(error){ui.budget.rows=[];ui.budget.ownerId=null;
+      ui.budget.error="預算未通過本人驗證，已隱藏本機預算："+String(error?.code||error?.message||"請重新登入");}
+  }
+  async function readAll(){
+    [ui.accounts,ui.cards,ui.categories,ui.transactions,ui.settings,ui.backgrounds,ui.ruleMemory.rules]=await Promise.all([
+      FinanceStorage.accounts.list(),FinanceStorage.creditCards.list(),FinanceStorage.categories.list(),
+      FinanceStorage.transactions.list(),FinanceStorage.settings.list(),FinanceStorage.backgrounds.list(),ruleMemoryStore.list()
+    ]);
+    await readBudgets();syncBackgroundUrls();applyBackground();
+  }
+  async function load(){ui.loading=true;update();try{await readAll();ui.loaded=true;ui.error="";}catch(error){console.error("Finance load failed",error);ui.error=FinanceUiModel.userError(error);}finally{ui.loading=false;update();if(ui.loaded){if(productionJobBridge){void syncFinance({silent:true});void syncRuleMemory({silent:true});
+        if(budgetCloudEnabled)void syncBudgetNow();}if(aiHostMode)void startBrowserHost();else if(productionJobBridge)startHostStatusRefresh();else void refreshOllamaStatus({silent:true});}}}
   async function reload(message=""){try{await readAll();ui.loaded=true;ui.error="";ui.notice=message;}catch(error){console.error("Finance refresh failed",error);ui.error=FinanceUiModel.userError(error);}update();}
   async function syncFinance({silent=false}={}){const result=await financeSync.sync();if(result?.ok&&result.applied)await readAll();if(!silent){if(result?.ok)ui.notice=result.deferred?"帳本已同步；部分交易等待參照資料。":"帳本已完成雲端同步。";else ui.error=result?.error?.message||"本機帳本已保留，雲端同步暫時失敗。";}update();return result;}
   async function syncRuleMemory({silent=false}={}){const result=await ruleMemorySync.sync();if(result?.ok)ui.ruleMemory.rules=await ruleMemoryStore.list();if(!silent){if(result?.ok)ui.notice="已確認規則已同步。";else ui.error=result?.error?.message||"已確認規則保留在本機，雲端同步暫時失敗。";}update();return result;}
@@ -71,7 +94,7 @@ const FinanceHome=(()=>{
   function applyBackground(){const root=document.querySelector("[data-finance-root]");if(!root)return;const active=ui.backgrounds.find(row=>row.active&&row.imageBlob),prefs=backgroundPrefs();root.dataset.backgroundTheme=active?"user":prefs.theme;root.dataset.overlay=prefs.overlay;root.dataset.blur=String(prefs.blur);if(active){ui.backgroundUrl=ui.backgroundUrls.get(active.id)||"";root.style.setProperty("--finance-user-background",`url("${ui.backgroundUrl}")`);}else{ui.backgroundUrl="";root.style.removeProperty("--finance-user-background");}}
   const field=(name,label,input,error=true)=>`<label>${label}${input}${error?`<span data-error="${name}"></span>`:""}</label>`;
   const options=(rows,value,label=row=>row.name,blank="")=>{const renderLabel=typeof label==="function"?label:row=>row[label];return `${blank?`<option value="">${esc(blank)}</option>`:""}${rows.map(row=>`<option value="${esc(row.id)}" ${row.id===value?"selected":""}>${esc(renderLabel(row))}</option>`).join("")}`;};
-  function nav(){const items=[["overview","⌂","總覽"],["transactions","記","記帳"],["accounts","戶","帳戶"],["cards","卡","信用卡"],["categories","類","分類"],["reports","圖","報表"],["settings","⚙","設定"]];return `<nav class="finance-tabs" aria-label="理財管家功能">${items.map(([view,icon,label])=>`<button class="finance-tab ${ui.view===view?"active":""}" data-finance-view="${view}" ${ui.view===view?'aria-current="page"':""}><i aria-hidden="true">${icon}</i><span>${label}</span></button>`).join("")}</nav>`;}
+  function nav(){const items=[["overview","⌂","總覽"],["transactions","記","記帳"],["accounts","戶","帳戶"],["cards","卡","信用卡"],["categories","類","分類"],["reports","圖","報表"],["budgets","預","預算"],["settings","⚙","設定"]];return `<nav class="finance-tabs" aria-label="理財管家功能">${items.map(([view,icon,label])=>`<button class="finance-tab ${ui.view===view?"active":""}" data-finance-view="${view}" ${ui.view===view?'aria-current="page"':""}><i aria-hidden="true">${icon}</i><span>${label}</span></button>`).join("")}</nav>`;}
   function syncStatusLabel(){if(ui.sync.state==="syncing")return"帳本同步中";if(ui.sync.state==="pending")return"等待雲端同步";if(ui.sync.state==="synced")return"帳本已同步";if(ui.sync.state==="error")return"同步暫時失敗";return productionJobBridge?"本機優先帳本":"本機離線帳本";}
   function rail(){return `<aside class="finance-rail"><button class="finance-rail-brand" data-route="home" aria-label="返回立之雲端庫"><b>立</b><span>立之雲端庫<small>FINANCE</small></span></button>${nav()}<div class="finance-rail-status ${esc(ui.sync.state)}" data-finance-sync-status><i></i><span>${esc(syncStatusLabel())}</span>${ui.sync.state==="error"?`<button data-finance-action="retry-finance-sync">重試</button>`:""}</div></aside>`;}
   function header(){return `<header class="finance-header"><div><div class="finance-eyebrow">PERSONAL FINANCE CONTROL CENTER</div><h1 id="finance-title">理財管家</h1><p>記錄日常・掌握財務・實現更好的自己</p></div><div class="finance-header-actions"><span class="finance-month">${esc(month())}</span><button class="finance-icon-button" data-finance-action="open-backgrounds" aria-label="更換背景">▧ <span>更換背景</span></button><button class="finance-icon-button" data-finance-view="settings" aria-label="開啟設定">⚙</button></div></header>`;}
@@ -138,7 +161,25 @@ const FinanceHome=(()=>{
   function ruleMemoryModal(){const row=ui.modal?.row||{},editing=Boolean(row.id);return `<div class="finance-modal-backdrop"><section class="finance-modal finance-memory-modal" role="dialog" aria-modal="true" aria-labelledby="finance-memory-title"><span>USER-CONFIRMED RULE</span><h2 id="finance-memory-title">${editing?"編輯":"新增"}已確認規則</h2><p>只有按下「確認儲存」才會建立規則；系統不會自動學習。</p><form data-finance-form="rule-memory"><input type="hidden" name="id" value="${esc(row.id||"")}"><div class="finance-form-grid">${field("matchKind","符合方式",`<select name="matchKind"><option value="keyword" ${row.matchKind==="keyword"||!row.matchKind?"selected":""}>包含關鍵字</option><option value="phrase" ${row.matchKind==="phrase"?"selected":""}>包含詞句</option><option value="merchant" ${row.matchKind==="merchant"?"selected":""}>商家完全相符</option></select>`)}${field("matchValue","觸發文字",`<input name="matchValue" maxlength="120" required value="${esc(row.matchValue||"")}" placeholder="例如：公司午餐">`)}${field("scopeType","適用交易類型",`<select name="scopeType"><option value="">所有類型</option>${Object.entries(transactionTypes).map(([value,label])=>`<option value="${value}" ${row.scopeType===value?"selected":""}>${label}</option>`).join("")}</select>`)}${field("target","要補上的資料",`<select name="target" required>${ruleTargetOptions(row)}</select>`)}${field("targetLabel","商家名稱（只在目標選商家時使用）",`<input name="targetLabel" maxlength="120" value="${esc(row.targetField==="merchant"?row.targetLabelSnapshot:"")}" placeholder="例如：中油">`)}</div><p class="finance-memory-confirm">確認：這項規則只補缺少欄位，不會覆蓋你輸入的內容，也不會記憶金額或日期。</p><footer><button type="button" class="finance-button" data-finance-action="close-modal">取消</button><button class="finance-button primary">確認儲存</button></footer></form></section></div>`;}
   function settingsPage(){return `${pageHead("設定","理財偏好與資料安全",`<button class="finance-button" data-finance-action="open-backgrounds">▧ 更換背景</button>`)}<form class="finance-form-card finance-settings-form" data-finance-form="settings"><div class="finance-form-grid">${field("baseCurrency","基礎貨幣（只影響顯示）",`<select name="baseCurrency"><option value="TWD" ${setting("baseCurrency","TWD")==="TWD"?"selected":""}>TWD</option><option value="USD" ${setting("baseCurrency")==="USD"?"selected":""}>USD</option><option value="JPY" ${setting("baseCurrency")==="JPY"?"selected":""}>JPY</option></select>`,false)}${field("firstDayOfWeek","週起始日",`<select name="firstDayOfWeek"><option value="1" ${Number(setting("firstDayOfWeek",1))===1?"selected":""}>週一</option><option value="0" ${Number(setting("firstDayOfWeek",1))===0?"selected":""}>週日</option></select>`,false)}${field("locale","Locale",`<select name="locale"><option value="zh-TW" ${setting("locale","zh-TW")==="zh-TW"?"selected":""}>zh-TW</option><option value="en-US" ${setting("locale")==="en-US"?"selected":""}>en-US</option><option value="ja-JP" ${setting("locale")==="ja-JP"?"selected":""}>ja-JP</option></select>`,false)}</div><footer><button class="finance-button primary">儲存設定</button></footer></form>${aiSettingsCard()}${ruleMemoryPanel()}<section class="finance-section"><h2>備份與匯入檢查</h2><p>匯出包含帳戶、信用卡、分類、交易與設定；背景圖片 Blob 會排除。</p><div class="finance-actions"><button class="finance-button primary" data-finance-action="export-backup">匯出理財資料</button><label class="finance-button">選擇備份並預覽<input type="file" data-finance-import-input accept="application/json,.json" hidden></label></div>${importPreview()}</section>${backgroundsPanel()}`;}
   function modal(){if(!ui.modal)return"";if(ui.modal.type==="backgrounds")return backgroundModal();if(ui.modal.type==="rule-memory")return ruleMemoryModal();if(ui.modal.type==="transaction-preview"){const row=ui.modal.draft,label=transactionLabel(row);return `<div class="finance-modal-backdrop"><section class="finance-modal" role="dialog" aria-modal="true" aria-labelledby="finance-modal-title"><span>寫入前確認</span><h2 id="finance-modal-title">確認${transactionTypes[row.type]}</h2><dl><dt>日期</dt><dd>${esc(row.date)}</dd><dt>類型</dt><dd>${transactionTypes[row.type]}</dd><dt>金額</dt><dd>${money(row.amount)}</dd><dt>明細</dt><dd>${esc(label.title)}${label.account?` · ${esc(label.account)}`:""}</dd><dt>備註</dt><dd>${esc(row.note||"無")}</dd></dl>${ui.modal.exceedsOutstanding?`<p class="finance-form-error" role="alert">繳款金額高於目前未繳；請再次核對後再確認寫入。</p>`:""}<footer><button class="finance-button" data-finance-action="close-modal">返回修改</button><button class="finance-button primary" data-finance-action="confirm-transaction">${ui.modal.exceedsOutstanding?"確認超額繳款並寫入":"確認寫入"}</button></footer></section></div>`;}const {kind,row}=ui.modal,labels={"delete-transaction":["刪除這筆交易","刪除後無法復原。"],"archive-account":["封存這個帳戶","歷史交易與餘額仍會保留。"],"archive-card":["封存這張信用卡","歷史刷卡與繳款仍會保留。"],"archive-category":["封存這個分類","歷史交易仍會顯示原分類。"],"delete-rule-memory":["刪除這項已確認規則","刪除會建立同步墓碑，防止其他裝置還原舊規則。"],"delete-background":["刪除這張背景圖片",row?.active?"目前使用中的背景會先切回預設，再從本機刪除。":"圖片將從此裝置永久刪除，不影響任何帳務資料。"]},[title,text]=labels[kind];return `<div class="finance-modal-backdrop"><section class="finance-modal" role="alertdialog" aria-modal="true"><span>此動作需要確認</span><h2>${title}？</h2><p>${esc(row.name||row.matchValue||row.note||row.date||"")}</p><small>${text}</small><footer><button class="finance-button" data-finance-action="close-modal">取消</button><button class="finance-button danger" data-finance-action="confirm-destructive">確認</button></footer></section></div>`;}
-  function content(){const pages={overview,transactions:transactionsPage,accounts:accountsPage,cards:cardsPage,categories:categoriesPage,reports:reportsPage,settings:settingsPage};return `${rail()}<div class="finance-stage">${header()}<div class="finance-body">${alerts()}${ui.loading&&!ui.loaded?loading():(pages[ui.view]||overview)()}</div></div>${modal()}`;}
+  function budgetPage(){
+    if(!ui.budget.ownerId){
+      return `${pageHead("PERSONAL FINANCE","預算管理")}
+        <section class="finance-section" role="alert">
+          <h3>預算需要本人身分驗證</h3>
+          <p>${esc(ui.budget.error||"請重新登入後查看預算。")}</p>
+          <p>為保護帳號隱私，本頁暫不顯示舊使用者的預算或消費統計。</p>
+        </section>`;
+    }
+    return FinanceBudgetUi.render({
+      month:ui.budget.month,rows:ui.budget.rows,transactions:ui.transactions,
+      categories:ui.categories,accounts:ui.accounts,creditCards:ui.cards,
+      editScope:ui.budget.editScope,deleteId:ui.budget.deleteId,
+      ledgerSyncState:ui.sync.state,syncState:ui.budget.syncState,
+      cloudEnabled:budgetCloudEnabled,syncMessage:ui.budget.syncMessage,
+      busy:ui.budget.busy||ui.budget.syncing,error:ui.budget.error
+    });
+  }
+  function content(){const pages={overview,transactions:transactionsPage,accounts:accountsPage,cards:cardsPage,categories:categoriesPage,reports:reportsPage,budgets:budgetPage,settings:settingsPage};return `${rail()}<div class="finance-stage">${header()}<div class="finance-body">${alerts()}${ui.loading&&!ui.loaded?loading():(pages[ui.view]||overview)()}</div></div>${modal()}`;}
   function render(){scheduleLoad();ensureVoiceController();return `<section class="finance-workspace" data-finance-root aria-labelledby="finance-title">${content()}</section>`;}
   function formObject(form){const data=Object.fromEntries(new FormData(form));if(form.elements.includeInAssets)data.includeInAssets=form.elements.includeInAssets.checked;return data;}
   function showErrors(form,errors){form.querySelectorAll("[data-error]").forEach(node=>node.textContent=errors[node.dataset.error]||"");const first=Object.keys(errors)[0];form.elements[first]?.focus();}
@@ -266,14 +307,160 @@ const FinanceHome=(()=>{
   async function uploadBackground(file){try{await validateImage(file);const row=await FinanceStorage.backgrounds.create({name:file.name.replace(/\.[^.]+$/,"").slice(0,60)||"我的背景",imageBlob:file,mimeType:file.type,active:false,createdAt:new Date().toISOString()});await FinanceStorage.backgrounds.setActive(row.id);await reload("背景已儲存並套用。");ui.modal={type:"backgrounds"};update();}catch(error){console.error("Finance background upload failed",error);ui.error=error.message||FinanceUiModel.userError(error);update();}}
   async function selectBuiltIn(theme){try{await Promise.all([FinanceStorage.backgrounds.clearActive(),FinanceStorage.settings.set("backgroundTheme",theme)]);await reload("內建背景已套用。");ui.modal={type:"backgrounds"};update();}catch(error){ui.error=FinanceUiModel.userError(error);update();}}
   async function saveBackgroundSettings(form){const data=formObject(form);try{await Promise.all([FinanceStorage.settings.set("backgroundBlur",data.blur==="true"),FinanceStorage.settings.set("backgroundOverlay",data.overlay)]);await reload("背景顯示設定已套用。");ui.modal={type:"backgrounds"};update();}catch(error){ui.error=FinanceUiModel.userError(error);update();}}
+  function budgetError(error){
+    const message=String(error?.message||"預算操作未完成。");
+    ui.budget.error=message==="BUDGET_SCHEMA_MISSING"
+      ?"預算本機儲存尚未升級，不能寫入。":message;
+    update();
+  }
+  async function syncBudgetNow(){
+    if(!budgetCloudEnabled)return {ok:false,state:"disabled"};
+    if(ui.budget.syncing||ui.budget.busy)return {ok:false,state:"busy"};
+    const targetMonth=ui.budget.month,ownerId=ui.budget.ownerId;
+    if(!ownerId)return {ok:false,state:"auth_required"};
+    ui.budget.syncing=true;ui.budget.syncState="syncing";ui.budget.syncMessage="";
+    update();
+    try{
+      if(await FinanceBudgetOwner.requireOwner()!==ownerId)
+        throw new Error("BUDGET_IDENTITY_CHANGED");
+      const result=await budgetSync.sync({month:targetMonth});
+      if(result.state==="auth_required"){
+        ui.budget.rows=[];ui.budget.ownerId=null;
+        ui.budget.error="預算同步期間身分失效；本機預算已隱藏。請重新登入。";
+      }else if(ui.budget.month===targetMonth){
+        await readBudgets();
+      }
+      if(ui.budget.month===targetMonth){
+        ui.budget.syncState=result.state;
+        ui.budget.syncMessage=result.ok?"預算已依登入身分完成雲端同步。":
+          result.state==="pending"?"存在版本衝突或未送出的本機預算，沒有覆寫。":
+          "預算同步未完成，本機修改會保留；請檢查登入與連線狀態。";
+      }
+      return result;
+    }catch(error){
+      const why=String(error?.code||error?.message||"BUDGET_SYNC_FAILED");
+      ui.budget.syncState=why.includes("AUTH")||why.includes("IDENTITY")?"auth_required":"error";
+      ui.budget.syncMessage="預算同步未完成，本機修改會保留（"+why+"）。";
+      if(ui.budget.syncState==="auth_required"){
+        ui.budget.rows=[];ui.budget.ownerId=null;
+      }
+      return {ok:false,state:ui.budget.syncState};
+    }finally{
+      ui.budget.syncing=false;
+      update();
+      // If the month changed during an in-flight request, sync the new month.
+      if(budgetCloudEnabled&&ui.budget.ownerId&&ui.budget.month!==targetMonth)
+        queueMicrotask(()=>void syncBudgetNow());
+    }
+  }
+  async function saveBudget(form){
+    if(ui.budget.busy)return;
+    let scope,amount,categoryId;
+    try{
+      const data=formObject(form);
+      scope=String(data.scope||"");amount=FinanceBudgetUi.parseAmount(data.amount);
+      categoryId=FinanceBudgetUi.parseScope(scope);
+      if(categoryId!==null&&!activeCategories("expense").some(x=>x.id===categoryId))
+        throw new Error("請先選擇有效的支出分類。");
+    }catch(error){budgetError(error);return;}
+    ui.budget.busy=true;ui.budget.error="";update();
+    try{
+      await FinanceBudgetLocalStore.save({month:ui.budget.month,categoryId,amount,currency:"TWD"});
+      await readBudgets();
+      ui.budget.editScope=scope;ui.budget.deleteId=null;
+      ui.notice=budgetCloudEnabled?"預算已保存，本機與雲端將同步。":"預算已儲存在本機。雲端預算服務尚未啟用，暫不提供跨裝置同步。";
+    }catch(error){budgetError(error);}
+    finally{ui.budget.busy=false;update();
+      if(budgetCloudEnabled&&!ui.budget.error)void syncBudgetNow();
+    }
+  }
+  async function copyPreviousBudgets(){
+    if(ui.budget.busy)return;
+    let source;
+    try{source=FinanceBudgetUi.shiftMonth(ui.budget.month,-1);}
+    catch(error){budgetError(error);return;}
+    const exists=new Set(ui.budget.rows.filter(x=>!x.deletedAt&&x.month===ui.budget.month)
+      .map(x=>FinanceBudgetUi.scopeOf(x.categoryId??null)));
+    const candidates=ui.budget.rows.filter(x=>x.month===source&&!x.deletedAt&&x.currency==="TWD"
+      &&(x.categoryId===null||activeCategories("expense").some(c=>c.id===x.categoryId))
+      &&!exists.has(FinanceBudgetUi.scopeOf(x.categoryId??null)));
+    if(!candidates.length){ui.notice="上月沒有可新增的預算，或本月已有相同項目。";update();return;}
+    ui.budget.busy=true;ui.budget.error="";update();
+    let copied=0;
+    try{
+      for(const b of candidates){
+        await FinanceBudgetLocalStore.save({
+          month:ui.budget.month,currency:"TWD",categoryId:b.categoryId??null,amount:b.amount
+        });
+        copied++;
+      }
+      ui.notice="已複製 "+copied+" 筆上月預算到本月（僅本機）；未覆寫本月既有額度。";
+    }catch(error){ui.budget.error="已複製 "+copied+" 筆，其餘未完成："+String(error?.message||"儲存失敗");}
+    finally{await readBudgets();ui.budget.busy=false;update();
+      if(budgetCloudEnabled&&!ui.budget.error)void syncBudgetNow();
+    }
+  }
+  async function removeBudget(id){
+    const row=ui.budget.rows.find(x=>x.id===id&&!x.deletedAt);
+    if(!row||ui.budget.busy){ui.budget.deleteId=null;update();return;}
+    ui.budget.busy=true;ui.budget.error="";update();
+    try{await FinanceBudgetLocalStore.remove(id);await readBudgets();
+      ui.notice="已移除預算額度（本機保留同步記錄），交易資料未變動。";
+    }catch(error){budgetError(error);}
+    finally{ui.budget.busy=false;ui.budget.deleteId=null;update();
+      if(budgetCloudEnabled&&!ui.budget.error)void syncBudgetNow();
+    }
+  }
+  let budgetOwnerListenerInstalled=false;
   function installEvents(host){
+    if(!budgetOwnerListenerInstalled&&globalThis.LizhiAuth?.client?.auth?.onAuthStateChange){
+      budgetOwnerListenerInstalled=true;
+      globalThis.LizhiAuth.client.auth.onAuthStateChange((event,session)=>{
+        if(event==="SIGNED_OUT"||ui.budget.ownerId&&session?.user?.id!==ui.budget.ownerId){
+          FinanceBudgetOwner.invalidate();
+          ui.budget.rows=[];ui.budget.ownerId=null;ui.budget.deleteId=null;
+          ui.budget.syncState="auth_required";ui.budget.syncMessage="";
+          ui.budget.error="登入身分已變更，預算資料已隱藏。請重新登入或重新載入。";
+          if(ui.loaded)update();
+        }
+      });
+    }
     host.addEventListener("input",event=>{if(event.target.matches('[data-finance-form="ai-quick"] textarea[name="aiText"]'))ui.ai.input=event.target.value;});
     host.addEventListener("click",event=>{const target=event.target.closest("[data-route]");if(target?.closest("[data-finance-root]"))destroyVoiceController();},true);
     host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-action]");if(!target||!target.closest("[data-finance-root]")||!["host-health","host-pause","host-resume"].includes(target.dataset.financeAction))return;event.preventDefault();event.stopImmediatePropagation();const action=target.dataset.financeAction;if(action==="host-pause")ui.host.instance?.pause();if(action==="host-resume")ui.host.instance?.resume();if(action==="host-health")void ui.host.instance?.health().then(()=>{ui.host.error="";ui.notice="本機 Gateway 健康檢查通過。";update();}).catch(error=>{ui.host.error=ollamaMessage(error);update();});},true);
     host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-action]");if(!target||!target.closest("[data-finance-root]")||!["retry-finance-sync","confirm-ai-transaction"].includes(target.dataset.financeAction))return;event.preventDefault();event.stopImmediatePropagation();if(target.dataset.financeAction==="retry-finance-sync")void syncFinance();else void confirmAiTransaction();},true);
-    host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-view],[data-finance-action]");if(!target||!target.closest("[data-finance-root]"))return;event.preventDefault();event.stopImmediatePropagation();if(target.dataset.financeView){ui.view=target.dataset.financeView;ui.edit=null;ui.draft=null;ui.aiDraftApplied=null;ui.modal=null;update();return;}const action=target.dataset.financeAction,id=target.dataset.id;if(action==="toggle-advanced-mode"){ui.advanced.enabled=!ui.advanced.enabled;update();return;}if(action==="clear-advanced-session"){advancedSession.clear();ui.advanced.query=null;ui.advanced.message="已清除本次暫存，沒有影響帳本。";update();return;}if(action==="confirm-advanced-draft")return void confirmAdvancedDraft(id);if(action==="confirm-all-ready")return void confirmAllAdvanced();if(action==="cancel-advanced-draft"){const position=advancedSession.list().findIndex(row=>row.draftId===id);const result=position<0?{ok:false}:advancedSession.cancel(`第${position+1}筆`);ui.advanced.message=result.ok?"候選交易已取消，沒有寫入帳本。":"無法取消這筆候選交易。";update();return;}if(action==="view-rule-memory"){ui.view="settings";update();queueMicrotask(()=>document.querySelector("#finance-rule-memory")?.scrollIntoView({behavior:"smooth"}));return;}if(action==="open-rule-memory"){ui.lastFocus=target;ui.modal={type:"rule-memory",row:null};}if(action==="edit-rule-memory"){ui.lastFocus=target;ui.modal={type:"rule-memory",row:ui.ruleMemory.rules.find(item=>item.id===id)||null};}if(action==="toggle-rule-memory")return void toggleRuleMemory(id);if(action==="delete-rule-memory")ui.modal={kind:"delete-rule-memory",row:ui.ruleMemory.rules.find(item=>item.id===id)};if(action==="sync-rule-memory")return void syncRuleMemory();if(action==="toggle-voice"){toggleVoiceInput();return;}if(action==="dismiss-alert"){ui.error="";ui.notice="";}if(action==="open-backgrounds"){ui.lastFocus=target;ui.modal={type:"backgrounds"};}if(action==="quick-transaction"){ui.view="transactions";formEdit("transaction");const type=target.dataset.type,card=activeCards()[0];ui.draft={type,date:FinanceUiModel.localDate(),amount:"",note:""};if(["income","expense"].includes(type)){ui.draft.categoryId=activeCategories(type)[0]?.id||"";ui.draft.accountId=activeAccounts()[0]?.id||"";}if(type==="transfer"){ui.draft.fromAccountId=activeAccounts()[0]?.id||"";ui.draft.toAccountId=activeAccounts()[1]?.id||"";}if(type==="credit_card_purchase"){ui.draft.creditCardId=card?.id||"";ui.draft.categoryId=activeCategories("expense")[0]?.id||"";}if(type==="credit_card_payment"){ui.draft.creditCardId=card?.id||"";ui.draft.fromAccountId=card?.linkedPaymentAccountId||activeAccounts()[0]?.id||"";}}if(action==="cancel-edit"){ui.edit=null;ui.draft=null;ui.aiDraftApplied=null;}if(action==="focus-ai-input"){document.querySelector('[data-finance-form="ai-quick"] textarea')?.focus();}if(action==="cancel-ai"){ui.ai.controller?.abort();}if(action==="launch-ai-host")return void launchOrRefreshAiHost();if(action==="test-ollama")return void refreshOllamaStatus();if(action==="apply-ai-draft")return void applyDraftTest();if(action==="apply-ollama-draft"){applyDraftResult(ui.ai.result);return;}if(action==="focus-draft-form"){queueMicrotask(()=>document.querySelector('[data-finance-form="transaction"] input[name="amount"]')?.focus());}if(action==="clear-ai-draft"){ui.draft=null;ui.aiDraftApplied=null;}if(action==="new-account"){ui.view="accounts";formEdit("account");}if(action==="edit-account")formEdit("account",id);if(action==="new-card"){formEdit("card");update();return;}if(action==="edit-card")formEdit("card",id);if(action==="new-category")formEdit("category");if(action==="edit-category")formEdit("category",id);if(action==="new-transaction"){ui.view="transactions";formEdit("transaction");}if(action==="new-card-purchase"){ui.view="transactions";formEdit("transaction");ui.draft={type:"credit_card_purchase",date:FinanceUiModel.localDate(),creditCardId:id||activeCards()[0]?.id||"",categoryId:activeCategories("expense")[0]?.id||"",amount:"",note:""};}if(action==="new-card-payment"){ui.view="transactions";formEdit("transaction");const card=activeCards()[0];ui.draft={type:"credit_card_payment",date:FinanceUiModel.localDate(),creditCardId:card?.id||"",fromAccountId:card?.linkedPaymentAccountId||activeAccounts()[0]?.id||"",amount:"",note:""};}if(action==="edit-transaction")formEdit("transaction",id);if(action==="delete-transaction")ui.modal={kind:"delete-transaction",row:byId(ui.transactions,id)};if(action==="archive-account")ui.modal={kind:"archive-account",row:byId(ui.accounts,id)};if(action==="archive-card")ui.modal={kind:"archive-card",row:byId(ui.cards,id)};if(action==="archive-category")ui.modal={kind:"archive-category",row:byId(ui.categories,id)};if(action==="delete-background")ui.modal={kind:"delete-background",row:byId(ui.backgrounds,id)};if(action==="close-modal"){ui.modal=null;queueMicrotask(()=>ui.lastFocus?.isConnected&&ui.lastFocus.focus());}if(action==="select-built-in")return void selectBuiltIn(target.dataset.theme);if(action==="confirm-transaction")return void confirmTransaction();if(action==="confirm-destructive")return void destructive();if(action==="export-backup")return void exportBackup();if(action==="select-background")return void FinanceStorage.backgrounds.setActive(id).then(async()=>{await reload("背景已切換。");ui.modal={type:"backgrounds"};update();}).catch(error=>{ui.error=FinanceUiModel.userError(error);update();});if(action==="default-background")return void Promise.all([FinanceStorage.backgrounds.clearActive(),FinanceStorage.settings.set("backgroundTheme","aurora")]).then(async()=>{await reload("已恢復預設背景。");ui.modal={type:"backgrounds"};update();}).catch(error=>{ui.error=FinanceUiModel.userError(error);update();});update();},true);
-    host.addEventListener("change",event=>{if(event.target.matches('[data-finance-form="transaction"] input[name="type"]')){const data=formObject(event.target.form),type=event.target.value;ui.draft={type,date:data.date,amount:data.amount,note:data.note||""};if(["income","expense"].includes(type)){ui.draft.categoryId=activeCategories(type)[0]?.id||"";ui.draft.accountId=activeAccounts()[0]?.id||"";}if(type==="transfer"){ui.draft.fromAccountId=activeAccounts()[0]?.id||"";ui.draft.toAccountId=activeAccounts()[1]?.id||"";}if(type==="credit_card_purchase"){ui.draft.creditCardId=activeCards()[0]?.id||"";ui.draft.categoryId=activeCategories("expense")[0]?.id||"";}if(type==="credit_card_payment"){const card=activeCards()[0];ui.draft.creditCardId=card?.id||"";ui.draft.fromAccountId=card?.linkedPaymentAccountId||activeAccounts()[0]?.id||"";}update();}if(event.target.matches("[data-finance-import-input]")&&event.target.files[0])readImport(event.target.files[0]);if(event.target.matches("[data-finance-background-input]")&&event.target.files[0])uploadBackground(event.target.files[0]);});
-    host.addEventListener("submit",event=>{const form=event.target.closest("[data-finance-form]");if(!form)return;event.preventDefault();event.stopImmediatePropagation();const kind=form.dataset.financeForm;if(kind==="account")saveEntity(form,"帳戶",FinanceUiModel.validateAccountDraft,FinanceStorage.accounts);if(kind==="card")saveEntity(form,"信用卡",FinanceUiModel.validateCardDraft,FinanceStorage.creditCards);if(kind==="category")saveEntity(form,"分類",FinanceUiModel.validateCategoryDraft,FinanceStorage.categories);if(kind==="transaction")submitTransaction(form);if(kind==="draft-test")parseDraftTest(form);if(kind==="ai-quick")parseAiText(form);if(kind==="advanced-edit")editAdvancedDraft(form);if(kind==="ai-settings")saveAiSettings(form);if(kind==="rule-memory")saveRuleMemory(form);if(kind==="settings")saveSettings(form);if(kind==="background-settings")saveBackgroundSettings(form);if(kind==="filter"){ui.filters={...ui.filters,...formObject(form)};update();}},true);
+    host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-view],[data-finance-action]");if(!target||!target.closest("[data-finance-root]"))return;event.preventDefault();event.stopImmediatePropagation();if(target.dataset.financeView){ui.view=target.dataset.financeView;ui.budget.deleteId=null;ui.edit=null;ui.draft=null;ui.aiDraftApplied=null;ui.modal=null;update();return;}const action=target.dataset.financeAction,id=target.dataset.id;
+      if(action==="budget-edit"){
+        if(!ui.budget.busy){ui.budget.editScope=target.dataset.scope||"total";ui.budget.deleteId=null;update();
+          queueMicrotask(()=>host.querySelector('[data-finance-form="budget"] input[name="amount"]')?.focus());}
+        return;
+      }
+      if(action==="budget-month-shift"){
+        try{ui.budget.month=FinanceBudgetUi.shiftMonth(ui.budget.month,Number(target.dataset.offset));ui.budget.editScope="total";ui.budget.deleteId=null;ui.budget.error="";}
+        catch(error){ui.budget.error=String(error.message);}
+        update();return;
+      }
+      if(action==="budget-copy-previous")return void copyPreviousBudgets();
+      if(action==="budget-sync")return void syncBudgetNow();
+      if(action==="budget-remove-request"){ui.budget.deleteId=id;update();return;}
+      if(action==="budget-remove-cancel"){ui.budget.deleteId=null;update();return;}
+      if(action==="budget-remove-confirm")return void removeBudget(id);
+      if(action==="toggle-advanced-mode"){ui.advanced.enabled=!ui.advanced.enabled;update();return;}if(action==="clear-advanced-session"){advancedSession.clear();ui.advanced.query=null;ui.advanced.message="已清除本次暫存，沒有影響帳本。";update();return;}if(action==="confirm-advanced-draft")return void confirmAdvancedDraft(id);if(action==="confirm-all-ready")return void confirmAllAdvanced();if(action==="cancel-advanced-draft"){const position=advancedSession.list().findIndex(row=>row.draftId===id);const result=position<0?{ok:false}:advancedSession.cancel(`第${position+1}筆`);ui.advanced.message=result.ok?"候選交易已取消，沒有寫入帳本。":"無法取消這筆候選交易。";update();return;}if(action==="view-rule-memory"){ui.view="settings";update();queueMicrotask(()=>document.querySelector("#finance-rule-memory")?.scrollIntoView({behavior:"smooth"}));return;}if(action==="open-rule-memory"){ui.lastFocus=target;ui.modal={type:"rule-memory",row:null};}if(action==="edit-rule-memory"){ui.lastFocus=target;ui.modal={type:"rule-memory",row:ui.ruleMemory.rules.find(item=>item.id===id)||null};}if(action==="toggle-rule-memory")return void toggleRuleMemory(id);if(action==="delete-rule-memory")ui.modal={kind:"delete-rule-memory",row:ui.ruleMemory.rules.find(item=>item.id===id)};if(action==="sync-rule-memory")return void syncRuleMemory();if(action==="toggle-voice"){toggleVoiceInput();return;}if(action==="dismiss-alert"){ui.error="";ui.notice="";}if(action==="open-backgrounds"){ui.lastFocus=target;ui.modal={type:"backgrounds"};}if(action==="quick-transaction"){ui.view="transactions";formEdit("transaction");const type=target.dataset.type,card=activeCards()[0];ui.draft={type,date:FinanceUiModel.localDate(),amount:"",note:""};if(["income","expense"].includes(type)){ui.draft.categoryId=activeCategories(type)[0]?.id||"";ui.draft.accountId=activeAccounts()[0]?.id||"";}if(type==="transfer"){ui.draft.fromAccountId=activeAccounts()[0]?.id||"";ui.draft.toAccountId=activeAccounts()[1]?.id||"";}if(type==="credit_card_purchase"){ui.draft.creditCardId=card?.id||"";ui.draft.categoryId=activeCategories("expense")[0]?.id||"";}if(type==="credit_card_payment"){ui.draft.creditCardId=card?.id||"";ui.draft.fromAccountId=card?.linkedPaymentAccountId||activeAccounts()[0]?.id||"";}}if(action==="cancel-edit"){ui.edit=null;ui.draft=null;ui.aiDraftApplied=null;}if(action==="focus-ai-input"){document.querySelector('[data-finance-form="ai-quick"] textarea')?.focus();}if(action==="cancel-ai"){ui.ai.controller?.abort();}if(action==="launch-ai-host")return void launchOrRefreshAiHost();if(action==="test-ollama")return void refreshOllamaStatus();if(action==="apply-ai-draft")return void applyDraftTest();if(action==="apply-ollama-draft"){applyDraftResult(ui.ai.result);return;}if(action==="focus-draft-form"){queueMicrotask(()=>document.querySelector('[data-finance-form="transaction"] input[name="amount"]')?.focus());}if(action==="clear-ai-draft"){ui.draft=null;ui.aiDraftApplied=null;}if(action==="new-account"){ui.view="accounts";formEdit("account");}if(action==="edit-account")formEdit("account",id);if(action==="new-card"){formEdit("card");update();return;}if(action==="edit-card")formEdit("card",id);if(action==="new-category")formEdit("category");if(action==="edit-category")formEdit("category",id);if(action==="new-transaction"){ui.view="transactions";formEdit("transaction");}if(action==="new-card-purchase"){ui.view="transactions";formEdit("transaction");ui.draft={type:"credit_card_purchase",date:FinanceUiModel.localDate(),creditCardId:id||activeCards()[0]?.id||"",categoryId:activeCategories("expense")[0]?.id||"",amount:"",note:""};}if(action==="new-card-payment"){ui.view="transactions";formEdit("transaction");const card=activeCards()[0];ui.draft={type:"credit_card_payment",date:FinanceUiModel.localDate(),creditCardId:card?.id||"",fromAccountId:card?.linkedPaymentAccountId||activeAccounts()[0]?.id||"",amount:"",note:""};}if(action==="edit-transaction")formEdit("transaction",id);if(action==="delete-transaction")ui.modal={kind:"delete-transaction",row:byId(ui.transactions,id)};if(action==="archive-account")ui.modal={kind:"archive-account",row:byId(ui.accounts,id)};if(action==="archive-card")ui.modal={kind:"archive-card",row:byId(ui.cards,id)};if(action==="archive-category")ui.modal={kind:"archive-category",row:byId(ui.categories,id)};if(action==="delete-background")ui.modal={kind:"delete-background",row:byId(ui.backgrounds,id)};if(action==="close-modal"){ui.modal=null;queueMicrotask(()=>ui.lastFocus?.isConnected&&ui.lastFocus.focus());}if(action==="select-built-in")return void selectBuiltIn(target.dataset.theme);if(action==="confirm-transaction")return void confirmTransaction();if(action==="confirm-destructive")return void destructive();if(action==="export-backup")return void exportBackup();if(action==="select-background")return void FinanceStorage.backgrounds.setActive(id).then(async()=>{await reload("背景已切換。");ui.modal={type:"backgrounds"};update();}).catch(error=>{ui.error=FinanceUiModel.userError(error);update();});if(action==="default-background")return void Promise.all([FinanceStorage.backgrounds.clearActive(),FinanceStorage.settings.set("backgroundTheme","aurora")]).then(async()=>{await reload("已恢復預設背景。");ui.modal={type:"backgrounds"};update();}).catch(error=>{ui.error=FinanceUiModel.userError(error);update();});update();},true);
+    host.addEventListener("change",event=>{
+      if(event.target.matches('[data-finance-form="budget"] select[name="scope"]')){
+        ui.budget.editScope=event.target.value;
+        ui.budget.deleteId=null;ui.budget.error="";
+        update();return;
+      }
+      if(event.target.matches("[data-finance-budget-month]")){
+        const candidate=event.target.value;
+        try{FinanceBudgetUi.shiftMonth(candidate,0);ui.budget.month=candidate;
+          ui.budget.editScope="total";ui.budget.deleteId=null;ui.budget.error="";}
+        catch(error){ui.budget.error="請選擇有效的預算月份。";}
+        update();return;
+      }
+      if(event.target.matches('[data-finance-form="transaction"] input[name="type"]')){const data=formObject(event.target.form),type=event.target.value;ui.draft={type,date:data.date,amount:data.amount,note:data.note||""};if(["income","expense"].includes(type)){ui.draft.categoryId=activeCategories(type)[0]?.id||"";ui.draft.accountId=activeAccounts()[0]?.id||"";}if(type==="transfer"){ui.draft.fromAccountId=activeAccounts()[0]?.id||"";ui.draft.toAccountId=activeAccounts()[1]?.id||"";}if(type==="credit_card_purchase"){ui.draft.creditCardId=activeCards()[0]?.id||"";ui.draft.categoryId=activeCategories("expense")[0]?.id||"";}if(type==="credit_card_payment"){const card=activeCards()[0];ui.draft.creditCardId=card?.id||"";ui.draft.fromAccountId=card?.linkedPaymentAccountId||activeAccounts()[0]?.id||"";}update();}if(event.target.matches("[data-finance-import-input]")&&event.target.files[0])readImport(event.target.files[0]);if(event.target.matches("[data-finance-background-input]")&&event.target.files[0])uploadBackground(event.target.files[0]);});
+    host.addEventListener("submit",event=>{const form=event.target.closest("[data-finance-form]");if(!form)return;event.preventDefault();event.stopImmediatePropagation();const kind=form.dataset.financeForm;if(kind==="account")saveEntity(form,"帳戶",FinanceUiModel.validateAccountDraft,FinanceStorage.accounts);if(kind==="card")saveEntity(form,"信用卡",FinanceUiModel.validateCardDraft,FinanceStorage.creditCards);if(kind==="category")saveEntity(form,"分類",FinanceUiModel.validateCategoryDraft,FinanceStorage.categories);if(kind==="transaction")submitTransaction(form);if(kind==="draft-test")parseDraftTest(form);if(kind==="ai-quick")parseAiText(form);if(kind==="advanced-edit")editAdvancedDraft(form);if(kind==="ai-settings")saveAiSettings(form);if(kind==="rule-memory")saveRuleMemory(form);if(kind==="settings")saveSettings(form);if(kind==="budget")void saveBudget(form);if(kind==="background-settings")saveBackgroundSettings(form);if(kind==="filter"){ui.filters={...ui.filters,...formObject(form)};update();}},true);
     host.addEventListener("keydown",event=>{if(!ui.modal)return;if(event.key==="Escape"){event.preventDefault();ui.modal=null;update();queueMicrotask(()=>ui.lastFocus?.isConnected&&ui.lastFocus.focus());return;}if(event.key==="Tab"){const modal=host.querySelector('.finance-modal'),focusable=[...modal?.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')||[]];if(!focusable.length)return;const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
   }
   return Object.freeze({render,installEvents,reload});

@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><title>Finance P1 isolated IndexedDB verification</title></head>
+<body data-p1-status="RUNNING">
+<h1>Finance P1 isolated IndexedDB verification</h1>
+<pre id="p1-result">RUNNING</pre>
+<script src="/finance/domain/finance-domain.js"></script>
+<script src="/finance/domain/backup.js"></script>
+<script src="/finance/budget/budget-owner.js"></script>
+<script src="/finance/storage/finance-db.js"></script>
+<script src="/finance/budget/budget-domain.js"></script>
+<script src="/finance/budget/budget-local-store.js"></script>
+<script>
+(async()=>{
+  const checks=[];
+  const check=(name,condition)=>{
+    if(!condition)throw new Error("FAIL "+name);
+    checks.push(name);
+  };
+  const request=r=>new Promise((resolve,reject)=>{
+    r.onsuccess=()=>resolve(r.result);
+    r.onerror=()=>reject(r.error||new Error("IDB request failed"));
+  });
+  const done=tx=>new Promise((resolve,reject)=>{
+    tx.oncomplete=resolve;
+    tx.onabort=()=>reject(tx.error||new Error("IDB aborted"));
+    tx.onerror=()=>{};
+  });
+  const stamp="2026-11-17T00:00:00.000Z";
+  const ownerA={id:"11111111-1111-4111-8111-111111111111",email:"owner-a@example.test"};
+  const ownerB={id:"22222222-2222-4222-8222-222222222222",email:"owner-b@example.test"};
+  let activeOwner=ownerA,authCallbacks=[],remoteChecks=0;
+  const auth={
+    getSession:async()=>({data:{session:activeOwner?{user:activeOwner}:null},error:null}),
+    getUser:async()=>{remoteChecks++;return {data:{user:activeOwner},error:null};},
+    onAuthStateChange:callback=>{
+      authCallbacks.push(callback);
+      return {data:{subscription:{unsubscribe(){authCallbacks=authCallbacks.filter(x=>x!==callback);}}}};
+    }
+  };
+  window.LizhiAuth={
+    client:{auth},
+    get user(){return activeOwner;},
+    get allowedEmail(){return activeOwner?.email||"owner-a@example.test";}
+  };
+  function switchOwner(user){
+    activeOwner=user;
+    authCallbacks.forEach(cb=>cb(user?"SIGNED_IN":"SIGNED_OUT",user?{user}:null));
+  }
+
+  // Isolated Chrome profile: simulate a real production-style pre-budget v1 database.
+  const first=indexedDB.open("lizhi-finance",1);
+  first.onupgradeneeded=()=>{
+    const db=first.result;
+    for(const name of ["accounts","creditCards","categories","transactions","settings","backgrounds"]){
+      db.createObjectStore(name,{keyPath:name==="settings"?"key":"id"});
+    }
+    first.transaction.objectStore("accounts").add({
+      id:"cash",name:"現金",type:"cash",initialBalance:9000,currency:"TWD",
+      includeInAssets:true,archived:false,createdAt:stamp,updatedAt:stamp
+    });
+    first.transaction.objectStore("categories").add({
+      id:"food",name:"餐飲",type:"expense",archived:false,system:false,
+      createdAt:stamp,updatedAt:stamp
+    });
+    first.transaction.objectStore("transactions").add({
+      id:"meal",type:"expense",amount:235,date:"2026-11-12",categoryId:"food",
+      accountId:"cash",note:"isolated test",createdAt:stamp,updatedAt:stamp
+    });
+    first.transaction.objectStore("settings").add({key:"baseCurrency",value:"TWD",updatedAt:stamp});
+  };
+  const legacyDb=await request(first);
+  check("actual IndexedDB created at v1",legacyDb.version===1);
+  legacyDb.close();
+
+  const upgraded=await FinanceStorage.openFinanceDb();
+  check("actual IndexedDB upgraded to v3",upgraded.version===3);
+  check("six original object stores preserved",["accounts","creditCards","categories",
+    "transactions","settings","backgrounds"].every(s=>upgraded.objectStoreNames.contains(s)));
+  check("budgets store added",upgraded.objectStoreNames.contains("budgets"));
+  const legacyData={};
+  for(const name of ["accounts","creditCards","categories","transactions","settings","backgrounds"]){
+    const tx=upgraded.transaction(name,"readonly");
+    const rows=await request(tx.objectStore(name).getAll());
+    legacyData[name]=rows;
+  }
+  check("original account preserved",legacyData.accounts.length===1&&legacyData.accounts[0].initialBalance===9000);
+  check("original transaction preserved",legacyData.transactions.length===1&&legacyData.transactions[0].amount===235);
+  check("original category preserved",legacyData.categories.length===1&&legacyData.categories[0].id==="food");
+  check("original settings preserved",legacyData.settings.length===1&&legacyData.settings[0].value==="TWD");
+  upgraded.close();
+
+  // Run the genuine P1 local budget module against the newly migrated real DB.
+  const total=await FinanceBudgetLocalStore.save({month:"2026-11",amount:1000,currency:"TWD"});
+  check("local budget saved",total.amount===1000&&total.version===0&&total.dirty===true);
+  const second=await FinanceBudgetLocalStore.save({month:"2026-11",amount:1200,currency:"TWD"});
+  check("same scope updated instead of inserted duplicate",second.id===total.id&&second.amount===1200);
+  const category=await FinanceBudgetLocalStore.save({month:"2026-11",categoryId:"food",amount:500});
+  let rows=await FinanceBudgetLocalStore.list({includeDeleted:false});
+  check("distinct total and category budget settings",rows.length===2&&rows.some(r=>r.categoryId==="food"));
+  const summary=FinanceBudgetDomain.summary({
+    month:"2026-11",budgets:rows,transactions:legacyData.transactions,
+    accounts:legacyData.accounts,categories:legacyData.categories
+  });
+  check("budget calculation on migrated legacy transaction",summary.used===235&&summary.remaining===965);
+  check("category calculation on migrated data",summary.by_category.some(x=>x.category_id==="food"&&x.used===235));
+
+  // Backup after v3 upgrade must retain all pre-existing stores and new budget rows.
+  const backup=await FinanceStorage.exportBackup("2026-11-17T02:00:00.000Z");
+  check("backup v3 includes legacy account and transaction",
+    backup.schemaVersion===3&&backup.data.accounts.length===1&&backup.data.transactions.length===1);
+  check("backup v3 includes two budgets",backup.data.budgets.length===2);
+  const preview=FinanceBackup.createImportPreview(backup);
+  check("v3 backup preview passes full validation",preview.valid===true&&preview.counts.budgets===2);
+
+  const legacyEnvelope={
+    format:"lizhi-finance-backup",schemaVersion:1,
+    exportedAt:"2026-11-17T01:00:00.000Z",data:legacyData
+  };
+  const oldPreview=FinanceBackup.createImportPreview(legacyEnvelope);
+  check("v1 backup is accepted without overwriting current budgets",
+    oldPreview.valid===true&&oldPreview.envelope.schemaVersion===3
+    &&oldPreview.envelope.data.budgets.length===0&&oldPreview.willWrite===false);
+
+  await FinanceBudgetLocalStore.remove(category.id);
+  rows=await FinanceBudgetLocalStore.list({includeDeleted:false});
+  check("budget removal preserves total budget",rows.length===1&&rows[0].id===total.id);
+  check("original transaction remains intact after budget removal",
+    (await FinanceStorage.transactions.list()).some(x=>x.id==="meal"&&x.amount===235));
+
+
+  // Owner A/B isolation on the same browser origin and the same local DB.
+  const aSaved=await FinanceBudgetLocalStore.get(total.id);
+  check("owner A can read own budget",aSaved?.ownerId===ownerA.id);
+  switchOwner(ownerB);
+  check("owner B sees no owner A budgets",(await FinanceBudgetLocalStore.list()).length===0);
+  check("switching owner verifies a fresh identity",remoteChecks>=2);
+  check("owner B cannot read A budget by ID",(await FinanceBudgetLocalStore.get(total.id))===null);
+  let cannotDelete=false;
+  try{await FinanceBudgetLocalStore.remove(total.id);}
+  catch(error){cannotDelete=error.message==="BUDGET_NOT_FOUND";}
+  check("owner B cannot delete A budget",cannotDelete);
+  const bRecord=await FinanceBudgetLocalStore.save({month:"2026-11",amount:700,currency:"TWD"});
+  check("same month and category coexist under different owners",bRecord.id!==total.id&&bRecord.ownerId===ownerB.id);
+  const bBackup=await FinanceStorage.exportBackup("2026-11-17T03:00:00.000Z");
+  check("B backup does not reveal A budget",bBackup.data.budgets.length===1&&bBackup.data.budgets[0].ownerId===ownerB.id);
+  switchOwner(ownerA);
+  check("A cannot read B budget",(await FinanceBudgetLocalStore.get(bRecord.id))===null);
+  check("A still sees own budget",(await FinanceBudgetLocalStore.list()).some(x=>x.id===total.id));
+  const aBackup=await FinanceStorage.exportBackup("2026-11-17T04:00:00.000Z");
+  check("A backup does not reveal B budget",aBackup.data.budgets.every(x=>x.ownerId===ownerA.id));
+  let remoteRejected=false;
+  try{
+    await FinanceBudgetLocalStore.applyRemote({id:bRecord.id,user_id:ownerB.id,month:"2026-11",
+      category_id:null,amount:500,version:1,currency:"TWD",created_at:stamp,updated_at:stamp});
+  }catch(error){remoteRejected=error.message==="BUDGET_OWNER_CONFLICT";}
+  check("remote row from other user is rejected",remoteRejected);
+  switchOwner(null);
+  let signedOutDenied=false;
+  try{await FinanceBudgetLocalStore.list();}
+  catch(error){signedOutDenied=error.code==="BUDGET_AUTH_REQUIRED";}
+  check("signed-out session cannot read budgets",signedOutDenied);
+  switchOwner(ownerA);
+
+  // Recreate a v2 database containing ownerless legacy budget rows; upgrade to v3.
+  const existing=await FinanceStorage.openFinanceDb();
+  existing.close();
+  await new Promise((resolve,reject)=>{
+    const deletion=indexedDB.deleteDatabase("lizhi-finance");
+    deletion.onsuccess=resolve;
+    deletion.onerror=()=>reject(deletion.error);
+    deletion.onblocked=()=>reject(new Error("Fixture database deletion blocked"));
+  });
+  const oldV2=indexedDB.open("lizhi-finance",2);
+  oldV2.onupgradeneeded=()=>{
+    const db=oldV2.result;
+    for(const name of ["accounts","creditCards","categories","transactions","settings","backgrounds"])
+      db.createObjectStore(name,{keyPath:name==="settings"?"key":"id"});
+    const budgets=db.createObjectStore("budgets",{keyPath:"id"});
+    budgets.createIndex("scopeKey","scopeKey",{unique:true});
+    budgets.createIndex("month","month");
+    budgets.createIndex("dirty","dirty");
+    budgets.add({id:"legacy-v2-unowned",month:"2026-11",categoryId:null,
+      amount:900,currency:"TWD",version:0,dirty:true,createdAt:stamp,updatedAt:stamp,
+      deletedAt:null,scopeKey:JSON.stringify(["2026-11","TWD",null])});
+  };
+  (await request(oldV2)).close();
+  const v3=await FinanceStorage.openFinanceDb();
+  check("owner index created for legacy v2 migration",
+    v3.transaction("budgets","readonly").objectStore("budgets").indexNames.contains("ownerId"));
+  const legacyRows=await request(v3.transaction("budgets","readonly").objectStore("budgets").getAll());
+  check("unowned v2 record is retained physically",legacyRows.some(x=>x.id==="legacy-v2-unowned"&&!x.ownerId));
+  v3.close();
+  check("unowned v2 budget hidden from owner A",(await FinanceBudgetLocalStore.list()).length===0);
+  switchOwner(ownerB);
+  check("unowned v2 budget hidden from owner B",(await FinanceBudgetLocalStore.list()).length===0);
+  switchOwner(ownerA);
+  const afterLegacy=await FinanceBudgetLocalStore.save({month:"2026-11",amount:1000});
+  check("new owned budget does not collide with legacy scope",afterLegacy.ownerId===ownerA.id);
+  const safeBackup=await FinanceStorage.exportBackup("2026-11-17T05:00:00.000Z");
+  check("legacy unowned budget excluded from normal export",
+    safeBackup.data.budgets.length===1&&safeBackup.data.budgets[0].id===afterLegacy.id);
+
+  // A cloud acknowledgement must not erase a same-millisecond local edit.
+  const beforeAck=await FinanceBudgetLocalStore.save({month:"2026-11",amount:1200});
+  await FinanceBudgetLocalStore.save({month:"2026-11",amount:1300});
+  const ack=await FinanceBudgetLocalStore.markSynced(beforeAck.id,beforeAck.updatedAt,{
+    id:beforeAck.id,user_id:ownerA.id,month:"2026-11",category_id:null,
+    amount:1200,version:1,currency:"TWD",created_at:stamp,updated_at:stamp,deleted_at:null
+  });
+  check("cloud acknowledgement never overwrites same-millisecond local edit",
+    ack.dirty===true&&ack.amount===1300&&ack.version===1);
+
+  const result={status:"PASS",checks:checks.length,names:checks,dbVersion:FinanceStorage.DB_VERSION,
+    savedBudgetRows:backup.data.budgets.length,legacyTransactions:legacyData.transactions.length};
+  document.body.dataset.p1Status="PASS";
+  document.getElementById("p1-result").textContent=JSON.stringify(result);
+})().catch(error=>{
+  document.body.dataset.p1Status="FAIL";
+  document.getElementById("p1-result").textContent=String(error.stack||error.message||error);
+});
+</script>
+</body>
+</html>
