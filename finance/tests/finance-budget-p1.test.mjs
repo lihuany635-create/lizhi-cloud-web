@@ -222,3 +222,25 @@ test("BP1-38 v3 backups reject records without ownerId",()=>{
   assert.equal(preview.valid,false);
   assert.ok(preview.errors.some(x=>x.field==="ownerId"));
 });
+
+test("P4-T06 category allocations over total are advisory and not double counted",()=>{
+  const result=calculate([tx("d","expense",250,"food")],[
+    budget(1000),budget(900,"food"),budget(500,"shopping")
+  ]);
+  assert.equal(result.used,250);
+  assert.equal(result.category_budget_total,"1400");
+  assert.equal(result.category_budget_excess,"400");
+  assert.equal(result.category_budget_warning,true);
+});
+test("P4-T06 allocations equal to total or total unset never warn",()=>{
+  assert.equal(calculate([],[budget(1000),budget(1000,"food")]).category_budget_warning,false);
+  assert.equal(calculate([],[budget(1000,"food")]).category_budget_warning,false);
+});
+test("P4-T06 very large allocations cannot overflow or prevent budgeting",()=>{
+  const result=calculate([],[
+    budget(Number.MAX_SAFE_INTEGER),budget(Number.MAX_SAFE_INTEGER,"food"),
+    budget(Number.MAX_SAFE_INTEGER,"shopping")
+  ]);
+  assert.equal(result.category_budget_warning,true);
+  assert.equal(result.category_budget_total,String(2n*BigInt(Number.MAX_SAFE_INTEGER)));
+});
