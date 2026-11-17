@@ -1,0 +1,62 @@
+name: Finance Budget P3 isolated MCP checks
+on:
+  pull_request:
+    paths:
+      - 'finance/budget/sql/p3-mcp-candidate.sql'
+      - 'finance/budget/verification/p3-isolated-verify.sql'
+      - 'finance/tests/finance-budget-p3.test.mjs'
+      - 'supabase/functions/lizhi-finance-site-mcp/**'
+      - '.github/workflows/finance-budget-p3-checks.yml'
+concurrency:
+  group: finance-budget-p3-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  node-mcp:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check all candidate MCP source files
+        run: |
+          node --check supabase/functions/lizhi-finance-site-mcp/finance-budget-contract.mjs
+          node --check supabase/functions/lizhi-finance-site-mcp/finance-budget-edge.mjs
+          node --check supabase/functions/lizhi-finance-site-mcp/edge-core.mjs
+      - name: Verify original finance MCP and P3 contract without production writes
+        run: |
+          node --test tests/finance-site-mcp.test.mjs tests/finance-cloud-ledger.test.mjs finance/tests/finance-budget-p3.test.mjs
+  postgres-mcp:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: finance_p3_candidate
+          POSTGRES_PASSWORD: isolated-no-production
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d finance_p3_candidate"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGPASSWORD: isolated-no-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify P3 PostgreSQL RPCs in disposable database only
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+          psql -h 127.0.0.1 -U postgres -d finance_p3_candidate -v ON_ERROR_STOP=1 \
+            -f finance/budget/verification/p3-isolated-verify.sql
