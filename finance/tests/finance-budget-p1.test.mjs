@@ -270,3 +270,39 @@ test("P4-T04 disabled defaults are not applied and duplicate scope is rejected",
  const dup=[{...defaults[0],disabled_at:null},{...defaults[0],id:"b",disabled_at:null}];
  assert.throws(()=>Domain.previewFutureDefaults({month:"2026-12",defaults:dup}),/DUPLICATE/);
 });
+
+test("P4-T11 only explicit linked and verified income offsets original spending",()=>{
+ const rows=[tx("purchase","expense",1000,"food","2026-11-12",{accountId:"cash"}),
+ tx("return","income",300,"salary","2026-12-01",{accountId:"cash",
+   refundOfTransactionId:"purchase",refundVerified:true}),
+ tx("salary","income",800,"salary","2026-11-13",{accountId:"cash"})];
+ const a=calculate(rows);
+ assert.equal(a.used,700);
+ assert.equal(a.by_category.find(x=>x.category_id==="food").used,700);
+ assert.equal(a.counted_linked_refunds,1);
+});
+test("P4-T11 unlinked income, unverified, invalid and deleted links never offset",()=>{
+ const original=tx("purchase","credit_card_purchase",850,"food","2026-11-13",{creditCardId:"cc"});
+ const refs=[
+  tx("income","income",500,"salary","2026-11-13"),
+  tx("unverified","income",100,"salary","2026-11-13",{refundOfTransactionId:"purchase"}),
+  tx("wrongid","income",150,"salary","2026-11-13",{refundOfTransactionId:"other",refundVerified:true})
+ ];
+ assert.equal(calculate([original,...refs]).used,850);
+ assert.equal(calculate([{...original,deletedAt:"2026-11-14"},...refs]).used,0);
+});
+test("P4-T11 over-refund groups cannot make monthly spending negative",()=>{
+ const rows=[tx("purchase","expense",100,"food"),
+ tx("r1","income",90,"salary","2026-11-17",{refundOfTransactionId:"purchase",refundVerified:true}),
+ tx("r2","income",90,"salary","2026-11-17",{refundOfTransactionId:"purchase",refundVerified:true})];
+ const a=calculate(rows);
+ assert.equal(a.used,100);assert.equal(a.excluded_over_refunds,2);
+});
+test("P4-T11 foreign currency refund never reduces a TWD purchase",()=>{
+ const rows=[tx("purchase","expense",500,"food","2026-11-11",{accountId:"cash"}),
+ tx("refund","income",300,"salary","2026-11-15",{accountId:"fx",
+   refundOfTransactionId:"purchase",refundVerified:true})];
+ const result=calculate(rows,undefined,{accounts:[{id:"cash",currency:"TWD"},
+   {id:"fx",currency:"USD"}]});
+ assert.equal(result.used,500);
+});
