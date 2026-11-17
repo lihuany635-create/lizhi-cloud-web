@@ -52,8 +52,7 @@ begin
 
   -- Only expense categories may receive a budget; archived/deleted categories
   -- remain usable for existing historical rows, but not new budget rows.
-  if new.category_id is not null
-     and (tg_op='INSERT' or new.category_id is distinct from old.category_id) then
+  if tg_op='INSERT' and new.category_id is not null then
     if not exists (
       select 1 from public.lizhi_finance_records r
       where r.user_id=new.user_id and r.kind='categories'
