@@ -68,6 +68,7 @@
 }
 @media(prefers-color-scheme:dark){
  .finance-budget-page{color:#e5eee8}
+ .finance-budget-page .finance-section{background:#172b26;border-color:#3c6354;color:#e5eee8}
  .finance-budget-hero{background:linear-gradient(130deg,#193d34,#20312f);border-color:#41665a}
  .finance-budget-hero.warning,.finance-budget-category.warning{background:#3b3324;border-color:#7b6036}
  .finance-budget-hero.limit,.finance-budget-hero.over,.finance-budget-category.limit,.finance-budget-category.over{background:#3b2929;border-color:#89504a}
