@@ -63,6 +63,8 @@ jobs:
           fi
           psql -h 127.0.0.1 -U postgres -d finance_p1_verify -v ON_ERROR_STOP=1 \
             -f finance/budget/verification/p1-isolated-verify.sql
+      - name: Verify two concurrent CAS writers against the same version
+        run: bash finance/budget/verification/p1-cas-concurrent.sh
   isolated-chrome:
     runs-on: ubuntu-latest
     steps:
