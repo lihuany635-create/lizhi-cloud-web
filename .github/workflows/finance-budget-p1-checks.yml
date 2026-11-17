@@ -1,14 +1,5 @@
 name: Finance Budget P1 Candidate Checks
 on:
-  push:
-    branches:
-      - 'feat/finance-budget-p1-*'
-    paths:
-      - 'finance/budget/**'
-      - 'finance/storage/finance-db.js'
-      - 'finance/domain/backup.js'
-      - 'finance/tests/**'
-      - '.github/workflows/finance-budget-p1-checks.yml'
   pull_request:
     paths:
       - 'finance/budget/**'
@@ -16,6 +7,9 @@ on:
       - 'finance/domain/backup.js'
       - 'finance/tests/**'
       - '.github/workflows/finance-budget-p1-checks.yml'
+concurrency:
+  group: finance-budget-p1-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
