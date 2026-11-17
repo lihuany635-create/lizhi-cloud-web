@@ -11,8 +11,8 @@
  ],
  "finance": [
   "./finance/domain/finance-domain.js?v=30",
-  "./finance/domain/backup.js?v=30",
-  "./finance/storage/finance-db.js?v=44",
+  "./finance/domain/backup.js?v=31",
+  "./finance/storage/finance-db.js?v=45",
   "./finance/ui-model.js?v=30",
   "./finance/domain/finance-transaction-template.js?v=1",
   "./finance/parsers/finance-amount-parser.js?v=2",
@@ -49,7 +49,10 @@
   "./finance/advanced-voice/finance-review-basket.js?v=1",
   "./finance/sync/finance-sync-store.js?v=1",
   "./finance/sync/finance-sync.js?v=1",
-  "./finance/pages/home.js?v=68"
+  "./finance/budget/budget-domain.js?v=1",
+  "./finance/budget/budget-local-store.js?v=1",
+  "./finance/budget/budget-ui.js?v=1",
+  "./finance/pages/home.js?v=69"
  ],
  "knowledge": [
   "./knowledge/domain/knowledge-model.js?v=16",
