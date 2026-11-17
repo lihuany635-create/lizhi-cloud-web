@@ -10,10 +10,10 @@
   "./ai-center/ai-center.js?v=1"
  ],
  "finance": [
-  "./finance/domain/finance-domain.js?v=30",
+  "./finance/domain/finance-domain.js?v=31",
   "./finance/domain/backup.js?v=32",
-  "./finance/storage/finance-db.js?v=46",
-  "./finance/ui-model.js?v=30",
+  "./finance/storage/finance-db.js?v=47",
+  "./finance/ui-model.js?v=31",
   "./finance/domain/finance-transaction-template.js?v=1",
   "./finance/parsers/finance-amount-parser.js?v=2",
   "./finance/parsers/finance-date-parser.js?v=1",
