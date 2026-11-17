@@ -108,7 +108,7 @@ test("BP1-24 local schema migrates additively to v3",()=>{
   const src=read("finance/storage/finance-db.js");
   assert.match(src,/DB_VERSION=3/);assert.match(src,/if\(event\.oldVersion<1\)/);
   assert.match(src,/if\(event\.oldVersion<2\)/);assert.match(src,/createObjectStore\("budgets"/);
-  assert.match(src,/scopeKey/);assert.match(src,/if\\(event\\.oldVersion<3\\)/);assert.match(src,/createIndex\\(transaction\\.objectStore\\("budgets"\\),"ownerId"/);
+  assert.match(src,/scopeKey/);assert.ok(src.includes("if(event.oldVersion<3)"));assert.ok(src.includes('createIndex(transaction.objectStore("budgets"),"ownerId"'));
 });
 test("BP1-25 backup v3 retains owner-scoped budget rows",()=>{
   const data=Object.fromEntries(Backup.COLLECTIONS.map(x=>[x,[]]));
