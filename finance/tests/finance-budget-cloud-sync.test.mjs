@@ -168,12 +168,13 @@ test("SYNC2-08 account switches during upload; local never marks synced",async()
   assert.equal(receipt.state,"auth_required");
   assert.equal(local.rows.get("shared").dirty,true);
 });
-test("SYNC2-09 ownerless local rows are not uploaded",async()=>{
+test("SYNC2-09 ownerless legacy rows are quarantined, not uploaded",async()=>{
   const local=localDevice(),cloud=cloudDb();
   local.rows.set("legacy",{id:"legacy",month:"2026-11",currency:"TWD",amount:50,version:0,dirty:true});
   const receipt=await sync(local,cloud).sync({client:{ownerId:A}});
-  assert.equal(receipt.state,"auth_required");
+  assert.equal(receipt.state,"synced");
   assert.equal(cloud.metrics.writes,0);
+  assert.equal(local.rows.get("legacy").amount,50);
 });
 test("SYNC2-10 owner B never sees A's cloud rows",async()=>{
   const cloud=cloudDb(),deviceA=localDevice(A),deviceB=localDevice(B);
