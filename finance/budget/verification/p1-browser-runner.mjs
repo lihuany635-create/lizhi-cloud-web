@@ -14,6 +14,7 @@ const allowed=new Set([
  "/finance/domain/finance-domain.js",
  "/finance/domain/backup.js",
  "/finance/storage/finance-db.js",
+ "/finance/budget/budget-owner.js",
  "/finance/budget/budget-domain.js",
  "/finance/budget/budget-local-store.js"
 ]);
