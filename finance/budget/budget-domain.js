@@ -103,6 +103,30 @@
       notice:unconverted?"存在未換算的外幣消費，未納入此幣別預算。":null
     });
   }
+  // Opt-in defaults are virtual monthly candidates. Never generate a remote row,
+  // overwrite an explicit month or resurrect an explicitly removed tombstone.
+  function previewFutureDefaults({month,budgets=[],defaults=[]}={}){
+    assertMonth(month);
+    if(!Array.isArray(budgets)||!Array.isArray(defaults))
+      throw new TypeError("BUDGET_DEFAULT_COLLECTION_REQUIRED");
+    const occupied=new Set(budgets.filter(row=>row?.month===month&&row.currency==="TWD")
+      .map(row=>row.categoryId??null));
+    const result=budgets.slice(),seen=new Set();
+    for(const row of defaults){
+      if(!row||row.currency!=="TWD"||row.disabled_at||!row.start_month||
+         row.start_month>month)continue;
+      const categoryId=row.category_id??null;
+      if(seen.has(categoryId))throw new Error("BUDGET_DEFAULT_DUPLICATE_SCOPE");
+      seen.add(categoryId);
+      if(occupied.has(categoryId))continue;
+      const amount=Number(row.amount);
+      validateBudget({month,categoryId,amount,currency:"TWD"});
+      result.push({id:"default-preview:"+String(row.id),month,categoryId,currency:"TWD",
+        amount,virtual:true,dirty:false,deletedAt:null,defaultStartMonth:row.start_month});
+      occupied.add(categoryId);
+    }
+    return result;
+  }
   function copyMonthBudgets({budgets,fromMonth,toMonth,idFactory}){
     assertMonth(fromMonth);assertMonth(toMonth);
     if(fromMonth===toMonth)throw new RangeError("SAME_BUDGET_MONTH");
@@ -117,5 +141,5 @@
         updatedAt:new Date().toISOString()};
     });
   }
-  return Object.freeze({MONEY_MAX,CURRENCY,validateBudget,state,summary,copyMonthBudgets});
+  return Object.freeze({MONEY_MAX,CURRENCY,validateBudget,state,summary,copyMonthBudgets,previewFutureDefaults});
 });
