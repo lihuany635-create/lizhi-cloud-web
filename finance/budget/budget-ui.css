@@ -1,0 +1,86 @@
+/* A方案預算管理 P2：獨立樣式，不覆寫理財管家其他模組。 */
+.finance-budget-page{min-width:0;color:var(--ink,#17342f)}
+.finance-budget-month-picker{display:flex;align-items:center;gap:8px}
+.finance-budget-month-picker .finance-button{padding:8px 13px;min-width:42px}
+.finance-budget-month-picker input{font:inherit;min-height:44px;max-width:175px;border:1px solid #b7cdc4;border-radius:11px;padding:6px 11px;color:#17342f;background:#fff}
+.finance-budget-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.finance-budget-sync{display:grid;gap:5px;border:1px solid #b7d5c8;padding:14px 17px;border-radius:14px;background:#edf7f1;margin-bottom:16px;color:#1b4b3f}
+.finance-budget-sync strong{font-size:14px}
+.finance-budget-sync span,.finance-budget-sync small{font-size:12px;color:#42675d}
+.finance-budget-hero{--budget-accent:#438f73;background:linear-gradient(130deg,#f5fbf6,#ffffff);border:1px solid #c6ddd0;border-radius:22px;padding:24px;box-shadow:0 12px 32px #164e4211}
+.finance-budget-hero.warning{--budget-accent:#c18a28;border-color:#dfc58d;background:#fff9ee}
+.finance-budget-hero.limit,.finance-budget-hero.over{--budget-accent:#bc514a;border-color:#e5a49c;background:#fff6f4}
+.finance-budget-hero-top,.finance-budget-category-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.finance-budget-hero-top small{letter-spacing:.15em;font-weight:800;color:#588071}
+.finance-budget-hero h3{margin:6px 0 0;font-size:22px}
+.finance-budget-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+.finance-budget-kpis>div{min-width:0;padding:15px;border-radius:14px;border:1px solid #dce9e1;background:#ffffffb0}
+.finance-budget-kpis small{display:block;color:#60796f;margin-bottom:7px;font-weight:700}
+.finance-budget-kpis strong{display:block;overflow-wrap:anywhere;font-size:clamp(19px,2.5vw,28px);font-variant-numeric:tabular-nums}
+.finance-budget-status{display:inline-flex;align-items:center;justify-content:center;white-space:normal;border-radius:999px;padding:5px 10px;border:1px solid #d4e0d9;background:#e9f2ed;color:#255c45;font-size:12px;font-weight:800}
+.finance-budget-status.warning{background:#fff0c8;border-color:#e3c77f;color:#805716}
+.finance-budget-status.limit,.finance-budget-status.over{background:#ffe2dc;border-color:#e3a79e;color:#93392f}
+.finance-budget-status.unset{background:#eef2f0;color:#536960}
+.finance-budget-progress{height:11px;background:#dce6df;border-radius:999px;overflow:hidden;margin:10px 0 5px}
+.finance-budget-progress span{display:block;height:100%;background:var(--budget-accent,#438f73);border-radius:999px}
+.finance-budget-hero>small,.finance-budget-category small{color:#5c756b}
+.finance-budget-hero>.finance-budget-action{margin-top:17px}
+.finance-budget-categories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.finance-budget-category{--budget-accent:#438f73;min-width:0;border:1px solid #d5e3db;border-radius:17px;padding:17px;background:#fbfdfa}
+.finance-budget-category.warning{--budget-accent:#bc8728;border-color:#e3d09e;background:#fffcf6}
+.finance-budget-category.limit,.finance-budget-category.over{--budget-accent:#bf594e;border-color:#e8b9b3;background:#fff9f7}
+.finance-budget-category-head h3{margin:0;font-size:17px;overflow-wrap:anywhere}
+.finance-budget-category-values{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:16px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.finance-budget-category-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}
+.finance-budget-settings form{display:grid;grid-template-columns:minmax(160px,1.2fr) minmax(160px,1fr) auto;align-items:end;gap:13px;margin:16px 0}
+.finance-budget-settings form label{min-width:0;display:grid;gap:7px;font-size:13px;font-weight:800}
+.finance-budget-settings select,.finance-budget-settings input{min-width:0;width:100%;min-height:44px;border-radius:11px;padding:8px 12px;background:#fff;border:1px solid #adcbc0;color:#234a3c}
+.finance-budget-settings>p{font-size:13px;color:#567469}
+.finance-budget-confirm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:13px;border-radius:13px;background:#fff1e8;padding:12px}
+.finance-budget-confirm p{flex-basis:100%;margin:0;color:#8b483b}
+.finance-budget-empty,.finance-budget-currency-alert{padding:14px;border-radius:12px;background:#fff7e8;color:#7d5c29}
+.finance-budget-category .finance-budget-notset{color:#60796f}
+.finance-budget-page :is(button,input,select):focus-visible{outline:3px solid #59c5a1;outline-offset:2px}
+@media(max-width:850px){
+ .finance-budget-categories{grid-template-columns:1fr}
+ .finance-budget-settings form{grid-template-columns:1fr 1fr}
+ .finance-budget-settings form button{grid-column:1/-1}
+}
+@media(max-width:600px){
+ .finance-budget-page .finance-page-head{align-items:stretch;flex-direction:column}
+ .finance-budget-month-picker{width:100%;justify-content:space-between}
+ .finance-budget-month-picker label{flex:1}
+ .finance-budget-month-picker input{width:100%;max-width:none}
+ .finance-budget-kpis{grid-template-columns:1fr 1fr}
+ .finance-budget-kpis>div:last-child{grid-column:1/-1}
+ .finance-budget-category-values{display:grid;grid-template-columns:1fr}
+ .finance-budget-settings form{grid-template-columns:1fr}
+ .finance-budget-settings form button{grid-column:auto}
+ .finance-budget-settings .finance-section-head{align-items:flex-start;flex-direction:column}
+ .finance-budget-sync{padding:12px}
+}
+@media(max-width:390px){
+ .finance-budget-kpis{grid-template-columns:1fr}
+ .finance-budget-kpis>div:last-child{grid-column:auto}
+ .finance-budget-hero-top,.finance-budget-category-head{align-items:flex-start;flex-direction:column}
+ .finance-budget-hero{padding:16px}
+ .finance-budget-status{font-size:11px}
+}
+@media(prefers-color-scheme:dark){
+ .finance-budget-page{color:#e5eee8}
+ .finance-budget-hero{background:linear-gradient(130deg,#193d34,#20312f);border-color:#41665a}
+ .finance-budget-hero.warning,.finance-budget-category.warning{background:#3b3324;border-color:#7b6036}
+ .finance-budget-hero.limit,.finance-budget-hero.over,.finance-budget-category.limit,.finance-budget-category.over{background:#3b2929;border-color:#89504a}
+ .finance-budget-category{background:#21332e;border-color:#365449}
+ .finance-budget-kpis>div{background:#152c27;border-color:#37584c}
+ .finance-budget-kpis small,.finance-budget-category small,.finance-budget-hero-top small{color:#afcec0}
+ .finance-budget-sync{background:#193c30;color:#d5f3e5;border-color:#416959}
+ .finance-budget-sync span,.finance-budget-sync small{color:#c4dccc}
+ .finance-budget-status.normal,.finance-budget-status.unset{background:#244c3a;color:#dbf3e7;border-color:#366551}
+ .finance-budget-status.warning{background:#5e491f;color:#ffe2a6;border-color:#926c23}
+ .finance-budget-status.limit,.finance-budget-status.over{background:#62312c;color:#ffe4e0;border-color:#9a564c}
+ .finance-budget-settings :is(input,select),.finance-budget-month-picker input{background:#1c332e;color:#edf7f0;border-color:#46685a;color-scheme:dark}
+ .finance-budget-settings>p,.finance-budget-empty{color:#c3d7cb}
+ .finance-budget-confirm{background:#463127;color:#ffd9c7}
+ .finance-budget-confirm p{color:#ffd2c0}
+}
