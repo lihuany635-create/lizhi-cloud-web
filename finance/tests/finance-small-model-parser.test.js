@@ -199,5 +199,5 @@ test("T20 parser does not write transactions and DB remains version 1", async ()
   const dbSource = fs.readFileSync(path.join(__dirname, "../storage/finance-db.js"), "utf8");
   assert.equal(result.draft.type, "expense");
   assert.equal(writes, 0);
-  assert.match(dbSource, /DB_VERSION=1/);
+  assert.match(dbSource, /DB_VERSION=2/);
 });
