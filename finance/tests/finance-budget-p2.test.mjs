@@ -212,3 +212,11 @@ test("BU2-40 owner-aware DB v3 and secure backup are registered",()=>{
   assert.match(storage,/DB_VERSION=3/);
   assert.match(loader,/finance\/storage\/finance-db\.js\?v=46/);
 });
+
+test("BU2-41 unauthenticated budget route never renders stale spending totals",()=>{
+  const home=read("finance/pages/home.js");
+  assert.ok(home.includes("if(!ui.budget.ownerId)"));
+  const guard=home.indexOf("if(!ui.budget.ownerId)"),render=home.indexOf("return FinanceBudgetUi.render({",guard);
+  assert.ok(guard>=0&&render>guard);
+  assert.match(home,/為保護帳號隱私，本頁暫不顯示舊使用者的預算或消費統計/);
+});
