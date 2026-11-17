@@ -226,7 +226,7 @@ test("BU2-42 cloud adapter and reconciler load before candidate page",()=>{
  const loader=read("loader.js");
  assert.ok(loader.indexOf("budget-cloud-store.js?v=1")>0);
  assert.ok(loader.indexOf("budget-cloud-store.js?v=1")<loader.indexOf("budget-sync.js?v=1"));
- assert.ok(loader.indexOf("budget-sync.js?v=1")<loader.indexOf("finance/pages/home.js?v=71"));
+ assert.ok(loader.indexOf("budget-sync.js?v=1")<loader.indexOf("finance/pages/home.js?v=72"));
 });
 test("BU2-43 approved production rollout enables cloud sync with fail-closed Auth gate",()=>{
  const home=read("finance/pages/home.js");
