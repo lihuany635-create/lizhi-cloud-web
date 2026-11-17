@@ -174,7 +174,7 @@ test("BU2-33 app loads budget modules before FinanceHome",()=>{
 });
 test("BU2-34 candidate service worker caches new assets",()=>{
   const sw=read("sw.js"),html=read("index.html");
-  assert.match(sw,/finance\/budget\/budget-ui.js\?v=2/);
+  assert.match(sw,/finance\/budget\/budget-ui.js\?v=3/);
   assert.match(sw,/finance\/budget\/budget-ui.css\?v=1/);
   assert.match(html,/finance\/budget\/budget-ui.css\?v=1/);
 });
@@ -211,7 +211,7 @@ test("BU2-39 budget UI clears rows when identity changes",()=>{
 test("BU2-40 owner-aware DB v3 and secure backup are registered",()=>{
   const loader=read("loader.js"),storage=read("finance/storage/finance-db.js");
   assert.match(storage,/DB_VERSION=3/);
-  assert.match(loader,/finance\/storage\/finance-db\.js\?v=46/);
+  assert.match(loader,/finance\/storage\/finance-db\.js\?v=47/);
 });
 
 test("BU2-41 unauthenticated budget route never renders stale spending totals",()=>{
