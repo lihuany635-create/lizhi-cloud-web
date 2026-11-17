@@ -6,8 +6,8 @@
 })(typeof globalThis!=="undefined"?globalThis:this,function(Domain,Backup){
   "use strict";
 
-  const DB_NAME="lizhi-finance",DB_VERSION=1;
-  const STORE_NAMES=Object.freeze(["accounts","creditCards","categories","transactions","settings","backgrounds"]);
+  const DB_NAME="lizhi-finance",DB_VERSION=2;
+  const STORE_NAMES=Object.freeze(["accounts","creditCards","categories","transactions","settings","backgrounds","budgets"]);
   const SYNC_STORE_NAMES=Object.freeze(["accounts","creditCards","categories","transactions"]);
   const DEFAULT_CATEGORIES=Object.freeze([
     {id:"system-salary",name:"薪資",type:"income",icon:"薪",system:true},
@@ -39,6 +39,13 @@
       const stamp=now();
       for(const category of DEFAULT_CATEGORIES)transaction.objectStore("categories").add({...category,archived:false,createdAt:stamp,updatedAt:stamp});
       for(const setting of [{key:"baseCurrency",value:"TWD"},{key:"firstDayOfWeek",value:1},{key:"locale",value:"zh-TW"}])transaction.objectStore("settings").add({...setting,updatedAt:stamp});
+    }
+    // P1: additive v1 → v2 upgrade. No existing transaction/account store is recreated.
+    if(event.oldVersion<2){
+      const budgets=db.createObjectStore("budgets",{keyPath:"id"});
+      createIndex(budgets,"scopeKey","scopeKey",{unique:true});
+      createIndex(budgets,"month","month");
+      createIndex(budgets,"dirty","dirty");
     }
   }
 
