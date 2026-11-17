@@ -240,3 +240,11 @@ test("BU2-44 candidate budget sync guards Auth and state",()=>{
  assert.match(home,/result\.state==="auth_required"/);
  assert.match(home,/BUDGET_IDENTITY_CHANGED/);
 });
+
+test("P4-T04 UI labels default previews and does not offer delete for virtual rows",()=>{
+ const d=[{id:"def1",category_id:null,currency:"TWD",amount:8000,start_month:"2026-12"}];
+ const html=Ui.render({month:"2026-12",rows:[],defaults:d,defaultsState:"synced"});
+ assert.match(html,/依未來月份預設沿用/);
+ assert.match(html,/將此額度設為未來月份預設/);
+ assert.doesNotMatch(html,/data-finance-action="budget-remove-request"/);
+});
