@@ -111,13 +111,13 @@
       +'<button class="finance-button finance-budget-action" type="button" data-finance-action="budget-edit" data-scope="total">設定總預算</button>'
       +'</section>';
     const cards=categoryRows.map(row=>{
-      const scope=scopeOf(row.category_id),saved=byScope.get(scope);
+      const scope=row.category_id===null?null:scopeOf(row.category_id),saved=scope?byScope.get(scope):null;
       return '<article class="finance-budget-category '+escapeHtml(row.status)+'">'
         +'<div class="finance-budget-category-head"><h3>'+escapeHtml(row.category)+'</h3>'+indicator(row.status)+'</div>'
         +'<div class="finance-budget-category-values"><span>預算 '+money(row.budget)+'</span>'
         +'<span>已使用 '+money(row.used)+'</span><span>剩餘 '+money(row.remaining)+'</span></div>'
         +progress(row.used,row.budget,row.category+"預算使用進度")
-        +'<div class="finance-budget-category-actions"><button type="button" class="finance-button" data-finance-action="budget-edit" data-scope="'+escapeHtml(scope)+'">設定</button>'
+        +'<div class="finance-budget-category-actions">'+(scope?'<button type="button" class="finance-button" data-finance-action="budget-edit" data-scope="'+escapeHtml(scope)+'">設定</button>':'<small>待分類交易：請先補充分類</small>')
         +(saved?'<button type="button" class="finance-button" data-finance-action="budget-remove-request" data-id="'+escapeHtml(saved.id)+'">移除額度</button>':"")
         +'</div></article>';
     }).join("");
