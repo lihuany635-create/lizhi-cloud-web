@@ -31,12 +31,16 @@
   async function transact(mode,action){
     const db=await Storage.openFinanceDb();
     try{
-      if(!db.objectStoreNames.contains(STORE)||
-         !db.transaction(STORE,"readonly").objectStore(STORE).indexNames.contains("ownerId"))
+      if(!db.objectStoreNames.contains(STORE))
         throw new Error("BUDGET_OWNER_SCHEMA_MISSING");
       const tx=db.transaction(STORE,mode);
+      const store=tx.objectStore(STORE);
+      if(!store.indexNames.contains("ownerId")){
+        tx.abort();
+        throw new Error("BUDGET_OWNER_SCHEMA_MISSING");
+      }
       const completed=done(tx);
-      const result=await action(tx.objectStore(STORE));
+      const result=await action(store);
       await completed;
       return result;
     }finally{db.close();}
