@@ -60,7 +60,7 @@
   }
   function render(input={}){
     const {month,rows=[],transactions=[],categories=[],accounts=[],creditCards=[],
-      syncState="local",ledgerSyncState="idle",editScope="total",deleteId=null,
+      syncState="local",syncMessage="",cloudEnabled=false,ledgerSyncState="idle",editScope="total",deleteId=null,
       busy=false,error=""}=input;
     const summary=Domain.summary({month,budgets:rows,transactions,categories,accounts,creditCards});
     const current=rows.filter(b=>!b.deletedAt&&b.month===month&&b.currency==="TWD");
@@ -86,8 +86,12 @@
     const edited=byScope.get(draftScope)||null;
     const selectedMonth=escapeHtml(month);
     const pending=rows.filter(x=>x.dirty).length;
-    const syncText=syncState==="synced"&&pending===0
-      ?"預算設定已與雲端同步":"預算設定保留本機，雲端預算服務尚待 P1 驗收與正式啟用。";
+    const syncText=!cloudEnabled?"預算設定保留本機，雲端預算服務尚待 P1 驗收與正式啟用。"
+      :syncState==="synced"&&pending===0?"預算設定已與雲端同步"
+      :syncState==="syncing"?"正在同步預算"
+      :syncState==="pending"?"預算設定存在未同步或衝突項目"
+      :syncState==="auth_required"?"預算雲端驗證失效"
+      :"預算設定待雲端同步";
     const ledgerText=ledgerSyncState==="error"
       ?"帳本同步失敗：本月支出可能不是雲端最新資料。"
       :ledgerSyncState==="pending"||ledgerSyncState==="syncing"
@@ -131,7 +135,10 @@
       +'<label><span class="finance-budget-sr">預算月份</span><input type="month" data-finance-budget-month value="'+selectedMonth+'" aria-label="預算月份"></label>'
       +'<button class="finance-button" type="button" data-finance-action="budget-month-shift" data-offset="1" aria-label="下一個月">›</button></div></div>'
       +'<div class="finance-budget-sync" role="status"><strong>'+escapeHtml(syncText)+'</strong><span>'+escapeHtml(ledgerText)+'</span>'
-      +(pending?'<small>待同步的預算設定：'+pending+' 筆</small>':"")+'</div>'
+      +(pending?'<small>待同步的預算設定：'+pending+' 筆</small>':"")
+      +(syncMessage?'<small role="status">'+escapeHtml(syncMessage)+'</small>':"")
+      +(cloudEnabled?'<button type="button" class="finance-button" data-finance-action="budget-sync"'
+        +(busy?' disabled':'')+'>立即同步預算</button>':"")+'</div>'
       +(error?'<div class="finance-alert error" role="alert">'+escapeHtml(error)+'</div>':"")
       +totals
       +'<section class="finance-section finance-budget-groups"><div class="finance-section-head"><h2>分類預算</h2><small>'+categoryRows.length+' 個分類</small></div>'
@@ -141,7 +148,8 @@
       +'<form data-finance-form="budget"><label>預算項目<select name="scope" aria-label="預算項目">'+selectable+'</select></label>'
       +'<label>額度（TWD 元）<input name="amount" inputmode="numeric" autocomplete="off" type="text" pattern="[0-9]*" value="'+(edited?edited.amount:"")+'" placeholder="例如：10000" aria-label="預算額度" required></label>'
       +'<button class="finance-button primary" type="submit"'+(busy?" disabled":"")+'>儲存預算</button></form>'
-      +'<p>支出包含一般消費及信用卡刷卡，不包含卡費繳款與帳戶互轉本金。所有修改目前只會儲存在本機。</p>'
+      +'<p>支出包含一般消費及信用卡刷卡，不包含卡費繳款與帳戶互轉本金。'
+      +(cloudEnabled?'預算先儲存在本機，通過本人驗證後才同步雲端。':'所有修改目前只會儲存在本機。')+'</p>'
       +confirm+'</section>'
       +(summary.excluded_foreign_currency?'<p class="finance-budget-currency-alert">有 '
         +summary.excluded_foreign_currency+' 筆外幣消費未併入 TWD 預算。</p>':"")

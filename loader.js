@@ -52,8 +52,10 @@
   "./finance/budget/budget-domain.js?v=1",
   "./finance/budget/budget-owner.js?v=1",
   "./finance/budget/budget-local-store.js?v=2",
-  "./finance/budget/budget-ui.js?v=1",
-  "./finance/pages/home.js?v=70"
+  "./finance/budget/budget-cloud-store.js?v=1",
+  "./finance/budget/budget-sync.js?v=1",
+  "./finance/budget/budget-ui.js?v=2",
+  "./finance/pages/home.js?v=71"
  ],
  "knowledge": [
   "./knowledge/domain/knowledge-model.js?v=16",

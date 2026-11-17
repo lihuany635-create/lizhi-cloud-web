@@ -2,7 +2,7 @@
 const FinanceHome=(()=>{
   "use strict";
   const ui={view:"overview",loaded:false,loading:false,accounts:[],cards:[],categories:[],transactions:[],settings:[],backgrounds:[],error:"",notice:"",edit:null,draft:null,aiDraftApplied:null,ai:{input:"",loading:false,status:"idle",models:[],result:null,validation:null,phase3:null,committed:null,dryRun:null,error:"",controller:null,jobStatus:""},advanced:{enabled:true,query:null,message:"",busy:false},voice:{supported:false,status:"idle",interim:"",error:""},sync:{state:"idle",lastSyncedAt:null,error:null,pending:0,deferred:0},ruleMemory:{rules:[],state:"local",error:""},host:{instance:null,state:null,availability:null,error:""},draftTestInput:'{\n  "version": 1,\n  "type": "expense",\n  "amount": 120,\n  "date": "2026-09-20",\n  "category": "餐飲",\n  "account": "現金",\n  "note": "午餐",\n  "source": "manual-test"\n}',draftTestResult:null,draftTestValidation:null,draftTestDryRun:null,draftTestError:"",modal:null,filters:{period:"month",start:"",end:"",type:"",query:""},importPreview:null,backgroundUrl:"",backgroundUrls:new Map(),lastFocus:null};
-  ui.budget={month:FinanceBudgetUi.taipeiMonth(),rows:[],busy:false,error:"",editScope:"total",deleteId:null,ownerId:null};
+  ui.budget={month:FinanceBudgetUi.taipeiMonth(),rows:[],busy:false,error:"",editScope:"total",deleteId:null,ownerId:null,syncState:"local",syncMessage:"",syncing:false};
   const queryParams=new URLSearchParams(location.search);
   const draftTestEnabled=queryParams.get("draftTest")==="1";
   const aiAutoEntryEnabled=false;
@@ -10,6 +10,10 @@ const FinanceHome=(()=>{
   const productionJobBridge=location.hostname==="lihuany635-create.github.io";
   let hostStatusTimer=null,hostStatusEventsInstalled=false,hostLaunchTimers=[],voiceController=null,voiceLifecycleInstalled=false;
   const financeSync=FinanceSync.create({storage:FinanceStorage});
+  // Explicit rollout gate. Never enable before the owner approves the production
+  // budgets table, real OAuth/RLS and cross-device acceptance.
+  const budgetCloudEnabled=false;
+  const budgetSync=FinanceBudgetSync.create();
   const ruleMemoryStore=FinanceRuleMemoryStore.create({settings:FinanceStorage.settings});
   const ruleMemorySync=FinanceRuleMemorySync.create({localStore:ruleMemoryStore});
   const financeCommitController=FinanceCommitController.createFinanceCommitController({createTransaction:async payload=>{const transaction=await FinanceStorage.transactions.create(payload);financeSync.schedule();return transaction;}});
@@ -52,7 +56,8 @@ const FinanceHome=(()=>{
     ]);
     await readBudgets();syncBackgroundUrls();applyBackground();
   }
-  async function load(){ui.loading=true;update();try{await readAll();ui.loaded=true;ui.error="";}catch(error){console.error("Finance load failed",error);ui.error=FinanceUiModel.userError(error);}finally{ui.loading=false;update();if(ui.loaded){if(productionJobBridge){void syncFinance({silent:true});void syncRuleMemory({silent:true});}if(aiHostMode)void startBrowserHost();else if(productionJobBridge)startHostStatusRefresh();else void refreshOllamaStatus({silent:true});}}}
+  async function load(){ui.loading=true;update();try{await readAll();ui.loaded=true;ui.error="";}catch(error){console.error("Finance load failed",error);ui.error=FinanceUiModel.userError(error);}finally{ui.loading=false;update();if(ui.loaded){if(productionJobBridge){void syncFinance({silent:true});void syncRuleMemory({silent:true});
+        if(budgetCloudEnabled)void syncBudgetNow();}if(aiHostMode)void startBrowserHost();else if(productionJobBridge)startHostStatusRefresh();else void refreshOllamaStatus({silent:true});}}}
   async function reload(message=""){try{await readAll();ui.loaded=true;ui.error="";ui.notice=message;}catch(error){console.error("Finance refresh failed",error);ui.error=FinanceUiModel.userError(error);}update();}
   async function syncFinance({silent=false}={}){const result=await financeSync.sync();if(result?.ok&&result.applied)await readAll();if(!silent){if(result?.ok)ui.notice=result.deferred?"帳本已同步；部分交易等待參照資料。":"帳本已完成雲端同步。";else ui.error=result?.error?.message||"本機帳本已保留，雲端同步暫時失敗。";}update();return result;}
   async function syncRuleMemory({silent=false}={}){const result=await ruleMemorySync.sync();if(result?.ok)ui.ruleMemory.rules=await ruleMemoryStore.list();if(!silent){if(result?.ok)ui.notice="已確認規則已同步。";else ui.error=result?.error?.message||"已確認規則保留在本機，雲端同步暫時失敗。";}update();return result;}
@@ -169,7 +174,9 @@ const FinanceHome=(()=>{
       month:ui.budget.month,rows:ui.budget.rows,transactions:ui.transactions,
       categories:ui.categories,accounts:ui.accounts,creditCards:ui.cards,
       editScope:ui.budget.editScope,deleteId:ui.budget.deleteId,
-      ledgerSyncState:ui.sync.state,syncState:"local",busy:ui.budget.busy,error:ui.budget.error
+      ledgerSyncState:ui.sync.state,syncState:ui.budget.syncState,
+      cloudEnabled:budgetCloudEnabled,syncMessage:ui.budget.syncMessage,
+      busy:ui.budget.busy||ui.budget.syncing,error:ui.budget.error
     });
   }
   function content(){const pages={overview,transactions:transactionsPage,accounts:accountsPage,cards:cardsPage,categories:categoriesPage,reports:reportsPage,budgets:budgetPage,settings:settingsPage};return `${rail()}<div class="finance-stage">${header()}<div class="finance-body">${alerts()}${ui.loading&&!ui.loaded?loading():(pages[ui.view]||overview)()}</div></div>${modal()}`;}
@@ -306,6 +313,46 @@ const FinanceHome=(()=>{
       ?"預算本機儲存尚未升級，不能寫入。":message;
     update();
   }
+  async function syncBudgetNow(){
+    if(!budgetCloudEnabled)return {ok:false,state:"disabled"};
+    if(ui.budget.syncing||ui.budget.busy)return {ok:false,state:"busy"};
+    const targetMonth=ui.budget.month,ownerId=ui.budget.ownerId;
+    if(!ownerId)return {ok:false,state:"auth_required"};
+    ui.budget.syncing=true;ui.budget.syncState="syncing";ui.budget.syncMessage="";
+    update();
+    try{
+      if(await FinanceBudgetOwner.requireOwner()!==ownerId)
+        throw new Error("BUDGET_IDENTITY_CHANGED");
+      const result=await budgetSync.sync({month:targetMonth});
+      if(result.state==="auth_required"){
+        ui.budget.rows=[];ui.budget.ownerId=null;
+        ui.budget.error="預算同步期間身分失效；本機預算已隱藏。請重新登入。";
+      }else if(ui.budget.month===targetMonth){
+        await readBudgets();
+      }
+      if(ui.budget.month===targetMonth){
+        ui.budget.syncState=result.state;
+        ui.budget.syncMessage=result.ok?"預算已依登入身分完成雲端同步。":
+          result.state==="pending"?"存在版本衝突或未送出的本機預算，沒有覆寫。":
+          "預算同步未完成，本機修改會保留；請檢查登入與連線狀態。";
+      }
+      return result;
+    }catch(error){
+      const why=String(error?.code||error?.message||"BUDGET_SYNC_FAILED");
+      ui.budget.syncState=why.includes("AUTH")||why.includes("IDENTITY")?"auth_required":"error";
+      ui.budget.syncMessage="預算同步未完成，本機修改會保留（"+why+"）。";
+      if(ui.budget.syncState==="auth_required"){
+        ui.budget.rows=[];ui.budget.ownerId=null;
+      }
+      return {ok:false,state:ui.budget.syncState};
+    }finally{
+      ui.budget.syncing=false;
+      update();
+      // If the month changed during an in-flight request, sync the new month.
+      if(budgetCloudEnabled&&ui.budget.ownerId&&ui.budget.month!==targetMonth)
+        queueMicrotask(()=>void syncBudgetNow());
+    }
+  }
   async function saveBudget(form){
     if(ui.budget.busy)return;
     let scope,amount,categoryId;
@@ -321,9 +368,11 @@ const FinanceHome=(()=>{
       await FinanceBudgetLocalStore.save({month:ui.budget.month,categoryId,amount,currency:"TWD"});
       await readBudgets();
       ui.budget.editScope=scope;ui.budget.deleteId=null;
-      ui.notice="預算已儲存在本機。雲端預算服務尚未啟用，暫不提供跨裝置同步。";
+      ui.notice=budgetCloudEnabled?"預算已保存，本機與雲端將同步。":"預算已儲存在本機。雲端預算服務尚未啟用，暫不提供跨裝置同步。";
     }catch(error){budgetError(error);}
-    finally{ui.budget.busy=false;update();}
+    finally{ui.budget.busy=false;update();
+      if(budgetCloudEnabled&&!ui.budget.error)void syncBudgetNow();
+    }
   }
   async function copyPreviousBudgets(){
     if(ui.budget.busy)return;
@@ -347,7 +396,9 @@ const FinanceHome=(()=>{
       }
       ui.notice="已複製 "+copied+" 筆上月預算到本月（僅本機）；未覆寫本月既有額度。";
     }catch(error){ui.budget.error="已複製 "+copied+" 筆，其餘未完成："+String(error?.message||"儲存失敗");}
-    finally{await readBudgets();ui.budget.busy=false;update();}
+    finally{await readBudgets();ui.budget.busy=false;update();
+      if(budgetCloudEnabled&&!ui.budget.error)void syncBudgetNow();
+    }
   }
   async function removeBudget(id){
     const row=ui.budget.rows.find(x=>x.id===id&&!x.deletedAt);
@@ -356,7 +407,9 @@ const FinanceHome=(()=>{
     try{await FinanceBudgetLocalStore.remove(id);await readBudgets();
       ui.notice="已移除預算額度（本機保留同步記錄），交易資料未變動。";
     }catch(error){budgetError(error);}
-    finally{ui.budget.busy=false;ui.budget.deleteId=null;update();}
+    finally{ui.budget.busy=false;ui.budget.deleteId=null;update();
+      if(budgetCloudEnabled&&!ui.budget.error)void syncBudgetNow();
+    }
   }
   let budgetOwnerListenerInstalled=false;
   function installEvents(host){
@@ -366,6 +419,7 @@ const FinanceHome=(()=>{
         if(event==="SIGNED_OUT"||ui.budget.ownerId&&session?.user?.id!==ui.budget.ownerId){
           FinanceBudgetOwner.invalidate();
           ui.budget.rows=[];ui.budget.ownerId=null;ui.budget.deleteId=null;
+          ui.budget.syncState="auth_required";ui.budget.syncMessage="";
           ui.budget.error="登入身分已變更，預算資料已隱藏。請重新登入或重新載入。";
           if(ui.loaded)update();
         }
@@ -387,6 +441,7 @@ const FinanceHome=(()=>{
         update();return;
       }
       if(action==="budget-copy-previous")return void copyPreviousBudgets();
+      if(action==="budget-sync")return void syncBudgetNow();
       if(action==="budget-remove-request"){ui.budget.deleteId=id;update();return;}
       if(action==="budget-remove-cancel"){ui.budget.deleteId=null;update();return;}
       if(action==="budget-remove-confirm")return void removeBudget(id);

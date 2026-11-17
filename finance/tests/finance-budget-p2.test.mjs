@@ -220,3 +220,22 @@ test("BU2-41 unauthenticated budget route never renders stale spending totals",(
   assert.ok(guard>=0&&render>guard);
   assert.match(home,/為保護帳號隱私，本頁暫不顯示舊使用者的預算或消費統計/);
 });
+
+test("BU2-42 cloud adapter and reconciler load before candidate page",()=>{
+ const loader=read("loader.js");
+ assert.ok(loader.indexOf("budget-cloud-store.js?v=1")>0);
+ assert.ok(loader.indexOf("budget-cloud-store.js?v=1")<loader.indexOf("budget-sync.js?v=1"));
+ assert.ok(loader.indexOf("budget-sync.js?v=1")<loader.indexOf("finance/pages/home.js?v=71"));
+});
+test("BU2-43 disabled production rollout cannot attempt cloud sync",()=>{
+ const home=read("finance/pages/home.js");
+ assert.match(home,/const budgetCloudEnabled=false/);
+ assert.match(home,/if\(!budgetCloudEnabled\)return \{ok:false,state:"disabled"\}/);
+});
+test("BU2-44 candidate budget sync guards Auth and state",()=>{
+ const home=read("finance/pages/home.js");
+ assert.match(home,/FinanceBudgetOwner\.requireOwner/);
+ assert.match(home,/budgetSync\.sync\(\{month:targetMonth\}\)/);
+ assert.match(home,/result\.state==="auth_required"/);
+ assert.match(home,/BUDGET_IDENTITY_CHANGED/);
+});

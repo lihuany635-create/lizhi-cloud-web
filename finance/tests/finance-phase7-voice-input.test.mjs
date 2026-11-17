@@ -104,5 +104,5 @@ test('P7-VOICE-23 no audio recording or upload API exists in the Phase 7 module'
 });
 
 test('P7-VOICE-24 production assets and safety boundaries remain correct',()=>{
-  const index=(read('index.html')+read('loader.js')),sw=read('sw.js'),home=read('finance/pages/home.js'),db=read('finance/storage/finance-db.js');assert.match(index,/finance\/voice\/finance-voice-input\.js\?v=1[\s\S]*finance\/pages\/home\.js\?v=70/);assert.match(index,/finance\/styles\/home\.css\?v=62/);assert.match(sw,/lizhi-cloud-v(?:79|[89][0-9]|[1-9][0-9]{2,})/);assert.match(sw,/finance\/voice\/finance-voice-input\.js\?v=1/);assert.match(db,/DB_VERSION=3/);assert.match(home,/aiAutoEntryEnabled=false/);
+  const index=(read('index.html')+read('loader.js')),sw=read('sw.js'),home=read('finance/pages/home.js'),db=read('finance/storage/finance-db.js');assert.match(index,/finance\/voice\/finance-voice-input\.js\?v=1[\s\S]*finance\/pages\/home\.js\?v=71/);assert.match(index,/finance\/styles\/home\.css\?v=62/);assert.match(sw,/lizhi-cloud-v(?:79|[89][0-9]|[1-9][0-9]{2,})/);assert.match(sw,/finance\/voice\/finance-voice-input\.js\?v=1/);assert.match(db,/DB_VERSION=3/);assert.match(home,/aiAutoEntryEnabled=false/);
 });

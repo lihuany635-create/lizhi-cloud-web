@@ -137,31 +137,34 @@ test("BP1-28 budget cloud table uses an owner-scoped dedicated table",()=>{
   assert.match(sql,/lizhi_finance_budget_category_unique/);
 });
 test("BP1-29 clean remote budget can be pulled into local store",async()=>{
-  const pulled=[],remote={id:"r",month:"2026-11",currency:"TWD",version:1,amount:1000};
+  const pulled=[],remote={id:"r",user_id:"11111111-1111-4111-8111-111111111111",month:"2026-11",currency:"TWD",version:1,amount:1000};
   const sync=Sync.create({
-    local:{list:async()=>[],applyRemote:async r=>pulled.push(r)},
-    cloud:{list:async()=>[remote]}});
+    local:{list:async()=>[],applyRemote:async r=>pulled.push(r),markSynced:async()=>{}},
+    cloud:{list:async()=>[remote],create:async()=>{},update:async()=>{}},
+    owner:{requireOwner:async()=>"11111111-1111-4111-8111-111111111111"}});
   const res=await sync.sync();
   assert.equal(res.ok,true);assert.equal(res.applied,1);assert.equal(pulled[0].id,"r");
 });
 test("BP1-30 dirty local change with a stale version is never overwritten",async()=>{
   let updates=0,applies=0;
   const sync=Sync.create({
-    local:{list:async()=>[{id:"x",month:"2026-11",dirty:true,version:1,
-      amount:900,updatedAt:"1"}],applyRemote:async()=>applies++},
-    cloud:{list:async()=>[{id:"x",version:2,month:"2026-11"}],
-      update:async()=>updates++}});
+    local:{list:async()=>[{id:"x",ownerId:"11111111-1111-4111-8111-111111111111",month:"2026-11",currency:"TWD",categoryId:null,dirty:true,version:1,
+      amount:900,updatedAt:"1"}],applyRemote:async()=>applies++,markSynced:async()=>{}},
+    cloud:{list:async()=>[{id:"x",user_id:"11111111-1111-4111-8111-111111111111",currency:"TWD",category_id:null,version:2,month:"2026-11"}],
+      update:async()=>updates++,create:async()=>{}},
+    owner:{requireOwner:async()=>"11111111-1111-4111-8111-111111111111"}});
   const res=await sync.sync();
   assert.equal(res.ok,false);assert.equal(res.conflicts.length,1);
   assert.equal(updates,0);assert.equal(applies,0);
 });
 test("BP1-31 new local budget creates one cloud row and reads back",async()=>{
   const synced=[];
-  const row={id:"x",month:"2026-11",currency:"TWD",categoryId:null,
+  const row={id:"x",ownerId:"11111111-1111-4111-8111-111111111111",month:"2026-11",currency:"TWD",categoryId:null,
     amount:100,dirty:true,version:0,updatedAt:"now"};
   const sync=Sync.create({
-    local:{list:async()=>[row],markSynced:async (...args)=>synced.push(args)},
-    cloud:{list:async()=>[],create:async()=>({id:"x",version:1})}});
+    local:{list:async()=>[row],markSynced:async (...args)=>synced.push(args),applyRemote:async()=>{}},
+    cloud:{list:async()=>[],create:async()=>({id:"x",user_id:"11111111-1111-4111-8111-111111111111",version:1}),update:async()=>{}},
+    owner:{requireOwner:async()=>"11111111-1111-4111-8111-111111111111"}});
   const res=await sync.sync();
   assert.equal(res.ok,true);assert.equal(res.uploaded,1);
   assert.equal(synced[0][0],"x");
