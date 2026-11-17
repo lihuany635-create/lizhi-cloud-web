@@ -175,7 +175,7 @@ test("BU2-33 app loads budget modules before FinanceHome",()=>{
 test("BU2-34 candidate service worker caches new assets",()=>{
   const sw=read("sw.js"),html=read("index.html");
   assert.match(sw,/finance\/budget\/budget-ui.js\?v=3/);
-  assert.match(sw,/finance\/budget\/budget-ui.css\?v=1/);
+  assert.match(sw,/finance\/budget\/budget-ui.css\?v=2/);
   assert.match(html,/finance\/budget\/budget-ui.css\?v=1/);
 });
 test("BU2-35 finance route preserves all original features",()=>{
