@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {handleFinanceSiteRequest} from "../supabase/functions/lizhi-finance-site-mcp/edge-core.mjs";
 import {FINANCE_SITE_TOOLS,FINANCE_UI_SITE_TOOLS,FINANCE_CLOUD_TOOLS} from "../supabase/functions/lizhi-finance-site-mcp/site-contract.mjs";
+import {FINANCE_BUDGET_TOOLS} from "../supabase/functions/lizhi-finance-site-mcp/finance-budget-contract.mjs";
 const TOKEN="a".repeat(64);
 const OWNER="84b34232-26ed-49c2-b160-e7fdbf80e8cf";
 const request=(method,params={})=>new Request("https://finance.invalid/mcp",{
@@ -14,11 +15,13 @@ async function invoke(method,params={}){
   const r=await handleFinanceSiteRequest(request(method,params),{db,token:TOKEN,ownerUid:OWNER});
   return (await r.json()).result;
 }
-test("FIN-SITE-RETIRE-01 advertise exactly five read and two cloud tools",async()=>{
+test("FIN-SITE-RETIRE-01 preserve original seven and append three bounded budgets",async()=>{
   const result=await invoke("tools/list");
   const names=result.tools.map(x=>x.name);
-  assert.deepEqual(names,[...FINANCE_SITE_TOOLS,...FINANCE_CLOUD_TOOLS].map(x=>x.name));
-  assert.equal(names.length,7);
+  const expected=[...FINANCE_SITE_TOOLS,...FINANCE_CLOUD_TOOLS,...FINANCE_BUDGET_TOOLS].map(x=>x.name);
+  assert.deepEqual(names,expected);
+  assert.equal(names.length,10);
+  assert.deepEqual(names.slice(0,7),[...FINANCE_SITE_TOOLS,...FINANCE_CLOUD_TOOLS].map(x=>x.name));
   for(const old of FINANCE_UI_SITE_TOOLS)assert.equal(names.includes(old.name),false);
 });
 test("FIN-SITE-RETIRE-02 old UI sessions/inspect/action/jobs refuse all remote calls",async()=>{
