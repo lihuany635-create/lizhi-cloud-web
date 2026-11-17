@@ -201,6 +201,16 @@
   check("legacy unowned budget excluded from normal export",
     safeBackup.data.budgets.length===1&&safeBackup.data.budgets[0].id===afterLegacy.id);
 
+  // A cloud acknowledgement must not erase a same-millisecond local edit.
+  const beforeAck=await FinanceBudgetLocalStore.save({month:"2026-11",amount:1200});
+  await FinanceBudgetLocalStore.save({month:"2026-11",amount:1300});
+  const ack=await FinanceBudgetLocalStore.markSynced(beforeAck.id,beforeAck.updatedAt,{
+    id:beforeAck.id,user_id:ownerA.id,month:"2026-11",category_id:null,
+    amount:1200,version:1,currency:"TWD",created_at:stamp,updated_at:stamp,deleted_at:null
+  });
+  check("cloud acknowledgement never overwrites same-millisecond local edit",
+    ack.dirty===true&&ack.amount===1300&&ack.version===1);
+
   const result={status:"PASS",checks:checks.length,names:checks,dbVersion:FinanceStorage.DB_VERSION,
     savedBudgetRows:backup.data.budgets.length,legacyTransactions:legacyData.transactions.length};
   document.body.dataset.p1Status="PASS";

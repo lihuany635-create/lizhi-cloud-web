@@ -131,7 +131,11 @@
     return transact("readwrite",async store=>{
       const current=await request(store.get(id));
       if(!current||current.ownerId!==ownerId)throw new Error("BUDGET_NOT_FOUND");
-      const stillCurrent=current.updatedAt===expectedUpdatedAt;
+      // A second local edit can land within the same millisecond as the upload.
+      // Matching updatedAt alone is insufficient to clear the dirty flag.
+      const stillCurrent=current.updatedAt===expectedUpdatedAt
+        &&current.amount===remote.amount
+        &&(current.deletedAt??null)===(remote.deletedAt??null);
       const next=stillCurrent?remote:{...current,version:remote.version,dirty:true};
       await request(store.put(next));
       return next;
