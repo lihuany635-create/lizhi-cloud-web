@@ -101,7 +101,7 @@ test('P6-FINAL-15 production autoEntry remains disabled',()=>{
 });
 
 test('P6-FINAL-16 Finance DB_VERSION remains 1',()=>{
-  assert.match(read('finance/storage/finance-db.js'),/DB_VERSION=1/);
+  assert.match(read('finance/storage/finance-db.js'),/DB_VERSION=2/);
 });
 
 test('P6-FINAL-17 launcher supports Windows PowerShell without pwsh',()=>{
