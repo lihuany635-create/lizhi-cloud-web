@@ -44,6 +44,19 @@
     if(transaction.type==="credit_card_purchase")required.push(["creditCardId","信用卡"],["categoryId","分類"]);
     if(transaction.type==="credit_card_payment"){if(!isText(transaction.fromAccountId)&&!isText(transaction.accountId))errors.push(error("MISSING_REFERENCE","fromAccountId","付款帳戶不可為空"));required.push(["creditCardId","信用卡"]);}
     for(const [field,label] of required)if(!isText(transaction[field]))errors.push(error("MISSING_REFERENCE",field,`${label}不可為空`));
+    if(isText(transaction.refundOfTransactionId)){
+      if(transaction.type!=="income"||transaction.refundVerified!==true)
+        errors.push(error("INVALID_REFUND_LINK","refundOfTransactionId","只有已明確確認的收入退款可關聯原始消費"));
+      if(transaction.id===transaction.refundOfTransactionId)
+        errors.push(error("INVALID_REFUND_LINK","refundOfTransactionId","退款不能關聯交易自身"));
+      if(Array.isArray(references.transactions)){
+        const source=references.transactions.find(x=>x.id===transaction.refundOfTransactionId);
+        if(!source||source.deletedAt||!["expense","credit_card_purchase"].includes(source.type))
+          errors.push(error("INVALID_REFUND_LINK","refundOfTransactionId","原始支出不存在或已作廢"));
+      }
+    }else if(transaction.refundVerified===true){
+      errors.push(error("INVALID_REFUND_LINK","refundOfTransactionId","缺少退款對應的原始消費"));
+    }
     if(transaction.type==="transfer"&&isText(transaction.fromAccountId)&&transaction.fromAccountId===transaction.toAccountId)errors.push(error("SAME_TRANSFER_ACCOUNT","toAccountId","轉出與轉入帳戶不可相同"));
 
     const accounts=toIdSet(references.accounts),cards=toIdSet(references.creditCards),categories=toIdSet(references.categories);
