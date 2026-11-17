@@ -5,7 +5,7 @@
 })(typeof globalThis!=="undefined"?globalThis:this,function(Domain){
   "use strict";
 
-  const FORMAT="lizhi-finance-backup",SCHEMA_VERSION=2,LEGACY_SCHEMA_VERSION=1;
+  const FORMAT="lizhi-finance-backup",SCHEMA_VERSION=3,LEGACY_SCHEMA_VERSION=1,PREVIOUS_SCHEMA_VERSION=2;
   const COLLECTIONS=Object.freeze(["accounts","creditCards","categories","transactions","settings","backgrounds","budgets"]);
   const isObject=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);
   const isText=value=>typeof value==="string"&&value.trim().length>0;
@@ -14,7 +14,7 @@
   const clone=value=>typeof structuredClone==="function"?structuredClone(value):JSON.parse(JSON.stringify(value));
   const entityError=(collection,index,field,message)=>({code:"INVALID_ENTITY",collection,index,field,message});
 
-  function validateEntity(name,row,index,errors){
+  function validateEntity(name,row,index,errors,schemaVersion){
     if(!isObject(row)){errors.push(entityError(name,index,null,`${name}[${index}] 必須是物件`));return;}
     const requiredTimestamp=field=>{if(!isTimestamp(row[field]))errors.push(entityError(name,index,field,`${field} 必須是有效 timestamp`));};
     if(name==="accounts"){
@@ -44,6 +44,7 @@
       if(row.key==="locale"&&!isText(row.value))errors.push(entityError(name,index,"value","locale 必須是字串"));
       requiredTimestamp("updatedAt");
     }else if(name==="budgets"){
+      if(schemaVersion>=3&&(!isText(row.ownerId)||!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(row.ownerId)))errors.push(entityError(name,index,"ownerId","預算必須綁定登入者 ID"));
       if(!/^20[0-9]{2}-(0[1-9]|1[0-2])$/.test(row.month||""))errors.push(entityError(name,index,"month","預算月份無效"));
       if(row.currency!=="TWD")errors.push(entityError(name,index,"currency","目前只支援 TWD 預算"));
       if(!Number.isSafeInteger(row.amount)||row.amount<0)errors.push(entityError(name,index,"amount","預算金額必須是非負安全整數"));
@@ -80,7 +81,7 @@
     const errors=[],warnings=[];
     if(!isObject(envelope))return {valid:false,errors:[{code:"INVALID_BACKUP",message:"備份必須是物件"}],warnings};
     if(envelope.format!==FORMAT)errors.push({code:"INVALID_BACKUP_FORMAT",message:`format 必須是 ${FORMAT}`});
-    if(![LEGACY_SCHEMA_VERSION,SCHEMA_VERSION].includes(envelope.schemaVersion))errors.push({code:"UNSUPPORTED_BACKUP_VERSION",message:`不支援 schemaVersion：${envelope.schemaVersion}`});
+    if(![LEGACY_SCHEMA_VERSION,PREVIOUS_SCHEMA_VERSION,SCHEMA_VERSION].includes(envelope.schemaVersion))errors.push({code:"UNSUPPORTED_BACKUP_VERSION",message:`不支援 schemaVersion：${envelope.schemaVersion}`});
     if(typeof envelope.exportedAt!=="string"||Number.isNaN(Date.parse(envelope.exportedAt)))errors.push({code:"INVALID_EXPORTED_AT",message:"exportedAt 必須是有效 timestamp"});
     if(!isObject(envelope.data))errors.push({code:"INVALID_BACKUP_DATA",message:"data 必須是物件"});
     const ids={};
@@ -89,7 +90,7 @@
       if(!Array.isArray(rows)){errors.push({code:"INVALID_COLLECTION",collection:name,message:`${name} 必須是陣列`});continue;}
       ids[name]=new Set();
       rows.forEach((row,index)=>{
-        validateEntity(name,row,index,errors);
+        validateEntity(name,row,index,errors,envelope.schemaVersion);
         const key=name==="settings"?row?.key:row?.id;
         if(typeof key!=="string"||!key.trim())errors.push({code:"INVALID_RECORD_ID",collection:name,index,message:`${name}[${index}] 缺少有效識別值`});
         else if(ids[name].has(key))errors.push({code:"DUPLICATE_ID",collection:name,index,message:`${name} 含重複識別值：${key}`});
@@ -122,7 +123,11 @@
     if(normalized&&normalized.schemaVersion===LEGACY_SCHEMA_VERSION){
       normalized.schemaVersion=SCHEMA_VERSION;
       normalized.data.budgets=[];
-      validation.warnings.push({code:"LEGACY_BUDGETS_EMPTY",message:"舊版備份沒有預算資料，已按空預算集合預覽，不覆寫現有預算。"});
+      validation.warnings.push({code:"LEGACY_BUDGETS_EMPTY",message:"v1 備份沒有預算資料，已按空預算集合預覽，不覆寫現有預算。"});
+    }
+    if(normalized&&normalized.schemaVersion===PREVIOUS_SCHEMA_VERSION){
+      validation.warnings.push({code:"LEGACY_UNOWNED_BUDGETS_QUARANTINED",
+        message:"v2 預算沒有可驗證的所有者，僅供預覽，不得自動轉成目前登入者或寫入。"});
     }
     for(const name of COLLECTIONS)counts[name]=Array.isArray(normalized?.data?.[name])?normalized.data[name].length:0;
     return {...validation,counts,envelope:normalized,requiresConfirmation:true,willWrite:false};
