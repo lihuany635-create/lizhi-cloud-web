@@ -48,7 +48,7 @@
     const selected=new Map();
     for(const row of budgets){
       if(!active(row)||row.month!==month||row.currency!==currency)continue;
-      const normalized=validateBudget(row),key=normalized.categoryId??"__TOTAL__";
+      const normalized=validateBudget(row),key=normalized.categoryId===null?"@total":"@cat:"+normalized.categoryId;
       if(selected.has(key))throw new Error("DUPLICATE_BUDGET_SCOPE");
       selected.set(key,{...row,...normalized});
     }
@@ -70,10 +70,10 @@
       used.set(category,add(used.get(category)||0,tx.amount));
       count++;
     }
-    const total=selected.get("__TOTAL__")??null;
-    const categoryIds=new Set([...used.keys(),...selected.keys()].filter(x=>x!=="__TOTAL__"));
+    const total=selected.get("@total")??null;
+    const categoryIds=new Set([...used.keys(),...[...selected.keys()].filter(x=>x.startsWith("@cat:")).map(x=>x.slice(5))]);
     const byCategory=[...categoryIds].map(categoryId=>{
-      const budget=selected.get(categoryId)??null,amountUsed=used.get(categoryId)||0;
+      const budget=selected.get("@cat:"+categoryId)??null,amountUsed=used.get(categoryId)||0;
       return {
         category_id:categoryId||null,
         category:categoryId?(label.get(categoryId)||"未分類"):"未分類",
@@ -100,7 +100,7 @@
     if(typeof idFactory!=="function")throw new TypeError("BUDGET_ID_FACTORY_REQUIRED");
     const keys=new Set();
     return budgets.filter(row=>active(row)&&row.month===fromMonth).map(row=>{
-      const value=validateBudget(row),key=value.currency+":"+(value.categoryId??"__TOTAL__");
+      const value=validateBudget(row),key=value.currency+":"+(value.categoryId===null?"T":"C:"+value.categoryId);
       if(keys.has(key))throw new Error("DUPLICATE_BUDGET_SCOPE");keys.add(key);
       return {id:idFactory(),month:toMonth,currency:value.currency,
         categoryId:value.categoryId,amount:value.amount,version:0,
