@@ -44,7 +44,7 @@ test("既有 UI Draft 驗證仍接受合法手動支出",()=>{
 });
 
 test("P1 預算升級仍保留舊 Finance 集合與 Ollama 本機限制",()=>{
-  assert.equal(Storage.DB_VERSION,2);
+  assert.equal(Storage.DB_VERSION,3);
   assert.ok(["accounts","creditCards","categories","transactions","settings","backgrounds","budgets"].every(name=>Storage.STORE_NAMES.includes(name)));
   assert.equal(Storage.STORE_NAMES.includes("transactions"),true);
   assert.equal(Ollama.normalizeSettings({baseUrl:"http://127.0.0.1:11434",model:"qwen2.5:7b"}).baseUrl,"http://127.0.0.1:11434");
