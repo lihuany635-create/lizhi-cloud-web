@@ -1,5 +1,5 @@
-# Approved one-time READ ONLY pre-migration capture; no hosted writes or deployments.
-name: Supabase restore verification of latest encrypted snapshot
+# Owner-approved pre-finance-budget READ-ONLY fresh snapshot; restores only to disposable PostgreSQL 17.
+name: Supabase finance budget fresh encrypted backup and isolated restore
 on:
   push:
     branches:
@@ -19,13 +19,14 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - name: Require owner backup passphrase only
+      - name: Require existing owner-managed backup secrets
         shell: bash
         env:
+          BACKUP_URL_PRESENT: ${{ secrets.LIZHI_SUPABASE_BACKUP_URL != '' }}
           BACKUP_KEY_PRESENT: ${{ secrets.LIZHI_BACKUP_PASSPHRASE != '' }}
         run: |
-          if [ "$BACKUP_KEY_PRESENT" != true ]; then
-            echo '::error::Backup passphrase secret missing.'
+          if [ "$BACKUP_URL_PRESENT" != true ] || [ "$BACKUP_KEY_PRESENT" != true ]; then
+            echo '::error::Backup secrets are missing; no database operation performed.'
             exit 1
           fi
       - name: Checkout reviewed workflow revision
@@ -55,28 +56,20 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/lizhi-backup-venv"
           "$RUNNER_TEMP/lizhi-backup-venv/bin/pip" install --disable-pip-version-check 'psycopg[binary]==3.2.13'
           python3 -m unittest discover -s scripts/tests -p 'test_supabase_backup.py' -v
-      - name: Fetch existing encrypted snapshot without database access
+      - name: Fresh encrypted snapshot and restore only inside disposable PostgreSQL 17
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          gh run download 43746029537 --repo "$GITHUB_REPOSITORY" --name "lizhi-supabase-encrypted-backup-43746029537-1" --dir "$RUNNER_TEMP/lizhi-backup-input"
-          test -s "$RUNNER_TEMP/lizhi-backup-input/backup.tar.gz.gpg"
-          test -s "$RUNNER_TEMP/lizhi-backup-input/backup.sha256"
-      - name: Restore original encrypted capture in isolated PostgreSQL 17
-        shell: bash
-        env:
-          LIZHI_RESTORE_CAPTURE_DIR: ${{ runner.temp }}/lizhi-backup-input
+          SUPABASE_DB_URL: ${{ secrets.LIZHI_SUPABASE_BACKUP_URL }}
           LIZHI_BACKUP_PASSPHRASE: ${{ secrets.LIZHI_BACKUP_PASSPHRASE }}
         run: |
           set -euo pipefail
+          # Hosted production DB access is read only. Never print secrets or dump plaintext.
           "$RUNNER_TEMP/lizhi-backup-venv/bin/python" scripts/supabase_backup.py
       - name: Preserve encrypted capture even if restore fails
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: lizhi-supabase-encrypted-restore-verified-${{ github.run_id }}-${{ github.run_attempt }}
+          name: lizhi-finance-budget-encrypted-backup-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/lizhi-backup-encrypted/
           if-no-files-found: warn
           retention-days: 7
