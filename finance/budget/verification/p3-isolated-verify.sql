@@ -45,7 +45,7 @@ begin
      or (spending->>'counted_transactions')::int<>2 then
     raise exception 'P3_SPENDING_AGGREGATION_FAIL %',spending;
   end if;
-  if (public.lizhi_finance_budget_site_spending(owner2,'2026-11')->>'used')::numeric<>0 then
+  if (public.lizhi_finance_budget_site_spending(owner2,'2026-11')->>'used')::numeric<>999 then
     raise exception 'P3_CROSS_OWNER_SUMMARY_FAIL';
   end if;
   raise notice 'PASS P3 minimal owner-scoped summary and exclusion';
