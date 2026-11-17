@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><title>Finance P1 isolated IndexedDB verification</title></head>
+<body data-p1-status="RUNNING">
+<h1>Finance P1 isolated IndexedDB verification</h1>
+<pre id="p1-result">RUNNING</pre>
+<script src="/finance/domain/finance-domain.js"></script>
+<script src="/finance/domain/backup.js"></script>
+<script src="/finance/storage/finance-db.js"></script>
+<script src="/finance/budget/budget-domain.js"></script>
+<script src="/finance/budget/budget-local-store.js"></script>
+<script>
+(async()=>{
+  const checks=[];
+  const check=(name,condition)=>{
+    if(!condition)throw new Error("FAIL "+name);
+    checks.push(name);
+  };
+  const request=r=>new Promise((resolve,reject)=>{
+    r.onsuccess=()=>resolve(r.result);
+    r.onerror=()=>reject(r.error||new Error("IDB request failed"));
+  });
+  const done=tx=>new Promise((resolve,reject)=>{
+    tx.oncomplete=resolve;
+    tx.onabort=()=>reject(tx.error||new Error("IDB aborted"));
+    tx.onerror=()=>{};
+  });
+  const stamp="2026-11-17T00:00:00.000Z";
+  // Isolated Chrome profile: simulate a real production-style pre-budget v1 database.
+  const first=indexedDB.open("lizhi-finance",1);
+  first.onupgradeneeded=()=>{
+    const db=first.result;
+    for(const name of ["accounts","creditCards","categories","transactions","settings","backgrounds"]){
+      db.createObjectStore(name,{keyPath:name==="settings"?"key":"id"});
+    }
+    first.transaction.objectStore("accounts").add({
+      id:"cash",name:"現金",type:"cash",initialBalance:9000,currency:"TWD",
+      includeInAssets:true,archived:false,createdAt:stamp,updatedAt:stamp
+    });
+    first.transaction.objectStore("categories").add({
+      id:"food",name:"餐飲",type:"expense",archived:false,system:false,
+      createdAt:stamp,updatedAt:stamp
+    });
+    first.transaction.objectStore("transactions").add({
+      id:"meal",type:"expense",amount:235,date:"2026-11-12",categoryId:"food",
+      accountId:"cash",note:"isolated test",createdAt:stamp,updatedAt:stamp
+    });
+    first.transaction.objectStore("settings").add({key:"baseCurrency",value:"TWD",updatedAt:stamp});
+  };
+  const legacyDb=await request(first);
+  check("actual IndexedDB created at v1",legacyDb.version===1);
+  legacyDb.close();
+
+  const upgraded=await FinanceStorage.openFinanceDb();
+  check("actual IndexedDB upgraded to v2",upgraded.version===2);
+  check("six original object stores preserved",["accounts","creditCards","categories",
+    "transactions","settings","backgrounds"].every(s=>upgraded.objectStoreNames.contains(s)));
+  check("budgets store added",upgraded.objectStoreNames.contains("budgets"));
+  const legacyData={};
+  for(const name of ["accounts","creditCards","categories","transactions","settings","backgrounds"]){
+    const tx=upgraded.transaction(name,"readonly");
+    const rows=await request(tx.objectStore(name).getAll());
+    legacyData[name]=rows;
+  }
+  check("original account preserved",legacyData.accounts.length===1&&legacyData.accounts[0].initialBalance===9000);
+  check("original transaction preserved",legacyData.transactions.length===1&&legacyData.transactions[0].amount===235);
+  check("original category preserved",legacyData.categories.length===1&&legacyData.categories[0].id==="food");
+  check("original settings preserved",legacyData.settings.length===1&&legacyData.settings[0].value==="TWD");
+  upgraded.close();
+
+  // Run the genuine P1 local budget module against the newly migrated real DB.
+  const total=await FinanceBudgetLocalStore.save({month:"2026-11",amount:1000,currency:"TWD"});
+  check("local budget saved",total.amount===1000&&total.version===0&&total.dirty===true);
+  const second=await FinanceBudgetLocalStore.save({month:"2026-11",amount:1200,currency:"TWD"});
+  check("same scope updated instead of inserted duplicate",second.id===total.id&&second.amount===1200);
+  const category=await FinanceBudgetLocalStore.save({month:"2026-11",categoryId:"food",amount:500});
+  let rows=await FinanceBudgetLocalStore.list({includeDeleted:false});
+  check("distinct total and category budget settings",rows.length===2&&rows.some(r=>r.categoryId==="food"));
+  const summary=FinanceBudgetDomain.summary({
+    month:"2026-11",budgets:rows,transactions:legacyData.transactions,
+    accounts:legacyData.accounts,categories:legacyData.categories
+  });
+  check("budget calculation on migrated legacy transaction",summary.used===235&&summary.remaining===965);
+  check("category calculation on migrated data",summary.by_category.some(x=>x.category_id==="food"&&x.used===235));
+
+  // Backup after v2 upgrade must retain all pre-existing stores and new budget rows.
+  const backup=await FinanceStorage.exportBackup("2026-11-17T02:00:00.000Z");
+  check("backup v2 includes legacy account and transaction",
+    backup.schemaVersion===2&&backup.data.accounts.length===1&&backup.data.transactions.length===1);
+  check("backup v2 includes two budgets",backup.data.budgets.length===2);
+  const preview=FinanceBackup.createImportPreview(backup);
+  check("v2 backup preview passes full validation",preview.valid===true&&preview.counts.budgets===2);
+
+  const legacyEnvelope={
+    format:"lizhi-finance-backup",schemaVersion:1,
+    exportedAt:"2026-11-17T01:00:00.000Z",data:legacyData
+  };
+  const oldPreview=FinanceBackup.createImportPreview(legacyEnvelope);
+  check("v1 backup is accepted without overwriting current budgets",
+    oldPreview.valid===true&&oldPreview.envelope.schemaVersion===2
+    &&oldPreview.envelope.data.budgets.length===0&&oldPreview.willWrite===false);
+
+  await FinanceBudgetLocalStore.remove(category.id);
+  rows=await FinanceBudgetLocalStore.list({includeDeleted:false});
+  check("budget removal preserves total budget",rows.length===1&&rows[0].id===total.id);
+  check("original transaction remains intact after budget removal",
+    (await FinanceStorage.transactions.list()).some(x=>x.id==="meal"&&x.amount===235));
+
+  const result={status:"PASS",checks:checks.length,names:checks,dbVersion:FinanceStorage.DB_VERSION,
+    savedBudgetRows:backup.data.budgets.length,legacyTransactions:legacyData.transactions.length};
+  document.body.dataset.p1Status="PASS";
+  document.getElementById("p1-result").textContent=JSON.stringify(result);
+})().catch(error=>{
+  document.body.dataset.p1Status="FAIL";
+  document.getElementById("p1-result").textContent=String(error.stack||error.message||error);
+});
+</script>
+</body>
+</html>
