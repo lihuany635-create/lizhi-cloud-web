@@ -55,7 +55,8 @@
     const label=new Map(categories.map(x=>[String(x.id),String(x.name||"未分類")]));
     const accountCurrency=new Map(accounts.map(x=>[String(x.id),x.currency||CURRENCY]));
     const cardCurrency=new Map(creditCards.map(x=>[String(x.id),x.currency||CURRENCY]));
-    const used=new Map();let spent=0,count=0,unconverted=0;
+    const used=new Map(),sourceExpenses=new Map();
+    let spent=0,count=0,unconverted=0;
     for(const tx of transactions){
       if(!active(tx)||typeof tx.date!=="string"||tx.date.slice(0,7)!==month)continue;
       if(tx.type!=="expense"&&tx.type!=="credit_card_purchase")continue;
@@ -68,9 +69,48 @@
       const category=(typeof tx.categoryId==="string"&&tx.categoryId.trim())?tx.categoryId:"";
       spent=add(spent,tx.amount);
       used.set(category,add(used.get(category)||0,tx.amount));
+      if(typeof tx.id==="string"&&tx.id)sourceExpenses.set(tx.id,{
+        amount:tx.amount,category,currency:txCurrency
+      });
       count++;
     }
+    // Only income explicitly confirmed against an existing expense/purchase ID
+    // can reverse spending. Refund month may differ from original purchase month.
+    // All linked refunds for a source must fit within that source's gross amount.
+    const refunds=new Map();
+    const seenRefundIds=new Set();
+    for(const tx of transactions){
+      if(!active(tx)||tx.type!=="income"||tx.refundVerified!==true||
+         !tx.refundOfTransactionId||!sourceExpenses.has(tx.refundOfTransactionId)||
+         typeof tx.id!=="string"||seenRefundIds.has(tx.id))continue;
+      seenRefundIds.add(tx.id);
+      const source=sourceExpenses.get(tx.refundOfTransactionId);
+      const refundedCurrency=tx.currency??
+        accountCurrency.get(String(tx.accountId))??CURRENCY;
+      if(refundedCurrency!==source.currency||!Number.isSafeInteger(tx.amount)||
+         tx.amount<=0)continue;
+      const group=refunds.get(tx.refundOfTransactionId)??{total:0,count:0};
+      group.total=add(group.total,tx.amount);group.count++;
+      refunds.set(tx.refundOfTransactionId,group);
+    }
+    let refunded=0,linkedRefunds=0,excludedOverRefunds=0;
+    for(const [originalId,group] of refunds){
+      const source=sourceExpenses.get(originalId);
+      if(group.total>source.amount){excludedOverRefunds+=group.count;continue;}
+      refunded=add(refunded,group.total);
+      const next=(used.get(source.category)??0)-group.total;
+      if(next<0)throw new Error("BUDGET_REFUND_CATEGORY_NEGATIVE");
+      used.set(source.category,next);
+      linkedRefunds+=group.count;
+    }
+    spent-=refunded;
     const total=selected.get("@total")??null;
+    // Category budgets are independent allocations. Display an advisory only;
+    // a larger combined allocation must never block the user from saving.
+    const categoryAllocation=[...selected.entries()].filter(([key])=>key.startsWith("@cat:"))
+      .reduce((sum,[,row])=>sum+BigInt(row.amount),0n);
+    const categoryOverage=total&&categoryAllocation>BigInt(total.amount)
+      ?(categoryAllocation-BigInt(total.amount)).toString():null;
     const categoryIds=new Set([...used.keys(),...[...selected.keys()].filter(x=>x.startsWith("@cat:")).map(x=>x.slice(5))]);
     const byCategory=[...categoryIds].map(categoryId=>{
       const budget=selected.get("@cat:"+categoryId)??null,amountUsed=used.get(categoryId)||0;
@@ -89,10 +129,39 @@
       status:state(total,spent),
       percentage:total?(total.amount===0?(spent>0?null:0):spent/total.amount*100):null,
       by_category:byCategory,
+      category_budget_total:categoryAllocation.toString(),
+      category_budget_excess:categoryOverage,
+      category_budget_warning:categoryOverage!==null,
       counted_transactions:count,
+      counted_linked_refunds:linkedRefunds,
+      excluded_over_refunds:excludedOverRefunds,
       excluded_foreign_currency:unconverted,
       notice:unconverted?"存在未換算的外幣消費，未納入此幣別預算。":null
     });
+  }
+  // Opt-in defaults are virtual monthly candidates. Never generate a remote row,
+  // overwrite an explicit month or resurrect an explicitly removed tombstone.
+  function previewFutureDefaults({month,budgets=[],defaults=[]}={}){
+    assertMonth(month);
+    if(!Array.isArray(budgets)||!Array.isArray(defaults))
+      throw new TypeError("BUDGET_DEFAULT_COLLECTION_REQUIRED");
+    const occupied=new Set(budgets.filter(row=>row?.month===month&&row.currency==="TWD")
+      .map(row=>row.categoryId??null));
+    const result=budgets.slice(),seen=new Set();
+    for(const row of defaults){
+      if(!row||row.currency!=="TWD"||row.disabled_at||!row.start_month||
+         row.start_month>month)continue;
+      const categoryId=row.category_id??null;
+      if(seen.has(categoryId))throw new Error("BUDGET_DEFAULT_DUPLICATE_SCOPE");
+      seen.add(categoryId);
+      if(occupied.has(categoryId))continue;
+      const amount=Number(row.amount);
+      validateBudget({month,categoryId,amount,currency:"TWD"});
+      result.push({id:"default-preview:"+String(row.id),month,categoryId,currency:"TWD",
+        amount,virtual:true,dirty:false,deletedAt:null,defaultStartMonth:row.start_month});
+      occupied.add(categoryId);
+    }
+    return result;
   }
   function copyMonthBudgets({budgets,fromMonth,toMonth,idFactory}){
     assertMonth(fromMonth);assertMonth(toMonth);
@@ -108,5 +177,5 @@
         updatedAt:new Date().toISOString()};
     });
   }
-  return Object.freeze({MONEY_MAX,CURRENCY,validateBudget,state,summary,copyMonthBudgets});
+  return Object.freeze({MONEY_MAX,CURRENCY,validateBudget,state,summary,copyMonthBudgets,previewFutureDefaults});
 });

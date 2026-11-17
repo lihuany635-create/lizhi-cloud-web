@@ -222,3 +222,87 @@ test("BP1-38 v3 backups reject records without ownerId",()=>{
   assert.equal(preview.valid,false);
   assert.ok(preview.errors.some(x=>x.field==="ownerId"));
 });
+
+test("P4-T06 category allocations over total are advisory and not double counted",()=>{
+  const result=calculate([tx("d","expense",250,"food")],[
+    budget(1000),budget(900,"food"),budget(500,"shopping")
+  ]);
+  assert.equal(result.used,250);
+  assert.equal(result.category_budget_total,"1400");
+  assert.equal(result.category_budget_excess,"400");
+  assert.equal(result.category_budget_warning,true);
+});
+test("P4-T06 allocations equal to total or total unset never warn",()=>{
+  assert.equal(calculate([],[budget(1000),budget(1000,"food")]).category_budget_warning,false);
+  assert.equal(calculate([],[budget(1000,"food")]).category_budget_warning,false);
+});
+test("P4-T06 very large allocations cannot overflow or prevent budgeting",()=>{
+  const result=calculate([],[
+    budget(Number.MAX_SAFE_INTEGER),budget(Number.MAX_SAFE_INTEGER,"food"),
+    budget(Number.MAX_SAFE_INTEGER,"shopping")
+  ]);
+  assert.equal(result.category_budget_warning,true);
+  assert.equal(result.category_budget_total,String(2n*BigInt(Number.MAX_SAFE_INTEGER)));
+});
+
+test("P4-T04 future-month defaults only preview unconfigured scopes",()=>{
+ const existing=[budget(100,"food","2026-12")];
+ const defaults=[{id:"dtotal",currency:"TWD",category_id:null,amount:8000,start_month:"2026-12"},
+  {id:"dfood",currency:"TWD",category_id:"food",amount:500,start_month:"2026-12"}];
+ const preview=Domain.previewFutureDefaults({month:"2026-12",budgets:existing,defaults});
+ assert.equal(preview.length,2);
+ assert.equal(preview.find(x=>x.categoryId==="food").amount,100);
+ assert.equal(preview.find(x=>x.categoryId===null).amount,8000);
+ assert.equal(preview.find(x=>x.categoryId===null).virtual,true);
+ assert.equal(existing.length,1);
+ assert.equal(Domain.previewFutureDefaults({month:"2026-11",budgets:existing,defaults}).length,1);
+});
+test("P4-T04 removed monthly budget does not silently reappear via default",()=>{
+ const removed={...budget(500,null,"2026-12"),deletedAt:"2026-12-02"};
+ const defaults=[{id:"dt",currency:"TWD",category_id:null,amount:1000,start_month:"2026-12"}];
+ const rows=Domain.previewFutureDefaults({month:"2026-12",budgets:[removed],defaults});
+ assert.equal(rows.length,1);assert.equal(rows[0].deletedAt,"2026-12-02");
+ assert.equal(Domain.summary({month:"2026-12",budgets:rows}).configured,false);
+});
+test("P4-T04 disabled defaults are not applied and duplicate scope is rejected",()=>{
+ const defaults=[{id:"a",currency:"TWD",category_id:null,amount:1000,start_month:"2026-12",disabled_at:"2026-12-02"}];
+ assert.equal(Domain.previewFutureDefaults({month:"2026-12",defaults}).length,0);
+ const dup=[{...defaults[0],disabled_at:null},{...defaults[0],id:"b",disabled_at:null}];
+ assert.throws(()=>Domain.previewFutureDefaults({month:"2026-12",defaults:dup}),/DUPLICATE/);
+});
+
+test("P4-T11 only explicit linked and verified income offsets original spending",()=>{
+ const rows=[tx("purchase","expense",1000,"food","2026-11-12",{accountId:"cash"}),
+ tx("return","income",300,"salary","2026-12-01",{accountId:"cash",
+   refundOfTransactionId:"purchase",refundVerified:true}),
+ tx("salary","income",800,"salary","2026-11-13",{accountId:"cash"})];
+ const a=calculate(rows);
+ assert.equal(a.used,700);
+ assert.equal(a.by_category.find(x=>x.category_id==="food").used,700);
+ assert.equal(a.counted_linked_refunds,1);
+});
+test("P4-T11 unlinked income, unverified, invalid and deleted links never offset",()=>{
+ const original=tx("purchase","credit_card_purchase",850,"food","2026-11-13",{creditCardId:"cc"});
+ const refs=[
+  tx("income","income",500,"salary","2026-11-13"),
+  tx("unverified","income",100,"salary","2026-11-13",{refundOfTransactionId:"purchase"}),
+  tx("wrongid","income",150,"salary","2026-11-13",{refundOfTransactionId:"other",refundVerified:true})
+ ];
+ assert.equal(calculate([original,...refs]).used,850);
+ assert.equal(calculate([{...original,deletedAt:"2026-11-14"},...refs]).used,0);
+});
+test("P4-T11 over-refund groups cannot make monthly spending negative",()=>{
+ const rows=[tx("purchase","expense",100,"food"),
+ tx("r1","income",90,"salary","2026-11-17",{refundOfTransactionId:"purchase",refundVerified:true}),
+ tx("r2","income",90,"salary","2026-11-17",{refundOfTransactionId:"purchase",refundVerified:true})];
+ const a=calculate(rows);
+ assert.equal(a.used,100);assert.equal(a.excluded_over_refunds,2);
+});
+test("P4-T11 foreign currency refund never reduces a TWD purchase",()=>{
+ const rows=[tx("purchase","expense",500,"food","2026-11-11",{accountId:"cash"}),
+ tx("refund","income",300,"salary","2026-11-15",{accountId:"fx",
+   refundOfTransactionId:"purchase",refundVerified:true})];
+ const result=calculate(rows,undefined,{accounts:[{id:"cash",currency:"TWD"},
+   {id:"fx",currency:"USD"}]});
+ assert.equal(result.used,500);
+});

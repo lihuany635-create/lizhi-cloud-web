@@ -85,3 +85,23 @@
  .finance-budget-confirm{background:#463127;color:#ffd9c7}
  .finance-budget-confirm p{color:#ffd2c0}
 }
+
+/* P4 advisory: allocation overages are informative; no writes are blocked. */
+.finance-budget-allocation-warning{padding:12px 14px;margin:12px 0;
+ border:1px solid #b98a35;border-radius:10px;background:#fff5dc;
+ color:#704a15;line-height:1.6;font-size:14px}
+.finance-budget-default-preview{padding:10px 12px;margin:12px 0;
+ border-inline-start:3px solid #4e8f7a;background:#e9f4ef;color:#234e3e;
+ line-height:1.55;font-size:13px}
+.finance-budget-default-actions{display:flex;gap:10px;flex-wrap:wrap;
+ margin-top:10px}
+.finance-budget-default-notice{line-height:1.55;color:#516a60;font-size:13px}
+@media(max-width:600px){
+ .finance-budget-default-actions{flex-direction:column}
+ .finance-budget-default-actions button{width:100%}
+}
+@media(prefers-color-scheme:dark){
+ .finance-budget-allocation-warning{background:#3c3321;color:#ffdfa2;border-color:#896e36}
+ .finance-budget-default-preview{background:#1b4035;color:#d8f2e2;border-color:#538e75}
+ .finance-budget-default-notice{color:#b3d3c3}
+}

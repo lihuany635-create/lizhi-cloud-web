@@ -10,10 +10,10 @@
   "./ai-center/ai-center.js?v=1"
  ],
  "finance": [
-  "./finance/domain/finance-domain.js?v=30",
+  "./finance/domain/finance-domain.js?v=31",
   "./finance/domain/backup.js?v=32",
-  "./finance/storage/finance-db.js?v=46",
-  "./finance/ui-model.js?v=30",
+  "./finance/storage/finance-db.js?v=47",
+  "./finance/ui-model.js?v=31",
   "./finance/domain/finance-transaction-template.js?v=1",
   "./finance/parsers/finance-amount-parser.js?v=2",
   "./finance/parsers/finance-date-parser.js?v=1",
@@ -49,13 +49,14 @@
   "./finance/advanced-voice/finance-review-basket.js?v=1",
   "./finance/sync/finance-sync-store.js?v=1",
   "./finance/sync/finance-sync.js?v=1",
-  "./finance/budget/budget-domain.js?v=1",
+  "./finance/budget/budget-domain.js?v=2",
   "./finance/budget/budget-owner.js?v=1",
   "./finance/budget/budget-local-store.js?v=2",
   "./finance/budget/budget-cloud-store.js?v=1",
+  "./finance/budget/budget-defaults.js?v=1",
   "./finance/budget/budget-sync.js?v=1",
-  "./finance/budget/budget-ui.js?v=2",
-  "./finance/pages/home.js?v=71"
+  "./finance/budget/budget-ui.js?v=3",
+  "./finance/pages/home.js?v=72"
  ],
  "knowledge": [
   "./knowledge/domain/knowledge-model.js?v=16",

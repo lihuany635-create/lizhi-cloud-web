@@ -129,6 +129,10 @@
       if(record.deletedAt){await requestResult(store.put(record));await transactionDone(tx);return record;}
       const allowed={income:["accountId","categoryId"],expense:["accountId","categoryId"],transfer:["fromAccountId","toAccountId"],credit_card_purchase:["creditCardId","categoryId"],credit_card_payment:["fromAccountId","accountId","creditCardId"]}[record.type]||[];
       for(const field of ["accountId","categoryId","fromAccountId","toAccountId","creditCardId"])if(!allowed.includes(field))delete record[field];
+      if(record.type!=="income"){
+        delete record.refundOfTransactionId;
+        delete record.refundVerified;
+      }
       const accountIds=[record.accountId,record.fromAccountId,record.toAccountId].filter(Boolean);
       const accountRows=await Promise.all(accountIds.map(key=>getRecord(tx.objectStore("accounts"),key)));
       const cardRow=record.creditCardId?await getRecord(tx.objectStore("creditCards"),record.creditCardId):null;
@@ -138,6 +142,29 @@
       for(const field of ["accountId","fromAccountId","toAccountId"]){const row=record[field]?accountRows[accountIds.indexOf(record[field])]:null;if(row?.archived&&(!current||current[field]!==record[field]))throw new FinanceStorageError("ARCHIVED_REFERENCE","已封存帳戶不可用於新交易",{field});}
       if(cardRow?.archived&&(!current||current.creditCardId!==record.creditCardId))throw new FinanceStorageError("ARCHIVED_REFERENCE","已封存信用卡不可用於新交易",{field:"creditCardId"});
       if(categoryRow?.archived&&(!current||current.categoryId!==record.categoryId))throw new FinanceStorageError("ARCHIVED_REFERENCE","已封存分類不可用於新交易",{field:"categoryId"});
+      if(record.type==="income"&&record.refundOfTransactionId){
+        const original=await getRecord(store,record.refundOfTransactionId);
+        if(!original||original.deletedAt||
+           !["expense","credit_card_purchase"].includes(original.type)||
+           record.refundVerified!==true||original.id===record.id)
+          throw new FinanceStorageError("INVALID_REFUND_LINK",
+            "退款必須關聯一筆有效的原始消費。");
+        const originalInstrument=original.type==="expense"?
+          await getRecord(tx.objectStore("accounts"),original.accountId):
+          await getRecord(tx.objectStore("creditCards"),original.creditCardId);
+        const receiver=accountRows[accountIds.indexOf(record.accountId)];
+        if((original.currency||originalInstrument?.currency||"TWD")!==
+           (record.currency||receiver?.currency||"TWD"))
+          throw new FinanceStorageError("INVALID_REFUND_CURRENCY","退款與原消費幣別不符。");
+        const all=await requestResult(store.getAll());
+        const existingRefunds=all.filter(x=>x.id!==record.id&&!x.deletedAt&&
+          x.type==="income"&&x.refundVerified===true&&
+          x.refundOfTransactionId===original.id);
+        const sum=existingRefunds.reduce((n,x)=>n+BigInt(x.amount),BigInt(record.amount));
+        if(sum>BigInt(original.amount))
+          throw new FinanceStorageError("REFUND_EXCEEDS_PURCHASE",
+            "該原始消費已關聯的退款合計超出原始金額。");
+      }
       if(record.type==="income"&&categoryRow?.type!=="income")throw new FinanceStorageError("INVALID_CATEGORY_REFERENCE","收入必須使用收入分類",{categoryId:record.categoryId});
       if(["expense","credit_card_purchase"].includes(record.type)&&categoryRow?.type!=="expense")throw new FinanceStorageError("INVALID_CATEGORY_REFERENCE","支出必須使用支出分類",{categoryId:record.categoryId});
       await requestResult(existingId||upsert?store.put(record):store.add(record));await transactionDone(tx);return record;

@@ -25,6 +25,7 @@ jobs:
       - name: Syntax-check budget candidate modules
         run: |
           node --check finance/budget/budget-domain.js
+          node --check finance/budget/budget-defaults.js
           node --check finance/budget/budget-local-store.js
           node --check finance/budget/budget-cloud-store.js
           node --check finance/budget/budget-sync.js

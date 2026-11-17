@@ -174,9 +174,9 @@ test("BU2-33 app loads budget modules before FinanceHome",()=>{
 });
 test("BU2-34 candidate service worker caches new assets",()=>{
   const sw=read("sw.js"),html=read("index.html");
-  assert.match(sw,/finance\/budget\/budget-ui.js\?v=2/);
-  assert.match(sw,/finance\/budget\/budget-ui.css\?v=1/);
-  assert.match(html,/finance\/budget\/budget-ui.css\?v=1/);
+  assert.match(sw,/finance\/budget\/budget-ui.js\?v=3/);
+  assert.match(sw,/finance\/budget\/budget-ui.css\?v=2/);
+  assert.match(html,/finance\/budget\/budget-ui.css\?v=2/);
 });
 test("BU2-35 finance route preserves all original features",()=>{
   const home=read("finance/pages/home.js");
@@ -211,7 +211,7 @@ test("BU2-39 budget UI clears rows when identity changes",()=>{
 test("BU2-40 owner-aware DB v3 and secure backup are registered",()=>{
   const loader=read("loader.js"),storage=read("finance/storage/finance-db.js");
   assert.match(storage,/DB_VERSION=3/);
-  assert.match(loader,/finance\/storage\/finance-db\.js\?v=46/);
+  assert.match(loader,/finance\/storage\/finance-db\.js\?v=47/);
 });
 
 test("BU2-41 unauthenticated budget route never renders stale spending totals",()=>{
@@ -226,7 +226,7 @@ test("BU2-42 cloud adapter and reconciler load before candidate page",()=>{
  const loader=read("loader.js");
  assert.ok(loader.indexOf("budget-cloud-store.js?v=1")>0);
  assert.ok(loader.indexOf("budget-cloud-store.js?v=1")<loader.indexOf("budget-sync.js?v=1"));
- assert.ok(loader.indexOf("budget-sync.js?v=1")<loader.indexOf("finance/pages/home.js?v=71"));
+ assert.ok(loader.indexOf("budget-sync.js?v=1")<loader.indexOf("finance/pages/home.js?v=72"));
 });
 test("BU2-43 approved production rollout enables cloud sync with fail-closed Auth gate",()=>{
  const home=read("finance/pages/home.js");
@@ -239,4 +239,23 @@ test("BU2-44 candidate budget sync guards Auth and state",()=>{
  assert.match(home,/budgetSync\.sync\(\{month:targetMonth\}\)/);
  assert.match(home,/result\.state==="auth_required"/);
  assert.match(home,/BUDGET_IDENTITY_CHANGED/);
+});
+
+test("P4-T04 UI labels default previews and does not offer delete for virtual rows",()=>{
+ const d=[{id:"def1",category_id:null,currency:"TWD",amount:8000,start_month:"2026-12"}];
+ const html=Ui.render({month:"2026-12",rows:[],defaults:d,defaultsState:"synced"});
+ assert.match(html,/依未來月份預設沿用/);
+ assert.match(html,/將此額度設為未來月份預設/);
+ assert.doesNotMatch(html,/data-finance-action="budget-remove-request"/);
+});
+
+test("P4-T04 owner-scoped default module loads before FinanceHome, with explicit fallback",()=>{
+ const loader=read("loader.js"),home=read("finance/pages/home.js"),sw=read("sw.js");
+ assert.ok(loader.includes("budget-defaults.js?v=1"));
+ assert.ok(loader.indexOf("budget-defaults.js")<loader.indexOf("pages/home.js"));
+ assert.ok(home.includes("FinanceBudgetDefaults.list()"));
+ assert.ok(home.includes("FinanceBudgetDefaults.save("));
+ assert.ok(home.includes("FinanceBudgetDefaults.disable("));
+ assert.ok(home.includes('if(action==="budget-default-save")'));
+ assert.ok(sw.includes("budget-defaults.js?v=1"));
 });
