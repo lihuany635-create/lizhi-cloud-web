@@ -2,7 +2,7 @@
 const FinanceHome=(()=>{
   "use strict";
   const ui={view:"overview",loaded:false,loading:false,accounts:[],cards:[],categories:[],transactions:[],settings:[],backgrounds:[],error:"",notice:"",edit:null,draft:null,aiDraftApplied:null,ai:{input:"",loading:false,status:"idle",models:[],result:null,validation:null,phase3:null,committed:null,dryRun:null,error:"",controller:null,jobStatus:""},advanced:{enabled:true,query:null,message:"",busy:false},voice:{supported:false,status:"idle",interim:"",error:""},sync:{state:"idle",lastSyncedAt:null,error:null,pending:0,deferred:0},ruleMemory:{rules:[],state:"local",error:""},host:{instance:null,state:null,availability:null,error:""},draftTestInput:'{\n  "version": 1,\n  "type": "expense",\n  "amount": 120,\n  "date": "2026-09-20",\n  "category": "餐飲",\n  "account": "現金",\n  "note": "午餐",\n  "source": "manual-test"\n}',draftTestResult:null,draftTestValidation:null,draftTestDryRun:null,draftTestError:"",modal:null,filters:{period:"month",start:"",end:"",type:"",query:""},importPreview:null,backgroundUrl:"",backgroundUrls:new Map(),lastFocus:null};
-  ui.budget={month:FinanceBudgetUi.taipeiMonth(),rows:[],busy:false,error:"",editScope:"total",deleteId:null,ownerId:null,syncState:"local",syncMessage:"",syncing:false};
+  ui.budget={month:FinanceBudgetUi.taipeiMonth(),rows:[],busy:false,error:"",editScope:"total",deleteId:null,ownerId:null,syncState:"local",syncMessage:"",syncing:false,defaults:[],defaultsOwner:null,defaultsState:"idle",defaultsMessage:""};
   const queryParams=new URLSearchParams(location.search);
   const draftTestEnabled=queryParams.get("draftTest")==="1";
   const aiAutoEntryEnabled=false;
@@ -45,16 +45,38 @@ const FinanceHome=(()=>{
       const ownerId=await FinanceBudgetOwner.requireOwner();
       const rows=await FinanceBudgetLocalStore.list({includeDeleted:true});
       if(await FinanceBudgetOwner.requireOwner()!==ownerId)throw new Error("BUDGET_OWNER_CHANGED");
+      if(ui.budget.defaultsOwner&&ui.budget.defaultsOwner!==ownerId){
+        ui.budget.defaults=[];ui.budget.defaultsOwner=null;
+        ui.budget.defaultsState="idle";ui.budget.defaultsMessage="";
+      }
       ui.budget.ownerId=ownerId;ui.budget.rows=rows;ui.budget.error="";
     }catch(error){ui.budget.rows=[];ui.budget.ownerId=null;
+      ui.budget.defaults=[];ui.budget.defaultsOwner=null;ui.budget.defaultsState="auth_required";
       ui.budget.error="預算未通過本人驗證，已隱藏本機預算："+String(error?.code||error?.message||"請重新登入");}
+  }
+  async function loadBudgetDefaults({force=false}={}){
+    const owner=ui.budget.ownerId;
+    if(!budgetCloudEnabled||!owner){ui.budget.defaults=[];ui.budget.defaultsState="auth_required";return;}
+    if(!force&&ui.budget.defaultsOwner===owner&&ui.budget.defaultsState==="synced")return;
+    ui.budget.defaultsState="loading";
+    try{
+      const rows=await FinanceBudgetDefaults.list();
+      if(ui.budget.ownerId!==owner||await FinanceBudgetOwner.requireOwner()!==owner)
+        throw new Error("BUDGET_IDENTITY_CHANGED");
+      ui.budget.defaults=rows;ui.budget.defaultsOwner=owner;
+      ui.budget.defaultsState="synced";ui.budget.defaultsMessage="";
+    }catch(error){
+      ui.budget.defaults=[];ui.budget.defaultsOwner=null;ui.budget.defaultsState="error";
+      ui.budget.defaultsMessage="未來月份預設載入失敗，請確認網路與登入。";
+    }finally{if(ui.loaded)update();}
   }
   async function readAll(){
     [ui.accounts,ui.cards,ui.categories,ui.transactions,ui.settings,ui.backgrounds,ui.ruleMemory.rules]=await Promise.all([
       FinanceStorage.accounts.list(),FinanceStorage.creditCards.list(),FinanceStorage.categories.list(),
       FinanceStorage.transactions.list(),FinanceStorage.settings.list(),FinanceStorage.backgrounds.list(),ruleMemoryStore.list()
     ]);
-    await readBudgets();syncBackgroundUrls();applyBackground();
+    await readBudgets();if(budgetCloudEnabled)await loadBudgetDefaults();
+    syncBackgroundUrls();applyBackground();
   }
   async function load(){ui.loading=true;update();try{await readAll();ui.loaded=true;ui.error="";}catch(error){console.error("Finance load failed",error);ui.error=FinanceUiModel.userError(error);}finally{ui.loading=false;update();if(ui.loaded){if(productionJobBridge){void syncFinance({silent:true});void syncRuleMemory({silent:true});
         if(budgetCloudEnabled)void syncBudgetNow();}if(aiHostMode)void startBrowserHost();else if(productionJobBridge)startHostStatusRefresh();else void refreshOllamaStatus({silent:true});}}}
@@ -176,6 +198,8 @@ const FinanceHome=(()=>{
       editScope:ui.budget.editScope,deleteId:ui.budget.deleteId,
       ledgerSyncState:ui.sync.state,syncState:ui.budget.syncState,
       cloudEnabled:budgetCloudEnabled,syncMessage:ui.budget.syncMessage,
+      defaults:ui.budget.defaultsState==="synced"?ui.budget.defaults:[],
+      defaultsState:ui.budget.defaultsState,defaultsMessage:ui.budget.defaultsMessage,
       busy:ui.budget.busy||ui.budget.syncing,error:ui.budget.error
     });
   }
@@ -374,6 +398,45 @@ const FinanceHome=(()=>{
       if(budgetCloudEnabled&&!ui.budget.error)void syncBudgetNow();
     }
   }
+  async function saveFutureBudgetDefault(host){
+    if(ui.budget.busy||ui.budget.syncing||ui.budget.defaultsState!=="synced")return;
+    let scope,categoryId,amount,firstMonth;
+    try{
+      const form=host.querySelector('[data-finance-form="budget"]');
+      if(!form)throw new Error("未找到預算表單。");
+      const data=formObject(form);scope=String(data.scope||"");
+      categoryId=FinanceBudgetUi.parseScope(scope);
+      if(categoryId!==null&&!activeCategories("expense").some(x=>x.id===categoryId))
+        throw new Error("只允許有效的支出分類。");
+      amount=FinanceBudgetUi.parseAmount(data.amount);
+      firstMonth=FinanceBudgetUi.shiftMonth(ui.budget.month,1);
+    }catch(error){budgetError(error);return;}
+    ui.budget.busy=true;ui.budget.error="";update();
+    try{
+      const existing=ui.budget.defaults.find(x=>(x.category_id??null)===categoryId);
+      await FinanceBudgetDefaults.save({categoryId,amount,startMonth:firstMonth,
+        expectedVersion:existing?.version??0});
+      await loadBudgetDefaults({force:true});
+      if(ui.budget.defaultsState!=="synced")throw new Error("預設已提交但讀回未確認，請重試讀取，勿重複建立。");
+      ui.budget.defaultsMessage="預設額度自 "+firstMonth+" 起供未設定月份使用，不會覆寫既有單月額度。";
+    }catch(error){ui.budget.error="未來月份預設未確認："+String(error?.code||error?.message||"請重試讀取");}
+    finally{ui.budget.busy=false;update();}
+  }
+  async function disableFutureBudgetDefault(host){
+    if(ui.budget.busy||ui.budget.syncing||ui.budget.defaultsState!=="synced")return;
+    let categoryId;
+    try{
+      const form=host.querySelector('[data-finance-form="budget"]');
+      categoryId=FinanceBudgetUi.parseScope(String(formObject(form).scope||""));
+      const previous=ui.budget.defaults.find(x=>(x.category_id??null)===categoryId&&!x.disabled_at);
+      if(!previous)throw new Error("此項目前沒有啟用的預設額度。");
+      ui.budget.busy=true;update();
+      await FinanceBudgetDefaults.disable({categoryId,expectedVersion:previous.version});
+      await loadBudgetDefaults({force:true});
+      ui.budget.defaultsMessage="未來月份預設已停用，原月份額度與歷史交易不受影響。";
+    }catch(error){ui.budget.error="停用預設未確認："+String(error?.code||error?.message);}
+    finally{ui.budget.busy=false;update();}
+  }
   async function copyPreviousBudgets(){
     if(ui.budget.busy)return;
     let source;
@@ -419,6 +482,7 @@ const FinanceHome=(()=>{
         if(event==="SIGNED_OUT"||ui.budget.ownerId&&session?.user?.id!==ui.budget.ownerId){
           FinanceBudgetOwner.invalidate();
           ui.budget.rows=[];ui.budget.ownerId=null;ui.budget.deleteId=null;
+          ui.budget.defaults=[];ui.budget.defaultsOwner=null;ui.budget.defaultsState="auth_required";
           ui.budget.syncState="auth_required";ui.budget.syncMessage="";
           ui.budget.error="登入身分已變更，預算資料已隱藏。請重新登入或重新載入。";
           if(ui.loaded)update();
@@ -440,6 +504,8 @@ const FinanceHome=(()=>{
         catch(error){ui.budget.error=String(error.message);}
         update();return;
       }
+      if(action==="budget-default-save")return void saveFutureBudgetDefault(host);
+      if(action==="budget-default-disable")return void disableFutureBudgetDefault(host);
       if(action==="budget-copy-previous")return void copyPreviousBudgets();
       if(action==="budget-sync")return void syncBudgetNow();
       if(action==="budget-remove-request"){ui.budget.deleteId=id;update();return;}
