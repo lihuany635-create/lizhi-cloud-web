@@ -12,7 +12,7 @@
   const error=(code,cause)=>Object.assign(new Error(code),{code,cause});
   function clientOf(client){
     const db=client||(typeof globalThis!=="undefined"?globalThis.LizhiAuth?.client:null);
-    if(!db?.from||!db?.auth?.getSession)throw error("BUDGET_AUTH_REQUIRED");
+    if(!db?.from||!db?.auth?.getSession||!db?.auth?.getUser)throw error("BUDGET_AUTH_REQUIRED");
     return db;
   }
   async function userOf(db){
@@ -21,6 +21,15 @@
     if(err||!data?.user?.id||data.user.id!==verifiedId)
       throw error("BUDGET_IDENTITY_MISMATCH");
     return data.user;
+  }
+  async function assertSameOwner(db,expected){
+    // A client may sign out or change identity while a network request is in flight.
+    const user=await userOf(db);
+    if(user.id!==expected)throw error("BUDGET_IDENTITY_CHANGED");
+  }
+  function checkRemote(row,expected){
+    if(!row||row.user_id!==expected)throw error("BUDGET_REMOTE_OWNER_MISMATCH");
+    return row;
   }
   async function list({client,month}={}){
     if(month!==undefined)Domain.validateBudget({month,amount:0});
@@ -33,7 +42,8 @@
       if(month!==undefined)query=query.eq("month",month);
       const {data,error:err}=await query;
       if(err||!Array.isArray(data))throw error("BUDGET_CLOUD_READ_FAILED",err);
-      rows.push(...data);
+      for(const row of data)rows.push(checkRemote(row,user.id));
+      await assertSameOwner(db,user.id);
       if(data.length<250)return rows;
     }
     throw error("BUDGET_CLOUD_ROW_LIMIT");
@@ -41,6 +51,7 @@
   function payload(record,userId){
     const b=Domain.validateBudget(record);
     if(typeof record.id!=="string"||!record.id.trim())throw error("BUDGET_ID_REQUIRED");
+    if(record.ownerId!==userId)throw error("BUDGET_OWNER_CONFLICT");
     return {id:record.id,user_id:userId,month:b.month,category_id:b.categoryId,
       currency:b.currency,amount:b.amount};
   }
@@ -55,6 +66,8 @@
     if(Number(record?.version)!==0)throw error("BUDGET_INSERT_VERSION_CONFLICT");
     const data=await one(db.from(TABLE).insert(payload(record,user.id)).select(FIELDS).maybeSingle());
     if(!data)throw error("BUDGET_WRITE_NOT_CONFIRMED");
+    checkRemote(data,user.id);
+    await assertSameOwner(db,user.id);
     return data;
   }
   async function update({client,record}={}){
@@ -67,6 +80,8 @@
       .eq("id",record.id).eq("user_id",user.id).eq("version",base)
       .select(FIELDS).maybeSingle());
     if(!data)throw error("BUDGET_VERSION_CONFLICT");
+    checkRemote(data,user.id);
+    await assertSameOwner(db,user.id);
     return data;
   }
   return Object.freeze({TABLE,FIELDS,list,create,update});
