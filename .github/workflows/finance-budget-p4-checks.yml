@@ -1,0 +1,65 @@
+name: Finance Budget P4 Gap Regression
+on:
+  pull_request:
+    paths:
+      - 'finance/**'
+      - 'loader.js'
+      - 'sw.js'
+      - 'index.html'
+      - '.github/workflows/finance-budget-p4-checks.yml'
+permissions:
+  contents: read
+concurrency:
+  group: finance-p4-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+jobs:
+  node-finance:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify modified browser + budget sources
+        run: |
+          node --check finance/budget/budget-domain.js
+          node --check finance/budget/budget-ui.js
+          node --check finance/budget/budget-defaults.js
+          node --check finance/domain/finance-domain.js
+          node --check finance/ui-model.js
+          node --check finance/storage/finance-db.js
+          node --check finance/pages/home.js
+      - name: Full existing Finance regression plus P4 unit suite
+        run: node --test finance/tests/*.test.mjs finance/tests/*.test.js
+  postgres-finance:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: finance_p4_candidate
+          POSTGRES_PASSWORD: isolated-no-production
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d finance_p4_candidate"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGPASSWORD: isolated-no-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: P4 real PostgreSQL refunds and default RLS/CAS in disposable DB
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+          psql -h 127.0.0.1 -U postgres -d finance_p4_candidate -v ON_ERROR_STOP=1 \
+            -f finance/budget/verification/p4-isolated-verify.sql
