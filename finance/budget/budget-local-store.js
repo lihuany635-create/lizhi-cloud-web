@@ -17,7 +17,7 @@
     tx.oncomplete=()=>resolve();tx.onabort=()=>reject(tx.error||new Error("BUDGET_TX_ABORT"));
     tx.onerror=()=>{};
   });
-  const scopeKey=row=>[row.month,row.currency??"TWD",row.categoryId??"__TOTAL__"].join("|");
+  const scopeKey=row=>JSON.stringify([row.month,row.currency??"TWD",row.categoryId??null]);
   async function transact(mode,action){
     const db=await Storage.openFinanceDb();
     try{
