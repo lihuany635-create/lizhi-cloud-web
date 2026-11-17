@@ -67,6 +67,8 @@ begin
 end;
 $$;
 
+revoke all on function public.lizhi_finance_budget_validate_change() from public, anon;
+
 drop trigger if exists lizhi_finance_budget_validate_change
   on public.lizhi_finance_budgets;
 create trigger lizhi_finance_budget_validate_change
