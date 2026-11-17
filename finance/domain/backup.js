@@ -5,8 +5,8 @@
 })(typeof globalThis!=="undefined"?globalThis:this,function(Domain){
   "use strict";
 
-  const FORMAT="lizhi-finance-backup",SCHEMA_VERSION=1;
-  const COLLECTIONS=Object.freeze(["accounts","creditCards","categories","transactions","settings","backgrounds"]);
+  const FORMAT="lizhi-finance-backup",SCHEMA_VERSION=2,LEGACY_SCHEMA_VERSION=1;
+  const COLLECTIONS=Object.freeze(["accounts","creditCards","categories","transactions","settings","backgrounds","budgets"]);
   const isObject=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);
   const isText=value=>typeof value==="string"&&value.trim().length>0;
   const isTimestamp=value=>typeof value==="string"&&!Number.isNaN(Date.parse(value));
@@ -43,6 +43,14 @@
       if(row.key==="firstDayOfWeek"&&(!Number.isInteger(row.value)||row.value<0||row.value>6))errors.push(entityError(name,index,"value","firstDayOfWeek 必須是 0 到 6"));
       if(row.key==="locale"&&!isText(row.value))errors.push(entityError(name,index,"value","locale 必須是字串"));
       requiredTimestamp("updatedAt");
+    }else if(name==="budgets"){
+      if(!/^20[0-9]{2}-(0[1-9]|1[0-2])$/.test(row.month||""))errors.push(entityError(name,index,"month","預算月份無效"));
+      if(row.currency!=="TWD")errors.push(entityError(name,index,"currency","目前只支援 TWD 預算"));
+      if(!Number.isSafeInteger(row.amount)||row.amount<0)errors.push(entityError(name,index,"amount","預算金額必須是非負安全整數"));
+      if(row.categoryId!==null&&(typeof row.categoryId!=="string"||!row.categoryId.trim()))errors.push(entityError(name,index,"categoryId","預算分類識別無效"));
+      if(!Number.isSafeInteger(row.version)||row.version<0)errors.push(entityError(name,index,"version","預算版本無效"));
+      if(typeof row.dirty!=="boolean")errors.push(entityError(name,index,"dirty","預算同步狀態無效"));
+      requiredTimestamp("createdAt");requiredTimestamp("updatedAt");
     }else if(name==="backgrounds"){
       if(!isText(row.name))errors.push(entityError(name,index,"name","背景名稱不可為空"));
       if(row.mimeType!==undefined&&!isText(row.mimeType))errors.push(entityError(name,index,"mimeType","mimeType 必須是字串"));
@@ -72,12 +80,12 @@
     const errors=[],warnings=[];
     if(!isObject(envelope))return {valid:false,errors:[{code:"INVALID_BACKUP",message:"備份必須是物件"}],warnings};
     if(envelope.format!==FORMAT)errors.push({code:"INVALID_BACKUP_FORMAT",message:`format 必須是 ${FORMAT}`});
-    if(envelope.schemaVersion!==SCHEMA_VERSION)errors.push({code:"UNSUPPORTED_BACKUP_VERSION",message:`不支援 schemaVersion：${envelope.schemaVersion}`});
+    if(![LEGACY_SCHEMA_VERSION,SCHEMA_VERSION].includes(envelope.schemaVersion))errors.push({code:"UNSUPPORTED_BACKUP_VERSION",message:`不支援 schemaVersion：${envelope.schemaVersion}`});
     if(typeof envelope.exportedAt!=="string"||Number.isNaN(Date.parse(envelope.exportedAt)))errors.push({code:"INVALID_EXPORTED_AT",message:"exportedAt 必須是有效 timestamp"});
     if(!isObject(envelope.data))errors.push({code:"INVALID_BACKUP_DATA",message:"data 必須是物件"});
     const ids={};
     for(const name of COLLECTIONS){
-      const rows=envelope.data?.[name];
+      const rows=name==="budgets"&&envelope.schemaVersion===LEGACY_SCHEMA_VERSION&&envelope.data?.budgets===undefined?[]:envelope.data?.[name];
       if(!Array.isArray(rows)){errors.push({code:"INVALID_COLLECTION",collection:name,message:`${name} 必須是陣列`});continue;}
       ids[name]=new Set();
       rows.forEach((row,index)=>{
@@ -110,8 +118,14 @@
       try{envelope=JSON.parse(input);}catch(error){return {valid:false,errors:[{code:"INVALID_JSON",message:"備份不是有效 JSON"}],warnings:[],counts:{},envelope:null};}
     }
     const validation=validateBackupEnvelope(envelope),counts={};
-    for(const name of COLLECTIONS)counts[name]=Array.isArray(envelope?.data?.[name])?envelope.data[name].length:0;
-    return {...validation,counts,envelope:validation.valid?clone(envelope):null,requiresConfirmation:true,willWrite:false};
+    const normalized=validation.valid?clone(envelope):null;
+    if(normalized&&normalized.schemaVersion===LEGACY_SCHEMA_VERSION){
+      normalized.schemaVersion=SCHEMA_VERSION;
+      normalized.data.budgets=[];
+      validation.warnings.push({code:"LEGACY_BUDGETS_EMPTY",message:"舊版備份沒有預算資料，已按空預算集合預覽，不覆寫現有預算。"});
+    }
+    for(const name of COLLECTIONS)counts[name]=Array.isArray(normalized?.data?.[name])?normalized.data[name].length:0;
+    return {...validation,counts,envelope:normalized,requiresConfirmation:true,willWrite:false};
   }
 
   return Object.freeze({FORMAT,SCHEMA_VERSION,COLLECTIONS,createBackupEnvelope,validateBackupEnvelope,createImportPreview});
