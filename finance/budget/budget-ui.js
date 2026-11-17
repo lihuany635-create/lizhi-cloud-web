@@ -112,6 +112,10 @@
       +'<div><small>已使用</small><strong>'+money(summary.used)+'</strong></div>'
       +'<div><small>剩餘額度</small><strong>'+money(summary.remaining)+'</strong></div></div>'
       +progress(summary.used,summary.budget,"每月總預算使用進度")
+      +(summary.category_budget_warning?
+        '<p class="finance-budget-allocation-warning" role="status">分類預算合計 '+money(BigInt(summary.category_budget_total))+
+        '，超過總預算 '+money(BigInt(summary.category_budget_excess))+
+        '。此為提醒，不影響個別分類額度，也不阻擋儲存。</p>':"")
       +'<button class="finance-button finance-budget-action" type="button" data-finance-action="budget-edit" data-scope="total">設定總預算</button>'
       +'</section>';
     const cards=categoryRows.map(row=>{
