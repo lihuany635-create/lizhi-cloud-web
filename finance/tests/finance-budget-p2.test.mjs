@@ -248,3 +248,14 @@ test("P4-T04 UI labels default previews and does not offer delete for virtual ro
  assert.match(html,/將此額度設為未來月份預設/);
  assert.doesNotMatch(html,/data-finance-action="budget-remove-request"/);
 });
+
+test("P4-T04 owner-scoped default module loads before FinanceHome, with explicit fallback",()=>{
+ const loader=read("loader.js"),home=read("finance/pages/home.js"),sw=read("sw.js");
+ assert.ok(loader.includes("budget-defaults.js?v=1"));
+ assert.ok(loader.indexOf("budget-defaults.js")<loader.indexOf("pages/home.js"));
+ assert.ok(home.includes("FinanceBudgetDefaults.list()"));
+ assert.ok(home.includes("FinanceBudgetDefaults.save("));
+ assert.ok(home.includes("FinanceBudgetDefaults.disable("));
+ assert.ok(home.includes('if(action==="budget-default-save")'));
+ assert.ok(sw.includes("budget-defaults.js?v=1"));
+});
