@@ -65,7 +65,7 @@ test('P8-25 automatic entry is disabled on every environment',()=>assert.match(r
 test('P8-26 voice final text still only appends and never commits',()=>{const home=read('finance/pages/home.js');assert.match(home,/onFinal:appendVoiceTranscript/);assert.doesNotMatch(home,/onFinal:[^,}]*confirmAiTransaction/);});
 test('P8-27 local transaction creation precedes sync scheduling',()=>assert.match(read('finance/pages/home.js'),/await FinanceStorage\.transactions\.create\(payload\);financeSync\.schedule\(\)/));
 test('P8-28 deleting a transaction creates a tombstone',()=>assert.match(read('finance/storage/finance-db.js'),/tombstoneTransaction[\s\S]*deletedAt:stamp,updatedAt:stamp/));
-test('P8-29 the IndexedDB schema remains v1',()=>assert.match(read('finance/storage/finance-db.js'),/DB_VERSION=1/));
+test('P8-29 the IndexedDB schema upgraded to v2',()=>assert.match(read('finance/storage/finance-db.js'),/DB_VERSION=2/));
 test('P8-30 migration enables RLS and isolates every operation by auth.uid',()=>{const sql=read('supabase/migrations/005_lizhi_finance_sync.sql');assert.match(sql,/enable row level security/);assert.equal((sql.match(/user_id = auth\.uid\(\)/g)||[]).length,5);});
 test('P8-31 migration denies anonymous table access',()=>assert.match(read('supabase/migrations/005_lizhi_finance_sync.sql'),/revoke all on table public\.lizhi_finance_records from anon/));
 test('P8-32 production assets load sync before the Finance page controller',()=>assert.match((read('index.html')+read('loader.js')),/finance\/sync\/finance-sync-store\.js\?v=1[\s\S]*finance\/sync\/finance-sync\.js\?v=1[\s\S]*finance\/pages\/home\.js\?v=68/));
