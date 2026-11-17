@@ -195,3 +195,20 @@ test("BU2-36 budget writes only use local store",()=>{
 test("BU2-37 separate status never asserts backend is deployed",()=>{
   assert.match(view(),/雲端預算服務尚待/);
 });
+
+test("BU2-38 owner module loads before budget local storage",()=>{
+  const loader=read("loader.js");
+  assert.ok(loader.indexOf("finance/budget/budget-owner.js")>=0);
+  assert.ok(loader.indexOf("finance/budget/budget-owner.js")<loader.indexOf("finance/budget/budget-local-store.js"));
+});
+test("BU2-39 budget UI clears rows when identity changes",()=>{
+  const home=read("finance/pages/home.js");
+  assert.match(home,/FinanceBudgetOwner\.invalidate\(\)/);
+  assert.match(home,/ui\.budget\.rows=\[\]/);
+  assert.match(home,/BUDGET_OWNER_CHANGED/);
+});
+test("BU2-40 owner-aware DB v3 and secure backup are registered",()=>{
+  const loader=read("loader.js"),storage=read("finance/storage/finance-db.js");
+  assert.match(storage,/DB_VERSION=3/);
+  assert.match(loader,/finance\/storage\/finance-db\.js\?v=46/);
+});

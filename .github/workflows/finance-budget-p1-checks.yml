@@ -32,3 +32,47 @@ jobs:
           node --check finance/domain/backup.js
       - name: Run new P1 budget tests and existing Finance Node regression
         run: node --test finance/tests/*.test.mjs finance/tests/*.test.js
+
+  isolated-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: finance_p1_verify
+          POSTGRES_PASSWORD: candidate-only-no-production
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d finance_p1_verify"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGPASSWORD: candidate-only-no-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify PostgreSQL fixture, RLS, uniqueness, CAS and summary
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+          psql -h 127.0.0.1 -U postgres -d finance_p1_verify -v ON_ERROR_STOP=1 \
+            -f finance/budget/verification/p1-isolated-verify.sql
+      - name: Verify two concurrent CAS writers against the same version
+        run: bash finance/budget/verification/p1-cas-concurrent.sh
+  isolated-chrome:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify actual IndexedDB v1-to-v2 upgrade and backup with fresh headless Chrome profile
+        run: node finance/budget/verification/p1-browser-runner.mjs

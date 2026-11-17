@@ -2,7 +2,7 @@
 const FinanceHome=(()=>{
   "use strict";
   const ui={view:"overview",loaded:false,loading:false,accounts:[],cards:[],categories:[],transactions:[],settings:[],backgrounds:[],error:"",notice:"",edit:null,draft:null,aiDraftApplied:null,ai:{input:"",loading:false,status:"idle",models:[],result:null,validation:null,phase3:null,committed:null,dryRun:null,error:"",controller:null,jobStatus:""},advanced:{enabled:true,query:null,message:"",busy:false},voice:{supported:false,status:"idle",interim:"",error:""},sync:{state:"idle",lastSyncedAt:null,error:null,pending:0,deferred:0},ruleMemory:{rules:[],state:"local",error:""},host:{instance:null,state:null,availability:null,error:""},draftTestInput:'{\n  "version": 1,\n  "type": "expense",\n  "amount": 120,\n  "date": "2026-09-20",\n  "category": "餐飲",\n  "account": "現金",\n  "note": "午餐",\n  "source": "manual-test"\n}',draftTestResult:null,draftTestValidation:null,draftTestDryRun:null,draftTestError:"",modal:null,filters:{period:"month",start:"",end:"",type:"",query:""},importPreview:null,backgroundUrl:"",backgroundUrls:new Map(),lastFocus:null};
-  ui.budget={month:FinanceBudgetUi.taipeiMonth(),rows:[],busy:false,error:"",editScope:"total",deleteId:null};
+  ui.budget={month:FinanceBudgetUi.taipeiMonth(),rows:[],busy:false,error:"",editScope:"total",deleteId:null,ownerId:null};
   const queryParams=new URLSearchParams(location.search);
   const draftTestEnabled=queryParams.get("draftTest")==="1";
   const aiAutoEntryEnabled=false;
@@ -35,8 +35,15 @@ const FinanceHome=(()=>{
   const formEdit=(kind,id="")=>{ui.edit={kind,id};ui.draft=null;ui.aiDraftApplied=null;ui.modal=null;};
   function scheduleLoad(){if(!ui.loaded&&!ui.loading)queueMicrotask(load);}
   async function readBudgets(){
-    try{ui.budget.rows=await FinanceBudgetLocalStore.list({includeDeleted:true});ui.budget.error="";}
-    catch(error){ui.budget.rows=[];ui.budget.error="預算本機資料無法讀取："+String(error?.message||"請稍後重試");}
+    // Fail closed while the owner is being verified. Never display the prior user's list.
+    ui.budget.rows=[];ui.budget.ownerId=null;
+    try{
+      const ownerId=await FinanceBudgetOwner.requireOwner();
+      const rows=await FinanceBudgetLocalStore.list({includeDeleted:true});
+      if(await FinanceBudgetOwner.requireOwner()!==ownerId)throw new Error("BUDGET_OWNER_CHANGED");
+      ui.budget.ownerId=ownerId;ui.budget.rows=rows;ui.budget.error="";
+    }catch(error){ui.budget.rows=[];ui.budget.ownerId=null;
+      ui.budget.error="預算未通過本人驗證，已隱藏本機預算："+String(error?.code||error?.message||"請重新登入");}
   }
   async function readAll(){
     [ui.accounts,ui.cards,ui.categories,ui.transactions,ui.settings,ui.backgrounds,ui.ruleMemory.rules]=await Promise.all([
@@ -343,7 +350,19 @@ const FinanceHome=(()=>{
     }catch(error){budgetError(error);}
     finally{ui.budget.busy=false;ui.budget.deleteId=null;update();}
   }
+  let budgetOwnerListenerInstalled=false;
   function installEvents(host){
+    if(!budgetOwnerListenerInstalled&&globalThis.LizhiAuth?.client?.auth?.onAuthStateChange){
+      budgetOwnerListenerInstalled=true;
+      globalThis.LizhiAuth.client.auth.onAuthStateChange((event,session)=>{
+        if(event==="SIGNED_OUT"||ui.budget.ownerId&&session?.user?.id!==ui.budget.ownerId){
+          FinanceBudgetOwner.invalidate();
+          ui.budget.rows=[];ui.budget.ownerId=null;ui.budget.deleteId=null;
+          ui.budget.error="登入身分已變更，預算資料已隱藏。請重新登入或重新載入。";
+          if(ui.loaded)update();
+        }
+      });
+    }
     host.addEventListener("input",event=>{if(event.target.matches('[data-finance-form="ai-quick"] textarea[name="aiText"]'))ui.ai.input=event.target.value;});
     host.addEventListener("click",event=>{const target=event.target.closest("[data-route]");if(target?.closest("[data-finance-root]"))destroyVoiceController();},true);
     host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-action]");if(!target||!target.closest("[data-finance-root]")||!["host-health","host-pause","host-resume"].includes(target.dataset.financeAction))return;event.preventDefault();event.stopImmediatePropagation();const action=target.dataset.financeAction;if(action==="host-pause")ui.host.instance?.pause();if(action==="host-resume")ui.host.instance?.resume();if(action==="host-health")void ui.host.instance?.health().then(()=>{ui.host.error="";ui.notice="本機 Gateway 健康檢查通過。";update();}).catch(error=>{ui.host.error=ollamaMessage(error);update();});},true);

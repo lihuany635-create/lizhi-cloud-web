@@ -1,12 +1,12 @@
 (function(root,factory){
   const isNode=typeof module!=="undefined"&&module.exports;
-  const api=factory(isNode?require("../domain/finance-domain.js"):root.FinanceDomain,isNode?require("../domain/backup.js"):root.FinanceBackup);
+  const api=factory(isNode?require("../domain/finance-domain.js"):root.FinanceDomain,isNode?require("../domain/backup.js"):root.FinanceBackup,isNode?require("../budget/budget-owner.js"):null);
   if(isNode)module.exports=api;
   root.FinanceStorage=api;
-})(typeof globalThis!=="undefined"?globalThis:this,function(Domain,Backup){
+})(typeof globalThis!=="undefined"?globalThis:this,function(Domain,Backup,ServerOwner){
   "use strict";
 
-  const DB_NAME="lizhi-finance",DB_VERSION=2;
+  const DB_NAME="lizhi-finance",DB_VERSION=3;
   const STORE_NAMES=Object.freeze(["accounts","creditCards","categories","transactions","settings","backgrounds","budgets"]);
   const SYNC_STORE_NAMES=Object.freeze(["accounts","creditCards","categories","transactions"]);
   const DEFAULT_CATEGORIES=Object.freeze([
@@ -46,6 +46,11 @@
       createIndex(budgets,"scopeKey","scopeKey",{unique:true});
       createIndex(budgets,"month","month");
       createIndex(budgets,"dirty","dirty");
+    }
+    // P1 security upgrade: old v2 budgets have no ownerId and remain intact but
+    // unlisted (quarantined) until explicitly reviewed. Never guess ownership.
+    if(event.oldVersion<3){
+      createIndex(transaction.objectStore("budgets"),"ownerId","ownerId");
     }
   }
 
@@ -159,7 +164,22 @@
   async function exportBackup(exportedAt){
     if(!Backup)throw new FinanceStorageError("BACKUP_UNAVAILABLE","FinanceBackup 尚未載入");
     const db=await openFinanceDb();
-    try{const tx=db.transaction(STORE_NAMES,"readonly"),rows={};await Promise.all(STORE_NAMES.map(async name=>{rows[name]=await requestResult(tx.objectStore(name).getAll());}));await transactionDone(tx);return Backup.createBackupEnvelope(rows,exportedAt);}catch(error){throw translateError(error,{operation:"exportBackup"});}finally{db.close();}
+    try{
+      const tx=db.transaction(STORE_NAMES,"readonly"),rows={};
+      await Promise.all(STORE_NAMES.map(async name=>{
+        rows[name]=await requestResult(tx.objectStore(name).getAll());
+      }));
+      await transactionDone(tx);
+      // Backups must never include another account's budgets or unclaimed v2 rows.
+      // If budgets exist, verify the signed-in owner; anonymous exports fail closed.
+      if(rows.budgets.length){
+        const service=ServerOwner||globalThis.FinanceBudgetOwner;
+        if(!service?.requireOwner)throw new FinanceStorageError("BUDGET_AUTH_REQUIRED","需驗證預算所有者後才能備份。");
+        const ownerId=await service.requireOwner();
+        rows.budgets=rows.budgets.filter(x=>x.ownerId===ownerId);
+      }
+      return Backup.createBackupEnvelope(rows,exportedAt);
+    }catch(error){throw translateError(error,{operation:"exportBackup"});}finally{db.close();}
   }
   return Object.freeze({DB_NAME,DB_VERSION,STORE_NAMES,SYNC_STORE_NAMES,DEFAULT_CATEGORIES,FinanceStorageError,migrateFinanceDb,openFinanceDb,accounts,creditCards,categories,transactions,settings,backgrounds,sync,exportBackup});
 });

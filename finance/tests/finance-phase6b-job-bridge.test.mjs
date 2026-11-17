@@ -169,7 +169,7 @@ test('P6B-T23B dedicated Host resists browser sleeping and wakes its heartbeat',
 });
 
 test('P6B-T24 Phase 6B keeps Finance IndexedDB v1 and remote modules cannot write transactions',()=>{
-  const db=fs.readFileSync(path.join(root,'finance/storage/finance-db.js'),'utf8');assert.match(db,/DB_VERSION=2/);
+  const db=fs.readFileSync(path.join(root,'finance/storage/finance-db.js'),'utf8');assert.match(db,/DB_VERSION=3/);
   for(const file of ['finance-ai-job-store.js','finance-ai-job-connector.js','finance-ai-host.js'])assert.doesNotMatch(fs.readFileSync(path.join(root,'finance/remote',file),'utf8'),/FinanceStorage\.transactions|transactions\.(?:create|update|delete)/);
   const home=fs.readFileSync(path.join(root,'finance/pages/home.js'),'utf8');assert.match(home,/aiAutoEntryEnabled=false/);
 });
