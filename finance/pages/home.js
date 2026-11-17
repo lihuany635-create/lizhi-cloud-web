@@ -12,7 +12,7 @@ const FinanceHome=(()=>{
   const financeSync=FinanceSync.create({storage:FinanceStorage});
   // Explicit rollout gate. Never enable before the owner approves the production
   // budgets table, real OAuth/RLS and cross-device acceptance.
-  const budgetCloudEnabled=false;
+  const budgetCloudEnabled=true;
   const budgetSync=FinanceBudgetSync.create();
   const ruleMemoryStore=FinanceRuleMemoryStore.create({settings:FinanceStorage.settings});
   const ruleMemorySync=FinanceRuleMemorySync.create({localStore:ruleMemoryStore});

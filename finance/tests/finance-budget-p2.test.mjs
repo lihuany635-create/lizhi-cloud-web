@@ -190,7 +190,7 @@ test("BU2-36 budget writes only use local store",()=>{
   assert.match(home,/FinanceBudgetLocalStore\.save/);
   assert.match(home,/FinanceBudgetLocalStore\.remove/);
   assert.doesNotMatch(home,/FinanceBudgetCloudStore\./);
-  assert.match(home,/const budgetCloudEnabled=false/);
+  assert.match(home,/const budgetCloudEnabled=true/);
   assert.match(home,/FinanceBudgetSync\.create/);
 });
 test("BU2-37 separate status never asserts backend is deployed",()=>{
@@ -228,9 +228,9 @@ test("BU2-42 cloud adapter and reconciler load before candidate page",()=>{
  assert.ok(loader.indexOf("budget-cloud-store.js?v=1")<loader.indexOf("budget-sync.js?v=1"));
  assert.ok(loader.indexOf("budget-sync.js?v=1")<loader.indexOf("finance/pages/home.js?v=71"));
 });
-test("BU2-43 disabled production rollout cannot attempt cloud sync",()=>{
+test("BU2-43 approved production rollout enables cloud sync with fail-closed Auth gate",()=>{
  const home=read("finance/pages/home.js");
- assert.match(home,/const budgetCloudEnabled=false/);
+ assert.match(home,/const budgetCloudEnabled=true/);
  assert.match(home,/if\(!budgetCloudEnabled\)return \{ok:false,state:"disabled"\}/);
 });
 test("BU2-44 candidate budget sync guards Auth and state",()=>{
