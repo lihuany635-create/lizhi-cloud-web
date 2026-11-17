@@ -1,4 +1,4 @@
-# Owner-approved pre-finance-budget READ-ONLY fresh snapshot; restores only to disposable PostgreSQL 17.
+# Owner-approved P3 pre-deployment fresh backup after A22 Dec 2026 budget; read-only capture and disposable PG17 restore.
 name: Supabase finance budget fresh encrypted backup and isolated restore
 on:
   push:
