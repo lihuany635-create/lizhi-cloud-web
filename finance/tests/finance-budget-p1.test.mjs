@@ -104,17 +104,17 @@ test("BP1-23 copying budgets creates fresh IDs without overwriting the source",(
   assert.equal(copy.length,2);assert.ok(copy.every(x=>x.dirty&&x.version===0));
   assert.equal(copy[0].month,"2026-12");assert.equal(source[0].month,"2026-11");
 });
-test("BP1-24 local schema migrates additively to v2",()=>{
+test("BP1-24 local schema migrates additively to v3",()=>{
   const src=read("finance/storage/finance-db.js");
-  assert.match(src,/DB_VERSION=2/);assert.match(src,/if\(event\.oldVersion<1\)/);
+  assert.match(src,/DB_VERSION=3/);assert.match(src,/if\(event\.oldVersion<1\)/);
   assert.match(src,/if\(event\.oldVersion<2\)/);assert.match(src,/createObjectStore\("budgets"/);
-  assert.match(src,/scopeKey/);
+  assert.match(src,/scopeKey/);assert.match(src,/if\\(event\\.oldVersion<3\\)/);assert.match(src,/createIndex\\(transaction\\.objectStore\\("budgets"\\),"ownerId"/);
 });
-test("BP1-25 backup v2 retains budget rows",()=>{
+test("BP1-25 backup v3 retains owner-scoped budget rows",()=>{
   const data=Object.fromEntries(Backup.COLLECTIONS.map(x=>[x,[]]));
-  data.budgets=[Local.create({id:"budget01",month:"2026-11",amount:5000})];
+  data.budgets=[Local.create({id:"budget01",month:"2026-11",amount:5000,ownerId:'11111111-1111-4111-8111-111111111111'})];
   const file=Backup.createBackupEnvelope(data,"2026-11-17T00:00:00.000Z");
-  assert.equal(file.schemaVersion,2);
+  assert.equal(file.schemaVersion,3);
   assert.equal(Backup.createImportPreview(file).counts.budgets,1);
 });
 test("BP1-26 legacy v1 backup is accepted as a zero-budget preview",()=>{
@@ -122,11 +122,11 @@ test("BP1-26 legacy v1 backup is accepted as a zero-budget preview",()=>{
   const file={format:"lizhi-finance-backup",schemaVersion:1,
     exportedAt:"2026-11-17T00:00:00.000Z",data};
   const preview=Backup.createImportPreview(file);
-  assert.equal(preview.valid,true);assert.equal(preview.envelope.schemaVersion,2);
+  assert.equal(preview.valid,true);assert.equal(preview.envelope.schemaVersion,3);
   assert.deepEqual(preview.envelope.data.budgets,[]);
 });
 test("BP1-27 local scope keys distinguish total and categorized budgets",()=>{
-  assert.notEqual(Local.scopeKey(budget(1000)),Local.scopeKey(budget(1000,"food")));
+  assert.notEqual(Local.scopeKey({...budget(1000),ownerId:'11111111-1111-4111-8111-111111111111'}),Local.scopeKey({...budget(1000,"food"),ownerId:'11111111-1111-4111-8111-111111111111'}));
 });
 test("BP1-28 budget cloud table uses an owner-scoped dedicated table",()=>{
   assert.equal(Cloud.TABLE,"lizhi_finance_budgets");
@@ -172,7 +172,7 @@ test("BP1-32 an actual category ID matching the legacy total sentinel cannot col
     [budget(1000),budget(100,"__TOTAL__")]);
   assert.equal(a.budget,1000);
   assert.equal(a.by_category.find(x=>x.category_id==="__TOTAL__").budget,100);
-  assert.notEqual(Local.scopeKey(budget(1000)),Local.scopeKey(budget(100,"__TOTAL__")));
+  assert.notEqual(Local.scopeKey({...budget(1000),ownerId:'11111111-1111-4111-8111-111111111111'}),Local.scopeKey({...budget(100,"__TOTAL__"),ownerId:'11111111-1111-4111-8111-111111111111'}));
 });
 test("BP1-33 compact spending RPC retains owner scoping and no full ledger response",()=>{
   const sql=read("finance/budget/sql/p1-spending-summary-candidate.sql");
@@ -187,4 +187,35 @@ test("BP1-34 deleted source budget is excluded when copying months",()=>{
     budgets:[budget(300),{...budget(400,"food"),deletedAt:"2026-11-17"}],
     fromMonth:"2026-11",toMonth:"2026-12",idFactory:()=>String(++number)});
   assert.equal(result.length,1);
+});
+
+test("BP1-35 verified budget owner scope differs between users",()=>{
+  const a=Local.scopeKey({...budget(100),ownerId:"11111111-1111-4111-8111-111111111111"});
+  const b=Local.scopeKey({...budget(100),ownerId:"22222222-2222-4222-8222-222222222222"});
+  assert.notEqual(a,b);
+});
+test("BP1-36 local budget creation rejects missing or forged owner",()=>{
+  assert.throws(()=>Local.create({id:"missing",month:"2026-11",amount:1}),/BUDGET_OWNER_REQUIRED/);
+  assert.throws(()=>Local.create({id:"bad",ownerId:"user@example.com",month:"2026-11",amount:1}),/BUDGET_OWNER_REQUIRED/);
+});
+test("BP1-37 legacy v2 backup stays read-only without auto-claim",()=>{
+  const data=Object.fromEntries(Backup.COLLECTIONS.map(x=>[x,[]]));
+  data.budgets=[{id:"legacy",month:"2026-11",categoryId:null,currency:"TWD",amount:1200,version:0,
+    dirty:true,createdAt:"2026-11-17T00:00:00.000Z",updatedAt:"2026-11-17T00:00:00.000Z"}];
+  const preview=Backup.createImportPreview({format:"lizhi-finance-backup",schemaVersion:2,
+    exportedAt:"2026-11-17T00:00:00.000Z",data});
+  assert.equal(preview.valid,true);
+  assert.equal(preview.willWrite,false);
+  assert.equal(preview.envelope.schemaVersion,2);
+  assert.equal(preview.envelope.data.budgets.length,1);
+  assert.ok(preview.warnings.some(x=>x.code==="LEGACY_UNOWNED_BUDGETS_QUARANTINED"));
+});
+test("BP1-38 v3 backups reject records without ownerId",()=>{
+  const data=Object.fromEntries(Backup.COLLECTIONS.map(x=>[x,[]]));
+  data.budgets=[{id:"legacy",month:"2026-11",categoryId:null,currency:"TWD",amount:1,version:0,
+    dirty:true,createdAt:"2026-11-17T00:00:00.000Z",updatedAt:"2026-11-17T00:00:00.000Z"}];
+  const preview=Backup.createImportPreview({format:"lizhi-finance-backup",schemaVersion:3,
+    exportedAt:"2026-11-17T00:00:00.000Z",data});
+  assert.equal(preview.valid,false);
+  assert.ok(preview.errors.some(x=>x.field==="ownerId"));
 });
