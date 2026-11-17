@@ -1,10 +1,11 @@
 (function(root,factory){
   "use strict";
   const isNode=typeof module==="object"&&module.exports;
-  const api=factory(isNode?require("./budget-domain.js"):root.FinanceBudgetDomain);
+  const api=factory(isNode?require("./budget-domain.js"):root.FinanceBudgetDomain,
+    isNode?require("./budget-owner.js"):root.FinanceBudgetOwner);
   if(isNode)module.exports=api;
   root.FinanceBudgetCloudStore=api;
-})(typeof globalThis!=="undefined"?globalThis:this,function(Domain){
+})(typeof globalThis!=="undefined"?globalThis:this,function(Domain,Owner){
   "use strict";
   const TABLE="lizhi_finance_budgets";
   const FIELDS="id,user_id,month,category_id,currency,amount,version,created_at,updated_at,deleted_at";
@@ -15,9 +16,11 @@
     return db;
   }
   async function userOf(db){
-    const {data,error:err}=await db.auth.getSession();
-    if(err||!data?.session?.user?.id)throw error("BUDGET_AUTH_REQUIRED");
-    return data.session.user;
+    const verifiedId=await Owner.requireOwner();
+    const {data,error:err}=await db.auth.getUser();
+    if(err||!data?.user?.id||data.user.id!==verifiedId)
+      throw error("BUDGET_IDENTITY_MISMATCH");
+    return data.user;
   }
   async function list({client,month}={}){
     if(month!==undefined)Domain.validateBudget({month,amount:0});
