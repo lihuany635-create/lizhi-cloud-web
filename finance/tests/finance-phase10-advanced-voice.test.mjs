@@ -60,7 +60,7 @@ test("P10-46 final voice transcript remains input-only before routing",()=>asser
 test("P10-47 host refresh does not clear advanced session",()=>assert.doesNotMatch(read("finance/pages/home.js"),/launchOrRefreshAiHost[^}]*advancedSession\.clear/));
 test("P10-48 Finance Sync refresh does not clear advanced session",()=>assert.doesNotMatch(read("finance/pages/home.js"),/syncFinance[^}]*advancedSession\.clear/));
 test("P10-49 390px layout is single-column",()=>assert.match(read("finance/styles/home.css"),/@media\(max-width:390px\)[\s\S]*finance-review-basket[\s\S]*grid-template-columns:1fr/));
-test("P10-50 Finance IndexedDB upgrades to version 2",()=>assert.match(read("finance/storage/finance-db.js"),/DB_VERSION=2/));
+test("P10-50 Finance IndexedDB upgrades to version 2",()=>assert.match(read("finance/storage/finance-db.js"),/DB_VERSION=3/));
 test("P10-51 production automatic entry remains disabled",()=>assert.match(read("finance/pages/home.js"),/aiAutoEntryEnabled=false/));
 test("P10-52 Phase 10 adds no audio or blob upload",()=>{for(const file of fs.readdirSync(path.join(root,"finance/advanced-voice")))assert.doesNotMatch(read(`finance/advanced-voice/${file}`),/(?:audio|FormData|Blob|setInputFiles)/i);});
 test("P10-53 advanced modules contain no secret-bearing payload fields",()=>{for(const file of fs.readdirSync(path.join(root,"finance/advanced-voice")))assert.doesNotMatch(read(`finance/advanced-voice/${file}`),/(?:service_role|access_token|refresh_token|password|authorization)/i);});
