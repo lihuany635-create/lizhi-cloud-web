@@ -244,3 +244,29 @@ test("P4-T06 very large allocations cannot overflow or prevent budgeting",()=>{
   assert.equal(result.category_budget_warning,true);
   assert.equal(result.category_budget_total,String(2n*BigInt(Number.MAX_SAFE_INTEGER)));
 });
+
+test("P4-T04 future-month defaults only preview unconfigured scopes",()=>{
+ const existing=[budget(100,"food","2026-12")];
+ const defaults=[{id:"dtotal",currency:"TWD",category_id:null,amount:8000,start_month:"2026-12"},
+  {id:"dfood",currency:"TWD",category_id:"food",amount:500,start_month:"2026-12"}];
+ const preview=Domain.previewFutureDefaults({month:"2026-12",budgets:existing,defaults});
+ assert.equal(preview.length,2);
+ assert.equal(preview.find(x=>x.categoryId==="food").amount,100);
+ assert.equal(preview.find(x=>x.categoryId===null).amount,8000);
+ assert.equal(preview.find(x=>x.categoryId===null).virtual,true);
+ assert.equal(existing.length,1);
+ assert.equal(Domain.previewFutureDefaults({month:"2026-11",budgets:existing,defaults}).length,1);
+});
+test("P4-T04 removed monthly budget does not silently reappear via default",()=>{
+ const removed={...budget(500,null,"2026-12"),deletedAt:"2026-12-02"};
+ const defaults=[{id:"dt",currency:"TWD",category_id:null,amount:1000,start_month:"2026-12"}];
+ const rows=Domain.previewFutureDefaults({month:"2026-12",budgets:[removed],defaults});
+ assert.equal(rows.length,1);assert.equal(rows[0].deletedAt,"2026-12-02");
+ assert.equal(Domain.summary({month:"2026-12",budgets:rows}).configured,false);
+});
+test("P4-T04 disabled defaults are not applied and duplicate scope is rejected",()=>{
+ const defaults=[{id:"a",currency:"TWD",category_id:null,amount:1000,start_month:"2026-12",disabled_at:"2026-12-02"}];
+ assert.equal(Domain.previewFutureDefaults({month:"2026-12",defaults}).length,0);
+ const dup=[{...defaults[0],disabled_at:null},{...defaults[0],id:"b",disabled_at:null}];
+ assert.throws(()=>Domain.previewFutureDefaults({month:"2026-12",defaults:dup}),/DUPLICATE/);
+});
