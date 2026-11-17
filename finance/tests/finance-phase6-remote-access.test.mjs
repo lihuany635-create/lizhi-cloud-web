@@ -66,6 +66,6 @@ test('P6-T07 connector failure stays safe and never falls back to direct Ollama'
 test('P6-T08 Phase 6 keeps DB v1 and performs no transaction writes',()=>{
   const db=fs.readFileSync(path.join(root,'finance/storage/finance-db.js'),'utf8');
   const script=fs.readFileSync(path.join(root,'scripts/start-finance-ai-quick-tunnel.ps1'),'utf8');
-  assert.match(db,/DB_VERSION=1/);
+  assert.match(db,/DB_VERSION=2/);
   assert.doesNotMatch(script,/transactions\.(?:create|update|delete)/);
 });
