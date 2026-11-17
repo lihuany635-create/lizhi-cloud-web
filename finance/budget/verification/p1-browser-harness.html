@@ -6,6 +6,7 @@
 <pre id="p1-result">RUNNING</pre>
 <script src="/finance/domain/finance-domain.js"></script>
 <script src="/finance/domain/backup.js"></script>
+<script src="/finance/budget/budget-owner.js"></script>
 <script src="/finance/storage/finance-db.js"></script>
 <script src="/finance/budget/budget-domain.js"></script>
 <script src="/finance/budget/budget-local-store.js"></script>
@@ -26,6 +27,27 @@
     tx.onerror=()=>{};
   });
   const stamp="2026-11-17T00:00:00.000Z";
+  const ownerA={id:"11111111-1111-4111-8111-111111111111",email:"owner-a@example.test"};
+  const ownerB={id:"22222222-2222-4222-8222-222222222222",email:"owner-b@example.test"};
+  let activeOwner=ownerA,authCallbacks=[],remoteChecks=0;
+  const auth={
+    getSession:async()=>({data:{session:activeOwner?{user:activeOwner}:null},error:null}),
+    getUser:async()=>{remoteChecks++;return {data:{user:activeOwner},error:null};},
+    onAuthStateChange:callback=>{
+      authCallbacks.push(callback);
+      return {data:{subscription:{unsubscribe(){authCallbacks=authCallbacks.filter(x=>x!==callback);}}}};
+    }
+  };
+  window.LizhiAuth={
+    client:{auth},
+    get user(){return activeOwner;},
+    get allowedEmail(){return activeOwner?.email||"owner-a@example.test";}
+  };
+  function switchOwner(user){
+    activeOwner=user;
+    authCallbacks.forEach(cb=>cb(user?"SIGNED_IN":"SIGNED_OUT",user?{user}:null));
+  }
+
   // Isolated Chrome profile: simulate a real production-style pre-budget v1 database.
   const first=indexedDB.open("lizhi-finance",1);
   first.onupgradeneeded=()=>{
@@ -52,7 +74,7 @@
   legacyDb.close();
 
   const upgraded=await FinanceStorage.openFinanceDb();
-  check("actual IndexedDB upgraded to v2",upgraded.version===2);
+  check("actual IndexedDB upgraded to v3",upgraded.version===3);
   check("six original object stores preserved",["accounts","creditCards","categories",
     "transactions","settings","backgrounds"].every(s=>upgraded.objectStoreNames.contains(s)));
   check("budgets store added",upgraded.objectStoreNames.contains("budgets"));
@@ -83,13 +105,13 @@
   check("budget calculation on migrated legacy transaction",summary.used===235&&summary.remaining===965);
   check("category calculation on migrated data",summary.by_category.some(x=>x.category_id==="food"&&x.used===235));
 
-  // Backup after v2 upgrade must retain all pre-existing stores and new budget rows.
+  // Backup after v3 upgrade must retain all pre-existing stores and new budget rows.
   const backup=await FinanceStorage.exportBackup("2026-11-17T02:00:00.000Z");
-  check("backup v2 includes legacy account and transaction",
-    backup.schemaVersion===2&&backup.data.accounts.length===1&&backup.data.transactions.length===1);
-  check("backup v2 includes two budgets",backup.data.budgets.length===2);
+  check("backup v3 includes legacy account and transaction",
+    backup.schemaVersion===3&&backup.data.accounts.length===1&&backup.data.transactions.length===1);
+  check("backup v3 includes two budgets",backup.data.budgets.length===2);
   const preview=FinanceBackup.createImportPreview(backup);
-  check("v2 backup preview passes full validation",preview.valid===true&&preview.counts.budgets===2);
+  check("v3 backup preview passes full validation",preview.valid===true&&preview.counts.budgets===2);
 
   const legacyEnvelope={
     format:"lizhi-finance-backup",schemaVersion:1,
@@ -97,7 +119,7 @@
   };
   const oldPreview=FinanceBackup.createImportPreview(legacyEnvelope);
   check("v1 backup is accepted without overwriting current budgets",
-    oldPreview.valid===true&&oldPreview.envelope.schemaVersion===2
+    oldPreview.valid===true&&oldPreview.envelope.schemaVersion===3
     &&oldPreview.envelope.data.budgets.length===0&&oldPreview.willWrite===false);
 
   await FinanceBudgetLocalStore.remove(category.id);
