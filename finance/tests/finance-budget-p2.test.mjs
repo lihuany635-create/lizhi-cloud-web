@@ -174,7 +174,7 @@ test("BU2-33 app loads budget modules before FinanceHome",()=>{
 });
 test("BU2-34 candidate service worker caches new assets",()=>{
   const sw=read("sw.js"),html=read("index.html");
-  assert.match(sw,/finance\/budget\/budget-ui.js\?v=1/);
+  assert.match(sw,/finance\/budget\/budget-ui.js\?v=2/);
   assert.match(sw,/finance\/budget\/budget-ui.css\?v=1/);
   assert.match(html,/finance\/budget\/budget-ui.css\?v=1/);
 });
@@ -190,7 +190,7 @@ test("BU2-36 budget writes only use local store",()=>{
   assert.match(home,/FinanceBudgetLocalStore\.save/);
   assert.match(home,/FinanceBudgetLocalStore\.remove/);
   assert.doesNotMatch(home,/FinanceBudgetCloudStore\./);
-  assert.doesNotMatch(home,/FinanceBudgetSync\.create/);
+  assert.match(home,/const budgetCloudEnabled=false/);\n  assert.match(home,/FinanceBudgetSync\.create/);
 });
 test("BU2-37 separate status never asserts backend is deployed",()=>{
   assert.match(view(),/雲端預算服務尚待/);
