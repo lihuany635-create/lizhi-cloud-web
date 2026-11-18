@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {GRIDCRAFT_TOOLS, GRIDCRAFT_TOOL_SET, callGridcraftFromSite}
+import {GRIDCRAFT_TOOLS, GRIDCRAFT_TOOL_SET, GRIDCRAFT_PAIR_TOOL, callGridcraftFromSite, pairGridcraftFromSite}
   from "../../sites-migration/ai-workbench/gridcraft-p3-bridge.mjs";
 
 const OWNER="verified-owner-2026";
@@ -70,4 +70,32 @@ test("upstream errors, redirects, malformed JSON and wrong IDs fail closed",asyn
  ]){
   await assert.rejects(()=>callGridcraftFromSite({...common,fetchImpl:async()=>response}));
  }
+});
+
+test("pairing is separate, owner-scoped and disabled by default",async()=>{
+  assert.equal(GRIDCRAFT_PAIR_TOOL.name,"gridcraft_pair_start");
+  assert.equal(GRIDCRAFT_PAIR_TOOL.annotations.readOnlyHint,false);
+  await assert.rejects(()=>pairGridcraftFromSite({
+     verifiedPrincipal:OWNER,expectedPrincipal:OWNER,bridgeSecret:KEY,
+     enabled:true,fetchImpl:fakeFetch
+  }),/PAIRING_GATE_OFF/);
+  await assert.rejects(()=>pairGridcraftFromSite({
+     verifiedPrincipal:"not-authorized",expectedPrincipal:OWNER,bridgeSecret:KEY,
+     enabled:true,pairingEnabled:true,fetchImpl:fakeFetch
+  }),/UNAUTHORIZED/);
+});
+test("pairing returns only expiring code, not underlying device token",async()=>{
+  const fetched=async(url,opt)=>{
+    assert.ok(url.endsWith("/site/pair/start"));
+    assert.equal(opt.redirect,"manual");
+    return new Response(JSON.stringify({ok:true,pairing_code:"a1b2c3d4e5f60708",expires_in_seconds:120}),
+      {status:200});
+  };
+  const r=await pairGridcraftFromSite({rpcId:22,verifiedPrincipal:OWNER,expectedPrincipal:OWNER,
+    bridgeSecret:KEY,enabled:true,pairingEnabled:true,fetchImpl:fetched});
+  assert.equal(r.id,22);
+  const content=JSON.parse(r.result.content[0].text);
+  assert.equal(content.pairing_code,"a1b2c3d4e5f60708");
+  assert.equal(content.expires_in_seconds,120);
+  assert.ok(!JSON.stringify(r).includes(KEY));
 });
