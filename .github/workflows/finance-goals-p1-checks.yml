@@ -1,0 +1,61 @@
+name: Finance Goals P1 isolated candidate checks
+
+on:
+  pull_request:
+    paths:
+      - 'finance/goals/**'
+      - 'finance/tests/finance-goals-p1.test.mjs'
+      - '.github/workflows/finance-goals-p1-checks.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: finance-goals-p1-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  node-goal-model:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate candidate syntax and P1 goal domain tests
+        run: |
+          node --check finance/goals/p1-goal-model.mjs
+          node --test finance/tests/finance-goals-p1.test.mjs
+
+  isolated-postgres:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: finance_goals_p1_isolated
+          POSTGRES_PASSWORD: isolated-not-production
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d finance_goals_p1_isolated"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGPASSWORD: isolated-not-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify isolated schema, RLS, CAS and allocation controls
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+          psql -h 127.0.0.1 -U postgres -d finance_goals_p1_isolated -v ON_ERROR_STOP=1 -f finance/goals/verification/p1-isolated-verify.sql
