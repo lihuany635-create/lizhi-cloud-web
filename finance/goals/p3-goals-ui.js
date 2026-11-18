@@ -38,6 +38,7 @@
       label("生活費",a.spendingPlan,"仍以既有支出預算管理"),
       label("固定儲蓄目標",a.fixedSavings,"不代表已實際存入"),
       label("可自由擇機投資",a.flexibleInvestible,"與受保護準備金分開"),
+      label("投資帳戶暫存池",a.investmentCashPool,"含受保護準備金，不能全部投入市場"),
       label("房租及保險準備金",a.protectedReserve,"保留現金，不投入市場"),
       label("信用卡預留",a.creditCardReserve,"待正式帳單後再調整")
     ].join(""):"";
