@@ -1,0 +1,36 @@
+name: Finance Goals P6 authenticated browser approval checks
+on:
+  pull_request:
+    paths:
+      - 'finance/goals/**'
+      - 'finance/tests/finance-goals-p*.test.mjs'
+      - 'finance/pages/home.js'
+      - 'loader.js'
+      - 'supabase/functions/lizhi-finance-site-mcp/**'
+      - '.github/workflows/finance-goals-p6-checks.yml'
+permissions:
+  contents: read
+concurrency:
+  group: finance-goals-p6-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser-auth-security:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source syntax checks
+        run: |
+          node --check finance/pages/home.js
+          node --check loader.js
+          node --check finance/goals/p5-goals-ui.js
+          node --check finance/goals/p6-browser-client.js
+          node --check supabase/functions/lizhi-finance-site-mcp/finance-goals-browser-bridge.mjs
+          node --check supabase/functions/lizhi-finance-site-mcp/edge-core.mjs
+      - name: Verify every goal phase and signed browser confirmation
+        run: |
+          node --test finance/tests/finance-goals-p*.test.mjs
