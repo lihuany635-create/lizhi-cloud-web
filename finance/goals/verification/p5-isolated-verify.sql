@@ -10,6 +10,11 @@ begin
    or has_function_privilege('authenticated',
    'public.lizhi_finance_p5_allocation_set(uuid,text,uuid,uuid,text,bigint,text,boolean)','execute')
    or has_table_privilege('authenticated','public.lizhi_finance_goal_requests','select')
+   or has_table_privilege('authenticated','public.lizhi_finance_goals','insert')
+   or has_table_privilege('authenticated','public.lizhi_finance_goals','update')
+   or has_table_privilege('authenticated','public.lizhi_finance_goal_events','insert')
+   or has_table_privilege('authenticated','public.lizhi_finance_salary_plans','update')
+   or has_table_privilege('authenticated','public.lizhi_finance_sinking_funds','insert')
  then raise exception 'P5_SERVICE_ROLE_EXPOSURE';end if;
 end $$;
 
@@ -101,6 +106,27 @@ begin
  end;
 end $$;
 
+
+-- Funds cannot be hidden by deactivating a goal while reservations remain.
+do $
+declare owner uuid:='11111111-1111-4111-8111-111111111111';
+declare goal uuid:='99999999-2222-4222-8222-999999999999';
+declare result jsonb;
+begin
+ begin
+   perform public.lizhi_finance_p5_goal_set(owner,'2026-12',goal,
+     'aaaaaaaa-bbbb-4aaa-8aaa-aaaaaaaaaaaa',2,'remove',
+     null,null,null,null,null,null,null);
+   raise exception 'P5_FUNDED_GOAL_REMOVAL_ALLOWED';
+ exception when check_violation then null;
+ end;
+ result:=public.lizhi_finance_p5_allocation_set(owner,'2026-12',goal,
+   '99999999-aaaa-4aaa-8aaa-999999999999','release',2000,
+   'salary-dec-p5-goal-slice',true);
+ if result->>'status'<>'recorded' then
+   raise exception 'P5_FULL_RELEASE_FAILED';end if;
+end $;
+
 -- Create and edit sinking fund atomically, retaining its original purpose.
 do $$
 declare owner uuid:='11111111-1111-4111-8111-111111111111';
@@ -152,8 +178,24 @@ begin
    where user_id=owner and id=goal and deleted_at is null)
  then raise exception 'P5_REMOVED_GOAL_VISIBLE';end if;
  if (select count(*) from public.lizhi_finance_goal_events
-   where goal_id=goal)<>2 then raise exception 'P5_EVENTS_CHANGED';end if;
+   where goal_id=goal)<>3 then raise exception 'P5_EVENTS_CHANGED';end if;
 end $$;
+
+
+-- The metadata for an empty protected fund must soft-delete in the same operation.
+do $
+declare owner uuid:='11111111-1111-4111-8111-111111111111';
+declare goal uuid:='55555555-4444-4444-8444-555555555555';
+declare result jsonb;
+begin
+ result:=public.lizhi_finance_p5_goal_set(owner,'2026-12',goal,
+   'cccccccc-cccc-4ccc-8ccc-cccccccccccc',2,'remove',
+   null,null,null,null,null,null,null);
+ if result->>'status'<>'removed' or exists(
+   select 1 from public.lizhi_finance_sinking_funds
+   where id=goal and deleted_at is null) then
+   raise exception 'P5_PROTECTED_FUND_SOFT_DELETE_INCONSISTENT';end if;
+end $;
 
 -- Read-only month report cannot expose disabled goal.
 do $$
