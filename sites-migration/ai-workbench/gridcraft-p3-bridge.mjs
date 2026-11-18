@@ -39,7 +39,7 @@ function validateCall(name,args) {
 }
 
 export const GRIDCRAFT_TOOL_SET = new Set(GRIDCRAFT_TOOLS.map(t=>t.name));
-const UPSTREAM="https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-gridcraft-bridge/site";
+const UPSTREAM="https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-gridcraft-bridge/site/dispatch";
 const MAX_BODY=32*1024;
 
 export async function callGridcraftFromSite(
