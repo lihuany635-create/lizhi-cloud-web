@@ -122,6 +122,18 @@ class TestAutoConnectV04(unittest.TestCase):
             self.assertEqual(ui._verified_grants(),{"1"})
             ui.session_grants={}
             self.assertEqual(ui._verified_grants(),set())
+    def test_gridcraft_temporarily_offline_clears_grants_without_thread_exit(self):
+        ui=agent.AgentUI.__new__(agent.AgentUI)
+        ui.settings={"remembered_workbooks":[]}
+        ui.session_grants={"1":(None,"Book1")}
+        ui.allowed_docs={"1"}
+        class FakeOffline:
+            def __init__(self,**kwargs):pass
+            def windows(self):raise ConnectionError("GridCraft not yet ready")
+        with mock.patch.object(agent,"GridCraftLocal",FakeOffline):
+            self.assertEqual(ui._verified_grants(),set())
+        self.assertEqual(ui.allowed_docs,set())
+
     def test_worker_rechecks_grant_immediately_before_job(self):
         class Local:
             def windows(self):return [{"doc":"1","title":"test","dirty":False}]
