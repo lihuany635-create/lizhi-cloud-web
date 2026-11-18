@@ -1,10 +1,19 @@
-立之 GridCraft Windows 連線代理 v0.1｜預覽候選（未正式發布）｜2026-11-18
+立之 GridCraft Windows 連線代理 v0.2｜配對與出站候選（未正式發布）｜2026-11-18
 
 本版完成「Windows 可攜式一鍵啟動程式」的候選製作。
 只在本人 Windows 電腦操作，不公開 7979 控制埠，不上傳 Excel，不傳送權杖，也沒有接上遠端 ChatGPT MCP（P3 尚未完成）。
 
+【P3 v0.2 預覽新增功能｜尚未能正式配對】
+這個版本增加「輸入配對碼」、「授權目前工作簿」、「開始遠端」及「停止遠端」按鈕。
+配對碼必須由原 Private Site 本人驗證後產生，且 2 分鐘內有效；目前 Site 與 Edge 尚未部署，所以現在按配對仍無法成功。
+每次程式啟動後，工作簿授權必須由你在本機親自選取；不會自動把整台電腦所有 Excel 開放給 ChatGPT。
+若未配對或未開啟「開始遠端」，代理不會主動連接遠端。配對成功時專屬裝置密鑰將以 Windows DPAPI 保護並保存到目前登入使用者，不會存進一般設定檔。
+只有你按下「開始遠端」才會儲存 opt-in 並開始每約 6 秒的出站 HTTPS 查詢；這會產生正常網路流量，是否採用及用量須在正式服務上線前審核。
+「停止遠端」只中斷本機連線，不等於立即撤銷遠端已配對裝置；正式服務必須另外提供 owner 撤權工具才可進入最終驗收。
+正式私人 Site、Supabase SQL/Edge 尚未部署、ChatGPT 新工具尚未載入，本版 Windows 真機 GUI/網路配對也未經本人實測。
+
 【安裝與啟動】
-1. 進 GitHub Actions 的「GridCraft Windows local agent package」成功執行紀錄，在 Artifacts 下載 LizhiGridCraftAgent-Windows-v0.1-unsigned.zip。
+1. 進 GitHub Actions 的「GridCraft Windows local agent package」成功執行紀錄，在 Artifacts 下載 LizhiGridCraftAgent-Windows-v0.2-unsigned.zip。
 2. 在本人電腦解壓縮、核對 SHA256.txt，再開啟 LizhiGridCraftAgent.exe；不需安裝 Python。
 3. 在代理介面按「選擇 GridCraft.exe」指定官方軟體的安裝位置。
 4. 按「啟動 GridCraft」，程式只會開啟指定的 GridCraft.exe --control 7979。狀態為 READY 才表示本機控制已接通。
@@ -17,7 +26,7 @@
 - 本版預設只支援狀態與安全唯讀：window.list / document.inspect / sheet.read / cell.get。
 - 不提供跨網路監聽、不開防火牆入站、沒有任意 shell / cmd / UI 模擬或檔案路徑遠端指令。
 - 原生 token 僅在本機使用，不應傳給 ChatGPT、公開 GitHub、網站或他人。
-- 目前尚未開發可信出站 HTTPS Relay、owner/device 身分驗證與 ChatGPT Site 的正式 MCP，因此即使此處 READY，**也不代表 ChatGPT 已能從雲端控制你的電腦**。
+- 目前已開發出站 HTTPS / owner-device 驗證候選，但正式服務與 ChatGPT Site MCP 未部署，因此即使此處 READY，**也不代表 ChatGPT 已能從雲端控制你的電腦**。
 - 這是 unsigned 預覽版：若 Windows 安全防護系統提出異常警示，應先檢查檔案來源、SHA256 與掃描結果，不要直接略過警示。
 
 【測試與發佈界線】
