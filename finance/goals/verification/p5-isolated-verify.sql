@@ -6,7 +6,7 @@
 do $$
 begin
  if has_function_privilege('anon',
-   'public.lizhi_finance_p5_goal_set(uuid,text,uuid,uuid,bigint,text,text,bigint,text,text,smallint,bigint,text)','execute')
+   'public.lizhi_finance_p5_goal_set(uuid,text,uuid,uuid,bigint,text,text,bigint,text,text,integer,bigint,text)','execute')
    or has_function_privilege('authenticated',
    'public.lizhi_finance_p5_allocation_set(uuid,text,uuid,uuid,text,bigint,text,boolean)','execute')
    or has_table_privilege('authenticated','public.lizhi_finance_goal_requests','select')
