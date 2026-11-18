@@ -93,7 +93,7 @@ Deno.test("device poll returns scoped queued read only",async()=>{
  mocked=[];
  fake=(url,init)=>{
    if(url.includes("lz_gridcraft_devices") && init.method==="GET")
-      return Response.json([{owner_id:OWNER,device_id:"synthetic-device",token_sha256:wanted,revoked_at:null}]);
+      return Response.json([{owner_id:OWNER,device_id:"synthetic-device",token_sha256:wanted,revoked_at:null,last_status:"READY",last_seen:new Date().toISOString()}]);
    if(url.includes("rpc/lz_gridcraft_claim_job"))
       return Response.json([{job_id:"e7dd7b91-18fa-4320-889b-7ded594d92db",
         tool:"gridcraft_read_range",arguments:{doc:"book",sheet:"Demo",range:"A1"},
