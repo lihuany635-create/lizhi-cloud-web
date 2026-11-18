@@ -2,6 +2,14 @@
 
 狀態：**開發候選／尚未正式接通**（2026-11-18）。本分支不更動既有 Private Site、Supabase 正式資料、main 或原有 MCP。這不是部署完成證明。
 
+## P0 本次補齊（2026-11-18）
+- 計畫書已更新為 [Google Drive v1.1](https://docs.google.com/document/d/17JBEggCL-h0GPsXCt6szi4cE7O-NzlILTlPrJzfjuQg/edit)，P0～P5 共六階段。
+- **Excel 高保真匯入與局部修改為核心成功條件**：原件永不覆寫、整本工作簿盤點、指定格／範圍才可修改、差異報告與恢復版本；不支援的巨集／物件不能宣稱完整複製。
+- 詳細導入、受限工具契約與 T01～T08 驗收：[EXCEL_FIDELITY_SPEC.md](EXCEL_FIDELITY_SPEC.md)。
+- P0 驗收與 P1 接手：[P0_ACCEPTANCE.md](P0_ACCEPTANCE.md)。
+- 官方 `gridcraft-cli check <file-or-dir> --json` 有 round-trip 與公式檢查；對其沒有列出的 Excel 物件仍須獨立驗證。此能力是官方文件盤點，**尚未執行測試**。
+- P0 文件盤點和規格 PASS（候選自查、待獨立技術複核）；GridCraft CLI 與真實 Excel 檔案的 T01–T08 仍全部 NOT_TESTED。
+
 ## 已核對的依據
 
 - 使用者指定：GridCraft v0.19.1（ArtCraft Launcher），「雲端 MCP 為主、桌面控制為輔」，ChatGPT 直接操作試算表，盡可能電腦關機可用。
@@ -58,10 +66,11 @@ python integrations/gridcraft/gridcraft_mcp_probe.py --cli /path/to/gridcraft-cl
 
 | 階段 | 要求 | 本分支狀態 |
 | --- | --- | --- |
-| P0 | 核對官方原始碼與現有系統；準備無敏感資料的 MCP 探測 | 文件與探測程式開發候選；執行 NOT_TESTED |
-| P1 | 實際跑官方 v0.19.1 Headless 並做 XLSX 來回驗證 | NOT_TESTED |
-| P2 | 在不新增未批准費用的可用雲端運算環境運行，具工作簿持久化、隔離與權限 | BLOCKED（未選定/驗證雲端執行個體） |
-| P3 | 在原 Private Site 附加 `gridcraft_*` 工具並證明原 MCP 無回歸 | 未部署 |
-| P4 | 真人 ChatGPT 讀寫、檔案備份讀回、桌面代理、匿名與撤權驗收 | NOT_TESTED |
+| P0 | 核對官方來源、既有系統與安全限制；訂定高保真匯入、精準修改及 T01～T08 驗收 | 規格候選 PASS，待獨立複核；真實 CLI 仍 NOT_TESTED |
+| P1 | 實際跑官方 v0.19.1 Headless、`gridcraft-cli check --json`、Excel 匯入/修改/回存 | NOT_TESTED |
+| P2 | 無未批准新增費用的雲端運算／檔案持久化／版本與權限 | BLOCKED（未選定/驗證雲端環境） |
+| P3 | 安全 HTTP MCP Gateway、局部修改/差異工具，原 Private Site 候選而不破壞舊工具 | 候選未實作，未部署 |
+| P4 | 電腦在線時本人授權的 GridCraft 桌面控制、離線及撤權處理 | NOT_TESTED |
+| P5 | ChatGPT 新對話雲端及桌面端到端、T01～T08、原工具回歸、安全正式驗收 | NOT_TESTED、未部署 |
 
 正式 Site／Edge／資料庫／main 變更、外部付費運算及安全敏感權限，依員工手冊另經本人批准。此候選 PR 不具備正式上線效力。
