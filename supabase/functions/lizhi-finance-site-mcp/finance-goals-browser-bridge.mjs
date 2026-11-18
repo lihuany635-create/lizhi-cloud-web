@@ -58,6 +58,10 @@ async function bounded(req,max=8192){
   if(!object(body))throw Error("BAD_JSON");
   return body;
 }
+/**
+ * @param {{db?: any,verifyUser?: (jwt:string)=>Promise<any>|any,
+ *   ownerUid?: string,secret?: string,origins?: string[],clock?:()=>number}} options
+ */
 export function createGoalsBrowserBridge({db,verifyUser,ownerUid,secret,origins=[],
   clock=()=>Date.now()}={}){
   const allowed=new Set(origins.filter(x=>typeof x==="string"&&
