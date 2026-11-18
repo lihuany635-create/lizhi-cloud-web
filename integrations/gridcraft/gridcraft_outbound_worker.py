@@ -133,13 +133,15 @@ class OutboundWorker:
     """Only a trusted local UI may populate approved_docs after explicit consent."""
     def __init__(self, *, transport: Transport, local: GridCraftLocal,
                  approved_docs: set[str] | frozenset[str] | None = None,
-                 clock=time.time, p4_writer=None, p4_enabled=lambda: False):
+                 clock=time.time, p4_writer=None, p4_enabled=lambda: False,
+                 grant_checker=None):
         self.transport = transport
         self.local = local
         self.approved_docs = frozenset(approved_docs or [])
         self.clock = clock
         self.p4_writer = p4_writer
         self.p4_enabled = p4_enabled
+        self.grant_checker = grant_checker
 
     def run_once(self):
         status = self.local.status().get("status", "CONTROL_ERROR")
@@ -177,6 +179,10 @@ class OutboundWorker:
         args = job.get("args", {})
         if not isinstance(args, dict):
             raise UnsafeJob("INVALID_ARGS")
+        # Re-evaluate the exact saved local workbook identity before EVERY job.
+        # Closing/replacing a workbook cannot silently inherit its old doc ID.
+        if self.grant_checker is not None:
+            self.approved_docs = frozenset(self.grant_checker())
         if name in P4_TOOLS:
             if self.p4_writer is None:
                 raise UnsafeJob("P4_GATE_OFF")
