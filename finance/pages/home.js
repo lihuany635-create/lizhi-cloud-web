@@ -4,7 +4,7 @@ const FinanceHome=(()=>{
   const ui={view:"overview",loaded:false,loading:false,accounts:[],cards:[],categories:[],transactions:[],settings:[],backgrounds:[],error:"",notice:"",edit:null,draft:null,aiDraftApplied:null,ai:{input:"",loading:false,status:"idle",models:[],result:null,validation:null,phase3:null,committed:null,dryRun:null,error:"",controller:null,jobStatus:""},advanced:{enabled:true,query:null,message:"",busy:false},voice:{supported:false,status:"idle",interim:"",error:""},sync:{state:"idle",lastSyncedAt:null,error:null,pending:0,deferred:0},ruleMemory:{rules:[],state:"local",error:""},host:{instance:null,state:null,availability:null,error:""},draftTestInput:'{\n  "version": 1,\n  "type": "expense",\n  "amount": 120,\n  "date": "2026-09-20",\n  "category": "餐飲",\n  "account": "現金",\n  "note": "午餐",\n  "source": "manual-test"\n}',draftTestResult:null,draftTestValidation:null,draftTestDryRun:null,draftTestError:"",modal:null,filters:{period:"month",start:"",end:"",type:"",query:""},importPreview:null,backgroundUrl:"",backgroundUrls:new Map(),lastFocus:null};
   ui.budget={month:FinanceBudgetUi.taipeiMonth(),rows:[],busy:false,error:"",editScope:"total",deleteId:null,ownerId:null,syncState:"local",syncMessage:"",syncing:false,defaults:[],defaultsOwner:null,defaultsState:"idle",defaultsMessage:""};
   ui.goals={month:FinanceUiModel.localMonth(),state:"candidate_only",
-    report:null,rows:[],plan:null,ownerId:null,loading:false,error:""};
+    report:null,rows:[],plan:null,ownerId:null,loading:false,error:"",loadedAt:0};
   const queryParams=new URLSearchParams(location.search);
   const draftTestEnabled=queryParams.get("draftTest")==="1";
   const aiAutoEntryEnabled=false;
@@ -85,10 +85,10 @@ const FinanceHome=(()=>{
         throw new Error("GOALS_IDENTITY_CHANGED");
       ui.goals.ownerId=verified;ui.goals.report=report;
       ui.goals.rows=report.goals||[];ui.goals.plan=report.plan||null;
-      ui.goals.state="synced";
+      ui.goals.state="synced";ui.goals.loadedAt=Date.now();
     }catch(error){
       ui.goals.report=null;ui.goals.rows=[];ui.goals.plan=null;ui.goals.ownerId=null;
-      ui.goals.error=String(error?.code||"GOALS_REMOTE_UNAVAILABLE");
+      ui.goals.loadedAt=0;ui.goals.error=String(error?.code||"GOALS_REMOTE_UNAVAILABLE");
       ui.goals.state=ui.goals.error.includes("AUTH")||ui.goals.error.includes("IDENTITY")
         ?"auth_required":"error";
     }finally{ui.goals.loading=false;if(ui.loaded)update();}
@@ -248,7 +248,7 @@ const FinanceHome=(()=>{
       enabled:ready,month:ui.goals.month,goals:ready?ui.goals.rows:[],
       plan:ready?ui.goals.plan:null,accounts:ready?ui.accounts:[]});
     const feedback=ui.goals.error?'<p role="alert">目標讀取或寫入尚未完成，請確認本人登入與雲端服務。</p>':"";
-    return base+feedback+forms;
+    return `<div class="finance-actions"><button type="button" class="finance-button" data-finance-action="goals-refresh" ${ui.goals.loading?"disabled":""}>重新讀取雲端目標</button></div>`+base+feedback+forms;
   }
   function content(){const pages={overview,transactions:transactionsPage,accounts:accountsPage,cards:cardsPage,categories:categoriesPage,reports:reportsPage,budgets:budgetPage,goals:goalsPage,settings:settingsPage};return `${rail()}<div class="finance-stage">${header()}<div class="finance-body">${alerts()}${ui.loading&&!ui.loaded?loading():(pages[ui.view]||overview)()}</div></div>${modal()}`;}
   function render(){scheduleLoad();ensureVoiceController();return `<section class="finance-workspace" data-finance-root aria-labelledby="finance-title">${content()}</section>`;}
@@ -543,7 +543,8 @@ const FinanceHome=(()=>{
     host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-action]");if(!target||!target.closest("[data-finance-root]")||!["host-health","host-pause","host-resume"].includes(target.dataset.financeAction))return;event.preventDefault();event.stopImmediatePropagation();const action=target.dataset.financeAction;if(action==="host-pause")ui.host.instance?.pause();if(action==="host-resume")ui.host.instance?.resume();if(action==="host-health")void ui.host.instance?.health().then(()=>{ui.host.error="";ui.notice="本機 Gateway 健康檢查通過。";update();}).catch(error=>{ui.host.error=ollamaMessage(error);update();});},true);
     host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-action]");if(!target||!target.closest("[data-finance-root]")||!["retry-finance-sync","confirm-ai-transaction"].includes(target.dataset.financeAction))return;event.preventDefault();event.stopImmediatePropagation();if(target.dataset.financeAction==="retry-finance-sync")void syncFinance();else void confirmAiTransaction();},true);
     host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-view],[data-finance-action]");if(!target||!target.closest("[data-finance-root]"))return;event.preventDefault();event.stopImmediatePropagation();if(target.dataset.financeView){ui.view=target.dataset.financeView;
-        if(ui.view==="goals")void loadGoals();ui.budget.deleteId=null;ui.edit=null;ui.draft=null;ui.aiDraftApplied=null;ui.modal=null;update();return;}const action=target.dataset.financeAction,id=target.dataset.id;
+        if(ui.view==="goals"&&(ui.goals.state!=="synced"||Date.now()-ui.goals.loadedAt>300000))void loadGoals({force:true});ui.budget.deleteId=null;ui.edit=null;ui.draft=null;ui.aiDraftApplied=null;ui.modal=null;update();return;}const action=target.dataset.financeAction,id=target.dataset.id;
+      if(action==="goals-refresh"){if(!ui.goals.loading)void loadGoals({force:true});return;}
       if(action==="budget-edit"){
         if(!ui.budget.busy){ui.budget.editScope=target.dataset.scope||"total";ui.budget.deleteId=null;update();
           queueMicrotask(()=>host.querySelector('[data-finance-form="budget"] input[name="amount"]')?.focus());}
