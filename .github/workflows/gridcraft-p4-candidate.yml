@@ -75,7 +75,7 @@ jobs:
           node-version: "24"
       - name: P4 MCP tool contract and P3 Site regression
         run: |
-          node --test integrations/gridcraft/gridcraft-p4-contract.test.mjs
+          node --test integrations/gridcraft/gridcraft-p4-contract.test.mjs integrations/gridcraft/gridcraft-p4-site.test.mjs
           node --test integrations/gridcraft/p3-site-bridge.test.mjs
 
   edge-contract:
