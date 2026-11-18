@@ -47,3 +47,10 @@
 - [P3 最新完整 CI #44223995873](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44223995873)：Node Site/relay、Windows outbound、Deno Edge mock DB、隔離 PG16 四個 job 均 SUCCESS，含修正後 Edge READY 心跳新鮮度門檻。這依然不是正式站或本人 PC 端到端。
 - 前一輪 [CI #44223977021](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44223977021) FAIL：Edge 新增 READY 心跳檢查後，原測試 fixture 缺 last_seen／status；已同步補上新鮮心跳，後續 CI #44223995873 SUCCESS。保留失敗紀錄。
 - 本次打算按員工手冊登記 AI 工作台前，usage_status 回 WITHIN_CAP、usage_alerts 卻回 HTTP 503，usage_egress_history 仍是 2026-11-16 的人工歷史用量 10.549GB、providerVerified=false。因此**遵守第27～29條暫停非必要工作台 Supabase 寫入，工作台 P3 交接狀態 NOT_LOGGED**；詳細 GitHub 與 Google Drive 報告已保存，不假稱 side_log 成功。後續新對話可在監控恢復、可記帳後補新增交接。
+
+## 7. 2026-11-18｜本人已批准正式部署，但因安全/流量 Gate 尚未執行
+- 本人已明確回覆「批准 P3 正式部署」，**不需要再次詢問同樣的部署批准**。之前「需本人批准」敘述是舊快照。
+- 最新 [P3 正式批准後前置檢查與暫停紀錄](P3_DEPLOY_APPROVED_PRECHECK_20261118.md)：usage_alerts HTTP 503、人工記錄 noncached egress 10.549GB（2026-11-16、來源未經官方即時驗證），依正式員工手冊 §27–29 暫停正式 Supabase SQL/Edge、原 Site 發布。沒有任何正式部署，NOT_LOGGED。
+- 修復 `gridcraft-p3-bridge.mjs` 誤用 `/site` URL、依官方 GridCraft v0.19.1 將 workbook doc UID 正確以十進位文字跨 MCP 傳送、Windows localhost 控制時轉回 u64 JSON number，避免跨工作簿讀取/丟失精度。
+- 最終 [P3 四層隔離 CI #44226690703](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44226690703) SUCCESS；[Windows EXE #44226566089](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44226566089) SUCCESS，自檢 SHA256 `d8cddb23cc097d76f37e2311348059bcc7f108ed6f6d5bc3a05656f12ef3f28d`；修正後的[私人 Drive ZIP](https://drive.google.com/file/d/18kY6FftBl8DYuyIsaneEostTFjd2mXCO/view)。
+- 需要補的是真正的流量/費用核實、原 Site 發布通道及獨立安全複核，不可把 CI PASS 誤寫成真實 ChatGPT /mcp 接通。要停在安全 Gate，不合併 main、不修改私人 Excel。
