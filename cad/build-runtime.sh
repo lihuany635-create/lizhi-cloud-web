@@ -2,7 +2,7 @@
 # Build the actual CADCraft WASM bundle into the existing LiZhi Cloud Pages tree.
 # Build-time compilation only; no remote CAD engine, user drawing uploads or secrets.
 set -euo pipefail
-CAD_REF="cb256cf8a383c422482e8a455e3013887fa39a74"
+CAD_REF="d3c939435a565e588c2248e8d9d48e43236b7a98"
 CAD_REPO="https://github.com/lihuany635-create/lizhi-cad.git"
 TEMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TEMP_DIR"' EXIT

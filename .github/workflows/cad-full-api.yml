@@ -1,0 +1,48 @@
+# 立之 CAD full command surface: contract, Edge, worker and isolated SQL tests.
+name: CAD full API (isolated)
+on:
+  push:
+    branches: [feature/cad-full-api-20261102]
+  pull_request:
+    paths:
+      - 'cad/**'
+      - 'supabase/functions/lizhi-cad-site-mcp/**'
+      - 'supabase/functions/lizhi-cad-cloud-worker/**'
+      - 'tests/cad-full-api.test.mjs'
+      - 'tests/sql/cad_full_api_isolated.test.sql'
+      - '.github/workflows/cad-full-api.yml'
+permissions:
+  contents: read
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test tests/cad-full-api.test.mjs
+      - run: |
+          node --check cad/cad-host.js
+          node --check cad/cad-remote-relay.js
+          node --check cad/cloud/worker.mjs
+  postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 3s --health-timeout 3s --health-retries 15
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          PGHOST: localhost
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: psql -X -d postgres -v ON_ERROR_STOP=1 -f tests/sql/cad_full_api_isolated.test.sql

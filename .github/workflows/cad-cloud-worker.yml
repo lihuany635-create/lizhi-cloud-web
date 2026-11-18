@@ -1,0 +1,57 @@
+# 立之 CAD cloud worker: runs queued ChatGPT CAD jobs with a headless
+# cadcraft-cli, so drafting works with the user's computer and browser closed.
+# Started by the CAD Site Edge (repository_dispatch) right after a job is
+# queued; a 6-hourly sweep picks up anything a missed dispatch left behind.
+# Secrets: LIZHI_CAD_WORKER_URL (lizhi-cad-cloud-worker Edge URL) and
+# LIZHI_CAD_WORKER_TOKEN. No Supabase service key lives in GitHub.
+# Logs print job ids and states only — never model contents or file links.
+name: CAD cloud worker
+on:
+  repository_dispatch:
+    types: [lizhi-cad-cloud-job]
+  workflow_dispatch:
+  schedule:
+    - cron: '47 */6 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: cad-cloud-worker
+  cancel-in-progress: false
+jobs:
+  work:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Skip when not configured
+        id: cfg
+        env:
+          URL: ${{ secrets.LIZHI_CAD_WORKER_URL }}
+          TOKEN: ${{ secrets.LIZHI_CAD_WORKER_TOKEN }}
+        run: |
+          if [ -n "$URL" ] && [ -n "$TOKEN" ]; then echo "ready=1" >> "$GITHUB_OUTPUT"; else echo "worker secrets not set; nothing to do"; fi
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.ready == '1'
+        with:
+          sparse-checkout: cad/cloud
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.ready == '1'
+        with:
+          node-version: '22'
+      - name: Fetch prebuilt headless cadcraft-cli
+        if: steps.cfg.outputs.ready == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download lizhi-cadcraft-cli --repo lihuany635-create/lizhi-cad \
+            --pattern 'cadcraft-cli-linux-x64' --dir "$RUNNER_TEMP"
+          chmod +x "$RUNNER_TEMP/cadcraft-cli-linux-x64"
+          "$RUNNER_TEMP/cadcraft-cli-linux-x64" --version
+      - name: Run queued CAD jobs
+        if: steps.cfg.outputs.ready == '1'
+        env:
+          LIZHI_CAD_WORKER_URL: ${{ secrets.LIZHI_CAD_WORKER_URL }}
+          LIZHI_CAD_WORKER_TOKEN: ${{ secrets.LIZHI_CAD_WORKER_TOKEN }}
+          CADCRAFT_CLI: ${{ runner.temp }}/cadcraft-cli-linux-x64
+          WORKER_RUN_ID: gh-${{ github.run_id }}-${{ github.run_attempt }}
+          WORKER_BUDGET_SECONDS: '600'
+        run: node cad/cloud/worker.mjs
