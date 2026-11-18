@@ -22,6 +22,16 @@ def invoke(cli, *args):
         raise RuntimeError(f"GridCraft exit {p.returncode}: {' '.join(args)}\n{p.stdout[-900:]}\n{p.stderr[-500:]}")
     return p.stdout
 
+def semantic(cell):
+    if cell is None:
+        return None
+    kind = cell["t"]
+    if kind in ("s", "str", "inlineStr"):
+        kind = "text"
+    elif kind in ("n", ""):
+        kind = "number"
+    return (cell["v"], cell["f"], kind)
+
 def load_sheet_info(path):
     with zipfile.ZipFile(path) as z:
         parts = set(z.namelist())
@@ -102,7 +112,7 @@ def main():
             for cell in set(old)|set(new):
                 before=old.get(cell)
                 after=new.get(cell)
-                if before==after:
+                if semantic(before)==semantic(after):
                     continue
                 if (title,cell)==("估價清單","B3") and (after or {}).get("v") in ("2500","2500.0") and (after or {}).get("f") is None:
                     required_b3=True
