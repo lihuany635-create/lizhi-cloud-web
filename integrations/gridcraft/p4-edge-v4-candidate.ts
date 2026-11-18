@@ -294,7 +294,7 @@ async function handler(req:Request, config:BridgeConfig):Promise<Response> {
     throw Error("NOT_FOUND");
   } catch(e) {
     // Do not leak credentials, SQL statements or workbook contents to clients.
-    const code = e instanceof Error ? e.message.match(/^[A-Z_]+$/)?.[0] ?? "BACKEND_ERROR" : "BACKEND_ERROR";
+    const code = e instanceof Error ? e.message.match(/^[A-Z0-9_]+$/)?.[0] ?? "BACKEND_ERROR" : "BACKEND_ERROR";
     if(["SITE_UNAUTHORIZED","DEVICE_UNAUTHORIZED","PAIR_DENIED"].includes(code))
       return json({ok:false,error:"UNAUTHORIZED"},401);
     return fault(code);
