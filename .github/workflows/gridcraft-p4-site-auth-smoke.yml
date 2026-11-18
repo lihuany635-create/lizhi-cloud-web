@@ -1,0 +1,29 @@
+name: GridCraft P4 original Site authorization
+on:
+  push:
+    branches: [feat/gridcraft-p4-safe-write-20261118]
+    paths: [.github/workflows/gridcraft-p4-site-auth-smoke.yml]
+permissions: {}
+jobs:
+  original-site-denies:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      SITE_URL: https://lizhi-animation-flow.lihuany635.chatgpt.site
+    steps:
+      - name: Reject anonymous and synthetic identity before P4 transmission
+        shell: bash
+        run: |
+          set -euo pipefail
+          check() {
+            local route="$1"
+            shift
+            local status
+            status="$(curl -sS --max-time 15 -o /dev/null -w '%{http_code}' "$@" "$SITE_URL$route")"
+            echo "$route → HTTP $status"
+            case "$status" in 302|303|307|308|401|403) ;; *) exit 1 ;; esac
+          }
+          check /gridcraft/approve
+          check /gridcraft/approve -H 'oai-authenticated-user-id: synthetic-other-account' -H 'oai-authenticated-user-email: synthetic@example.invalid'
+          check /mcp -H 'content-type: application/json' --data '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"gridcraft_commit_write","arguments":{"preview_id":"11111111-1111-4111-8111-111111111111","expected_version":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","request_id":"22222222-2222-4222-8222-222222222222","owner_confirmed":true}}}'
+          check /mcp -H 'content-type: application/json' -H 'oai-authenticated-user-id: synthetic-other-account' -H 'oai-authenticated-user-email: synthetic@example.invalid' --data '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
