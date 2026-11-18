@@ -349,6 +349,8 @@ class AgentUI:
                 self.workbooks_var.set("工作簿清單暫時無法讀取")
         else:
             self.workbooks_var.set("目前無法讀取工作簿")
+            self.allowed_docs.clear()
+            self.p4_write_enabled = False
         if status == "READY":
             try:
                 self._verified_grants(windows)
@@ -435,7 +437,13 @@ class AgentUI:
         """Recheck exact document identity; never auto-grant by title or UID."""
         local = GridCraftLocal(port=7979, timeout=1.2)
         if windows is None:
-            windows = local.windows()
+            try:
+                windows = local.windows()
+            except Exception:
+                # GridCraft may still be launching or temporarily disconnected.
+                # Never keep stale workbook authorization across that interval.
+                self.allowed_docs = set()
+                return set()
         valid = set()
         remembered = set(self.settings.get("remembered_workbooks", []))
         for w in windows[:20]:
@@ -511,8 +519,8 @@ class AgentUI:
                 p4_enabled=lambda: self.p4_write_enabled,
                 grant_checker=self._verified_grants)
             while not self.remote_stop.is_set():
-                worker.approved_docs = frozenset(self._verified_grants())
                 try:
+                    worker.approved_docs = frozenset(self._verified_grants())
                     worker.run_once()
                     self.remote_status = "出站連線已收到伺服器回應（遠端 Site 仍須獨立驗收）"
                 except Exception:
