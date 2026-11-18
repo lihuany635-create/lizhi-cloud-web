@@ -131,6 +131,23 @@ function calculate(name,args,b) {
       credit_card:names.get(id(t.creditCardId))||null
     }))};
 }
+// Only the private owner-authenticated Site Worker can sign a goals-write
+// confirmation, after its trusted interactive user-approval callback succeeds.
+async function verifySiteGoalApproval(req,frame,token,now=Date.now()){
+  const match=/^(\\d{10})\\.([0-9a-f]{64})$/.exec(
+    req.headers.get("x-lizhi-goals-write-approval")||"");
+  if(!match||!HEX.test(token||""))return false;
+  const when=Number(match[1]),current=Math.floor(now/1000);
+  if(!Number.isSafeInteger(when)||when>current+5||when<current-90)return false;
+  try{
+    const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(token),
+      {name:"HMAC",hash:"SHA-256"},false,["verify"]);
+    const bytes=Uint8Array.from(match[2].match(/../g),x=>parseInt(x,16));
+    const data=new TextEncoder().encode(String(when)+"\\n"+JSON.stringify(frame));
+    return await crypto.subtle.verify("HMAC",key,bytes,data);
+  }catch{return false}
+}
+
 /** Dedicated server-to-server Site gateway; never expose the bearer to the browser. */
 export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBearer=equal,goalToolsEnabled=false,goalWriteApproval=null}) {
   if(req.headers.has("origin"))return json({error:"BROWSER_ORIGIN_NOT_ALLOWED"},403);
@@ -164,8 +181,9 @@ export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBear
     let approvedWrite=false;
     if(write){
       try {
-        approvedWrite=typeof goalWriteApproval==="function" &&
-          await goalWriteApproval({tool:p.name,arguments:p.arguments??{},owner:ownerUid})===true;
+        approvedWrite=typeof goalWriteApproval==="function"
+          ?await goalWriteApproval({tool:p.name,arguments:p.arguments??{},owner:ownerUid})===true
+          :await verifySiteGoalApproval(req,frame,token);
       }catch {approvedWrite=false}
       if(!approvedWrite)return fail(requestId,"GOALS_EXPLICIT_APPROVAL_REQUIRED");
     }
