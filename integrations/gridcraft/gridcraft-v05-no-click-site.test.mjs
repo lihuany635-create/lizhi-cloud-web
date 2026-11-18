@@ -66,5 +66,5 @@ test("Unexpected methods and injected properties cannot reach Edge",async()=>{
 test("Missing preview fields are rejected before Edge",async()=>{
  await assert.rejects(callGridcraftNoClick({...common,
   name:"gridcraft_commit_write",args:{...commit,preview_id:"broken"},
-  fetchImpl:async()=>{throw Error("unexpected network")}}),/P4_INVALID_ARGS/);
+  fetchImpl:async()=>{throw Error("unexpected network")}}),/P4_CONFIRMATION_REQUIRED/);
 });
