@@ -1,0 +1,40 @@
+name: GridCraft P4 production Edge v4 unauthorized smoke
+
+on:
+  push:
+    branches:
+      - feat/gridcraft-p4-safe-write-20261118
+    paths:
+      - .github/workflows/gridcraft-p4-live-smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  p4-live-deny:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - name: Live Edge v4 refuses anonymous write and forged device requests
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-gridcraft-bridge"
+          cat > /tmp/p4-body.json <<'EOF'
+          {"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"gridcraft_prepare_write","arguments":{"doc":"1","sheet":"Sheet1","range":"A1","values":[["must-not-write"]]}}}
+          EOF
+          status=$(curl -sS --max-time 15 --retry 0 -o /tmp/p4-reply.json -w "%{http_code}" -X POST "$base/site/dispatch" -H "Content-Type: application/json" --data-binary @/tmp/p4-body.json)
+          test "$status" = "401"
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/p4-reply.json'))
+          assert r["error"]=="UNAUTHORIZED",r
+          print("PASS: anonymous P4 request refused with HTTP 401")
+          PY
+          status=$(curl -sS --max-time 15 --retry 0 -o /tmp/device-reply.json -w "%{http_code}" -X POST "$base/device/poll" -H "Content-Type: application/json" --data '{"deviceId":"forged-device"}')
+          test "$status" = "401"
+          echo "PASS: forged device poll refused with HTTP 401"
+          status=$(curl -sS --max-time 15 --retry 0 -o /tmp/get-reply.json -w "%{http_code}" "$base/site/dispatch")
+          test "$status" = "400"
+          echo "PASS: GET refused with HTTP 400"
