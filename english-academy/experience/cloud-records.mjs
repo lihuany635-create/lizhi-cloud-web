@@ -5,36 +5,46 @@ const panel=document.createElement('section');
 panel.className='p6-shell p6-cloud-wrap';
 panel.setAttribute('aria-label','已儲存的英文雲端學習紀錄');
 panel.innerHTML=
-  '<div class="card">'+
-  '<div class="p6-cloud-header"><h2>我的雲端學習紀錄</h2>'+
-  '<button type="button" class="button" id="english-cloud-refresh">重新整理紀錄</button></div>'+
-  '<p class="p6-note">ChatGPT 已同步的候選單字與錯句會顯示在這裡。下方七種題型仍為示範練習，作答不會自動儲存。</p>'+
-  '<p id="english-cloud-status" class="p6-note" role="status" aria-live="polite">正在讀取已儲存的資料…</p>'+
+  '<div class="p6-hero">'+
+  '<div class="p6-cloud-header"><div><span class="eyebrow">MY LEARNING · 雲端紀錄</span><h2>我的雲端學習紀錄</h2>'+
+  '<p class="p6-note">ChatGPT 已同步的候選單字與錯句會顯示在這裡。下方七種題型仍為示範練習，作答不會自動儲存。</p></div>'+
+  '<button type="button" class="button" id="english-cloud-refresh">'+
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>'+
+  '重新整理紀錄</button></div>'+
+  '<p id="english-cloud-status" class="p6-note" aria-live="polite">正在讀取已儲存的資料…</p>'+
+  '<div class="p6-skeleton" id="english-cloud-skeleton" aria-hidden="true"><i></i><i></i><i></i></div>'+
   '<div id="english-cloud-results" hidden>'+
-  '<div class="p6-cloud-counts"><span id="english-cloud-candidate-count"></span>'+
-  '<span id="english-cloud-error-count"></span><span id="english-cloud-card-count"></span></div>'+
+  '<div class="p6-cloud-counts">'+
+  '<div class="p6-stat accent"><b id="english-cloud-candidate-count">0</b><span>待審單字</span></div>'+
+  '<div class="p6-stat"><b id="english-cloud-error-count">0</b><span>錯句紀錄</span></div>'+
+  '<div class="p6-stat"><b id="english-cloud-card-count">0</b><span>正式單字卡</span></div></div>'+
   '<section id="english-flashcard-deck" class="p6-deck" aria-label="英文單字卡預覽">'+
   '<div class="p6-deck-head"><div><span class="p6-deck-eyebrow">VOCABULARY · 單字卡</span>'+
   '<h3>翻翻看，記住今天的單字</h3></div><span class="p6-deck-counter" id="english-deck-counter"></span></div>'+
-  '<button type="button" id="english-deck-card" class="p6-deck-card" aria-label="翻面查看單字意思">'+
+  '<div class="p6-deck-stage"><button type="button" id="english-deck-card" class="p6-deck-card" aria-label="翻面查看單字意思">'+
   '<span class="p6-deck-label" id="english-deck-label"></span>'+
   '<span class="p6-deck-word" id="english-deck-word"></span>'+
   '<span class="p6-deck-help" id="english-deck-help"></span>'+
   '<span class="p6-deck-example" id="english-deck-example"></span>'+
-  '</button>'+
-  '<div class="p6-deck-actions"><button class="button" type="button" id="english-deck-prev">上一張</button>'+
+  '</button></div>'+
+  '<div class="p6-deck-actions"><button class="button" type="button" id="english-deck-prev" aria-label="上一張">← 上一張</button>'+
   '<button class="button primary" type="button" id="english-deck-flip">翻面</button>'+
-  '<button class="button" type="button" id="english-deck-speak">播放發音</button>'+
-  '<button class="button" type="button" id="english-deck-next">下一張</button></div>'+
+  '<button class="button" type="button" id="english-deck-speak">'+
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>'+
+  '播放發音</button>'+
+  '<button class="button" type="button" id="english-deck-next" aria-label="下一張">下一張 →</button></div>'+
   '<p class="p6-note">本區直接使用你雲端已保存的單字。翻卡和發音僅供體驗，不會改動正式單字卡或複習排程。</p>'+
-  '<p id="english-deck-message" class="p6-note" role="status" aria-live="polite"></p></section>'+
-  '<div class="p6-cloud-cols"><div><h3>待審候選單字（最近 20 筆）</h3>'+
+  '<p id="english-deck-message" class="p6-note" aria-live="polite"></p></section></div></div>'+
+  '<div class="p6-cloud-cols" id="english-cloud-cols" hidden><div><h3>待審候選單字（最近 20 筆）</h3>'+
   '<ul class="p6-cloud-list" id="english-cloud-candidates"></ul></div>'+
   '<div><h3>已保存錯句（最近 20 筆）</h3>'+
-  '<ul class="p6-cloud-list" id="english-cloud-errors"></ul></div></div></div></div>';
-root.before(panel);
+  '<ul class="p6-cloud-list" id="english-cloud-errors"></ul></div></div>';
+const slot=document.getElementById('english-cloud-slot');
+if(slot)slot.replaceChildren(panel);else root.before(panel);
 const status=panel.querySelector('#english-cloud-status');
 const results=panel.querySelector('#english-cloud-results');
+const columns=panel.querySelector('#english-cloud-cols');
+const skeleton=panel.querySelector('#english-cloud-skeleton');
 const refresh=panel.querySelector('#english-cloud-refresh');
 const candidates=panel.querySelector('#english-cloud-candidates');
 const errors=panel.querySelector('#english-cloud-errors');
@@ -85,8 +95,12 @@ function shiftCard(offset){
 function flipCard(){
  if(!flashcards.length)return;
  flipped=!flipped;
+ card.classList.remove('is-turning');
+ void card.offsetWidth; // restart the flip animation on every turn
+ card.classList.add('is-turning');
  renderFlashcard();
 }
+card.addEventListener('animationend',()=>card.classList.remove('is-turning'));
 card.addEventListener('click',flipCard);
 deckButtons.flip.addEventListener('click',flipCard);
 deckButtons.prev.addEventListener('click',()=>shiftCard(-1));
@@ -114,7 +128,7 @@ function entry(container,main,secondary){
 }
 function fill(container,items,formatter){
  container.replaceChildren();
- if(!items?.length){entry(container,'目前沒有紀錄','');return;}
+ if(!items?.length){entry(container,'目前沒有紀錄','');container.lastChild.className='is-empty';return;}
  for(const item of items){
   const [primary,secondary]=formatter(item);
   entry(container,primary,secondary);
@@ -124,7 +138,8 @@ let loading=false;
 async function updateRecords(){
  if(loading)return;
  loading=true;refresh.disabled=true;
- results.hidden=true;flashcards=[];cardIndex=0;flipped=false;
+ results.hidden=true;columns.hidden=true;skeleton.hidden=false;
+ flashcards=[];cardIndex=0;flipped=false;
  status.textContent='正在使用已登入的本人帳號讀取雲端資料…';
  try{
   const auth=window.parent!==window&&window.parent.LizhiAuth;
@@ -159,9 +174,9 @@ async function updateRecords(){
   fill(errors,corrections.data,record=>[
    record.original_sentence,'修改：'+record.corrected_sentence
   ]);
-  field('candidate-count').textContent='待審單字：'+(pending.count??pending.data.length);
-  field('error-count').textContent='錯句紀錄：'+(corrections.count??corrections.data.length);
-  field('card-count').textContent='正式單字卡：'+(active.count??0);
+  field('candidate-count').textContent=String(pending.count??pending.data.length);
+  field('error-count').textContent=String(corrections.count??corrections.data.length);
+  field('card-count').textContent=String(active.count??0);
   const words=[
    ...(active.data||[]).map(x=>({term:String(x.term||''),meaning:String(x.meaning_zh||''),pending:false})),
    ...(pending.data||[]).slice().reverse().map(x=>({term:String(x.term||''),meaning:String(x.meaning_zh||''),pending:true}))
@@ -173,10 +188,10 @@ async function updateRecords(){
   flipped=false;
   renderFlashcard();
   status.textContent='已讀取雲端資料（僅本人可見）。';
-  results.hidden=false;
+  results.hidden=false;columns.hidden=false;
  }catch{
   status.textContent='暫時無法讀取雲端紀錄，請稍後按「重新整理紀錄」。練習頁仍可使用。';
- }finally{loading=false;refresh.disabled=false;}
+ }finally{loading=false;refresh.disabled=false;skeleton.hidden=true;}
 }
 refresh.addEventListener('click',updateRecords);
 void updateRecords();
