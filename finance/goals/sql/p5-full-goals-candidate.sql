@@ -87,6 +87,23 @@ begin
        or v_goal.version<>p_expected_version then
        raise exception 'GOALS_VERSION_CONFLICT' using errcode='23514';end if;
     if p_action='remove' then
+       -- Do not hide actively reserved money by soft-removing its goal.
+       -- Source slices must first be explicitly released, leaving audit events.
+       if exists (
+         select 1 from public.lizhi_finance_goal_events e
+           where e.user_id=p_owner and e.goal_id=p_goal_id
+         having coalesce(sum(case when e.event_kind='allocate'
+           then e.amount::numeric else -e.amount::numeric end),0)<>0
+       ) then
+         raise exception 'GOALS_RESERVE_NOT_RELEASED' using errcode='23514';
+       end if;
+       -- A protected-purpose fund is deactivated while the linked goal is
+       -- still active, because the P2 fund trigger checks the live parent.
+       if v_goal.goal_kind='sinking_fund' then
+         update public.lizhi_finance_sinking_funds f
+           set deleted_at=pg_catalog.clock_timestamp(),version=f.version+1
+           where f.id=p_goal_id and f.user_id=p_owner and f.deleted_at is null;
+       end if;
        update public.lizhi_finance_goals g
        set deleted_at=pg_catalog.clock_timestamp(),version=g.version+1
        where g.id=p_goal_id and g.user_id=p_owner
@@ -180,4 +197,12 @@ grant execute on function public.lizhi_finance_p5_goal_set(
  uuid,text,uuid,uuid,bigint,text,text,bigint,text,text,integer,bigint,text) to service_role;
 grant execute on function public.lizhi_finance_p5_allocation_set(
  uuid,text,uuid,uuid,text,bigint,text,boolean) to service_role;
+
+-- Final permission boundary: browser/authenticated clients may read their
+-- own goals using existing restrictive RLS, but can never bypass service-side
+-- per-request write approval, idempotency receipts, or source checks.
+revoke insert,update,delete on public.lizhi_finance_goals from authenticated,anon,public;
+revoke insert,update,delete on public.lizhi_finance_sinking_funds from authenticated,anon,public;
+revoke insert,update,delete on public.lizhi_finance_salary_plans from authenticated,anon,public;
+revoke insert,update,delete on public.lizhi_finance_goal_events from authenticated,anon,public;
 commit;
