@@ -24,6 +24,8 @@ export function buildMonthlyGoalReport({
     !safe(expenseBudget.amount)))
     error("GOAL_REPORT_BUDGET_INVALID");
 
+  // Fail closed on foreign snapshot rows; do not silently discard them.
+  assertOwnerSnapshot({ownerId,salaryPlan,goals,funds,events});
   const plan=salaryPlan?summarizeSalaryPlan(salaryPlan,ownerId):null;
   const owned=goalsFor(goals,month,ownerId);
   const reports=owned.map(g=>{
