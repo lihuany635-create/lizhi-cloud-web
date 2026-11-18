@@ -30,7 +30,7 @@ globalThis.fetch=(async (url:string|URL|Request,_init?:RequestInit)=>{
  check(u.searchParams.get("revoked_at")==="is.null","MUST_FILTER_REVOCATION");
  check(u.searchParams.get("owner_id")==="eq."+owner,"MUST_FILTER_OWNER");
  check(u.searchParams.get("limit")==="2","MUST_DETECT_MULTIPLE");
- const cutoff=Date.parse(since.slice(4));
+ const cutoff=Date.parse((since??"").slice(4));
  check(Number.isFinite(cutoff),"BAD_HEARTBEAT_BOUNDARY");
  const found=fixture.filter(d=>d.owner_id===owner&&!d.revoked_at&&d.last_seen!==null&&Date.parse(d.last_seen)>=cutoff)
   .sort((a,b)=>Date.parse(b.last_seen!)-Date.parse(a.last_seen!))
