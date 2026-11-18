@@ -13,6 +13,7 @@ on:
       - sites-migration/ai-workbench/gridcraft-p3-bridge.mjs
       - sites-migration/ai-workbench/route-p3-candidate.ts
       - integrations/gridcraft/P3_SQL_*.sql
+      - integrations/gridcraft/p3-edge-candidate.ts
   workflow_dispatch:
 
 permissions:
@@ -87,3 +88,24 @@ jobs:
           fi
           psql -v ON_ERROR_STOP=1 -f integrations/gridcraft/P3_SQL_TEST.sql
           echo "PASS: isolated PostgreSQL RLS/owner queue SQL candidate (NOT production)"
+
+  edge-candidate-syntax:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check draft Edge handler without any deployment
+        run: deno check integrations/gridcraft/p3-edge-candidate.ts
+      - name: Verify unconfigured Edge fails closed
+        run: |
+          deno eval --allow-env --no-check "
+            import {handler} from './integrations/gridcraft/p3-edge-candidate.ts';
+            const r=await handler(new Request('https://example.invalid/functions/v1/lizhi-gridcraft-bridge/site/dispatch',{method:'POST'}));
+            if(r.status!==400)throw Error('Edge did not fail closed');
+            const body=await r.json();
+            if(body.error!=='GRIDCRAFT_GATE_OFF')throw Error('Edge gate not off by default');
+            console.log('PASS: disabled backend blocks all unconfigured requests');
+          "
