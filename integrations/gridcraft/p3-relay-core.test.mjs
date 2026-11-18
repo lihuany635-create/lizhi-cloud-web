@@ -23,10 +23,10 @@ test("Site tools have only 3 read-only names and no writes or arbitrary paths",(
   }
 });
 test("strict range & doc limits, block huge returned workbook and injected params",()=>{
-  assert.deepEqual(validateCall("gridcraft_read_range",{doc:"Book-7",sheet:"估價清單",range:"B3:D6"}),
-    {doc:"Book-7",sheet:"估價清單",range:"B3:D6"});
+  assert.deepEqual(validateCall("gridcraft_read_range",{doc:"42",sheet:"估價清單",range:"B3:D6"}),
+    {doc:"42",sheet:"估價清單",range:"B3:D6"});
   for(const range of ["A1:ZZ1000","A1:A201","Z10:A1","A0","A1;open","A1:Q100","A1:XX20"]){
-    assert.throws(()=>validateCall("gridcraft_read_range",{doc:"Book-7",sheet:"Main",range}));
+    assert.throws(()=>validateCall("gridcraft_read_range",{doc:"42",sheet:"Main",range}));
   }
   assert.throws(()=>validateCall("gridcraft_read_range",{doc:"../../windows",sheet:"Main",range:"B2"}));
   assert.throws(()=>validateCall("gridcraft_status",{ownerId:OWNER}));
@@ -68,9 +68,9 @@ test("read_range preserves workbook doc and bounded range and returns precise ce
   const r=relay();await ready(r);
   const id=cmd();
   const pending=r.dispatch({verifiedOwner:OWNER,name:"gridcraft_read_range",requestId:id,
-   args:{doc:"synthetic-book",sheet:"估價清單",range:"B3:D3"}});
+   args:{doc:"42",sheet:"估價清單",range:"B3:D3"}});
   const delivery=await r.poll(device);
-  assert.deepEqual(delivery.job.args,{doc:"synthetic-book",sheet:"估價清單",range:"B3:D3"});
+  assert.deepEqual(delivery.job.args,{doc:"42",sheet:"估價清單",range:"B3:D3"});
   await r.complete({...device,id,result:{values:[[2500,30,75000]],sheet:"估價清單",range:"B3:D3"}});
   assert.deepEqual((await pending).values,[[2500,30,75000]]);
 });
