@@ -115,3 +115,24 @@ Deno.test("device pair refuses unknown server-side code",async()=>{
  assert(r.status===400,"unknown code must be denied");
 });
 
+
+Deno.test("approved one-time pairing stores only token hash in DB adapter",async()=>{
+ mocked=[];
+ fake=()=>Response.json(OWNER);
+ const r=await handler(request("device/pair",{
+   code:"0123456789abcdef",deviceId:"gridcraft-device-for-test",deviceToken:TOKEN
+ }));
+ const b=await r.json();
+ assert(r.status===200&&b.ok===true,"valid pairing rejected");
+ const data=mocked.map(x=>String(x.body)).join(" ");
+ assert(!data.includes(TOKEN),"raw device token must not be sent to database");
+ assert(data.includes("p_token_hash"),"token hash not sent to database");
+});
+Deno.test("revoked device credential rejected even with correct bearer token",async()=>{
+ const wanted=await sha(TOKEN);
+ mocked=[];
+ fake=()=>Response.json([{owner_id:OWNER,device_id:"synthetic-device",
+    token_sha256:wanted,revoked_at:new Date().toISOString()}]);
+ const r=await handler(request("device/heartbeat",{deviceId:"synthetic-device",status:"READY"},deviceHeaders));
+ assert(r.status===400,"revoked device was accepted");
+});
