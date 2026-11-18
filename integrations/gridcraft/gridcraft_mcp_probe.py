@@ -127,9 +127,20 @@ def run(cli: str, timeout: float):
                 ],
             })
             read = client.tool("read_range", {"range": "A1:B3"})
-            if not read.get("content"):
+            blocks = [item.get("text") for item in read.get("content", [])
+                      if item.get("type") == "text" and item.get("text")]
+            if not blocks:
                 raise MCPError("read_range returned empty content")
-            print("PASS: synthetic workbook write_range/read_range")
+            try:
+                inspected = json.loads(blocks[0])
+            except json.JSONDecodeError as exc:
+                raise MCPError("read_range text block is not parseable JSON") from exc
+            values = inspected.get("values")
+            if not isinstance(values, list) or len(values) < 3:
+                raise MCPError(f"read_range values absent or incomplete: {inspected!r}")
+            if values[0][0] != "Item" or values[1][1] != 2:
+                raise MCPError(f"read_range did not reproduce source input: {values!r}")
+            print("PASS: GridCraft synthetic workbook write_range/read_range content")
             path = Path(tmp) / "sample.xlsx"
             client.tool("save_workbook", {"path": str(path)})
             if not path.is_file() or path.stat().st_size == 0:
@@ -143,6 +154,22 @@ def run(cli: str, timeout: float):
                 ):
                     raise MCPError("missing XLSX core entries")
             print("PASS: save_workbook produced structurally valid XLSX")
+            checked = subprocess.run(
+                [cli, "check", str(path), "--json"],
+                capture_output=True, text=True, encoding="utf-8", timeout=120,
+            )
+            if checked.returncode:
+                raise MCPError(f"gridcraft-cli check failed: {checked.stdout[-700:]} {checked.stderr[-300:]}")
+            try:
+                report = json.loads(checked.stdout)
+                totals = report["totals"]
+            except (ValueError, KeyError, TypeError) as exc:
+                raise MCPError("gridcraft-cli check --json returned invalid summary") from exc
+            if totals.get("opened", 0) < 1 or totals.get("failedToOpen", 0) != 0:
+                raise MCPError(f"check could not reopen XLSX: {totals!r}")
+            if totals.get("roundTripDiffering") != 0:
+                raise MCPError(f"check found round-trip fidelity differences: {totals!r}")
+            print("PASS: GridCraft CLI check --json reopened workbook with no round-trip difference")
         print("PASS: GridCraft Headless P0 smoke test (not a full fidelity test)")
     finally:
         client.close()
