@@ -57,3 +57,11 @@ Sites 注意：
 6. 以一般 ChatGPT 重新選取該 Site / App；實際讀 `finance_status` 和一個月收支，確認僅自己的已同步資料。未通過不可宣稱完成。
 
 目前沒有 Sites 建立／私人發布權限的對話，不能自行聲稱第 5～6 步完成。
+
+## P6 儲蓄／投資 Goals（隔離候選，預設未部署）
+
+- 本版 `finance/sites/site-worker-adapter.mjs` 若收到 `finance_goals_salary_set`、`finance_goals_goal_set`、`finance_goals_allocation_set`，**必須**由原 Private Site 提供 `approveGoalWrite({request,principal,name,arguments})` 可信回呼。此回呼需從 Sites 本人已登入 session／ChatGPT 當次使用者的明確操作確認取得，不能以 AI 自填入的 `confirmed_by_user` 或來源標頭替代。缺回呼或回傳非 true → 403，完全不呼叫上游。
+- 回呼通過後，Site 用原有伺服器專用 Token 為 `timestamp + 完整 JSON-RPC payload` 產生短效 HMAC-SHA256，單次上送 `x-lizhi-goals-write-approval`。原 Edge `edge-core.mjs` 重新驗證簽章、時效、原始工具與參數；修改目標、金額、request_id 都不能重用核准。寫入仍交由 P3/P5 RPC 的 CAS、防重、本人資料限制做最後驗證。
+- `LIZHI_FINANCE_GOALS_MCP_ENABLED` 必須正式部署後明確設為 true 才列出五項 Goals 工具（原十項不變）；**沒有可信 Site 回呼前，即使開了開關也只允許讀取，寫入仍拒絕**。正式 Site 仍需本人以原站地址原地更新，嚴禁建立第二個 MCP/Site。
+- 原 Finance 網站讀取 Goals 使用 `FinanceGoalsBrowserClient` 與其自身 Supabase Auth JWT；Edge `/ui/goals` 僅允許受信任的 HTTPS Origin，須有 `LIZHI_FINANCE_GOALS_BROWSER_ENABLED=true`、`LIZHI_FINANCE_GOALS_ORIGINS` 才會啟用。Browser 永不取得 Site Token 或 service-role secret。原網站的每筆寫入有本機確認加 Edge 3 分鐘簽署 challenge；不宣稱預留等於銀行已存入或實際投資買進。
+- PR #97 還是 **NOT_DEPLOYED**；本文件是開發交接，不代表 Sites 的 `approveGoalWrite` 真正已實作或上線。部署前必須查核原站可信本人人機確認 API，並進行真實第二帳號／登出／撤權測試。
