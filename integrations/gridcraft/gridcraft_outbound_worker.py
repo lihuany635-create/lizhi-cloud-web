@@ -26,6 +26,7 @@ TOKEN = re.compile(r"^[a-fA-F0-9]{64}$")
 A1 = re.compile(r"^([A-Z]{1,3})([1-9][0-9]{0,5})(?::([A-Z]{1,3})([1-9][0-9]{0,5}))?$")
 BASE = "https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-gridcraft-bridge/device"
 READ_TOOLS = frozenset({"gridcraft_list_workbooks", "gridcraft_read_range"})
+P4_TOOLS = frozenset({"gridcraft_prepare_write","gridcraft_commit_write"})
 RESPONSE_LIMIT = 24 * 1024
 
 
@@ -132,11 +133,13 @@ class OutboundWorker:
     """Only a trusted local UI may populate approved_docs after explicit consent."""
     def __init__(self, *, transport: Transport, local: GridCraftLocal,
                  approved_docs: set[str] | frozenset[str] | None = None,
-                 clock=time.time):
+                 clock=time.time, p4_writer=None, p4_enabled=lambda: False):
         self.transport = transport
         self.local = local
         self.approved_docs = frozenset(approved_docs or [])
         self.clock = clock
+        self.p4_writer = p4_writer
+        self.p4_enabled = p4_enabled
 
     def run_once(self):
         status = self.local.status().get("status", "CONTROL_ERROR")
@@ -168,12 +171,29 @@ class OutboundWorker:
         return {"status":"DONE","executed":True,"requestId":req}
 
     def execute_job(self, job):
-        if not isinstance(job, dict) or job.get("name") not in READ_TOOLS:
+        if not isinstance(job, dict) or job.get("name") not in READ_TOOLS | P4_TOOLS:
             raise UnsafeJob("METHOD_DENIED")
         name = job["name"]
         args = job.get("args", {})
         if not isinstance(args, dict):
             raise UnsafeJob("INVALID_ARGS")
+        if name in P4_TOOLS:
+            if self.p4_writer is None:
+                raise UnsafeJob("P4_GATE_OFF")
+            # This grant is populated only by the local Windows UI, never by
+            # a device job or untrusted remote document contents.
+            self.p4_writer.approved_docs = frozenset(self.approved_docs)
+            if name == "gridcraft_prepare_write":
+                if set(args) != {"doc","sheet","range","values"}:
+                    raise UnsafeJob("INVALID_ARGS")
+                return bounded_reply(self.p4_writer.prepare(
+                    args["doc"],args["sheet"],args["range"],args["values"]))
+            if set(args) != {"preview_id","expected_version","request_id","owner_confirmed"}:
+                raise UnsafeJob("INVALID_ARGS")
+            return bounded_reply(self.p4_writer.commit(
+                args["preview_id"],args["expected_version"],args["request_id"],
+                write_enabled=self.p4_enabled(),
+                owner_confirmed=args["owner_confirmed"]))
         if name == "gridcraft_list_workbooks":
             if args:
                 raise UnsafeJob("INVALID_ARGS")

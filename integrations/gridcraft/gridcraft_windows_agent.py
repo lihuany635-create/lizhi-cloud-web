@@ -19,6 +19,8 @@ from tkinter import filedialog, messagebox, simpledialog, ttk
 
 from gridcraft_desktop_local import GridCraftLocal
 from gridcraft_outbound_worker import HTTPSDeviceTransport, OutboundWorker
+from gridcraft_p4_safe_write import P4SafeWriter
+from gridcraft_p4_desktop import P4Local
 from gridcraft_pairing_client import DeviceStore, PairingError, pair_one_time
 
 try:
@@ -156,9 +158,9 @@ def diagnostic() -> int:
 class AgentUI:
     def __init__(self, root: tk.Tk, minimized: bool = False):
         self.root = root
-        self.root.title(APP_TITLE + "｜v0.2 候選")
-        self.root.geometry("580x530")
-        self.root.minsize(530, 480)
+        self.root.title(APP_TITLE + "｜v0.3 P4 候選")
+        self.root.geometry("620x580")
+        self.root.minsize(555, 520)
         self.root.protocol("WM_DELETE_WINDOW", self.stop)
         self.settings = load_settings()
         self.pair_store = DeviceStore(app_directory())
@@ -169,6 +171,9 @@ class AgentUI:
         self.allowed_docs = set()  # Explicit local per-session grant, never server-controlled.
         self.remote_stop = threading.Event()
         self.remote_thread = None
+        # P4 write toggle is NEVER loaded from settings or automatically enabled.
+        self.p4_write_enabled = False
+        self.p4_state_var = tk.StringVar(value="P4 寫入：停用（本次執行需本人按鍵授權）")
         self.remote_status = "未配對（遠端 MCP 尚未驗收）" if not self.paired else "已配對，尚未驗證遠端服務"
         self.path_var = tk.StringVar(value=self.settings["gridcraft_path"] if "gridcraft_path" in self.settings else "")
         self.status_var = tk.StringVar(value="檢查中…")
@@ -223,6 +228,8 @@ class AgentUI:
         ttk.Button(remote, text="授權目前工作簿", command=self.grant_open_book).pack(side="left", padx=4)
         ttk.Button(remote, text="開始遠端", command=self.start_remote).pack(side="left", padx=4)
         ttk.Button(remote, text="停止遠端", command=self.stop_remote).pack(side="left")
+        ttk.Button(frm, text="P4 寫入授權（本次執行）", command=self.toggle_p4_write).pack(anchor="w", pady=5)
+        ttk.Label(frm, textvariable=self.p4_state_var, foreground="#a64d11", wraplength=570).pack(anchor="w", pady=2)
         ttk.Label(frm, textvariable=self.info_var, foreground="#926c10", wraplength=540).pack(anchor="w", pady=4)
         ttk.Label(frm, text="安全狀態：唯讀｜127.0.0.1:7979｜不輸出控制權杖", foreground="#5b6472").pack(anchor="w")
 
@@ -362,15 +369,41 @@ class AgentUI:
         self.allowed_docs.add(doc)  # Per-session only; reset when agent closes.
         self.remote_status = "已於本次工作階段授權 " + str(len(self.allowed_docs)) + " 本工作簿"
 
+    def toggle_p4_write(self):
+        if self.p4_write_enabled:
+            self.p4_write_enabled = False
+            self.p4_state_var.set("P4 寫入：已停用；既有已排程指令不可跳過本機檢查")
+            return
+        if not self.allowed_docs:
+            messagebox.showerror("沒有授權工作簿", "先在本機授權測試工作簿，不能寫其他檔案。", parent=self.root)
+            return
+        approved = messagebox.askyesno(
+            "P4 寫入風險確認",
+            "P4 將允許 ChatGPT 在本次 Windows 執行期間，經兩階段預覽及本人確認後，"
+            "修改已授權工作簿中最多 50 格。\n"
+            "寫入前會建立本機 XLSX 快照，但不會自動儲存或覆寫原件。\n"
+            "本功能仍屬開發候選。是否開啟本次執行的寫入授權？",
+            parent=self.root,
+        )
+        if approved:
+            self.p4_write_enabled = True
+            self.p4_state_var.set("P4 寫入：已允許（僅本次執行；可再按此鈕關閉）")
+
     def _remote_loop(self):
         if not self.paired:
             return
         try:
             transport = HTTPSDeviceTransport(
                 device_id=self.paired["device_id"], device_token=self.paired["token"])
+            p4_writer = P4SafeWriter(
+                local=P4Local(port=7979, timeout=3),
+                backup_folder=app_directory() / "P4Backups",
+                approved_docs=self.allowed_docs)
             worker = OutboundWorker(
                 transport=transport, local=GridCraftLocal(port=7979, timeout=2),
-                approved_docs=self.allowed_docs)
+                approved_docs=self.allowed_docs,
+                p4_writer=p4_writer,
+                p4_enabled=lambda: self.p4_write_enabled)
             while not self.remote_stop.is_set():
                 worker.approved_docs = frozenset(self.allowed_docs)
                 try:
@@ -396,12 +429,15 @@ class AgentUI:
         self.remote_thread.start()
 
     def stop_remote(self):
+        self.p4_write_enabled = False
+        self.p4_state_var.set("P4 寫入：已停用（遠端停止）")
         self.remote_stop.set()
         self.settings["remote_enabled"] = False
         save_settings(self.settings)
         self.remote_status = "遠端連線已停止（本機配對資料保留，若要撤銷雲端權限需在本人 Site 操作）"
 
     def stop(self):
+        self.p4_write_enabled = False
         self.remote_stop.set()
         self.running = False
         self.root.destroy()

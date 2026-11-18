@@ -1,0 +1,27 @@
+name: GridCraft Edge v6 active-device regression (no production writes)
+on:
+  push:
+    branches:
+      - feat/gridcraft-p4-safe-write-20261118
+    paths:
+      - .github/workflows/gridcraft-edge-v6-device-filter.yml
+      - integrations/gridcraft/gridcraft-edge-v6-device-filter.ts
+      - integrations/gridcraft/gridcraft-edge-v6-device-filter.test.ts
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  edge-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type check actual v5-based Edge v6 candidate and tests
+        run: deno check integrations/gridcraft/gridcraft-edge-v6-device-filter.ts integrations/gridcraft/gridcraft-edge-v6-device-filter.test.ts
+      - name: Test live-only selection, duplicate-live deny and owner verification
+        run: deno test --allow-env integrations/gridcraft/gridcraft-edge-v6-device-filter.test.ts
+      - name: Regress original P4 Edge owner and write guards
+        run: deno test --allow-env integrations/gridcraft/p4-edge.test.ts

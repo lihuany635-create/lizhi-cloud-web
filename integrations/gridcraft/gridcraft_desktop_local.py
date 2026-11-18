@@ -143,10 +143,14 @@ class GridCraftLocal:
     def inspect(self):
         return self._request("document.inspect")
 
-    def read_range(self, sheet: str, a1_range: str, doc: str | None = None):
+    def read_range(self, sheet: str, a1_range: str, doc: str | None = None, formulas: bool = False):
         if not isinstance(sheet, str) or not 1 <= len(sheet) <= 80:
             raise ValueError("invalid sheet")
         arguments = {"sheet": sheet, "range": a1_range}
+        if not isinstance(formulas, bool):
+            raise ValueError("invalid formulas flag")
+        if formulas:
+            arguments["formulas"] = True
         if doc is not None:
             if not isinstance(doc, str) or not re.fullmatch(r"[1-9][0-9]{0,19}", doc):
                 raise ValueError("invalid decimal workbook id")
