@@ -17,7 +17,7 @@ grant insert on public.lizhi_finance_goal_events to service_role;
 create or replace function public.lizhi_finance_p5_goal_set(
  p_owner uuid,p_month text,p_goal_id uuid,p_request_id uuid,
  p_expected_version bigint,p_action text,p_kind text,p_target bigint,
- p_account text,p_purpose text,p_cadence smallint,p_due_amount bigint,p_due_month text
+ p_account text,p_purpose text,p_cadence integer,p_due_amount bigint,p_due_month text
 ) returns jsonb language plpgsql security invoker set search_path='' as $$
 declare v_payload jsonb;v_request public.lizhi_finance_goal_requests%rowtype;
 declare v_goal public.lizhi_finance_goals%rowtype;v_status text;v_version bigint;
@@ -171,13 +171,13 @@ begin
  return v_result;
 end $$;
 revoke all on function public.lizhi_finance_p5_goal_set(
- uuid,text,uuid,uuid,bigint,text,text,bigint,text,text,smallint,bigint,text)
+ uuid,text,uuid,uuid,bigint,text,text,bigint,text,text,integer,bigint,text)
  from public,anon,authenticated;
 revoke all on function public.lizhi_finance_p5_allocation_set(
  uuid,text,uuid,uuid,text,bigint,text,boolean)
  from public,anon,authenticated;
 grant execute on function public.lizhi_finance_p5_goal_set(
- uuid,text,uuid,uuid,bigint,text,text,bigint,text,text,smallint,bigint,text) to service_role;
+ uuid,text,uuid,uuid,bigint,text,text,bigint,text,text,integer,bigint,text) to service_role;
 grant execute on function public.lizhi_finance_p5_allocation_set(
  uuid,text,uuid,uuid,text,bigint,text,boolean) to service_role;
 commit;
