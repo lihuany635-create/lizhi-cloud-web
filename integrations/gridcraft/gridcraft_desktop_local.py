@@ -76,8 +76,11 @@ class GridCraftLocal:
             rg = params.get("range")
             if not isinstance(rg, str) or not RANGE.fullmatch(rg):
                 raise ValueError("sheet.read needs bounded A1 range")
-            if len(params) > 3 or any(k not in ("range", "sheet", "formulas") for k in params):
+            if len(params) > 4 or any(k not in ("range", "sheet", "formulas", "doc") for k in params):
                 raise ValueError("unsupported sheet.read parameters")
+        if "doc" in params and (not isinstance(params["doc"], str) or
+                                not re.fullmatch(r"[A-Za-z0-9._:-]{1,100}", params["doc"])):
+            raise ValueError("invalid workbook document id")
         if method == "cell.get" and (not isinstance(params.get("cell"), str)
                                       or not RANGE.fullmatch(params["cell"])
                                       or ":" in params["cell"]):
@@ -134,10 +137,19 @@ class GridCraftLocal:
     def inspect(self):
         return self._request("document.inspect")
 
-    def read_range(self, sheet: str, a1_range: str):
+    def read_range(self, sheet: str, a1_range: str, doc: str | None = None):
         if not isinstance(sheet, str) or not 1 <= len(sheet) <= 80:
             raise ValueError("invalid sheet")
-        return self._request("sheet.read", {"sheet": sheet, "range": a1_range})
+        arguments = {"sheet": sheet, "range": a1_range}
+        if doc is not None:
+            if not isinstance(doc, str) or not re.fullmatch(r"[A-Za-z0-9._:-]{1,100}", doc):
+                raise ValueError("invalid workbook document id")
+            # When remote access is explicitly permitted, refuse a stale or
+            # unknown document id rather than silently reading the active book.
+            if doc not in {x["doc"] for x in self.windows()}:
+                raise GridCraftUnauthorized("requested workbook not open locally")
+            arguments["doc"] = doc
+        return self._request("sheet.read", arguments)
 
 
 if __name__ == "__main__":
