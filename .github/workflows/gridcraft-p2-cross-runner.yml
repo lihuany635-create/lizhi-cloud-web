@@ -1,0 +1,72 @@
+name: GridCraft P2 isolated cross-runner synthetic recovery
+
+on:
+  push:
+    branches:
+      - feat/gridcraft-mcp-p0-20261118
+    paths:
+      - .github/workflows/gridcraft-p2-cross-runner.yml
+      - integrations/gridcraft/p2_cross_runner_probe.py
+      - integrations/gridcraft/p2_synthetic_store.py
+      - integrations/gridcraft/fixtures/engineering_estimate.xlsx.b64
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  producer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout synthetic-only candidate
+        uses: actions/checkout@v4
+      - name: Download verified official GridCraft v0.19.1
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 2 --max-time 150             "https://github.com/storytold/gridcraft/releases/download/v0.19.1/gridcraft-0.19.1-linux-x86_64.tar.gz"             --output "$RUNNER_TEMP/gridcraft.tar.gz"
+          echo "8d97bba2d5bb00fd69ed55064852c1fd914de40d5ecd55ca01c8df81b828946d  $RUNNER_TEMP/gridcraft.tar.gz" | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/gridcraft"
+          tar -xzf "$RUNNER_TEMP/gridcraft.tar.gz" -C "$RUNNER_TEMP/gridcraft"
+          CLI="$(find "$RUNNER_TEMP/gridcraft" -type f -name gridcraft-cli | head -n 1)"
+          test -n "$CLI"
+          "$CLI" version
+          echo "GRIDCRAFT_CLI=$CLI" >> "$GITHUB_ENV"
+      - name: First runner generate synthetic snapshots with real CLI
+        run: |
+          python3 integrations/gridcraft/p2_cross_runner_probe.py produce             --workdir "$RUNNER_TEMP/gridcraft-p2"             --cli "$GRIDCRAFT_CLI"
+      - name: Upload only synthetic snapshot to short-lived handoff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gridcraft-p2-public-synthetic-snapshot
+          path: ${{ runner.temp }}/gridcraft-p2/
+          retention-days: 1
+          if-no-files-found: error
+  consumer:
+    needs: producer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout candidate in independent runner
+        uses: actions/checkout@v4
+      - name: Download previous runner short-lived artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: gridcraft-p2-public-synthetic-snapshot
+          path: ${{ runner.temp }}/gridcraft-p2
+      - name: Download verified official GridCraft v0.19.1 on second runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 2 --max-time 150             "https://github.com/storytold/gridcraft/releases/download/v0.19.1/gridcraft-0.19.1-linux-x86_64.tar.gz"             --output "$RUNNER_TEMP/gridcraft.tar.gz"
+          echo "8d97bba2d5bb00fd69ed55064852c1fd914de40d5ecd55ca01c8df81b828946d  $RUNNER_TEMP/gridcraft.tar.gz" | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/gridcraft"
+          tar -xzf "$RUNNER_TEMP/gridcraft.tar.gz" -C "$RUNNER_TEMP/gridcraft"
+          CLI="$(find "$RUNNER_TEMP/gridcraft" -type f -name gridcraft-cli | head -n 1)"
+          test -n "$CLI"
+          "$CLI" version
+          echo "GRIDCRAFT_CLI=$CLI" >> "$GITHUB_ENV"
+      - name: Read, modify, restore verified snapshot from first runner
+        run: |
+          python3 integrations/gridcraft/p2_cross_runner_probe.py consume             --workdir "$RUNNER_TEMP/gridcraft-p2"             --cli "$GRIDCRAFT_CLI"
