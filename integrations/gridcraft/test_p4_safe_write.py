@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from unittest import mock
 import uuid
 import zipfile
 
@@ -227,6 +228,26 @@ class P4GuardTests(unittest.TestCase):
         result=self.commit(self.preview())
         self.assertEqual(result["error"],"VERIFY_MISMATCH")
         self.assertTrue(result["backup_id"].endswith(".xlsx"))
+
+    def test_change_during_full_backup_blocks_command(self):
+        class UserEditedDuringBackup(FakeDesktop):
+            def snapshot_bytes(self,doc):
+                self.values[0][0]="edited by user during export"
+                return super().snapshot_bytes(doc)
+        self.local=UserEditedDuringBackup()
+        self.writer=P4SafeWriter(self.local,Path(self.d.name)/"p4",
+                                 approved_docs={"1"},clock=lambda:self.time)
+        p=self.preview()
+        with self.assertRaisesRegex(P4Denied,"VERSION_CONFLICT_AFTER_SNAPSHOT"):
+            self.commit(p)
+        self.assertEqual(self.local.write_count,0)
+
+    def test_local_snapshot_storage_quota_halts_write_without_deleting_backups(self):
+        p=self.preview()
+        with mock.patch("gridcraft_p4_safe_write.MAX_BACKUP_FOLDER",1):
+            with self.assertRaisesRegex(P4Denied,"BACKUP_STORAGE_LIMIT"):
+                self.commit(p)
+        self.assertEqual(self.local.write_count,0)
 
     def test_no_automatic_save_of_original(self):
         p=self.preview()
