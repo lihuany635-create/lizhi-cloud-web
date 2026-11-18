@@ -154,18 +154,31 @@ begin
   exception when check_violation then null;
   end;
 end $$;
--- Cross-owner insert must be blocked by RLS.
-do $$
+-- A foreign owner's previously selected account ID must fail before insert.
+do $
 begin
   begin
     insert into public.lizhi_finance_salary_plans
       (user_id,month,expected_income,lines)
     select '22222222-2222-4222-8222-222222222222','2027-02',expected_income,lines
       from public.lizhi_finance_salary_plans where month='2026-12';
-    raise exception 'P2_CROSS_OWNER_NOT_BLOCKED';
+    raise exception 'P2_FOREIGN_OWNER_ACCOUNT_NOT_BLOCKED';
+  exception when check_violation then null;
+  end;
+end $;
+-- Also verify pure cross-owner RLS independently with only null account IDs.
+do $
+begin
+  begin
+    insert into public.lizhi_finance_salary_plans
+      (user_id,month,expected_income,lines)
+    select '22222222-2222-4222-8222-222222222222','2027-03',
+      expected_income, jsonb_set(lines,'{0,accountId}','null'::jsonb)
+      from public.lizhi_finance_salary_plans where month='2026-12';
+    raise exception 'P2_CROSS_OWNER_RLS_NOT_BLOCKED';
   exception when insufficient_privilege then null;
   end;
-end $$;
+end $;
 -- Cross-owner read must return no rows.
 select set_config('request.jwt.claim.sub','22222222-2222-4222-8222-222222222222',false);
 do $$
