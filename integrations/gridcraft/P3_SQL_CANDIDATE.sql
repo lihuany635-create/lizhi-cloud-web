@@ -112,6 +112,61 @@ REVOKE ALL ON FUNCTION public.lz_gridcraft_complete_job(text,text,uuid,jsonb) FR
 GRANT EXECUTE ON FUNCTION public.lz_gridcraft_claim_job(text,text) TO service_role;
 GRANT EXECUTE ON FUNCTION public.lz_gridcraft_complete_job(text,text,uuid,jsonb) TO service_role;
 
+
+-- One-time pairing: owner created a 64-bit random code through authenticated
+-- Private Site. Device presents code and its random credential over TLS.
+-- Both are stored as SHA-256; never store raw device bearer token in DB.
+CREATE OR REPLACE FUNCTION public.lz_gridcraft_pair_device(
+  p_code_hash text, p_device_id text, p_token_hash text
+) RETURNS text
+LANGUAGE plpgsql SECURITY INVOKER
+SET search_path = public, pg_temp AS $
+DECLARE paired_owner text;
+BEGIN
+  IF p_code_hash !~ '^[0-9a-f]{64}
+-- Not yet provided by this draft:
+-- * pairing Site UI / owner confirmation, per-user rate limits and revocation;
+-- * secure random code generation / rate limiting / revocation;
+-- * HTTP Edge verification of owner and device;
+-- * queued/claimed expiry cleanup, retention & budget policy;
+-- * real Windows device connection and cross-account tests.
+-- Therefore DO NOT DEPLOY this schema alone.
+
+     OR p_token_hash !~ '^[0-9a-f]{64}
+-- Not yet provided by this draft:
+-- * one-time owner-authorized device pairing transaction with hashed secrets;
+-- * secure random code generation / rate limiting / revocation;
+-- * HTTP Edge verification of owner and device;
+-- * queued/claimed expiry cleanup, retention & budget policy;
+-- * real Windows device connection and cross-account tests.
+-- Therefore DO NOT DEPLOY this schema alone.
+
+     OR p_device_id !~ '^[A-Za-z0-9._:-]{1,100}
+-- Not yet provided by this draft:
+-- * one-time owner-authorized device pairing transaction with hashed secrets;
+-- * secure random code generation / rate limiting / revocation;
+-- * HTTP Edge verification of owner and device;
+-- * queued/claimed expiry cleanup, retention & budget policy;
+-- * real Windows device connection and cross-account tests.
+-- Therefore DO NOT DEPLOY this schema alone.
+ THEN
+    RETURN NULL;
+  END IF;
+  SELECT p.owner_id INTO paired_owner
+    FROM public.lz_gridcraft_pairings p
+    WHERE p.code_sha256 = p_code_hash AND p.consumed_at IS NULL
+      AND p.expires_at > now()
+    FOR UPDATE;
+  IF paired_owner IS NULL THEN RETURN NULL; END IF;
+  INSERT INTO public.lz_gridcraft_devices(device_id, owner_id, token_sha256)
+    VALUES(p_device_id, paired_owner, p_token_hash);
+  UPDATE public.lz_gridcraft_pairings SET consumed_at = now()
+    WHERE code_sha256 = p_code_hash AND consumed_at IS NULL;
+  RETURN paired_owner;
+END $;
+REVOKE ALL ON FUNCTION public.lz_gridcraft_pair_device(text,text,text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.lz_gridcraft_pair_device(text,text,text) TO service_role;
+
 COMMIT;
 
 -- Not yet provided by this draft:
