@@ -1,0 +1,54 @@
+name: GridCraft P3 candidate read-only bridge security tests
+
+on:
+  push:
+    branches:
+      - feat/gridcraft-mcp-p0-20261118
+    paths:
+      - .github/workflows/gridcraft-p3-candidate.yml
+      - integrations/gridcraft/p3-*
+      - integrations/gridcraft/gridcraft_outbound_worker.py
+      - integrations/gridcraft/test_outbound_worker.py
+      - integrations/gridcraft/gridcraft_desktop_local.py
+      - sites-migration/ai-workbench/gridcraft-p3-bridge.mjs
+      - sites-migration/ai-workbench/route-p3-candidate.ts
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  relay-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: P3 mocked owner/device relay, replay, offline and Site adapter
+        run: |
+          node --test integrations/gridcraft/p3-relay-core.test.mjs integrations/gridcraft/p3-site-bridge.test.mjs
+      - name: Verify candidate keeps legacy AI Workbench and photo tools unchanged
+        run: |
+          node --input-type=module -e "import fs from 'node:fs';import assert from 'node:assert/strict';const s=fs.readFileSync('sites-migration/ai-workbench/route-p3-candidate.ts','utf8');assert(s.includes('GRIDCRAFT_P3_ENABLED'));assert(s.includes('legacyPOST'));assert(s.includes('PHOTO_SHEET_TOOLS'));assert(s.includes('...aiwb.result.tools, ...photo, ...gridcraft'));console.log('PASS: Site candidate composes three tool groups behind gate');"
+
+  outbound-worker:
+    runs-on: windows-2022
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Windows outbound-only worker mocked relay/local tests
+        shell: pwsh
+        run: |
+          python -m py_compile integrations/gridcraft/gridcraft_desktop_local.py integrations/gridcraft/gridcraft_outbound_worker.py integrations/gridcraft/test_outbound_worker.py
+          python integrations/gridcraft/test_outbound_worker.py
+          if ($LASTEXITCODE -ne 0) { throw "P3 outbound worker tests failed" }
+      - name: Existing local-only control tests
+        shell: pwsh
+        run: |
+          python integrations/gridcraft/test_desktop_local.py
+          if ($LASTEXITCODE -ne 0) { throw "Existing local-only tests failed" }
