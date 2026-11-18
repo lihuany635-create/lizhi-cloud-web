@@ -78,9 +78,10 @@ class GridCraftLocal:
                 raise ValueError("sheet.read needs bounded A1 range")
             if len(params) > 4 or any(k not in ("range", "sheet", "formulas", "doc") for k in params):
                 raise ValueError("unsupported sheet.read parameters")
-        if "doc" in params and (not isinstance(params["doc"], str) or
-                                not re.fullmatch(r"[A-Za-z0-9._:-]{1,100}", params["doc"])):
-            raise ValueError("invalid workbook document id")
+        if "doc" in params and (not isinstance(params["doc"], int)
+                               or isinstance(params["doc"], bool)
+                               or not 1 <= params["doc"] <= (1 << 64) - 1):
+            raise ValueError("invalid numeric GridCraft workbook id")
         if method == "cell.get" and (not isinstance(params.get("cell"), str)
                                       or not RANGE.fullmatch(params["cell"])
                                       or ":" in params["cell"]):
@@ -131,8 +132,13 @@ class GridCraftLocal:
         windows = self._request("window.list")
         if not isinstance(windows, list):
             raise GridCraftConnectionError("window.list reply must be array")
-        return [{"doc": x.get("doc"), "title": str(x.get("title", ""))[:100],
-                 "dirty": x.get("dirty") is True} for x in windows[:40] if isinstance(x, dict)]
+        # GridCraft v0.19.1 uses a JSON u64 for doc/window UID. Present it as
+        # decimal text across the remote MCP boundary to preserve full precision.
+        return [{"doc": str(x["doc"]), "title": str(x.get("title", ""))[:100],
+                 "dirty": x.get("dirty") is True}
+                for x in windows[:40] if isinstance(x, dict)
+                and isinstance(x.get("doc"), int) and not isinstance(x["doc"], bool)
+                and 1 <= x["doc"] <= (1 << 64) - 1]
 
     def inspect(self):
         return self._request("document.inspect")
@@ -142,13 +148,17 @@ class GridCraftLocal:
             raise ValueError("invalid sheet")
         arguments = {"sheet": sheet, "range": a1_range}
         if doc is not None:
-            if not isinstance(doc, str) or not re.fullmatch(r"[A-Za-z0-9._:-]{1,100}", doc):
-                raise ValueError("invalid workbook document id")
-            # When remote access is explicitly permitted, refuse a stale or
-            # unknown document id rather than silently reading the active book.
+            if not isinstance(doc, str) or not re.fullmatch(r"[1-9][0-9]{0,19}", doc):
+                raise ValueError("invalid decimal workbook id")
+            doc_id = int(doc)
+            if not 1 <= doc_id <= (1 << 64) - 1:
+                raise ValueError("workbook id outside GridCraft u64 range")
+            # Verify that the selected workbook is still actually open.
             if doc not in {x["doc"] for x in self.windows()}:
                 raise GridCraftUnauthorized("requested workbook not open locally")
-            arguments["doc"] = doc
+            # IMPORTANT: official control Target::from_json requires JSON number,
+            # not a string. A doc ID as a decimal string will NOT work.
+            arguments["doc"] = doc_id
         return self._request("sheet.read", arguments)
 
 
