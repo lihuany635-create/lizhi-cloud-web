@@ -20,6 +20,7 @@ from typing import Protocol
 from gridcraft_desktop_local import GridCraftLocal
 
 DEVICE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,100}$")
+WORKBOOK_UID = re.compile(r"^[1-9][0-9]{0,19}$")
 REQUEST_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{7,95}$")
 TOKEN = re.compile(r"^[a-fA-F0-9]{64}$")
 A1 = re.compile(r"^([A-Z]{1,3})([1-9][0-9]{0,5})(?::([A-Z]{1,3})([1-9][0-9]{0,5}))?$")
@@ -185,7 +186,7 @@ class OutboundWorker:
         if set(args) != {"doc","sheet","range"}:
             raise UnsafeJob("INVALID_ARGS")
         doc, sheet, rng = args["doc"], args["sheet"], args["range"]
-        if not isinstance(doc, str) or not DEVICE_ID.fullmatch(doc):
+        if not isinstance(doc, str) or not WORKBOOK_UID.fullmatch(doc) or int(doc) > (1 << 64) - 1:
             raise UnsafeJob("INVALID_DOC")
         if doc not in self.approved_docs:
             raise UnsafeJob("WORKBOOK_NOT_GRANTED")
