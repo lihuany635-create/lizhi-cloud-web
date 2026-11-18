@@ -37,7 +37,7 @@ jobs:
           grep -F "0.19.1" /tmp/gridcraft-version.txt
           echo "GRIDCRAFT_CLI=$CLI" >> "$GITHUB_ENV"
       - name: Python harness syntax
-        run: python3 -m py_compile integrations/gridcraft/gridcraft_mcp_probe.py integrations/gridcraft/p1_fidelity_probe.py integrations/gridcraft/p1_complex_probe.py integrations/gridcraft/p2_synthetic_store.py integrations/gridcraft/p2_synthetic_test.py
+        run: python3 -m py_compile integrations/gridcraft/gridcraft_mcp_probe.py integrations/gridcraft/p1_fidelity_probe.py integrations/gridcraft/p1_complex_probe.py integrations/gridcraft/p2_synthetic_store.py integrations/gridcraft/p2_synthetic_test.py integrations/gridcraft/gridcraft_desktop_local.py integrations/gridcraft/test_desktop_local.py
       - name: Run official STDIO MCP + XLSX check on synthetic workbook
         run: python3 integrations/gridcraft/gridcraft_mcp_probe.py --cli "$GRIDCRAFT_CLI" --timeout 35
 
@@ -55,3 +55,6 @@ jobs:
 
       - name: P2 synthetic durable snapshot + real GridCraft cloud runner
         run: python3 integrations/gridcraft/p2_synthetic_test.py
+
+      - name: Windows GridCraft loopback control security simulation
+        run: python3 integrations/gridcraft/test_desktop_local.py
