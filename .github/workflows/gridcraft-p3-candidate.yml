@@ -12,6 +12,7 @@ on:
       - integrations/gridcraft/gridcraft_desktop_local.py
       - sites-migration/ai-workbench/gridcraft-p3-bridge.mjs
       - sites-migration/ai-workbench/route-p3-candidate.ts
+      - integrations/gridcraft/P3_SQL_*.sql
   workflow_dispatch:
 
 permissions:
@@ -52,3 +53,37 @@ jobs:
         run: |
           python integrations/gridcraft/test_desktop_local.py
           if ($LASTEXITCODE -ne 0) { throw "Existing local-only tests failed" }
+
+  postgres-candidate-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: test-password
+          POSTGRES_USER: postgres
+          POSTGRES_DB: p3_isolated
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d p3_isolated"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+    env:
+      PGPASSWORD: test-password
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: postgres
+      PGDATABASE: p3_isolated
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify draft P3 device queue SQL in disposable PostgreSQL 16
+        run: |
+          if ! command -v psql >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+          psql -v ON_ERROR_STOP=1 -f integrations/gridcraft/P3_SQL_TEST.sql
+          echo "PASS: isolated PostgreSQL RLS/owner queue SQL candidate (NOT production)"
