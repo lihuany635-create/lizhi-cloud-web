@@ -8,6 +8,10 @@ on:
       - .github/workflows/gridcraft-windows-agent.yml
       - integrations/gridcraft/gridcraft_windows_agent.py
       - integrations/gridcraft/gridcraft_desktop_local.py
+      - integrations/gridcraft/gridcraft_outbound_worker.py
+      - integrations/gridcraft/gridcraft_pairing_client.py
+      - integrations/gridcraft/test_outbound_worker.py
+      - integrations/gridcraft/test_pairing_client.py
       - integrations/gridcraft/test_windows_agent.py
       - integrations/gridcraft/test_desktop_local.py
       - integrations/gridcraft/WINDOWS_AGENT_README.md
@@ -32,11 +36,15 @@ jobs:
       - name: Run Windows agent security tests
         shell: pwsh
         run: |
-          python -m py_compile integrations/gridcraft/gridcraft_desktop_local.py integrations/gridcraft/gridcraft_windows_agent.py integrations/gridcraft/test_windows_agent.py
+          python -m py_compile integrations/gridcraft/gridcraft_desktop_local.py integrations/gridcraft/gridcraft_windows_agent.py integrations/gridcraft/test_windows_agent.py integrations/gridcraft/gridcraft_pairing_client.py integrations/gridcraft/gridcraft_outbound_worker.py integrations/gridcraft/test_pairing_client.py integrations/gridcraft/test_outbound_worker.py
           python integrations/gridcraft/test_desktop_local.py
           if ($LASTEXITCODE -ne 0) { throw "Loopback tests FAILED" }
           python integrations/gridcraft/test_windows_agent.py
           if ($LASTEXITCODE -ne 0) { throw "Windows agent tests FAILED" }
+          python integrations/gridcraft/test_pairing_client.py
+          if ($LASTEXITCODE -ne 0) { throw "Windows DPAPI pairing tests FAILED" }
+          python integrations/gridcraft/test_outbound_worker.py
+          if ($LASTEXITCODE -ne 0) { throw "Windows outbound tests FAILED" }
 
       - name: Build standalone user-executable GUI
         shell: pwsh
@@ -61,7 +69,7 @@ jobs:
       - name: Upload the EXE as unsigned preview artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LizhiGridCraftAgent-Windows-v0.1-unsigned
+          name: LizhiGridCraftAgent-Windows-v0.2-unsigned
           path: |
             dist/LizhiGridCraftAgent.exe
             dist/SHA256.txt
