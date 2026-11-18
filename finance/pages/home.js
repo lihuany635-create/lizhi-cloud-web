@@ -3,6 +3,8 @@ const FinanceHome=(()=>{
   "use strict";
   const ui={view:"overview",loaded:false,loading:false,accounts:[],cards:[],categories:[],transactions:[],settings:[],backgrounds:[],error:"",notice:"",edit:null,draft:null,aiDraftApplied:null,ai:{input:"",loading:false,status:"idle",models:[],result:null,validation:null,phase3:null,committed:null,dryRun:null,error:"",controller:null,jobStatus:""},advanced:{enabled:true,query:null,message:"",busy:false},voice:{supported:false,status:"idle",interim:"",error:""},sync:{state:"idle",lastSyncedAt:null,error:null,pending:0,deferred:0},ruleMemory:{rules:[],state:"local",error:""},host:{instance:null,state:null,availability:null,error:""},draftTestInput:'{\n  "version": 1,\n  "type": "expense",\n  "amount": 120,\n  "date": "2026-09-20",\n  "category": "餐飲",\n  "account": "現金",\n  "note": "午餐",\n  "source": "manual-test"\n}',draftTestResult:null,draftTestValidation:null,draftTestDryRun:null,draftTestError:"",modal:null,filters:{period:"month",start:"",end:"",type:"",query:""},importPreview:null,backgroundUrl:"",backgroundUrls:new Map(),lastFocus:null};
   ui.budget={month:FinanceBudgetUi.taipeiMonth(),rows:[],busy:false,error:"",editScope:"total",deleteId:null,ownerId:null,syncState:"local",syncMessage:"",syncing:false,defaults:[],defaultsOwner:null,defaultsState:"idle",defaultsMessage:""};
+  ui.goals={month:FinanceUiModel.localMonth(),state:"candidate_only",
+    report:null,rows:[],plan:null,ownerId:null,loading:false,error:""};
   const queryParams=new URLSearchParams(location.search);
   const draftTestEnabled=queryParams.get("draftTest")==="1";
   const aiAutoEntryEnabled=false;
@@ -14,6 +16,7 @@ const FinanceHome=(()=>{
   // budgets table, real OAuth/RLS and cross-device acceptance.
   const budgetCloudEnabled=true;
   const budgetSync=FinanceBudgetSync.create();
+  const goalsClient=FinanceGoalsBrowserClient.create();
   const ruleMemoryStore=FinanceRuleMemoryStore.create({settings:FinanceStorage.settings});
   const ruleMemorySync=FinanceRuleMemorySync.create({localStore:ruleMemoryStore});
   const financeCommitController=FinanceCommitController.createFinanceCommitController({createTransaction:async payload=>{const transaction=await FinanceStorage.transactions.create(payload);financeSync.schedule();return transaction;}});
@@ -69,6 +72,26 @@ const FinanceHome=(()=>{
       ui.budget.defaults=[];ui.budget.defaultsOwner=null;ui.budget.defaultsState="error";
       ui.budget.defaultsMessage="未來月份預設載入失敗，請確認網路與登入。";
     }finally{if(ui.loaded)update();}
+  }
+  async function loadGoals({force=false}={}){
+    if(ui.goals.loading||!force&&ui.goals.state==="synced")return;
+    ui.goals.loading=true;ui.goals.state="pending";ui.goals.error="";
+    ui.goals.report=null;ui.goals.rows=[];ui.goals.plan=null;
+    const month=ui.goals.month;
+    try{
+      const verified=await FinanceBudgetOwner.requireOwner();
+      const report=await goalsClient.readMonth(month);
+      if(month!==ui.goals.month||await FinanceBudgetOwner.requireOwner()!==verified)
+        throw new Error("GOALS_IDENTITY_CHANGED");
+      ui.goals.ownerId=verified;ui.goals.report=report;
+      ui.goals.rows=report.goals||[];ui.goals.plan=report.plan||null;
+      ui.goals.state="synced";
+    }catch(error){
+      ui.goals.report=null;ui.goals.rows=[];ui.goals.plan=null;ui.goals.ownerId=null;
+      ui.goals.error=String(error?.code||"GOALS_REMOTE_UNAVAILABLE");
+      ui.goals.state=ui.goals.error.includes("AUTH")||ui.goals.error.includes("IDENTITY")
+        ?"auth_required":"error";
+    }finally{ui.goals.loading=false;if(ui.loaded)update();}
   }
   async function readAll(){
     [ui.accounts,ui.cards,ui.categories,ui.transactions,ui.settings,ui.backgrounds,ui.ruleMemory.rules]=await Promise.all([
@@ -216,7 +239,17 @@ const FinanceHome=(()=>{
       busy:ui.budget.busy||ui.budget.syncing,error:ui.budget.error
     });
   }
-  function goalsPage(){const base=typeof FinanceGoalsP3Ui==="undefined"?"<section class=\"finance-section\">目標候選介面尚未載入；正式功能仍未部署。</section>":FinanceGoalsP3Ui.render({report:null,state:"candidate_only"});const forms=typeof FinanceGoalsP5Ui==="undefined"?"":FinanceGoalsP5Ui.render({enabled:false,month:FinanceUiModel.localDate().slice(0,7)});return base+forms;}
+  function goalsPage(){
+    const ready=ui.goals.state==="synced"&&Boolean(ui.goals.ownerId);
+    const base=typeof FinanceGoalsP3Ui==="undefined"
+      ?'<section class="finance-section">目標介面尚未載入。</section>'
+      :FinanceGoalsP3Ui.render({report:ready?ui.goals.report:null,state:ui.goals.state});
+    const forms=typeof FinanceGoalsP5Ui==="undefined"?"":FinanceGoalsP5Ui.render({
+      enabled:ready,month:ui.goals.month,goals:ready?ui.goals.rows:[],
+      plan:ready?ui.goals.plan:null,accounts:ready?ui.accounts:[]});
+    const feedback=ui.goals.error?'<p role="alert">目標讀取或寫入尚未完成，請確認本人登入與雲端服務。</p>':"";
+    return base+feedback+forms;
+  }
   function content(){const pages={overview,transactions:transactionsPage,accounts:accountsPage,cards:cardsPage,categories:categoriesPage,reports:reportsPage,budgets:budgetPage,goals:goalsPage,settings:settingsPage};return `${rail()}<div class="finance-stage">${header()}<div class="finance-body">${alerts()}${ui.loading&&!ui.loaded?loading():(pages[ui.view]||overview)()}</div></div>${modal()}`;}
   function render(){scheduleLoad();ensureVoiceController();return `<section class="finance-workspace" data-finance-root aria-labelledby="finance-title">${content()}</section>`;}
   function formObject(form){const data=Object.fromEntries(new FormData(form));if(form.elements.includeInAssets)data.includeInAssets=form.elements.includeInAssets.checked;return data;}
@@ -498,6 +531,8 @@ const FinanceHome=(()=>{
           ui.budget.rows=[];ui.budget.ownerId=null;ui.budget.deleteId=null;
           ui.budget.defaults=[];ui.budget.defaultsOwner=null;ui.budget.defaultsState="auth_required";
           ui.budget.syncState="auth_required";ui.budget.syncMessage="";
+          ui.goals.state="auth_required";ui.goals.report=null;
+          ui.goals.rows=[];ui.goals.plan=null;ui.goals.ownerId=null;
           ui.budget.error="登入身分已變更，預算資料已隱藏。請重新登入或重新載入。";
           if(ui.loaded)update();
         }
@@ -507,7 +542,8 @@ const FinanceHome=(()=>{
     host.addEventListener("click",event=>{const target=event.target.closest("[data-route]");if(target?.closest("[data-finance-root]"))destroyVoiceController();},true);
     host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-action]");if(!target||!target.closest("[data-finance-root]")||!["host-health","host-pause","host-resume"].includes(target.dataset.financeAction))return;event.preventDefault();event.stopImmediatePropagation();const action=target.dataset.financeAction;if(action==="host-pause")ui.host.instance?.pause();if(action==="host-resume")ui.host.instance?.resume();if(action==="host-health")void ui.host.instance?.health().then(()=>{ui.host.error="";ui.notice="本機 Gateway 健康檢查通過。";update();}).catch(error=>{ui.host.error=ollamaMessage(error);update();});},true);
     host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-action]");if(!target||!target.closest("[data-finance-root]")||!["retry-finance-sync","confirm-ai-transaction"].includes(target.dataset.financeAction))return;event.preventDefault();event.stopImmediatePropagation();if(target.dataset.financeAction==="retry-finance-sync")void syncFinance();else void confirmAiTransaction();},true);
-    host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-view],[data-finance-action]");if(!target||!target.closest("[data-finance-root]"))return;event.preventDefault();event.stopImmediatePropagation();if(target.dataset.financeView){ui.view=target.dataset.financeView;ui.budget.deleteId=null;ui.edit=null;ui.draft=null;ui.aiDraftApplied=null;ui.modal=null;update();return;}const action=target.dataset.financeAction,id=target.dataset.id;
+    host.addEventListener("click",event=>{const target=event.target.closest("[data-finance-view],[data-finance-action]");if(!target||!target.closest("[data-finance-root]"))return;event.preventDefault();event.stopImmediatePropagation();if(target.dataset.financeView){ui.view=target.dataset.financeView;
+        if(ui.view==="goals")void loadGoals();ui.budget.deleteId=null;ui.edit=null;ui.draft=null;ui.aiDraftApplied=null;ui.modal=null;update();return;}const action=target.dataset.financeAction,id=target.dataset.id;
       if(action==="budget-edit"){
         if(!ui.budget.busy){ui.budget.editScope=target.dataset.scope||"total";ui.budget.deleteId=null;update();
           queueMicrotask(()=>host.querySelector('[data-finance-form="budget"] input[name="amount"]')?.focus());}
@@ -540,6 +576,35 @@ const FinanceHome=(()=>{
         update();return;
       }
       if(event.target.matches('[data-finance-form="transaction"] input[name="type"]')){const data=formObject(event.target.form),type=event.target.value;ui.draft={type,date:data.date,amount:data.amount,note:data.note||""};if(["income","expense"].includes(type)){ui.draft.categoryId=activeCategories(type)[0]?.id||"";ui.draft.accountId=activeAccounts()[0]?.id||"";}if(type==="transfer"){ui.draft.fromAccountId=activeAccounts()[0]?.id||"";ui.draft.toAccountId=activeAccounts()[1]?.id||"";}if(type==="credit_card_purchase"){ui.draft.creditCardId=activeCards()[0]?.id||"";ui.draft.categoryId=activeCategories("expense")[0]?.id||"";}if(type==="credit_card_payment"){const card=activeCards()[0];ui.draft.creditCardId=card?.id||"";ui.draft.fromAccountId=card?.linkedPaymentAccountId||activeAccounts()[0]?.id||"";}update();}if(event.target.matches("[data-finance-import-input]")&&event.target.files[0])readImport(event.target.files[0]);if(event.target.matches("[data-finance-background-input]")&&event.target.files[0])uploadBackground(event.target.files[0]);});
+    host.addEventListener("submit",event=>{
+      const form=event.target?.closest?.("[data-goals-form]");
+      if(!form||!form.closest("[data-finance-root]"))return;
+      event.preventDefault();event.stopImmediatePropagation();
+      if(ui.goals.state!=="synced"||!ui.goals.ownerId||ui.goals.loading)return;
+      const type=form.dataset.goalsForm;
+      const commandLabel={goal:"目標",allocation:"預留／釋出",salary:"薪水分配"}[type];
+      if(!commandLabel)return;
+      const controller=FinanceGoalsP5Ui.createController({
+        provider:goalsClient,authenticated:true,
+        goals:ui.goals.rows,plan:ui.goals.plan,
+        confirmAction:async({tool,args})=>{
+          // This local click confirmation is in addition to the Edge's
+          // short-lived signed request-bound prepare/commit challenge.
+          const details=JSON.stringify({tool,month:args.month,
+            action:args.action,goal_id:args.goal_id,
+            amount:args.amount??args.target_amount??args.estimated_income,
+            request_id:args.request_id},null,2);
+          return window.confirm("確定寫入這筆理財規劃嗎？不會執行銀行轉帳或投資交易。\n"+details);
+        }
+      });
+      void controller.submit(type,new FormData(form)).then(async()=>{
+        ui.notice="目標操作已回傳保存收據，正在重新讀取雲端資料。";
+        await loadGoals({force:true});
+      }).catch(()=>{
+        ui.goals.error="目標未通過確認或寫入失敗，請重新檢查。";
+        update();
+      });
+    },true);
     host.addEventListener("submit",event=>{const form=event.target.closest("[data-finance-form]");if(!form)return;event.preventDefault();event.stopImmediatePropagation();const kind=form.dataset.financeForm;if(kind==="account")saveEntity(form,"帳戶",FinanceUiModel.validateAccountDraft,FinanceStorage.accounts);if(kind==="card")saveEntity(form,"信用卡",FinanceUiModel.validateCardDraft,FinanceStorage.creditCards);if(kind==="category")saveEntity(form,"分類",FinanceUiModel.validateCategoryDraft,FinanceStorage.categories);if(kind==="transaction")submitTransaction(form);if(kind==="draft-test")parseDraftTest(form);if(kind==="ai-quick")parseAiText(form);if(kind==="advanced-edit")editAdvancedDraft(form);if(kind==="ai-settings")saveAiSettings(form);if(kind==="rule-memory")saveRuleMemory(form);if(kind==="settings")saveSettings(form);if(kind==="budget")void saveBudget(form);if(kind==="background-settings")saveBackgroundSettings(form);if(kind==="filter"){ui.filters={...ui.filters,...formObject(form)};update();}},true);
     host.addEventListener("keydown",event=>{if(!ui.modal)return;if(event.key==="Escape"){event.preventDefault();ui.modal=null;update();queueMicrotask(()=>ui.lastFocus?.isConnected&&ui.lastFocus.focus());return;}if(event.key==="Tab"){const modal=host.querySelector('.finance-modal'),focusable=[...modal?.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')||[]];if(!focusable.length)return;const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
   }
