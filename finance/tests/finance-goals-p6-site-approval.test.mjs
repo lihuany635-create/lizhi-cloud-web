@@ -82,15 +82,14 @@ test("P6-SITE-05 only true owner principal can even attempt write approval",asyn
  const r=await handleFinanceSiteMcp(incoming(),x.env,x.opts);
  assert.equal(r.status,403);assert.equal(x.metrics().forwarded,0);
 });
-test("P6-SITE-06 signed proof does not allow browser origin into old MCP route",async()=>{
+test("P6-SITE-06 old MCP gateway rejects CSRF browser origins before forwarding",async()=>{
  const x=ctx({approve:true});
  const req=new Request(SRC,{method:"POST",headers:{origin:"https://attacker.example"},
  body:JSON.stringify(frame())});
  const r=await handleFinanceSiteMcp(req,x.env,x.opts);
- // Site explicitly verifies its owner before forwarding, not the Origin header.
- const data=await r.json();
- assert.equal(data.result.structuredContent.committed,true);
- assert.equal(x.backend.calls.length,1);
+ assert.equal(r.status,403);
+ assert.equal(x.metrics().forwarded,0);
+ assert.equal(x.backend.calls.length,0);
  assert.equal(r.headers.get("access-control-allow-origin"),null);
 });
 test("P6-SITE-07 unauthorised tool call cannot supply extra owner argument",async()=>{
