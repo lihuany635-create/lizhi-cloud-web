@@ -1,6 +1,6 @@
 """立之 GridCraft Windows 本機代理 v0.1 — 可攜式、僅本機的安全控制面板。
 
-Does NOT connect to ChatGPT or a cloud relay yet (P3 pending).
+P3 outbound candidate requires explicit owner pairing and an approved backend; not deployed.
 This program opens NO network listener, touches only 127.0.0.1, and does
 not expose GridCraft's local control token in user-visible output.
 """
@@ -13,10 +13,13 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import threading
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, messagebox, simpledialog, ttk
 
 from gridcraft_desktop_local import GridCraftLocal
+from gridcraft_outbound_worker import HTTPSDeviceTransport, OutboundWorker
+from gridcraft_pairing_client import DeviceStore, PairingError, pair_one_time
 
 try:
     import winreg
@@ -60,6 +63,7 @@ def load_settings(path: Path | None = None) -> dict:
         return {
             "gridcraft_path": str(result.get("gridcraft_path") or "")[:MAX_PATH],
             "start_gridcraft_on_login": result.get("start_gridcraft_on_login") is True,
+            "remote_enabled": result.get("remote_enabled") is True,
         }
     except (OSError, json.JSONDecodeError, UnicodeDecodeError):
         return {}
@@ -71,6 +75,7 @@ def save_settings(settings: dict, path: Path | None = None) -> None:
     clean = {
         "gridcraft_path": str(settings.get("gridcraft_path") or "")[:MAX_PATH],
         "start_gridcraft_on_login": settings.get("start_gridcraft_on_login") is True,
+        "remote_enabled": settings.get("remote_enabled") is True,
     }
     tmp = path.with_suffix(".json.tmp")
     try:
@@ -151,17 +156,26 @@ def diagnostic() -> int:
 class AgentUI:
     def __init__(self, root: tk.Tk, minimized: bool = False):
         self.root = root
-        self.root.title(APP_TITLE + "｜v0.1")
-        self.root.geometry("540x395")
-        self.root.minsize(470, 340)
+        self.root.title(APP_TITLE + "｜v0.2 候選")
+        self.root.geometry("580x530")
+        self.root.minsize(530, 480)
         self.root.protocol("WM_DELETE_WINDOW", self.stop)
         self.settings = load_settings()
+        self.pair_store = DeviceStore(app_directory())
+        try:
+            self.paired = self.pair_store.load()
+        except PairingError:
+            self.paired = None
+        self.allowed_docs = set()  # Explicit local per-session grant, never server-controlled.
+        self.remote_stop = threading.Event()
+        self.remote_thread = None
+        self.remote_status = "未配對（遠端 MCP 尚未驗收）" if not self.paired else "已配對，尚未驗證遠端服務"
         self.path_var = tk.StringVar(value=self.settings["gridcraft_path"] if "gridcraft_path" in self.settings else "")
         self.status_var = tk.StringVar(value="檢查中…")
         self.workbooks_var = tk.StringVar(value="工作簿：尚未讀取")
         self.startup_var = tk.BooleanVar(value=startup_enabled())
         self.launch_var = tk.BooleanVar(value=self.settings.get("start_gridcraft_on_login") is True)
-        self.info_var = tk.StringVar(value="ChatGPT 遠端 MCP：尚未接通（P3 待驗收）")
+        self.info_var = tk.StringVar(value="ChatGPT 遠端 MCP：尚未接通（P3 待正式部署與驗收）")
         self.running = True
         self._create_widgets()
         self.refresh()
@@ -170,12 +184,14 @@ class AgentUI:
             if self.launch_var.get():
                 root.after(1200, self.launch_on_login)
         root.after(4500, self._poll)
+        if self.settings.get("remote_enabled") is True and self.paired:
+            root.after(900, self.start_remote)
 
     def _create_widgets(self):
         frm = ttk.Frame(self.root, padding=16)
         frm.pack(fill="both", expand=True)
         ttk.Label(frm, text="立之 GridCraft 連線代理", font=("Microsoft JhengHei UI", 17, "bold")).pack(anchor="w")
-        ttk.Label(frm, text="本機控制｜不會開放網際網路連入｜v0.1", foreground="#5b6472").pack(anchor="w", pady=(2, 13))
+        ttk.Label(frm, text="本機控制與候選出站連線｜不開放網際網路連入｜v0.2", foreground="#5b6472").pack(anchor="w", pady=(2, 13))
         ttk.Label(frm, textvariable=self.status_var, font=("Microsoft JhengHei UI", 12, "bold")).pack(anchor="w")
         ttk.Label(frm, textvariable=self.workbooks_var, wraplength=490).pack(anchor="w", pady=(5, 10))
         source = ttk.Frame(frm)
@@ -201,7 +217,13 @@ class AgentUI:
             command=self.change_launch_preference,
         ).pack(anchor="w")
         ttk.Separator(frm).pack(fill="x", pady=10)
-        ttk.Label(frm, textvariable=self.info_var, foreground="#926c10", wraplength=490).pack(anchor="w", pady=4)
+        remote = ttk.Frame(frm)
+        remote.pack(fill="x", pady=(2, 8))
+        ttk.Button(remote, text="輸入配對碼", command=self.pair_remote).pack(side="left")
+        ttk.Button(remote, text="授權目前工作簿", command=self.grant_open_book).pack(side="left", padx=4)
+        ttk.Button(remote, text="開始遠端", command=self.start_remote).pack(side="left", padx=4)
+        ttk.Button(remote, text="停止遠端", command=self.stop_remote).pack(side="left")
+        ttk.Label(frm, textvariable=self.info_var, foreground="#926c10", wraplength=540).pack(anchor="w", pady=4)
         ttk.Label(frm, text="安全狀態：唯讀｜127.0.0.1:7979｜不輸出控制權杖", foreground="#5b6472").pack(anchor="w")
 
     def choose_gridcraft(self):
@@ -288,7 +310,7 @@ class AgentUI:
                 self.workbooks_var.set("工作簿清單暫時無法讀取")
         else:
             self.workbooks_var.set("目前無法讀取工作簿")
-        self.info_var.set("ChatGPT 遠端 MCP：尚未接通（P3 待驗收）")
+        self.info_var.set("ChatGPT 遠端 MCP：" + self.remote_status)
 
     def _poll(self):
         if self.running:
@@ -297,7 +319,90 @@ class AgentUI:
             finally:
                 self.root.after(4500, self._poll)
 
+
+    def pair_remote(self):
+        code = simpledialog.askstring(
+            "一次性裝置配對",
+            "從本人 ChatGPT 私人 MCP 取得 16 位一次性配對碼，在此輸入（有效 2 分鐘）：",
+            parent=self.root
+        )
+        if not code:
+            return
+        try:
+            device_id, token = pair_one_time(code.strip())
+            self.pair_store.save(device_id, token)
+            self.paired = {"device_id": device_id, "token": token}
+            self.remote_status = "已配對（仍需正式服務驗收）"
+            messagebox.showinfo("配對資料已保存", "裝置認證已加密保存在目前 Windows 使用者帳號中。", parent=self.root)
+        except (PairingError, OSError) as exc:
+            self.remote_status = "配對尚未成功"
+            messagebox.showerror("配對失敗", str(exc), parent=self.root)
+
+    def grant_open_book(self):
+        try:
+            windows = GridCraftLocal(port=7979, timeout=1.2).windows()
+        except Exception:
+            messagebox.showerror("GridCraft 不在線", "先以本機連上 GridCraft 再授權工作簿", parent=self.root)
+            return
+        if not windows:
+            messagebox.showinfo("沒有工作簿", "請先在 GridCraft 開啟工作簿", parent=self.root)
+            return
+        lines = [str(i + 1) + ". " + str(w.get("title", ""))[:65] for i, w in enumerate(windows[:20])]
+        choice = simpledialog.askinteger(
+            "本機工作簿授權",
+            "只授權你親自指定的工作簿供 ChatGPT 唯讀使用：\n" + "\n".join(lines),
+            parent=self.root, minvalue=1, maxvalue=len(lines)
+        )
+        if choice is None:
+            return
+        doc = windows[choice - 1].get("doc")
+        if not isinstance(doc, str) or not doc:
+            messagebox.showerror("無法授權", "工作簿沒有有效識別碼", parent=self.root)
+            return
+        self.allowed_docs.add(doc)  # Per-session only; reset when agent closes.
+        self.remote_status = "已於本次工作階段授權 " + str(len(self.allowed_docs)) + " 本工作簿"
+
+    def _remote_loop(self):
+        if not self.paired:
+            return
+        try:
+            transport = HTTPSDeviceTransport(
+                device_id=self.paired["device_id"], device_token=self.paired["token"])
+            worker = OutboundWorker(
+                transport=transport, local=GridCraftLocal(port=7979, timeout=2),
+                approved_docs=self.allowed_docs)
+            while not self.remote_stop.is_set():
+                worker.approved_docs = frozenset(self.allowed_docs)
+                try:
+                    worker.run_once()
+                    self.remote_status = "出站連線已收到伺服器回應（遠端 Site 仍須獨立驗收）"
+                except Exception:
+                    self.remote_status = "出站服務未接通或暫時不可用"
+                self.remote_stop.wait(6)
+        except Exception:
+            self.remote_status = "無法啟動安全出站連線"
+
+    def start_remote(self):
+        if not self.paired:
+            self.remote_status = "尚未經本人完成裝置配對"
+            messagebox.showinfo("尚未配對", "需先在私人 Site 產生一次性配對碼", parent=self.root)
+            return
+        if self.remote_thread and self.remote_thread.is_alive():
+            return
+        self.remote_stop.clear()
+        self.settings["remote_enabled"] = True
+        save_settings(self.settings)
+        self.remote_thread = threading.Thread(target=self._remote_loop, daemon=True)
+        self.remote_thread.start()
+
+    def stop_remote(self):
+        self.remote_stop.set()
+        self.settings["remote_enabled"] = False
+        save_settings(self.settings)
+        self.remote_status = "遠端連線已停止（本機配對資料保留，若要撤銷雲端權限需在本人 Site 操作）"
+
     def stop(self):
+        self.remote_stop.set()
         self.running = False
         self.root.destroy()
 
