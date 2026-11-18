@@ -52,7 +52,7 @@ export async function executeGoalsP3({db,owner},name,untrustedArgs){
   // No private transaction notes, bank credentials, or external owner fields.
   if(name==="finance_goals_salary_set"){
     if(data.committed!==true||
-      !["created","updated","removed","already_applied"].includes(data.status)||
+      !["created","updated","restored","removed","already_applied"].includes(data.status)||
       data.request_id!==args.request_id)fail("GOALS_RECEIPT_INVALID");
     return Object.freeze({month:data.month,status:data.status,
       version:data.version,committed:true,request_id:data.request_id,
