@@ -34,7 +34,7 @@ test("valid bounded range forwarded to fixed trusted Edge HTTPS endpoint",async(
  let called=false;
  const fetchImpl=async(url,opt)=>{
    called=true;
-   assert.equal(url,"https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-gridcraft-bridge/site");
+   assert.equal(url,"https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-gridcraft-bridge/site/dispatch");
    assert.equal(opt.redirect,"manual");
    assert.equal(opt.headers["x-lizhi-gridcraft-actor"],OWNER);
    assert.equal(opt.headers["x-lizhi-gridcraft-bridge"],KEY);
