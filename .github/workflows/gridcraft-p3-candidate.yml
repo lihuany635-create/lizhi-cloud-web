@@ -14,6 +14,7 @@ on:
       - sites-migration/ai-workbench/route-p3-candidate.ts
       - integrations/gridcraft/P3_SQL_*.sql
       - integrations/gridcraft/p3-edge-candidate.ts
+      - integrations/gridcraft/p3-edge.test.ts
   workflow_dispatch:
 
 permissions:
@@ -98,7 +99,9 @@ jobs:
         with:
           deno-version: v2.x
       - name: Check draft Edge handler without any deployment
-        run: deno check integrations/gridcraft/p3-edge-candidate.ts
+        run: deno check integrations/gridcraft/p3-edge-candidate.ts integrations/gridcraft/p3-edge.test.ts
+      - name: Execute draft Edge handler security tests with isolated mock DB
+        run: deno test --allow-env integrations/gridcraft/p3-edge.test.ts
       - name: Verify unconfigured Edge fails closed
         run: |
           deno eval --allow-env --no-check "
