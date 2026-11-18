@@ -1,6 +1,4 @@
-"""立之 GridCraft Windows 本機代理 v0.1 — 可攜式、僅本機的安全控制面板。
-
-P3 outbound candidate requires explicit owner pairing and an approved backend; not deployed.
+"""立之 GridCraft Windows 本機代理 v0.4 — 已配對自動回連、已儲存檔案自動授權。
 This program opens NO network listener, touches only 127.0.0.1, and does
 not expose GridCraft's local control token in user-visible output.
 """
@@ -208,7 +206,7 @@ class AgentUI:
         self.workbooks_var = tk.StringVar(value="工作簿：尚未讀取")
         self.startup_var = tk.BooleanVar(value=startup_enabled())
         self.launch_var = tk.BooleanVar(value=self.settings.get("start_gridcraft_on_login") is True)
-        self.info_var = tk.StringVar(value="ChatGPT 遠端 MCP：尚未接通（P3 待正式部署與驗收）")
+        self.info_var = tk.StringVar(value="ChatGPT 遠端 MCP：啟動後自動連線中")
         self.running = True
         self._create_widgets()
         self.refresh()
@@ -255,9 +253,10 @@ class AgentUI:
         remote = ttk.Frame(frm)
         remote.pack(fill="x", pady=(2, 8))
         ttk.Button(remote, text="輸入配對碼", command=self.pair_remote).pack(side="left")
-        ttk.Button(remote, text="授權目前工作簿", command=self.grant_open_book).pack(side="left", padx=4)
+        ttk.Button(remote, text="授權並記住檔案", command=self.grant_open_book).pack(side="left", padx=4)
         ttk.Button(remote, text="開始遠端", command=self.start_remote).pack(side="left", padx=4)
         ttk.Button(remote, text="停止遠端", command=self.stop_remote).pack(side="left")
+        ttk.Button(remote, text="忘記已授權檔案", command=self.forget_authorized_workbooks).pack(side="left", padx=4)
         ttk.Button(frm, text="P4 寫入授權（本次執行）", command=self.toggle_p4_write).pack(anchor="w", pady=5)
         ttk.Checkbutton(frm, text="記住本機 P4 寫入允許（僅限已授權的檔案；每次實際寫入仍須在原 Site 確認）",
                         variable=self.auto_p4_var,command=self.change_auto_p4).pack(anchor="w", pady=2)
@@ -433,6 +432,21 @@ class AgentUI:
             self.remote_status = "已授權未存檔工作簿；請先存成檔案，之後才能永久自動授權"
         self.refresh()
 
+    def forget_authorized_workbooks(self):
+        """Explicit local revocation; no change to user documents or cloud pairing."""
+        if not messagebox.askyesno("清除檔案授權",
+             "忘記此 Windows 使用者已記住的工作簿授權？\n"
+             "這不會刪除任何 Excel，遠端 MCP 將無法讀寫那些工作簿，"
+             "直到你再次在本機授權。", parent=self.root):
+            return
+        self.settings["remembered_workbooks"] = []
+        self.session_grants.clear()
+        self.allowed_docs.clear()
+        self.p4_write_enabled = False
+        save_settings(self.settings)
+        self.remote_status = "已清除工作簿授權；保留裝置配對但不能讀寫檔案"
+        self.refresh()
+
     def _verified_grants(self, windows=None):
         """Recheck exact document identity; never auto-grant by title or UID."""
         local = GridCraftLocal(port=7979, timeout=1.2)
@@ -495,7 +509,7 @@ class AgentUI:
             "P4 將允許 ChatGPT 在本次 Windows 執行期間，經兩階段預覽及本人確認後，"
             "修改已授權工作簿中最多 50 格。\n"
             "寫入前會建立本機 XLSX 快照，但不會自動儲存或覆寫原件。\n"
-            "本功能仍屬開發候選。是否開啟本次執行的寫入授權？",
+            "這個本機授權可隨時關閉。是否開啟本次執行的寫入授權？",
             parent=self.root,
         )
         if approved:
