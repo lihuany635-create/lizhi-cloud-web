@@ -1,0 +1,55 @@
+name: GridCraft P4 guarded write candidate (no production writes)
+
+on:
+  push:
+    branches:
+      - feat/gridcraft-p4-safe-write-20261118
+    paths:
+      - .github/workflows/gridcraft-p4-candidate.yml
+      - integrations/gridcraft/gridcraft_p4_*.py
+      - integrations/gridcraft/gridcraft_desktop_local.py
+      - integrations/gridcraft/test_p4_*.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-contract:
+    runs-on: windows-2022
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile P4 candidate (no production access)
+        shell: pwsh
+        run: |
+          python -m py_compile integrations/gridcraft/gridcraft_p4_safe_write.py integrations/gridcraft/gridcraft_p4_desktop.py integrations/gridcraft/test_p4_safe_write.py
+          if ($LASTEXITCODE -ne 0) { throw "P4 Python compile FAILED" }
+      - name: Run P4 isolated synthetic workbook safety tests
+        shell: pwsh
+        run: |
+          python integrations/gridcraft/test_p4_safe_write.py
+          if ($LASTEXITCODE -ne 0) { throw "P4 safe write tests FAILED" }
+      - name: Confirm P3 read-only regression
+        shell: pwsh
+        run: |
+          python integrations/gridcraft/test_desktop_local.py
+          if ($LASTEXITCODE -ne 0) { throw "P3 desktop local tests FAILED" }
+          python integrations/gridcraft/test_outbound_worker.py
+          if ($LASTEXITCODE -ne 0) { throw "P3 outbound worker tests FAILED" }
+
+  linux-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: P4 security tests independent of Windows desktop
+        run: |
+          python -m py_compile integrations/gridcraft/gridcraft_p4_safe_write.py integrations/gridcraft/gridcraft_p4_desktop.py
+          python integrations/gridcraft/test_p4_safe_write.py
