@@ -1,0 +1,196 @@
+"""GridCraft P3 outbound *candidate*; NOT enabled in v0.1 or production.
+
+The Windows machine never listens to inbound Internet traffic. Every request
+goes OUT via HTTPS to a single fixed existing Supabase project endpoint, only
+after a separately authorized device pairing and the owner's explicit grant
+of selected document IDs. No device credential is included in this repo.
+
+This module is tested with fake relay/local GridCraft; endpoint NOT DEPLOYED.
+"""
+from __future__ import annotations
+
+import json
+import re
+import ssl
+import time
+import urllib.error
+import urllib.request
+from typing import Protocol
+
+from gridcraft_desktop_local import GridCraftLocal
+
+DEVICE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,100}$")
+REQUEST_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{7,95}$")
+TOKEN = re.compile(r"^[a-fA-F0-9]{64}$")
+A1 = re.compile(r"^([A-Z]{1,3})([1-9][0-9]{0,5})(?::([A-Z]{1,3})([1-9][0-9]{0,5}))?$")
+BASE = "https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-gridcraft-bridge/device"
+READ_TOOLS = frozenset({"gridcraft_list_workbooks", "gridcraft_read_range"})
+RESPONSE_LIMIT = 24 * 1024
+
+
+class UnsafeJob(ValueError):
+    pass
+
+
+def bounded_range(s: str):
+    if not isinstance(s, str) or len(s) > 22:
+        raise UnsafeJob("INVALID_RANGE")
+    m = A1.fullmatch(s)
+    if m is None:
+        raise UnsafeJob("INVALID_RANGE")
+    def col(x):
+        n = 0
+        for ch in x:
+            n = n * 26 + ord(ch) - 64
+        return n
+    rows = int(m[4] or m[2]) - int(m[2]) + 1
+    cols = col(m[3] or m[1]) - col(m[1]) + 1
+    if rows < 1 or cols < 1 or rows > 50 or cols > 20 or rows * cols > 200:
+        raise UnsafeJob("RANGE_LIMIT")
+
+
+def bounded_reply(data):
+    # Reject responses with unexpected binary-like or oversized content.
+    if not isinstance(data, dict):
+        raise UnsafeJob("RESULT_INVALID")
+    encoded = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    if len(encoded.encode("utf-8")) > RESPONSE_LIMIT:
+        raise UnsafeJob("RESULT_LIMIT")
+    return data
+
+
+class Transport(Protocol):
+    def heartbeat(self, status: str) -> dict: ...
+    def poll(self) -> dict: ...
+    def complete(self, request_id: str, result: dict) -> dict: ...
+
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):
+        raise UnsafeJob("REDIRECT_DENIED")
+
+
+class HTTPSDeviceTransport:
+    """Prepared client for approved existing Edge only (not deployed yet)."""
+    def __init__(self, *, device_id: str, device_token: str, endpoint: str = BASE):
+        if not DEVICE_ID.fullmatch(device_id) or not TOKEN.fullmatch(device_token):
+            raise ValueError("Missing device pairing credentials")
+        if endpoint != BASE:
+            raise ValueError("Unapproved device relay endpoint")
+        self.device_id = device_id
+        self._device_token = device_token
+        self._endpoint = endpoint
+        self._opener = urllib.request.build_opener(
+            urllib.request.HTTPSHandler(context=ssl.create_default_context()),
+            NoRedirect(),
+        )
+
+    def _post(self, action: str, payload: dict):
+        if action not in ("heartbeat", "poll", "complete"):
+            raise UnsafeJob("METHOD_DENIED")
+        body = json.dumps({"deviceId": self.device_id, **payload}, ensure_ascii=False,
+                          separators=(",", ":")).encode("utf-8")
+        if len(body) > RESPONSE_LIMIT + 2048:
+            raise UnsafeJob("REQUEST_LIMIT")
+        request = urllib.request.Request(
+            self._endpoint + "/" + action,
+            data=body, method="POST",
+            headers={"Content-Type": "application/json", "Accept": "application/json",
+                     "Authorization": "Bearer " + self._device_token,
+                     "Cache-Control": "no-store"},
+        )
+        try:
+            with self._opener.open(request, timeout=7) as r:
+                if r.status != 200:
+                    raise UnsafeJob("BACKEND_UNAVAILABLE")
+                raw = r.read(RESPONSE_LIMIT + 1)
+                if len(raw) > RESPONSE_LIMIT:
+                    raise UnsafeJob("RESULT_LIMIT")
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, OSError) as exc:
+            # Deliberately omit original exception, which might include internal URLs.
+            raise UnsafeJob("BACKEND_UNAVAILABLE") from None
+        try:
+            response = json.loads(raw)
+        except (ValueError, UnicodeDecodeError):
+            raise UnsafeJob("INVALID_RELAY_RESPONSE") from None
+        if not isinstance(response, dict):
+            raise UnsafeJob("INVALID_RELAY_RESPONSE")
+        return response
+
+    def heartbeat(self, status: str):
+        return self._post("heartbeat", {"status": status})
+
+    def poll(self):
+        return self._post("poll", {})
+
+    def complete(self, request_id: str, result: dict):
+        return self._post("complete", {"id": request_id, "result": bounded_reply(result)})
+
+
+class OutboundWorker:
+    """Only a trusted local UI may populate approved_docs after explicit consent."""
+    def __init__(self, *, transport: Transport, local: GridCraftLocal,
+                 approved_docs: set[str] | frozenset[str] | None = None,
+                 clock=time.time):
+        self.transport = transport
+        self.local = local
+        self.approved_docs = frozenset(approved_docs or [])
+        self.clock = clock
+
+    def run_once(self):
+        status = self.local.status().get("status", "CONTROL_ERROR")
+        if status not in ("READY", "GRIDCRAFT_OFFLINE", "UNAUTHORIZED", "CONTROL_ERROR"):
+            status = "CONTROL_ERROR"
+        self.transport.heartbeat(status)
+        if status != "READY":
+            return {"status":status,"executed":False}
+        received = self.transport.poll()
+        job = received.get("job")
+        if not job:
+            return {"status":"IDLE","executed":False}
+        req = job.get("id")
+        if not isinstance(req, str) or not REQUEST_ID.fullmatch(req):
+            raise UnsafeJob("INVALID_REQUEST_ID")
+        if (not isinstance(job.get("expiresAt"), (int, float)) or
+                self.clock()*1000 > job["expiresAt"]):
+            raise UnsafeJob("EXPIRED_JOB")
+        try:
+            result = self.execute_job(job)
+        except (UnsafeJob, ValueError, PermissionError) as exc:
+            result = {"ok": False, "error": str(exc)[:80]}
+        except Exception:
+            result = {"ok": False, "error": "LOCAL_CONTROL_UNAVAILABLE"}
+        # Never execute a remote write, and never retry after an uncertain result.
+        response = self.transport.complete(req, bounded_reply(result))
+        if response.get("accepted") is not True:
+            raise UnsafeJob("COMPLETION_NOT_ACKNOWLEDGED")
+        return {"status":"DONE","executed":True,"requestId":req}
+
+    def execute_job(self, job):
+        if not isinstance(job, dict) or job.get("name") not in READ_TOOLS:
+            raise UnsafeJob("METHOD_DENIED")
+        name = job["name"]
+        args = job.get("args", {})
+        if not isinstance(args, dict):
+            raise UnsafeJob("INVALID_ARGS")
+        if name == "gridcraft_list_workbooks":
+            if args:
+                raise UnsafeJob("INVALID_ARGS")
+            windows = self.local.windows()
+            # List only specifically granted docs; no absolute paths/tokens.
+            result = [{"doc":w["doc"], "title":str(w.get("title", ""))[:80],
+                       "dirty":w.get("dirty") is True}
+                      for w in windows if w.get("doc") in self.approved_docs][:20]
+            return bounded_reply({"ok":True,"workbooks":result})
+        if set(args) != {"doc","sheet","range"}:
+            raise UnsafeJob("INVALID_ARGS")
+        doc, sheet, rng = args["doc"], args["sheet"], args["range"]
+        if not isinstance(doc, str) or not DEVICE_ID.fullmatch(doc):
+            raise UnsafeJob("INVALID_DOC")
+        if doc not in self.approved_docs:
+            raise UnsafeJob("WORKBOOK_NOT_GRANTED")
+        if not isinstance(sheet, str) or len(sheet) < 1 or len(sheet) > 80 or any(ord(c)<32 for c in sheet):
+            raise UnsafeJob("INVALID_SHEET")
+        bounded_range(rng)
+        result = self.local.read_range(sheet, rng, doc=doc)
+        return bounded_reply({"ok": True, "doc": doc, "sheet": sheet, "range": rng, "data": result})
