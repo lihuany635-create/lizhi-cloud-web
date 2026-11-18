@@ -30,6 +30,7 @@ import uuid
 import zipfile
 
 MAX_SNAPSHOT = 8 * 1024 * 1024
+MAX_BACKUP_FOLDER = 512 * 1024 * 1024
 MAX_CELLS = 50
 MAX_PAYLOAD = 4096
 TTL_SECONDS = 90
@@ -205,6 +206,10 @@ class P4SafeWriter:
         except (zipfile.BadZipFile,OSError):
             raise P4Denied("SNAPSHOT_INVALID") from None
         self.backups.mkdir(parents=True,exist_ok=True)
+        # Fail closed when local backups are full; never silently delete versions.
+        total=sum(p.stat().st_size for p in self.backups.glob("p4-*.xlsx") if p.is_file())
+        if total + len(data) > MAX_BACKUP_FOLDER:
+            raise P4Denied("BACKUP_STORAGE_LIMIT")
         name="p4-"+doc+"-"+uuid.uuid4().hex+".xlsx"
         filename=self.backups/name
         try:
@@ -242,6 +247,11 @@ class P4SafeWriter:
                 raise P4Denied("VERSION_CONFLICT")
             # No GridCraft cell mutation occurs before this full XLSX snapshot.
             backup=self._save_backup(plan["doc"])
+            # A user may edit the sheet while GridCraft serializes the snapshot.
+            # Recheck immediately before the single guarded write command.
+            after_backup=self._preimage(plan["doc"],plan["sheet"],plan["range"])
+            if fingerprint(plan["doc"],plan["sheet"],plan["range"],after_backup)!=expected_version:
+                raise P4Denied("VERSION_CONFLICT_AFTER_SNAPSHOT")
             self.receipts.reserve(rid,preview_id,backup["backup_sha256"])
             try:
                 self.local.write_range(
