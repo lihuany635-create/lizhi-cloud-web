@@ -1,0 +1,68 @@
+name: GridCraft Windows v0.4 autoconnect candidate
+
+on:
+  push:
+    branches:
+      - feat/gridcraft-p4-autoconnect-v04-20261118
+    paths:
+      - .github/workflows/gridcraft-v04-autoconnect.yml
+      - integrations/gridcraft/gridcraft_windows_agent.py
+      - integrations/gridcraft/gridcraft_desktop_local.py
+      - integrations/gridcraft/gridcraft_outbound_worker.py
+      - integrations/gridcraft/test_autoconnect_v04.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-tests-and-build:
+    runs-on: windows-2022
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile v0.4 Windows agent and worker
+        shell: pwsh
+        run: |
+          python -m py_compile integrations/gridcraft/gridcraft_windows_agent.py integrations/gridcraft/gridcraft_desktop_local.py integrations/gridcraft/gridcraft_outbound_worker.py integrations/gridcraft/test_autoconnect_v04.py
+          if ($LASTEXITCODE -ne 0) { throw "Compile failed" }
+      - name: Automatic pairing, exact workbook identity and recheck tests
+        shell: pwsh
+        run: |
+          python integrations/gridcraft/test_autoconnect_v04.py
+          if ($LASTEXITCODE -ne 0) { throw "Auto-connect tests FAILED" }
+      - name: P3 and P4 regression
+        shell: pwsh
+        run: |
+          python integrations/gridcraft/test_windows_agent.py
+          if ($LASTEXITCODE -ne 0) { throw "Windows regression FAILED" }
+          python integrations/gridcraft/test_desktop_local.py
+          if ($LASTEXITCODE -ne 0) { throw "P3 local regression FAILED" }
+          python integrations/gridcraft/test_outbound_worker.py
+          if ($LASTEXITCODE -ne 0) { throw "P3 worker regression FAILED" }
+          python integrations/gridcraft/test_p4_safe_write.py
+          if ($LASTEXITCODE -ne 0) { throw "P4 safety regression FAILED" }
+          python integrations/gridcraft/test_p4_desktop.py
+          if ($LASTEXITCODE -ne 0) { throw "P4 socket regression FAILED" }
+      - name: Build portable v0.4 Windows EXE
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pyinstaller==6.16.0
+          if ($LASTEXITCODE -ne 0) { throw "PyInstaller install failed" }
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name LizhiGridCraftAgent_v04_AutoConnect --paths integrations/gridcraft integrations/gridcraft/gridcraft_windows_agent.py
+          if ($LASTEXITCODE -ne 0) { throw "EXE build FAILED" }
+          $exe = (Resolve-Path "dist/LizhiGridCraftAgent_v04_AutoConnect.exe").Path
+          $p = Start-Process -FilePath $exe -ArgumentList "--self-test" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "Packaged EXE self-test FAILED" }
+          (Get-FileHash $exe -Algorithm SHA256).Hash.ToLowerInvariant() | Out-File -Encoding ascii dist/SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GridCraft-Windows-v04-AutoConnect-candidate
+          path: |
+            dist/LizhiGridCraftAgent_v04_AutoConnect.exe
+            dist/SHA256.txt
+          retention-days: 14
+          if-no-files-found: error

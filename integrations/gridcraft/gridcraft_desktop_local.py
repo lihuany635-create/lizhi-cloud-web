@@ -86,7 +86,7 @@ class GridCraftLocal:
                                       or not RANGE.fullmatch(params["cell"])
                                       or ":" in params["cell"]):
             raise ValueError("cell.get needs a single A1 cell")
-        if method in ("window.list", "document.inspect") and params:
+        if (method == "window.list" and params) or (method == "document.inspect" and params and set(params) != {"doc"}):
             raise ValueError("parameters not supported for this method")
         data = json.dumps({"id": 1, "method": method, "params": params}, separators=(",", ":")).encode() + b"\n"
         if len(data) > MAX_REQUEST:
@@ -140,8 +140,19 @@ class GridCraftLocal:
                 and isinstance(x.get("doc"), int) and not isinstance(x["doc"], bool)
                 and 1 <= x["doc"] <= (1 << 64) - 1]
 
-    def inspect(self):
-        return self._request("document.inspect")
+    def inspect(self, doc: str | None = None):
+        """Local-only workbook identity read; never forward its path to MCP."""
+        params = {}
+        if doc is not None:
+            if not isinstance(doc, str) or not re.fullmatch(r"[1-9][0-9]{0,19}", doc):
+                raise ValueError("invalid decimal workbook id")
+            n = int(doc)
+            if n > (1 << 64) - 1:
+                raise ValueError("workbook id outside u64 range")
+            if doc not in {w["doc"] for w in self.windows()}:
+                raise GridCraftUnauthorized("requested workbook not open locally")
+            params["doc"] = n
+        return self._request("document.inspect", params)
 
     def read_range(self, sheet: str, a1_range: str, doc: str | None = None, formulas: bool = False):
         if not isinstance(sheet, str) or not 1 <= len(sheet) <= 80:
