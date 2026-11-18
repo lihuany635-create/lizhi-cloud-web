@@ -14,8 +14,8 @@ const MONEY="3000";
 const goal=(x={})=>({month:"2026-12",goal_id:GOAL,request_id:REQUEST,
   expected_version:0,action:"create",kind:"savings",target_amount:5000,
   account_id:null,...x});
-const fund=(x={})=>goal({...x,kind:"sinking_fund",target_amount:7000,
-  purpose:"rent",cadence_months:3,due_amount:null,due_month:null});
+const fund=(x={})=>goal({kind:"sinking_fund",target_amount:7000,
+  purpose:"rent",cadence_months:3,due_amount:null,due_month:null,...x});
 const alloc=(x={})=>({month:"2026-12",goal_id:GOAL,request_id:REQUEST,
   action:"allocate",amount:3000,source_reference:"2026-12-salary-slice-1",
   confirmed_by_user:true,...x});
@@ -113,7 +113,7 @@ test("P5-12 provider bridge denies unauthenticated or unconfirmed requests",asyn
  assert.equal(backend.calls.length,0);
 });
 test("P5-13 authenticated controller invokes the approved tool only",async()=>{
- const backend={calls:[],async invoke(tool,args){this.calls.push({tool,args});return receipt()}};
+ const backend={calls:[],async invoke(tool,args){this.calls.push({tool,args});return {...receipt(),actualTransfer:false}}};
  let i=0;const ids=[REQUEST,GOAL];
  const c=UI.createController({provider:backend,authenticated:true,confirmAction:()=>true,uuid:()=>ids[i++]});
  const got=await c.submit("goal",{confirmed:"on",month:"2026-12",action:"create",
