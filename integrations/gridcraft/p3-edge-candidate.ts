@@ -10,6 +10,7 @@ const SITE_SECRET = Deno.env.get("GRIDCRAFT_SITE_SECRET") ?? "";
 const EXPECTED_OWNER = Deno.env.get("GRIDCRAFT_EXPECTED_OWNER") ?? "";
 const GATE = Deno.env.get("GRIDCRAFT_P3_ENABLED") === "true";
 const DEVICE_REG = /^[A-Za-z0-9._:-]{1,100}$/;
+const DOC_UID = /^[1-9][0-9]{0,19}$/;
 const HEX64 = /^[a-f0-9]{64}$/i;
 const CODE = /^[a-f0-9]{16}$/i;
 const MAX_QUERY = 8192;
@@ -100,7 +101,7 @@ function boundInput(name:unknown,args:unknown):Record<string,unknown> {
   }
   if(Object.keys(args).sort().join("|")!=="doc|range|sheet")throw Error("BAD_ARGS");
   const {doc,range,sheet}=args;
-  if(typeof doc!=="string"||!DEVICE_REG.test(doc)||typeof sheet!=="string"||
+  if(typeof doc!=="string"||(!DOC_UID.test(doc)||BigInt(doc)>18446744073709551615n)||typeof sheet!=="string"||
      !sheet.length||sheet.length>80||/[\x00-\x1f]/.test(sheet))throw Error("BAD_ARGS");
   const m=typeof range==="string"&&range.length<=22
     ? /^([A-Z]{1,3})([1-9][0-9]{0,5})(?::([A-Z]{1,3})([1-9][0-9]{0,5}))?$/.exec(range):null;
