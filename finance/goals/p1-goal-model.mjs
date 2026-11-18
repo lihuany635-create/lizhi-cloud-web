@@ -1,6 +1,6 @@
 // Finance savings/investment goals P1 - isolated candidate; NOT wired to production.
 // No account transfers, brokerage trades, ledger mutations or remote calls.
-export const GOAL_KINDS = Object.freeze(["savings", "investible_cash"]);
+export const GOAL_KINDS = Object.freeze(["savings", "investible_cash", "sinking_fund"]);
 export const ENTRY_KINDS = Object.freeze(["allocate", "release"]);
 const MONTH = /^20\d{2}-(0[1-9]|1[0-2])$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
