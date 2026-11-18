@@ -5,6 +5,7 @@
 
 const A1 = /^([A-Z]{1,3})([1-9][0-9]{0,5})(?::([A-Z]{1,3})([1-9][0-9]{0,5}))?$/;
 const DOC = /^[A-Za-z0-9._:-]{1,100}$/;
+const WORKBOOK_UID = /^[1-9][0-9]{0,19}$/;
 const REQ = /^[A-Za-z0-9][A-Za-z0-9._:-]{7,95}$/;
 const TOOLS = new Set(["gridcraft_status", "gridcraft_list_workbooks", "gridcraft_read_range"]);
 const MAX_JSON_RESULT = 24 * 1024;
@@ -63,7 +64,7 @@ export function validateCall(name, args) {
     return {};
   }
   if (Object.keys(args).sort().join("|") !== "doc|range|sheet") throw new RelayFault("INVALID_ARGS");
-  if (typeof args.doc !== "string" || !DOC.test(args.doc)) throw new RelayFault("INVALID_DOC");
+  if (typeof args.doc !== "string" || (!WORKBOOK_UID.test(args.doc) || BigInt(args.doc)>18446744073709551615n)) throw new RelayFault("INVALID_DOC");
   if (typeof args.sheet !== "string" || args.sheet.length < 1 || args.sheet.length > 80 ||
       /[\r\n\x00-\x1f]/.test(args.sheet)) throw new RelayFault("INVALID_SHEET");
   a1bounds(args.range);
