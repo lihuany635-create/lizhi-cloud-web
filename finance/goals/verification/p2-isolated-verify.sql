@@ -155,7 +155,7 @@ begin
   end;
 end $$;
 -- A foreign owner's previously selected account ID must fail before insert.
-do $
+do $$
 begin
   begin
     insert into public.lizhi_finance_salary_plans
@@ -165,9 +165,9 @@ begin
     raise exception 'P2_FOREIGN_OWNER_ACCOUNT_NOT_BLOCKED';
   exception when check_violation then null;
   end;
-end $;
+end $$;
 -- Also verify pure cross-owner RLS independently with only null account IDs.
-do $
+do $$
 begin
   begin
     insert into public.lizhi_finance_salary_plans
@@ -178,7 +178,7 @@ begin
     raise exception 'P2_CROSS_OWNER_RLS_NOT_BLOCKED';
   exception when insufficient_privilege then null;
   end;
-end $;
+end $$;
 -- Cross-owner read must return no rows.
 select set_config('request.jwt.claim.sub','22222222-2222-4222-8222-222222222222',false);
 do $$
