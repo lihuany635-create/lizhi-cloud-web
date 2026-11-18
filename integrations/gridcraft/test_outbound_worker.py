@@ -41,8 +41,8 @@ class FakeLocal:
     def windows(self):
         self.windows_calls += 1
         return [
-            {"doc": "permitted-doc", "title": "合成估價表", "dirty": False},
-            {"doc": "other-private", "title": "不得外洩的資料", "dirty": False}
+            {"doc": "42", "title": "合成估價表", "dirty": False},
+            {"doc": "43", "title": "不得外洩的資料", "dirty": False}
         ]
 
     def read_range(self, sheet, rng, doc=None):
@@ -53,7 +53,7 @@ class FakeLocal:
 def sample_job(name="gridcraft_read_range", args=None, expires_at=1000000):
     return {"id":"p3-device-test-0001", "name":name,
             "args":args if args is not None else
-              {"doc":"permitted-doc","sheet":"估價清單","range":"B3"},
+              {"doc":"42","sheet":"估價清單","range":"B3"},
             "expiresAt":expires_at}
 
 
@@ -61,14 +61,14 @@ class OutboundTests(unittest.TestCase):
     def worker(self, *, job=None, status="READY", approved=None):
         relay, local = FakeTransport(job), FakeLocal(status)
         return (OutboundWorker(transport=relay,local=local,
-                               approved_docs=set(approved or {"permitted-doc"}),
+                               approved_docs=set(approved or {"42"}),
                                clock=lambda: 900),relay,local)
 
     def test_read_only_granted_workbook(self):
         w,t,l=self.worker(job=sample_job())
         self.assertTrue(w.run_once()["executed"])
         self.assertEqual(t.statuses, ["READY"])
-        self.assertEqual(l.read_calls,[("估價清單","B3","permitted-doc")])
+        self.assertEqual(l.read_calls,[("估價清單","B3","42")])
         self.assertEqual(t.completions[0][1]["data"]["values"],[[2500]])
 
     def test_list_only_local_granted_docs(self):
@@ -76,8 +76,8 @@ class OutboundTests(unittest.TestCase):
         self.assertTrue(w.run_once()["executed"])
         books=t.completions[0][1]["workbooks"]
         self.assertEqual(len(books),1)
-        self.assertEqual(books[0]["doc"],"permitted-doc")
-        self.assertNotIn("other-private",str(books))
+        self.assertEqual(books[0]["doc"],"42")
+        self.assertNotIn("43",str(books))
 
     def test_offline_never_polls_or_executes(self):
         w,t,l=self.worker(job=sample_job(),status="GRIDCRAFT_OFFLINE")
@@ -92,7 +92,7 @@ class OutboundTests(unittest.TestCase):
         self.assertEqual(l.read_calls,[])
 
     def test_no_grant_blocks_read_even_if_workbook_open(self):
-        w,t,l=self.worker(job=sample_job(),approved={"a-different-doc"})
+        w,t,l=self.worker(job=sample_job(),approved={"99"})
         w.run_once()
         self.assertEqual(t.completions[0][1]["error"],"WORKBOOK_NOT_GRANTED")
         self.assertEqual(l.read_calls,[])
@@ -106,10 +106,10 @@ class OutboundTests(unittest.TestCase):
 
     def test_large_range_and_injected_args_blocked(self):
         for args in [
-            {"doc":"permitted-doc","sheet":"Main","range":"A1:Z1000"},
-            {"doc":"permitted-doc","sheet":"Main","range":"A1","path":"C:/Windows"},
+            {"doc":"42","sheet":"Main","range":"A1:Z1000"},
+            {"doc":"42","sheet":"Main","range":"A1","path":"C:/Windows"},
             {"doc":"../../user","sheet":"Main","range":"A1"},
-            {"doc":"permitted-doc","sheet":"Main","range":"A1;open"},
+            {"doc":"42","sheet":"Main","range":"A1;open"},
         ]:
             w,t,l=self.worker(job=sample_job(args=args))
             w.run_once()
