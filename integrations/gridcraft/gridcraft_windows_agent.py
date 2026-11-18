@@ -221,6 +221,13 @@ class AgentUI:
             messagebox.showerror("GridCraft 路徑不正確", str(exc), parent=self.root)
 
     def launch_gridcraft(self):
+        local_status = GridCraftLocal(port=7979, timeout=1.2).status()["status"]
+        if local_status == "READY":
+            self.status_var.set("GridCraft 已在線，不重複啟動")
+            return
+        if local_status == "UNAUTHORIZED":
+            messagebox.showerror("控制授權異常", "GridCraft 已回應但權杖驗證失敗，請先處理本機授權", parent=self.root)
+            return
         if not self.path_var.get():
             messagebox.showinfo("請先選擇程式", "請先指定已安裝的 GridCraft.exe", parent=self.root)
             return
@@ -231,6 +238,9 @@ class AgentUI:
             messagebox.showerror("啟動失敗", str(exc), parent=self.root)
 
     def launch_on_login(self):
+        # Never create an extra GridCraft window when it is already available.
+        if GridCraftLocal(port=7979, timeout=1.2).status()["status"] != "GRIDCRAFT_OFFLINE":
+            return
         if self.path_var.get():
             try:
                 start_gridcraft(self.path_var.get())
