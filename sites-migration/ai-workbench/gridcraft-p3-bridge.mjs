@@ -74,3 +74,37 @@ export async function callGridcraftFromSite(
   }
   return payload;
 }
+
+export const GRIDCRAFT_PAIR_TOOL = Object.freeze({
+  name:"gridcraft_pair_start",
+  description:"本人授權啟動一次性 Windows GridCraft 配對；只回傳 2 分鐘有效配對碼，不傳本機控制權杖。",
+  inputSchema:{type:"object",properties:{},additionalProperties:false},
+  annotations:{readOnlyHint:false,destructiveHint:false}
+});
+
+export async function pairGridcraftFromSite({
+  rpcId, verifiedPrincipal, expectedPrincipal, bridgeSecret, enabled=false, pairingEnabled=false,
+  fetchImpl=fetch,timeoutMs=12000
+}={}){
+  if(enabled!==true||pairingEnabled!==true)throw Error("PAIRING_GATE_OFF");
+  if(typeof verifiedPrincipal!=="string"||verifiedPrincipal.length<8||
+     verifiedPrincipal!==expectedPrincipal)throw Error("UNAUTHORIZED");
+  if(typeof bridgeSecret!=="string"||bridgeSecret.length<32)throw Error("BRIDGE_NOT_CONFIGURED");
+  if(!Number.isInteger(timeoutMs)||timeoutMs<1000||timeoutMs>15000)throw Error("INVALID_TIMEOUT");
+  const result=await fetchImpl(
+    "https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-gridcraft-bridge/site/pair/start",
+    {method:"POST",headers:{"Content-Type":"application/json","x-lizhi-gridcraft-bridge":bridgeSecret,
+       "x-lizhi-gridcraft-actor":verifiedPrincipal},
+     body:"{}",redirect:"manual",signal:AbortSignal.timeout(timeoutMs)}
+  );
+  if(!result?.ok||result.status>=300)throw Error("PAIRING_BACKEND_UNAVAILABLE");
+  const body=await result.json();
+  if(body?.ok!==true||typeof body.pairing_code!=="string"||
+     !/^[0-9a-f]{16}$/i.test(body.pairing_code)||body.expires_in_seconds!==120)
+     throw Error("INVALID_PAIR_RESPONSE");
+  return {jsonrpc:"2.0",id:rpcId??null,
+    result:{content:[{type:"text",text:JSON.stringify({
+      pairing_code:body.pairing_code,expires_in_seconds:120,
+      instruction:"在本人 Windows GridCraft 代理輸入此一次性代碼完成配對；不需貼上任何權杖。"
+    })}],isError:false}};
+}
