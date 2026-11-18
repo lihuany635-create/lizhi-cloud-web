@@ -24,6 +24,8 @@ async function goalHmac(secret,frame,timestamp){
  */
 export async function handleFinanceSiteMcp(request,env,opts={}) {
   if(request.method!=="POST")return response("POST_ONLY",405);
+  // Never accept browser-origin MCP calls even if login cookies exist (CSRF).
+  if(request.headers.has("origin"))return response("BROWSER_ORIGIN_NOT_ALLOWED",403);
   if(typeof opts.verifyOwner!=="function")return response("OWNER_CHECK_UNAVAILABLE",403);
   let authenticated;
   try{authenticated=await opts.verifyOwner(request)}catch{return response("OWNER_CHECK_FAILED",403)}
