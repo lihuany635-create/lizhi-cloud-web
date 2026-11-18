@@ -10,6 +10,12 @@
 - 官方 `gridcraft-cli check <file-or-dir> --json` 有 round-trip 與公式檢查；對其沒有列出的 Excel 物件仍須獨立驗證。此能力是官方文件盤點，**尚未執行測試**。
 - P0 文件盤點和規格 PASS（候選自查、待獨立技術複核）；GridCraft CLI 與真實 Excel 檔案的 T01–T08 仍全部 NOT_TESTED。
 
+## P2 雲端引擎與持久化的實際狀態（2026-11-18）
+- **原生運算 PASS**：GitHub Actions 的標準雲端 Linux runner 已真實執行 GridCraft v0.19.1 CLI，無須使用者電腦在線；但 runner 是單次運算，**不是長期運行的 HTTP MCP**。
+- **版本化儲存契約 PASS（隔離合成測試）**：`p2_synthetic_store.py`＋`p2_synthetic_test.py` 在同一 runner 的 SQLite 中通過 6/6：owner 欄位隔離、CAS、去重、損毀偵測、恢復、重新開啟及真正 CLI 局改。此模組必須設定 `GRIDCRAFT_P2_SYNTHETIC_ONLY=1`，不可用於真人 Excel。
+- **P2 主驗收仍 BLOCKED**：runner 關閉後工作簿沒有永久保存；尚無正式 Private Storage/Drive API 權限、被批准的即時雲端引擎及可核對的 Supabase 官方帳期／剩餘額度。P3 不可在此基礎上宣告可用。
+- 真實執行：[CI #44217406071](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44217406071)；[P2_EVIDENCE.md](P2_EVIDENCE.md)。不合併或部署、沒有變更正式 Supabase 或使用者檔案。
+
 ## 已核對的依據
 
 - 使用者指定：GridCraft v0.19.1（ArtCraft Launcher），「雲端 MCP 為主、桌面控制為輔」，ChatGPT 直接操作試算表，盡可能電腦關機可用。
