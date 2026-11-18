@@ -1,0 +1,31 @@
+name: English Academy chat ledger contract (candidate only)
+
+on:
+  pull_request:
+    paths:
+      - 'english-academy/conversation/**'
+      - '.github/workflows/english-chat-ledger-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  candidate-ledger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test in-memory contract and P3/P6 mapping
+        run: node --test english-academy/conversation/tests/*.test.mjs
+      - name: Reject accidental production writes in conversation candidate
+        shell: bash
+        run: |
+          if grep -R -n -E 'fetch\(|localStorage|sessionStorage|service_role|SUPABASE_SERVICE_ROLE|https://[^ ]*supabase\.co' english-academy/conversation --include='*.mjs'; then
+            echo 'Unsafe network / persistence reference in chat candidate'
+            exit 1
+          fi
