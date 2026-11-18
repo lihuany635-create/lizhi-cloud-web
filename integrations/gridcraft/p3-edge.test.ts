@@ -115,4 +115,3 @@ Deno.test("device pair refuses unknown server-side code",async()=>{
  assert(r.status===400,"unknown code must be denied");
 });
 
-Deno.addSignalListener?.("SIGTERM",()=>{});
