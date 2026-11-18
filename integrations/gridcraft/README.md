@@ -1,9 +1,17 @@
-# GridCraft → 立之雲端庫 Private MCP｜P0 候選
+# GridCraft → 立之雲端庫 Private MCP｜v1.2 電腦在線優先候選
 
 狀態：**開發候選／尚未正式接通**（2026-11-18）。本分支不更動既有 Private Site、Supabase 正式資料、main 或原有 MCP。這不是部署完成證明。
 
+## 2026-11-18 最新使用者決策：電腦開機才需連線（優先於下列歷史規格）
+- **主線更改**：Windows 電腦在線且已啟動本機代理、GridCraft 桌面程式後才允許 ChatGPT 在私人 Site 以 gridcraft_* 工具操作。關機與代理離線回報 `DEVICE_OFFLINE`；GridCraft 未開回報 `GRIDCRAFT_OFFLINE`，撤權回報 `UNAUTHORIZED`。
+- **不再要求**永久雲端 GridCraft 執行／雲端 Storage 作為 P2 前置條件。原本 P2 雲端 runner 及跨 runner 的合成成果仍保留歷史；不等於本人電腦已連接。
+- **必須**有 Windows 本機代理「主動出站」連到既有本人驗證的安全中繼，不能讓遠端 ChatGPT 直接連 `127.0.0.1:7979`；該控制埠和權杖只留本機。
+- 新候選檔 [gridcraft_desktop_local.py](gridcraft_desktop_local.py) 僅支援 `window.list`、`document.inspect`、`sheet.read`、`cell.get`，**寫入及正式雲端中繼尚未實作**；[test_desktop_local.py](test_desktop_local.py) 的 6 個模擬協定測試 PASS（GitHub Actions [#44219256668](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44219256668)）。
+- Google Drive 原計畫書 [v1.2](https://docs.google.com/document/d/17JBEggCL-h0GPsXCt6szi4cE7O-NzlILTlPrJzfjuQg/edit) 第 13 章是最新覆蓋條款；原下方過去雲端優先與 BLOCKED 叙述僅保留歷史，**不再作為新 P2 的先決條件**。
+- **目前尚缺**：雲端出站中繼／owner、device 身分驗證、Windows 真機上安裝啟動代理並確認 GridCraft 授權、開關機與寫入實測、原 Site MCP 正式接線。原 PR #88 維持 draft，未合併／未部署。
+
 ## P0 本次補齊（2026-11-18）
-- 計畫書已更新為 [Google Drive v1.1](https://docs.google.com/document/d/17JBEggCL-h0GPsXCt6szi4cE7O-NzlILTlPrJzfjuQg/edit)，P0～P5 共六階段。
+- 計畫書目前以 [Google Drive v1.2](https://docs.google.com/document/d/17JBEggCL-h0GPsXCt6szi4cE7O-NzlILTlPrJzfjuQg/edit)，P0～P5 共六階段。
 - **Excel 高保真匯入與局部修改為核心成功條件**：原件永不覆寫、整本工作簿盤點、指定格／範圍才可修改、差異報告與恢復版本；不支援的巨集／物件不能宣稱完整複製。
 - 詳細導入、受限工具契約與 T01～T08 驗收：[EXCEL_FIDELITY_SPEC.md](EXCEL_FIDELITY_SPEC.md)。
 - P0 驗收與 P1 接手：[P0_ACCEPTANCE.md](P0_ACCEPTANCE.md)。
@@ -18,7 +26,7 @@
 
 ## 已核對的依據
 
-- 使用者指定：GridCraft v0.19.1（ArtCraft Launcher），「雲端 MCP 為主、桌面控制為輔」，ChatGPT 直接操作試算表，盡可能電腦關機可用。
+- 使用者最新指定（2026-11-18）：GridCraft v0.19.1，**Windows 電腦開機且代理／程式在線即能連線**；雲端 Headless 改為日後選配。
 - 原作者原始碼：https://github.com/storytold/gridcraft
 - 官方 MCP 規格：https://github.com/storytold/gridcraft/blob/main/docs/mcp.md
 - 官方桌面控制與認證：https://github.com/storytold/gridcraft/blob/main/docs/control-protocol.md
@@ -72,11 +80,11 @@ python integrations/gridcraft/gridcraft_mcp_probe.py --cli /path/to/gridcraft-cl
 
 | 階段 | 要求 | 本分支狀態 |
 | --- | --- | --- |
-| P0 | 核對官方來源、既有系統與安全限制；訂定高保真匯入、精準修改及 T01～T08 驗收 | 規格候選 PASS，待獨立複核；真實 CLI 仍 NOT_TESTED |
-| P1 | 實際跑官方 v0.19.1 Headless、`gridcraft-cli check --json`、Excel 匯入/修改/回存 | NOT_TESTED |
-| P2 | 無未批准新增費用的雲端運算／檔案持久化／版本與權限 | BLOCKED（未選定/驗證雲端環境） |
-| P3 | 安全 HTTP MCP Gateway、局部修改/差異工具，原 Private Site 候選而不破壞舊工具 | 候選未實作，未部署 |
-| P4 | 電腦在線時本人授權的 GridCraft 桌面控制、離線及撤權處理 | NOT_TESTED |
-| P5 | ChatGPT 新對話雲端及桌面端到端、T01～T08、原工具回歸、安全正式驗收 | NOT_TESTED、未部署 |
+| P0 | 官方協定、既有架構、Excel 規格 | 候選規格 PASS，待獨立複核 |
+| P1 | 官方 v0.19.1 CLI、Excel 匯入/修改/回存 | 合成資料實測 PASS，待獨立複核 |
+| P2 | Windows 本機代理、開機／登入後可連、離線辨識與本機版本保存；不再以雲端永久儲存為前提 | localhost 協定模擬 6/6 PASS，Windows 真機／出站連線 NOT_TESTED |
+| P3 | 原 Private Site 增加 GridCraft MCP 限權工具，經受保護出站中繼連 Windows 本機代理 | 尚未實作雲端中繼、未部署 |
+| P4 | Windows 真機 GridCraft 授權工作簿讀／寫／存與停止/撤權、關機離線 | NOT_TESTED |
+| P5 | 本人電腦開/關兩態、新對話、權限、T01～T08（T07 以在線/離線為準）、原 MCP 回歸 | NOT_TESTED、未部署 |
 
 正式 Site／Edge／資料庫／main 變更、外部付費運算及安全敏感權限，依員工手冊另經本人批准。此候選 PR 不具備正式上線效力。
