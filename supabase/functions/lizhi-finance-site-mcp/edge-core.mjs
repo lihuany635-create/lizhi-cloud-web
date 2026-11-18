@@ -134,7 +134,7 @@ function calculate(name,args,b) {
 // Only the private owner-authenticated Site Worker can sign a goals-write
 // confirmation, after its trusted interactive user-approval callback succeeds.
 async function verifySiteGoalApproval(req,frame,token,now=Date.now()){
-  const match=/^(\\d{10})\\.([0-9a-f]{64})$/.exec(
+  const match=/^(\d{10})\.([0-9a-f]{64})$/.exec(
     req.headers.get("x-lizhi-goals-write-approval")||"");
   if(!match||!HEX.test(token||""))return false;
   const when=Number(match[1]),current=Math.floor(now/1000);
@@ -143,7 +143,7 @@ async function verifySiteGoalApproval(req,frame,token,now=Date.now()){
     const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(token),
       {name:"HMAC",hash:"SHA-256"},false,["verify"]);
     const bytes=Uint8Array.from(match[2].match(/../g),x=>parseInt(x,16));
-    const data=new TextEncoder().encode(String(when)+"\\n"+JSON.stringify(frame));
+    const data=new TextEncoder().encode(String(when)+"\n"+JSON.stringify(frame));
     return await crypto.subtle.verify("HMAC",key,bytes,data);
   }catch{return false}
 }
