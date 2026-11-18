@@ -2,6 +2,13 @@
 
 狀態：**開發候選／尚未正式接通**（2026-11-18）。本分支不更動既有 Private Site、Supabase 正式資料、main 或原有 MCP。這不是部署完成證明。
 
+## P3 開發候選（2026-11-18）：已通過隔離測試、正式連線尚未部署
+- P3 嚴格沿用**原 Private Site、原 Supabase 專案**，無新 Site、無新資料庫、無正式 Edge 或 SQL 變更；[P3_HANDOFF.md](P3_HANDOFF.md) 是最新候選、安全與接續依據。
+- 原 Site 擬追加 `gridcraft_status / gridcraft_list_workbooks / gridcraft_read_range`，另設獨立 Gate 的 `gridcraft_pair_start`；原 AI 工作台與施工照片工具不可移除。預設 `GRIDCRAFT_P3_ENABLED=false`、`GRIDCRAFT_PAIRING_ENABLED=false`。
+- Windows v0.2 候選：一鍵開啟 GridCraft、本人一次性配對碼、工作簿本機授權、DPAPI 裝置密鑰、按鍵啟停 HTTPS 主動出站（不公開 7979）。已由 Windows 真實 runner [#44223637530](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44223637530) 驗證 **32/32 自動測試與 EXE 自檢通過**；ZIP 已存[原私人 Drive](https://drive.google.com/file/d/10nQSbwjfSTOE8uyDmNBf3Nvo1BpKEVkn/view)，可先保留原 v0.1，不必立即替換。
+- Node 受限 relay＋Site 模擬、Windows 出站代理、Deno Edge 候選及隔離 PostgreSQL 16 均已有獨立 CI 證據，**但沒有實際雲端中繼發布與本人新對話 MCP 工具**，標記 NOT_DEPLOYED／NOT_TESTED。
+- **正式 Gate**：獨立安全審查／歷史與即時流量核對、本人批准原 Site 及既有 Supabase 的最小 migration+Edge，部署 Gate OFF→驗證→配對→逐項 Gate ON；P4 才開指定格寫入。
+
 ## 2026-11-18 最新使用者決策：電腦開機才需連線（優先於下列歷史規格）
 - **主線更改**：Windows 電腦在線且已啟動本機代理、GridCraft 桌面程式後才允許 ChatGPT 在私人 Site 以 gridcraft_* 工具操作。關機與代理離線回報 `DEVICE_OFFLINE`；GridCraft 未開回報 `GRIDCRAFT_OFFLINE`，撤權回報 `UNAUTHORIZED`。
 - **不再要求**永久雲端 GridCraft 執行／雲端 Storage 作為 P2 前置條件。原本 P2 雲端 runner 及跨 runner 的合成成果仍保留歷史；不等於本人電腦已連接。
