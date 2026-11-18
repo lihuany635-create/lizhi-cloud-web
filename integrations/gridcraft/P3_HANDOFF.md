@@ -42,3 +42,8 @@
 - 設定 server-only owner/bridge secret；僅對本人啟用 Pair Gate，取得一次性碼配對本人 Windows v0.2。
 - 新 ChatGPT 對話實際測試 READY、OFFLINE、指定工作簿讀取、撤權；不得在權限／流量驗收前啟用遠端寫入。
 - 未達閘門就維持舊 Site/原 v0.1 本機可用，正式服務不改動。
+
+## 6. 補充 CI 回歸與監控限制（2026-11-18）
+- [P3 最新完整 CI #44223995873](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44223995873)：Node Site/relay、Windows outbound、Deno Edge mock DB、隔離 PG16 四個 job 均 SUCCESS，含修正後 Edge READY 心跳新鮮度門檻。這依然不是正式站或本人 PC 端到端。
+- 前一輪 [CI #44223977021](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44223977021) FAIL：Edge 新增 READY 心跳檢查後，原測試 fixture 缺 last_seen／status；已同步補上新鮮心跳，後續 CI #44223995873 SUCCESS。保留失敗紀錄。
+- 本次打算按員工手冊登記 AI 工作台前，usage_status 回 WITHIN_CAP、usage_alerts 卻回 HTTP 503，usage_egress_history 仍是 2026-11-16 的人工歷史用量 10.549GB、providerVerified=false。因此**遵守第27～29條暫停非必要工作台 Supabase 寫入，工作台 P3 交接狀態 NOT_LOGGED**；詳細 GitHub 與 Google Drive 報告已保存，不假稱 side_log 成功。後續新對話可在監控恢復、可記帳後補新增交接。
