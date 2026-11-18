@@ -87,5 +87,33 @@ class BackupSafetyTests(unittest.TestCase):
         self.assertEqual(result['large_objects'], [[42, 3, 'abc', 'owner', None]])
 
 
+    def test_nontransactional_sequence_forward_only_drift_safety(self):
+        def obj(value, *, increment=1, cycling=False, cache=1):
+            return json.dumps(["owner", "bigint", 1, 1, 100000,
+                               increment, cycling, cache, value])
+        def check(before, after):
+            source = {"objects": [["sequence", "public.seq", before]]}
+            restored = {"objects": [["sequence", "public.seq", after]]}
+            count = backup.normalize_safe_sequence_advance(source, restored)
+            return count, source["objects"][0][2]
+        before = obj(50)
+        count, normalized = check(before, obj(60))
+        self.assertEqual(count, 1)
+        self.assertEqual(normalized, obj(60))
+        # Resetting the sequence could cause duplicated identifiers after
+        # restore and must never be treated as a harmless snapshot drift.
+        count, normalized = check(before, obj(49))
+        self.assertEqual(count, 0)
+        self.assertEqual(normalized, before)
+        # Underlying sequence properties or wraparound change the contract.
+        self.assertEqual(check(before, obj(60, cache=10))[0], 0)
+        self.assertEqual(check(obj(50, cycling=True), obj(60, cycling=True))[0], 0)
+        self.assertEqual(check(obj(50, increment=-1), obj(40, increment=-1))[0], 1)
+        self.assertEqual(check(obj(50, increment=-1), obj(60, increment=-1))[0], 0)
+        self.assertEqual(check(obj(50), obj(None))[0], 0)
+        self.assertEqual(check(obj(None), obj(50))[0], 0)
+
+
+
 if __name__ == "__main__":
     unittest.main()
