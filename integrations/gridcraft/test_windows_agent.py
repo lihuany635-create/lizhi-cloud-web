@@ -69,7 +69,7 @@ class WindowsAgentTests(TestCase):
                 args, kwargs = popen.call_args
                 self.assertEqual(args[0], [str(exe.resolve()), "--control", "7979"])
                 self.assertFalse(kwargs["shell"])
-                self.assertEqual(kwargs["cwd"], str(exe.parent))
+                self.assertEqual(Path(kwargs["cwd"]).resolve(), exe.resolve().parent)
             other = Path(d) / "powershell.exe"
             other.write_bytes(b"test")
             with self.assertRaises(ValueError):
