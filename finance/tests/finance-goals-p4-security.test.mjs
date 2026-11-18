@@ -136,7 +136,8 @@ test("P4-12 restoration receipt is accepted but claims no bank transfer",async()
   const r=await executeGoalsP3({db:db({...response,status:"restored",version:4,
     request_id:REQUEST,committed:true}),owner:OWNER},
     "finance_goals_salary_set",{month:"2026-12",
-      request_id:REQUEST,expected_version:3,action:"remove"});
+      request_id:REQUEST,expected_version:3,action:"set",
+      estimated_income:43000,lines:salaryPlan().lines.map(l=>({...l}))});
   assert.equal(r.status,"restored");
   assert.equal(r.actualTransfer,false);
   assert.equal(r.version,4);
