@@ -104,7 +104,7 @@ Deno.test("device poll returns scoped queued read only",async()=>{
  const body=await r.json();
  assert(body.status==="CLAIMED","poll did not claim job");
  assert(body.job.name==="gridcraft_read_range","wrong tool forwarded");
- assert(body.job.args.doc==="book","wrong document");
+ assert(body.job.args.doc==="42","wrong document");
 });
 Deno.test("device pair refuses unknown server-side code",async()=>{
  mocked=[];
