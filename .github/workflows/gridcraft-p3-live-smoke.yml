@@ -1,0 +1,37 @@
+name: GridCraft P3 production Edge gate-off smoke
+
+on:
+  push:
+    branches:
+      - feat/gridcraft-mcp-p0-20261118
+    paths:
+      - .github/workflows/gridcraft-p3-live-smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-gate-off:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - name: Verify original deployed P3 Edge is present but defaults closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          endpoint="https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-gridcraft-bridge/site/dispatch"
+          body='{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"gridcraft_status","arguments":{}}}'
+          code=$(curl -sS --max-time 12 --retry 0 -o /tmp/reply.json -w "%{http_code}" -X POST "$endpoint" -H "Content-Type: application/json" --data "$body")
+          test "$code" = "400"
+          python3 - <<'PY'
+          import json
+          with open('/tmp/reply.json',encoding='utf-8') as f:
+              data=json.load(f)
+          if data.get('error')!='GRIDCRAFT_GATE_OFF':
+              raise SystemExit('FAIL: P3 Edge does not fail closed as expected')
+          print('PASS: LIVE Edge returned HTTP 400 GRIDCRAFT_GATE_OFF to anonymous POST')
+          PY
+          code=$(curl -sS --max-time 12 --retry 0 -o /tmp/other.json -w "%{http_code}" "$endpoint")
+          test "$code" = "400"
+          echo "PASS: LIVE Edge rejects unauthenticated GET; no device credentials or workbook read"
