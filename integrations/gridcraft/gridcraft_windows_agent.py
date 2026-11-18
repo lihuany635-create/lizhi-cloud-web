@@ -182,9 +182,9 @@ def diagnostic() -> int:
 class AgentUI:
     def __init__(self, root: tk.Tk, minimized: bool = False):
         self.root = root
-        self.root.title(APP_TITLE + "｜v0.4 自動連線候選")
-        self.root.geometry("680x620")
-        self.root.minsize(600, 550)
+        self.root.title(APP_TITLE + "｜v0.5 一鍵連線候選")
+        self.root.geometry("490x275")
+        self.root.minsize(440, 260)
         self.root.protocol("WM_DELETE_WINDOW", self.stop)
         self.settings = load_settings()
         self.pair_store = DeviceStore(app_directory())
@@ -196,9 +196,10 @@ class AgentUI:
         self.session_grants = {}  # doc -> (exact identity hash | None, displayed title).
         self.remote_stop = threading.Event()
         self.remote_thread = None
-        # P4 write toggle is NEVER loaded from settings or automatically enabled.
+        # Auto mode is scoped to workbooks currently OPEN IN LOCAL GRIDCRAFT.
+        # No human UI confirmation; Site still must authenticate the owner.
         self.p4_write_enabled = False
-        self.p4_state_var = tk.StringVar(value="P4 寫入：等待本機工作簿授權")
+        self.p4_state_var = tk.StringVar(value="P4 寫入：等待 GridCraft 就緒")
         self.auto_p4_var = tk.BooleanVar(value=self.settings.get("auto_allow_p4") is True)
         self.remote_status = "未配對（遠端 MCP 尚未驗收）" if not self.paired else "已配對，尚未驗證遠端服務"
         self.path_var = tk.StringVar(value=self.settings["gridcraft_path"] if "gridcraft_path" in self.settings else "")
@@ -217,52 +218,33 @@ class AgentUI:
         if self.path_var.get():
             root.after(1100, self.launch_on_login)
         root.after(4500, self._poll)
-        if self.paired and self.settings.get("remote_enabled") is not False:
+        if self.paired:
             root.after(900, self.start_remote)
 
     def _create_widgets(self):
+        """Minimal one-click UI: opening the EXE automatically connects."""
         frm = ttk.Frame(self.root, padding=16)
         frm.pack(fill="both", expand=True)
-        ttk.Label(frm, text="立之 GridCraft 連線代理", font=("Microsoft JhengHei UI", 17, "bold")).pack(anchor="w")
-        ttk.Label(frm, text="打開代理即自動連線｜只認已授權的本機工作簿｜v0.4", foreground="#5b6472").pack(anchor="w", pady=(2, 13))
-        ttk.Label(frm, textvariable=self.status_var, font=("Microsoft JhengHei UI", 12, "bold")).pack(anchor="w")
-        ttk.Label(frm, textvariable=self.workbooks_var, wraplength=490).pack(anchor="w", pady=(5, 10))
-        source = ttk.Frame(frm)
-        source.pack(fill="x", pady=(3, 4))
-        ttk.Entry(source, textvariable=self.path_var, state="readonly").pack(side="left", fill="x", expand=True)
-        ttk.Button(source, text="選擇 GridCraft.exe", command=self.choose_gridcraft).pack(side="left", padx=(6, 0))
+        ttk.Label(frm, text="立之 GridCraft", font=("Microsoft JhengHei UI", 17, "bold")).pack(anchor="w")
+        ttk.Label(frm, text="開啟代理即連線｜目前開啟的工作簿自動可用｜v0.5",
+                  foreground="#5b6472").pack(anchor="w", pady=(3, 12))
+        ttk.Label(frm, textvariable=self.status_var,
+                  font=("Microsoft JhengHei UI", 12, "bold")).pack(anchor="w")
+        ttk.Label(frm, textvariable=self.workbooks_var).pack(anchor="w", pady=(4, 4))
+        ttk.Label(frm, textvariable=self.info_var,
+                  wraplength=450).pack(anchor="w", pady=(4, 12))
         buttons = ttk.Frame(frm)
-        buttons.pack(fill="x", pady=7)
-        ttk.Button(buttons, text="啟動 GridCraft", command=self.launch_gridcraft).pack(side="left")
-        ttk.Button(buttons, text="重新檢查", command=self.refresh).pack(side="left", padx=7)
-        ttk.Button(buttons, text="停止代理", command=self.stop).pack(side="left")
-        ttk.Separator(frm).pack(fill="x", pady=9)
-        ttk.Checkbutton(
-            frm,
-            text="Windows 登入後自動啟動此代理（需要本人按一下才啟用）",
-            variable=self.startup_var,
-            command=self.change_startup,
-        ).pack(anchor="w", pady=(2, 5))
-        ttk.Checkbutton(
-            frm,
-            text="登入後也自動啟動 GridCraft（需先選擇 GridCraft.exe）",
-            variable=self.launch_var,
-            command=self.change_launch_preference,
-        ).pack(anchor="w")
-        ttk.Separator(frm).pack(fill="x", pady=10)
-        remote = ttk.Frame(frm)
-        remote.pack(fill="x", pady=(2, 8))
-        ttk.Button(remote, text="輸入配對碼", command=self.pair_remote).pack(side="left")
-        ttk.Button(remote, text="授權並記住檔案", command=self.grant_open_book).pack(side="left", padx=4)
-        ttk.Button(remote, text="開始遠端", command=self.start_remote).pack(side="left", padx=4)
-        ttk.Button(remote, text="停止遠端", command=self.stop_remote).pack(side="left")
-        ttk.Button(remote, text="忘記已授權檔案", command=self.forget_authorized_workbooks).pack(side="left", padx=4)
-        ttk.Button(frm, text="P4 寫入授權（本次執行）", command=self.toggle_p4_write).pack(anchor="w", pady=5)
-        ttk.Checkbutton(frm, text="記住本機 P4 寫入允許（僅限已授權的檔案；每次實際寫入仍須在原 Site 確認）",
-                        variable=self.auto_p4_var,command=self.change_auto_p4).pack(anchor="w", pady=2)
-        ttk.Label(frm, textvariable=self.p4_state_var, foreground="#a64d11", wraplength=570).pack(anchor="w", pady=2)
-        ttk.Label(frm, textvariable=self.info_var, foreground="#926c10", wraplength=540).pack(anchor="w", pady=4)
-        ttk.Label(frm, text="安全狀態：白名單＋兩階段寫入｜127.0.0.1:7979｜不輸出控制權杖", foreground="#5b6472").pack(anchor="w")
+        buttons.pack(fill="x", pady=5)
+        ttk.Button(buttons, text="停止連線", command=self.stop_remote).pack(side="left")
+        ttk.Button(buttons, text="重新連線", command=self.start_remote).pack(side="left", padx=8)
+        ttk.Button(buttons, text="關閉代理", command=self.stop).pack(side="left")
+        # Exceptional first-time setup only; previously paired users never need these.
+        if not self.paired:
+            ttk.Button(frm, text="首次配對此裝置", command=self.pair_remote).pack(anchor="w", pady=5)
+        if not self.path_var.get():
+            ttk.Button(frm, text="首次指定 GridCraft 程式", command=self.choose_gridcraft).pack(anchor="w")
+        ttk.Label(frm, text="僅經本人帳號與裝置金鑰連線｜本機備份｜可立即停止",
+                  foreground="#5b6472").pack(anchor="w", pady=(6, 0))
 
     def choose_gridcraft(self):
         chosen = filedialog.askopenfilename(
@@ -331,37 +313,32 @@ class AgentUI:
             messagebox.showerror("儲存失敗", str(exc), parent=self.root)
 
     def refresh(self):
-        state = GridCraftLocal(port=7979, timeout=1.2).status()
-        status = state["status"]
-        meanings = {
-            "READY": "READY｜GridCraft 已開啟，桌面本機可安全讀取",
-            "GRIDCRAFT_OFFLINE": "GRIDCRAFT_OFFLINE｜未偵測到 GridCraft 控制連線",
-            "UNAUTHORIZED": "UNAUTHORIZED｜本機權杖不可用／已失效",
-            "CONTROL_ERROR": "CONTROL_ERROR｜控制服務回傳錯誤",
-        }
-        self.status_var.set(meanings.get(status, status))
+        """Shows local readiness, not an unverified claim that cloud MCP succeeded."""
+        local = GridCraftLocal(port=7979, timeout=1.2)
+        state = local.status()
+        status = state.get("status", "CONTROL_ERROR")
+        self.status_var.set({
+            "READY": "GridCraft：READY",
+            "GRIDCRAFT_OFFLINE": "GridCraft 尚未啟動",
+            "UNAUTHORIZED": "本機 GridCraft 授權失效",
+            "CONTROL_ERROR": "本機 GridCraft 連線錯誤"
+        }.get(status, status))
         if status == "READY":
             try:
-                windows = GridCraftLocal(port=7979, timeout=1.2).windows()
-                self.workbooks_var.set(f"已開啟工作簿：{len(windows)} 本（只顯示於本機）")
+                windows = local.windows()
+                approved = self._verified_grants(windows)
+                self.workbooks_var.set(f"已開啟可用工作簿：{len(approved)} 本")
             except Exception:
-                self.workbooks_var.set("工作簿清單暫時無法讀取")
-        else:
-            self.workbooks_var.set("目前無法讀取工作簿")
-            self.allowed_docs.clear()
-            self.p4_write_enabled = False
-        if status == "READY":
-            try:
-                self._verified_grants(windows)
-                if self.auto_p4_var.get() and self.allowed_docs and self.remote_stop.is_set() is False:
-                    self.p4_write_enabled = True
-                    self.p4_state_var.set("P4 寫入：自動授權已記住的本機檔案（實際寫入仍需 Site 確認）")
-                elif not self.allowed_docs:
-                    self.p4_write_enabled = False
-                    self.p4_state_var.set("P4 寫入：等待已授權的本機檔案")
-            except Exception:
+                self.workbooks_var.set("工作簿讀取失敗")
                 self.allowed_docs.clear()
-                self.p4_write_enabled = False
+        else:
+            self.workbooks_var.set("等待 GridCraft 就緒")
+            self.allowed_docs.clear()
+        # Local write permission is automatic, but actual remote commit
+        # remains a site/Edge user identity check + local CAS/backup decision.
+        self.p4_write_enabled = bool(
+            self.paired and self.allowed_docs and not self.remote_stop.is_set()
+        )
         self.info_var.set("ChatGPT 遠端 MCP：" + self.remote_status)
 
     def _poll(self):
@@ -448,34 +425,29 @@ class AgentUI:
         self.refresh()
 
     def _verified_grants(self, windows=None):
-        """Recheck exact document identity; never auto-grant by title or UID."""
-        local = GridCraftLocal(port=7979, timeout=1.2)
+        """Auto-authorize only currently OPEN local workbooks; never a disk path.
+
+        Re-evaluated before EVERY remote request; closed/removed workbooks
+        instantly lose access. The owner must still be authenticated at Site.
+        """
         if windows is None:
             try:
-                windows = local.windows()
+                windows = GridCraftLocal(port=7979, timeout=1.2).windows()
             except Exception:
-                # GridCraft may still be launching or temporarily disconnected.
-                # Never keep stale workbook authorization across that interval.
                 self.allowed_docs = set()
+                self.p4_write_enabled = False
                 return set()
         valid = set()
-        remembered = set(self.settings.get("remembered_workbooks", []))
         for w in windows[:20]:
+            if not isinstance(w, dict):
+                continue
             doc = w.get("doc")
-            if not isinstance(doc, str):
-                continue
-            try:
-                detail = local.inspect(doc)
-                path_hash = workbook_identity_hash(detail.get("path") if isinstance(detail, dict) else None)
-            except Exception:
-                continue
-            current_title = str(w.get("title",""))[:100]
-            grant = self.session_grants.get(doc)
-            if path_hash and path_hash in remembered:
-                valid.add(doc)
-            elif grant is not None and grant == (path_hash, current_title):
-                valid.add(doc)
+            if isinstance(doc, str) and re.fullmatch(r"[1-9][0-9]{0,19}", doc):
+                if 1 <= int(doc) <= (1 << 64) - 1:
+                    valid.add(doc)
         self.allowed_docs = valid
+        self.p4_write_enabled = bool(self.paired and valid and
+                                     not self.remote_stop.is_set())
         return valid
 
     def change_auto_p4(self):
@@ -536,7 +508,7 @@ class AgentUI:
                 try:
                     worker.approved_docs = frozenset(self._verified_grants())
                     worker.run_once()
-                    self.remote_status = "出站連線已收到伺服器回應（遠端 Site 仍須獨立驗收）"
+                    self.remote_status = "伺服器已回應（Cloud MCP 狀態需另行查核）"
                 except Exception:
                     self.remote_status = "出站服務未接通或暫時不可用"
                 self.remote_stop.wait(6)
@@ -545,8 +517,7 @@ class AgentUI:
 
     def start_remote(self):
         if not self.paired:
-            self.remote_status = "尚未經本人完成裝置配對"
-            messagebox.showinfo("尚未配對", "需先在私人 Site 產生一次性配對碼", parent=self.root)
+            self.remote_status = "尚未配對；首次使用仍需要本人裝置配對一次"
             return
         if self.remote_thread and self.remote_thread.is_alive():
             return
