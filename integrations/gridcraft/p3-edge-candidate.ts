@@ -46,7 +46,7 @@ async function verifySite(req:Request) {
   const owner=req.headers.get("x-lizhi-gridcraft-actor")??"";
   const secret=req.headers.get("x-lizhi-gridcraft-bridge")??"";
   if (!EXPECTED_OWNER||EXPECTED_OWNER.length<8||!SITE_SECRET||SITE_SECRET.length<32||
-      owner!==EXPECTED_OWNER||!(await sha(secret)).length||
+      owner!==EXPECTED_OWNER||
       !safeEqual(await sha(secret),await sha(SITE_SECRET))) {
     throw Error("SITE_UNAUTHORIZED");
   }
@@ -81,15 +81,15 @@ async function readBody(req:Request,max:number):Promise<any> {
   return body;
 }
 
-async function authorizedDevice(req:Request,deviceId:unknown):Promise<{owner_id:string;device_id:string}> {
+async function authorizedDevice(req:Request,deviceId:unknown):Promise<{owner_id:string;device_id:string;last_status:string;last_seen:string|null}> {
   if(typeof deviceId!=="string"||!DEVICE_REG.test(deviceId))throw Error("DEVICE_UNAUTHORIZED");
   const match=/^Bearer ([a-f0-9]{64})$/i.exec(req.headers.get("authorization")??"");
   if(!match)throw Error("DEVICE_UNAUTHORIZED");
   const rows=await db("lz_gridcraft_devices?device_id=eq."+enc(deviceId)+
-    "&select=owner_id,device_id,token_sha256,revoked_at&limit=1");
+    "&select=owner_id,device_id,token_sha256,revoked_at,last_status,last_seen&limit=1");
   if(!Array.isArray(rows)||rows.length!==1||rows[0].revoked_at||
      !safeEqual(rows[0].token_sha256,await sha(match[1]))) throw Error("DEVICE_UNAUTHORIZED");
-  return {owner_id:rows[0].owner_id,device_id:rows[0].device_id};
+  return {owner_id:rows[0].owner_id,device_id:rows[0].device_id,last_status:rows[0].last_status,last_seen:rows[0].last_seen};
 }
 
 function boundInput(name:unknown,args:unknown):Record<string,unknown> {
@@ -148,7 +148,7 @@ async function siteDispatch(req:Request,owner:string) {
     const rows=await db("lz_gridcraft_jobs?id=eq."+enc(jobId)+
        "&owner_id=eq."+enc(owner)+"&select=state,result&limit=1");
     if(Array.isArray(rows)&&rows.length===1&&rows[0].state==="completed") {
-      return json(toolReply(id,rows[0].result));
+      return json(toolReply(id,rows[0].result,rows[0].result?.ok===false));
     }
   }
   return json(toolReply(id,{error:"DEVICE_TIMEOUT",request_id:jobId},true));
@@ -191,6 +191,9 @@ async function deviceOperation(req:Request,action:string) {
     return json({state:body.status});
   }
   if(action==="poll") {
+    if(device.last_status!=="READY" || !device.last_seen ||
+       Date.now()-new Date(device.last_seen).getTime()>DEVICE_ACTIVE_MS)
+      return json({job:null,status:"GRIDCRAFT_OFFLINE"});
     const rows=await db("rpc/lz_gridcraft_claim_job",{
       p_owner:device.owner_id,p_device:device.device_id
     },"POST");
@@ -201,7 +204,7 @@ async function deviceOperation(req:Request,action:string) {
   }
   if(action==="complete") {
     if(typeof body.id!=="string"||!/^[0-9a-f-]{36}$/i.test(body.id)||
-       !plain(body.result)||JSON.stringify(body.result).length>MAX_DEVICE_RESULT)
+       !plain(body.result)||new TextEncoder().encode(JSON.stringify(body.result)).length>MAX_DEVICE_RESULT)
       throw Error("INVALID_COMPLETION");
     const ok=await db("rpc/lz_gridcraft_complete_job",{
       p_owner:device.owner_id,p_device:device.device_id,
