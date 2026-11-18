@@ -54,3 +54,12 @@
 - 修復 `gridcraft-p3-bridge.mjs` 誤用 `/site` URL、依官方 GridCraft v0.19.1 將 workbook doc UID 正確以十進位文字跨 MCP 傳送、Windows localhost 控制時轉回 u64 JSON number，避免跨工作簿讀取/丟失精度。
 - 最終 [P3 四層隔離 CI #44226690703](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44226690703) SUCCESS；[Windows EXE #44226566089](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44226566089) SUCCESS，自檢 SHA256 `d8cddb23cc097d76f37e2311348059bcc7f108ed6f6d5bc3a05656f12ef3f28d`；修正後的[私人 Drive ZIP](https://drive.google.com/file/d/18kY6FftBl8DYuyIsaneEostTFjd2mXCO/view)。
 - 需要補的是真正的流量/費用核實、原 Site 發布通道及獨立安全複核，不可把 CI PASS 誤寫成真實 ChatGPT /mcp 接通。要停在安全 Gate，不合併 main、不修改私人 Excel。
+
+## 8. 2026-11-18｜最新正式基礎部署（已核對）
+- **使用者部署批准沿用，已實際執行。**
+- 原 Supabase 專案 `hrdzywkihfqggiwjgavi` 已套用 migration `lizhi_gridcraft_p3_private_device_queue_20261118`，新增三張**獨立** private P3 表與三項 RPC。正式 SQL 讀回：`rls_tables=3`、`created_tables=3`、`private_rpcs=3`、`public_table_access_denied=true`、`public_rpc_access_denied=true`。
+- 正式新 Edge `lizhi-gridcraft-bridge` **v1 ACTIVE**，`verify_jwt=false` 限於此 Edge（Windows 裝置使用自訂 token 驗證）。邏輯 `GRIDCRAFT_P3_ENABLED` 仍預設 OFF；正式 `get_edge_function` 讀回含 gate。
+- [正式外部 HTTP 驗收 #44229073996](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44229073996)：無憑證 POST 到 `/site/dispatch` 回 HTTP400 `GRIDCRAFT_GATE_OFF`；未授權 GET 亦回 HTTP400。**無資料回傳、沒有新增 Site 工具、沒有成功遠端讀取**。
+- 監控一度 HTTP503，後來 `usage_alerts` 重新成功回 `WITHIN_CAP`，明確只代表 AI 操作數額度；`usage_egress_history` 仍是 2026-11-16 人工 10.549GB、providerVerified=false。實際新 Supabase 批次已記 `usage_log_before` `allow/saved/verified=true`，`usage_log_after` 實際 9 次工具呼叫保存/核驗 true，事件 `c6287442-d7a4-46ce-a8ce-ff3dbdb92351` 的 before/after 兩筆均讀回確認。
+- **正式未完成**：原 Private Site 不在可用 ChatGPT Sites 管理工具內，尚未能原地發布新 `gridcraft_*`；Supabase Edge 與 Site 的正式 server-only 配對 Secret、Gate 啟用、真實 Windows v0.2 配對/讀取皆 NOT_TESTED。原有 Site、既有 Edge/資料庫表和 Excel 沒有修改。
+- 使用者現有 v0.1 localhost READY 保留，v0.2 應待 Site 接通/本機本人同意後才啟用。P4 遠端寫入依然未開放。
