@@ -28,7 +28,10 @@ class MockGridCraft:
             with conn:
                 f = conn.makefile("rwb")
                 with f:
-                    hello = json.loads(f.readline())
+                    first = f.readline()
+                    if not first:
+                        return
+                    hello = json.loads(first)
                     assert hello["method"] == "auth"
                     assert hello["id"] == 0
                     if not self.authorized or hello["params"]["token"] != "t"*32:
