@@ -297,9 +297,13 @@ def main():
     PHASE = "isolated-replay-archived-relation-permissions"
     before_acl = local_inventory(local_sql)
     restore_snapshot_relation_acls(local_sql, source, before_acl)
-    PHASE = "complete-data-and-object-comparison"
-    actual = normalize_default_relation_acls(local_inventory(local_sql), local_sql)
+    PHASE = "isolated-catalog-inventory"
+    actual_inventory = local_inventory(local_sql)
+    PHASE = "isolated-normalize-restored-acls"
+    actual = normalize_default_relation_acls(actual_inventory, local_sql)
+    PHASE = "isolated-normalize-source-acls"
     source = normalize_default_relation_acls(source, local_sql)
+    PHASE = "complete-data-and-object-comparison"
     if json.loads(json.dumps(actual)) != json.loads(json.dumps(source)):
         # Log only aggregate diagnostics, never identifiers, definitions or rows.
         src_tables, dst_tables = source["tables"], actual["tables"]
