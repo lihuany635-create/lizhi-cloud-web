@@ -4,6 +4,7 @@ import socket
 import tempfile
 import threading
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from gridcraft_desktop_local import GridCraftLocal, GridCraftOffline
@@ -19,6 +20,7 @@ class MockGridCraft:
         self.authorized = authorized
         self.windows = windows if windows is not None else [{"doc": "synthetic", "title": "Book1", "dirty": False}]
         self.methods = []
+        self.requests = []
         self.thread = threading.Thread(target=self._serve, daemon=True)
         self.thread.start()
 
@@ -42,6 +44,7 @@ class MockGridCraft:
                     f.flush()
                     cmd = json.loads(f.readline())
                     self.methods.append(cmd["method"])
+                    self.requests.append(cmd)
                     if cmd["method"] == "window.list":
                         result = self.windows
                     elif cmd["method"] == "sheet.read":
@@ -82,6 +85,27 @@ class LocalDesktopTests(unittest.TestCase):
         self.assertEqual(client.read_range("估價清單", "B3")["values"], [[2300]])
         server.wait()
         self.assertEqual(server.methods, ["sheet.read"])
+
+    def test_targeted_sheet_read_uses_numeric_gridcraft_doc_id(self):
+        server = MockGridCraft()
+        client = GridCraftLocal(port=server.port, token_path=str(self.tokenfile))
+        with mock.patch.object(client, "windows", return_value=[{"doc": "42", "title": "Only allowed", "dirty": False}]):
+            self.assertEqual(client.read_range("估價清單", "B3", doc="42")["values"], [[2300]])
+            with self.assertRaises(ValueError):
+                client.read_range("估價清單", "B3", doc="not-a-workbook-id")
+            with self.assertRaises(ValueError):
+                client.read_range("估價清單", "B3", doc=str(2**64))
+        server.wait()
+        self.assertEqual(server.requests[0]["params"]["doc"], 42)
+        self.assertIsInstance(server.requests[0]["params"]["doc"], int)
+
+    def test_window_list_preserves_u64_doc_id_as_decimal_text(self):
+        doc_id = (1 << 64) - 1
+        server = MockGridCraft(windows=[{"doc": doc_id, "title": "Large id", "dirty": False}])
+        client = GridCraftLocal(port=server.port, token_path=str(self.tokenfile))
+        docs = client.windows()
+        self.assertEqual(docs[0]["doc"], str(doc_id))
+        server.wait()
 
     def test_offline_when_no_listener(self):
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
