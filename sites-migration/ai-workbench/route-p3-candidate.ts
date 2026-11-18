@@ -5,7 +5,7 @@
 import {env} from 'cloudflare:workers';
 import {identity} from '@/lib/store';
 import {POST as legacyPOST} from './legacy-route';
-import {GRIDCRAFT_TOOLS, GRIDCRAFT_TOOL_SET, callGridcraftFromSite} from './gridcraft-p3-bridge.mjs';
+import {GRIDCRAFT_TOOLS, GRIDCRAFT_TOOL_SET, GRIDCRAFT_PAIR_TOOL, callGridcraftFromSite, pairGridcraftFromSite} from './gridcraft-p3-bridge.mjs';
 export const dynamic = 'force-dynamic';
 
 const UPSTREAM = 'https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-ai-workbench/mcp';
@@ -50,6 +50,18 @@ export async function POST(req: Request) {
       if (who.id !== e.PRODUCTION_CHATGPT_OWNER) throw new RelayError('此帳號尚未連接 AI 工作台');
       // All calls, including the legacy photo tools, pass the same owner check.
       if (PHOTO_SHEET_TOOLS.has(String(body.params?.name ?? ''))) return await legacy(req, body);
+      if (String(body.params?.name ?? '') === 'gridcraft_pair_start') {
+        if (body.params?.arguments && Object.keys(body.params.arguments).length) throw new RelayError('配對工具不接受任意參數');
+        return reply(await pairGridcraftFromSite({
+          rpcId: id,
+          verifiedPrincipal: who.id,
+          expectedPrincipal: e.PRODUCTION_CHATGPT_OWNER,
+          bridgeSecret: e.GRIDCRAFT_P3_SITE_BRIDGE_SECRET,
+          enabled: e.GRIDCRAFT_P3_ENABLED === 'true',
+          pairingEnabled: e.GRIDCRAFT_PAIRING_ENABLED === 'true',
+          fetchImpl: fetch,
+        }));
+      }
       if (GRIDCRAFT_TOOL_SET.has(String(body.params?.name ?? ''))) {
         const result = await callGridcraftFromSite({
           rpcId: id,
@@ -80,7 +92,8 @@ export async function POST(req: Request) {
       if (e.GRIDCRAFT_P3_ENABLED === 'true') {
         const who = identity(req, 'ai');
         if (who.id !== e.PRODUCTION_CHATGPT_OWNER) throw new RelayError('本人驗證失敗');
-        gridcraft = GRIDCRAFT_TOOLS;
+        gridcraft = [...GRIDCRAFT_TOOLS];
+        if (e.GRIDCRAFT_PAIRING_ENABLED === 'true') gridcraft.push(GRIDCRAFT_PAIR_TOOL);
       }
       return reply({jsonrpc: '2.0', id, result: {tools: [...aiwb.result.tools, ...photo, ...gridcraft]}});
     }
