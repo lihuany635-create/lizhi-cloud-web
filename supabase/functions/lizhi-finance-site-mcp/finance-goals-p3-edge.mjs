@@ -94,8 +94,10 @@ export async function executeGoalsP3({db,owner},name,untrustedArgs){
     fail("GOALS_RECEIPT_INVALID");
   // No private transaction notes, bank credentials, or external owner fields.
   if(name==="finance_goals_salary_set"){
+    const allowedStatus=args.action==="remove"
+      ?["removed","already_applied"]:["created","updated","restored","already_applied"];
     if(data.committed!==true||
-      !["created","updated","restored","removed","already_applied"].includes(data.status)||
+      !allowedStatus.includes(data.status)||
       data.request_id!==args.request_id||
       !Number.isSafeInteger(data.version)||data.version<1)
       fail("GOALS_RECEIPT_INVALID");
