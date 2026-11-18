@@ -75,6 +75,21 @@ class WindowsAgentTests(TestCase):
             with self.assertRaises(ValueError):
                 agent.start_gridcraft(other)
 
+    def test_login_start_does_not_duplicate_running_gridcraft(self):
+        ui = agent.AgentUI.__new__(agent.AgentUI)
+        ui.path_var = mock.Mock()
+        ui.path_var.get.return_value = r"C:\GridCraft\gridcraft.exe"
+        with mock.patch.object(agent, "GridCraftLocal") as client, mock.patch.object(agent, "start_gridcraft") as start:
+            client.return_value.status.return_value = {"status": "READY"}
+            ui.launch_on_login()
+            start.assert_not_called()
+            client.return_value.status.return_value = {"status": "UNAUTHORIZED"}
+            ui.launch_on_login()
+            start.assert_not_called()
+            client.return_value.status.return_value = {"status": "GRIDCRAFT_OFFLINE"}
+            ui.launch_on_login()
+            start.assert_called_once_with(r"C:\GridCraft\gridcraft.exe")
+
     def test_missing_exe_rejected(self):
         with self.assertRaises(FileNotFoundError):
             agent.safe_gridcraft_exe("x:\\no\\such\\gridcraft.exe")
