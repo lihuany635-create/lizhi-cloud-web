@@ -216,7 +216,7 @@ const FinanceHome=(()=>{
       busy:ui.budget.busy||ui.budget.syncing,error:ui.budget.error
     });
   }
-  function goalsPage(){return typeof FinanceGoalsP3Ui==="undefined"?"<section class=\"finance-section\">目標候選介面尚未載入；正式功能仍未部署。</section>":FinanceGoalsP3Ui.render({report:null,state:"candidate_only"});}
+  function goalsPage(){const base=typeof FinanceGoalsP3Ui==="undefined"?"<section class=\"finance-section\">目標候選介面尚未載入；正式功能仍未部署。</section>":FinanceGoalsP3Ui.render({report:null,state:"candidate_only"});const forms=typeof FinanceGoalsP5Ui==="undefined"?"":FinanceGoalsP5Ui.render({enabled:false,month:FinanceUiModel.localDate().slice(0,7)});return base+forms;}
   function content(){const pages={overview,transactions:transactionsPage,accounts:accountsPage,cards:cardsPage,categories:categoriesPage,reports:reportsPage,budgets:budgetPage,goals:goalsPage,settings:settingsPage};return `${rail()}<div class="finance-stage">${header()}<div class="finance-body">${alerts()}${ui.loading&&!ui.loaded?loading():(pages[ui.view]||overview)()}</div></div>${modal()}`;}
   function render(){scheduleLoad();ensureVoiceController();return `<section class="finance-workspace" data-finance-root aria-labelledby="finance-title">${content()}</section>`;}
   function formObject(form){const data=Object.fromEntries(new FormData(form));if(form.elements.includeInAssets)data.includeInAssets=form.elements.includeInAssets.checked;return data;}
