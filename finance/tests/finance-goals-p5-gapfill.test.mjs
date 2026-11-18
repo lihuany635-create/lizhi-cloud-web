@@ -185,3 +185,15 @@ test("P5-20 trusted per-call approval allows bounded write receipt, without bank
  assert.equal(approved.result.structuredContent.actualTransfer,false);
  assert.equal(opts.db.calls[0].args.p_owner,OWNER);
 });
+
+test("P5-21 funded goals cannot be removed and get a safe explicit error",async()=>{
+ const backend={async rpc(){return {error:{message:"GOALS_RESERVE_NOT_RELEASED: 2000 reserved"}}}};
+ await assert.rejects(()=>executeGoalsCandidate({
+   db:backend,owner:OWNER,approvedWrite:true
+ },"finance_goals_goal_set",goal({action:"remove",expected_version:2,kind:undefined,
+ target_amount:undefined,account_id:undefined})),{code:"GOALS_INVALID_ARGS"});
+ const remove={month:"2026-12",goal_id:GOAL,request_id:REQUEST,
+   expected_version:2,action:"remove"};
+ await assert.rejects(()=>executeGoalsCandidate({db:backend,owner:OWNER,
+   approvedWrite:true},"finance_goals_goal_set",remove),{code:"GOALS_RESERVE_NOT_RELEASED"});
+});
