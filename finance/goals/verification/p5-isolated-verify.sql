@@ -108,7 +108,7 @@ end $$;
 
 
 -- Funds cannot be hidden by deactivating a goal while reservations remain.
-do $
+do $$
 declare owner uuid:='11111111-1111-4111-8111-111111111111';
 declare goal uuid:='99999999-2222-4222-8222-999999999999';
 declare result jsonb;
@@ -125,7 +125,7 @@ begin
    'salary-dec-p5-goal-slice',true);
  if result->>'status'<>'recorded' then
    raise exception 'P5_FULL_RELEASE_FAILED';end if;
-end $;
+end $$;
 
 -- Create and edit sinking fund atomically, retaining its original purpose.
 do $$
@@ -183,7 +183,7 @@ end $$;
 
 
 -- The metadata for an empty protected fund must soft-delete in the same operation.
-do $
+do $$
 declare owner uuid:='11111111-1111-4111-8111-111111111111';
 declare goal uuid:='55555555-4444-4444-8444-555555555555';
 declare result jsonb;
@@ -195,7 +195,7 @@ begin
    select 1 from public.lizhi_finance_sinking_funds
    where id=goal and deleted_at is null) then
    raise exception 'P5_PROTECTED_FUND_SOFT_DELETE_INCONSISTENT';end if;
-end $;
+end $$;
 
 -- Read-only month report cannot expose disabled goal.
 do $$
