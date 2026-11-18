@@ -148,6 +148,43 @@ def inventory(conn):
     return {"tables": result, "objects": objects, "large_objects": large_objects}
 
 
+
+def normalize_safe_sequence_advance(source, actual):
+    """Accept only a safe forward-only move of a nontransactional sequence.
+
+    All sequence properties including owner, increment, cache size and cycle
+    must match. Reject backwards movement, wraparound, missing sequences and
+    NULL values. Preserve private names and values in the encrypted archive.
+    """
+    available = {(row[0], row[1]): row[2] for row in actual["objects"]}
+    accepted = 0
+    for item in source["objects"]:
+        kind, name, old_raw = item
+        if kind != "sequence" or (kind, name) not in available:
+            continue
+        new_raw = available[(kind, name)]
+        if old_raw == new_raw:
+            continue
+        try:
+            old = json.loads(old_raw)
+            new = json.loads(new_raw)
+        except (ValueError, TypeError):
+            continue
+        if not (isinstance(old, list) and isinstance(new, list)
+                and len(old) == len(new) == 9
+                and old[:8] == new[:8] and old[6] is False):
+            continue
+        increment, old_value, new_value = old[5], old[8], new[8]
+        if (type(increment) is not int or increment == 0 or
+                type(old_value) is not int or type(new_value) is not int):
+            continue
+        if ((increment > 0 and new_value >= old_value) or
+                (increment < 0 and new_value <= old_value)):
+            item[2] = new_raw
+            accepted += 1
+    return accepted
+
+
 def main():
     global PHASE
     import psycopg
@@ -303,6 +340,11 @@ def main():
     actual = normalize_default_relation_acls(actual_inventory, local_sql)
     PHASE = "isolated-normalize-source-acls"
     source = normalize_default_relation_acls(source, local_sql)
+    PHASE = "isolated-sequence-forward-safety-check"
+    accepted = normalize_safe_sequence_advance(source, actual)
+    if accepted:
+        print("Nontransactional sequence forward-only safety check: PASS (" +
+              str(accepted) + " object(s))", flush=True)
     PHASE = "complete-data-and-object-comparison"
     if json.loads(json.dumps(actual)) != json.loads(json.dumps(source)):
         # Log only aggregate diagnostics, never identifiers, definitions or rows.
