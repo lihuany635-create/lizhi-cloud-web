@@ -27,6 +27,9 @@ INSERT INTO public.lz_gridcraft_jobs(id,owner_id,device_id,tool,arguments,expire
 VALUES ('00000000-0000-4000-8000-000000000001','synthetic-owner-2026','synthetic-owner-device',
         'gridcraft_read_range','{"doc":"dummy","sheet":"Demo","range":"B3"}'::jsonb,now()+interval '1 minute');
 
+INSERT INTO public.lz_gridcraft_pairings(code_sha256,owner_id,expires_at)
+VALUES (repeat('b',64),'synthetic-owner-2026',now()+interval '2 minutes');
+
 SET ROLE service_role;
 
 DO $$
@@ -56,6 +59,23 @@ BEGIN
     RAISE EXCEPTION 'same job completed twice';
   END IF;
   RAISE NOTICE 'PASS: RLS, owner isolation, single claim and no replay complete';
+END $$;
+
+
+DO $$
+DECLARE owner_name text;
+BEGIN
+  owner_name := public.lz_gridcraft_pair_device(repeat('b',64),'paired-synthetic-device',repeat('f',64));
+  IF owner_name <> 'synthetic-owner-2026' THEN
+    RAISE EXCEPTION 'approved one-time pairing failed';
+  END IF;
+  IF public.lz_gridcraft_pair_device(repeat('b',64),'paired-again',repeat('e',64)) IS NOT NULL THEN
+    RAISE EXCEPTION 'pairing replay was allowed';
+  END IF;
+  IF public.lz_gridcraft_pair_device(repeat('c',64),'unapproved-device',repeat('e',64)) IS NOT NULL THEN
+    RAISE EXCEPTION 'unknown pairing code was accepted';
+  END IF;
+  RAISE NOTICE 'PASS: isolated one-time device pairing, no replay, wrong code rejected';
 END $$;
 
 RESET ROLE;
