@@ -134,6 +134,25 @@ class TestAutoConnectV04(unittest.TestCase):
             self.assertEqual(ui._verified_grants(),set())
         self.assertEqual(ui.allowed_docs,set())
 
+    def test_clear_remembered_grants_revokes_local_read_and_write(self):
+        ui=agent.AgentUI.__new__(agent.AgentUI)
+        ui.root=Root()
+        ui.settings={"remembered_workbooks":[agent.workbook_identity_hash(str(self.one))],
+                     "remote_enabled":True}
+        ui.session_grants={"1":(None,"Book1")}
+        ui.allowed_docs={"1"}
+        ui.p4_write_enabled=True
+        ui.remote_status=""
+        with mock.patch.object(agent.messagebox,"askyesno",return_value=True), \
+             mock.patch.object(agent,"save_settings") as save, \
+             mock.patch.object(agent.AgentUI,"refresh"):
+            ui.forget_authorized_workbooks()
+        self.assertEqual(ui.settings["remembered_workbooks"],[])
+        self.assertEqual(ui.session_grants,{})
+        self.assertEqual(ui.allowed_docs,set())
+        self.assertFalse(ui.p4_write_enabled)
+        save.assert_called_once()
+
     def test_worker_rechecks_grant_immediately_before_job(self):
         class Local:
             def windows(self):return [{"doc":"1","title":"test","dirty":False}]
