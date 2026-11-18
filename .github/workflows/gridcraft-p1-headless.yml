@@ -6,7 +6,8 @@ on:
       - feat/gridcraft-mcp-p0-20261118
     paths:
       - .github/workflows/gridcraft-p1-headless.yml
-      - integrations/gridcraft/**
+      - integrations/gridcraft/*.py
+      - integrations/gridcraft/fixtures/*.b64
   workflow_dispatch:
 
 permissions:
