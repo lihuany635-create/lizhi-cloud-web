@@ -26,7 +26,7 @@ function validateCall(name,args) {
     return {};
   }
   if (Object.keys(args).sort().join("|")!=="doc|range|sheet") throw Error("INVALID_ARGS");
-  if (typeof args.doc!=="string" || !/^[A-Za-z0-9._:-]{1,100}$/.test(args.doc)) throw Error("INVALID_DOC");
+  if (typeof args.doc!=="string" || (!/^[1-9][0-9]{0,19}$/.test(args.doc) || BigInt(args.doc)>18446744073709551615n)) throw Error("INVALID_DOC");
   if (typeof args.sheet!=="string" || args.sheet.length<1 || args.sheet.length>80 ||
       /[\x00-\x1f]/.test(args.sheet)) throw Error("INVALID_SHEET");
   const m=typeof args.range==="string"&&args.range.length<=22
