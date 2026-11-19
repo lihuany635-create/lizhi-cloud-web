@@ -32,6 +32,7 @@ from gridcraft_p2_batch import P2BatchWriter
 from gridcraft_p4_desktop import P4Local
 from gridcraft_p3_desktop import P3Local
 from gridcraft_p3_format import P3FormatWriter
+from gridcraft_p4_safe_save import P4SafeSaveWriter
 from gridcraft_pairing_client import DeviceStore, PairingError, pair_one_time
 
 try:
@@ -336,6 +337,7 @@ class AgentUI:
         self._p4_writer = None
         self._p2_batch = None
         self._p3_formatter = None
+        self._p4_saver = None
         self._create_widgets()
         self.refresh()
         if minimized:
@@ -587,6 +589,9 @@ class AgentUI:
         fmt = getattr(self, "_p3_formatter", None)
         if fmt is not None:
             fmt.invalidate_previews()
+        saver = getattr(self, "_p4_saver", None)
+        if saver is not None:
+            saver.invalidate_previews()
 
     def _poll(self):
         """Monitor GridCraft for entire agent lifetime, not only at login."""
@@ -823,6 +828,15 @@ class AgentUI:
                 # P3 isolated gate failure must NOT disable existing P3-read, P4, P2.
                 _logger.error("P3_FORMAT_GATE_OFF %s", safe_error_code(exc))
         self._p3_formatter = p3_formatter
+        p4_saver = None
+        if p4_writer is not None:
+            try:
+                p4_saver = P4SafeSaveWriter(p4_writer)
+            except Exception as exc:
+                # A corrupt P4SafeSave receipt folder disables ONLY copy export.
+                # P3 read, P4 cell write, P2 batch, P3 formatting keep working.
+                _logger.error("P4_SAVE_GATE_OFF %s", safe_error_code(exc))
+        self._p4_saver = p4_saver
         try:
             worker = OutboundWorker(
                 transport=transport, local=GridCraftLocal(port=7979, timeout=2),
@@ -830,6 +844,7 @@ class AgentUI:
                 p4_writer=p4_writer,
                 p2_batch=p2_batch,
                 p3_formatter=p3_formatter,
+                p4_saver=p4_saver,
                 p4_enabled=lambda: self.p4_write_enabled and not self._user_stopped,
                 grant_checker=self._verified_grants)
             started_at = time.monotonic()
@@ -875,6 +890,7 @@ class AgentUI:
             self._p4_writer = None
             self._p2_batch = None
             self._p3_formatter = None
+            self._p4_saver = None
             self._remote_transition("STOPPED")
 
     def start_remote(self):
