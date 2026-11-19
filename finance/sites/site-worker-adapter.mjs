@@ -7,18 +7,10 @@ const response=(code,status)=>Response.json({error:code},{status,headers:{"Cache
 const GOAL_WRITES=new Set([
   "finance_goals_salary_set","finance_goals_goal_set","finance_goals_allocation_set"
 ]);
-async function goalHmac(secret,frame,timestamp){
-  const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(secret),
-    {name:"HMAC",hash:"SHA-256"},false,["sign"]);
-  const data=new TextEncoder().encode(String(timestamp)+"\n"+JSON.stringify(frame));
-  const signature=new Uint8Array(await crypto.subtle.sign("HMAC",key,data));
-  return [...signature].map(b=>b.toString(16).padStart(2,"0")).join("");
-}
-
 /**
  * @param {Request} request
  * @param {Record<string,string>} env  Server-side only Sites secrets.
- * @param {{verifyOwner:(req:Request)=>Promise<string|null>,fetchImpl?:typeof fetch,approveGoalWrite?:(args:{request:Request,principal:string,name:string,arguments:Record<string,unknown>})=>Promise<boolean>}} opts
+ * @param {{verifyOwner:(req:Request)=>Promise<string|null>,fetchImpl?:typeof fetch,/* goal writes intentionally unavailable until trusted human proof exists */}} opts
  * verifyOwner MUST be bound to the actual Sites authenticated principal.
  * Never trust a client-supplied email header or JSON body. No fallback.
  */
@@ -56,27 +48,16 @@ export async function handleFinanceSiteMcp(request,env,opts={}) {
   try{writeFrame=JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(content));}
   catch{return response("INVALID_REQUEST_BODY",400)}
   const goalName=writeFrame?.method==="tools/call"?writeFrame?.params?.name:null;
-  let goalProof=null;
-  if(GOAL_WRITES.has(goalName)){
-    if(typeof opts.approveGoalWrite!=="function")
-      return response("GOALS_EXPLICIT_APPROVAL_REQUIRED",403);
-    let permitted=false;
-    try{
-      permitted=await opts.approveGoalWrite({request,principal:authenticated,
-        name:goalName,arguments:writeFrame.params?.arguments??{}})===true;
-    }catch{permitted=false}
-    if(!permitted)return response("GOALS_EXPLICIT_APPROVAL_REQUIRED",403);
-    // The proof is bound to the exact tool arguments; never forward a raw
-    // browser-provided confirmation header or expose the HMAC secret.
-    const timestamp=Math.floor(Date.now()/1000);
-    goalProof=String(timestamp)+"."+await goalHmac(token,writeFrame,timestamp);
-  }
+  // F-03/F-04: a model flag, injected callback, or Site bearer can never
+  // prove a real user's confirmation. The original Site has no verified
+  // presence API yet, so reject EVERY Goals mutation before any upstream call.
+  if(GOAL_WRITES.has(goalName))
+    return response("GOALS_HUMAN_APPROVAL_NOT_CONFIGURED",403);
   const headers=new Headers({
     "Authorization":"Bearer "+token,
     "Content-Type":"application/json",
     "Accept":"application/json"
   });
-  if(goalProof)headers.set("x-lizhi-goals-write-approval",goalProof);
   let upstream;
   try {
     upstream=await (opts.fetchImpl??fetch)(EDGE,{
