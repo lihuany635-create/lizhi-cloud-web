@@ -75,7 +75,7 @@ export function createGoalsBrowserBridge({db,verifyUser,ownerUid,origins=[],writ
    const payload=await executeGoalsCandidate({
      db,owner:user.id,approvedWrite:write&&writesEnabled===true
    },data.tool,checked.args);
-   return json({ok:true,result:payload},200,origin);
+   return json({ok:true,result:payload,...(!write?{write_enabled:writesEnabled===true}:{})},200,origin);
   }catch(error){
    const allowed=new Set([
     "GOALS_VERSION_CONFLICT","GOALS_DUPLICATE_REQUEST","GOALS_NOT_FOUND",
