@@ -175,15 +175,15 @@ test("P5-19 enabled candidate lists goals but disallows writes without per-call 
  assert.equal(listing.result.tools.some(x=>x.name==="finance_goals_goal_set"),true);
  const denied=await (await handleFinanceSiteRequest(request({method:"tools/call",params:{
    name:"finance_goals_goal_set",arguments:goal()}}),opts)).json();
- assert.match(denied.result.content[0].text,/GOALS_EXPLICIT_APPROVAL_REQUIRED/);
+ assert.match(denied.result.content[0].text,/GOALS_HUMAN_APPROVAL_NOT_CONFIGURED/);
 });
-test("P5-20 trusted per-call approval allows bounded write receipt, without bank transfer",async()=>{
+test("P5-20 even an injected approval callback cannot bypass missing human proof",async()=>{
  const opts=gatewayOpts({goalToolsEnabled:true,goalWriteApproval:async()=>true});
- const approved=await (await handleFinanceSiteRequest(request({method:"tools/call",params:{
+ const res=await (await handleFinanceSiteRequest(request({method:"tools/call",params:{
    name:"finance_goals_goal_set",arguments:goal()}}),opts)).json();
- assert.equal(approved.result.structuredContent.committed,true);
- assert.equal(approved.result.structuredContent.actualTransfer,false);
- assert.equal(opts.db.calls[0].args.p_owner,OWNER);
+ assert.equal(res.result.isError,true);
+ assert.match(res.result.content[0].text,/GOALS_HUMAN_APPROVAL_NOT_CONFIGURED/);
+ assert.equal(opts.db.calls.length,0);
 });
 
 test("P5-21 funded goals cannot be removed and get a safe explicit error",async()=>{
