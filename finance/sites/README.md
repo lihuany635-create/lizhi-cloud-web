@@ -67,6 +67,7 @@ Sites 注意：
 - 原 Private Site Worker 先驗證平台真人本人 principal 並禁止 browser Origin，使用僅伺服器持有的既有 Site bearer 轉送。Edge 驗證固定 bearer、固定 owner UID，且**每次 Goals 操作**都用 Auth admin `getUserById` 檢查擁有者現況、預期 email 以及 ban 狀態；Edge 必須提供 `LIZHI_FINANCE_SITE_OWNER_EMAIL` 與既有 owner UID，缺少時拒絕。
 - 原網頁每次操作使用本人 Supabase JWT，Edge 先以 `auth.getUser(jwt)` 驗證，必須為本人 UID、第一方 `aud=authenticated`、有效 `session_id`、AAL，且 JWT 不含 `client_id`；再以該 JWT 呼叫原 `lizhi_web_is_allowed` 做當下 allowlist 判定。只要任一環節不符就拒絕。
 - 無 `prepare/commit`、`approved:true`、Bearer-HMAC、自行產生的「真人同意」憑證或 Passkey。網站單次送出 `action=write`，由 RPC 檢查 request_id 冪等、版本 CAS、唯一資金來源、金額範圍與保護性不可刪除；記錄 receipt，完成後重新讀取。
+- 資金預留 MCP 不再接受/要求呼叫者填 `confirmed_by_user`。登入授權由原 Private Site 或 Browser JWT 驗證；RPC 內部仍傳遞必要的布林值，資料庫事件 `evidence_type='owner_authorized'`。P3 報表的舊欄位 `user_confirmed_reserved` 暫為相容性保留名稱，只表示規劃預留，**不代表有 Passkey、逐筆確認或銀行入帳證據**。
 - **明確剩餘風險：** 放棄逐筆本人再驗證後，若已登入的本人 session / 既有 Private Site bearer 遭竊或遭授權程式誤用，攻擊者可能更改規劃資料。原 Site MFA/Passkey 不是必要條件，且 Auth logout 後 access token 的撤銷即時性尚須真人實測；不應謊稱能阻止所有憑證失竊。
 - 本次修正為 PR #97 候選。正式更新前仍需原資料庫備份、隔離還原、整套相依 PR 安全整合、獨立複審、正式 Edge 與**原 Site 原地**接線及手機／電腦跨帳號測試。不建立第二套 Site、MCP 或資料庫。
 
