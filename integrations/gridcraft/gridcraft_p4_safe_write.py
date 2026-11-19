@@ -274,6 +274,49 @@ class P4SafeWriter:
         self._lock=threading.RLock()
         self._previews={}
         self.receipts=P4ReceiptStore(self.backups)
+        self._prune_old_backups()
+
+    def _existing_backups(self):
+        try:
+            return sorted((p for p in self.backups.glob("p4-*.xlsx") if p.is_file()),
+                          key=lambda p:(p.stat().st_mtime,p.name))
+        except OSError:
+            raise P4Denied("BACKUP_SCAN_FAILED") from None
+
+    def _prune_old_backups(self):
+        """Prune files older than 30 days, preserving at least MIN_KEEP newest."""
+        files=self._existing_backups()
+        limit=max(0,len(files)-MIN_KEEP)
+        cutoff=time.time()-BACKUP_MAX_AGE
+        for path in files[:limit]:
+            try:
+                if path.stat().st_mtime>=cutoff:
+                    break
+                path.unlink()
+            except OSError:
+                raise P4Denied("BACKUP_CLEANUP_FAILED") from None
+
+    def _make_backup_room(self, incoming):
+        """Only delete old existing snapshots, never this transaction's new one."""
+        if incoming>MAX_BACKUP_FOLDER:
+            raise P4Denied("BACKUP_STORAGE_LIMIT")
+        files=self._existing_backups()
+        try:
+            sizes={p:p.stat().st_size for p in files}
+            used=sum(sizes.values())
+        except OSError:
+            raise P4Denied("BACKUP_SCAN_FAILED") from None
+        allowed_removals=max(0,len(files)-MIN_KEEP)
+        for path in files[:allowed_removals]:
+            if used+incoming<=MAX_BACKUP_FOLDER:
+                break
+            try:
+                path.unlink()
+            except OSError:
+                raise P4Denied("BACKUP_CLEANUP_FAILED") from None
+            used-=sizes[path]
+        if used+incoming>MAX_BACKUP_FOLDER:
+            raise P4Denied("BACKUP_STORAGE_LIMIT")
 
     def invalidate_previews(self):
         """Discard stale previews on local disconnect or workbook switch.
@@ -337,10 +380,10 @@ class P4SafeWriter:
         except (zipfile.BadZipFile,OSError):
             raise P4Denied("SNAPSHOT_INVALID") from None
         self.backups.mkdir(parents=True,exist_ok=True)
-        # Fail closed when local backups are full; never silently delete versions.
-        total=sum(p.stat().st_size for p in self.backups.glob("p4-*.xlsx") if p.is_file())
-        if total + len(data) > MAX_BACKUP_FOLDER:
-            raise P4Denied("BACKUP_STORAGE_LIMIT")
+        # Rotate oldest backups only when necessary; preserve newest MIN_KEEP.
+        # This runs before creating the new backup so that the pending write's
+        # snapshot can never appear in the deletion candidates.
+        self._make_backup_room(len(data))
         name="p4-"+doc+"-"+uuid.uuid4().hex+".xlsx"
         filename=self.backups/name
         try:
