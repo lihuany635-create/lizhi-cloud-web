@@ -3,6 +3,7 @@ import {createClient} from "npm:@supabase/supabase-js@2.109.0";
 import {handleFinanceSiteRequest} from "./edge-core.mjs";
 import {createGoalsBrowserBridge} from "./finance-goals-browser-bridge.mjs";
 import {verifiedFirstPartyClaims} from "./finance-goals-auth-claims.mjs";
+import {verifyGoalsOwnerAccount} from "./finance-goals-owner-auth.mjs";
 
 /** 
  * Separate from OAuth Finance MCP: private ChatGPT Sites server-to-server route.
@@ -56,16 +57,8 @@ Deno.serve(request=>{
   return handleFinanceSiteRequest(request,{db,token,ownerUid,
     goalToolsEnabled:Deno.env.get("LIZHI_FINANCE_GOALS_MCP_ENABLED")==="true",
     goalWritesEnabled,
-    verifyGoalsOwner:async()=>{
-      if(!db?.auth?.admin?.getUserById||!ownerUid)return false;
-      const allowedEmail=(Deno.env.get("LIZHI_FINANCE_SITE_OWNER_EMAIL")||"").trim().toLowerCase();
-      if(!allowedEmail)return false;
-      const {data,error}=await db.auth.admin.getUserById(ownerUid);
-      const user=data?.user;
-      if(error||!user||user.id!==ownerUid||
-        user.email?.trim().toLowerCase()!==allowedEmail)return false;
-      if(user.banned_until&&Date.parse(user.banned_until)>Date.now())return false;
-      return true;
-    }
+    verifyGoalsOwner:()=>verifyGoalsOwnerAccount(
+      db,ownerUid,Deno.env.get("LIZHI_FINANCE_SITE_OWNER_EMAIL")||""
+    )
   });
 });
