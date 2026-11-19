@@ -1,0 +1,33 @@
+name: Finance Goals UX scroll and draft refresh checks
+on:
+  pull_request:
+    paths:
+      - 'finance/pages/home.js'
+      - 'finance/goals/p5-goals-ui.js'
+      - 'finance/styles/home.css'
+      - 'finance/tests/finance-goals-refresh-ux.test.mjs'
+      - 'finance/tests/finance-goals-p5-gapfill.test.mjs'
+      - 'loader.js'
+      - 'index.html'
+      - 'sw.js'
+      - '.github/workflows/finance-goals-ux-refresh.yml'
+permissions:
+  contents: read
+jobs:
+  goals-ux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax checks
+        run: |
+          node --check finance/pages/home.js
+          node --check finance/goals/p5-goals-ui.js
+          node --check loader.js
+          node --check sw.js
+      - name: Goals UI and safe contract regression
+        run: node --test finance/tests/finance-goals-refresh-ux.test.mjs finance/tests/finance-goals-p5-gapfill.test.mjs

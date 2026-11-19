@@ -59,18 +59,18 @@
        ["","無"],["rent","季繳房租"],["insurance","年繳保險"]],"")+'</select></label>'+
      '<label>確認帳單金額（可空） <input name="due_amount" type="number" min="0"'+disabled+'></label>'+
      '<label>到期月份（可空） <input name="due_month" type="month"'+disabled+'></label>'+
-     consent+'<button type="submit"'+disabled+'>確認目標變更</button></form>';
+     consent+'<button type="submit"'+disabled+'>儲存目標變更</button></form>';
    const allocationForm='<form data-goals-form="allocation" class="finance-goals-editor">'+
-     '<h3>人工確認預留與釋出</h3>'+currency+
+     '<h3>資金預留與釋出</h3>'+currency+
      '<label>月份 <input name="month" type="month" value="'+escape(month)+'"'+disabled+' required></label>'+
      '<label>目標 <select name="goal_id"'+disabled+' required>'+
      '<option value="">選擇既有目標</option>'+goalOptions+'</select></label>'+
      '<label>動作 <select name="action"'+disabled+'>'+opts([
-       ["allocate","記錄已確認預留"],["release","釋出已預留款"]],"allocate")+'</select></label>'+
+       ["allocate","記錄規劃預留"],["release","釋出已預留款"]],"allocate")+'</select></label>'+
      field("amount","預留／釋出金額","number","0",off)+
      field("source_reference","資金來源切片識別碼","text","",off)+
      '<p>同一筆來源切片不可重複分配；釋出不得超過原本預留。</p>'+
-     consent+'<button type="submit"'+disabled+'>確認資金紀錄</button></form>';
+     consent+'<button type="submit"'+disabled+'>儲存預留／釋出</button></form>';
    const salaryLines=categories.map(([key,label])=>{
      const row=(plan?.lines||[]).find(x=>x.category===key);
      return field(key,label,"number",row?.amount??0,off);
@@ -81,8 +81,8 @@
      '<label>動作 <select name="action"'+disabled+'>'+opts([
        ["set","儲存薪資分配"],["remove","停用本月分配"]],"set")+'</select></label>'+
      '<label>預估薪水 <input name="estimated_income" type="number" min="0" value="'+
-     escape(plan?.estimated_income??43000)+'"'+disabled+' required></label>'+
-     salaryLines+consent+'<button type="submit"'+disabled+'>確認薪水分配</button></form>';
+     escape(plan?.estimated_income??"")+'" placeholder="例如 43000"'+disabled+' required></label>'+
+     salaryLines+consent+'<button type="submit"'+disabled+'>儲存薪水分配</button></form>';
    return '<section class="finance-section finance-goals-actions" aria-label="目標管理操作">'+
      '<p role="status" data-goals-feedback>'+(off?
      '目前為候選介面，尚未完成正式本人驗證與 MCP 接線；所有儲存按鈕停用。':

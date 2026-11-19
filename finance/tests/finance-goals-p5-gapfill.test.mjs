@@ -67,7 +67,8 @@ test("P5-08 editor is disabled and clearly honest when provider missing",()=>{
  const html=UI.render();
  assert.match(html,/候選介面/);
  assert.match(html,/新增、修改或停用目標/);
- assert.match(html,/人工確認預留與釋出/);
+ assert.match(html,/資金預留與釋出/);
+ assert.doesNotMatch(html,/人工確認預留與釋出/);
  assert.match(html,/八項薪水分配/);
  assert.match(html,/disabled/);
  assert.doesNotMatch(html,/已存入銀行|正式已啟用/);
