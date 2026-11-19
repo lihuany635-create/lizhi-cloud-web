@@ -1,0 +1,60 @@
+name: GridCraft v0.5.2 Windows live reconnect
+on:
+  push:
+    branches:
+      - fix/gridcraft-v052-reconnect-workbook-20261119
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-reconnect-and-package:
+    runs-on: windows-2022
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile reconnect candidate
+        shell: pwsh
+        run: |
+          python -m py_compile integrations/gridcraft/gridcraft_windows_agent.py integrations/gridcraft/gridcraft_p4_safe_write.py integrations/gridcraft/test_reconnect_v052.py
+          if ($LASTEXITCODE -ne 0) { throw "PY COMPILE FAILED" }
+      - name: Run reconnect and preexisting GridCraft regression tests
+        shell: pwsh
+        run: |
+          python integrations/gridcraft/test_reconnect_v052.py
+          if ($LASTEXITCODE -ne 0) { throw "v052 RECONNECT FAILED" }
+          python integrations/gridcraft/test_autostart_v051.py
+          if ($LASTEXITCODE -ne 0) { throw "v051 AUTO START FAILED" }
+          python integrations/gridcraft/test_oneclick_v05.py
+          if ($LASTEXITCODE -ne 0) { throw "v05 ONE CLICK FAILED" }
+          python integrations/gridcraft/test_windows_agent.py
+          if ($LASTEXITCODE -ne 0) { throw "WIN AGENT FAILED" }
+          python integrations/gridcraft/test_desktop_local.py
+          if ($LASTEXITCODE -ne 0) { throw "P3 LOCAL FAILED" }
+          python integrations/gridcraft/test_outbound_worker.py
+          if ($LASTEXITCODE -ne 0) { throw "P3 OUTBOUND FAILED" }
+          python integrations/gridcraft/test_p4_safe_write.py
+          if ($LASTEXITCODE -ne 0) { throw "P4 SAFE WRITER FAILED" }
+          python integrations/gridcraft/test_p4_desktop.py
+          if ($LASTEXITCODE -ne 0) { throw "P4 LOCAL FAILED" }
+      - name: Build EXE, self-test, calculate SHA256
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pyinstaller==6.16.0
+          if ($LASTEXITCODE -ne 0) { throw "PYINSTALLER INSTALL FAILED" }
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name LizhiGridCraftAgent_v052_AutoReconnect --paths integrations/gridcraft integrations/gridcraft/gridcraft_windows_agent.py
+          if ($LASTEXITCODE -ne 0) { throw "WINDOWS EXE FAILED" }
+          $exe = (Resolve-Path "dist/LizhiGridCraftAgent_v052_AutoReconnect.exe").Path
+          $proc = Start-Process -FilePath $exe -ArgumentList "--self-test" -Wait -PassThru
+          if ($proc.ExitCode -ne 0) { throw "PACKAGED SELF TEST FAILED" }
+          (Get-FileHash $exe -Algorithm SHA256).Hash.ToLowerInvariant() | Out-File -Encoding ascii dist/SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GridCraft-Windows-v052-AutoReconnect-candidate
+          path: |
+            dist/LizhiGridCraftAgent_v052_AutoReconnect.exe
+            dist/SHA256.txt
+          retention-days: 14
+          if-no-files-found: error
