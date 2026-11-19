@@ -217,7 +217,7 @@ export function mount(host) {
   const timer = setInterval(() => {
     if (!host.isConnected) { clearInterval(timer); return; }
     const focused = root.contains(document.activeElement) &&
-      /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+      document.activeElement.matches('textarea,select,input:not([type="checkbox"]):not([type="radio"])');
     if (document.visibilityState === 'visible' && !state.newKey && !focused)
       void load({quiet:true});
   }, 60000);
