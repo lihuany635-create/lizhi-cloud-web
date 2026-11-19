@@ -85,9 +85,14 @@
      const result=await request("read","finance_goals_month_report",{month});
      return reportFromPayload(month,result.result);
    }
-   async function invoke(_tool,_args){
-     // A browser confirm() and JWT possession are not human presence.
-     fail("GOALS_HUMAN_APPROVAL_NOT_CONFIGURED");
+   async function invoke(tool,args){
+     // The server checks live first-party owner identity, allowlist and
+     // write feature flag. Each call uses its stable request_id for dedupe.
+     // Never present a planning record as a real transfer or bank payment.
+     const result=await request("write",tool,args);
+     if(result?.result?.committed!==true||
+        result.result.actualTransfer!==false)fail("GOALS_RECEIPT_INVALID");
+     return result.result;
    }
    return Object.freeze({readMonth,invoke,verified});
  }
