@@ -207,5 +207,38 @@ begin
    where x->>'id'='99999999-2222-4222-8222-999999999999') then
    raise exception 'P5_SOFT_REMOVED_IN_MONTH_REPORT';end if;
 end $$;
+-- F-07: a declared target is an upper bound, and lowering the target
+-- beneath previously confirmed reserves must fail at the database layer.
+do $reserve$
+declare owner uuid:='11111111-1111-4111-8111-111111111111';
+declare goal uuid:='66666666-6666-4666-8666-666666666666';
+declare result jsonb;
+begin
+ result:=public.lizhi_finance_p5_goal_set(owner,'2026-12',goal,
+   '66666666-1111-4111-8111-666666666666',0,
+   'create','savings',1000,null,null,null,null,null);
+ if result->>'status'<>'created' then
+   raise exception 'P5_TEST_GOAL_CREATE_FAILED';end if;
+ begin
+   perform public.lizhi_finance_p5_allocation_set(owner,'2026-12',goal,
+     '66666666-2222-4222-8222-666666666666','allocate',5000000,
+     'over-reserve-5-million',true);
+   raise exception 'P5_OVER_RESERVE_ALLOWED';
+ exception when check_violation then null;
+ end;
+ result:=public.lizhi_finance_p5_allocation_set(owner,'2026-12',goal,
+   '66666666-3333-4333-8333-666666666666','allocate',1000,
+   'reserve-exactly-at-target',true);
+ if result->>'status'<>'recorded' then
+   raise exception 'P5_EXACT_RESERVE_REJECTED';end if;
+ begin
+   perform public.lizhi_finance_p5_goal_set(owner,'2026-12',goal,
+     '66666666-4444-4444-8444-666666666666',1,
+     'update','savings',999,null,null,null,null,null);
+   raise exception 'P5_GOAL_LOWERED_BELOW_RESERVE';
+ exception when check_violation then null;
+ end;
+end $reserve$;
+
 reset role;
 select 'P5_ISOLATED_SQL_PASS' as result;
