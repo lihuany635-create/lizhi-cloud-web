@@ -141,7 +141,7 @@ class HTTPSDeviceTransport:
             NoRedirect(),
         )
 
-    def _post(self, action: str, payload: dict):
+    def _post(self, action: str, payload: dict, *, timeout: float = 7):
         if action not in ("heartbeat", "poll", "complete"):
             raise UnsafeJob("METHOD_DENIED")
         body = json.dumps({"deviceId": self.device_id, **payload}, ensure_ascii=False,
@@ -156,15 +156,18 @@ class HTTPSDeviceTransport:
                      "Cache-Control": "no-store"},
         )
         try:
-            with self._opener.open(request, timeout=7) as r:
+            with self._opener.open(request, timeout=timeout) as r:
                 if r.status != 200:
                     raise UnsafeJob("BACKEND_UNAVAILABLE")
                 raw = r.read(RESPONSE_LIMIT + 1)
                 if len(raw) > RESPONSE_LIMIT:
                     raise UnsafeJob("RESULT_LIMIT")
-        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, OSError) as exc:
-            # Deliberately omit original exception, which might include internal URLs.
-            raise UnsafeJob("BACKEND_UNAVAILABLE") from None
+        except urllib.error.HTTPError as exc:
+            # Return only status and Retry-After; never expose URL, token or body.
+            retry = parse_retry_after(exc.headers.get("Retry-After") if exc.headers else None)
+            raise RelayTransportError("BACKEND_UNAVAILABLE", exc.code, retry) from None
+        except (urllib.error.URLError, TimeoutError, OSError):
+            raise RelayTransportError("BACKEND_UNAVAILABLE") from None
         try:
             response = json.loads(raw)
         except (ValueError, UnicodeDecodeError):
@@ -176,8 +179,17 @@ class HTTPSDeviceTransport:
     def heartbeat(self, status: str):
         return self._post("heartbeat", {"status": status})
 
-    def poll(self):
-        return self._post("poll", {})
+    def poll(self, status="READY"):
+        if status not in ("READY","GRIDCRAFT_OFFLINE","UNAUTHORIZED","CONTROL_ERROR"):
+            raise UnsafeJob("INVALID_STATUS")
+        reply = self._post("poll", {"status":status},
+                           timeout=30 if self.long_poll else 7)
+        # Existing Edge v6 ignores status and returns no opt-in flags.
+        if reply.get("heartbeatMerged") is True:
+            self.heartbeat_merged = True
+        if reply.get("longPoll") is True:
+            self.long_poll = True
+        return reply
 
     def complete(self, request_id: str, result: dict):
         return self._post("complete", {"id": request_id, "result": bounded_reply(result)})
@@ -201,10 +213,15 @@ class OutboundWorker:
         status = self.local.status().get("status", "CONTROL_ERROR")
         if status not in ("READY", "GRIDCRAFT_OFFLINE", "UNAUTHORIZED", "CONTROL_ERROR"):
             status = "CONTROL_ERROR"
-        self.transport.heartbeat(status)
+        if not getattr(self.transport, "heartbeat_merged", False):
+            self.transport.heartbeat(status)
         if status != "READY":
             return {"status":status,"executed":False}
-        received = self.transport.poll()
+        try:
+            received = self.transport.poll(status=status)
+        except TypeError:
+            # Compatibility with the already-tested synthetic transport API.
+            received = self.transport.poll()
         job = received.get("job")
         if not job:
             return {"status":"IDLE","executed":False}
@@ -224,7 +241,9 @@ class OutboundWorker:
         response = self.transport.complete(req, bounded_reply(result))
         if response.get("accepted") is not True:
             raise UnsafeJob("COMPLETION_NOT_ACKNOWLEDGED")
-        return {"status":"DONE","executed":True,"requestId":req}
+        code = result.get("status") or result.get("error") or ("OK" if result.get("ok") else "UNKNOWN")
+        return {"status":"DONE","executed":True,"requestId":req,
+                "resultCode":str(code)[:48], "backupId":str(result.get("backup_id",""))[:100]}
 
     def execute_job(self, job):
         if not isinstance(job, dict) or job.get("name") not in READ_TOOLS | P4_TOOLS:
