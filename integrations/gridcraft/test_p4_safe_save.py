@@ -112,13 +112,33 @@ class P4SafeSaveTests(unittest.TestCase):
         self.assertEqual(self.p4.saved_backups,1)
         self.assertEqual(self.writer.status(r['request_id'],verify_disk=True)['disk_verification'],'MATCH')
 
-    def test_fresh_writer_reconciles_disk_without_doc_id(self):
+    def test_fresh_writer_does_not_leak_receipt_while_doc_offline(self):
         r=self.commit(self.prepare(),uid())
         self.p4.local.online=False
         other=P4SafeSaveWriter(self.p4)
         reply=other.status(r['request_id'],verify_disk=True)
+        self.assertFalse(reply['ok'])
+        self.assertEqual(reply['error'],'RECEIPT_IDENTITY_NOT_VERIFIED')
+        self.assertNotIn('file_name',reply)
+
+    def test_fresh_writer_reconciles_same_live_workbook(self):
+        r=self.commit(self.prepare(),uid())
+        other=P4SafeSaveWriter(self.p4)
+        reply=other.status(r['request_id'],verify_disk=True)
+        self.assertTrue(reply['ok'])
         self.assertEqual(reply['disk_verification'],'MATCH')
         self.assertFalse(reply['source_document_saved'])
+
+    def test_uid_reused_for_new_workbook_cannot_read_old_receipt(self):
+        r=self.commit(self.prepare(),uid())
+        # The new workbook happens to have the same document UID, but its
+        # contents are unrelated. A fresh session cannot trust that UID alone.
+        self.p4.local.data=b'OTHER_WORKBOOK'
+        other=P4SafeSaveWriter(self.p4)
+        reply=other.status(r['request_id'],verify_disk=True)
+        self.assertFalse(reply['ok'])
+        self.assertEqual(reply['error'],'RECEIPT_IDENTITY_NOT_VERIFIED')
+        self.assertNotIn('file_name',reply)
 
     def test_no_overwrite_existing(self):
         path=self.writer.root/'留存副本.xlsx';path.write_bytes(b'KEEP_ME')
