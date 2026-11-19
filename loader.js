@@ -57,9 +57,9 @@
   "./finance/budget/budget-sync.js?v=1",
   "./finance/budget/budget-ui.js?v=3",
   "./finance/goals/p3-goals-ui.js?v=1",
-  "./finance/goals/p5-goals-ui.js?v=1",
+  "./finance/goals/p5-goals-ui.js?v=2",
   "./finance/goals/p6-browser-client.js?v=1",
-  "./finance/pages/home.js?v=72"
+  "./finance/pages/home.js?v=73"
  ],
  "knowledge": [
   "./knowledge/domain/knowledge-model.js?v=16",
