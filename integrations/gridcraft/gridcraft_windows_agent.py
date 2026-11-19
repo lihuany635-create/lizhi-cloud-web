@@ -1,12 +1,16 @@
-"""立之 GridCraft Windows 本機代理 v0.4 — 已配對自動回連、已儲存檔案自動授權。
-This program opens NO network listener, touches only 127.0.0.1, and does
-not expose GridCraft's local control token in user-visible output.
+"""GridCraft Windows v0.5.3 owner-paired local agent.
+
+One-click startup and read/write access to all *currently open* GridCraft
+workbooks remain automatic. The local P4 writer always creates an XLSX backup,
+checks version and verifies readback. Only outbound HTTPS is used.
 """
 from __future__ import annotations
 
 import argparse
 import csv
 import hashlib
+import logging
+from logging.handlers import RotatingFileHandler
 import json
 import os
 import re
@@ -20,7 +24,9 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 
 from gridcraft_desktop_local import GridCraftLocal
-from gridcraft_outbound_worker import HTTPSDeviceTransport, OutboundWorker
+from gridcraft_outbound_worker import (HTTPSDeviceTransport, OutboundWorker,
+                                      reconnect_delay, poll_delay, RelayTransportError)
+import gridcraft_win_lifecycle as lifecycle
 from gridcraft_p4_safe_write import P4SafeWriter
 from gridcraft_p4_desktop import P4Local
 from gridcraft_pairing_client import DeviceStore, PairingError, pair_one_time
@@ -31,10 +37,50 @@ except ImportError:  # development tests can run outside Windows
     winreg = None
 
 APP_TITLE = "立之 GridCraft 連線代理"
+AGENT_VERSION = "0.5.3"
+_logger = logging.getLogger("lizhi-gridcraft")
 AUTOSTART_NAME = "LizhiGridCraftAgent"
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 APP_EXE_NAME = "LizhiGridCraftAgent.exe"
 MAX_PATH = 1024
+
+def init_agent_log():
+    """Fixed, local-only, privacy-preserving 1MB x 3 rotating journal."""
+    location = app_directory() / "agent.log"
+    location.parent.mkdir(parents=True, exist_ok=True)
+    if not _logger.handlers:
+        handler = RotatingFileHandler(location, maxBytes=1024*1024,
+                                      backupCount=3, encoding="utf-8")
+        handler.setFormatter(logging.Formatter(
+            "%(asctime)s %(levelname)s %(message)s"))
+        _logger.addHandler(handler)
+    _logger.setLevel(logging.INFO)
+    _logger.propagate = False
+    return _logger
+
+
+def safe_error_code(exc):
+    """Never propagate paths, URLs or credentials into persistent log text."""
+    code = str(exc)
+    return code[:64] if re.fullmatch(r"[A-Z][A-Z0-9_]{1,63}", code) else type(exc).__name__.upper()[:40]
+
+
+def correct_startup_target():
+    """Repair an EXISTING HKCU Run entry, never enable autostart silently."""
+    if winreg is None:
+        return False
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY, 0,
+                            winreg.KEY_QUERY_VALUE | winreg.KEY_SET_VALUE) as key:
+            current, _ = winreg.QueryValueEx(key, AUTOSTART_NAME)
+            intended = f'"{installed_executable()}" --minimized'
+            if current != intended:
+                winreg.SetValueEx(key, AUTOSTART_NAME, 0, winreg.REG_SZ,
+                                  intended)
+            return True
+    except (OSError, PermissionError, FileNotFoundError):
+        return False
+
 LAUNCH_MAX_ATTEMPTS = 3
 LAUNCH_MAX_POLLS = 18
 LAUNCH_POLL_MS = 2000
@@ -73,6 +119,7 @@ def load_settings(path: Path | None = None) -> dict:
             "gridcraft_path": str(result.get("gridcraft_path") or "")[:MAX_PATH],
             "start_gridcraft_on_login": result.get("start_gridcraft_on_login") is True,
             "remote_enabled": result.get("remote_enabled") is True,
+            "agent_version": str(result.get("agent_version") or "")[:20],
             "auto_allow_p4": result.get("auto_allow_p4") is True,
             "remembered_workbooks": list(dict.fromkeys(x for x in result.get("remembered_workbooks", [])[:20] if isinstance(x, str) and re.fullmatch(r"[0-9a-f]{64}", x))) if isinstance(result.get("remembered_workbooks"), list) else [],
         }
@@ -87,6 +134,7 @@ def save_settings(settings: dict, path: Path | None = None) -> None:
         "gridcraft_path": str(settings.get("gridcraft_path") or "")[:MAX_PATH],
         "start_gridcraft_on_login": settings.get("start_gridcraft_on_login") is True,
         "remote_enabled": settings.get("remote_enabled") is True,
+        "agent_version": str(settings.get("agent_version") or AGENT_VERSION)[:20],
         "auto_allow_p4": settings.get("auto_allow_p4") is True,
         "remembered_workbooks": list(dict.fromkeys(x for x in settings.get("remembered_workbooks", [])[:20] if isinstance(x, str) and re.fullmatch(r"[0-9a-f]{64}", x))) if isinstance(settings.get("remembered_workbooks"), list) else [],
     }
