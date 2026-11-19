@@ -824,8 +824,11 @@ class AgentUI:
                     self._remote_transition("CONNECTED")
                     self.remote_status = "伺服器已回應（Cloud MCP 狀態需另行查核）"
                     quiet_for = (now-last_job_at) if last_job_at is not None else None
+                    # Long-poll responses when GridCraft is offline are
+                    # immediate; avoid a zero-delay request storm.
+                    long_wait = transport.long_poll and outcome.get("status") in ("IDLE","DONE")
                     delay = poll_delay(quiet_for,since_start=now-started_at,
-                                       long_poll=transport.long_poll)
+                                       long_poll=long_wait)
                 except Exception as exc:
                     failures += 1
                     retry_after = getattr(exc, "retry_after", None)
