@@ -6,6 +6,7 @@ New server optimizations are optional; the active v6 relay remains supported.
 """
 from __future__ import annotations
 
+import inspect
 import json
 import random
 from datetime import datetime, timezone
@@ -210,6 +211,13 @@ class OutboundWorker:
         self.p4_writer = p4_writer
         self.p4_enabled = p4_enabled
         self.grant_checker = grant_checker
+        # Detect compatibility once. An internal TypeError must not lead to
+        # an accidental SECOND server poll / duplicate claimed job.
+        try:
+            self._poll_accepts_status = "status" in inspect.signature(
+                self.transport.poll).parameters
+        except (TypeError, ValueError):
+            self._poll_accepts_status = False
 
     def run_once(self):
         status = self.local.status().get("status", "CONTROL_ERROR")
@@ -219,11 +227,8 @@ class OutboundWorker:
             self.transport.heartbeat(status)
         if status != "READY":
             return {"status":status,"executed":False}
-        try:
-            received = self.transport.poll(status=status)
-        except TypeError:
-            # Compatibility with the already-tested synthetic transport API.
-            received = self.transport.poll()
+        received = (self.transport.poll(status=status) if self._poll_accepts_status
+                    else self.transport.poll())
         job = received.get("job")
         if not job:
             return {"status":"IDLE","executed":False}
