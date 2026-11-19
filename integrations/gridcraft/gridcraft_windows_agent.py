@@ -5,6 +5,7 @@ not expose GridCraft's local control token in user-visible output.
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import os
@@ -14,6 +15,7 @@ import shutil
 import subprocess
 import sys
 import threading
+import time
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 
@@ -36,6 +38,8 @@ MAX_PATH = 1024
 LAUNCH_MAX_ATTEMPTS = 3
 LAUNCH_MAX_POLLS = 18
 LAUNCH_POLL_MS = 2000
+RECONNECT_MISSED_POLLS = 2
+RECONNECT_COOLDOWN_SECONDS = 60
 
 
 def app_directory() -> Path:
@@ -180,6 +184,29 @@ def locate_gridcraft_exe(saved_path: str = "") -> Path | None:
     return None
 
 
+def gridcraft_process_running() -> bool | None:
+    """Check Windows process presence before starting another GUI instance.
+
+    True means at least one GridCraft.exe is running (possibly without --control).
+    None means process inspection failed, so fail closed and DO NOT spawn a
+    duplicate that could confuse workbooks or cause unsaved changes.
+    """
+    if os.name != "nt":
+        return None
+    try:
+        result = subprocess.run(
+            ["tasklist.exe", "/FI", "IMAGENAME eq gridcraft.exe", "/FO", "CSV", "/NH"],
+            shell=False, capture_output=True, text=True, errors="replace",
+            timeout=4, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+        if result.returncode != 0:
+            return None
+        return any(row and row[0].strip().casefold() == "gridcraft.exe"
+                   for row in csv.reader(result.stdout.splitlines()))
+    except (OSError, ValueError, subprocess.TimeoutExpired, csv.Error):
+        return None
+
+
 def start_gridcraft(path: str | Path):
     selected = safe_gridcraft_exe(path)
     # Only locally user-selected GridCraft.exe, no shell/cmd/synthetic remote args.
@@ -208,7 +235,7 @@ def diagnostic() -> int:
 class AgentUI:
     def __init__(self, root: tk.Tk, minimized: bool = False):
         self.root = root
-        self.root.title(APP_TITLE + "｜v0.5.1 一鍵連線修正版")
+        self.root.title(APP_TITLE + "｜v0.5.2 換檔自動重連候選")
         self.root.geometry("490x275")
         self.root.minsize(440, 260)
         self.root.protocol("WM_DELETE_WINDOW", self.stop)
@@ -240,6 +267,12 @@ class AgentUI:
         self.launch_polls = 0
         self.launch_active = False
         self.launch_error = ""
+        self._offline_streak = 0
+        self._last_ready = False
+        self._reconnect_after = 0.0
+        self._last_workbook_signature = None
+        self._grant_lock = threading.RLock()
+        self._p4_writer = None
         self._create_widgets()
         self.refresh()
         if minimized:
@@ -256,7 +289,7 @@ class AgentUI:
         frm = ttk.Frame(self.root, padding=16)
         frm.pack(fill="both", expand=True)
         ttk.Label(frm, text="立之 GridCraft", font=("Microsoft JhengHei UI", 17, "bold")).pack(anchor="w")
-        ttk.Label(frm, text="開啟代理自動啟動 GridCraft 並連線｜v0.5.1",
+        ttk.Label(frm, text="GridCraft 斷線自動恢復／換檔自動辨識｜v0.5.2",
                   foreground="#5b6472").pack(anchor="w", pady=(3, 12))
         ttk.Label(frm, textvariable=self.status_var,
                   font=("Microsoft JhengHei UI", 12, "bold")).pack(anchor="w")
@@ -331,8 +364,10 @@ class AgentUI:
             status = "CONTROL_ERROR"
         if status == "READY":
             self.launch_active = False
-            self.launch_process = None
+            # Keep the owned process handle: if its control listener later drops,
+            # we can distinguish a still-running GUI from an exited instance.
             self.launch_error = ""
+            self._reconnect_after = 0.0
             self.refresh()
             return
         if status == "UNAUTHORIZED":
@@ -361,6 +396,16 @@ class AgentUI:
                 if not child_running:
                     self.launch_error = "主程式提前結束，代碼 " + str(exit_code)[:12]
             if not child_running and self.launch_attempts < LAUNCH_MAX_ATTEMPTS:
+                running_elsewhere = gridcraft_process_running()
+                if running_elsewhere is not False:
+                    self.launch_active = False
+                    self.launch_error = (
+                        "已有 GridCraft 視窗，但控制埠未啟動；請從代理啟動主程式"
+                        if running_elsewhere else
+                        "無法安全確認 GridCraft 行程狀態，已停止自動開第二份"
+                    )
+                    self.status_var.set(self.launch_error)
+                    return
                 executable = locate_gridcraft_exe(self.path_var.get())
                 if executable is None:
                     self.launch_active = False
@@ -444,13 +489,45 @@ class AgentUI:
             self.paired and self.allowed_docs and not self.remote_stop.is_set()
         )
         self.info_var.set("ChatGPT 遠端 MCP：" + self.remote_status)
+        return status
+
+    def _invalidate_pending_write(self):
+        """Invalidates any preview tied to the previous process/workbook."""
+        writer = getattr(self, "_p4_writer", None)
+        if writer is not None:
+            writer.invalidate_previews()
 
     def _poll(self):
-        if self.running:
-            try:
-                self.refresh()
-            finally:
-                self.root.after(4500, self._poll)
+        """Monitor GridCraft for entire agent lifetime, not only at login."""
+        if not self.running:
+            return
+        try:
+            status = self.refresh()
+            if status == "READY":
+                self._last_ready = True
+                self._offline_streak = 0
+                self._reconnect_after = 0.0
+            elif status == "GRIDCRAFT_OFFLINE":
+                if self._last_ready:
+                    self._invalidate_pending_write()
+                    self._last_ready = False
+                self._offline_streak += 1
+                if (self._offline_streak >= RECONNECT_MISSED_POLLS
+                        and not self.launch_active
+                        and not self.remote_stop.is_set()
+                        and time.monotonic() >= self._reconnect_after):
+                    # Retries are bounded and rate-limited if GridCraft keeps
+                    # shutting down. Never auto-launch on explicit Stop.
+                    self._reconnect_after = time.monotonic() + RECONNECT_COOLDOWN_SECONDS
+                    self.launch_on_login()
+            else:
+                # Unauthorized control is a security issue, not permission to
+                # run more processes or automatically repair credentials.
+                self._offline_streak = 0
+                if status != "CONTROL_ERROR":
+                    self._last_ready = False
+        finally:
+            self.root.after(4500, self._poll)
 
 
     def pair_remote(self):
@@ -538,8 +615,12 @@ class AgentUI:
             try:
                 windows = GridCraftLocal(port=7979, timeout=1.2).windows()
             except Exception:
-                self.allowed_docs = set()
-                self.p4_write_enabled = False
+                with getattr(self, "_grant_lock", threading.RLock()):
+                    if getattr(self, "_last_workbook_signature", None):
+                        self._invalidate_pending_write()
+                    self._last_workbook_signature = None
+                    self.allowed_docs = set()
+                    self.p4_write_enabled = False
                 return set()
         valid = set()
         for w in windows[:20]:
@@ -549,9 +630,18 @@ class AgentUI:
             if isinstance(doc, str) and re.fullmatch(r"[1-9][0-9]{0,19}", doc):
                 if 1 <= int(doc) <= (1 << 64) - 1:
                     valid.add(doc)
-        self.allowed_docs = valid
-        self.p4_write_enabled = bool(self.paired and valid and
-                                     not self.remote_stop.is_set())
+        signature = frozenset(
+            (w.get("doc"), w.get("title"))
+            for w in windows[:20] if isinstance(w, dict) and w.get("doc") in valid
+        )
+        with getattr(self, "_grant_lock", threading.RLock()):
+            previous = getattr(self, "_last_workbook_signature", None)
+            if previous is not None and previous != signature:
+                self._invalidate_pending_write()
+            self._last_workbook_signature = signature
+            self.allowed_docs = valid
+            self.p4_write_enabled = bool(self.paired and valid and
+                                         not self.remote_stop.is_set())
         return valid
 
     def change_auto_p4(self):
@@ -602,6 +692,7 @@ class AgentUI:
                 local=P4Local(port=7979, timeout=3),
                 backup_folder=app_directory() / "P4Backups",
                 approved_docs=self.allowed_docs)
+            self._p4_writer = p4_writer
             worker = OutboundWorker(
                 transport=transport, local=GridCraftLocal(port=7979, timeout=2),
                 approved_docs=self.allowed_docs,
@@ -618,6 +709,8 @@ class AgentUI:
                 self.remote_stop.wait(6)
         except Exception:
             self.remote_status = "無法啟動安全出站連線"
+        finally:
+            self._p4_writer = None
 
     def start_remote(self):
         if not self.paired:
@@ -630,6 +723,9 @@ class AgentUI:
         save_settings(self.settings)
         self.remote_thread = threading.Thread(target=self._remote_loop, daemon=True)
         self.remote_thread.start()
+        # A manual reconnect also retries local control only if needed.
+        if self.running and not self.launch_active:
+            self.root.after(300, self.launch_on_login)
 
     def stop_remote(self):
         self.launch_active = False
