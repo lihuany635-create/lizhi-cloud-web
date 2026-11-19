@@ -31,3 +31,15 @@ Original candidate branch: `feat/gridcraft-v054-p4-safe-save-20261119`. P3 alrea
 P4 status on a **fresh** agent session must not trust a recycled GridCraft numeric workbook UID. Before returning the previous receipt's filename or disk-match status, the newly connected agent verifies current per-document grant and the original source snapshot SHA-256. If the prior workbook is closed, the agent is offline, or the UID now refers to a different workbook, status returns only `RECEIPT_IDENTITY_NOT_VERIFIED` and does not reveal the filename. This is intentionally more restrictive than the earlier offline-restart receipt lookup. It does not prevent a same-byte clone of a workbook from matching, and is not a substitute for a stable cryptographic workbook identity. Windows GUI/native app close/reopen and cross-account revocation still require a real device.
 
 Two tests added: same-session restart rebind with matching open workbook and recycled UID to different workbook; original offline-after-restart test changed to fail closed. P4 isolated tests now 28/28 PASS locally; GitHub Windows/Linux CI is required before accepting the change.
+
+## Optional local native GridCraft parser probe (prepared; **not yet executed against a real CLI**)
+
+`gridcraft_p4_native_read_probe.py` uses the official **GridCraft CLI v0.19.1** via strict read-only `version`, `info --json` and `check --json --max-report 0` commands, with no shell, bounded output, timeouts, and local-only file/binary parameters. It requires an already-exported P4 copy in the agent-controlled folder. A matching CLI `check` exits 0 and is labeled `NATIVE_CLI_ROUNDTRIP_PASS`; any differences are **not** falsely marked success. No worksheet contents, absolute file paths, or raw command outputs are logged. It cannot modify or close an open GridCraft GUI document, and is not exposed as a remote MCP. Testing with mocked CLI responses is **not actual native GridCraft verification**. The CLI binary must be independently installed and the target copy authorized before a real-device run.
+
+Example, to be run on the user's approved Windows test workstation only:
+
+```powershell
+python integrations/gridcraft/gridcraft_p4_native_read_probe.py --export-folder "$env:LOCALAPPDATA\Lizhi\GridCraftAgent\P4SafeExports" --file-name "測試副本.xlsx" --cli-bin "C:\Path\To\gridcraft-cli.exe"
+```
+
+`test_p4_native_read_probe.py`: synthetic-only command isolation, invalid-path, native-version, timeout and nonzero-`check` tests; all 8 pass locally. No real CLI, GUI close/open, or source workbook write was performed.
