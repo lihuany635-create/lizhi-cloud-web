@@ -17,8 +17,7 @@ const goal=(x={})=>({month:"2026-12",goal_id:GOAL,request_id:REQUEST,
 const fund=(x={})=>goal({kind:"sinking_fund",target_amount:7000,
   purpose:"rent",cadence_months:3,due_amount:null,due_month:null,...x});
 const alloc=(x={})=>({month:"2026-12",goal_id:GOAL,request_id:REQUEST,
-  action:"allocate",amount:3000,source_reference:"2026-12-salary-slice-1",
-  confirmed_by_user:true,...x});
+  action:"allocate",amount:3000,source_reference:"2026-12-salary-slice-1",...x});
 const db=(data)=>({calls:[],from(){return this},async rpc(proc,args){this.calls.push({proc,args});return {data,error:null}}});
 const receipt=(status="created")=>({month:"2026-12",source:"finance_goals_cloud_snapshot",
   goal_id:GOAL,request_id:REQUEST,status,version:1,committed:true,actual_transfer:false});
@@ -53,8 +52,9 @@ test("P5-05 ordinary savings cannot carry reserve-specific properties",()=>{
  assert.equal(validateGoalsP5("finance_goals_goal_set",goal({account_id:""})).ok,false);
  assert.equal(validateGoalsP5("finance_goals_goal_set",goal({owner_id:OTHER})).ok,false);
 });
-test("P5-06 only explicitly confirmed allocation is accepted",()=>{
+test("P5-06 allocation uses owner authentication, no spoofable confirmation field",()=>{
  assert.equal(validateGoalsP5("finance_goals_allocation_set",alloc()).ok,true);
+ assert.equal(GOALS_P5_TOOLS.find(x=>x.name==="finance_goals_allocation_set").inputSchema.required.includes("confirmed_by_user"),false);
  assert.equal(validateGoalsP5("finance_goals_allocation_set",alloc({confirmed_by_user:false})).ok,false);
  assert.equal(validateGoalsP5("finance_goals_allocation_set",alloc({amount:0})).ok,false);
  assert.equal(validateGoalsP5("finance_goals_allocation_set",alloc({source_reference:"  "})).ok,false);
