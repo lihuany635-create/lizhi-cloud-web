@@ -25,3 +25,9 @@ This P4 candidate adds a **non-overwriting XLSX export copy** from the memory-re
 The tests use a small synthetic XLSX generated in memory. Never commit/upload user attendance workbook or personal cell data to public GitHub.
 
 Original candidate branch: `feat/gridcraft-v054-p4-safe-save-20261119`. P3 already merged to `feat/gridcraft-v053-windows-reliability-20261119` via PR #108 on `ba2bcf4b56939b3aa6d73ddbd70dbf1080c45b03`.
+
+## 2026-11-19 receipt identity hardening
+
+P4 status on a **fresh** agent session must not trust a recycled GridCraft numeric workbook UID. Before returning the previous receipt's filename or disk-match status, the newly connected agent verifies current per-document grant and the original source snapshot SHA-256. If the prior workbook is closed, the agent is offline, or the UID now refers to a different workbook, status returns only `RECEIPT_IDENTITY_NOT_VERIFIED` and does not reveal the filename. This is intentionally more restrictive than the earlier offline-restart receipt lookup. It does not prevent a same-byte clone of a workbook from matching, and is not a substitute for a stable cryptographic workbook identity. Windows GUI/native app close/reopen and cross-account revocation still require a real device.
+
+Two tests added: same-session restart rebind with matching open workbook and recycled UID to different workbook; original offline-after-restart test changed to fail closed. P4 isolated tests now 28/28 PASS locally; GitHub Windows/Linux CI is required before accepting the change.
