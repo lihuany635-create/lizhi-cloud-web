@@ -27,6 +27,12 @@ class Process:
     def poll(self): return self.exit_code
 
 class StartupTests(unittest.TestCase):
+    def setUp(self):
+        # Synthetic CI must never change the runner's real saved agent settings.
+        patch=mock.patch.object(agent,"save_settings")
+        patch.start()
+        self.addCleanup(patch.stop)
+
     def agent(self,path=""):
         ui=agent.AgentUI.__new__(agent.AgentUI)
         ui.root=Root()
