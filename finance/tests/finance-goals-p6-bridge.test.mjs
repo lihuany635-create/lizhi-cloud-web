@@ -36,15 +36,15 @@ function fakeDB(){
 }
 const make=(x={})=>{const db=x.db||fakeDB();return {db,bridge:createGoalsBrowserBridge({
  db,ownerUid:OWNER,secret:SECRET,origins:[ORIGIN],
- verifyUser:async jwt=>jwt==="valid-owner-access-token"?{id:OWNER}:null,
+ verifyUser:async jwt=>jwt==="valid-owner-access-token"?{id:OWNER,firstParty:true,allowlisted:true}:null,
  clock:()=>1_800_000_000_000,...x
  })}};
 async function call(bridge,action,tool,args,options){const r=await bridge.handle(
  request(action,tool,args,options));return {status:r.status,data:await r.json(),headers:r.headers};}
 
-test("P6-01 refuses all browser goals endpoints if secret or origins missing",async()=>{
+test("P6-01 refuses browser goals when trusted origins are missing",async()=>{
  const db=fakeDB(),bridge=createGoalsBrowserBridge({
-  db,ownerUid:OWNER,secret:"",origins:[ORIGIN],verifyUser:()=>({id:OWNER})});
+  db,ownerUid:OWNER,origins:[],verifyUser:()=>({id:OWNER,firstParty:true,allowlisted:true})});
  assert.equal(bridge.configured,false);
  const r=await call(bridge,"read","finance_goals_month_report",{month:"2026-12"});
  assert.equal(r.status,503);
@@ -89,61 +89,43 @@ test("P6-05 cannot substitute caller owner or SQL fields in args",async()=>{
 test("P6-06 a browser cannot mutate via a read action",async()=>{
  const {bridge,db}=make();
  const r=await call(bridge,"read","finance_goals_goal_set",base());
- assert.equal(r.status,400);
+ assert.equal(r.status,403);
  assert.equal(db.calls.length,0);
 });
-test("P6-07 write requires a signed prepare/commit challenge plus approval",async()=>{
+test("P6-07 JWT and approved=true cannot create a goals write",async()=>{
  const {bridge,db}=make();
- const prepared=await call(bridge,"prepare","finance_goals_goal_set",base());
- assert.equal(prepared.status,200);
- assert.equal(prepared.data.requiresExplicitConfirmation,true);
- assert.equal(db.calls.length,0);
- const noApproval=await call(bridge,"commit","finance_goals_goal_set",base(),
-  {extra:{proof:prepared.data.proof,approved:false}});
- assert.equal(noApproval.status,403);
- assert.equal(db.calls.length,0);
- const done=await call(bridge,"commit","finance_goals_goal_set",base(),
-  {extra:{proof:prepared.data.proof,approved:true}});
- assert.equal(done.status,200);
- assert.equal(done.data.result.committed,true);
- assert.equal(done.data.result.actualTransfer,false);
- assert.equal(db.calls.length,1);
- assert.doesNotMatch(JSON.stringify(done.data),/privateToken|NEVER_RETURN/);
+ for(const action of ["prepare","commit"]){
+   const r=await call(bridge,action,"finance_goals_goal_set",base(),
+     {extra:{approved:true,proof:"fake-human-presence"}});
+   assert.equal(r.status,403);
+   assert.equal(r.data.code,"GOALS_HUMAN_APPROVAL_NOT_CONFIGURED");
+   assert.equal(db.calls.length,0);
+ }
 });
-test("P6-08 a proof is cryptographically bound to the exact amount and version",async()=>{
+test("P6-08 do not issue a reusable consent proof without a verifier",async()=>{
  const {bridge,db}=make();
- const prepared=await call(bridge,"prepare","finance_goals_goal_set",base());
- const r=await call(bridge,"commit","finance_goals_goal_set",base({target_amount:5001}),
-  {extra:{proof:prepared.data.proof,approved:true}});
+ const r=await call(bridge,"prepare","finance_goals_goal_set",base());
  assert.equal(r.status,403);
+ assert.equal(Object.hasOwn(r.data,"proof"),false);
  assert.equal(db.calls.length,0);
 });
-test("P6-09 a changed request_id cannot reuse a previous approval",async()=>{
- const {bridge}=make();
- const prepared=await call(bridge,"prepare","finance_goals_goal_set",base());
- const r=await call(bridge,"commit","finance_goals_goal_set",
-  base({request_id:"cccccccc-cccc-4ccc-8ccc-cccccccccccc"}),
-  {extra:{proof:prepared.data.proof,approved:true}});
+test("P6-09 current first-party session must be verified independently of owner id",async()=>{
+ const x=make({verifyUser:async()=>({id:OWNER,firstParty:false,allowlisted:true})});
+ const r=await call(x.bridge,"read","finance_goals_month_report",{month:"2026-12"});
  assert.equal(r.status,403);
+ assert.equal(x.db.calls.length,0);
 });
-test("P6-10 stale approval proof is rejected after three minutes",async()=>{
- let now=1_800_000_000_000;
- const {bridge,db}=make({clock:()=>now});
- const prepared=await call(bridge,"prepare","finance_goals_goal_set",base());
- now+=180001;
- const r=await call(bridge,"commit","finance_goals_goal_set",base(),
-  {extra:{proof:prepared.data.proof,approved:true}});
+test("P6-10 allowlist revocation must reject even a valid owner session",async()=>{
+ const x=make({verifyUser:async()=>({id:OWNER,firstParty:true,allowlisted:false})});
+ const r=await call(x.bridge,"read","finance_goals_month_report",{month:"2026-12"});
  assert.equal(r.status,403);
- assert.equal(db.calls.length,0);
+ assert.equal(x.db.calls.length,0);
 });
-test("P6-11 forged approval signature and malformed base64 are rejected",async()=>{
- const {bridge,db}=make();
- const prepared=await call(bridge,"prepare","finance_goals_goal_set",base());
- const forged=prepared.data.proof.slice(0,-3)+"bad";
- const r=await call(bridge,"commit","finance_goals_goal_set",base(),
-  {extra:{proof:forged,approved:true}});
- assert.equal(r.status,403);
- assert.equal(db.calls.length,0);
+test("P6-11 browser client cannot invoke mutations without verified human approval",async()=>{
+ const gateway=BrowserClient.create({getAuth:()=>{throw Error("SHOULD_NOT_QUERY_AUTH")},
+   doFetch:async()=>{throw Error("SHOULD_NOT_FETCH")}});
+ await assert.rejects(()=>gateway.invoke("finance_goals_goal_set",base()),
+   {code:"GOALS_HUMAN_APPROVAL_NOT_CONFIGURED"});
 });
 test("P6-12 unknown tool and unrecognised extra JSON fields are denied",async()=>{
  const {bridge}=make();
