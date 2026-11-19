@@ -154,7 +154,7 @@ begin
     end if;
     new.created_at:=clock_timestamp();new.updated_at:=new.created_at;
   else
-    if (old.deleted_at is not null and new.deleted_at is not null) or new.id<>old.id
+    if old.deleted_at is not null or new.id<>old.id
        or new.user_id<>old.user_id or new.month<>old.month
        or new.currency<>old.currency or new.created_at<>old.created_at
     then raise exception 'SALARY_PLAN_SCOPE_IMMUTABLE' using errcode='23514'; end if;
@@ -172,16 +172,12 @@ alter table public.lizhi_finance_sinking_funds enable row level security;
 alter table public.lizhi_finance_salary_plans enable row level security;
 revoke all on public.lizhi_finance_sinking_funds,
   public.lizhi_finance_salary_plans from public,anon,authenticated;
-grant select,insert,update on public.lizhi_finance_sinking_funds,
+-- Clients may read their own plans, but no direct writes can bypass P5 approval.
+grant select on public.lizhi_finance_sinking_funds,
   public.lizhi_finance_salary_plans to authenticated;
 
 create policy p2_fund_read_own on public.lizhi_finance_sinking_funds
   for select to authenticated using(user_id=(select auth.uid()));
-create policy p2_fund_insert_own on public.lizhi_finance_sinking_funds
-  for insert to authenticated with check(user_id=(select auth.uid()));
-create policy p2_fund_update_own on public.lizhi_finance_sinking_funds
-  for update to authenticated using(user_id=(select auth.uid()))
-  with check(user_id=(select auth.uid()));
 create policy p2_fund_allowlist on public.lizhi_finance_sinking_funds
   as restrictive for all to authenticated
   using(public.lizhi_web_is_allowed())
@@ -189,11 +185,6 @@ create policy p2_fund_allowlist on public.lizhi_finance_sinking_funds
 
 create policy p2_salary_read_own on public.lizhi_finance_salary_plans
   for select to authenticated using(user_id=(select auth.uid()));
-create policy p2_salary_insert_own on public.lizhi_finance_salary_plans
-  for insert to authenticated with check(user_id=(select auth.uid()));
-create policy p2_salary_update_own on public.lizhi_finance_salary_plans
-  for update to authenticated using(user_id=(select auth.uid()))
-  with check(user_id=(select auth.uid()));
 create policy p2_salary_allowlist on public.lizhi_finance_salary_plans
   as restrictive for all to authenticated
   using(public.lizhi_web_is_allowed())
