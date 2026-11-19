@@ -131,7 +131,13 @@ function calculate(name,args,b) {
       credit_card:names.get(id(t.creditCardId))||null
     }))};
 }
-/** Dedicated server-to-server Site gateway; never expose the bearer to the browser. */
+/** Dedicated server-to-server Site gateway; never expose the bearer to the browser.
+ * @param {Request} req
+ * @param {{db:any,token:string,ownerUid:string,
+ *  verifyBearer?:(supplied:string,expected:string)=>Promise<boolean>|boolean,
+ *  goalToolsEnabled?:boolean,goalWritesEnabled?:boolean,
+ *  verifyGoalsOwner?:(()=>Promise<boolean>|boolean)|null}} options
+ */
 export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBearer=equal,goalToolsEnabled=false,goalWritesEnabled=false,verifyGoalsOwner=null}) {
   if(req.headers.has("origin"))return json({error:"BROWSER_ORIGIN_NOT_ALLOWED"},403);
   if(req.method!=="POST")return json({error:"POST_ONLY"},405);
