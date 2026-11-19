@@ -18,12 +18,11 @@ export const GOALS_P5_TOOLS=Object.freeze([
     cadence_months:{type:"integer",enum:[3,12]},
     due_amount:{anyOf:[{type:"null"},amt]},due_month:{anyOf:[{type:"null"},month]}
   },["month","goal_id","request_id","expected_version","action"]),annotations:{readOnlyHint:false,idempotentHint:true}},
-  {name:"finance_goals_allocation_set",description:"Append a user-confirmed reservation or release of a uniquely identified source slice. Never creates a bank transfer or securities trade.",inputSchema:schema({
+  {name:"finance_goals_allocation_set",description:"Append an owner-authorized reservation or release of a uniquely identified source slice. No per-action passkey or confirmation flag; never moves real funds.",inputSchema:schema({
     month,goal_id:uuid,request_id:uuid,
     action:{type:"string",enum:["allocate","release"]},
-    amount:pos,source_reference:{type:"string",minLength:1,maxLength:160},
-    confirmed_by_user:{type:"boolean",const:true}
-  },["month","goal_id","request_id","action","amount","source_reference","confirmed_by_user"]),annotations:{readOnlyHint:false,idempotentHint:true}}
+    amount:pos,source_reference:{type:"string",minLength:1,maxLength:160}
+  },["month","goal_id","request_id","action","amount","source_reference"]),annotations:{readOnlyHint:false,idempotentHint:true}}
 ]);
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MONTH=/^20[0-9]{2}-(0[1-9]|1[0-2])$/;
@@ -39,11 +38,11 @@ export function validateGoalsP5(name,input){
      !UUID.test(input.goal_id||"")||!UUID.test(input.request_id||""))
     return error("GOALS_INVALID_ARGS");
   if(name==="finance_goals_allocation_set"){
-    if(!only(input,["month","goal_id","request_id","action","amount","source_reference","confirmed_by_user"])||
+    if(!only(input,["month","goal_id","request_id","action","amount","source_reference"])||
        !["allocate","release"].includes(input.action)||
        !money(input.amount)||input.amount===0||
        typeof input.source_reference!=="string"||!input.source_reference.trim()||
-       input.source_reference.length>160||input.confirmed_by_user!==true)
+       input.source_reference.length>160)
        return error("GOALS_INVALID_ALLOCATION");
     return {ok:true,args:{...input}};
   }
