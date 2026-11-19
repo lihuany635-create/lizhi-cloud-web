@@ -1,15 +1,15 @@
-"""GridCraft P3 outbound *candidate*; NOT enabled in v0.1 or production.
+"""GridCraft v0.5.3 authenticated P3/P4 outbound worker.
 
-The Windows machine never listens to inbound Internet traffic. Every request
-goes OUT via HTTPS to a single fixed existing Supabase project endpoint, only
-after a separately authorized device pairing and the owner's explicit grant
-of selected document IDs. No device credential is included in this repo.
-
-This module is tested with fake relay/local GridCraft; endpoint NOT DEPLOYED.
+The existing private owner-paired Edge is contacted only by outbound HTTPS.
+No new listener, endpoint, or document credential exposure is introduced.
+New server optimizations are optional; the active v6 relay remains supported.
 """
 from __future__ import annotations
 
 import json
+import random
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 import re
 import ssl
 import time
@@ -32,6 +32,58 @@ RESPONSE_LIMIT = 24 * 1024
 
 class UnsafeJob(ValueError):
     pass
+
+
+class RelayTransportError(UnsafeJob):
+    """Safe error code and optional retry metadata; no URL or token."""
+    def __init__(self, code="BACKEND_UNAVAILABLE", status_code=None, retry_after=None):
+        super().__init__(code)
+        self.status_code = status_code
+        self.retry_after = retry_after
+
+
+def parse_retry_after(value, *, now=None):
+    """Retry-After seconds or HTTP-date, max 24 hours."""
+    if value is None:
+        return None
+    try:
+        n = float(value)
+        if 0 <= n <= 86400:
+            return n
+    except (TypeError, ValueError):
+        pass
+    if not isinstance(value, str) or len(value) > 100:
+        return None
+    try:
+        when = parsedate_to_datetime(value)
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=timezone.utc)
+        now = now or datetime.now(timezone.utc)
+        return max(0.0, min(86400.0, (when-now).total_seconds()))
+    except (TypeError, ValueError, OverflowError):
+        return None
+
+
+def reconnect_delay(failures, retry_after=None, *, random_fraction=None):
+    """6, 12, 24, 48, 60s exponential retry with 0–20% jitter."""
+    if retry_after is not None:
+        return max(0.0, float(retry_after))
+    failures = max(1, int(failures))
+    base = min(60, 6 * 2 ** min(failures-1, 4))
+    fraction = random.uniform(0, .2) if random_fraction is None else random_fraction
+    if not 0 <= fraction <= .2:
+        raise ValueError("INVALID_JITTER")
+    return base * (1 + fraction)
+
+
+def poll_delay(since_last_job, *, long_poll=False):
+    if long_poll:
+        return 0.0
+    if since_last_job is not None and since_last_job < 60:
+        return 2.0
+    if since_last_job is None or since_last_job < 600:
+        return 6.0
+    return 20.0
 
 
 def bounded_range(s: str):
@@ -63,7 +115,7 @@ def bounded_reply(data):
 
 class Transport(Protocol):
     def heartbeat(self, status: str) -> dict: ...
-    def poll(self) -> dict: ...
+    def poll(self, status: str = "READY") -> dict: ...
     def complete(self, request_id: str, result: dict) -> dict: ...
 
 
@@ -73,7 +125,7 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 class HTTPSDeviceTransport:
-    """Prepared client for approved existing Edge only (not deployed yet)."""
+    """Existing authenticated owner-paired Edge transport, with fallbacks."""
     def __init__(self, *, device_id: str, device_token: str, endpoint: str = BASE):
         if not DEVICE_ID.fullmatch(device_id) or not TOKEN.fullmatch(device_token):
             raise ValueError("Missing device pairing credentials")
@@ -82,6 +134,8 @@ class HTTPSDeviceTransport:
         self.device_id = device_id
         self._device_token = device_token
         self._endpoint = endpoint
+        self.heartbeat_merged = False
+        self.long_poll = False
         self._opener = urllib.request.build_opener(
             urllib.request.HTTPSHandler(context=ssl.create_default_context()),
             NoRedirect(),
