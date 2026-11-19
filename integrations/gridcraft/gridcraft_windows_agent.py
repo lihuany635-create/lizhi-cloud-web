@@ -583,6 +583,7 @@ class AgentUI:
             return
         try:
             if (self.paired and not getattr(self, "_user_stopped", False)
+                    and hasattr(self, "remote_thread")
                     and not self.remote_stop.is_set()
                     and (self.remote_thread is None or not self.remote_thread.is_alive())):
                 self.start_remote()
