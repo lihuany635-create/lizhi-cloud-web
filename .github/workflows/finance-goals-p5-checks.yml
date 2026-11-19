@@ -68,3 +68,6 @@ jobs:
       - name: Isolated P1-P5 SQL / guard / manual reservation verification
         run: |
           psql -h 127.0.0.1 -U postgres -d finance_goals_p5_disposable -v ON_ERROR_STOP=1 -f finance/goals/verification/p5-isolated-verify.sql
+      - name: Verify empty-only rollback preserves original ledger
+        run: |
+          psql -h 127.0.0.1 -U postgres -d finance_goals_p5_disposable -v ON_ERROR_STOP=1 -f finance/goals/verification/p6-empty-rollback-isolated-verify.sql
