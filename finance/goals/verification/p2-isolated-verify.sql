@@ -169,7 +169,7 @@ begin
 end $$;
 -- Regression for F-05: even the real allowlisted owner cannot write directly.
 set role authenticated;
-do $
+do $$
 begin
   if has_table_privilege('authenticated','public.lizhi_finance_salary_plans','INSERT')
     or has_table_privilege('authenticated','public.lizhi_finance_salary_plans','UPDATE')
@@ -182,7 +182,7 @@ begin
     raise exception 'P2_AUTH_DIRECT_WRITE_NOT_BLOCKED';
   exception when insufficient_privilege then null;
   end;
-end $;
+end $$;
 -- Also verify pure cross-owner RLS independently with only null account IDs.
 do $$
 begin
