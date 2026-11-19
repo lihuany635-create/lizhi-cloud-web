@@ -1,4 +1,4 @@
-const CACHE="lizhi-cloud-v168";
+const CACHE="lizhi-cloud-v169";
 const FILES=[
   "production/ai-workbench.js?v=2",
   // Frontend for the existing protected Supabase usage route.
@@ -48,7 +48,7 @@ const FILES=[
   "image-graph/workspace-ui.mjs?v=28",
   "image-graph/source-manifest.json",
   // END IMAGE GRAPH ASSETS
-  "","index.html","styles.css?v=15","theme.css?v=15","study.css?v=17","chat.css?v=15",
+  "","index.html","styles.css?v=15","theme.css?v=15","study.css?v=18","chat.css?v=15",
   "knowledge-weaving.css?v=20","finance/styles/home.css?v=62","finance/budget/budget-ui.css?v=2","workspace-ui.css?v=35","engineering/engineering.css?v=10","engineering/sync/sync.css?v=1","engineering/modules/supervision/supervision.css?v=1",
   "supabase-config.js?v=2","auth.js?v=9","home-stage/home-stage.css?v=3","home-stage/characters.js?v=4","home-stage/stage.js?v=4","sync.js?v=1","cloud-chat.js?v=18",
   "knowledge-weaving-validator.js?v=20","knowledge-weaving.js?v=20",
