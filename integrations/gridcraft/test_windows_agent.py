@@ -76,10 +76,27 @@ class WindowsAgentTests(TestCase):
                 agent.start_gridcraft(other)
 
     def test_login_start_does_not_duplicate_running_gridcraft(self):
+        """Regression for new bounded startup: READY or unauthorized never spawn."""
+        import threading
         ui = agent.AgentUI.__new__(agent.AgentUI)
         ui.path_var = mock.Mock()
         ui.path_var.get.return_value = r"C:\GridCraft\gridcraft.exe"
-        with mock.patch.object(agent, "GridCraftLocal") as client, mock.patch.object(agent, "start_gridcraft") as start:
+        ui.status_var = mock.Mock()
+        ui.root = mock.Mock()
+        ui.remote_stop = threading.Event()
+        ui.running = True
+        ui.launch_active = False
+        ui.launch_attempts = 0
+        ui.launch_polls = 0
+        ui.launch_process = None
+        ui.launch_error = ""
+        ui.settings = {}
+        path = Path(r"C:\GridCraft\gridcraft.exe")
+        with mock.patch.object(agent, "GridCraftLocal") as client, \
+                mock.patch.object(agent, "locate_gridcraft_exe", return_value=path), \
+                mock.patch.object(agent, "start_gridcraft") as start, \
+                mock.patch.object(agent.AgentUI, "refresh"), \
+                mock.patch.object(agent, "save_settings"):
             client.return_value.status.return_value = {"status": "READY"}
             ui.launch_on_login()
             start.assert_not_called()
@@ -88,7 +105,10 @@ class WindowsAgentTests(TestCase):
             start.assert_not_called()
             client.return_value.status.return_value = {"status": "GRIDCRAFT_OFFLINE"}
             ui.launch_on_login()
-            start.assert_called_once_with(r"C:\GridCraft\gridcraft.exe")
+            start.assert_called_once_with(path)
+            # An outstanding launch attempt must not spawn a second copy.
+            ui.launch_on_login()
+            start.assert_called_once()
 
     def test_missing_exe_rejected(self):
         with self.assertRaises(FileNotFoundError):
