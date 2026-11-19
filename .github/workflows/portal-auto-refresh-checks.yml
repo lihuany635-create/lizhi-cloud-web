@@ -1,0 +1,32 @@
+name: Portal non-disruptive auto-update and refresh checks
+on:
+  pull_request:
+    paths:
+      - 'app.js'
+      - 'index.html'
+      - 'workspace-ui.js'
+      - 'tests/usage-library-route.test.mjs'
+      - 'loader.js'
+      - 'sw.js'
+      - 'production/ai-workbench.js'
+      - 'tests/portal-auto-refresh.test.mjs'
+      - '.github/workflows/portal-auto-refresh-checks.yml'
+permissions:
+  contents: read
+jobs:
+  portal-refresh:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify JavaScript syntax
+        run: |
+          node --check app.js
+          node --check production/ai-workbench.js
+          node --check sw.js
+      - name: Verify update notification, cache parity and polling
+        run: node --test tests/portal-auto-refresh.test.mjs tests/usage-library-route.test.mjs
