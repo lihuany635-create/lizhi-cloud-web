@@ -10,7 +10,7 @@ const GOAL_WRITES=new Set([
 /**
  * @param {Request} request
  * @param {Record<string,string>} env  Server-side only Sites secrets.
- * @param {{verifyOwner:(req:Request)=>Promise<string|null>,fetchImpl?:typeof fetch,/* goal writes intentionally unavailable until trusted human proof exists */}} opts
+ * @param {{verifyOwner:(req:Request)=>Promise<string|null>,fetchImpl?:typeof fetch}} opts
  * verifyOwner MUST be bound to the actual Sites authenticated principal.
  * Never trust a client-supplied email header or JSON body. No fallback.
  */
