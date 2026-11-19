@@ -153,6 +153,15 @@ class P4SafeWriter:
         self._previews={}
         self.receipts=P4ReceiptStore(self.backups)
 
+    def invalidate_previews(self):
+        """Discard stale previews on local disconnect or workbook switch.
+
+        A new document can reuse the old transient doc ID after restart.
+        This method does not alter cells, backups or the replay ledger.
+        """
+        with self._lock:
+            self._previews.clear()
+
     def _preimage(self, doc, sheet, region):
         # Must preserve formulas in the version hash, not merely their computed values.
         value=self.local.read_range(sheet,region,doc=doc,formulas=True)
