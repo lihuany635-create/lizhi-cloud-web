@@ -48,7 +48,7 @@
   "./finance/advanced-voice/finance-ledger-query.js?v=1",
   "./finance/advanced-voice/finance-review-basket.js?v=1",
   "./finance/sync/finance-sync-store.js?v=1",
-  "./finance/sync/finance-sync.js?v=1",
+  "./finance/sync/finance-sync.js?v=2",
   "./finance/budget/budget-domain.js?v=2",
   "./finance/budget/budget-owner.js?v=1",
   "./finance/budget/budget-local-store.js?v=2",
@@ -59,7 +59,7 @@
   "./finance/goals/p3-goals-ui.js?v=1",
   "./finance/goals/p5-goals-ui.js?v=2",
   "./finance/goals/p6-browser-client.js?v=1",
-  "./finance/pages/home.js?v=73"
+  "./finance/pages/home.js?v=74"
  ],
  "knowledge": [
   "./knowledge/domain/knowledge-model.js?v=16",
