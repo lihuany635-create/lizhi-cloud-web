@@ -822,9 +822,9 @@ class AgentUI:
                     failures = 0
                     self._remote_transition("CONNECTED")
                     self.remote_status = "伺服器已回應（Cloud MCP 狀態需另行查核）"
-                    quiet_for = now - (last_job_at if last_job_at is not None else started_at)
-                    # Until a first job, count uptime as idle time.
-                    delay = poll_delay(quiet_for, long_poll=transport.long_poll)
+                    quiet_for = (now-last_job_at) if last_job_at is not None else None
+                    delay = poll_delay(quiet_for,since_start=now-started_at,
+                                       long_poll=transport.long_poll)
                 except Exception as exc:
                     failures += 1
                     retry_after = getattr(exc, "retry_after", None)
