@@ -26,6 +26,8 @@ jobs:
         run: python -m py_compile integrations/gridcraft/gridcraft_p4_safe_save.py integrations/gridcraft/test_p4_safe_save.py integrations/gridcraft/test_p4_save_worker_route.py
       - name: P4 safe export and malicious path checks
         run: python -m unittest discover -s integrations/gridcraft -p 'test_p4_safe_save.py' -v
+      - name: Optional native GridCraft CLI read-only probe isolation tests
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_p4_native_read_probe.py' -v
       - name: P4 authenticated worker routing tests
         run: python -m unittest discover -s integrations/gridcraft -p 'test_p4_save_worker_route.py' -v
       - name: P3 format safety tests
