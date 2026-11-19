@@ -28,6 +28,7 @@ from gridcraft_outbound_worker import (HTTPSDeviceTransport, OutboundWorker,
                                       reconnect_delay, poll_delay, RelayTransportError)
 import gridcraft_win_lifecycle as lifecycle
 from gridcraft_p4_safe_write import P4SafeWriter
+from gridcraft_p2_batch import P2BatchWriter
 from gridcraft_p4_desktop import P4Local
 from gridcraft_pairing_client import DeviceStore, PairingError, pair_one_time
 
@@ -331,6 +332,7 @@ class AgentUI:
         self._last_workbook_signature = None
         self._grant_lock = threading.RLock()
         self._p4_writer = None
+        self._p2_batch = None
         self._create_widgets()
         self.refresh()
         if minimized:
@@ -576,6 +578,9 @@ class AgentUI:
         writer = getattr(self, "_p4_writer", None)
         if writer is not None:
             writer.invalidate_previews()
+        batch = getattr(self, "_p2_batch", None)
+        if batch is not None:
+            batch.invalidate_previews()
 
     def _poll(self):
         """Monitor GridCraft for entire agent lifetime, not only at login."""
@@ -795,11 +800,21 @@ class AgentUI:
             _logger.error("P4_GATE_OFF %s", self._write_suspended_code)
 
         self._p4_writer = p4_writer
+        p2_batch = None
+        if p4_writer is not None:
+            try:
+                p2_batch = P2BatchWriter(p4_writer)
+            except Exception as exc:
+                # A corrupt P2 ledger disables ONLY new P2 commands.
+                # Legacy P3 and P4 must remain independently functional.
+                _logger.error("P2_GATE_OFF %s", safe_error_code(exc))
+        self._p2_batch = p2_batch
         try:
             worker = OutboundWorker(
                 transport=transport, local=GridCraftLocal(port=7979, timeout=2),
                 approved_docs=self.allowed_docs,
                 p4_writer=p4_writer,
+                p2_batch=p2_batch,
                 p4_enabled=lambda: self.p4_write_enabled and not self._user_stopped,
                 grant_checker=self._verified_grants)
             started_at = time.monotonic()
@@ -843,6 +858,7 @@ class AgentUI:
             self.remote_status = "遠端執行緒異常，將自動恢復"
         finally:
             self._p4_writer = None
+            self._p2_batch = None
             self._remote_transition("STOPPED")
 
     def start_remote(self):
