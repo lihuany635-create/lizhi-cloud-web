@@ -1,4 +1,4 @@
-name: Finance Goals P6 authenticated browser approval checks
+name: Finance Goals P6 owner-authorized write security checks
 on:
   pull_request:
     paths:
@@ -31,6 +31,6 @@ jobs:
           node --check finance/goals/p6-browser-client.js
           node --check supabase/functions/lizhi-finance-site-mcp/finance-goals-browser-bridge.mjs
           node --check supabase/functions/lizhi-finance-site-mcp/edge-core.mjs
-      - name: Verify every goal phase and signed browser confirmation
+      - name: Verify every goals phase, owner-only writes and revoked access
         run: |
           node --test finance/tests/finance-goals-p*.test.mjs
