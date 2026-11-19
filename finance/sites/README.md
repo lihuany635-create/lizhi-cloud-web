@@ -58,14 +58,13 @@ Sites 注意：
 
 目前沒有 Sites 建立／私人發布權限的對話，不能自行聲稱第 5～6 步完成。
 
-## P6 儲蓄／投資 Goals（隔離候選，預設未部署）
+## P6 儲蓄／投資 Goals（安全修復候選，未部署）
 
-- 本版 `finance/sites/site-worker-adapter.mjs` 若收到 `finance_goals_salary_set`、`finance_goals_goal_set`、`finance_goals_allocation_set`，**必須**由原 Private Site 提供 `approveGoalWrite({request,principal,name,arguments})` 可信回呼。此回呼需從 Sites 本人已登入 session／ChatGPT 當次使用者的明確操作確認取得，不能以 AI 自填入的 `confirmed_by_user` 或來源標頭替代。缺回呼或回傳非 true → 403，完全不呼叫上游。
-- 回呼通過後，Site 用原有伺服器專用 Token 為 `timestamp + 完整 JSON-RPC payload` 產生短效 HMAC-SHA256，單次上送 `x-lizhi-goals-write-approval`。原 Edge `edge-core.mjs` 重新驗證簽章、時效、原始工具與參數；修改目標、金額、request_id 都不能重用核准。寫入仍交由 P3/P5 RPC 的 CAS、防重、本人資料限制做最後驗證。
-- `LIZHI_FINANCE_GOALS_MCP_ENABLED` 必須正式部署後明確設為 true 才列出五項 Goals 工具（原十項不變）；**沒有可信 Site 回呼前，即使開了開關也只允許讀取，寫入仍拒絕**。正式 Site 仍需本人以原站地址原地更新，嚴禁建立第二個 MCP/Site。
-- 原 Finance 網站讀取 Goals 使用 `FinanceGoalsBrowserClient` 與其自身 Supabase Auth JWT；Edge `/ui/goals` 僅允許受信任的 HTTPS Origin，須有 `LIZHI_FINANCE_GOALS_BROWSER_ENABLED=true`、`LIZHI_FINANCE_GOALS_ORIGINS` 才會啟用。Browser 永不取得 Site Token 或 service-role secret。原網站的每筆寫入有本機確認加 Edge 3 分鐘簽署 challenge；不宣稱預留等於銀行已存入或實際投資買進。
-- PR #97 還是 **NOT_DEPLOYED**；本文件是開發交接，不代表 Sites 的 `approveGoalWrite` 真正已實作或上線。部署前必須查核原站可信本人人機確認 API，並進行真實第二帳號／登出／撤權測試。
-
+- 原十項 Finance MCP 必須保持不變。開啟 `LIZHI_FINANCE_GOALS_MCP_ENABLED` 僅能列出額外五項工具；**全部 Goals 寫入仍會被原 Site adapter 和 Edge 雙層拒絕**（`GOALS_HUMAN_APPROVAL_NOT_CONFIGURED`），包括模型提供的任何確認欄位、模擬 Site callback 或以 Bearer 產生的舊 HMAC。
+- `LIZHI_FINANCE_GOALS_BROWSER_ENABLED=true` 及明確的 HTTPS origins 僅允許讀取目標。原網站使用本人 JWT；Edge 先聯絡 Supabase Auth 驗證 JWT，再檢查 `aud`、`client_id`、`session_id` 及 `aal`，並以使用者自己的 JWT 查原 allowlist。沒有有效的第一方登入與 allowlist 許可即拒絕。
+- Claude 審查的 `prepare/commit` + `approved=true`、`window.confirm`、Bearer-HMAC 均**不是可信真人操作證據**。目前已移除該寫入通道；不能解讀為已完成 Passkey 實作。
+- 若日後要啟用寫入，須另行實作伺服器驗證的 Passkey/WebAuthn 或等效二次驗證，逐筆綁定 payload、帳號、會話、單次 nonce，並在 DB 原子消耗、確認撤權；還需原站真人端到端測試及獨立安全複審。
+- 本修正只存在 GitHub 開發分支。正式 Supabase Edge、原 Private Site、財務帳本、既有預算沒有因此變更。
 
 ## 2026-11-19 安全修復候選（CHANGES_REQUIRED）
 
