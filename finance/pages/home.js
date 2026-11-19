@@ -101,9 +101,29 @@ const FinanceHome=(()=>{
     await readBudgets();if(budgetCloudEnabled)await loadBudgetDefaults();
     syncBackgroundUrls();applyBackground();
   }
-  async function load(){ui.loading=true;update();try{await readAll();ui.loaded=true;ui.error="";}catch(error){console.error("Finance load failed",error);ui.error=FinanceUiModel.userError(error);}finally{ui.loading=false;update();if(ui.loaded){if(productionJobBridge){void syncFinance({silent:true});void syncRuleMemory({silent:true});
+  async function load(){ui.loading=true;update();try{await readAll();ui.loaded=true;ui.error="";}catch(error){console.error("Finance load failed",error);ui.error=FinanceUiModel.userError(error);}finally{ui.loading=false;update();if(ui.loaded){if(productionJobBridge){void syncFinance({silent:true});installFinanceAutoSync();void syncRuleMemory({silent:true});
         if(budgetCloudEnabled)void syncBudgetNow();}if(aiHostMode)void startBrowserHost();else if(productionJobBridge)startHostStatusRefresh();else void refreshOllamaStatus({silent:true});}}}
   async function reload(message=""){try{await readAll();ui.loaded=true;ui.error="";ui.notice=message;}catch(error){console.error("Finance refresh failed",error);ui.error=FinanceUiModel.userError(error);}update();}
+  // Pull other devices' changes while the page stays open: on return to the tab,
+  // window focus, reconnect, bfcache restore and every minute while visible.
+  // Quiet syncs never re-render while a form or modal is being edited.
+  const FINANCE_AUTO_SYNC_MIN_GAP_MS=15000,FINANCE_AUTO_SYNC_INTERVAL_MS=60000;
+  let financeAutoSyncInstalled=false,financeAutoSyncAt=0;
+  function financeUserEditing(){const root=document.querySelector("[data-finance-root]"),active=document.activeElement;return Boolean(ui.modal)||Boolean(root&&active&&root.contains(active)&&active.matches("input,textarea,select,[contenteditable]"));}
+  async function autoSyncFinance(){
+    if(document.visibilityState!=="visible"||navigator.onLine===false||!document.querySelector("[data-finance-root]"))return null;
+    const now=Date.now();if(now-financeAutoSyncAt<FINANCE_AUTO_SYNC_MIN_GAP_MS)return null;financeAutoSyncAt=now;
+    const result=await financeSync.sync({quiet:true});
+    if(result?.ok&&result.applied){await readAll();if(ui.loaded&&ui.view!=="goals"&&!financeUserEditing())update();}
+    return result;
+  }
+  function installFinanceAutoSync(){
+    if(financeAutoSyncInstalled)return;financeAutoSyncInstalled=true;financeAutoSyncAt=Date.now();
+    const trigger=()=>void autoSyncFinance();
+    document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")trigger();});
+    addEventListener("focus",trigger);addEventListener("online",trigger);addEventListener("pageshow",event=>{if(event.persisted)trigger();});
+    setInterval(trigger,FINANCE_AUTO_SYNC_INTERVAL_MS);
+  }
   async function syncFinance({silent=false}={}){const result=await financeSync.sync();if(result?.ok&&result.applied)await readAll();if(!silent){if(result?.ok)ui.notice=result.deferred?"帳本已同步；部分交易等待參照資料。":"帳本已完成雲端同步。";else ui.error=result?.error?.message||"本機帳本已保留，雲端同步暫時失敗。";}update();return result;}
   async function syncRuleMemory({silent=false}={}){const result=await ruleMemorySync.sync();if(result?.ok)ui.ruleMemory.rules=await ruleMemoryStore.list();if(!silent){if(result?.ok)ui.notice="已確認規則已同步。";else ui.error=result?.error?.message||"已確認規則保留在本機，雲端同步暫時失敗。";}update();return result;}
   // Keep unsubmitted Goals values only while the same owner's cloud snapshot
