@@ -10,7 +10,7 @@ const html=read("index.html"),sw=read("sw.js");
 const app=read("app.js"),workbench=read("production/ai-workbench.js");
 
 test("PORTAL-REFRESH-01 all critical entry asset versions match Service Worker",()=>{
- for(const path of ["loader.js","app.js","finance/pages/home.js","study.css"]){
+ for(const path of ["loader.js","app.js","finance/pages/home.js","study.css","workspace-ui.js"]){
    const rx=new RegExp(path.replaceAll(".","\\.")+"\\?v=(\\d+)","g");
    const entry=path==="finance/pages/home.js"?read("loader.js"):html;
    const version=[...entry.matchAll(rx)][0]?.[1];
@@ -18,6 +18,10 @@ test("PORTAL-REFRESH-01 all critical entry asset versions match Service Worker",
    const matches=[...sw.matchAll(rx)].filter(x=>sw[x.index-1]==='"').map(x=>x[1]);
    assert.deepEqual(matches,[version],"SW must cache exactly the active version of "+path);
  }
+ const workbenchVersion=read("workspace-ui.js").match(/production[/]ai-workbench[.]js[?]v=([0-9]+)/)?.[1];
+ assert.ok(workbenchVersion,"Workbench import should be versioned");
+ assert.ok(sw.includes('"production/ai-workbench.js?v='+workbenchVersion+'"'),
+   "SW must cache current Workbench version");
  assert.match(sw,/const CACHE="lizhi-cloud-v170"/);
 });
 
