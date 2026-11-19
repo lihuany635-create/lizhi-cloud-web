@@ -26,6 +26,8 @@ jobs:
         run: python -m unittest discover -s integrations/gridcraft -p 'test_p3_format.py' -v
       - name: P3 localhost scoped command adapter (synthetic)
         run: python -m unittest discover -s integrations/gridcraft -p 'test_p3_desktop.py' -v
+      - name: P3 existing owner-gate worker routing regression
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_p3_worker_route.py' -v
       - name: Existing P2 batch and worker routing regression
         run: |
           python -m unittest discover -s integrations/gridcraft -p 'test_p2_batch.py' -v
