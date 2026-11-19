@@ -140,13 +140,48 @@ function registerFeatureActivators(){
   loader.register("engineering",()=>{EngineeringHub.installEvents(app);});
 }
 
+// A new Service Worker does NOT reload already-open tabs. Warn once and let
+// the owner choose when to reload so unsaved forms, CAD work and audio survive.
+function watchPortalUpdates(registration){
+  let previousController=navigator.serviceWorker.controller;
+  let updateRunning=false;
+  function offerRefresh(){
+    if(document.getElementById("lizhi-update-available"))return;
+    const notice=document.createElement("aside");
+    notice.id="lizhi-update-available";
+    notice.setAttribute("role","status");
+    notice.style.cssText="position:fixed;bottom:16px;right:16px;z-index:10000;max-width:min(420px,calc(100vw - 32px));padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1px solid #cbd5e1;border-radius:12px;background:#fff;color:#172033;box-shadow:0 8px 30px #0002;font:14px system-ui";
+    const label=document.createElement("span");
+    label.textContent="網站已有新版本，可在完成目前工作後重新整理。";
+    const button=document.createElement("button");
+    button.type="button";button.textContent="載入新版";
+    button.style.cssText="padding:7px 12px;border-radius:8px;border:1px solid #5567aa;background:#263b77;color:white;cursor:pointer";
+    button.addEventListener("click",()=>location.reload());
+    notice.append(label,button);
+    document.body.append(notice);
+  }
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{
+    const next=navigator.serviceWorker.controller;
+    if(previousController&&next!==previousController)offerRefresh();
+    previousController=next;
+  });
+  function checkUpdate(){
+    if(document.visibilityState!=="visible"||updateRunning)return;
+    updateRunning=true;
+    void registration.update().catch(()=>{}).finally(()=>{updateRunning=false;});
+  }
+  checkUpdate();
+  document.addEventListener("visibilitychange",checkUpdate);
+  window.addEventListener("pageshow",checkUpdate);
+  setInterval(checkUpdate,600000);
+}
 async function boot(){
   if(IS_CLOUD_SITE&&window.LizhiAuth&&!await window.LizhiAuth.requireUser())return;
   initializeChatIdentity();
   initializeDelivery();
   installWorkspaceEvents();
   registerFeatureActivators();
-  if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").then(registration=>registration.update()).catch(()=>{});
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").then(watchPortalUpdates).catch(()=>{});
   seed().then(()=>window.LizhiSync?.sync?.()).then(loadCloudMedia).then(refresh).catch(error=>{app.innerHTML=`<div class="empty">無法開啟資料庫：${escapeHtml(error.message)}</div>`;});
 }
 boot();
