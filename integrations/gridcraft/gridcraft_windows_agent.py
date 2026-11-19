@@ -33,6 +33,9 @@ AUTOSTART_NAME = "LizhiGridCraftAgent"
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 APP_EXE_NAME = "LizhiGridCraftAgent.exe"
 MAX_PATH = 1024
+LAUNCH_MAX_ATTEMPTS = 3
+LAUNCH_MAX_POLLS = 18
+LAUNCH_POLL_MS = 2000
 
 
 def app_directory() -> Path:
@@ -154,6 +157,29 @@ def disable_startup() -> None:
         pass
 
 
+def locate_gridcraft_exe(saved_path: str = "") -> Path | None:
+    """Use an owner-selected path, else known GridCraft install locations.
+
+    Never execute a path coming from a remote MCP request or a workbook.
+    """
+    roots = [
+        os.environ.get("ProgramW6432"),
+        os.environ.get("PROGRAMFILES"),
+        os.environ.get("ProgramFiles(x86)"),
+        r"C:\Program Files",
+    ]
+    candidates = ([saved_path] if saved_path else []) + [
+        str(Path(root) / "ArtCraft" / "GridCraft" / "gridcraft.exe")
+        for root in roots if root
+    ]
+    for raw in candidates:
+        try:
+            return safe_gridcraft_exe(raw)
+        except (OSError, RuntimeError, ValueError):
+            continue
+    return None
+
+
 def start_gridcraft(path: str | Path):
     selected = safe_gridcraft_exe(path)
     # Only locally user-selected GridCraft.exe, no shell/cmd/synthetic remote args.
@@ -182,7 +208,7 @@ def diagnostic() -> int:
 class AgentUI:
     def __init__(self, root: tk.Tk, minimized: bool = False):
         self.root = root
-        self.root.title(APP_TITLE + "｜v0.5 一鍵連線候選")
+        self.root.title(APP_TITLE + "｜v0.5.1 一鍵連線修正版")
         self.root.geometry("490x275")
         self.root.minsize(440, 260)
         self.root.protocol("WM_DELETE_WINDOW", self.stop)
@@ -209,14 +235,18 @@ class AgentUI:
         self.launch_var = tk.BooleanVar(value=self.settings.get("start_gridcraft_on_login") is True)
         self.info_var = tk.StringVar(value="ChatGPT 遠端 MCP：啟動後自動連線中")
         self.running = True
+        self.launch_process = None
+        self.launch_attempts = 0
+        self.launch_polls = 0
+        self.launch_active = False
+        self.launch_error = ""
         self._create_widgets()
         self.refresh()
         if minimized:
             root.after(400, root.iconify)
-        # Just launching this agent is enough: GridCraft and saved pairing
-        # reconnect without repeating buttons. No new workbook is auto-granted.
-        if self.path_var.get():
-            root.after(1100, self.launch_on_login)
+        # Attempt a bounded startup even when settings lost the EXE path.
+        # Also recover the verified default install path if it exists.
+        root.after(1100, self.launch_on_login)
         root.after(4500, self._poll)
         if self.paired:
             root.after(900, self.start_remote)
@@ -226,7 +256,7 @@ class AgentUI:
         frm = ttk.Frame(self.root, padding=16)
         frm.pack(fill="both", expand=True)
         ttk.Label(frm, text="立之 GridCraft", font=("Microsoft JhengHei UI", 17, "bold")).pack(anchor="w")
-        ttk.Label(frm, text="開啟代理即連線｜目前開啟的工作簿自動可用｜v0.5",
+        ttk.Label(frm, text="開啟代理自動啟動 GridCraft 並連線｜v0.5.1",
                   foreground="#5b6472").pack(anchor="w", pady=(3, 12))
         ttk.Label(frm, textvariable=self.status_var,
                   font=("Microsoft JhengHei UI", 12, "bold")).pack(anchor="w")
@@ -280,14 +310,86 @@ class AgentUI:
             messagebox.showerror("啟動失敗", str(exc), parent=self.root)
 
     def launch_on_login(self):
-        # Never create an extra GridCraft window when it is already available.
-        if GridCraftLocal(port=7979, timeout=1.2).status()["status"] != "GRIDCRAFT_OFFLINE":
+        """Start a bounded, observable one-click launch instead of a one-shot call."""
+        if not self.running or self.launch_active or self.remote_stop.is_set():
             return
-        if self.path_var.get():
-            try:
-                start_gridcraft(self.path_var.get())
-            except (OSError, ValueError):
-                self.status_var.set("自動啟動 GridCraft 失敗；請手動檢查")
+        self.launch_attempts = 0
+        self.launch_polls = 0
+        self.launch_process = None
+        self.launch_error = ""
+        self.launch_active = True
+        self._ensure_gridcraft_started()
+
+    def _ensure_gridcraft_started(self):
+        """Nonblocking retry timer; never spawn a second still-running GridCraft."""
+        if not self.running or self.remote_stop.is_set() or not self.launch_active:
+            self.launch_active = False
+            return
+        try:
+            status = GridCraftLocal(port=7979, timeout=1.2).status().get("status")
+        except Exception:
+            status = "CONTROL_ERROR"
+        if status == "READY":
+            self.launch_active = False
+            self.launch_process = None
+            self.launch_error = ""
+            self.refresh()
+            return
+        if status == "UNAUTHORIZED":
+            self.launch_active = False
+            self.status_var.set("GridCraft 本機認證失效，已停止自動啟動")
+            return
+
+        self.launch_polls += 1
+        if self.launch_polls >= LAUNCH_MAX_POLLS:
+            self.launch_active = False
+            self.status_var.set(
+                "GridCraft 自動啟動未成功" +
+                ("：" + self.launch_error if self.launch_error else "，請檢查主程式")
+            )
+            return
+
+        # A socket that exists but fails control negotiation may be a running
+        # GridCraft instance. Do not spawn another process on top of it.
+        if status == "GRIDCRAFT_OFFLINE":
+            child_running = False
+            if self.launch_process is not None:
+                try:
+                    exit_code = self.launch_process.poll()
+                except (OSError, ValueError):
+                    exit_code = 1
+                child_running = exit_code is None
+                if not child_running:
+                    self.launch_error = "主程式提前結束，代碼 " + str(exit_code)[:12]
+            if not child_running and self.launch_attempts < LAUNCH_MAX_ATTEMPTS:
+                executable = locate_gridcraft_exe(self.path_var.get())
+                if executable is None:
+                    self.launch_active = False
+                    self.status_var.set("找不到 GridCraft.exe；請確認安裝位置")
+                    return
+                if str(executable) != self.path_var.get():
+                    self.path_var.set(str(executable))
+                    self.settings["gridcraft_path"] = str(executable)
+                    try:
+                        save_settings(self.settings)
+                    except OSError:
+                        pass  # Still allow launch; next run can rediscover.
+                self.launch_attempts += 1
+                try:
+                    self.launch_process = start_gridcraft(executable)
+                    self.launch_error = ""
+                    self.status_var.set(
+                        f"正在自動啟動 GridCraft（第 {self.launch_attempts} 次）"
+                    )
+                except (OSError, ValueError) as exc:
+                    # Do not leak full exception details or file names to the cloud.
+                    self.launch_process = None
+                    self.launch_error = "啟動程序失敗：" + type(exc).__name__
+            elif child_running:
+                self.status_var.set("正在等待 GridCraft 啟動完成")
+        elif status == "CONTROL_ERROR":
+            self.status_var.set("GridCraft 控制介面初始化中，正在重試")
+        self.root.after(LAUNCH_POLL_MS, self._ensure_gridcraft_started)
 
     def change_startup(self):
         requested = self.startup_var.get()
@@ -528,6 +630,7 @@ class AgentUI:
         self.remote_thread.start()
 
     def stop_remote(self):
+        self.launch_active = False
         self.p4_write_enabled = False
         self.p4_state_var.set("P4 寫入：已停用（遠端停止）")
         self.remote_stop.set()
@@ -536,6 +639,7 @@ class AgentUI:
         self.remote_status = "遠端連線已停止（本機配對資料保留，若要撤銷雲端權限需在本人 Site 操作）"
 
     def stop(self):
+        self.launch_active = False
         self.p4_write_enabled = False
         self.remote_stop.set()
         self.running = False
