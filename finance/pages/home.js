@@ -22,8 +22,8 @@ const FinanceHome=(()=>{
   const financeCommitController=FinanceCommitController.createFinanceCommitController({createTransaction:async payload=>{const transaction=await FinanceStorage.transactions.create(payload);financeSync.schedule();return transaction;}});
   const advancedSession=FinanceSessionContext.create({sessionId:`finance-${Date.now()}`});
   const advancedBasket=FinanceReviewBasket.create({session:advancedSession,commitCandidate:async candidate=>{const payload=FinanceCommitPayload.buildFinanceCommitPayload(candidate.validation);const transaction=await FinanceStorage.transactions.create(payload);financeSync.schedule();return transaction;}});
-  financeSync.subscribe(state=>{ui.sync=state;if(ui.loaded)update();});
-  ruleMemorySync.subscribe(state=>{ui.ruleMemory.state=state.state;ui.ruleMemory.error=state.error?.message||"";if(ui.loaded)update();});
+  financeSync.subscribe(state=>{ui.sync=state;if(ui.loaded&&ui.view!=="goals")update();});
+  ruleMemorySync.subscribe(state=>{ui.ruleMemory.state=state.state;ui.ruleMemory.error=state.error?.message||"";if(ui.loaded&&ui.view!=="goals")update();});
   const builtInBackgrounds=Object.freeze([{id:"aurora",name:"極光湖泊",className:"aurora"},{id:"forest",name:"靜謐森林",className:"forest"},{id:"sky",name:"晨光天空",className:"sky"},{id:"city",name:"暮色城市",className:"city"},{id:"minimal",name:"極簡漸層",className:"minimal"}]);
   const transactionIcons={income:"↗",expense:"↘",transfer:"⇄",credit_card_purchase:"◇",credit_card_payment:"✓"};
   const esc=value=>String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[char]);
@@ -106,7 +106,80 @@ const FinanceHome=(()=>{
   async function reload(message=""){try{await readAll();ui.loaded=true;ui.error="";ui.notice=message;}catch(error){console.error("Finance refresh failed",error);ui.error=FinanceUiModel.userError(error);}update();}
   async function syncFinance({silent=false}={}){const result=await financeSync.sync();if(result?.ok&&result.applied)await readAll();if(!silent){if(result?.ok)ui.notice=result.deferred?"帳本已同步；部分交易等待參照資料。":"帳本已完成雲端同步。";else ui.error=result?.error?.message||"本機帳本已保留，雲端同步暫時失敗。";}update();return result;}
   async function syncRuleMemory({silent=false}={}){const result=await ruleMemorySync.sync();if(result?.ok)ui.ruleMemory.rules=await ruleMemoryStore.list();if(!silent){if(result?.ok)ui.notice="已確認規則已同步。";else ui.error=result?.error?.message||"已確認規則保留在本機，雲端同步暫時失敗。";}update();return result;}
-  function update(){const root=document.querySelector("[data-finance-root]");if(root){const currentInput=root.querySelector('[data-finance-form="ai-quick"] textarea[name="aiText"]'),restoreInput=currentInput&&document.activeElement===currentInput?{focused:true,start:currentInput.selectionStart,end:currentInput.selectionEnd,direction:currentInput.selectionDirection}:null;if(currentInput)ui.ai.input=currentInput.value;root.innerHTML=content();applyBackground();queueMicrotask(()=>{if(restoreInput){const nextInput=root.querySelector('[data-finance-form="ai-quick"] textarea[name="aiText"]');if(nextInput&&!nextInput.disabled){nextInput.focus({preventScroll:true});nextInput.setSelectionRange(restoreInput.start,restoreInput.end,restoreInput.direction||"none");}}else if(ui.modal)document.querySelector('.finance-modal [autofocus],.finance-modal button,.finance-modal input')?.focus();});}}
+  // Keep unsubmitted Goals values only while the same owner's cloud snapshot
+  // remains current. Never persist drafts or restore across auth/month changes.
+  function goalsRevision(){return ui.goals.state==="synced"&&ui.goals.ownerId
+    ?String(ui.goals.ownerId)+":"+String(ui.goals.loadedAt):"";}
+  function captureGoalsDraft(root){
+    const revision=goalsRevision();
+    if(ui.view!=="goals"||!revision||root.dataset.goalsRevision!==revision)return null;
+    const active=document.activeElement;
+    const forms=[...root.querySelectorAll('[data-goals-form]')].map(form=>({
+      type:form.dataset.goalsForm,
+      fields:[...form.elements].filter(el=>el.name&&el.type!=="file")
+        .map(el=>({name:el.name,type:el.type,value:el.value,checked:el.checked}))
+    }));
+    const selected=active?.closest?.('[data-goals-form]');
+    const focused=selected?{
+      type:selected.dataset.goalsForm,name:active.name,
+      start:typeof active.selectionStart==="number"?active.selectionStart:null,
+      end:typeof active.selectionEnd==="number"?active.selectionEnd:null
+    }:null;
+    return {revision,forms,focused};
+  }
+  function restoreGoalsDraft(root,draft){
+    if(!draft||draft.revision!==goalsRevision()||ui.view!=="goals")return false;
+    const targets=new Map();
+    for(const entry of draft.forms){
+      const form=[...root.querySelectorAll('[data-goals-form]')]
+        .find(node=>node.dataset.goalsForm===entry.type);
+      if(!form)continue;
+      for(const field of entry.fields){
+        const input=[...form.elements].find(node=>node.name===field.name&&node.type===field.type);
+        if(!input||input.disabled)continue;
+        if(field.type==="checkbox"||field.type==="radio")input.checked=field.checked;
+        else input.value=field.value;
+        targets.set(entry.type+":"+entry.name,input);
+      }
+    }
+    if(draft.focused){
+      const target=targets.get(draft.focused.type+":"+draft.focused.name);
+      if(target&&target.isConnected){
+        target.focus({preventScroll:true});
+        if(draft.focused.start!==null&&typeof target.setSelectionRange==="function")
+          try{target.setSelectionRange(draft.focused.start,draft.focused.end)}catch{}
+      }
+    }
+    return true;
+  }
+  function update(){
+    const root=document.querySelector("[data-finance-root]");
+    if(!root)return;
+    const oldView=root.dataset.financeView;
+    const sameView=oldView===ui.view;
+    const oldScroll=sameView?root.querySelector(".finance-stage")?.scrollTop||0:0;
+    const goalDraft=captureGoalsDraft(root);
+    const currentInput=root.querySelector('[data-finance-form="ai-quick"] textarea[name="aiText"]');
+    const restoreInput=currentInput&&document.activeElement===currentInput
+      ?{focused:true,start:currentInput.selectionStart,end:currentInput.selectionEnd,
+        direction:currentInput.selectionDirection}:null;
+    if(currentInput)ui.ai.input=currentInput.value;
+    root.innerHTML=content();
+    root.dataset.financeView=ui.view;
+    root.dataset.goalsRevision=goalsRevision();
+    if(sameView){const stage=root.querySelector(".finance-stage");if(stage)stage.scrollTop=oldScroll;}
+    applyBackground();
+    queueMicrotask(()=>{
+      if(restoreGoalsDraft(root,goalDraft))return;
+      if(restoreInput){
+        const nextInput=root.querySelector('[data-finance-form="ai-quick"] textarea[name="aiText"]');
+        if(nextInput&&!nextInput.disabled){
+          nextInput.focus({preventScroll:true});
+          nextInput.setSelectionRange(restoreInput.start,restoreInput.end,restoreInput.direction||"none");
+        }
+      }else if(ui.modal)document.querySelector('.finance-modal [autofocus],.finance-modal button,.finance-modal input')?.focus();
+    });
+  }
   const voiceActive=()=>["starting","listening","processing"].includes(ui.voice.status);
   function voiceButtonLabel(){if(ui.voice.status==="starting")return"準備麥克風…";if(ui.voice.status==="listening")return"■ 停止聶聽";if(ui.voice.status==="processing")return"整理語音…";return"🎙 語音輸入";}
   function updateVoiceIndicators(){
