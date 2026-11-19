@@ -22,8 +22,9 @@ const db=url&&serviceKey?createClient(url,serviceKey,{
 // A verified OAuth client_id is never a valid Finance browser principal.
 const publicKey=Deno.env.get("SUPABASE_PUBLISHABLE_KEY")||
  Deno.env.get("SUPABASE_ANON_KEY")||"";
+const goalWritesEnabled=Deno.env.get("LIZHI_FINANCE_GOALS_WRITES_ENABLED")==="true";
 const browserBridge=createGoalsBrowserBridge({
-  db,ownerUid,
+  db,ownerUid,writesEnabled:goalWritesEnabled,
   origins:(Deno.env.get("LIZHI_FINANCE_GOALS_ORIGINS")||"").split(",")
     .map(x=>x.trim()).filter(Boolean),
   verifyUser:async (jwt:string)=>{
@@ -53,5 +54,18 @@ Deno.serve(request=>{
     return browserBridge.handle(request);
   }
   return handleFinanceSiteRequest(request,{db,token,ownerUid,
-    goalToolsEnabled:Deno.env.get("LIZHI_FINANCE_GOALS_MCP_ENABLED")==="true"});
+    goalToolsEnabled:Deno.env.get("LIZHI_FINANCE_GOALS_MCP_ENABLED")==="true",
+    goalWritesEnabled,
+    verifyGoalsOwner:async()=>{
+      if(!db?.auth?.admin?.getUserById||!ownerUid)return false;
+      const allowedEmail=(Deno.env.get("LIZHI_FINANCE_SITE_OWNER_EMAIL")||"").trim().toLowerCase();
+      if(!allowedEmail)return false;
+      const {data,error}=await db.auth.admin.getUserById(ownerUid);
+      const user=data?.user;
+      if(error||!user||user.id!==ownerUid||
+        user.email?.trim().toLowerCase()!==allowedEmail)return false;
+      if(user.banned_until&&Date.parse(user.banned_until)>Date.now())return false;
+      return true;
+    }
+  });
 });
