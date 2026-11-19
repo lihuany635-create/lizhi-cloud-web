@@ -1,0 +1,74 @@
+name: Finance Goals P3 isolated interface and MCP checks
+
+on:
+  pull_request:
+    paths:
+      - 'finance/goals/**'
+      - 'finance/tests/finance-goals-p*.test.mjs'
+      - 'supabase/functions/lizhi-finance-site-mcp/finance-goals-p3-*.mjs'
+      - 'finance/pages/home.js'
+      - 'loader.js'
+      - 'index.html'
+      - '.github/workflows/finance-goals-p3-checks.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: finance-goals-p3-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  goals-node:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check all candidate source syntax
+        run: |
+          node --check finance/goals/p1-goal-model.mjs
+          node --check finance/goals/p2-salary-sinking-model.mjs
+          node --check finance/goals/p3-monthly-report.mjs
+          node --check finance/goals/p3-goals-ui.js
+          node --check supabase/functions/lizhi-finance-site-mcp/finance-goals-p3-contract.mjs
+          node --check supabase/functions/lizhi-finance-site-mcp/finance-goals-p3-edge.mjs
+          node --check finance/pages/home.js
+          node --check loader.js
+      - name: Verify P1/P2/P3 Finance goal models and isolated MCP adapter
+        run: |
+          node --test finance/tests/finance-goals-p1.test.mjs finance/tests/finance-goals-p2.test.mjs finance/tests/finance-goals-p3.test.mjs
+
+  isolated-postgres:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: finance_goals_p3_disposable
+          POSTGRES_PASSWORD: isolated-no-production
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d finance_goals_p3_disposable"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGPASSWORD: isolated-no-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify service-only RPCs against disposable PostgreSQL
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+          psql -h 127.0.0.1 -U postgres -d finance_goals_p3_disposable -v ON_ERROR_STOP=1 -f finance/goals/verification/p3-isolated-verify.sql
