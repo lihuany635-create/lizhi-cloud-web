@@ -4,6 +4,8 @@ on:
     paths:
       - 'app.js'
       - 'index.html'
+      - 'workspace-ui.js'
+      - 'tests/usage-library-route.test.mjs'
       - 'loader.js'
       - 'sw.js'
       - 'production/ai-workbench.js'
@@ -27,4 +29,4 @@ jobs:
           node --check production/ai-workbench.js
           node --check sw.js
       - name: Verify update notification, cache parity and polling
-        run: node --test tests/portal-auto-refresh.test.mjs
+        run: node --test tests/portal-auto-refresh.test.mjs tests/usage-library-route.test.mjs
