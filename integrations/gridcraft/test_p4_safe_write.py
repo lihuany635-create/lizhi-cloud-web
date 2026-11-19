@@ -204,8 +204,10 @@ class P4GuardTests(unittest.TestCase):
     def test_ledger_fail_closed_if_corrupt(self):
         self.writer.receipts.path.parent.mkdir(parents=True,exist_ok=True)
         self.writer.receipts.path.write_text("not json\n",encoding="utf-8")
-        with self.assertRaisesRegex(P4Denied,"RECEIPT_LEDGER_CORRUPT"):
+        with self.assertRaisesRegex(P4Denied,"RECEIPT_CORRUPT_QUARANTINED"):
             P4ReceiptStore(self.writer.backups)
+        self.assertTrue((self.writer.backups/"p4-write-receipts.needs-review").exists())
+        self.assertEqual(len(list(self.writer.backups.glob("p4-write-receipts.corrupt-*.jsonl"))),1)
 
     def test_4_cells_max_50_and_exact_dimension(self):
         self.assertEqual(bounded_region("A1:B2"),(1,1,2,2))
