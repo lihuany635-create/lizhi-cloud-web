@@ -33,7 +33,9 @@ test("style, assets and cache versions are aligned on desktop/mobile", () => {
   const sw = read("sw.js");
   assert.match(index, /study\.css\?v=18/);
   assert.match(index, /workspace-ui\.js\?v=40/);
-  assert.match(index, /app\.js\?v=95/);
+  const appVersion=index.match(/app\\.js\\?v=(\\d+)/)?.[1];
+  assert.ok(appVersion, "Portal entry must version its app script");
+  assert.ok(sw.includes('"app.js?v='+appVersion+'"'), "SW and HTML app.js versions must match");
   assert.match(css, /\.route-usage \.main/);
   assert.match(css, /\.route-usage \.workspace-panel/);
   assert.match(sw, /usage-monitor\/\?v=1/);
