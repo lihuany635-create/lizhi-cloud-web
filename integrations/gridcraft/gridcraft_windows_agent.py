@@ -767,64 +767,129 @@ class AgentUI:
             self.p4_state_var.set("P4 寫入：已允許（僅本次執行；可再按此鈕關閉）")
 
     def _remote_loop(self):
+        """Safe outbound loop: failure never silently kills the P3 connection."""
         if not self.paired:
             return
+        self._remote_transition("STARTING")
         try:
             transport = HTTPSDeviceTransport(
-                device_id=self.paired["device_id"], device_token=self.paired["token"])
+                device_id=self.paired["device_id"],
+                device_token=self.paired["token"])
+        except Exception as exc:
+            _logger.error("REMOTE_INIT_ERROR %s", safe_error_code(exc))
+            self.remote_status = "出站裝置連線初始化失敗"
+            return
+
+        # Receipt corruption MUST NOT disable read-only P3. The actual
+        # sensitive P4 job fails closed with P4_GATE_OFF until local review.
+        p4_writer = None
+        try:
             p4_writer = P4SafeWriter(
                 local=P4Local(port=7979, timeout=3),
                 backup_folder=app_directory() / "P4Backups",
                 approved_docs=self.allowed_docs)
-            self._p4_writer = p4_writer
+            self._write_suspended_code = ""
+        except Exception as exc:
+            self._write_suspended_code = safe_error_code(exc)
+            _logger.error("P4_GATE_OFF %s", self._write_suspended_code)
+
+        self._p4_writer = p4_writer
+        try:
             worker = OutboundWorker(
                 transport=transport, local=GridCraftLocal(port=7979, timeout=2),
                 approved_docs=self.allowed_docs,
                 p4_writer=p4_writer,
-                p4_enabled=lambda: self.p4_write_enabled,
+                p4_enabled=lambda: self.p4_write_enabled and not self._user_stopped,
                 grant_checker=self._verified_grants)
+            started_at = time.monotonic()
+            last_job_at = None
+            failures = 0
             while not self.remote_stop.is_set():
                 try:
                     worker.approved_docs = frozenset(self._verified_grants())
-                    worker.run_once()
+                    outcome = worker.run_once()
+                    now = time.monotonic()
+                    if outcome.get("executed"):
+                        last_job_at = now
+                        code = outcome.get("resultCode", "UNKNOWN")
+                        rid = outcome.get("requestId", "")
+                        backup = outcome.get("backupId", "")
+                        # Never log sheet contents, title, path, token or URL.
+                        if isinstance(code, str) and re.fullmatch(r"[A-Za-z0-9_]{1,48}", code):
+                            _logger.info("JOB_RESULT code=%s request_id=%s backup_id=%s",
+                                         code, rid if re.fullmatch(r"[A-Za-z0-9._:-]{8,96}", rid) else "-",
+                                         backup if re.fullmatch(r"p4-[0-9]+-[a-f0-9]{32}\.xlsx", backup) else "-")
+                    failures = 0
+                    self._remote_transition("CONNECTED")
                     self.remote_status = "伺服器已回應（Cloud MCP 狀態需另行查核）"
-                except Exception:
-                    self.remote_status = "出站服務未接通或暫時不可用"
-                self.remote_stop.wait(6)
-        except Exception:
-            self.remote_status = "無法啟動安全出站連線"
+                    quiet_for = now - (last_job_at if last_job_at is not None else started_at)
+                    # Until a first job, count uptime as idle time.
+                    delay = poll_delay(quiet_for, long_poll=transport.long_poll)
+                except Exception as exc:
+                    failures += 1
+                    retry_after = getattr(exc, "retry_after", None)
+                    delay = reconnect_delay(failures, retry_after)
+                    self._remote_transition("BACKOFF")
+                    self.remote_status = "出站服務暫時不可用，將自動重試"
+                    _logger.warning("REMOTE_ERROR %s", safe_error_code(exc))
+                if self.remote_stop.wait(delay):
+                    break
+        except Exception as exc:
+            _logger.error("REMOTE_LOOP_ERROR %s", safe_error_code(exc))
+            self.remote_status = "遠端執行緒異常，將自動恢復"
         finally:
             self._p4_writer = None
+            self._remote_transition("STOPPED")
 
     def start_remote(self):
+        self._user_stopped = False
         if not self.paired:
             self.remote_status = "尚未配對；首次使用仍需要本人裝置配對一次"
             return
+        # Clear BEFORE checking thread state; a just-stopped worker still alive
+        # will be re-used, never duplicated.
+        self.remote_stop.clear()
         if self.remote_thread and self.remote_thread.is_alive():
             return
-        self.remote_stop.clear()
         self.settings["remote_enabled"] = True
-        save_settings(self.settings)
-        self.remote_thread = threading.Thread(target=self._remote_loop, daemon=True)
+        self.settings["agent_version"] = AGENT_VERSION
+        try:
+            save_settings(self.settings)
+        except OSError:
+            _logger.warning("SETTINGS_SAVE_FAILED")
+        self.remote_thread = threading.Thread(target=self._remote_loop,
+                                               name="gridcraft-outbound", daemon=True)
         self.remote_thread.start()
-        # A manual reconnect also retries local control only if needed.
         if self.running and not self.launch_active:
             self.root.after(300, self.launch_on_login)
 
     def stop_remote(self):
+        self._user_stopped = True
         self.launch_active = False
         self.p4_write_enabled = False
         self.p4_state_var.set("P4 寫入：已停用（遠端停止）")
         self.remote_stop.set()
         self.settings["remote_enabled"] = False
-        save_settings(self.settings)
-        self.remote_status = "遠端連線已停止（本機配對資料保留，若要撤銷雲端權限需在本人 Site 操作）"
+        try:
+            save_settings(self.settings)
+        except OSError:
+            _logger.warning("SETTINGS_SAVE_FAILED")
+        self.remote_status = "遠端連線已停止（本機配對保留）"
+        self._remote_transition("STOPPED")
 
     def stop(self):
+        if not self.running:
+            return
         self.launch_active = False
         self.p4_write_enabled = False
         self.remote_stop.set()
         self.running = False
+        thread = self.remote_thread
+        if thread is not None and thread.is_alive() and thread is not threading.current_thread():
+            thread.join(timeout=8)
+            if thread.is_alive():
+                _logger.warning("REMOTE_EXIT_TIMEOUT")
+        _logger.info("AGENT_STOP version=%s", AGENT_VERSION)
         self.root.destroy()
 
 
