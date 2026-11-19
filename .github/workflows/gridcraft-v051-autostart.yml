@@ -1,0 +1,65 @@
+name: GridCraft v0.5.1 automatic startup fix (Windows isolated tests)
+on:
+  push:
+    branches:
+      - fix/gridcraft-v051-auto-launch-20261119
+    paths:
+      - .github/workflows/gridcraft-v051-autostart.yml
+      - integrations/gridcraft/gridcraft_windows_agent.py
+      - integrations/gridcraft/test_autostart_v051.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-startup-and-build:
+    runs-on: windows-2022
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile Windows startup and agent
+        shell: pwsh
+        run: |
+          python -m py_compile integrations/gridcraft/gridcraft_windows_agent.py integrations/gridcraft/test_autostart_v051.py
+          if ($LASTEXITCODE -ne 0) { throw "Compile FAILED" }
+      - name: Run GridCraft v0.5.1 launch and retry safety tests
+        shell: pwsh
+        run: |
+          python integrations/gridcraft/test_autostart_v051.py
+          if ($LASTEXITCODE -ne 0) { throw "Autostart tests FAILED" }
+      - name: P3 P4 and one-click regression
+        shell: pwsh
+        run: |
+          python integrations/gridcraft/test_oneclick_v05.py
+          if ($LASTEXITCODE -ne 0) { throw "One-click regression FAILED" }
+          python integrations/gridcraft/test_windows_agent.py
+          if ($LASTEXITCODE -ne 0) { throw "Agent regression FAILED" }
+          python integrations/gridcraft/test_desktop_local.py
+          if ($LASTEXITCODE -ne 0) { throw "P3 local regression FAILED" }
+          python integrations/gridcraft/test_outbound_worker.py
+          if ($LASTEXITCODE -ne 0) { throw "P3 worker regression FAILED" }
+          python integrations/gridcraft/test_p4_safe_write.py
+          if ($LASTEXITCODE -ne 0) { throw "P4 safety regression FAILED" }
+          python integrations/gridcraft/test_p4_desktop.py
+          if ($LASTEXITCODE -ne 0) { throw "P4 local regression FAILED" }
+      - name: Build v0.5.1 Windows EXE, package and verify SHA256
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pyinstaller==6.16.0
+          if ($LASTEXITCODE -ne 0) { throw "PyInstaller install FAILED" }
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name LizhiGridCraftAgent_v051_AutoLaunchFixed --paths integrations/gridcraft integrations/gridcraft/gridcraft_windows_agent.py
+          if ($LASTEXITCODE -ne 0) { throw "EXE build FAILED" }
+          $exe = (Resolve-Path "dist/LizhiGridCraftAgent_v051_AutoLaunchFixed.exe").Path
+          $p = Start-Process -FilePath $exe -ArgumentList "--self-test" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "Packaged EXE self-test FAILED" }
+          (Get-FileHash $exe -Algorithm SHA256).Hash.ToLowerInvariant() | Out-File -Encoding ascii dist/SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GridCraft-Windows-v051-AutoLaunchFixed-candidate
+          path: |
+            dist/LizhiGridCraftAgent_v051_AutoLaunchFixed.exe
+            dist/SHA256.txt
+          retention-days: 14
+          if-no-files-found: error
