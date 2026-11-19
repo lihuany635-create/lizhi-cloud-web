@@ -45,6 +45,7 @@ create index if not exists lizhi_finance_goal_event_read
 
 create or replace function public.lizhi_finance_goal_guard()
 returns trigger language plpgsql security invoker set search_path = '' as $$
+declare current_reserved numeric;
 begin
   if tg_op='INSERT' then
     if new.version <> 1 or new.deleted_at is not null then
@@ -62,6 +63,14 @@ begin
     if new.version <> old.version + 1 then
       raise exception 'GOAL_VERSION_CONFLICT' using errcode='23514';
     end if;
+    -- Prevent lowering a goal beneath already confirmed reserves.
+    select coalesce(sum(case when e.event_kind='allocate' then e.amount::numeric
+      else -e.amount::numeric end),0) into current_reserved
+      from public.lizhi_finance_goal_events e
+      where e.user_id=new.user_id and e.goal_id=new.id;
+    if current_reserved > new.target_amount::numeric then
+      raise exception 'GOAL_RESERVE_EXCEEDS_TARGET' using errcode='23514';
+    end if;
     new.updated_at := clock_timestamp();
   end if;
   return new;
@@ -74,18 +83,28 @@ create trigger lizhi_finance_goal_guard before insert or update on public.lizhi_
 -- releases spending the same reservation). Event records stay append-only.
 create or replace function public.lizhi_finance_goal_event_guard()
 returns trigger language plpgsql security invoker set search_path = '' as $$
-declare current_reserved bigint;
-declare source_reserved bigint;
+declare current_reserved numeric;
+declare source_reserved numeric;
+declare goal_target numeric;
 declare source_owner_goal uuid;
 begin
   if tg_op <> 'INSERT' then
     raise exception 'GOAL_EVENT_IMMUTABLE' using errcode='23514';
   end if;
-  perform 1 from public.lizhi_finance_goals g
+  select g.target_amount into goal_target from public.lizhi_finance_goals g
     where g.id=new.goal_id and g.user_id=new.user_id and g.deleted_at is null
     for update;
   if not found then
     raise exception 'GOAL_NOT_FOUND' using errcode='23514';
+  end if;
+  if new.event_kind='allocate' then
+    select coalesce(sum(case when e.event_kind='allocate' then e.amount::numeric
+      else -e.amount::numeric end),0) into current_reserved
+      from public.lizhi_finance_goal_events e
+      where e.user_id=new.user_id and e.goal_id=new.goal_id;
+    if current_reserved + new.amount::numeric > goal_target then
+      raise exception 'GOAL_RESERVE_EXCEEDS_TARGET' using errcode='23514';
+    end if;
   end if;
   if new.event_kind='release' then
     select e.goal_id into source_owner_goal
@@ -116,16 +135,13 @@ create trigger lizhi_finance_goal_event_guard
 alter table public.lizhi_finance_goals enable row level security;
 alter table public.lizhi_finance_goal_events enable row level security;
 revoke all on public.lizhi_finance_goals, public.lizhi_finance_goal_events from public, anon, authenticated;
-grant select, insert, update on public.lizhi_finance_goals to authenticated;
-grant select, insert on public.lizhi_finance_goal_events to authenticated;
+-- Read-only at EVERY migration boundary: service_role-only writes begin in P5.
+-- Never rely on a later migration revoking an earlier unsafe grant.
+grant select on public.lizhi_finance_goals to authenticated;
+grant select on public.lizhi_finance_goal_events to authenticated;
 
 create policy finance_goal_select_own on public.lizhi_finance_goals
   for select to authenticated using (user_id=(select auth.uid()));
-create policy finance_goal_insert_own on public.lizhi_finance_goals
-  for insert to authenticated with check (user_id=(select auth.uid()));
-create policy finance_goal_update_own on public.lizhi_finance_goals
-  for update to authenticated using (user_id=(select auth.uid()))
-  with check (user_id=(select auth.uid()));
 create policy finance_goal_allowlist on public.lizhi_finance_goals
   as restrictive for all to authenticated
   using (public.lizhi_web_is_allowed())
@@ -133,8 +149,6 @@ create policy finance_goal_allowlist on public.lizhi_finance_goals
 
 create policy finance_goal_event_select_own on public.lizhi_finance_goal_events
   for select to authenticated using (user_id=(select auth.uid()));
-create policy finance_goal_event_insert_own on public.lizhi_finance_goal_events
-  for insert to authenticated with check (user_id=(select auth.uid()));
 create policy finance_goal_event_allowlist on public.lizhi_finance_goal_events
   as restrictive for all to authenticated
   using (public.lizhi_web_is_allowed())
