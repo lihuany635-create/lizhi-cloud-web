@@ -76,14 +76,16 @@ def reconnect_delay(failures, retry_after=None, *, random_fraction=None):
     return base * (1 + fraction)
 
 
-def poll_delay(since_last_job, *, long_poll=False):
+def poll_delay(since_last_job, *, since_start=None, long_poll=False):
+    """2s during 60s after work, 6s normally, 20s after 10m idle."""
     if long_poll:
         return 0.0
     if since_last_job is not None and since_last_job < 60:
         return 2.0
-    if since_last_job is None or since_last_job < 600:
-        return 6.0
-    return 20.0
+    idle = since_last_job if since_last_job is not None else since_start
+    if idle is not None and idle >= 600:
+        return 20.0
+    return 6.0
 
 
 def bounded_range(s: str):
