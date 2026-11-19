@@ -28,6 +28,7 @@ async function bounded(req,max=8192){
  if(!record(body))throw Error("BAD_BODY");
  return body;
 }
+/** @param {{db?:any,verifyUser?:(jwt:string)=>Promise<any>|any,ownerUid?:string,origins?:string[]}} options */
 export function createGoalsBrowserBridge({db,verifyUser,ownerUid,origins=[]}={}){
  const allowed=new Set(origins.filter(x=>typeof x==="string"&&
   /^https:\/\/[a-z0-9.-]+(?::\d{1,5})?$/i.test(x)));
