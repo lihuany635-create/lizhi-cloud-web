@@ -34,8 +34,7 @@ test("PORTAL-REFRESH-02 new Goals assets are preloaded for owner portal",()=>{
  ]){
    assert.ok(existsSync(resolve(root,file)),"Missing "+file);
    const source=file.endsWith(".css")?html:read("loader.js");
-   const pattern=new RegExp(file.replaceAll(".","\\\\.")+"\\\\?v=([0-9]+)");
-   const activeVersion=source.match(pattern)?.[1];
+   const activeVersion=source.split(file+"?v=")[1]?.match(/^[0-9]+/)?.[0];
    assert.ok(activeVersion,"Entrypoint must version "+file);
    assert.ok(sw.includes(file+"?v="+activeVersion),"SW needs current "+file);
  }
