@@ -1,8 +1,9 @@
 // P6 goals browser bridge (security repair candidate).
-// All remote mutations are explicitly disabled until a real server-verifiable
-// WebAuthn/reauthentication factor and atomic one-time approval receipt exist.
-// JWT possession, client-side confirm(), Origin, approved=true and HMAC alone
-// are NOT evidence of a human approving an exact financial mutation.
+// Owner-authorized planning writes (never bank transfers) need a valid live
+// first-party owner session and current allowlist. Per-write passkey is NOT
+// required by the owner; use CAS, request_id and service-only write RPCs.
+// This reduces resistance to stolen owner credentials; never treat a caller-
+// supplied approval flag, Origin, or client_id OAuth token as authorization.
 import {executeGoalsCandidate} from "./finance-goals-p5-edge.mjs";
 import {validateGoalsP5,GOALS_P5_TOOLS} from "./finance-goals-p5-contract.mjs";
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -28,8 +29,8 @@ async function bounded(req,max=8192){
  if(!record(body))throw Error("BAD_BODY");
  return body;
 }
-/** @param {{db?:any,verifyUser?:(jwt:string)=>Promise<any>|any,ownerUid?:string,origins?:string[]}} options */
-export function createGoalsBrowserBridge({db,verifyUser,ownerUid,origins=[]}={}){
+/** @param {{db?:any,verifyUser?:(jwt:string)=>Promise<any>|any,ownerUid?:string,origins?:string[],writesEnabled?:boolean}} options */
+export function createGoalsBrowserBridge({db,verifyUser,ownerUid,origins=[],writesEnabled=false}={}){
  const allowed=new Set(origins.filter(x=>typeof x==="string"&&
   /^https:\/\/[a-z0-9.-]+(?::\d{1,5})?$/i.test(x)));
  const configured=Boolean(db?.rpc&&typeof verifyUser==="function"&&
@@ -58,24 +59,37 @@ export function createGoalsBrowserBridge({db,verifyUser,ownerUid,origins=[]}={})
   let data;
   try{data=await bounded(req)}
   catch{return reject("GOALS_BAD_REQUEST",400,origin)}
-  if(!["read","prepare","commit"].includes(data.action)||!names.has(data.tool)||
-   Object.keys(data).some(k=>!["action","tool","args","proof","approved"].includes(k)))
-   return reject("GOALS_INVALID_ARGS",400,origin);
+  // Reject legacy prepare/commit and any model-supplied approval fields.
+  if(!["read","write"].includes(data.action)||!names.has(data.tool)||
+     Object.keys(data).some(k=>!["action","tool","args"].includes(k)))
+     return reject("GOALS_INVALID_ARGS",400,origin);
   const tool=names.get(data.tool);
-  const isWrite=tool?.annotations?.readOnlyHint!==true;
-  // Server-side hard stop: no matter what proof or flags a caller sends,
-  // NO goals writes may reach the database until independent human proof exists.
-  if(data.action!=="read"||isWrite)
-   return reject("GOALS_HUMAN_APPROVAL_NOT_CONFIGURED",403,origin);
-  if(data.proof!==undefined||data.approved!==undefined)
-   return reject("GOALS_INVALID_ARGS",400,origin);
+  const write=tool?.annotations?.readOnlyHint!==true;
+  if(write!==(data.action==="write"))
+    return reject("GOALS_ACTION_MISMATCH",400,origin);
+  if(write&&writesEnabled!==true)
+    return reject("GOALS_WRITES_DISABLED",403,origin);
   const checked=validateGoalsP5(data.tool,data.args);
   if(!checked.ok)return reject(checked.code,422,origin);
   try{
-   const payload=await executeGoalsCandidate({db,owner:user.id},
-    data.tool,checked.args);
+   const payload=await executeGoalsCandidate({
+     db,owner:user.id,approvedWrite:write&&writesEnabled===true
+   },data.tool,checked.args);
    return json({ok:true,result:payload},200,origin);
-  }catch{return reject("GOALS_READ_FAILED",503,origin)}
+  }catch(error){
+   const allowed=new Set([
+    "GOALS_VERSION_CONFLICT","GOALS_DUPLICATE_REQUEST","GOALS_NOT_FOUND",
+    "GOALS_ACCOUNT_NOT_OWNED","GOALS_RESERVE_NOT_RELEASED",
+    "GOALS_KIND_IMMUTABLE","GOALS_FUND_SCOPE_IMMUTABLE",
+    "GOALS_INVALID_ALLOCATION","GOAL_SOURCE_ALREADY_ALLOCATED",
+    "GOAL_RESERVE_EXCEEDS_TARGET","GOAL_RELEASE_EXCEEDS_RESERVE",
+    "GOAL_RELEASE_SOURCE_INVALID","GOALS_UNBALANCED",
+    "GOALS_INVALID_ARGS","GOALS_INVALID_GOAL","GOALS_INVALID_LINES"
+   ]);
+   if(write&&allowed.has(error?.code))
+     return reject(error.code,409,origin);
+   return reject(write?"GOALS_WRITE_FAILED":"GOALS_READ_FAILED",503,origin);
+  }
  }
- return Object.freeze({handle,configured,writeEnabled:false});
+ return Object.freeze({handle,configured,writeEnabled:writesEnabled===true});
 }
