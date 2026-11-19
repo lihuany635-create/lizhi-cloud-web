@@ -1,0 +1,35 @@
+name: GridCraft v0.5.4 P2 Safe Batch Candidate
+on:
+  pull_request:
+    paths:
+      - 'integrations/gridcraft/gridcraft_p2_batch.py'
+      - 'integrations/gridcraft/test_p2_batch.py'
+      - 'integrations/gridcraft/gridcraft_outbound_worker.py'
+      - 'integrations/gridcraft/gridcraft_windows_agent.py'
+      - '.github/workflows/gridcraft-v054-p2-batch.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-regression:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.12', '3.13']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Compile candidate and legacy adapters
+        run: python -m py_compile integrations/gridcraft/gridcraft_p2_batch.py integrations/gridcraft/gridcraft_p4_safe_write.py integrations/gridcraft/gridcraft_windows_agent.py integrations/gridcraft/gridcraft_outbound_worker.py
+      - name: P2 batch, receipts and failure injection (synthetic data only)
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_p2_batch.py' -v
+      - name: Legacy P4 protected write tests
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_p4_safe_write.py' -v
+      - name: P1 source fidelity isolated tests
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_xlsx_fidelity.py' -v
+      - name: Existing outbound worker regression tests
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_v053_reliability.py' -v
