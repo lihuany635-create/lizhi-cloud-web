@@ -184,6 +184,22 @@ def test_new_server_merges_heartbeat_and_longpoll_timeout_30(monkeypatch):
     assert calls[-1][2]==30 and relay.heartbeat_merged and relay.long_poll
 
 
+def test_merged_heartbeat_updates_offline_gridcraft_status_without_separate_heartbeat(monkeypatch):
+    calls=[]
+    relay=outbound.HTTPSDeviceTransport(device_id="local-device",device_token="a"*64)
+    relay.heartbeat_merged=True
+    relay.long_poll=True
+    def fake_post(action,payload,*,timeout=7):
+        calls.append((action,payload,timeout))
+        return {"job":None,"heartbeatMerged":True,"longPoll":True}
+    monkeypatch.setattr(relay,"_post",fake_post)
+    local=mock.Mock()
+    local.status.return_value={"status":"GRIDCRAFT_OFFLINE"}
+    worker=outbound.OutboundWorker(transport=relay,local=local)
+    assert worker.run_once()["status"]=="GRIDCRAFT_OFFLINE"
+    assert calls==[("poll",{"status":"GRIDCRAFT_OFFLINE"},30)]
+
+
 def test_p4_gate_off_but_p3_still_operates_with_corrupt_ledger():
     worker=outbound.OutboundWorker(transport=mock.Mock(),local=mock.Mock(),
             approved_docs={"1"},p4_writer=None)
