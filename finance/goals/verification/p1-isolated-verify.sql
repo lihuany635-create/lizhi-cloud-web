@@ -27,12 +27,16 @@ begin
   if has_table_privilege('anon','public.lizhi_finance_goals','SELECT')
      or has_table_privilege('anon','public.lizhi_finance_goal_events','INSERT')
      or has_table_privilege('authenticated','public.lizhi_finance_goal_events','DELETE')
+     or has_table_privilege('authenticated','public.lizhi_finance_goals','INSERT')
+     or has_table_privilege('authenticated','public.lizhi_finance_goals','UPDATE')
+     or has_table_privilege('authenticated','public.lizhi_finance_goal_events','INSERT')
      or not (select relrowsecurity from pg_class where oid='public.lizhi_finance_goals'::regclass)
      or not (select relrowsecurity from pg_class where oid='public.lizhi_finance_goal_events'::regclass) then
     raise exception 'P1_PERMISSIONS_INVALID';
   end if;
 end $$;
-set role authenticated;
+-- Fixtures and trigger checks run as a trusted disposable DB owner, not
+-- as an authenticated user, which MUST remain read-only at every phase.
 select set_config('app.allowed','true',false);
 select set_config('request.jwt.claim.sub','11111111-1111-4111-8111-111111111111',false);
 insert into public.lizhi_finance_goals(
@@ -99,6 +103,17 @@ begin
   exception when check_violation then null;
   end;
 end $$;
+-- No first-party or OAuth bearer may directly mutate goal tables.
+set role authenticated;
+do $
+begin
+  begin
+    insert into public.lizhi_finance_goals(user_id,month,goal_kind,target_amount)
+    values(auth.uid(),'2027-01','savings',100);
+    raise exception 'P1_AUTH_DIRECT_WRITE_NOT_BLOCKED';
+  exception when insufficient_privilege then null;
+  end;
+end $;
 -- Attempt to create another user's goal must be rejected by RLS.
 do $$
 begin
