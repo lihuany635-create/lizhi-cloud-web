@@ -343,10 +343,9 @@ class AgentUI:
         self.launch_polls += 1
         if self.launch_polls >= LAUNCH_MAX_POLLS:
             self.launch_active = False
-            self.status_var.set(
-                "GridCraft 自動啟動未成功" +
-                ("：" + self.launch_error if self.launch_error else "，請檢查主程式")
-            )
+            if not self.launch_error:
+                self.launch_error = "啟動後未收到 READY"
+            self.status_var.set("GridCraft 自動啟動未成功：" + self.launch_error)
             return
 
         # A socket that exists but fails control negotiation may be a running
@@ -365,7 +364,8 @@ class AgentUI:
                 executable = locate_gridcraft_exe(self.path_var.get())
                 if executable is None:
                     self.launch_active = False
-                    self.status_var.set("找不到 GridCraft.exe；請確認安裝位置")
+                    self.launch_error = "找不到 GridCraft.exe；請確認安裝位置"
+                    self.status_var.set(self.launch_error)
                     return
                 if str(executable) != self.path_var.get():
                     self.path_var.set(str(executable))
@@ -425,6 +425,8 @@ class AgentUI:
             "UNAUTHORIZED": "本機 GridCraft 授權失效",
             "CONTROL_ERROR": "本機 GridCraft 連線錯誤"
         }.get(status, status))
+        if status == "GRIDCRAFT_OFFLINE" and not self.launch_active and self.launch_error:
+            self.status_var.set("自動啟動失敗：" + self.launch_error)
         if status == "READY":
             try:
                 windows = local.windows()
