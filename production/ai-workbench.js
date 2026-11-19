@@ -55,11 +55,26 @@ export function mount(host) {
     if (!r.ok) throw new Error(v.error || '工作台連線失敗');
     return v;
   }
-  async function load() {
-    if (state.tab === 'side') return loadSide();
-    try { state.data = await api('board'); state.error = ''; for (const id of state.open) state.details[id] = await api('task?id=' + id); }
-    catch (e) { state.error = e.message; }
-    render();
+  // Quiet polling never re-creates the DOM when the visible snapshot is
+  // unchanged; otherwise it can reset keyboard focus and <details> every 60s.
+  let loadSequence = 0;
+  const sameSnapshot = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  async function load({quiet = false} = {}) {
+    if (state.tab === 'side') return loadSide({quiet});
+    const seq = ++loadSequence;
+    try {
+      const data = await api('board');
+      const details = {...state.details};
+      for (const id of state.open) details[id] = await api('task?id=' + id);
+      if (seq !== loadSequence || state.tab !== 'roles') return;
+      const unchanged = !state.error && sameSnapshot(state.data, data) &&
+        [...state.open].every(id => sameSnapshot(state.details[id], details[id]));
+      state.data = data; state.details = details; state.error = '';
+      if (!quiet || !unchanged) render();
+    } catch (e) {
+      if (seq !== loadSequence || state.tab !== 'roles') return;
+      if (!quiet || state.error !== e.message) { state.error = e.message; render(); }
+    }
   }
 
   function taskRow(t) {
@@ -85,10 +100,19 @@ export function mount(host) {
     </div>`;
   }
 
-  async function loadSide() {
-    try { const [side, keys] = await Promise.all([api('side'), api('agent-keys')]); state.side = side; state.keys = keys.keys; state.error = ''; }
-    catch (e) { state.error = e.message; }
-    render();
+  async function loadSide({quiet = false} = {}) {
+    const seq = ++loadSequence;
+    try {
+      const [side, keys] = await Promise.all([api('side'), api('agent-keys')]);
+      if (seq !== loadSequence || state.tab !== 'side') return;
+      const unchanged = !state.error && sameSnapshot(state.side, side) &&
+        sameSnapshot(state.keys, keys.keys);
+      state.side = side; state.keys = keys.keys; state.error = '';
+      if (!quiet || !unchanged) render();
+    } catch (e) {
+      if (seq !== loadSequence || state.tab !== 'side') return;
+      if (!quiet || state.error !== e.message) { state.error = e.message; render(); }
+    }
   }
   const tabs = () => `<div class="aiwb-tabs"><button data-tab="roles" class="${state.tab === 'roles' ? 'on' : ''}">三角色任務</button><button data-tab="side" class="${state.tab === 'side' ? 'on' : ''}">其他 AI 紀錄</button></div>`;
   function todoCard(t) {
@@ -190,5 +214,11 @@ export function mount(host) {
   });
 
   render(); load();
-  const timer = setInterval(() => { if (document.visibilityState === 'visible' && host.isConnected && !state.newKey) load(); else if (!host.isConnected) clearInterval(timer); }, 60000);
+  const timer = setInterval(() => {
+    if (!host.isConnected) { clearInterval(timer); return; }
+    const focused = root.contains(document.activeElement) &&
+      /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+    if (document.visibilityState === 'visible' && !state.newKey && !focused)
+      void load({quiet:true});
+  }, 60000);
 }
