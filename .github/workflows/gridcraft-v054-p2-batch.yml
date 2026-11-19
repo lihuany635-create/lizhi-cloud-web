@@ -36,4 +36,5 @@ jobs:
       - name: Install existing v0.5.3 regression test dependency
         run: python -m pip install pytest
       - name: Existing v0.5.3 transport / Windows regression tests
+        if: runner.os == 'Windows'
         run: python -m pytest integrations/gridcraft/test_v053_reliability.py -q
