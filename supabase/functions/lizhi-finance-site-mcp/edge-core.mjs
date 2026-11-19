@@ -131,25 +131,8 @@ function calculate(name,args,b) {
       credit_card:names.get(id(t.creditCardId))||null
     }))};
 }
-// Only the private owner-authenticated Site Worker can sign a goals-write
-// confirmation, after its trusted interactive user-approval callback succeeds.
-async function verifySiteGoalApproval(req,frame,token,now=Date.now()){
-  const match=/^(\d{10})\.([0-9a-f]{64})$/.exec(
-    req.headers.get("x-lizhi-goals-write-approval")||"");
-  if(!match||!HEX.test(token||""))return false;
-  const when=Number(match[1]),current=Math.floor(now/1000);
-  if(!Number.isSafeInteger(when)||when>current+5||when<current-90)return false;
-  try{
-    const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(token),
-      {name:"HMAC",hash:"SHA-256"},false,["verify"]);
-    const bytes=Uint8Array.from(match[2].match(/../g),x=>parseInt(x,16));
-    const data=new TextEncoder().encode(String(when)+"\n"+JSON.stringify(frame));
-    return await crypto.subtle.verify("HMAC",key,bytes,data);
-  }catch{return false}
-}
-
 /** Dedicated server-to-server Site gateway; never expose the bearer to the browser. */
-export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBearer=equal,goalToolsEnabled=false,goalWriteApproval=null}) {
+export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBearer=equal,goalToolsEnabled=false}) {
   if(req.headers.has("origin"))return json({error:"BROWSER_ORIGIN_NOT_ALLOWED"},403);
   if(req.method!=="POST")return json({error:"POST_ONLY"},405);
   if(!HEX.test(token||"")||!UUID.test(ownerUid||"")||!db?.from)
@@ -178,15 +161,11 @@ export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBear
     // a trusted private-Site approval gate must authorise each user-requested mutation.
     if(!goalToolsEnabled)return fail(requestId,"GOALS_NOT_CONNECTED");
     const write=!GOALS_CANDIDATE_MCP.find(t=>t.name===p.name)?.annotations?.readOnlyHint;
-    let approvedWrite=false;
-    if(write){
-      try {
-        approvedWrite=typeof goalWriteApproval==="function"
-          ?await goalWriteApproval({tool:p.name,arguments:p.arguments??{},owner:ownerUid})===true
-          :await verifySiteGoalApproval(req,frame,token);
-      }catch {approvedWrite=false}
-      if(!approvedWrite)return fail(requestId,"GOALS_EXPLICIT_APPROVAL_REQUIRED");
-    }
+    // F-03: a Site bearer or mock callback is not an independent human factor.
+    // No production-facing goal mutation can reach an RPC until the original
+    // private Site has verifiable WebAuthn/reauthentication and one-time consent.
+    if(write)return fail(requestId,"GOALS_HUMAN_APPROVAL_NOT_CONFIGURED");
+    const approvedWrite=false;
     try{
       const result=await executeGoalsCandidate({db,owner:ownerUid,approvedWrite},p.name,p.arguments??{});
       return success(requestId,result);
