@@ -281,13 +281,23 @@ def diagnostic() -> int:
 
 
 class AgentUI:
-    def __init__(self, root: tk.Tk, minimized: bool = False):
+    def __init__(self, root: tk.Tk, minimized: bool = False, quit_requested=None):
         self.root = root
-        self.root.title(APP_TITLE + "｜v0.5.2 換檔自動重連候選")
+        self.root.title(APP_TITLE + "｜v0.5.3")
         self.root.geometry("490x275")
         self.root.minsize(440, 260)
         self.root.protocol("WM_DELETE_WINDOW", self.stop)
         self.settings = load_settings()
+        self.settings["agent_version"] = AGENT_VERSION
+        try:
+            save_settings(self.settings)
+        except OSError:
+            _logger.warning("SETTINGS_SAVE_FAILED")
+        self._user_stopped = False
+        self._write_suspended_code = ""
+        self._last_gridcraft_logged = None
+        self._last_remote_logged = None
+        self._quit_requested = quit_requested
         self.pair_store = DeviceStore(app_directory())
         try:
             self.paired = self.pair_store.load()
@@ -329,6 +339,8 @@ class AgentUI:
         # Also recover the verified default install path if it exists.
         root.after(1100, self.launch_on_login)
         root.after(4500, self._poll)
+        if quit_requested is not None:
+            root.after(200, self._check_quit)
         if self.paired:
             root.after(900, self.start_remote)
 
@@ -337,7 +349,7 @@ class AgentUI:
         frm = ttk.Frame(self.root, padding=16)
         frm.pack(fill="both", expand=True)
         ttk.Label(frm, text="立之 GridCraft", font=("Microsoft JhengHei UI", 17, "bold")).pack(anchor="w")
-        ttk.Label(frm, text="GridCraft 斷線自動恢復／換檔自動辨識｜v0.5.2",
+        ttk.Label(frm, text="GridCraft 自動重連、換檔與安全備份｜v0.5.3",
                   foreground="#5b6472").pack(anchor="w", pady=(3, 12))
         ttk.Label(frm, textvariable=self.status_var,
                   font=("Microsoft JhengHei UI", 12, "bold")).pack(anchor="w")
@@ -507,11 +519,29 @@ class AgentUI:
             self.launch_var.set(not self.launch_var.get())
             messagebox.showerror("儲存失敗", str(exc), parent=self.root)
 
+    def _check_quit(self):
+        if not self.running:
+            return
+        if self._quit_requested is not None and self._quit_requested.is_set():
+            self.stop()
+            return
+        self.root.after(200, self._check_quit)
+
+    def _remote_transition(self, state):
+        if state != getattr(self, "_last_remote_logged", None):
+            if state in ("CONNECTED","BACKOFF","STOPPED","STARTING"):
+                _logger.info("REMOTE_STATE %s", state)
+            self._last_remote_logged = state
+
     def refresh(self):
         """Shows local readiness, not an unverified claim that cloud MCP succeeded."""
         local = GridCraftLocal(port=7979, timeout=1.2)
         state = local.status()
         status = state.get("status", "CONTROL_ERROR")
+        if status != getattr(self, "_last_gridcraft_logged", None):
+            if status in ("READY","GRIDCRAFT_OFFLINE","UNAUTHORIZED","CONTROL_ERROR"):
+                _logger.info("GRIDCRAFT_STATE %s", status)
+            self._last_gridcraft_logged = status
         self.status_var.set({
             "READY": "GridCraft：READY",
             "GRIDCRAFT_OFFLINE": "GridCraft 尚未啟動",
@@ -536,6 +566,8 @@ class AgentUI:
         self.p4_write_enabled = bool(
             self.paired and self.allowed_docs and not self.remote_stop.is_set()
         )
+        if getattr(self, "_write_suspended_code", ""):
+            self.status_var.set("寫入暫停：收據檔異常")
         self.info_var.set("ChatGPT 遠端 MCP：" + self.remote_status)
         return status
 
@@ -550,6 +582,10 @@ class AgentUI:
         if not self.running:
             return
         try:
+            if (self.paired and not getattr(self, "_user_stopped", False)
+                    and not self.remote_stop.is_set()
+                    and (self.remote_thread is None or not self.remote_thread.is_alive())):
+                self.start_remote()
             status = self.refresh()
             if status == "READY":
                 self._last_ready = True
