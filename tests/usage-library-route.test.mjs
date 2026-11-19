@@ -32,7 +32,9 @@ test("style, assets and cache versions are aligned on desktop/mobile", () => {
   const css = read("study.css");
   const sw = read("sw.js");
   assert.match(index, /study\.css\?v=18/);
-  assert.match(index, /workspace-ui\.js\?v=40/);
+  const workspaceVersion=index.match(/workspace-ui[.]js[?]v=([0-9]+)/)?.[1];
+  assert.ok(workspaceVersion, "Portal entry must version workspace-ui");
+  assert.ok(sw.includes('"workspace-ui.js?v='+workspaceVersion+'"'), "SW workspace-ui version must match");
   const appVersion=index.match(/app[.]js[?]v=([0-9]+)/)?.[1];
   assert.ok(appVersion, "Portal entry must version its app script");
   assert.ok(sw.includes('"app.js?v='+appVersion+'"'), "SW and HTML app.js versions must match");
@@ -40,7 +42,7 @@ test("style, assets and cache versions are aligned on desktop/mobile", () => {
   assert.match(css, /\.route-usage \.workspace-panel/);
   assert.match(sw, /usage-monitor\/\?v=1/);
   assert.match(sw, /usage-monitor\/monitor\.js/);
-  assert.match(sw, /workspace-ui\.js\?v=40/);
+
 });
 
 test("dashboard does not contain a service key, request body logging, or a fake monthly total", () => {
