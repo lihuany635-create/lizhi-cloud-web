@@ -26,7 +26,7 @@ const browserBridge=createGoalsBrowserBridge({
   db,ownerUid,
   origins:(Deno.env.get("LIZHI_FINANCE_GOALS_ORIGINS")||"").split(",")
     .map(x=>x.trim()).filter(Boolean),
-  verifyUser:async jwt=>{
+  verifyUser:async (jwt:string)=>{
     if(!db?.auth?.getUser||!publicKey||!url)return null;
     // getUser(jwt) authenticates the token BEFORE any decoded claim is trusted.
     const {data,error}=await db.auth.getUser(jwt);
