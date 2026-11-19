@@ -216,7 +216,9 @@ class OutboundWorker:
         try:
             self._poll_accepts_status = "status" in inspect.signature(
                 self.transport.poll).parameters
-        except (TypeError, ValueError):
+        except (AttributeError, TypeError, ValueError):
+            # Tests intentionally use transport=None when testing purely local
+            # P3/P4 job validation; this is never used for a network run.
             self._poll_accepts_status = False
 
     def run_once(self):
