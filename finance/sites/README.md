@@ -58,18 +58,16 @@ Sites 注意：
 
 目前沒有 Sites 建立／私人發布權限的對話，不能自行聲稱第 5～6 步完成。
 
-## P6 儲蓄／投資 Goals（安全修復候選，未部署）
+## P6 儲蓄／投資 Goals（本人登入直接寫入，候選未部署｜2026-11-19）
 
-- 原十項 Finance MCP 必須保持不變。開啟 `LIZHI_FINANCE_GOALS_MCP_ENABLED` 僅能列出額外五項工具；**全部 Goals 寫入仍會被原 Site adapter 和 Edge 雙層拒絕**（`GOALS_HUMAN_APPROVAL_NOT_CONFIGURED`），包括模型提供的任何確認欄位、模擬 Site callback 或以 Bearer 產生的舊 HMAC。
-- `LIZHI_FINANCE_GOALS_BROWSER_ENABLED=true` 及明確的 HTTPS origins 僅允許讀取目標。原網站使用本人 JWT；Edge 先聯絡 Supabase Auth 驗證 JWT，再檢查 `aud`、`client_id`、`session_id` 及 `aal`，並以使用者自己的 JWT 查原 allowlist。沒有有效的第一方登入與 allowlist 許可即拒絕。
-- Claude 審查的 `prepare/commit` + `approved=true`、`window.confirm`、Bearer-HMAC 均**不是可信真人操作證據**。目前已移除該寫入通道；不能解讀為已完成 Passkey 實作。
-- 若日後要啟用寫入，須另行實作伺服器驗證的 Passkey/WebAuthn 或等效二次驗證，逐筆綁定 payload、帳號、會話、單次 nonce，並在 DB 原子消耗、確認撤權；還需原站真人端到端測試及獨立安全複審。
-- 本修正只存在 GitHub 開發分支。正式 Supabase Edge、原 Private Site、財務帳本、既有預算沒有因此變更。
+使用者已明確取消「真人逐筆 Passkey／確認視窗」需求。本候選只變更**理財規劃資料**，不執行銀行轉帳、信用卡付款或證券交易。
 
-## 2026-11-19 安全修復候選（CHANGES_REQUIRED）
+- 原十項 MCP 必須保留。設定 `LIZHI_FINANCE_GOALS_MCP_ENABLED=true` 才列出五項新增工具；`LIZHI_FINANCE_GOALS_BROWSER_ENABLED=true` 才開放網站目標 API。上述兩者均不會單獨啟用寫入。
+- 寫入獨立總開關 `LIZHI_FINANCE_GOALS_WRITES_ENABLED=true`（預設 false）。尚未設定時，Browser Goals 與 Site MCP 均明確回應 `GOALS_WRITES_DISABLED`、完全不呼叫寫入 RPC。
+- 原 Private Site Worker 先驗證平台真人本人 principal 並禁止 browser Origin，使用僅伺服器持有的既有 Site bearer 轉送。Edge 驗證固定 bearer、固定 owner UID，且**每次 Goals 操作**都用 Auth admin `getUserById` 檢查擁有者現況、預期 email 以及 ban 狀態；Edge 必須提供 `LIZHI_FINANCE_SITE_OWNER_EMAIL` 與既有 owner UID，缺少時拒絕。
+- 原網頁每次操作使用本人 Supabase JWT，Edge 先以 `auth.getUser(jwt)` 驗證，必須為本人 UID、第一方 `aud=authenticated`、有效 `session_id`、AAL，且 JWT 不含 `client_id`；再以該 JWT 呼叫原 `lizhi_web_is_allowed` 做當下 allowlist 判定。只要任一環節不符就拒絕。
+- 無 `prepare/commit`、`approved:true`、Bearer-HMAC、自行產生的「真人同意」憑證或 Passkey。網站單次送出 `action=write`，由 RPC 檢查 request_id 冪等、版本 CAS、唯一資金來源、金額範圍與保護性不可刪除；記錄 receipt，完成後重新讀取。
+- **明確剩餘風險：** 放棄逐筆本人再驗證後，若已登入的本人 session / 既有 Private Site bearer 遭竊或遭授權程式誤用，攻擊者可能更改規劃資料。原 Site MFA/Passkey 不是必要條件，且 Auth logout 後 access token 的撤銷即時性尚須真人實測；不應謊稱能阻止所有憑證失竊。
+- 本次修正為 PR #97 候選。正式更新前仍需原資料庫備份、隔離還原、整套相依 PR 安全整合、獨立複審、正式 Edge 與**原 Site 原地**接線及手機／電腦跨帳號測試。不建立第二套 Site、MCP 或資料庫。
 
-Claude 獨立審查證實 P6 的 prepare/commit、Bearer HMAC 不是獨立真人核准。現 P6 候選將 Browser Goals 和 Site Goals 所有寫入均預設拒絕（GOALS_HUMAN_APPROVAL_NOT_CONFIGURED），只保留本人的 Goals 讀取；不可將 window.confirm、模型參數或第三方 OAuth Token 視為真人同意。所有本階段結果為 CANDIDATE / NOT_DEPLOYED。
-
-恢復寫入前，原網站必須加入伺服器驗證的 WebAuthn/Passkey 或等效本人再驗證；逐筆綁定目標、金額、完整 payload、session 與單次 nonce，在資料庫原子消耗，並通過獨立複審與真實跨帳號、撤權、手機驗收。不可恢復原 bearer-derived HMAC 通道。
-
-來源：https://docs.google.com/document/d/1298KW4gv_BmUYN0p0gMYsvuRyVMEfNvZ9OFg9aw7yVw/edit
+來源：<https://docs.google.com/document/d/1298KW4gv_BmUYN0p0gMYsvuRyVMEfNvZ9OFg9aw7yVw/edit>
