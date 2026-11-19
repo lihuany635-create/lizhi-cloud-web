@@ -43,7 +43,7 @@ export async function executeGoalsCandidate({
   } else if(toolName==="finance_goals_allocation_set"){
     Object.assign(params,{
       p_amount:args.amount,p_source_reference:args.source_reference,
-      p_confirmed:args.confirmed_by_user
+      p_confirmed:true
     });
   } else failure("GOALS_TOOL_UNKNOWN");
   let data;
