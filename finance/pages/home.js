@@ -245,9 +245,10 @@ const FinanceHome=(()=>{
       ?'<section class="finance-section">目標介面尚未載入。</section>'
       :FinanceGoalsP3Ui.render({report:ready?ui.goals.report:null,state:ui.goals.state});
     const forms=typeof FinanceGoalsP5Ui==="undefined"?"":FinanceGoalsP5Ui.render({
-      enabled:ready,month:ui.goals.month,goals:ready?ui.goals.rows:[],
+      enabled:false,month:ui.goals.month,goals:ready?ui.goals.rows:[],
       plan:ready?ui.goals.plan:null,accounts:ready?ui.accounts:[]});
-    const feedback=ui.goals.error?'<p role="alert">目標讀取或寫入尚未完成，請確認本人登入與雲端服務。</p>':"";
+    const feedback='<p class="finance-goals-safety-note" role="status">安全審查修復中：目前只能查詢目標，不能寫入。確認視窗不能視為身分驗證。</p>'+
+      (ui.goals.error?'<p role="alert">目標讀取或寫入尚未完成，請確認本人登入與雲端服務。</p>':"");
     return `<div class="finance-actions"><button type="button" class="finance-button" data-finance-action="goals-refresh" ${ui.goals.loading?"disabled":""}>重新讀取雲端目標</button></div>`+base+feedback+forms;
   }
   function content(){const pages={overview,transactions:transactionsPage,accounts:accountsPage,cards:cardsPage,categories:categoriesPage,reports:reportsPage,budgets:budgetPage,goals:goalsPage,settings:settingsPage};return `${rail()}<div class="finance-stage">${header()}<div class="finance-body">${alerts()}${ui.loading&&!ui.loaded?loading():(pages[ui.view]||overview)()}</div></div>${modal()}`;}
