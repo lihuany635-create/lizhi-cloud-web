@@ -44,7 +44,7 @@ create index if not exists lizhi_finance_goal_event_read
   on public.lizhi_finance_goal_events (user_id, goal_id, created_at, id);
 
 create or replace function public.lizhi_finance_goal_guard()
-returns trigger language plpgsql security invoker set search_path = '' as $
+returns trigger language plpgsql security invoker set search_path = '' as $$
 declare current_reserved numeric;
 begin
   if tg_op='INSERT' then
