@@ -1,0 +1,65 @@
+name: Finance Goals P2 isolated candidate checks
+
+on:
+  pull_request:
+    paths:
+      - 'finance/goals/**'
+      - 'finance/tests/finance-goals-p1.test.mjs'
+      - 'finance/tests/finance-goals-p2.test.mjs'
+      - '.github/workflows/finance-goals-p2-checks.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: finance-goals-p2-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  node-p1-p2:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check P1 and P2 syntax
+        run: |
+          node --check finance/goals/p1-goal-model.mjs
+          node --check finance/goals/p2-salary-sinking-model.mjs
+      - name: Verify P1 backwards compatibility and P2 salary/fund model
+        run: |
+          node --test finance/tests/finance-goals-p1.test.mjs finance/tests/finance-goals-p2.test.mjs
+
+  isolated-postgres:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: finance_goals_p2_disposable
+          POSTGRES_PASSWORD: isolated-no-production
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d finance_goals_p2_disposable"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGPASSWORD: isolated-no-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify P2 SQL on disposable PostgreSQL only
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+          psql -h 127.0.0.1 -U postgres -d finance_goals_p2_disposable -v ON_ERROR_STOP=1 -f finance/goals/verification/p2-isolated-verify.sql
