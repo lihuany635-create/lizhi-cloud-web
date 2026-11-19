@@ -89,43 +89,61 @@ test("P6-05 cannot substitute caller owner or SQL fields in args",async()=>{
 test("P6-06 a browser cannot mutate via a read action",async()=>{
  const {bridge,db}=make();
  const r=await call(bridge,"read","finance_goals_goal_set",base());
- assert.equal(r.status,403);
+ assert.equal(r.status,400);
  assert.equal(db.calls.length,0);
 });
-test("P6-07 JWT and approved=true cannot create a goals write",async()=>{
+test("P6-07 disabled write flag refuses authenticated owner without DB call",async()=>{
  const {bridge,db}=make();
- for(const action of ["prepare","commit"]){
-   const r=await call(bridge,action,"finance_goals_goal_set",base(),
-     {extra:{approved:true,proof:"fake-human-presence"}});
+ const r=await call(bridge,"write","finance_goals_goal_set",base());
+ assert.equal(r.status,403);
+ assert.equal(r.data.code,"GOALS_WRITES_DISABLED");
+ assert.equal(db.calls.length,0);
+});
+test("P6-08 owner JWT writes once when enabled, no approval proof or Passkey",async()=>{
+ const {bridge,db}=make({writesEnabled:true});
+ const r=await call(bridge,"write","finance_goals_goal_set",base());
+ assert.equal(r.status,200);
+ assert.equal(r.data.result.committed,true);
+ assert.equal(r.data.result.actualTransfer,false);
+ assert.equal(db.calls.length,1);
+ assert.equal(db.calls[0].args.p_owner,OWNER);
+ assert.doesNotMatch(JSON.stringify(r.data),/NEVER_RETURN|privateToken/);
+});
+test("P6-09 spoofing approval or legacy prepare/commit is rejected",async()=>{
+ const {bridge,db}=make({writesEnabled:true});
+ const a=await call(bridge,"prepare","finance_goals_goal_set",base());
+ assert.equal(a.status,400);
+ const b=await call(bridge,"write","finance_goals_goal_set",base(),{extra:{approved:true}});
+ assert.equal(b.status,400);
+ assert.equal(db.calls.length,0);
+});
+test("P6-10 revoked allowlist, OAuth-like or foreign-owner principals fail closed",async()=>{
+ for(const profile of [
+   {id:OWNER,firstParty:false,allowlisted:true},
+   {id:OWNER,firstParty:true,allowlisted:false},
+   {id:OTHER,firstParty:true,allowlisted:true}
+ ]){
+   const x=make({writesEnabled:true,verifyUser:async()=>profile});
+   const r=await call(x.bridge,"write","finance_goals_goal_set",base());
    assert.equal(r.status,403);
-   assert.equal(r.data.code,"GOALS_HUMAN_APPROVAL_NOT_CONFIGURED");
-   assert.equal(db.calls.length,0);
+   assert.equal(x.db.calls.length,0);
  }
 });
-test("P6-08 do not issue a reusable consent proof without a verifier",async()=>{
- const {bridge,db}=make();
- const r=await call(bridge,"prepare","finance_goals_goal_set",base());
- assert.equal(r.status,403);
- assert.equal(Object.hasOwn(r.data,"proof"),false);
- assert.equal(db.calls.length,0);
-});
-test("P6-09 current first-party session must be verified independently of owner id",async()=>{
- const x=make({verifyUser:async()=>({id:OWNER,firstParty:false,allowlisted:true})});
- const r=await call(x.bridge,"read","finance_goals_month_report",{month:"2026-12"});
- assert.equal(r.status,403);
- assert.equal(x.db.calls.length,0);
-});
-test("P6-10 allowlist revocation must reject even a valid owner session",async()=>{
- const x=make({verifyUser:async()=>({id:OWNER,firstParty:true,allowlisted:false})});
- const r=await call(x.bridge,"read","finance_goals_month_report",{month:"2026-12"});
- assert.equal(r.status,403);
- assert.equal(x.db.calls.length,0);
-});
-test("P6-11 browser client cannot invoke mutations without verified human approval",async()=>{
- const gateway=BrowserClient.create({getAuth:()=>{throw Error("SHOULD_NOT_QUERY_AUTH")},
-   doFetch:async()=>{throw Error("SHOULD_NOT_FETCH")}});
- await assert.rejects(()=>gateway.invoke("finance_goals_goal_set",base()),
-   {code:"GOALS_HUMAN_APPROVAL_NOT_CONFIGURED"});
+test("P6-11 browser client sends one request and requires verified receipt",async()=>{
+ const access={user:{id:OWNER},access_token:"test-owner-jwt"};
+ const client={supabaseUrl:"https://hrdzywkihfqggiwjgavi.supabase.co",
+   auth:{getSession:async()=>({data:{session:access},error:null}),
+     getUser:async()=>({data:{user:{id:OWNER}},error:null})}};
+ const gateway=BrowserClient.create({
+   getAuth:()=>({client,user:{id:OWNER}}),owner:async()=>OWNER,
+   doFetch:async(url,init)=>{
+     assert.equal(JSON.parse(init.body).action,"write");
+     assert.equal(JSON.parse(init.body).tool,"finance_goals_goal_set");
+     return Response.json({ok:true,result:{committed:true,actualTransfer:false,status:"created"}});
+   }
+ });
+ const result=await gateway.invoke("finance_goals_goal_set",base());
+ assert.equal(result.committed,true);
 });
 test("P6-12 unknown tool and unrecognised extra JSON fields are denied",async()=>{
  const {bridge}=make();
