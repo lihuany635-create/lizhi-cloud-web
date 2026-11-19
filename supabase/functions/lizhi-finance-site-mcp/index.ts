@@ -2,6 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "npm:@supabase/supabase-js@2.109.0";
 import {handleFinanceSiteRequest} from "./edge-core.mjs";
 import {createGoalsBrowserBridge} from "./finance-goals-browser-bridge.mjs";
+import {verifiedFirstPartyClaims} from "./finance-goals-auth-claims.mjs";
 
 /** 
  * Separate from OAuth Finance MCP: private ChatGPT Sites server-to-server route.
@@ -21,19 +22,6 @@ const db=url&&serviceKey?createClient(url,serviceKey,{
 // A verified OAuth client_id is never a valid Finance browser principal.
 const publicKey=Deno.env.get("SUPABASE_PUBLISHABLE_KEY")||
  Deno.env.get("SUPABASE_ANON_KEY")||"";
-function verifiedClaims(jwt:string){
-  try{
-    const parts=jwt.split(".");
-    if(parts.length!==3||parts[1].length>8192)return null;
-    const b64=parts[1].replace(/-/g,"+").replace(/_/g,"/");
-    const claims=JSON.parse(atob(b64.padEnd(Math.ceil(b64.length/4)*4,"=")));
-    if(!claims||typeof claims!=="object"||claims.client_id||
-      claims.aud!=="authenticated"||
-      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(claims.session_id||"")||
-      !["aal1","aal2"].includes(claims.aal))return null;
-    return claims;
-  }catch{return null}
-}
 const browserBridge=createGoalsBrowserBridge({
   db,ownerUid,
   origins:(Deno.env.get("LIZHI_FINANCE_GOALS_ORIGINS")||"").split(",")
@@ -43,8 +31,8 @@ const browserBridge=createGoalsBrowserBridge({
     // getUser(jwt) authenticates the token BEFORE any decoded claim is trusted.
     const {data,error}=await db.auth.getUser(jwt);
     if(error||!data?.user?.id)return null;
-    const claims=verifiedClaims(jwt);
-    if(!claims||claims.sub!==data.user.id)return null;
+    const claims=verifiedFirstPartyClaims(jwt,data.user.id);
+    if(!claims)return null;
     // The service role bypasses RLS. Check the original allowlist with the
     // owner's own JWT instead, and require an exact true response.
     const userDb=createClient(url,publicKey,{
