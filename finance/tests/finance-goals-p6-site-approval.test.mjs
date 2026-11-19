@@ -54,27 +54,20 @@ test("P6-SITE-02 denies Goals write when the real owner rejects confirmation",as
  const r=await handleFinanceSiteMcp(incoming(),x.env,x.opts);
  assert.equal(r.status,403);assert.equal(x.metrics().forwarded,0);
 });
-test("P6-SITE-03 Site signed confirmation binds exact request and allows one valid RPC",async()=>{
+test("P6-SITE-03 rejects even an injected approval callback while no verified human API exists",async()=>{
  const x=ctx({approve:true});
  const r=await handleFinanceSiteMcp(incoming(),x.env,x.opts);
- const value=await r.json();
- assert.equal(r.status,200);
- assert.equal(value.result.structuredContent.committed,true);
- assert.equal(value.result.structuredContent.actualTransfer,false);
- assert.equal(x.backend.calls.length,1);
- assert.equal(x.backend.calls[0].params.p_owner,OWNER);
- assert.match(x.metrics().proof,/^\d{10}\.[0-9a-f]{64}$/);
- assert.doesNotMatch(JSON.stringify(value),/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/);
-});
-test("P6-SITE-04 signed proof fails if payload amount is modified after confirmation",async()=>{
- const x=ctx({approve:true,alter:body=>{
-   body.params.arguments.target_amount=5001;return body;
- }});
- const r=await handleFinanceSiteMcp(incoming(),x.env,x.opts);
- const data=await r.json();
+ assert.equal(r.status,403);
+ assert.equal(x.metrics().forwarded,0);
  assert.equal(x.backend.calls.length,0);
- assert.equal(data.result.isError,true);
- assert.match(data.result.content[0].text,/GOALS_EXPLICIT_APPROVAL_REQUIRED/);
+});
+test("P6-SITE-04 caller flags and changed amounts cannot forge a Site approval",async()=>{
+ const x=ctx({approve:true});
+ const forged=frame({...goalArgs,target_amount:5001,confirmed_by_user:true});
+ const r=await handleFinanceSiteMcp(incoming(forged),x.env,x.opts);
+ assert.equal(r.status,403);
+ assert.equal(x.metrics().forwarded,0);
+ assert.equal(x.backend.calls.length,0);
 });
 test("P6-SITE-05 only true owner principal can even attempt write approval",async()=>{
  const x=ctx({approve:true});
@@ -92,11 +85,25 @@ test("P6-SITE-06 old MCP gateway rejects CSRF browser origins before forwarding"
  assert.equal(x.backend.calls.length,0);
  assert.equal(r.headers.get("access-control-allow-origin"),null);
 });
-test("P6-SITE-07 unauthorised tool call cannot supply extra owner argument",async()=>{
+test("P6-SITE-07 refuses model-supplied owner and approved flags before forwarding",async()=>{
  const x=ctx({approve:true});
- const forged=frame({...goalArgs,owner_id:OWNER});
+ const forged=frame({...goalArgs,owner_id:OWNER,approved:true});
  const r=await handleFinanceSiteMcp(incoming(forged),x.env,x.opts);
- const data=await r.json();
- assert.equal(data.result.isError,true);
+ assert.equal(r.status,403);
+ assert.equal(x.metrics().forwarded,0);
  assert.equal(x.backend.calls.length,0);
+});
+test("P6-SITE-08 Edge refuses Bearer-signed fake human approval even if goal tools enabled",async()=>{
+ const backend=db();
+ const headers={"authorization":"Bearer "+TOKEN,
+  "content-type":"application/json",
+  "x-lizhi-goals-write-approval":"1800000000."+TOKEN};
+ const req=new Request("https://example.test/mcp",{
+   method:"POST",headers,body:JSON.stringify(frame())});
+ const res=await handleFinanceSiteRequest(req,{
+   db:backend,token:TOKEN,ownerUid:OWNER,goalToolsEnabled:true});
+ const data=await res.json();
+ assert.equal(data.result.isError,true);
+ assert.match(data.result.content[0].text,/GOALS_HUMAN_APPROVAL_NOT_CONFIGURED/);
+ assert.equal(backend.calls.length,0);
 });
