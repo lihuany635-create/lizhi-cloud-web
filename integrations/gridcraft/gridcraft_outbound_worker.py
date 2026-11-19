@@ -30,6 +30,8 @@ READ_TOOLS = frozenset({"gridcraft_list_workbooks", "gridcraft_read_range"})
 P4_TOOLS = frozenset({"gridcraft_prepare_write","gridcraft_commit_write"})
 # Candidate only: old Site/Edge do not advertise these jobs until approved.
 P2_TOOLS = frozenset({"gridcraft_batch_prepare", "gridcraft_batch_commit", "gridcraft_batch_status"})
+# P3 candidate not advertised by the current Site/Edge.
+P3_FORMAT_TOOLS = frozenset({"gridcraft_format_prepare", "gridcraft_format_commit", "gridcraft_format_status"})
 RESPONSE_LIMIT = 24 * 1024
 
 
@@ -205,13 +207,14 @@ class OutboundWorker:
     def __init__(self, *, transport: Transport, local: GridCraftLocal,
                  approved_docs: set[str] | frozenset[str] | None = None,
                  clock=time.time, p4_writer=None, p4_enabled=lambda: False,
-                 grant_checker=None, p2_batch=None):
+                 grant_checker=None, p2_batch=None, p3_formatter=None):
         self.transport = transport
         self.local = local
         self.approved_docs = frozenset(approved_docs or [])
         self.clock = clock
         self.p4_writer = p4_writer
         self.p2_batch = p2_batch
+        self.p3_formatter = p3_formatter
         self.p4_enabled = p4_enabled
         self.grant_checker = grant_checker
         # Detect compatibility once. An internal TypeError must not lead to
@@ -266,7 +269,7 @@ class OutboundWorker:
                 "resultCode":str(code)[:48], "backupId":str(result.get("backup_id",""))[:100]}
 
     def execute_job(self, job):
-        if not isinstance(job, dict) or job.get("name") not in READ_TOOLS | P4_TOOLS | P2_TOOLS:
+        if not isinstance(job, dict) or job.get("name") not in READ_TOOLS | P4_TOOLS | P2_TOOLS | P3_FORMAT_TOOLS:
             raise UnsafeJob("METHOD_DENIED")
         name = job["name"]
         args = job.get("args", {})
@@ -276,6 +279,24 @@ class OutboundWorker:
         # Closing/replacing a workbook cannot silently inherit its old doc ID.
         if self.grant_checker is not None:
             self.approved_docs = frozenset(self.grant_checker())
+        if name in P3_FORMAT_TOOLS:
+            if self.p3_formatter is None:
+                raise UnsafeJob("P3_FORMAT_GATE_OFF")
+            # Re-evaluate current local verified workbook grant for EVERY job.
+            self.p3_formatter.p4.approved_docs = frozenset(self.approved_docs)
+            if name == "gridcraft_format_prepare":
+                if set(args) != {"doc", "spec"}:
+                    raise UnsafeJob("INVALID_ARGS")
+                return bounded_reply(self.p3_formatter.prepare(args["doc"], args["spec"]))
+            if name == "gridcraft_format_commit":
+                if set(args) != {"preview_id", "expected_version", "request_id", "owner_confirmed"}:
+                    raise UnsafeJob("INVALID_ARGS")
+                return bounded_reply(self.p3_formatter.commit(
+                    args["preview_id"], args["expected_version"], args["request_id"],
+                    write_enabled=self.p4_enabled(), owner_confirmed=args["owner_confirmed"]))
+            if set(args) != {"request_id", "reconcile"} or type(args["reconcile"]) is not bool:
+                raise UnsafeJob("INVALID_ARGS")
+            return bounded_reply(self.p3_formatter.status(args["request_id"], reconcile=args["reconcile"]))
         if name in P2_TOOLS:
             if self.p2_batch is None:
                 raise UnsafeJob("P2_GATE_OFF")
