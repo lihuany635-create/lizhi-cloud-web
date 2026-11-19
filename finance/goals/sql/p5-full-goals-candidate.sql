@@ -184,7 +184,7 @@ begin
    insert into public.lizhi_finance_goal_events
      (user_id,goal_id,request_id,event_kind,amount,source_reference,evidence_type)
    values(p_owner,p_goal_id,p_request_id,p_action,p_amount,
-      p_source_reference,'user_confirmed');
+      p_source_reference,'owner_authorized');
  exception when unique_violation then
    get stacked diagnostics v_constraint = constraint_name;
    if v_constraint='lizhi_finance_goal_source_once' then
