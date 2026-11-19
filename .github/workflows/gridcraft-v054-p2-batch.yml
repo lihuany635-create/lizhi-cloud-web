@@ -33,5 +33,7 @@ jobs:
         run: python -m unittest discover -s integrations/gridcraft -p 'test_p4_safe_write.py' -v
       - name: P1 source fidelity isolated tests
         run: python -m unittest discover -s integrations/gridcraft -p 'test_xlsx_fidelity.py' -v
-      - name: Existing outbound worker regression tests
-        run: python -m unittest discover -s integrations/gridcraft -p 'test_v053_reliability.py' -v
+      - name: Install existing v0.5.3 regression test dependency
+        run: python -m pip install pytest
+      - name: Existing v0.5.3 transport / Windows regression tests
+        run: python -m pytest integrations/gridcraft/test_v053_reliability.py -q
