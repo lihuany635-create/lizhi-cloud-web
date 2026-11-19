@@ -41,8 +41,7 @@
    const accountOptions='<option value="">尚未指定</option>'+
      (accounts||[]).filter(a=>text(a.id)).map(a=>
        '<option value="'+escape(a.id)+'">'+escape(a.name||a.id)+'</option>').join("");
-   const consent='<label class="finance-goals-consent"><input type="checkbox" name="confirmed"'+disabled+
-     ' required> 我確認這是規劃／預留紀錄，不是實際匯款或投資交易</label>';
+   const consent='<p class="finance-goals-consent">本功能只更新規劃與預留紀錄，不會執行銀行匯款或買賣證券。</p>';
    const currency='<small>金額單位：新臺幣（TWD）</small>';
    const goalForm='<form data-goals-form="goal" class="finance-goals-editor">'+
      '<h3>新增、修改或停用目標</h3>'+currency+
@@ -87,7 +86,7 @@
    return '<section class="finance-section finance-goals-actions" aria-label="目標管理操作">'+
      '<p role="status" data-goals-feedback>'+(off?
      '目前為候選介面，尚未完成正式本人驗證與 MCP 接線；所有儲存按鈕停用。':
-     '請確認帳戶和目標資料；所有操作會要求再次確認。')+'</p>'+
+     '已登入本人帳號即可儲存，無須 Passkey 或逐筆確認；所有寫入均有請求編號與版本檢查。')+'</p>'+
      '<div class="finance-goals-forms">'+goalForm+allocationForm+salaryForm+'</div></section>';
  }
  function asObject(data){if(data&&typeof data.get==="function"){
@@ -95,7 +94,7 @@
  }return {...data};}
  function buildCommand(type,raw,{goals=[],plan=null,uuid}={}){
    const data=asObject(raw);
-   if(data.confirmed!==true&&data.confirmed!=="on")fail("EXPLICIT_CONFIRMATION_REQUIRED");
+   // Owner login and the Edge's live allowlist are the authorization boundary.
    if(!MONTH.test(data.month||"")||typeof uuid!=="function")fail("INVALID_MONTH");
    const request_id=uuid();if(!id(request_id))fail("INVALID_REQUEST_ID");
    if(type==="goal"){
@@ -154,9 +153,8 @@
    async function submit(type,data){
      if(!authorised)fail("GOALS_NOT_CONNECTED");
      const command=buildCommand(type,data,{goals,plan,uuid:generate});
-     if(typeof confirmAction!=="function"||
-       await confirmAction(command)!==true)fail("ACTION_NOT_CONFIRMED");
-     // The server must still recheck authenticated identity and explicit approval.
+     // No independent per-command confirmation. The site/Edge validates
+     // the authenticated owner and applies CAS + request_id idempotency.
      const result=await provider.invoke(command.tool,command.args);
      if(!result?.committed||result.actualTransfer!==false)
        fail("GOALS_RECEIPT_INVALID");
