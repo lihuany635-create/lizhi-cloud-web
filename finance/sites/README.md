@@ -65,3 +65,12 @@ Sites 注意：
 - `LIZHI_FINANCE_GOALS_MCP_ENABLED` 必須正式部署後明確設為 true 才列出五項 Goals 工具（原十項不變）；**沒有可信 Site 回呼前，即使開了開關也只允許讀取，寫入仍拒絕**。正式 Site 仍需本人以原站地址原地更新，嚴禁建立第二個 MCP/Site。
 - 原 Finance 網站讀取 Goals 使用 `FinanceGoalsBrowserClient` 與其自身 Supabase Auth JWT；Edge `/ui/goals` 僅允許受信任的 HTTPS Origin，須有 `LIZHI_FINANCE_GOALS_BROWSER_ENABLED=true`、`LIZHI_FINANCE_GOALS_ORIGINS` 才會啟用。Browser 永不取得 Site Token 或 service-role secret。原網站的每筆寫入有本機確認加 Edge 3 分鐘簽署 challenge；不宣稱預留等於銀行已存入或實際投資買進。
 - PR #97 還是 **NOT_DEPLOYED**；本文件是開發交接，不代表 Sites 的 `approveGoalWrite` 真正已實作或上線。部署前必須查核原站可信本人人機確認 API，並進行真實第二帳號／登出／撤權測試。
+
+
+## 2026-11-19 安全修復候選（CHANGES_REQUIRED）
+
+Claude 獨立審查證實 P6 的 prepare/commit、Bearer HMAC 不是獨立真人核准。現 P6 候選將 Browser Goals 和 Site Goals 所有寫入均預設拒絕（GOALS_HUMAN_APPROVAL_NOT_CONFIGURED），只保留本人的 Goals 讀取；不可將 window.confirm、模型參數或第三方 OAuth Token 視為真人同意。所有本階段結果為 CANDIDATE / NOT_DEPLOYED。
+
+恢復寫入前，原網站必須加入伺服器驗證的 WebAuthn/Passkey 或等效本人再驗證；逐筆綁定目標、金額、完整 payload、session 與單次 nonce，在資料庫原子消耗，並通過獨立複審與真實跨帳號、撤權、手機驗收。不可恢復原 bearer-derived HMAC 通道。
+
+來源：https://docs.google.com/document/d/1298KW4gv_BmUYN0p0gMYsvuRyVMEfNvZ9OFg9aw7yVw/edit
