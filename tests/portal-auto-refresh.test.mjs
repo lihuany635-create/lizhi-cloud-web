@@ -15,7 +15,7 @@ test("PORTAL-REFRESH-01 all critical entry asset versions match Service Worker",
    const entry=path==="finance/pages/home.js"?read("loader.js"):html;
    const version=[...entry.matchAll(rx)][0]?.[1];
    assert.ok(version,"Missing version for "+path);
-   const matches=[...sw.matchAll(rx)].map(x=>x[1]);
+   const matches=[...sw.matchAll(rx)].filter(x=>sw[x.index-1]==='"').map(x=>x[1]);
    assert.deepEqual(matches,[version],"SW must cache exactly the active version of "+path);
  }
  assert.match(sw,/const CACHE="lizhi-cloud-v170"/);
