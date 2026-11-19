@@ -169,8 +169,10 @@ const FinanceHome=(()=>{
     root.dataset.goalsRevision=goalsRevision();
     if(sameView){const stage=root.querySelector(".finance-stage");if(stage)stage.scrollTop=oldScroll;}
     applyBackground();
+    // Restore immediately: a second sync event can re-render before microtasks run.
+    const restoredGoals=restoreGoalsDraft(root,goalDraft);
     queueMicrotask(()=>{
-      if(restoreGoalsDraft(root,goalDraft))return;
+      if(restoredGoals)return;
       if(restoreInput){
         const nextInput=root.querySelector('[data-finance-form="ai-quick"] textarea[name="aiText"]');
         if(nextInput&&!nextInput.disabled){
