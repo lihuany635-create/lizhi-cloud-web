@@ -22,7 +22,8 @@ test("PORTAL-REFRESH-01 all critical entry asset versions match Service Worker",
  assert.ok(workbenchVersion,"Workbench import should be versioned");
  assert.ok(sw.includes('"production/ai-workbench.js?v='+workbenchVersion+'"'),
    "SW must cache current Workbench version");
- assert.match(sw,/const CACHE="lizhi-cloud-v170"/);
+ const version=Number(sw.match(/const CACHE="lizhi-cloud-v([0-9]+)"/)?.[1]);
+ assert.ok(version>=170,"Portal must not regress to an older Service Worker");
 });
 
 test("PORTAL-REFRESH-02 new Goals assets are preloaded for owner portal",()=>{
@@ -32,7 +33,11 @@ test("PORTAL-REFRESH-02 new Goals assets are preloaded for owner portal",()=>{
    "finance/goals/p6-browser-client.js"
  ]){
    assert.ok(existsSync(resolve(root,file)),"Missing "+file);
-   assert.ok(sw.includes(file+"?v=1"),"SW needs "+file);
+   const source=file.endsWith(".css")?html:read("loader.js");
+   const pattern=new RegExp(file.replaceAll(".","\\\\.")+"\\\\?v=([0-9]+)");
+   const activeVersion=source.match(pattern)?.[1];
+   assert.ok(activeVersion,"Entrypoint must version "+file);
+   assert.ok(sw.includes(file+"?v="+activeVersion),"SW needs current "+file);
  }
 });
 
