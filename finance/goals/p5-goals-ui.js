@@ -126,8 +126,7 @@
        fail("INVALID_ALLOCATION");
      return {tool:"finance_goals_allocation_set",args:{
        month:data.month,goal_id:data.goal_id,request_id,action:data.action,
-       amount:money(data.amount),source_reference:data.source_reference,
-       confirmed_by_user:true}};
+       amount:money(data.amount),source_reference:data.source_reference}};
    }
    if(type==="salary"){
      if(!["set","remove"].includes(data.action))fail("INVALID_ACTION");
