@@ -65,7 +65,7 @@ test("P5-07 existing P3 read and salary contract remain backwards compatible",()
 });
 test("P5-08 editor is disabled and clearly honest when provider missing",()=>{
  const html=UI.render();
- assert.match(html,/尚未完成正式本人驗證/);
+ assert.match(html,/候選介面/);
  assert.match(html,/新增、修改或停用目標/);
  assert.match(html,/人工確認預留與釋出/);
  assert.match(html,/八項薪水分配/);
@@ -100,17 +100,18 @@ test("P5-11 salary form must balance all eight items to expected income",()=>{
  expectCode(()=>UI.buildCommand("salary",{...base,food:"7001"},{uuid:()=>REQUEST}),
     "SALARY_PLAN_UNBALANCED");
 });
-test("P5-12 provider bridge denies unauthenticated or unconfirmed requests",async()=>{
- const backend={calls:[],async invoke(tool,args){this.calls.push({tool,args});
-   return {...receipt("created")}}};
- const no=UI.createController({provider:backend,authenticated:false,confirmAction:()=>true,uuid:()=>REQUEST});
- await assert.rejects(()=>no.submit("goal",{confirmed:"on",month:"2026-12",action:"create",
+test("P5-12 unauthenticated caller denied, owner needs no per-write confirmation",async()=>{
+ const backend={calls:[],async invoke(tool,args){this.calls.push({tool,args});return {...receipt("created"),actualTransfer:false}}};
+ const no=UI.createController({provider:backend,authenticated:false,uuid:()=>REQUEST});
+ await assert.rejects(()=>no.submit("goal",{month:"2026-12",action:"create",
    kind:"savings",target_amount:"5000"}),{code:"GOALS_NOT_CONNECTED"});
  assert.equal(backend.calls.length,0);
- const denied=UI.createController({provider:backend,authenticated:true,confirmAction:()=>false,uuid:()=>REQUEST});
- await assert.rejects(()=>denied.submit("goal",{confirmed:"on",month:"2026-12",action:"create",
-   kind:"savings",target_amount:"5000"}),{code:"ACTION_NOT_CONFIRMED"});
- assert.equal(backend.calls.length,0);
+ let i=0;const ids=[REQUEST,GOAL];
+ const owner=UI.createController({provider:backend,authenticated:true,uuid:()=>ids[i++]});
+ const saved=await owner.submit("goal",{month:"2026-12",action:"create",
+   kind:"savings",target_amount:"5000"});
+ assert.equal(saved.committed,true);
+ assert.equal(backend.calls.length,1);
 });
 test("P5-13 authenticated controller invokes the approved tool only",async()=>{
  const backend={calls:[],async invoke(tool,args){this.calls.push({tool,args});return {...receipt(),actualTransfer:false}}};
@@ -169,23 +170,25 @@ test("P5-18 existing MCP remains unchanged when feature gate is disabled",async(
  const j=await denied.json();
  assert.match(j.result.content[0].text,/GOALS_NOT_CONNECTED/);
 });
-test("P5-19 enabled candidate lists goals but disallows writes without per-call authorisation",async()=>{
- const opts=gatewayOpts({goalToolsEnabled:true});
+test("P5-19 goals remain disabled without a live owner verifier",async()=>{
+ const opts=gatewayOpts({goalToolsEnabled:true,goalWritesEnabled:true});
  const listing=await (await handleFinanceSiteRequest(request({method:"tools/list"}),opts)).json();
  assert.equal(listing.result.tools.some(x=>x.name==="finance_goals_goal_set"),true);
  const denied=await (await handleFinanceSiteRequest(request({method:"tools/call",params:{
    name:"finance_goals_goal_set",arguments:goal()}}),opts)).json();
- assert.match(denied.result.content[0].text,/GOALS_HUMAN_APPROVAL_NOT_CONFIGURED/);
-});
-test("P5-20 even an injected approval callback cannot bypass missing human proof",async()=>{
- const opts=gatewayOpts({goalToolsEnabled:true,goalWriteApproval:async()=>true});
- const res=await (await handleFinanceSiteRequest(request({method:"tools/call",params:{
-   name:"finance_goals_goal_set",arguments:goal()}}),opts)).json();
- assert.equal(res.result.isError,true);
- assert.match(res.result.content[0].text,/GOALS_HUMAN_APPROVAL_NOT_CONFIGURED/);
+ assert.match(denied.result.content[0].text,/GOALS_OWNER_AUTH_UNAVAILABLE/);
  assert.equal(opts.db.calls.length,0);
 });
-
+test("P5-20 owner-only enabled write commits once without second approval",async()=>{
+ const opts=gatewayOpts({goalToolsEnabled:true,goalWritesEnabled:true,
+   verifyGoalsOwner:async()=>true});
+ const res=await (await handleFinanceSiteRequest(request({method:"tools/call",params:{
+   name:"finance_goals_goal_set",arguments:goal()}}),opts)).json();
+ assert.equal(res.result.structuredContent.committed,true);
+ assert.equal(res.result.structuredContent.actualTransfer,false);
+ assert.equal(opts.db.calls.length,1);
+ assert.equal(opts.db.calls[0].args.p_owner,OWNER);
+});
 test("P5-21 funded goals cannot be removed and get a safe explicit error",async()=>{
  const backend={async rpc(){return {error:{message:"GOALS_RESERVE_NOT_RELEASED: 2000 reserved"}}}};
  await assert.rejects(()=>executeGoalsCandidate({
