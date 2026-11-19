@@ -83,7 +83,8 @@
    async function readMonth(month){
      if(!MONTH.test(month||""))fail("GOALS_INVALID_MONTH");
      const result=await request("read","finance_goals_month_report",{month});
-     return reportFromPayload(month,result.result);
+     const report=reportFromPayload(month,result.result);
+     return Object.freeze({...report,writeEnabled:result.write_enabled===true});
    }
    async function invoke(tool,args){
      // The server checks live first-party owner identity, allowlist and
