@@ -44,7 +44,8 @@ create index if not exists lizhi_finance_goal_event_read
   on public.lizhi_finance_goal_events (user_id, goal_id, created_at, id);
 
 create or replace function public.lizhi_finance_goal_guard()
-returns trigger language plpgsql security invoker set search_path = '' as $$
+returns trigger language plpgsql security invoker set search_path = '' as $
+declare current_reserved numeric;
 begin
   if tg_op='INSERT' then
     if new.version <> 1 or new.deleted_at is not null then
@@ -61,6 +62,14 @@ begin
     end if;
     if new.version <> old.version + 1 then
       raise exception 'GOAL_VERSION_CONFLICT' using errcode='23514';
+    end if;
+    -- Prevent lowering a goal beneath already confirmed reserves.
+    select coalesce(sum(case when e.event_kind='allocate' then e.amount::numeric
+      else -e.amount::numeric end),0) into current_reserved
+      from public.lizhi_finance_goal_events e
+      where e.user_id=new.user_id and e.goal_id=new.id;
+    if current_reserved > new.target_amount::numeric then
+      raise exception 'GOAL_RESERVE_EXCEEDS_TARGET' using errcode='23514';
     end if;
     new.updated_at := clock_timestamp();
   end if;
