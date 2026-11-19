@@ -105,7 +105,7 @@ begin
 end $$;
 -- No first-party or OAuth bearer may directly mutate goal tables.
 set role authenticated;
-do $
+do $$
 begin
   begin
     insert into public.lizhi_finance_goals(user_id,month,goal_kind,target_amount)
@@ -113,7 +113,7 @@ begin
     raise exception 'P1_AUTH_DIRECT_WRITE_NOT_BLOCKED';
   exception when insufficient_privilege then null;
   end;
-end $;
+end $$;
 -- Attempt to create another user's goal must be rejected by RLS.
 do $$
 begin
