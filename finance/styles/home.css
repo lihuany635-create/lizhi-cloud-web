@@ -59,7 +59,7 @@
 /* Finance Goals: keep the content readable while scrolling.
    The desktop stage scrolls independently; a sticky 140px header previously
    covered the Goals notice and displaced the form while editing. */
-.route-finance .finance-workspace .finance-header{
+.route-finance .finance-workspace[data-finance-view="goals"] .finance-header{
   position:relative;
   top:auto;
 }
