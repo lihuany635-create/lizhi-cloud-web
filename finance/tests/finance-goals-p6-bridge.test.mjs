@@ -47,7 +47,7 @@ test("P6-01 refuses browser goals when trusted origins are missing",async()=>{
   db,ownerUid:OWNER,origins:[],verifyUser:()=>({id:OWNER,firstParty:true,allowlisted:true})});
  assert.equal(bridge.configured,false);
  const r=await call(bridge,"read","finance_goals_month_report",{month:"2026-12"});
- assert.equal(r.status,503);
+ assert.equal(r.status,403);
  assert.equal(db.calls.length,0);
 });
 test("P6-02 disallows arbitrary origins and has no public wildcard CORS",async()=>{
