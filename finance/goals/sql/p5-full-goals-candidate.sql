@@ -146,6 +146,7 @@ create or replace function public.lizhi_finance_p5_allocation_set(
 declare v_goal public.lizhi_finance_goals%rowtype;
 declare v_event public.lizhi_finance_goal_events%rowtype;
 declare v_result jsonb;
+declare v_constraint text;
 begin
  if p_owner is null or p_goal_id is null or p_request_id is null
    or p_month is null or p_month !~ '^20[0-9]{2}-(0[1-9]|1[0-2])$'
@@ -177,10 +178,20 @@ begin
   where user_id=p_owner and id=p_goal_id and month=p_month
     and deleted_at is null;
  if not found then raise exception 'GOALS_NOT_FOUND' using errcode='23514';end if;
- insert into public.lizhi_finance_goal_events
-  (user_id,goal_id,request_id,event_kind,amount,source_reference,evidence_type)
- values(p_owner,p_goal_id,p_request_id,p_action,p_amount,
-    p_source_reference,'user_confirmed');
+ -- A source slice is intentionally single-use for its lifetime, even after
+ -- release; reusing it would obscure the immutable allocation audit chain.
+ begin
+   insert into public.lizhi_finance_goal_events
+     (user_id,goal_id,request_id,event_kind,amount,source_reference,evidence_type)
+   values(p_owner,p_goal_id,p_request_id,p_action,p_amount,
+      p_source_reference,'user_confirmed');
+ exception when unique_violation then
+   get stacked diagnostics v_constraint = constraint_name;
+   if v_constraint='lizhi_finance_goal_source_once' then
+     raise exception 'GOAL_SOURCE_ALREADY_ALLOCATED' using errcode='23505';
+   end if;
+   raise;
+ end;
  v_result:=pg_catalog.jsonb_build_object('month',p_month,
    'source','finance_goals_cloud_snapshot','goal_id',p_goal_id,
    'request_id',p_request_id,'status','recorded','committed',true,
