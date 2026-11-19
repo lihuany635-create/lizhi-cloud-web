@@ -100,16 +100,23 @@ begin
   if v_previous.receipt is not null then
     return jsonb_set(v_previous.receipt,'{status}','"already_applied"'::jsonb);
   end if;
+  -- Serialise concurrent first-writes to the same owner/month. Otherwise a
+  -- race on the UNIQUE index can leak a low-level unique_violation instead of CAS.
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(p_owner::text||':'||p_month,0));
   select * into v_existing from public.lizhi_finance_salary_plans p
     where p.user_id=p_owner and p.month=p_month for update;
   if found then
-    if v_existing.version<>p_expected_version or v_existing.deleted_at is not null then
+    if v_existing.version<>p_expected_version
+       or (v_existing.deleted_at is not null and p_action='remove') then
       raise exception 'GOALS_VERSION_CONFLICT' using errcode='23514'; end if;
     if p_action='set' then
       update public.lizhi_finance_salary_plans p
-        set expected_income=p_income,lines=p_lines,version=p.version+1
+        set expected_income=p_income,lines=p_lines,
+          deleted_at=null,version=p.version+1
         where p.id=v_existing.id returning p.version into v_version;
-      v_status='updated';
+      v_status=case when v_existing.deleted_at is not null
+        then 'restored' else 'updated' end;
     else
       update public.lizhi_finance_salary_plans p
         set deleted_at=clock_timestamp(),version=p.version+1
