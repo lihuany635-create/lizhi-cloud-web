@@ -132,7 +132,7 @@ function calculate(name,args,b) {
     }))};
 }
 /** Dedicated server-to-server Site gateway; never expose the bearer to the browser. */
-export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBearer=equal,goalToolsEnabled=false}) {
+export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBearer=equal,goalToolsEnabled=false,goalWritesEnabled=false,verifyGoalsOwner=null}) {
   if(req.headers.has("origin"))return json({error:"BROWSER_ORIGIN_NOT_ALLOWED"},403);
   if(req.method!=="POST")return json({error:"POST_ONLY"},405);
   if(!HEX.test(token||"")||!UUID.test(ownerUid||"")||!db?.from)
@@ -157,15 +157,18 @@ export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBear
   const p=frame.params;
   if(!obj(p)||typeof p.name!=="string")return err(requestId,-32602,"Invalid tool call");
   if(GOALS_CANDIDATE_MCP.some(t=>t.name===p.name)){
-    // This is disabled by default. Opt-in alone is not sufficient for writes:
-    // a trusted private-Site approval gate must authorise each user-requested mutation.
+    // The original private Site must authenticate the owner; the Edge separately
+    // verifies the configured owner's currently active Auth account on every
+    // Goals call. Site bearer alone is NOT sufficient to access Goals.
     if(!goalToolsEnabled)return fail(requestId,"GOALS_NOT_CONNECTED");
+    if(typeof verifyGoalsOwner!=="function")
+      return fail(requestId,"GOALS_OWNER_AUTH_UNAVAILABLE");
+    let activeOwner=false;
+    try{activeOwner=await verifyGoalsOwner()===true}catch{activeOwner=false}
+    if(!activeOwner)return fail(requestId,"GOALS_OWNER_NOT_AUTHORIZED");
     const write=!GOALS_CANDIDATE_MCP.find(t=>t.name===p.name)?.annotations?.readOnlyHint;
-    // F-03: a Site bearer or mock callback is not an independent human factor.
-    // No production-facing goal mutation can reach an RPC until the original
-    // private Site has verifiable WebAuthn/reauthentication and one-time consent.
-    if(write)return fail(requestId,"GOALS_HUMAN_APPROVAL_NOT_CONFIGURED");
-    const approvedWrite=false;
+    if(write&&goalWritesEnabled!==true)return fail(requestId,"GOALS_WRITES_DISABLED");
+    const approvedWrite=write&&goalWritesEnabled===true;
     try{
       const result=await executeGoalsCandidate({db,owner:ownerUid,approvedWrite},p.name,p.arguments??{});
       return success(requestId,result);
@@ -176,6 +179,8 @@ export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBear
         "GOALS_VERSION_CONFLICT","GOALS_DUPLICATE_REQUEST","GOALS_NOT_FOUND",
         "GOALS_KIND_IMMUTABLE","GOALS_FUND_SCOPE_IMMUTABLE","GOALS_RESERVE_NOT_RELEASED",
         "GOALS_ACCOUNT_NOT_OWNED","GOALS_EXPLICIT_APPROVAL_REQUIRED",
+        "GOAL_SOURCE_ALREADY_ALLOCATED","GOAL_RELEASE_SOURCE_INVALID",
+        "GOAL_RESERVE_EXCEEDS_TARGET","GOAL_RELEASE_EXCEEDS_RESERVE",
         "GOALS_INVALID_LINES","GOALS_RECEIPT_INVALID","GOALS_REPORT_LIMIT",
         "GOALS_DEPENDENCY_UNAVAILABLE","GOALS_TOOL_UNKNOWN"
       ]);
