@@ -1,0 +1,111 @@
+name: Finance Goals P4 security and isolated restoration checks
+
+on:
+  pull_request:
+    paths:
+      - 'finance/goals/**'
+      - 'finance/tests/finance-goals-p*.test.mjs'
+      - 'supabase/functions/lizhi-finance-site-mcp/finance-goals-p3-*.mjs'
+      - '.github/workflows/finance-goals-p4-checks.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: finance-goals-p4-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+
+jobs:
+  security-node:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check original Finance and all candidate goal modules
+        run: |
+          node --check finance/pages/home.js
+          node --check loader.js
+          node --check finance/goals/p1-goal-model.mjs
+          node --check finance/goals/p2-salary-sinking-model.mjs
+          node --check finance/goals/p3-monthly-report.mjs
+          node --check finance/goals/p3-goals-ui.js
+          node --check supabase/functions/lizhi-finance-site-mcp/finance-goals-p3-contract.mjs
+          node --check supabase/functions/lizhi-finance-site-mcp/finance-goals-p3-edge.mjs
+      - name: Run all P1 P2 P3 and security red-team tests
+        run: |
+          node --test finance/tests/finance-goals-p1.test.mjs finance/tests/finance-goals-p2.test.mjs finance/tests/finance-goals-p3.test.mjs finance/tests/finance-goals-p4-security.test.mjs
+
+  security-postgres:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: finance_goals_p4_disposable
+          POSTGRES_PASSWORD: isolated-no-production
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d finance_goals_p4_disposable"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGPASSWORD: isolated-no-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install PostgreSQL client if missing
+        run: |
+          if ! command -v psql >/dev/null 2>&1 || ! command -v pg_dump >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+      - name: Isolated RLS CAS soft-delete restore and transaction rollback checks
+        run: |
+          psql -h 127.0.0.1 -U postgres -d finance_goals_p4_disposable -v ON_ERROR_STOP=1 \
+            -f finance/goals/verification/p4-isolated-security.sql
+      - name: Isolated sample-only encrypted-free backup and restore proof
+        run: |
+          pg_dump -h 127.0.0.1 -U postgres -Fc --no-owner --no-acl \
+            -f "$RUNNER_TEMP/finance_p4_DISPOSABLE_ONLY.dump" finance_goals_p4_disposable
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            -c 'create database finance_goals_p4_restored;'
+          pg_restore -h 127.0.0.1 -U postgres -d finance_goals_p4_restored \
+            --no-owner --no-acl "$RUNNER_TEMP/finance_p4_DISPOSABLE_ONLY.dump"
+          psql -h 127.0.0.1 -U postgres -d finance_goals_p4_restored -v ON_ERROR_STOP=1 \
+            -f finance/goals/verification/p4-restore-check.sql
+          rm -f "$RUNNER_TEMP/finance_p4_DISPOSABLE_ONLY.dump"
+      - name: Concurrent same-month salary first-write must return CAS not duplicate row
+        shell: bash
+        run: |
+          set +e
+          psql -h 127.0.0.1 -U postgres -d finance_goals_p4_disposable -v ON_ERROR_STOP=1 \
+            -v request_id=cccccccc-1111-4111-8111-cccccccccccc \
+            -f finance/goals/verification/p4-race-worker.sql > "$RUNNER_TEMP/worker_a.log" 2>&1 &
+          worker_a=$!
+          psql -h 127.0.0.1 -U postgres -d finance_goals_p4_disposable -v ON_ERROR_STOP=1 \
+            -v request_id=dddddddd-1111-4111-8111-dddddddddddd \
+            -f finance/goals/verification/p4-race-worker.sql > "$RUNNER_TEMP/worker_b.log" 2>&1 &
+          worker_b=$!
+          wait "$worker_a"; code_a=$?
+          wait "$worker_b"; code_b=$?
+          set -e
+          if ! { { [ "$code_a" -eq 0 ] && [ "$code_b" -ne 0 ] &&
+            grep -q 'GOALS_VERSION_CONFLICT' "$RUNNER_TEMP/worker_b.log"; } ||
+            { [ "$code_b" -eq 0 ] && [ "$code_a" -ne 0 ] &&
+            grep -q 'GOALS_VERSION_CONFLICT' "$RUNNER_TEMP/worker_a.log"; }; }; then
+            echo "P4 concurrency guard failed; worker outcomes:"
+            cat "$RUNNER_TEMP/worker_a.log" "$RUNNER_TEMP/worker_b.log"
+            exit 1
+          fi
+          rows=$(psql -h 127.0.0.1 -U postgres -d finance_goals_p4_disposable \
+            -At -c "select count(*) from public.lizhi_finance_salary_plans where month='2028-02'")
+          [ "$rows" = "1" ] || { echo "P4 race duplicated plan"; exit 1; }
+          echo "P4_ISOLATED_RACE_PASS"

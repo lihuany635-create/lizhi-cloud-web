@@ -1,6 +1,7 @@
 import {FINANCE_SITE_TOOLS,validateFinanceSiteTool,FINANCE_UI_SITE_TOOLS,validateFinanceUiTool,FINANCE_CLOUD_TOOLS,validateFinanceCloudTool} from "./site-contract.mjs";
 import {FINANCE_BUDGET_TOOLS,validateFinanceBudgetTool} from "./finance-budget-contract.mjs";
 import {executeFinanceBudget} from "./finance-budget-edge.mjs";
+import {GOALS_CANDIDATE_MCP,executeGoalsCandidate} from "./finance-goals-p5-edge.mjs";
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const HEX=/^[0-9a-f]{64,128}$/i;
@@ -130,8 +131,14 @@ function calculate(name,args,b) {
       credit_card:names.get(id(t.creditCardId))||null
     }))};
 }
-/** Dedicated server-to-server Site gateway; never expose the bearer to the browser. */
-export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBearer=equal}) {
+/** Dedicated server-to-server Site gateway; never expose the bearer to the browser.
+ * @param {Request} req
+ * @param {{db:any,token:string,ownerUid:string,
+ *  verifyBearer?:(supplied:string,expected:string)=>Promise<boolean>|boolean,
+ *  goalToolsEnabled?:boolean,goalWritesEnabled?:boolean,
+ *  verifyGoalsOwner?:(()=>Promise<boolean>|boolean)|null}} options
+ */
+export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBearer=equal,goalToolsEnabled=false,goalWritesEnabled=false,verifyGoalsOwner=null}) {
   if(req.headers.has("origin"))return json({error:"BROWSER_ORIGIN_NOT_ALLOWED"},403);
   if(req.method!=="POST")return json({error:"POST_ONLY"},405);
   if(!HEX.test(token||"")||!UUID.test(ownerUid||"")||!db?.from)
@@ -151,10 +158,41 @@ export async function handleFinanceSiteRequest(req,{db,token,ownerUid,verifyBear
   if(frame.method==="initialize")return rpc(requestId,{protocolVersion:"2025-06-18",
     capabilities:{tools:{listChanged:false}},serverInfo:{name:"lizhi-finance-private-site",version:"0.1.0"}});
   if(frame.method==="ping")return rpc(requestId,{});
-  if(frame.method==="tools/list")return rpc(requestId,{tools:[...FINANCE_SITE_TOOLS,...FINANCE_CLOUD_TOOLS,...FINANCE_BUDGET_TOOLS]});
+  if(frame.method==="tools/list")return rpc(requestId,{tools:[...FINANCE_SITE_TOOLS,...FINANCE_CLOUD_TOOLS,...FINANCE_BUDGET_TOOLS,...(goalToolsEnabled?GOALS_CANDIDATE_MCP:[])]});
   if(frame.method!=="tools/call")return err(requestId,-32601,"Method unavailable");
   const p=frame.params;
   if(!obj(p)||typeof p.name!=="string")return err(requestId,-32602,"Invalid tool call");
+  if(GOALS_CANDIDATE_MCP.some(t=>t.name===p.name)){
+    // The original private Site must authenticate the owner; the Edge separately
+    // verifies the configured owner's currently active Auth account on every
+    // Goals call. Site bearer alone is NOT sufficient to access Goals.
+    if(!goalToolsEnabled)return fail(requestId,"GOALS_NOT_CONNECTED");
+    if(typeof verifyGoalsOwner!=="function")
+      return fail(requestId,"GOALS_OWNER_AUTH_UNAVAILABLE");
+    let activeOwner=false;
+    try{activeOwner=await verifyGoalsOwner()===true}catch{activeOwner=false}
+    if(!activeOwner)return fail(requestId,"GOALS_OWNER_NOT_AUTHORIZED");
+    const write=!GOALS_CANDIDATE_MCP.find(t=>t.name===p.name)?.annotations?.readOnlyHint;
+    if(write&&goalWritesEnabled!==true)return fail(requestId,"GOALS_WRITES_DISABLED");
+    const approvedWrite=write&&goalWritesEnabled===true;
+    try{
+      const result=await executeGoalsCandidate({db,owner:ownerUid,approvedWrite},p.name,p.arguments??{});
+      return success(requestId,result);
+    }catch(error){
+      const allowed=new Set([
+        "GOALS_INVALID_ARGS","GOALS_INVALID_MONTH","GOALS_INVALID_GOAL",
+        "GOALS_INVALID_FUND","GOALS_INVALID_ALLOCATION","GOALS_UNBALANCED",
+        "GOALS_VERSION_CONFLICT","GOALS_DUPLICATE_REQUEST","GOALS_NOT_FOUND",
+        "GOALS_KIND_IMMUTABLE","GOALS_FUND_SCOPE_IMMUTABLE","GOALS_RESERVE_NOT_RELEASED",
+        "GOALS_ACCOUNT_NOT_OWNED","GOALS_EXPLICIT_APPROVAL_REQUIRED",
+        "GOAL_SOURCE_ALREADY_ALLOCATED","GOAL_RELEASE_SOURCE_INVALID",
+        "GOAL_RESERVE_EXCEEDS_TARGET","GOAL_RELEASE_EXCEEDS_RESERVE",
+        "GOALS_INVALID_LINES","GOALS_RECEIPT_INVALID","GOALS_REPORT_LIMIT",
+        "GOALS_DEPENDENCY_UNAVAILABLE","GOALS_TOOL_UNKNOWN"
+      ]);
+      return fail(requestId,allowed.has(String(error?.code))?String(error.code):"GOALS_DEPENDENCY_UNAVAILABLE");
+    }
+  }
   if(FINANCE_BUDGET_TOOLS.some(t=>t.name===p.name)){
     const validated=validateFinanceBudgetTool(p.name,p.arguments??{});
     if(!validated.ok)return fail(requestId,validated.code);

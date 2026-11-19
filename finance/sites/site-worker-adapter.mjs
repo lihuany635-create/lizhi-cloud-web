@@ -13,6 +13,8 @@ const response=(code,status)=>Response.json({error:code},{status,headers:{"Cache
  */
 export async function handleFinanceSiteMcp(request,env,opts={}) {
   if(request.method!=="POST")return response("POST_ONLY",405);
+  // Never accept browser-origin MCP calls even if login cookies exist (CSRF).
+  if(request.headers.has("origin"))return response("BROWSER_ORIGIN_NOT_ALLOWED",403);
   if(typeof opts.verifyOwner!=="function")return response("OWNER_CHECK_UNAVAILABLE",403);
   let authenticated;
   try{authenticated=await opts.verifyOwner(request)}catch{return response("OWNER_CHECK_FAILED",403)}
@@ -36,7 +38,15 @@ export async function handleFinanceSiteMcp(request,env,opts={}) {
     content=new Uint8Array(bytes);let offset=0;
     for(const part of parts){content.set(part,offset);offset+=part.byteLength}
   }catch{return response("INVALID_REQUEST_BODY",400)}
-  // A fixed HTTPS upstream, no client URLs or cookies forwarded.
+  // Fixed HTTPS upstream; owner identity is checked above by Sites itself.
+  // No per-action passkey or model-supplied approval is required. The Edge
+  // performs a second live owner-account check and independently gates Goals
+  // writes with a disabled-by-default deployment setting.
+  let writeFrame;
+  try{writeFrame=JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(content));}
+  catch{return response("INVALID_REQUEST_BODY",400)}
+  if(!writeFrame||typeof writeFrame!=="object"||Array.isArray(writeFrame))
+    return response("INVALID_REQUEST_BODY",400);
   const headers=new Headers({
     "Authorization":"Bearer "+token,
     "Content-Type":"application/json",

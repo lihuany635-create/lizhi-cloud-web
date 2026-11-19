@@ -1,0 +1,73 @@
+name: Finance Goals Gapfill P5 isolated candidate checks
+on:
+  pull_request:
+    paths:
+      - 'finance/goals/**'
+      - 'finance/tests/finance-goals-p*.test.mjs'
+      - 'supabase/functions/lizhi-finance-site-mcp/**'
+      - 'finance/pages/home.js'
+      - 'loader.js'
+      - 'index.html'
+      - '.github/workflows/finance-goals-p5-checks.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: finance-goals-p5-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+jobs:
+  node-goals:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate original Finance, UI and candidate Edge syntax
+        run: |
+          node --check finance/pages/home.js
+          node --check loader.js
+          node --check finance/goals/p5-goals-ui.js
+          node --check finance/goals/p3-monthly-report.mjs
+          node --check supabase/functions/lizhi-finance-site-mcp/edge-core.mjs
+          node --check supabase/functions/lizhi-finance-site-mcp/finance-goals-p5-contract.mjs
+          node --check supabase/functions/lizhi-finance-site-mcp/finance-goals-p5-edge.mjs
+      - name: Regress P1-P4 and P5 candidate interactions and MCP
+        run: |
+          node --test finance/tests/finance-goals-p1.test.mjs finance/tests/finance-goals-p2.test.mjs finance/tests/finance-goals-p3.test.mjs finance/tests/finance-goals-p4-security.test.mjs finance/tests/finance-goals-p5-gapfill.test.mjs
+  isolated-postgres:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: finance_goals_p5_disposable
+          POSTGRES_PASSWORD: isolated-not-prod
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d finance_goals_p5_disposable"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGPASSWORD: isolated-not-prod
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install psql if necessary
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+      - name: Isolated P1-P5 SQL / guard / manual reservation verification
+        run: |
+          psql -h 127.0.0.1 -U postgres -d finance_goals_p5_disposable -v ON_ERROR_STOP=1 -f finance/goals/verification/p5-isolated-verify.sql
+      - name: Verify empty-only rollback preserves original ledger
+        run: |
+          psql -h 127.0.0.1 -U postgres -d finance_goals_p5_disposable -v ON_ERROR_STOP=1 -f finance/goals/verification/p6-empty-rollback-isolated-verify.sql
