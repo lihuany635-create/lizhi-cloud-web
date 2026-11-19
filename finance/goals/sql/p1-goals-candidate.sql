@@ -29,8 +29,8 @@ create table if not exists public.lizhi_finance_goal_events (
   event_kind text not null check (event_kind in ('allocate','release')),
   amount bigint not null check (amount between 1 and 9007199254740991),
   source_reference text not null check (length(source_reference) between 1 and 160),
-  evidence_type text not null default 'user_confirmed'
-    check (evidence_type = 'user_confirmed'),
+  evidence_type text not null default 'owner_authorized'
+    check (evidence_type in ('owner_authorized','user_confirmed')),
   created_at timestamptz not null default clock_timestamp(),
   unique(user_id, request_id),
   foreign key(user_id, goal_id)
