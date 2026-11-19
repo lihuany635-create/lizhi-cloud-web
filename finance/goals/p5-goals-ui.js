@@ -145,7 +145,7 @@
    }
    fail("UNKNOWN_FORM");
  }
- function createController({provider=null,authenticated=false,confirmAction=null,
+ function createController({provider=null,authenticated=false,
    uuid=null,goals=[],plan=null}={}){
    const authorised=authenticated&&provider&&typeof provider.invoke==="function";
    const generate=uuid||(()=>globalThis.crypto.randomUUID());
