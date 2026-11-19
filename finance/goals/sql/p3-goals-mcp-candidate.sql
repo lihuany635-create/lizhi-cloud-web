@@ -35,7 +35,7 @@ begin
     where g.user_id=p_owner and g.month=p_month and g.deleted_at is null;
   if v_n>50 then raise exception 'GOALS_REPORT_LIMIT' using errcode='23514'; end if;
   select coalesce(jsonb_agg(jsonb_build_object(
-      'id',g.id,'kind',g.goal_kind,'target_amount',g.target_amount,
+      'id',g.id,'kind',g.goal_kind,'target_amount',g.target_amount,'version',g.version,
       'account_id',g.account_id,
       'user_confirmed_reserved',coalesce((
         select sum(case when e.event_kind='allocate' then e.amount else -e.amount end)

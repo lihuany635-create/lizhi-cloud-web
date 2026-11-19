@@ -46,6 +46,7 @@ function safeGoal(g){
     !money(g.target_amount)||!money(g.user_confirmed_reserved)||
     !optionalAccount(g.account_id))fail("GOALS_RECEIPT_INVALID");
   return {id:g.id,kind:g.kind,target_amount:g.target_amount,
+    version:Number.isSafeInteger(g.version)&&g.version>0?g.version:null,
     account_id:g.account_id,user_confirmed_reserved:g.user_confirmed_reserved};
 }
 function safeFund(f){

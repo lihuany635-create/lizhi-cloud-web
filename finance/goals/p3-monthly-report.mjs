@@ -31,7 +31,7 @@ export function buildMonthlyGoalReport({
   const reports=owned.map(g=>{
     const state=goalProgress(g,events,ownerId);
     return Object.freeze({
-      id:g.id,kind:g.kind,targetAmount:g.targetAmount,
+      id:g.id,kind:g.kind,version:g.version,targetAmount:g.targetAmount,
       userConfirmedReserved:state.userConfirmedReserved,
       remaining:state.remaining,percentage:state.percentage,
       accountId:g.accountId,bankVerified:false,investedPrincipal:null
