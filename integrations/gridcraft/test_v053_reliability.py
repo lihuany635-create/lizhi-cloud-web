@@ -225,7 +225,8 @@ def test_start_remote_clears_event_before_reusing_still_alive_thread():
     ui.remote_stop=threading.Event()
     ui.remote_stop.set()
     ui.paired={"device_id":"fake"}
-    ui.remote_thread=mock.Mock(is_alive=lambda:True)
+    ui.remote_thread=mock.Mock()
+    ui.remote_thread.is_alive.return_value=True
     ui.start_remote()
     assert ui._user_stopped is False
     assert not ui.remote_stop.is_set()
