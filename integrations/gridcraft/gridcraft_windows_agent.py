@@ -894,19 +894,71 @@ class AgentUI:
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(description="Lizhi GridCraft Windows local agent")
-    p.add_argument("--self-test", action="store_true", help="Check packaging only; no private data")
-    p.add_argument("--minimized", action="store_true", help="Start the window minimized after Windows login")
-    args = p.parse_args(argv)
+    parser = argparse.ArgumentParser(description="Lizhi GridCraft Windows local agent")
+    parser.add_argument("--self-test",action="store_true",
+                        help="Packaging self-test only; no mutex, file or registry mutation")
+    parser.add_argument("--minimized",action="store_true",
+                        help="Start minimized when launched by existing HKCU Run entry")
+    args=parser.parse_args(argv)
     if args.self_test:
         return diagnostic()
-    if os.name != "nt":
-        print("Windows only; run the packaged EXE on your own Windows PC.", file=sys.stderr)
+    if os.name!="nt":
+        print("Windows only; run the packaged EXE on your own Windows PC.",
+              file=sys.stderr)
         return 2
-    root = tk.Tk()
-    AgentUI(root, minimized=args.minimized)
-    root.mainloop()
-    return 0
+
+    try:
+        init_agent_log()
+    except OSError:
+        # No privacy-safe file log available, but don't prevent connection.
+        pass
+    _logger.info("AGENT_START version=%s",AGENT_VERSION)
+
+    # Update before the instance check; a v0.5.3+ old process exits cleanly
+    # on the named Quit event, releasing its held mutex. A v0.5.2 legacy
+    # process cannot be signalled and is NEVER force-terminated.
+    try:
+        if lifecycle.maybe_update_installed(sys.executable,installed_executable()):
+            _logger.info("AGENT_RELAUNCHED version=%s",AGENT_VERSION)
+            return 0
+    except lifecycle.WinLifecycleError as exc:
+        _logger.warning("UPDATE_ABORT %s",safe_error_code(exc))
+        lifecycle.focus_existing_agent()
+        return 0
+    correct_startup_target()
+
+    mutex=None
+    event_handle=None
+    quit_stop=threading.Event()
+    quit_requested=threading.Event()
+    watcher=None
+    try:
+        mutex,exists=lifecycle.acquire_single_instance()
+        if exists:
+            lifecycle.focus_existing_agent()
+            _logger.info("DUPLICATE_INSTANCE_FOCUSED")
+            return 0
+        event_handle=lifecycle.create_quit_event()
+        watcher=threading.Thread(
+            target=lifecycle.watch_quit_event,
+            args=(event_handle,quit_stop,quit_requested),daemon=True,
+            name="gridcraft-quit-watcher")
+        watcher.start()
+        root=tk.Tk()
+        AgentUI(root,minimized=args.minimized,quit_requested=quit_requested)
+        root.mainloop()
+        return 0
+    except Exception as exc:
+        _logger.error("APP_FATAL %s",safe_error_code(exc))
+        return 1
+    finally:
+        quit_stop.set()
+        if watcher and watcher.is_alive():
+            watcher.join(timeout=2)
+        if event_handle:
+            lifecycle._configure(lifecycle._kernel()).CloseHandle(event_handle)
+        if mutex:
+            lifecycle.release_instance(mutex)
 
 
 if __name__ == "__main__":
