@@ -225,9 +225,17 @@ class OutboundWorker:
         status = self.local.status().get("status", "CONTROL_ERROR")
         if status not in ("READY", "GRIDCRAFT_OFFLINE", "UNAUTHORIZED", "CONTROL_ERROR"):
             status = "CONTROL_ERROR"
-        if not getattr(self.transport, "heartbeat_merged", False):
+        merged = getattr(self.transport, "heartbeat_merged", False)
+        if not merged:
             self.transport.heartbeat(status)
         if status != "READY":
+            if merged:
+                # After server opt-in, poll carries the status even while
+                # offline. Never silently leave stale READY in the Edge DB.
+                if self._poll_accepts_status:
+                    self.transport.poll(status=status)
+                else:
+                    self.transport.heartbeat(status)
             return {"status":status,"executed":False}
         received = (self.transport.poll(status=status) if self._poll_accepts_status
                     else self.transport.poll())
