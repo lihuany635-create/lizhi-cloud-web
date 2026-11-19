@@ -245,9 +245,9 @@ const FinanceHome=(()=>{
       ?'<section class="finance-section">目標介面尚未載入。</section>'
       :FinanceGoalsP3Ui.render({report:ready?ui.goals.report:null,state:ui.goals.state});
     const forms=typeof FinanceGoalsP5Ui==="undefined"?"":FinanceGoalsP5Ui.render({
-      enabled:false,month:ui.goals.month,goals:ready?ui.goals.rows:[],
+      enabled:ready&&ui.goals.report?.writeEnabled===true,month:ui.goals.month,goals:ready?ui.goals.rows:[],
       plan:ready?ui.goals.plan:null,accounts:ready?ui.accounts:[]});
-    const feedback='<p class="finance-goals-safety-note" role="status">安全審查修復中：目前只能查詢目標，不能寫入。確認視窗不能視為身分驗證。</p>'+
+    const feedback=(ui.goals.report?.writeEnabled===true?'<p class="finance-goals-safety-note" role="status">已登入本人帳號可直接儲存規劃，不會執行真正匯款或交易。</p>':'<p class="finance-goals-safety-note" role="status">目前只能查詢，尚未啟用目標寫入功能。</p>')+
       (ui.goals.error?'<p role="alert">目標讀取或寫入尚未完成，請確認本人登入與雲端服務。</p>':"");
     return `<div class="finance-actions"><button type="button" class="finance-button" data-finance-action="goals-refresh" ${ui.goals.loading?"disabled":""}>重新讀取雲端目標</button></div>`+base+feedback+forms;
   }
@@ -582,28 +582,20 @@ const FinanceHome=(()=>{
       const form=event.target?.closest?.("[data-goals-form]");
       if(!form||!form.closest("[data-finance-root]"))return;
       event.preventDefault();event.stopImmediatePropagation();
-      if(ui.goals.state!=="synced"||!ui.goals.ownerId||ui.goals.loading)return;
+      if(ui.goals.state!=="synced"||!ui.goals.ownerId||ui.goals.loading||
+        ui.goals.report?.writeEnabled!==true)return;
       const type=form.dataset.goalsForm;
       const commandLabel={goal:"目標",allocation:"預留／釋出",salary:"薪水分配"}[type];
       if(!commandLabel)return;
       const controller=FinanceGoalsP5Ui.createController({
         provider:goalsClient,authenticated:true,
-        goals:ui.goals.rows,plan:ui.goals.plan,
-        confirmAction:async({tool,args})=>{
-          // This local click confirmation is in addition to the Edge's
-          // short-lived signed request-bound prepare/commit challenge.
-          const details=JSON.stringify({tool,month:args.month,
-            action:args.action,goal_id:args.goal_id,
-            amount:args.amount??args.target_amount??args.estimated_income,
-            request_id:args.request_id},null,2);
-          return window.confirm("確定寫入這筆理財規劃嗎？不會執行銀行轉帳或投資交易。\n"+details);
-        }
+        goals:ui.goals.rows,plan:ui.goals.plan
       });
       void controller.submit(type,new FormData(form)).then(async()=>{
         ui.notice="目標操作已回傳保存收據，正在重新讀取雲端資料。";
         await loadGoals({force:true});
       }).catch(()=>{
-        ui.goals.error="目標未通過確認或寫入失敗，請重新檢查。";
+        ui.goals.error="目標寫入失敗，請檢查本人登入、版本與功能開關。";
         update();
       });
     },true);
