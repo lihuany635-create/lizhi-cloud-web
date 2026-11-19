@@ -85,13 +85,9 @@
      const result=await request("read","finance_goals_month_report",{month});
      return reportFromPayload(month,result.result);
    }
-   async function invoke(tool,args){
-     const prepared=await request("prepare",tool,args);
-     if(!prepared.proof||!prepared.requiresExplicitConfirmation)
-       fail("GOALS_APPROVAL_INVALID");
-     const result=await request("commit",tool,args,{
-       proof:prepared.proof,approved:true});
-     return result.result;
+   async function invoke(_tool,_args){
+     // A browser confirm() and JWT possession are not human presence.
+     fail("GOALS_HUMAN_APPROVAL_NOT_CONFIGURED");
    }
    return Object.freeze({readMonth,invoke,verified});
  }
