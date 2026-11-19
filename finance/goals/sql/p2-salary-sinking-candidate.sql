@@ -83,7 +83,7 @@ begin
     new.created_at:=clock_timestamp();
     new.updated_at:=new.created_at;
   else
-    if old.deleted_at is not null or new.id<>old.id
+    if (old.deleted_at is not null and new.deleted_at is not null) or new.id<>old.id
        or new.user_id<>old.user_id or new.purpose<>old.purpose
        or new.cadence_months<>old.cadence_months or new.created_at<>old.created_at
     then raise exception 'FUND_SCOPE_IMMUTABLE' using errcode='23514'; end if;
