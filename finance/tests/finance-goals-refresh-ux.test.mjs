@@ -25,7 +25,7 @@ test("GOALS-UX-01 no false per-record approval labels or prefilled salary",()=>{
 test("GOALS-UX-02 sticky header cannot cover notices while stage scrolls",()=>{
  const css=read("finance/styles/home.css");
  assert.match(css,/\.finance-stage\{[^}]*overflow:auto/);
- assert.match(css,/\.route-finance \.finance-workspace \.finance-header\{\s*position:relative;\s*top:auto;/);
+ assert.match(css,/\.route-finance \.finance-workspace\[data-finance-view="goals"\] \.finance-header\{\s*position:relative;\s*top:auto;/);
 });
 
 test("GOALS-UX-03 form snapshot is per-owner and cloud revision",()=>{
