@@ -287,6 +287,24 @@ class P4SafeSaveWriter:
             # workbook; never leak filenames after authorization is revoked.
             if rec["doc"] not in self.p4.approved_docs:
                 raise P4Denied("WORKBOOK_NOT_GRANTED")
+            # A GridCraft numeric doc UID is transient and may be reused after
+            # restart. Never reveal a previous export name to a newly granted
+            # but unrelated workbook sharing that UID. To reconcile a receipt
+            # from an earlier agent session, prove the *currently open* and
+            # locally authorized document still has the original XLSX bytes.
+            # When the old workbook is offline, fail closed; a disk copy is not
+            # proof of current workbook identity.
+            if rec.get("session") != self.session:
+                verified_identity = False
+                try:
+                    self.p4._authorized(rec["doc"])
+                    current = self.p4.local.snapshot_bytes(rec["doc"])
+                    verified_identity = (_sha_bytes(current) == rec["source_sha256"])
+                except Exception:
+                    pass
+                if not verified_identity:
+                    return {"ok": False, "error": "RECEIPT_IDENTITY_NOT_VERIFIED",
+                            "request_id": rid, "source_document_saved": False}
             ans = {"ok": True, "request_id": rid, "status": rec["state"],
                    "file_name": rec["filename"], "source_document_saved": False}
             if not verify_disk: return ans
