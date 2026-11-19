@@ -30,6 +30,8 @@ import gridcraft_win_lifecycle as lifecycle
 from gridcraft_p4_safe_write import P4SafeWriter
 from gridcraft_p2_batch import P2BatchWriter
 from gridcraft_p4_desktop import P4Local
+from gridcraft_p3_desktop import P3Local
+from gridcraft_p3_format import P3FormatWriter
 from gridcraft_pairing_client import DeviceStore, PairingError, pair_one_time
 
 try:
@@ -333,6 +335,7 @@ class AgentUI:
         self._grant_lock = threading.RLock()
         self._p4_writer = None
         self._p2_batch = None
+        self._p3_formatter = None
         self._create_widgets()
         self.refresh()
         if minimized:
@@ -581,6 +584,9 @@ class AgentUI:
         batch = getattr(self, "_p2_batch", None)
         if batch is not None:
             batch.invalidate_previews()
+        fmt = getattr(self, "_p3_formatter", None)
+        if fmt is not None:
+            fmt.invalidate_previews()
 
     def _poll(self):
         """Monitor GridCraft for entire agent lifetime, not only at login."""
@@ -791,7 +797,7 @@ class AgentUI:
         p4_writer = None
         try:
             p4_writer = P4SafeWriter(
-                local=P4Local(port=7979, timeout=3),
+                local=P3Local(port=7979, timeout=3),
                 backup_folder=app_directory() / "P4Backups",
                 approved_docs=self.allowed_docs)
             self._write_suspended_code = ""
@@ -809,12 +815,21 @@ class AgentUI:
                 # Legacy P3 and P4 must remain independently functional.
                 _logger.error("P2_GATE_OFF %s", safe_error_code(exc))
         self._p2_batch = p2_batch
+        p3_formatter = None
+        if p4_writer is not None:
+            try:
+                p3_formatter = P3FormatWriter(p4_writer)
+            except Exception as exc:
+                # P3 isolated gate failure must NOT disable existing P3-read, P4, P2.
+                _logger.error("P3_FORMAT_GATE_OFF %s", safe_error_code(exc))
+        self._p3_formatter = p3_formatter
         try:
             worker = OutboundWorker(
                 transport=transport, local=GridCraftLocal(port=7979, timeout=2),
                 approved_docs=self.allowed_docs,
                 p4_writer=p4_writer,
                 p2_batch=p2_batch,
+                p3_formatter=p3_formatter,
                 p4_enabled=lambda: self.p4_write_enabled and not self._user_stopped,
                 grant_checker=self._verified_grants)
             started_at = time.monotonic()
@@ -859,6 +874,7 @@ class AgentUI:
         finally:
             self._p4_writer = None
             self._p2_batch = None
+            self._p3_formatter = None
             self._remote_transition("STOPPED")
 
     def start_remote(self):
