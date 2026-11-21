@@ -19,6 +19,7 @@ import urllib.request
 from typing import Protocol
 
 from gridcraft_desktop_local import GridCraftLocal
+from gridcraft_p4_safe_write import P4Denied
 
 DEVICE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,100}$")
 WORKBOOK_UID = re.compile(r"^[1-9][0-9]{0,19}$")
@@ -32,6 +33,8 @@ P4_TOOLS = frozenset({"gridcraft_prepare_write","gridcraft_commit_write"})
 P2_TOOLS = frozenset({"gridcraft_batch_prepare", "gridcraft_batch_commit", "gridcraft_batch_status"})
 # P3 candidate not advertised by the current Site/Edge.
 P3_FORMAT_TOOLS = frozenset({"gridcraft_format_prepare", "gridcraft_format_commit", "gridcraft_format_status"})
+# P4 safe copy-export candidate; existing Site/Edge do not advertise these tools.
+P4_SAVE_TOOLS = frozenset({"gridcraft_save_prepare", "gridcraft_save_commit", "gridcraft_save_status"})
 RESPONSE_LIMIT = 24 * 1024
 
 
@@ -207,7 +210,7 @@ class OutboundWorker:
     def __init__(self, *, transport: Transport, local: GridCraftLocal,
                  approved_docs: set[str] | frozenset[str] | None = None,
                  clock=time.time, p4_writer=None, p4_enabled=lambda: False,
-                 grant_checker=None, p2_batch=None, p3_formatter=None):
+                 grant_checker=None, p2_batch=None, p3_formatter=None, p4_saver=None):
         self.transport = transport
         self.local = local
         self.approved_docs = frozenset(approved_docs or [])
@@ -215,6 +218,7 @@ class OutboundWorker:
         self.p4_writer = p4_writer
         self.p2_batch = p2_batch
         self.p3_formatter = p3_formatter
+        self.p4_saver = p4_saver
         self.p4_enabled = p4_enabled
         self.grant_checker = grant_checker
         # Detect compatibility once. An internal TypeError must not lead to
@@ -256,11 +260,15 @@ class OutboundWorker:
             raise UnsafeJob("EXPIRED_JOB")
         try:
             result = self.execute_job(job)
+        except P4Denied as exc:
+            code = str(exc)
+            safe_code = re.fullmatch(r"[A-Z][A-Z0-9_]{1,63}", code)
+            result = {"ok": False, "error": code if safe_code else "LOCAL_CONTROL_UNAVAILABLE"}
         except (UnsafeJob, ValueError, PermissionError) as exc:
             result = {"ok": False, "error": str(exc)[:80]}
         except Exception:
             result = {"ok": False, "error": "LOCAL_CONTROL_UNAVAILABLE"}
-        # Never execute a remote write, and never retry after an uncertain result.
+        # Send one completion for the claimed job; do not retry an uncertain write.
         response = self.transport.complete(req, bounded_reply(result))
         if response.get("accepted") is not True:
             raise UnsafeJob("COMPLETION_NOT_ACKNOWLEDGED")
@@ -269,7 +277,7 @@ class OutboundWorker:
                 "resultCode":str(code)[:48], "backupId":str(result.get("backup_id",""))[:100]}
 
     def execute_job(self, job):
-        if not isinstance(job, dict) or job.get("name") not in READ_TOOLS | P4_TOOLS | P2_TOOLS | P3_FORMAT_TOOLS:
+        if not isinstance(job, dict) or job.get("name") not in READ_TOOLS | P4_TOOLS | P2_TOOLS | P3_FORMAT_TOOLS | P4_SAVE_TOOLS:
             raise UnsafeJob("METHOD_DENIED")
         name = job["name"]
         args = job.get("args", {})
@@ -279,6 +287,24 @@ class OutboundWorker:
         # Closing/replacing a workbook cannot silently inherit its old doc ID.
         if self.grant_checker is not None:
             self.approved_docs = frozenset(self.grant_checker())
+        if name in P4_SAVE_TOOLS:
+            if self.p4_saver is None:
+                raise UnsafeJob("P4_SAVE_GATE_OFF")
+            # Re-evaluate existing verified local grant on every job.
+            self.p4_saver.p4.approved_docs = frozenset(self.approved_docs)
+            if name == "gridcraft_save_prepare":
+                if set(args) != {"doc", "file_name"}:
+                    raise UnsafeJob("INVALID_ARGS")
+                return bounded_reply(self.p4_saver.prepare(args["doc"], args["file_name"]))
+            if name == "gridcraft_save_commit":
+                if set(args) != {"preview_id", "expected_version", "request_id", "owner_confirmed"}:
+                    raise UnsafeJob("INVALID_ARGS")
+                return bounded_reply(self.p4_saver.commit(
+                    args["preview_id"], args["expected_version"], args["request_id"],
+                    write_enabled=self.p4_enabled(), owner_confirmed=args["owner_confirmed"]))
+            if set(args) != {"request_id", "verify_disk"} or type(args["verify_disk"]) is not bool:
+                raise UnsafeJob("INVALID_ARGS")
+            return bounded_reply(self.p4_saver.status(args["request_id"], verify_disk=args["verify_disk"]))
         if name in P3_FORMAT_TOOLS:
             if self.p3_formatter is None:
                 raise UnsafeJob("P3_FORMAT_GATE_OFF")
