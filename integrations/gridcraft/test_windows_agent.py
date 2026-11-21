@@ -11,6 +11,16 @@ import os
 
 import gridcraft_windows_agent as agent
 
+from gridcraft_test_isolation import isolate_app_directory, restore_app_directory
+
+
+def setUpModule():
+    isolate_app_directory()
+
+
+def tearDownModule():
+    restore_app_directory()
+
 
 class FakeRegistry:
     HKEY_CURRENT_USER = object()

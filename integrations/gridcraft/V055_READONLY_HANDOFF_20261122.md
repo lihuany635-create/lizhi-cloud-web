@@ -73,6 +73,29 @@
 - **Drive**：沒有上傳。連接器單檔上限 10 MB，ZIP 已在對話中直接交給本人。
 - **NOT_TESTED**：本人實際安裝、v0.5.3 自動換版、安裝後連線。
 
+## 本人電腦安裝（本人授權，2026-11-22 02:56）
+- **結果**：已安裝 v0.5.5。安裝檔 SHA256 和打包產物一致；log 顯示 `AGENT_START version=0.5.5` → `GRIDCRAFT_STATE READY` → `REMOTE_STATE CONNECTED`。
+- **雲端讀回**：`lz_gridcraft_devices` 是同一台配對裝置（11/18 12:28 配對），`last_status=READY`，心跳 1 秒內。
+- **未受影響**：配對憑證 `device-credential.dpapi`（11/18）、HKCU Run 開機啟動、`P4Backups` 都沒變。
+- **第一次安裝失敗**：
+  - 現象：舊 0.5.3 收到結束信號正常關閉，但替換檔案時 `AGENT_UPDATE_FAILED`，留下「沒有代理在執行」約 35 秒。
+  - 原因：單一檔案 EXE 先釋放 mutex，但啟動程序還沒結束，安裝檔仍被鎖住。
+  - 處理：第二次執行就成功了。
+  - 修正：`gridcraft_win_lifecycle.maybe_update_installed` 改成鎖住時最多重試 20 次、每次間隔 0.5 秒；最後仍失敗就重新啟動原本安裝的版本，不再讓本人沒有代理可用。測試見 `test_update_retry_v055.py`。這項修正要等**下一次**升版才會生效，因為執行替換的是新版 EXE。
+
+## 事故：測試寫入本人真實設定檔（已還原）
+- **經過**：02:32 在本人電腦跑整套測試時，`test_oneclick_v05.py`、`test_autoconnect_v04.py` 建立的 `AgentUI()` 沒有隔離 `LOCALAPPDATA`，把合成設定寫進真實的 `%LOCALAPPDATA%\Lizhi\GridCraftAgent\settings.json`。
+- **被改掉的值**：
+  - `remote_enabled`：true → false
+  - `start_gridcraft_on_login`：true → false
+  - `gridcraft_path`：被改成 `C:/GridCraft/gridcraft.exe`（不存在的路徑）
+- **為什麼沒有立即影響**：執行中的舊代理在設定被改之前就已啟動，所以仍保持連線。
+- **還原**：本人同意後，安裝前已把設定寫回原值（原值由先前的唯讀讀取得到），讀回確認可正確解析。
+- **修正**：
+  - 新增 `gridcraft_test_isolation.py`。7 個會載入代理程式的測試檔都在 `setUpModule` 把 `LOCALAPPDATA` 指到暫存資料夾。
+  - 打包 CI 新增 `TEST_ISOLATION_LEAK` 檢查。
+- **今後規則**：這些代理測試只在 CI 執行，不在本人電腦執行。
+
 ## 上線順序（每一步都需要本人批准）
 1. 打包 Windows 代理 v0.5.5，本人安裝。目前本人電腦是 0.5.3，要直接升到 0.5.5。
 2. 部署 Edge v10，維持 `readonlyV055Enabled=false`，回歸確認舊的 3 個工具正常。

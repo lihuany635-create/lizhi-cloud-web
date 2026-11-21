@@ -31,11 +31,18 @@ jobs:
         run: |
           $tests = @("test_readonly_v055.py","test_desktop_local.py","test_outbound_worker.py",
                      "test_p4_save_worker_route.py","test_p3_worker_route.py","test_p2_worker_route.py",
-                     "test_windows_agent.py","test_reconnect_v052.py","test_oneclick_v05.py")
+                     "test_windows_agent.py","test_reconnect_v052.py","test_oneclick_v05.py",
+                     "test_autoconnect_v04.py","test_autostart_v051.py","test_pairing_client.py",
+                     "test_update_retry_v055.py")
           foreach ($test in $tests) {
             python -m pytest -q "integrations/gridcraft/$test"
             if ($LASTEXITCODE -ne 0) { throw "TEST_FAILED $test" }
           }
+      - name: Agent tests must not touch the runner's real settings file
+        shell: pwsh
+        run: |
+          $real = Join-Path $env:LOCALAPPDATA "Lizhi\GridCraftAgent\settings.json"
+          if (Test-Path $real) { throw "TEST_ISOLATION_LEAK $real" }
       - name: Build versioned EXE and self-test
         shell: pwsh
         run: |

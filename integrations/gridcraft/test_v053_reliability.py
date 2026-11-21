@@ -15,6 +15,16 @@ import zipfile
 import pytest
 
 import gridcraft_windows_agent as agent
+
+from gridcraft_test_isolation import isolate_app_directory, restore_app_directory
+
+
+def setUpModule():
+    isolate_app_directory()
+
+
+def tearDownModule():
+    restore_app_directory()
 import gridcraft_win_lifecycle as lifecycle
 import gridcraft_p4_safe_write as p4
 import gridcraft_outbound_worker as outbound

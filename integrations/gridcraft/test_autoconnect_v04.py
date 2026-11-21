@@ -7,6 +7,16 @@ from pathlib import Path
 from unittest import mock
 
 import gridcraft_windows_agent as agent
+
+from gridcraft_test_isolation import isolate_app_directory, restore_app_directory
+
+
+def setUpModule():
+    isolate_app_directory()
+
+
+def tearDownModule():
+    restore_app_directory()
 from gridcraft_desktop_local import GridCraftLocal
 from gridcraft_outbound_worker import OutboundWorker, UnsafeJob
 

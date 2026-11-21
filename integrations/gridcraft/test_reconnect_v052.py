@@ -5,6 +5,16 @@ import unittest
 from unittest import mock
 from types import SimpleNamespace
 import gridcraft_windows_agent as agent
+
+from gridcraft_test_isolation import isolate_app_directory, restore_app_directory
+
+
+def setUpModule():
+    isolate_app_directory()
+
+
+def tearDownModule():
+    restore_app_directory()
 from gridcraft_p4_safe_write import P4SafeWriter
 
 class Root:
