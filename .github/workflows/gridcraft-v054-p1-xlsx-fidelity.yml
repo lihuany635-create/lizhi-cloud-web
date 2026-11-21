@@ -1,0 +1,27 @@
+name: GridCraft v0.5.4 P1 XLSX Fidelity
+on:
+  pull_request:
+    paths:
+      - integrations/gridcraft/gridcraft_xlsx_fidelity.py
+      - integrations/gridcraft/test_xlsx_fidelity.py
+      - .github/workflows/gridcraft-v054-p1-xlsx-fidelity.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  xlsx-fidelity:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile parser and tests
+        run: python -m py_compile integrations/gridcraft/gridcraft_xlsx_fidelity.py integrations/gridcraft/test_xlsx_fidelity.py
+      - name: Run isolated source-fidelity and security tests
+        working-directory: integrations/gridcraft
+        run: python -m unittest -v test_xlsx_fidelity.py

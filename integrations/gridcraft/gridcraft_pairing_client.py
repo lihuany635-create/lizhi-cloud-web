@@ -1,8 +1,7 @@
-"""Windows P3 device pairing, user-scoped DPAPI credential store (candidate only).
+"""Windows v0.5.3 device pairing and DPAPI user-scoped credential store.
 
-No server endpoint is deployed yet. Never print or log the device token.
-Pairing runs only when Windows user enters a short-lived code from their own
-verified Private Site; the GridCraft local token is never transferred.
+Once paired on the verified Private Site, credentials are reused locally.
+No device token, pairing code or Windows control token is logged.
 """
 from __future__ import annotations
 

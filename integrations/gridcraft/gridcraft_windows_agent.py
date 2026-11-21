@@ -1,12 +1,16 @@
-"""立之 GridCraft Windows 本機代理 v0.4 — 已配對自動回連、已儲存檔案自動授權。
-This program opens NO network listener, touches only 127.0.0.1, and does
-not expose GridCraft's local control token in user-visible output.
+"""GridCraft Windows v0.5.3 owner-paired local agent.
+
+One-click startup and read/write access to all *currently open* GridCraft
+workbooks remain automatic. The local P4 writer always creates an XLSX backup,
+checks version and verifies readback. Only outbound HTTPS is used.
 """
 from __future__ import annotations
 
 import argparse
 import csv
 import hashlib
+import logging
+from logging.handlers import RotatingFileHandler
 import json
 import os
 import re
@@ -14,15 +18,22 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 
 from gridcraft_desktop_local import GridCraftLocal
-from gridcraft_outbound_worker import HTTPSDeviceTransport, OutboundWorker
-from gridcraft_p4_safe_write import P4SafeWriter
+from gridcraft_outbound_worker import (HTTPSDeviceTransport, OutboundWorker, UnsafeJob,
+                                      reconnect_delay, poll_delay, RelayTransportError)
+import gridcraft_win_lifecycle as lifecycle
+from gridcraft_p4_safe_write import P4Denied, P4SafeWriter
+from gridcraft_p2_batch import P2BatchWriter
 from gridcraft_p4_desktop import P4Local
+from gridcraft_p3_desktop import P3Local
+from gridcraft_p3_format import P3FormatWriter
+from gridcraft_p4_safe_save import P4SafeSaveWriter
 from gridcraft_pairing_client import DeviceStore, PairingError, pair_one_time
 
 try:
@@ -31,10 +42,50 @@ except ImportError:  # development tests can run outside Windows
     winreg = None
 
 APP_TITLE = "立之 GridCraft 連線代理"
+AGENT_VERSION = "0.5.4"
+_logger = logging.getLogger("lizhi-gridcraft")
 AUTOSTART_NAME = "LizhiGridCraftAgent"
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 APP_EXE_NAME = "LizhiGridCraftAgent.exe"
 MAX_PATH = 1024
+
+def init_agent_log():
+    """Fixed, local-only, privacy-preserving 1MB x 3 rotating journal."""
+    location = app_directory() / "agent.log"
+    location.parent.mkdir(parents=True, exist_ok=True)
+    if not _logger.handlers:
+        handler = RotatingFileHandler(location, maxBytes=1024*1024,
+                                      backupCount=3, encoding="utf-8")
+        handler.setFormatter(logging.Formatter(
+            "%(asctime)s %(levelname)s %(message)s"))
+        _logger.addHandler(handler)
+    _logger.setLevel(logging.INFO)
+    _logger.propagate = False
+    return _logger
+
+
+def safe_error_code(exc):
+    """Never propagate paths, URLs or credentials into persistent log text."""
+    code = str(exc)
+    return code[:64] if re.fullmatch(r"[A-Z][A-Z0-9_]{1,63}", code) else type(exc).__name__.upper()[:40]
+
+
+def correct_startup_target():
+    """Repair an EXISTING HKCU Run entry, never enable autostart silently."""
+    if winreg is None:
+        return False
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY, 0,
+                            winreg.KEY_QUERY_VALUE | winreg.KEY_SET_VALUE) as key:
+            current, _ = winreg.QueryValueEx(key, AUTOSTART_NAME)
+            intended = f'"{installed_executable()}" --minimized'
+            if current != intended:
+                winreg.SetValueEx(key, AUTOSTART_NAME, 0, winreg.REG_SZ,
+                                  intended)
+            return True
+    except (OSError, PermissionError, FileNotFoundError):
+        return False
+
 LAUNCH_MAX_ATTEMPTS = 3
 LAUNCH_MAX_POLLS = 18
 LAUNCH_POLL_MS = 2000
@@ -73,6 +124,7 @@ def load_settings(path: Path | None = None) -> dict:
             "gridcraft_path": str(result.get("gridcraft_path") or "")[:MAX_PATH],
             "start_gridcraft_on_login": result.get("start_gridcraft_on_login") is True,
             "remote_enabled": result.get("remote_enabled") is True,
+            "agent_version": str(result.get("agent_version") or "")[:20],
             "auto_allow_p4": result.get("auto_allow_p4") is True,
             "remembered_workbooks": list(dict.fromkeys(x for x in result.get("remembered_workbooks", [])[:20] if isinstance(x, str) and re.fullmatch(r"[0-9a-f]{64}", x))) if isinstance(result.get("remembered_workbooks"), list) else [],
         }
@@ -87,6 +139,7 @@ def save_settings(settings: dict, path: Path | None = None) -> None:
         "gridcraft_path": str(settings.get("gridcraft_path") or "")[:MAX_PATH],
         "start_gridcraft_on_login": settings.get("start_gridcraft_on_login") is True,
         "remote_enabled": settings.get("remote_enabled") is True,
+        "agent_version": str(settings.get("agent_version") or AGENT_VERSION)[:20],
         "auto_allow_p4": settings.get("auto_allow_p4") is True,
         "remembered_workbooks": list(dict.fromkeys(x for x in settings.get("remembered_workbooks", [])[:20] if isinstance(x, str) and re.fullmatch(r"[0-9a-f]{64}", x))) if isinstance(settings.get("remembered_workbooks"), list) else [],
     }
@@ -222,24 +275,61 @@ def start_gridcraft(path: str | Path):
 
 
 def diagnostic() -> int:
-    """Safe packaging self-test; never reads or emits token/private documents."""
+    """Check packaged save routes with temporary receipts and no network."""
     assert AUTOSTART_NAME and RUN_KEY
     assert APP_EXE_NAME.lower().endswith(".exe")
     assert load_settings(Path("__intentionally_missing_gridcraft_test__.json")) == {}
     assert GridCraftLocal(port=7979, timeout=1.2) is not None
-    print("PASS: LizhiGridCraftAgent packaging and local-only dependencies")
-    print("NOT_TESTED: user's real Windows desktop or remote ChatGPT MCP")
+    with tempfile.TemporaryDirectory(prefix="gridcraft-agent-self-test-") as directory:
+        local = P3Local(port=7979, timeout=1.2)
+        writer = P4SafeWriter(local, Path(directory) / "P4Backups", approved_docs=set())
+        worker = OutboundWorker(
+            transport=None, local=local, p4_writer=writer, p4_saver=P4SafeSaveWriter(writer),
+        )
+        try:
+            worker.execute_job({"name": "gridcraft_save_prepare", "args": {
+                "doc": "1", "file_name": "self-test.xlsx",
+            }})
+        except P4Denied as exc:
+            if str(exc) != "WORKBOOK_NOT_GRANTED":
+                raise
+        else:
+            raise RuntimeError("P4 save prepare accepted an ungranted workbook")
+        status = worker.execute_job({"name": "gridcraft_save_status", "args": {
+            "request_id": "b91331eb-9201-4c4a-9822-03dc80e71663", "verify_disk": False,
+        }})
+        if status.get("error") != "RECEIPT_NOT_FOUND":
+            raise RuntimeError("P4 save status did not open the isolated receipt store")
+        try:
+            worker.execute_job({"name": "gridcraft_app_save", "args": {}})
+        except UnsafeJob as exc:
+            if str(exc) != "METHOD_DENIED":
+                raise
+        else:
+            raise RuntimeError("Worker accepted an unrestricted native save")
+    print(f"PASS: LizhiGridCraftAgent {AGENT_VERSION} P4 save routes and packaging")
+    print("NOT_TESTED: live GridCraft socket or ChatGPT MCP")
     return 0
 
 
 class AgentUI:
-    def __init__(self, root: tk.Tk, minimized: bool = False):
+    def __init__(self, root: tk.Tk, minimized: bool = False, quit_requested=None):
         self.root = root
-        self.root.title(APP_TITLE + "｜v0.5.2 換檔自動重連候選")
+        self.root.title(APP_TITLE + "｜v0.5.3")
         self.root.geometry("490x275")
         self.root.minsize(440, 260)
         self.root.protocol("WM_DELETE_WINDOW", self.stop)
         self.settings = load_settings()
+        self.settings["agent_version"] = AGENT_VERSION
+        try:
+            save_settings(self.settings)
+        except OSError:
+            _logger.warning("SETTINGS_SAVE_FAILED")
+        self._user_stopped = False
+        self._write_suspended_code = ""
+        self._last_gridcraft_logged = None
+        self._last_remote_logged = None
+        self._quit_requested = quit_requested
         self.pair_store = DeviceStore(app_directory())
         try:
             self.paired = self.pair_store.load()
@@ -273,6 +363,9 @@ class AgentUI:
         self._last_workbook_signature = None
         self._grant_lock = threading.RLock()
         self._p4_writer = None
+        self._p2_batch = None
+        self._p3_formatter = None
+        self._p4_saver = None
         self._create_widgets()
         self.refresh()
         if minimized:
@@ -281,6 +374,8 @@ class AgentUI:
         # Also recover the verified default install path if it exists.
         root.after(1100, self.launch_on_login)
         root.after(4500, self._poll)
+        if quit_requested is not None:
+            root.after(200, self._check_quit)
         if self.paired:
             root.after(900, self.start_remote)
 
@@ -289,7 +384,7 @@ class AgentUI:
         frm = ttk.Frame(self.root, padding=16)
         frm.pack(fill="both", expand=True)
         ttk.Label(frm, text="立之 GridCraft", font=("Microsoft JhengHei UI", 17, "bold")).pack(anchor="w")
-        ttk.Label(frm, text="GridCraft 斷線自動恢復／換檔自動辨識｜v0.5.2",
+        ttk.Label(frm, text="GridCraft 自動重連、換檔與安全備份｜v0.5.3",
                   foreground="#5b6472").pack(anchor="w", pady=(3, 12))
         ttk.Label(frm, textvariable=self.status_var,
                   font=("Microsoft JhengHei UI", 12, "bold")).pack(anchor="w")
@@ -459,11 +554,29 @@ class AgentUI:
             self.launch_var.set(not self.launch_var.get())
             messagebox.showerror("儲存失敗", str(exc), parent=self.root)
 
+    def _check_quit(self):
+        if not self.running:
+            return
+        if self._quit_requested is not None and self._quit_requested.is_set():
+            self.stop()
+            return
+        self.root.after(200, self._check_quit)
+
+    def _remote_transition(self, state):
+        if state != getattr(self, "_last_remote_logged", None):
+            if state in ("CONNECTED","BACKOFF","STOPPED","STARTING"):
+                _logger.info("REMOTE_STATE %s", state)
+            self._last_remote_logged = state
+
     def refresh(self):
         """Shows local readiness, not an unverified claim that cloud MCP succeeded."""
         local = GridCraftLocal(port=7979, timeout=1.2)
         state = local.status()
         status = state.get("status", "CONTROL_ERROR")
+        if status != getattr(self, "_last_gridcraft_logged", None):
+            if status in ("READY","GRIDCRAFT_OFFLINE","UNAUTHORIZED","CONTROL_ERROR"):
+                _logger.info("GRIDCRAFT_STATE %s", status)
+            self._last_gridcraft_logged = status
         self.status_var.set({
             "READY": "GridCraft：READY",
             "GRIDCRAFT_OFFLINE": "GridCraft 尚未啟動",
@@ -488,6 +601,8 @@ class AgentUI:
         self.p4_write_enabled = bool(
             self.paired and self.allowed_docs and not self.remote_stop.is_set()
         )
+        if getattr(self, "_write_suspended_code", ""):
+            self.status_var.set("寫入暫停：收據檔異常")
         self.info_var.set("ChatGPT 遠端 MCP：" + self.remote_status)
         return status
 
@@ -496,12 +611,26 @@ class AgentUI:
         writer = getattr(self, "_p4_writer", None)
         if writer is not None:
             writer.invalidate_previews()
+        batch = getattr(self, "_p2_batch", None)
+        if batch is not None:
+            batch.invalidate_previews()
+        fmt = getattr(self, "_p3_formatter", None)
+        if fmt is not None:
+            fmt.invalidate_previews()
+        saver = getattr(self, "_p4_saver", None)
+        if saver is not None:
+            saver.invalidate_previews()
 
     def _poll(self):
         """Monitor GridCraft for entire agent lifetime, not only at login."""
         if not self.running:
             return
         try:
+            if (self.paired and not getattr(self, "_user_stopped", False)
+                    and hasattr(self, "remote_thread")
+                    and not self.remote_stop.is_set()
+                    and (self.remote_thread is None or not self.remote_thread.is_alive())):
+                self.start_remote()
             status = self.refresh()
             if status == "READY":
                 self._last_ready = True
@@ -683,81 +812,233 @@ class AgentUI:
             self.p4_state_var.set("P4 寫入：已允許（僅本次執行；可再按此鈕關閉）")
 
     def _remote_loop(self):
+        """Safe outbound loop: failure never silently kills the P3 connection."""
         if not self.paired:
             return
+        self._remote_transition("STARTING")
         try:
             transport = HTTPSDeviceTransport(
-                device_id=self.paired["device_id"], device_token=self.paired["token"])
+                device_id=self.paired["device_id"],
+                device_token=self.paired["token"])
+        except Exception as exc:
+            _logger.error("REMOTE_INIT_ERROR %s", safe_error_code(exc))
+            self.remote_status = "出站裝置連線初始化失敗"
+            return
+
+        # Receipt corruption MUST NOT disable read-only P3. The actual
+        # sensitive P4 job fails closed with P4_GATE_OFF until local review.
+        p4_writer = None
+        try:
             p4_writer = P4SafeWriter(
-                local=P4Local(port=7979, timeout=3),
+                local=P3Local(port=7979, timeout=3),
                 backup_folder=app_directory() / "P4Backups",
                 approved_docs=self.allowed_docs)
-            self._p4_writer = p4_writer
+            self._write_suspended_code = ""
+        except Exception as exc:
+            self._write_suspended_code = safe_error_code(exc)
+            _logger.error("P4_GATE_OFF %s", self._write_suspended_code)
+
+        self._p4_writer = p4_writer
+        p2_batch = None
+        if p4_writer is not None:
+            try:
+                p2_batch = P2BatchWriter(p4_writer)
+            except Exception as exc:
+                # A corrupt P2 ledger disables ONLY new P2 commands.
+                # Legacy P3 and P4 must remain independently functional.
+                _logger.error("P2_GATE_OFF %s", safe_error_code(exc))
+        self._p2_batch = p2_batch
+        p3_formatter = None
+        if p4_writer is not None:
+            try:
+                p3_formatter = P3FormatWriter(p4_writer)
+            except Exception as exc:
+                # P3 isolated gate failure must NOT disable existing P3-read, P4, P2.
+                _logger.error("P3_FORMAT_GATE_OFF %s", safe_error_code(exc))
+        self._p3_formatter = p3_formatter
+        p4_saver = None
+        if p4_writer is not None:
+            try:
+                p4_saver = P4SafeSaveWriter(p4_writer)
+            except Exception as exc:
+                # A corrupt P4SafeSave receipt folder disables ONLY copy export.
+                # P3 read, P4 cell write, P2 batch, P3 formatting keep working.
+                _logger.error("P4_SAVE_GATE_OFF %s", safe_error_code(exc))
+        self._p4_saver = p4_saver
+        try:
             worker = OutboundWorker(
                 transport=transport, local=GridCraftLocal(port=7979, timeout=2),
                 approved_docs=self.allowed_docs,
                 p4_writer=p4_writer,
-                p4_enabled=lambda: self.p4_write_enabled,
+                p2_batch=p2_batch,
+                p3_formatter=p3_formatter,
+                p4_saver=p4_saver,
+                p4_enabled=lambda: self.p4_write_enabled and not self._user_stopped,
                 grant_checker=self._verified_grants)
+            started_at = time.monotonic()
+            last_job_at = None
+            failures = 0
             while not self.remote_stop.is_set():
                 try:
                     worker.approved_docs = frozenset(self._verified_grants())
-                    worker.run_once()
+                    outcome = worker.run_once()
+                    now = time.monotonic()
+                    if outcome.get("executed"):
+                        last_job_at = now
+                        code = outcome.get("resultCode", "UNKNOWN")
+                        rid = outcome.get("requestId", "")
+                        backup = outcome.get("backupId", "")
+                        # Never log sheet contents, title, path, token or URL.
+                        if isinstance(code, str) and re.fullmatch(r"[A-Za-z0-9_]{1,48}", code):
+                            _logger.info("JOB_RESULT code=%s request_id=%s backup_id=%s",
+                                         code, rid if re.fullmatch(r"[A-Za-z0-9._:-]{8,96}", rid) else "-",
+                                         backup if re.fullmatch(r"p4-[0-9]+-[a-f0-9]{32}\.xlsx", backup) else "-")
+                    failures = 0
+                    self._remote_transition("CONNECTED")
                     self.remote_status = "伺服器已回應（Cloud MCP 狀態需另行查核）"
-                except Exception:
-                    self.remote_status = "出站服務未接通或暫時不可用"
-                self.remote_stop.wait(6)
-        except Exception:
-            self.remote_status = "無法啟動安全出站連線"
+                    quiet_for = (now-last_job_at) if last_job_at is not None else None
+                    # Long-poll responses when GridCraft is offline are
+                    # immediate; avoid a zero-delay request storm.
+                    long_wait = transport.long_poll and outcome.get("status") in ("IDLE","DONE")
+                    delay = poll_delay(quiet_for,since_start=now-started_at,
+                                       long_poll=long_wait)
+                except Exception as exc:
+                    failures += 1
+                    retry_after = getattr(exc, "retry_after", None)
+                    delay = reconnect_delay(failures, retry_after)
+                    self._remote_transition("BACKOFF")
+                    self.remote_status = "出站服務暫時不可用，將自動重試"
+                    _logger.warning("REMOTE_ERROR %s", safe_error_code(exc))
+                if self.remote_stop.wait(delay):
+                    break
+        except Exception as exc:
+            _logger.error("REMOTE_LOOP_ERROR %s", safe_error_code(exc))
+            self.remote_status = "遠端執行緒異常，將自動恢復"
         finally:
             self._p4_writer = None
+            self._p2_batch = None
+            self._p3_formatter = None
+            self._p4_saver = None
+            self._remote_transition("STOPPED")
 
     def start_remote(self):
+        self._user_stopped = False
         if not self.paired:
             self.remote_status = "尚未配對；首次使用仍需要本人裝置配對一次"
             return
+        # Clear BEFORE checking thread state; a just-stopped worker still alive
+        # will be re-used, never duplicated.
+        self.remote_stop.clear()
         if self.remote_thread and self.remote_thread.is_alive():
             return
-        self.remote_stop.clear()
         self.settings["remote_enabled"] = True
-        save_settings(self.settings)
-        self.remote_thread = threading.Thread(target=self._remote_loop, daemon=True)
+        self.settings["agent_version"] = AGENT_VERSION
+        try:
+            save_settings(self.settings)
+        except OSError:
+            _logger.warning("SETTINGS_SAVE_FAILED")
+        self.remote_thread = threading.Thread(target=self._remote_loop,
+                                               name="gridcraft-outbound", daemon=True)
         self.remote_thread.start()
-        # A manual reconnect also retries local control only if needed.
         if self.running and not self.launch_active:
             self.root.after(300, self.launch_on_login)
 
     def stop_remote(self):
+        self._user_stopped = True
         self.launch_active = False
         self.p4_write_enabled = False
         self.p4_state_var.set("P4 寫入：已停用（遠端停止）")
         self.remote_stop.set()
         self.settings["remote_enabled"] = False
-        save_settings(self.settings)
-        self.remote_status = "遠端連線已停止（本機配對資料保留，若要撤銷雲端權限需在本人 Site 操作）"
+        try:
+            save_settings(self.settings)
+        except OSError:
+            _logger.warning("SETTINGS_SAVE_FAILED")
+        self.remote_status = "遠端連線已停止（本機配對保留）"
+        self._remote_transition("STOPPED")
 
     def stop(self):
+        if not self.running:
+            return
         self.launch_active = False
         self.p4_write_enabled = False
         self.remote_stop.set()
         self.running = False
+        thread = self.remote_thread
+        if thread is not None and thread.is_alive() and thread is not threading.current_thread():
+            thread.join(timeout=8)
+            if thread.is_alive():
+                _logger.warning("REMOTE_EXIT_TIMEOUT")
+        _logger.info("AGENT_STOP version=%s", AGENT_VERSION)
         self.root.destroy()
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(description="Lizhi GridCraft Windows local agent")
-    p.add_argument("--self-test", action="store_true", help="Check packaging only; no private data")
-    p.add_argument("--minimized", action="store_true", help="Start the window minimized after Windows login")
-    args = p.parse_args(argv)
+    parser = argparse.ArgumentParser(description="Lizhi GridCraft Windows local agent")
+    parser.add_argument("--self-test",action="store_true",
+                        help="Packaging self-test only; no user settings, workbook or registry mutation")
+    parser.add_argument("--minimized",action="store_true",
+                        help="Start minimized when launched by existing HKCU Run entry")
+    args=parser.parse_args(argv)
     if args.self_test:
         return diagnostic()
-    if os.name != "nt":
-        print("Windows only; run the packaged EXE on your own Windows PC.", file=sys.stderr)
+    if os.name!="nt":
+        print("Windows only; run the packaged EXE on your own Windows PC.",
+              file=sys.stderr)
         return 2
-    root = tk.Tk()
-    AgentUI(root, minimized=args.minimized)
-    root.mainloop()
-    return 0
+
+    try:
+        init_agent_log()
+    except OSError:
+        # No privacy-safe file log available, but don't prevent connection.
+        pass
+    _logger.info("AGENT_START version=%s",AGENT_VERSION)
+
+    # Update before the instance check; a v0.5.3+ old process exits cleanly
+    # on the named Quit event, releasing its held mutex. A v0.5.2 legacy
+    # process cannot be signalled and is NEVER force-terminated.
+    try:
+        if lifecycle.maybe_update_installed(sys.executable,installed_executable()):
+            _logger.info("AGENT_RELAUNCHED version=%s",AGENT_VERSION)
+            return 0
+    except lifecycle.WinLifecycleError as exc:
+        _logger.warning("UPDATE_ABORT %s",safe_error_code(exc))
+        lifecycle.focus_existing_agent()
+        return 0
+    correct_startup_target()
+
+    mutex=None
+    event_handle=None
+    quit_stop=threading.Event()
+    quit_requested=threading.Event()
+    watcher=None
+    try:
+        mutex,exists=lifecycle.acquire_single_instance()
+        if exists:
+            lifecycle.focus_existing_agent()
+            _logger.info("DUPLICATE_INSTANCE_FOCUSED")
+            return 0
+        event_handle=lifecycle.create_quit_event()
+        watcher=threading.Thread(
+            target=lifecycle.watch_quit_event,
+            args=(event_handle,quit_stop,quit_requested),daemon=True,
+            name="gridcraft-quit-watcher")
+        watcher.start()
+        root=tk.Tk()
+        AgentUI(root,minimized=args.minimized,quit_requested=quit_requested)
+        root.mainloop()
+        return 0
+    except Exception as exc:
+        _logger.error("APP_FATAL %s",safe_error_code(exc))
+        return 1
+    finally:
+        quit_stop.set()
+        if watcher and watcher.is_alive():
+            watcher.join(timeout=2)
+        if event_handle:
+            lifecycle._configure(lifecycle._kernel()).CloseHandle(event_handle)
+        if mutex:
+            lifecycle.release_instance(mutex)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,7 @@
-"""GridCraft Windows desktop control client: local-only candidate, READ-ONLY by design.
+"""GridCraft Windows v0.5.3 local-only P3 read-only control adapter.
 
-Connects to official GridCraft v0.19.1 control socket at 127.0.0.1:7979.
-Does not expose a public listener, cloud endpoint, or arbitrary command execution.
-An authenticated outbound cloud relay is a separate, NOT YET IMPLEMENTED stage.
+Connects to GridCraft 127.0.0.1:7979; never opens an inbound listener.
+The existing authenticated outbound bridge is implemented separately.
 """
 from __future__ import annotations
 
