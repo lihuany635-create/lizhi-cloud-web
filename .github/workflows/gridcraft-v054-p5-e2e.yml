@@ -1,0 +1,70 @@
+name: GridCraft v0.5.4 P5 320-row E2E Candidate
+on:
+  pull_request:
+    paths:
+      - 'integrations/gridcraft/**'
+      - '.github/workflows/gridcraft-v054-p5-e2e.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  p5-regression:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.12', '3.13']
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install existing v0.5.3 test dependency
+        run: python -m pip install pytest
+      - name: Static compile P5 scripts
+        run: python -m py_compile integrations/gridcraft/test_p5_large_regression.py integrations/gridcraft/p5_windows_native_acceptance.py
+      - name: 320-row synthetic P5 OOXML/copy/restore/denial/offline/replay/P2 cap
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_p5_large_regression.py' -v
+      - name: P1 source fidelity regression
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_xlsx_fidelity.py' -v
+      - name: P2 bounded batch regression
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_p2_batch.py' -v
+      - name: P2 worker route regression
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_p2_worker_route.py' -v
+      - name: P3 format and layout regression
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_p3_format.py' -v
+      - name: P4 safe save and receipt regression
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_p4_safe_save.py' -v
+      - name: P4 outbound routing regression
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_p4_save_worker_route.py' -v
+      - name: Windows-specific v0.5.3 stability
+        if: runner.os == 'Windows'
+        run: python -m pytest integrations/gridcraft/test_v053_reliability.py -q
+
+  p5-native-windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Genuine GridCraft 0.19.1 isolated Windows 320-row E2E
+        shell: pwsh
+        run: |
+          $url = 'https://github.com/storytold/gridcraft/releases/download/v0.19.1/gridcraft-0.19.1-windows-x64-portable.zip'
+          $archive = Join-Path $env:RUNNER_TEMP 'gridcraft-0.19.1-p5.zip'
+          $folder = Join-Path $env:RUNNER_TEMP 'gridcraft-p5-portable'
+          Invoke-WebRequest -Uri $url -OutFile $archive
+          $digest = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
+          if ($digest -ne '0b4bf8535f4904fac654326a360ff6d74ea6f4d184a8257c106388fafe74c9ac') {
+            throw 'Pinned GridCraft release checksum differed'
+          }
+          Expand-Archive -LiteralPath $archive -DestinationPath $folder
+          $exe = @(Get-ChildItem -LiteralPath $folder -Recurse -File -Filter 'gridcraft.exe')
+          if ($exe.Count -ne 1) { throw 'Expected one official GridCraft executable' }
+          python integrations/gridcraft/p5_windows_native_acceptance.py $exe[0].FullName

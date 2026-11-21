@@ -92,7 +92,7 @@ class P4GuardTests(unittest.TestCase):
         self.assertEqual(self.local.snapshot_count,1)
         file=Path(self.d.name)/"p4"/done["backup_id"]
         self.assertTrue(file.exists())
-        self.assertEqual(file.read_bytes(),make_xlsx())
+        self.assertEqual(file.read_bytes(),self.local.snapshot)  # compare the exact pre-write fixture bytes
         self.assertNotIn("立之",str(file))
 
     def test_no_local_toggle_no_commit(self):
