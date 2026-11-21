@@ -18,16 +18,17 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 
 from gridcraft_desktop_local import GridCraftLocal
-from gridcraft_outbound_worker import (HTTPSDeviceTransport, OutboundWorker,
+from gridcraft_outbound_worker import (HTTPSDeviceTransport, OutboundWorker, UnsafeJob,
                                       reconnect_delay, poll_delay, RelayTransportError)
 import gridcraft_win_lifecycle as lifecycle
-from gridcraft_p4_safe_write import P4SafeWriter
+from gridcraft_p4_safe_write import P4Denied, P4SafeWriter
 from gridcraft_p2_batch import P2BatchWriter
 from gridcraft_p4_desktop import P4Local
 from gridcraft_p3_desktop import P3Local
@@ -41,7 +42,7 @@ except ImportError:  # development tests can run outside Windows
     winreg = None
 
 APP_TITLE = "立之 GridCraft 連線代理"
-AGENT_VERSION = "0.5.3"
+AGENT_VERSION = "0.5.4"
 _logger = logging.getLogger("lizhi-gridcraft")
 AUTOSTART_NAME = "LizhiGridCraftAgent"
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
@@ -274,13 +275,40 @@ def start_gridcraft(path: str | Path):
 
 
 def diagnostic() -> int:
-    """Safe packaging self-test; never reads or emits token/private documents."""
+    """Check packaged save routes with temporary receipts and no network."""
     assert AUTOSTART_NAME and RUN_KEY
     assert APP_EXE_NAME.lower().endswith(".exe")
     assert load_settings(Path("__intentionally_missing_gridcraft_test__.json")) == {}
     assert GridCraftLocal(port=7979, timeout=1.2) is not None
-    print("PASS: LizhiGridCraftAgent packaging and local-only dependencies")
-    print("NOT_TESTED: user's real Windows desktop or remote ChatGPT MCP")
+    with tempfile.TemporaryDirectory(prefix="gridcraft-agent-self-test-") as directory:
+        local = P3Local(port=7979, timeout=1.2)
+        writer = P4SafeWriter(local, Path(directory) / "P4Backups", approved_docs=set())
+        worker = OutboundWorker(
+            transport=None, local=local, p4_writer=writer, p4_saver=P4SafeSaveWriter(writer),
+        )
+        try:
+            worker.execute_job({"name": "gridcraft_save_prepare", "args": {
+                "doc": "1", "file_name": "self-test.xlsx",
+            }})
+        except P4Denied as exc:
+            if str(exc) != "WORKBOOK_NOT_GRANTED":
+                raise
+        else:
+            raise RuntimeError("P4 save prepare accepted an ungranted workbook")
+        status = worker.execute_job({"name": "gridcraft_save_status", "args": {
+            "request_id": "b91331eb-9201-4c4a-9822-03dc80e71663", "verify_disk": False,
+        }})
+        if status.get("error") != "RECEIPT_NOT_FOUND":
+            raise RuntimeError("P4 save status did not open the isolated receipt store")
+        try:
+            worker.execute_job({"name": "gridcraft_app_save", "args": {}})
+        except UnsafeJob as exc:
+            if str(exc) != "METHOD_DENIED":
+                raise
+        else:
+            raise RuntimeError("Worker accepted an unrestricted native save")
+    print(f"PASS: LizhiGridCraftAgent {AGENT_VERSION} P4 save routes and packaging")
+    print("NOT_TESTED: live GridCraft socket or ChatGPT MCP")
     return 0
 
 
@@ -948,7 +976,7 @@ class AgentUI:
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Lizhi GridCraft Windows local agent")
     parser.add_argument("--self-test",action="store_true",
-                        help="Packaging self-test only; no mutex, file or registry mutation")
+                        help="Packaging self-test only; no user settings, workbook or registry mutation")
     parser.add_argument("--minimized",action="store_true",
                         help="Start minimized when launched by existing HKCU Run entry")
     args=parser.parse_args(argv)

@@ -47,3 +47,29 @@ jobs:
       - name: Windows-only v0.5.3 reliability regression
         if: runner.os == 'Windows'
         run: python -m pytest integrations/gridcraft/test_v053_reliability.py -q
+
+  windows-exe:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build isolated Windows candidate
+        run: |
+          python -m pip install pyinstaller==6.16.0
+          python -m PyInstaller --clean --noconfirm --onefile --name LizhiGridCraftAgent integrations/gridcraft/gridcraft_windows_agent.py
+      - name: Verify packaged P4 routing
+        shell: pwsh
+        run: |
+          $result = & .\dist\LizhiGridCraftAgent.exe --self-test
+          $result | Write-Output
+          if ($LASTEXITCODE -ne 0 -or $result -notcontains 'PASS: LizhiGridCraftAgent 0.5.4 P4 save routes and packaging') {
+            throw 'Packaged GridCraft P4 smoke test failed'
+          }
+      - name: Upload Windows candidate for this run
+        uses: actions/upload-artifact@v4
+        with:
+          name: LizhiGridCraftAgent-v0.5.4-candidate
+          path: dist/LizhiGridCraftAgent.exe
+          if-no-files-found: error
