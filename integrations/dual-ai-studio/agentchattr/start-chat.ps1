@@ -1,4 +1,4 @@
-# One-click start for the cross-AI chat room (agentchattr + Claude + Codex).
+﻿# One-click start for the cross-AI chat room (agentchattr + Claude + Codex).
 #
 #   Default : auto-run mode (Claude auto mode, Codex never-ask). Agents work in test-repo only.
 #   -Safe   : every agent action asks for approval in its window.
@@ -60,11 +60,18 @@ Start-Sleep 5
 Start-Process conhost.exe -WindowStyle $win -ArgumentList "`"$py`" wrapper.py codex -- $codexArgs" -WorkingDirectory $PSScriptRoot
 Start-Sleep 10
 
+# 5b. Website bridge (立之雲端庫 → 雙AI工作室). Runs only when bridge.local.json exists.
+$bridgeOn = Test-Path (Join-Path $PSScriptRoot 'bridge.local.json')
+if ($bridgeOn) {
+  Start-Process conhost.exe -WindowStyle $win -ArgumentList "`"$py`" bridge\supabase_bridge.py" -WorkingDirectory $PSScriptRoot
+}
+
 # 6. Open the chat room
 Start-Process 'http://127.0.0.1:8300'
 Write-Host ""
 Write-Host "Chat room is running.  Mode: $mode"
 Write-Host "  Open : http://127.0.0.1:8300"
 Write-Host "  Talk : @claude / @codex in the message box"
+Write-Host ("  Web  : " + $(if ($bridgeOn) { "bridge to 立之雲端庫 is ON" } else { "bridge OFF (no bridge.local.json)" }))
 Write-Host "  Stop : double-click stop-chat.bat"
 Write-Host "  Stuck? double-click show-agents.bat to see the agent windows"
