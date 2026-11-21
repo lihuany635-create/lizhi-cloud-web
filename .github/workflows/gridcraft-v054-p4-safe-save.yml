@@ -64,7 +64,8 @@ jobs:
         run: |
           $result = & .\dist\LizhiGridCraftAgent.exe --self-test
           $result | Write-Output
-          if ($LASTEXITCODE -ne 0 -or $result -notcontains 'PASS: LizhiGridCraftAgent 0.5.4 P4 save routes and packaging') {
+          # Version-agnostic from v0.5.4 on; -match on an array returns matching lines.
+          if ($LASTEXITCODE -ne 0 -or -not ($result -match '^PASS: LizhiGridCraftAgent 0\.5\.[4-9] P4 save routes and packaging$')) {
             throw 'Packaged GridCraft P4 smoke test failed'
           }
       - name: Upload Windows candidate for this run
