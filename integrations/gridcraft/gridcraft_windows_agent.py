@@ -34,6 +34,7 @@ from gridcraft_p4_desktop import P4Local
 from gridcraft_p3_desktop import P3Local
 from gridcraft_p3_format import P3FormatWriter
 from gridcraft_p4_safe_save import P4SafeSaveWriter
+from gridcraft_readonly_v055 import ReadOnlyDenied
 from gridcraft_pairing_client import DeviceStore, PairingError, pair_one_time
 
 try:
@@ -42,7 +43,7 @@ except ImportError:  # development tests can run outside Windows
     winreg = None
 
 APP_TITLE = "立之 GridCraft 連線代理"
-AGENT_VERSION = "0.5.4"
+AGENT_VERSION = "0.5.5"
 _logger = logging.getLogger("lizhi-gridcraft")
 AUTOSTART_NAME = "LizhiGridCraftAgent"
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
@@ -307,7 +308,34 @@ def diagnostic() -> int:
                 raise
         else:
             raise RuntimeError("Worker accepted an unrestricted native save")
+        # v0.5.5 read-only tools: grant, deny-list and engine command allow-list
+        # are all enforced before any localhost connection is attempted.
+        for job in ({"name": "gridcraft_inspect_workbook", "args": {"doc": "1"}},
+                    {"name": "gridcraft_evaluate_formula", "args": {"doc": "1", "formula": "=1+1"}},
+                    {"name": "gridcraft_read_range", "args": {"doc": "1", "sheet": "S", "range": "A1",
+                                                              "mode": "formulas"}}):
+            try:
+                worker.execute_job(job)
+            except UnsafeJob as exc:
+                if str(exc) != "WORKBOOK_NOT_GRANTED":
+                    raise
+            else:
+                raise RuntimeError("v0.5.5 read tool accepted an ungranted workbook")
+        try:
+            local.evaluate("1", '=CELL("filename")')
+        except ReadOnlyDenied as exc:
+            if str(exc) != "FORMULA_FUNCTION_DENIED":
+                raise
+        else:
+            raise RuntimeError("Path-revealing formula was not refused")
+        try:
+            local._request("engine.execute", {"command": "app.save", "params": {}, "doc": 1})
+        except PermissionError:
+            pass
+        else:
+            raise RuntimeError("Unrestricted engine command was not refused")
     print(f"PASS: LizhiGridCraftAgent {AGENT_VERSION} P4 save routes and packaging")
+    print(f"PASS: LizhiGridCraftAgent {AGENT_VERSION} read-only inspect/evaluate/read-mode guards")
     print("NOT_TESTED: live GridCraft socket or ChatGPT MCP")
     return 0
 

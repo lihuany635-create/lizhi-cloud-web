@@ -153,6 +153,15 @@ def file_sha256(path):
     return h.hexdigest()
 
 
+REPLACE_ATTEMPTS=20
+REPLACE_DELAY_S=0.5
+
+
+def _sleep(seconds):
+    import time
+    time.sleep(seconds)
+
+
 def maybe_update_installed(source,target):
     """Update a stable installed copy and relaunch it with --minimized.
 
@@ -178,14 +187,33 @@ def maybe_update_installed(source,target):
         raise WinLifecycleError("LEGACY_AGENT_CLOSE_REQUIRED")
     target.parent.mkdir(parents=True,exist_ok=True)
     temp=target.with_suffix(".update.tmp")
-    try:
-        shutil.copy2(source,temp)
-        os.replace(temp,target)
-        subprocess.Popen([str(target),"--minimized"],cwd=str(target.parent),
+    def launch(path):
+        subprocess.Popen([str(path),"--minimized"],cwd=str(path.parent),
                          shell=False,stdin=subprocess.DEVNULL,
                          stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
                          close_fds=True)
+    try:
+        shutil.copy2(source,temp)
+        # v0.5.5: the old one-file EXE releases its mutex before its
+        # bootloader process exits, so the image can stay locked for a few
+        # seconds (observed 2026-11-22: first update failed, old agent gone).
+        for attempt in range(REPLACE_ATTEMPTS):
+            try:
+                os.replace(temp,target)
+                break
+            except PermissionError:
+                if attempt==REPLACE_ATTEMPTS-1:
+                    raise
+                _sleep(REPLACE_DELAY_S)
+        launch(target)
     except (OSError,ValueError):
+        # Never leave the owner with no agent: the old one already quit, so
+        # restart the unchanged installed copy if it is still there.
+        try:
+            if target.exists():
+                launch(target)
+        except OSError:
+            pass
         raise WinLifecycleError("AGENT_UPDATE_FAILED") from None
     finally:
         if temp.exists():

@@ -11,6 +11,16 @@ from gridcraft_pairing_client import (
 )
 import gridcraft_windows_agent as agent
 
+from gridcraft_test_isolation import isolate_app_directory, restore_app_directory
+
+
+def setUpModule():
+    isolate_app_directory()
+
+
+def tearDownModule():
+    restore_app_directory()
+
 
 class PairingTests(unittest.TestCase):
     def test_code_shape_rejected_without_any_network(self):
