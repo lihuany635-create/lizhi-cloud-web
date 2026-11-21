@@ -43,7 +43,7 @@ const safeName = name => {
     [...name].length<6 || [...name].length>95 ||
     !name.toLowerCase().endsWith(".xlsx") || name.split(".").length!==2 ||
     name[0]===" " || name[0]==="." || name.at(-1)===" " ||
-    /[<>:"/\\|?*\x00-\x1f\p{Cf}\p{Cs}]/u.test(name) ||
+    /[<>:"\/\\|?*\x00-\x1f\p{Cf}\p{Cs}]/u.test(name) ||
     name.slice(0,-5).trim()!==name.slice(0,-5) ||
     DEVICE.test(name.slice(0,-5))) throw Error("SAVE_NAME_DENIED");
  return name;
