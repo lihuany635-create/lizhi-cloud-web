@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'integrations/gridcraft/**'
+      - 'sites-migration/ai-workbench/gridcraft-v054-save-addon.mjs'
       - '.github/workflows/gridcraft-v054-p5-e2e.yml'
   workflow_dispatch:
 permissions:
@@ -39,6 +40,8 @@ jobs:
         run: python -m unittest discover -s integrations/gridcraft -p 'test_p4_safe_save.py' -v
       - name: P4 outbound routing regression
         run: python -m unittest discover -s integrations/gridcraft -p 'test_p4_save_worker_route.py' -v
+      - name: Private Site v31 SafeSave owner, gate, schema and redirect regression
+        run: node --test integrations/gridcraft/gridcraft-v054-save-site.test.mjs
       - name: Windows-specific v0.5.3 stability
         if: runner.os == 'Windows'
         run: python -m pytest integrations/gridcraft/test_v053_reliability.py -q
