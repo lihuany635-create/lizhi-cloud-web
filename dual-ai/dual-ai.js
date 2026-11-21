@@ -187,7 +187,14 @@ function queue(text) {
   writeOutbox(); renderList(); void flush();
 }
 
-async function flush() {
+// 同一時間只允許一個補送流程：按送出與定時更新若同時觸發，第二個會等第一個完成，不會重送同一則
+let flushing = null;
+function flush() {
+  if (!flushing) flushing = sendOutbox().finally(() => { flushing = null; });
+  return flushing;
+}
+
+async function sendOutbox() {
   while (s.outbox.length) {
     const item = s.outbox[0];
     const { data, error } = await client().rpc('lizhi_dualai_send', { p_id: item.id, p_content: item.content });
