@@ -26,7 +26,9 @@ ROOT = Path(__file__).resolve().parent.parent          # agentchattr/
 CONFIG_FILE = ROOT / "bridge.local.json"
 STATE_FILE = ROOT / "data" / "bridge_state.json"
 LOCAL = "http://127.0.0.1:8300"
-POLL_SECONDS = 4
+POLL_SECONDS = 4          # 有對話時：每 4 秒檢查一次
+POLL_IDLE_SECONDS = 15    # 閒置時：每 15 秒檢查一次（省約 7 成請求）
+IDLE_AFTER_SECONDS = 300  # 5 分鐘沒有新訊息就算閒置
 CHANNEL = "general"
 
 
@@ -115,7 +117,8 @@ def kind_of(msg: dict) -> str:
     return "human" if msg.get("sender") == "user" else "agent"
 
 
-def run_once(cloud: Cloud, local: Local, state: dict, echo: list[str]) -> None:
+def run_once(cloud: Cloud, local: Local, state: dict, echo: list[str]) -> bool:
+    """執行一輪同步；有任何訊息往來時回傳 True。"""
     # 1) 網站 → 本機
     rows = cloud.pull()
     if rows:
@@ -132,7 +135,7 @@ def run_once(cloud: Cloud, local: Local, state: dict, echo: list[str]) -> None:
         # 第一次啟動：不上傳舊紀錄，從目前最新一則之後開始
         state["last_local_id"] = max([m["id"] for m in msgs], default=0)
         save_state(state)
-        return
+        return bool(rows)
     sent = 0
     for m in sorted(msgs, key=lambda x: x["id"]):
         text = (m.get("text") or "").strip()
@@ -148,6 +151,7 @@ def run_once(cloud: Cloud, local: Local, state: dict, echo: list[str]) -> None:
         save_state(state)
     if sent:
         log(f"本機→網站 {sent} 則")
+    return bool(rows) or sent > 0 or any(m["id"] > last for m in msgs)
 
 
 def main() -> int:
@@ -157,12 +161,14 @@ def main() -> int:
     cfg = json.loads(CONFIG_FILE.read_text("utf-8"))
     cloud, local = Cloud(cfg), Local()
     state, echo = load_state(), []
+    last_activity = time.monotonic()
     log("轉接程式啟動")
     while True:
         try:
             if not local.token:
                 local.refresh_token()
-            run_once(cloud, local, state, echo)
+            if run_once(cloud, local, state, echo):
+                last_activity = time.monotonic()
             del echo[:-50]
         except urllib.error.HTTPError as e:
             if e.code == 403 and "8300" in (e.url or ""):
@@ -177,7 +183,8 @@ def main() -> int:
             local.token = ""
             log(f"暫時無法同步：{type(e).__name__}: {e}")
             time.sleep(POLL_SECONDS * 2)
-        time.sleep(POLL_SECONDS)
+        idle = time.monotonic() - last_activity > IDLE_AFTER_SECONDS
+        time.sleep(POLL_IDLE_SECONDS if idle else POLL_SECONDS)
 
 
 if __name__ == "__main__":
