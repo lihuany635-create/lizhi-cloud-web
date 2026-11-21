@@ -20,6 +20,7 @@ from typing import Protocol
 
 from gridcraft_desktop_local import GridCraftLocal
 from gridcraft_p4_safe_write import P4Denied
+from gridcraft_readonly_v055 import READ_MODES, ReadOnlyDenied, bound_eval_value
 
 DEVICE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,100}$")
 WORKBOOK_UID = re.compile(r"^[1-9][0-9]{0,19}$")
@@ -28,6 +29,8 @@ TOKEN = re.compile(r"^[a-fA-F0-9]{64}$")
 A1 = re.compile(r"^([A-Z]{1,3})([1-9][0-9]{0,5})(?::([A-Z]{1,3})([1-9][0-9]{0,5}))?$")
 BASE = "https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-gridcraft-bridge/device"
 READ_TOOLS = frozenset({"gridcraft_list_workbooks", "gridcraft_read_range"})
+# v0.5.5 read-only candidate; old Site/Edge/DB do not advertise or queue these.
+V055_READ_TOOLS = frozenset({"gridcraft_inspect_workbook", "gridcraft_evaluate_formula"})
 P4_TOOLS = frozenset({"gridcraft_prepare_write","gridcraft_commit_write"})
 # Candidate only: old Site/Edge do not advertise these jobs until approved.
 P2_TOOLS = frozenset({"gridcraft_batch_prepare", "gridcraft_batch_commit", "gridcraft_batch_status"})
@@ -260,7 +263,7 @@ class OutboundWorker:
             raise UnsafeJob("EXPIRED_JOB")
         try:
             result = self.execute_job(job)
-        except P4Denied as exc:
+        except (P4Denied, ReadOnlyDenied) as exc:
             code = str(exc)
             safe_code = re.fullmatch(r"[A-Z][A-Z0-9_]{1,63}", code)
             result = {"ok": False, "error": code if safe_code else "LOCAL_CONTROL_UNAVAILABLE"}
@@ -277,7 +280,8 @@ class OutboundWorker:
                 "resultCode":str(code)[:48], "backupId":str(result.get("backup_id",""))[:100]}
 
     def execute_job(self, job):
-        if not isinstance(job, dict) or job.get("name") not in READ_TOOLS | P4_TOOLS | P2_TOOLS | P3_FORMAT_TOOLS | P4_SAVE_TOOLS:
+        if not isinstance(job, dict) or job.get("name") not in (
+                READ_TOOLS | V055_READ_TOOLS | P4_TOOLS | P2_TOOLS | P3_FORMAT_TOOLS | P4_SAVE_TOOLS):
             raise UnsafeJob("METHOD_DENIED")
         name = job["name"]
         args = job.get("args", {})
@@ -367,15 +371,42 @@ class OutboundWorker:
                        "dirty":w.get("dirty") is True}
                       for w in windows if w.get("doc") in self.approved_docs][:20]
             return bounded_reply({"ok":True,"workbooks":result})
-        if set(args) != {"doc","sheet","range"}:
+        if name == "gridcraft_inspect_workbook":
+            if set(args) != {"doc"}:
+                raise UnsafeJob("INVALID_ARGS")
+            doc = self._granted_doc(args["doc"])
+            return bounded_reply({"ok": True, "doc": doc, "workbook": self.local.inspect_summary(doc)})
+        if name == "gridcraft_evaluate_formula":
+            if set(args) not in ({"doc", "formula"}, {"doc", "formula", "cell"}):
+                raise UnsafeJob("INVALID_ARGS")
+            doc = self._granted_doc(args["doc"])
+            value = self.local.evaluate(doc, args["formula"], args.get("cell"))
+            return bounded_reply({"ok": True, "doc": doc, "formula": args["formula"],
+                                  "value": bound_eval_value(value), "sheet_changed": False})
+        # Legacy 3-key read stays valid; optional v0.5.5 "mode".
+        if set(args) not in ({"doc","sheet","range"}, {"doc","sheet","range","mode"}):
             raise UnsafeJob("INVALID_ARGS")
         doc, sheet, rng = args["doc"], args["sheet"], args["range"]
+        mode = args.get("mode", "values")
+        if mode not in READ_MODES:
+            raise UnsafeJob("INVALID_MODE")
+        doc = self._granted_doc(doc)
+        if not isinstance(sheet, str) or len(sheet) < 1 or len(sheet) > 80 or any(ord(c)<32 for c in sheet):
+            raise UnsafeJob("INVALID_SHEET")
+        bounded_range(rng)
+        if mode == "values":
+            result = self.local.read_range(sheet, rng, doc=doc)
+        else:
+            result = self.local.read_range(sheet, rng, doc=doc, formulas=mode == "formulas",
+                                           formatted=mode == "formatted")
+        reply = {"ok": True, "doc": doc, "sheet": sheet, "range": rng, "data": result}
+        if "mode" in args:
+            reply["mode"] = mode
+        return bounded_reply(reply)
+
+    def _granted_doc(self, doc):
         if not isinstance(doc, str) or not WORKBOOK_UID.fullmatch(doc) or int(doc) > (1 << 64) - 1:
             raise UnsafeJob("INVALID_DOC")
         if doc not in self.approved_docs:
             raise UnsafeJob("WORKBOOK_NOT_GRANTED")
-        if not isinstance(sheet, str) or len(sheet) < 1 or len(sheet) > 80 or any(ord(c)<32 for c in sheet):
-            raise UnsafeJob("INVALID_SHEET")
-        bounded_range(rng)
-        result = self.local.read_range(sheet, rng, doc=doc)
-        return bounded_reply({"ok": True, "doc": doc, "sheet": sheet, "range": rng, "data": result})
+        return doc

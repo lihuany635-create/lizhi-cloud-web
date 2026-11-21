@@ -11,6 +11,8 @@ from pathlib import Path
 import re
 import socket
 
+from gridcraft_readonly_v055 import eval_cell_guard, formula_guard, sanitize_inspect
+
 
 class GridCraftConnectionError(Exception):
     pass
@@ -24,7 +26,9 @@ class GridCraftOffline(GridCraftConnectionError):
     pass
 
 
-ALLOWED_METHODS = frozenset({"window.list", "document.inspect", "sheet.read", "cell.get"})
+ALLOWED_METHODS = frozenset({"window.list", "document.inspect", "sheet.read", "cell.get", "engine.execute"})
+# engine.execute is reachable ONLY for this side-effect-free command (v0.5.5).
+EXECUTE_COMMANDS = frozenset({"formulas.evaluate"})
 RANGE = re.compile(r"^\$?[A-Z]{1,3}\$?[1-9][0-9]{0,5}(?::\$?[A-Z]{1,3}\$?[1-9][0-9]{0,5})?$")
 MAX_REPLY = 128 * 1024
 MAX_REQUEST = 3 * 1024
@@ -75,8 +79,20 @@ class GridCraftLocal:
             rg = params.get("range")
             if not isinstance(rg, str) or not RANGE.fullmatch(rg):
                 raise ValueError("sheet.read needs bounded A1 range")
-            if len(params) > 4 or any(k not in ("range", "sheet", "formulas", "doc") for k in params):
+            if len(params) > 4 or any(k not in ("range", "sheet", "formulas", "formatted", "doc") for k in params):
                 raise ValueError("unsupported sheet.read parameters")
+            if params.get("formulas") and params.get("formatted"):
+                raise ValueError("choose formulas or formatted, not both")
+        if method == "engine.execute":
+            if set(params) != {"command", "params", "doc"} or params.get("command") not in EXECUTE_COMMANDS:
+                raise PermissionError("engine command not allowed")
+            inner = params.get("params")
+            if (not isinstance(inner, dict) or not set(inner) <= {"formula", "cell"}
+                    or not isinstance(inner.get("formula"), str)):
+                raise ValueError("invalid formulas.evaluate parameters")
+            # Re-check here so no caller can bypass the function deny-list.
+            formula_guard(inner["formula"])
+            eval_cell_guard(inner.get("cell"))
         if "doc" in params and (not isinstance(params["doc"], int)
                                or isinstance(params["doc"], bool)
                                or not 1 <= params["doc"] <= (1 << 64) - 1):
@@ -153,14 +169,41 @@ class GridCraftLocal:
             params["doc"] = n
         return self._request("document.inspect", params)
 
-    def read_range(self, sheet: str, a1_range: str, doc: str | None = None, formulas: bool = False):
+    def _open_doc_id(self, doc: str) -> int:
+        """Decimal workbook UID -> JSON number, only while it is still open."""
+        if not isinstance(doc, str) or not re.fullmatch(r"[1-9][0-9]{0,19}", doc):
+            raise ValueError("invalid decimal workbook id")
+        doc_id = int(doc)
+        if not 1 <= doc_id <= (1 << 64) - 1:
+            raise ValueError("workbook id outside GridCraft u64 range")
+        if doc not in {x["doc"] for x in self.windows()}:
+            raise GridCraftUnauthorized("requested workbook not open locally")
+        return doc_id
+
+    def inspect_summary(self, doc: str):
+        """v0.5.5: allow-listed workbook structure (no path/undo/trust)."""
+        return sanitize_inspect(self._request("document.inspect", {"doc": self._open_doc_id(doc)}))
+
+    def evaluate(self, doc: str, formula: str, cell: str | None = None):
+        """v0.5.5: formulas.evaluate never changes the sheet (verified headless)."""
+        formula_guard(formula)
+        inner = {"formula": formula}
+        if eval_cell_guard(cell) is not None:
+            inner["cell"] = cell
+        return self._request("engine.execute", {"command": "formulas.evaluate", "params": inner,
+                                                "doc": self._open_doc_id(doc)})
+
+    def read_range(self, sheet: str, a1_range: str, doc: str | None = None, formulas: bool = False,
+                   formatted: bool = False):
         if not isinstance(sheet, str) or not 1 <= len(sheet) <= 80:
             raise ValueError("invalid sheet")
         arguments = {"sheet": sheet, "range": a1_range}
-        if not isinstance(formulas, bool):
+        if not isinstance(formulas, bool) or not isinstance(formatted, bool) or (formulas and formatted):
             raise ValueError("invalid formulas flag")
         if formulas:
             arguments["formulas"] = True
+        if formatted:
+            arguments["formatted"] = True
         if doc is not None:
             if not isinstance(doc, str) or not re.fullmatch(r"[1-9][0-9]{0,19}", doc):
                 raise ValueError("invalid decimal workbook id")

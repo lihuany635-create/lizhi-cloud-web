@@ -1,0 +1,68 @@
+name: GridCraft v0.5.5 read-only tools candidate
+on:
+  pull_request:
+    paths:
+      - 'integrations/gridcraft/**'
+      - 'sites-migration/ai-workbench/gridcraft-v055-readonly-addon.mjs'
+      - '.github/workflows/gridcraft-v055-readonly.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  python:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.12', '3.13']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Syntax check
+        run: python -m py_compile integrations/gridcraft/gridcraft_readonly_v055.py integrations/gridcraft/gridcraft_desktop_local.py integrations/gridcraft/gridcraft_outbound_worker.py integrations/gridcraft/test_readonly_v055.py
+      - name: v0.5.5 guard, sanitize, local adapter and worker routing
+        run: python -m unittest discover -s integrations/gridcraft -p 'test_readonly_v055.py' -v
+      - name: Existing read/worker regressions
+        run: |
+          python -m unittest discover -s integrations/gridcraft -p 'test_desktop_local.py' -v
+          python -m unittest discover -s integrations/gridcraft -p 'test_outbound_worker.py' -v
+          python -m unittest discover -s integrations/gridcraft -p 'test_p4_save_worker_route.py' -v
+          python -m unittest discover -s integrations/gridcraft -p 'test_p3_worker_route.py' -v
+          python -m unittest discover -s integrations/gridcraft -p 'test_p2_worker_route.py' -v
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Edge v10 candidate (mock PostgREST) and Site addon
+        run: node --test integrations/gridcraft/gridcraft-edge-v10.test.mjs integrations/gridcraft/gridcraft-v055-readonly-site.test.mjs
+  native-headless:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download pinned official GridCraft v0.19.1 portable
+        shell: pwsh
+        run: |
+          $url = 'https://github.com/storytold/gridcraft/releases/download/v0.19.1/gridcraft-0.19.1-windows-x64-portable.zip'
+          $zip = Join-Path $env:RUNNER_TEMP 'gridcraft-0.19.1-v055.zip'
+          $folder = Join-Path $env:RUNNER_TEMP 'gridcraft-v055-portable'
+          Invoke-WebRequest -Uri $url -OutFile $zip
+          $digest = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash
+          if ($digest -ne '0b4bf8535f4904fac654326a360ff6d74ea6f4d184a8257c106388fafe74c9ac') {
+            throw 'Pinned GridCraft release checksum differed'
+          }
+          Expand-Archive -LiteralPath $zip -DestinationPath $folder
+          $cli = @(Get-ChildItem -LiteralPath $folder -Recurse -File -Filter 'gridcraft-cli.exe')
+          if ($cli.Count -ne 1) { throw 'Expected one official gridcraft-cli executable' }
+          "GRIDCRAFT_CLI=$($cli[0].FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Native headless probe (synthetic sample only)
+        run: python -m unittest test_readonly_v055.NativeHeadlessProbe -v
+        working-directory: integrations/gridcraft
