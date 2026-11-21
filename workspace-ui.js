@@ -70,9 +70,9 @@ function renderWorkspace() {
   }
   if(state.route === 'media') updateMediaPanel(panel);
   else if(state.route === 'chat') updateChatPanel(panel);
-  else if(state.route === 'study' || state.route === 'english' || state.route === 'cad' || state.route === 'a4' || state.route === 'licut' || state.route === 'imagegraph' || state.route === 'model3d' || state.route === 'hew3d' || state.route === 'animationflow' || state.route === 'usage') {
+  else if(state.route === 'study' || state.route === 'english' || state.route === 'cad' || state.route === 'a4' || state.route === 'licut' || state.route === 'imagegraph' || state.route === 'model3d' || state.route === 'hew3d' || state.route === 'animationflow' || state.route === 'usage' || state.route === 'dualai') {
     if(!panel.hasChildNodes()) {
-      panel.innerHTML = state.route === 'study' ? renderStudy() : state.route === 'english' ? renderEnglish() : state.route === 'cad' ? renderCad() : state.route === 'licut' ? renderLicut() : state.route === 'imagegraph' ? renderImageGraph() : state.route === 'model3d' ? renderModel3d() : state.route === 'hew3d' ? renderHew3d() : state.route === 'animationflow' ? renderAnimationFlow() : state.route === 'usage' ? renderUsageMonitor() : renderA4Editor();
+      panel.innerHTML = state.route === 'study' ? renderStudy() : state.route === 'english' ? renderEnglish() : state.route === 'cad' ? renderCad() : state.route === 'licut' ? renderLicut() : state.route === 'imagegraph' ? renderImageGraph() : state.route === 'model3d' ? renderModel3d() : state.route === 'hew3d' ? renderHew3d() : state.route === 'animationflow' ? renderAnimationFlow() : state.route === 'dualai' ? renderDualAi() : state.route === 'usage' ? renderUsageMonitor() : renderA4Editor();
       if(state.route === 'cad') window.LizhiCadHost?.mount(panel);
       if(state.route === 'hew3d') window.LizhiHewEditor?.mount(panel);
       if(state.route === 'study') {
@@ -94,6 +94,18 @@ function renderWorkspace() {
   if(state.route === 'phoneagent' && window.LizhiPhoneAgent) {
     const host = panel.querySelector('#lizhi-phone-host');
     if(host) window.LizhiPhoneAgent.mount(host);
+  }
+  if(state.route === 'dualai' && !panel.dataset.dualaiMounted) {
+    panel.dataset.dualaiMounted = 'loading';
+    import('./dual-ai/dual-ai.js?v=1').then(module => {
+      const host = panel.querySelector('#dualai-root');
+      if(!host) throw new Error('雙AI工作室容器不存在');
+      module.mount(host); panel.dataset.dualaiMounted = 'ready';
+    }).catch(error => {
+      const host = panel.querySelector('#dualai-root');
+      if(host) { host.replaceChildren(); const message=document.createElement('p'); message.className='production-loading'; message.textContent='雙AI工作室載入失敗，請重新整理。'+error.message; host.append(message); }
+      delete panel.dataset.dualaiMounted;
+    });
   }
   if(state.route === 'animationflow' && !panel.dataset.productionMounted) {
     panel.dataset.productionMounted = 'loading';

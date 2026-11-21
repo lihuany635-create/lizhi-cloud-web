@@ -44,7 +44,7 @@ test("GOALS-UX-03 form snapshot is per-owner and cloud revision",()=>{
 
 test("GOALS-UX-04 entrypoints and Service Worker preload only the active assets",()=>{
  const index=read("index.html"),loader=read("loader.js"),sw=read("sw.js");
- assert.match(sw,/const CACHE="lizhi-cloud-v172"/);
+ assert.match(sw,/const CACHE="lizhi-cloud-v173"/);
  for(const [entry,asset,version]of [
    [index,"finance/styles/home.css","63"],
    [index,"loader.js","9"],

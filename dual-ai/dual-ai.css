@@ -1,0 +1,31 @@
+/* 雙AI工作室｜網站群聊 */
+.dualai{display:flex;flex-direction:column;gap:10px;max-width:820px;margin:0 auto;height:calc(100dvh - 150px);min-height:420px}
+.dualai-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dualai-title{display:flex;flex-direction:column}
+.dualai-title strong{font-size:1.15rem;color:var(--ink)}
+.dualai-sub{font-size:.85rem;color:var(--muted)}
+.dualai-pill{font-size:.85rem;padding:4px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.dualai-pill.is-on{color:var(--green);border-color:var(--green)}
+.dualai-pill.is-off{color:var(--muted)}
+.dualai-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--paper-2)}
+.dualai-empty{margin:auto;color:var(--muted)}
+.dualai-msg{display:flex;flex-direction:column;max-width:82%}
+.dualai-msg.is-me{align-self:flex-end;align-items:flex-end}
+.dualai-msg.is-agent{align-self:flex-start}
+.dualai-msg.is-system{align-self:center;max-width:95%;opacity:.75;font-size:.85rem}
+.dualai-who{font-size:.8rem;color:var(--muted);margin:0 6px 2px}
+.dualai-bubble{white-space:pre-wrap;word-break:break-word;padding:8px 12px;border-radius:14px;background:var(--paper);border:1px solid var(--line);color:var(--ink);line-height:1.55}
+.dualai-msg.is-me .dualai-bubble{background:var(--accent);border-color:var(--accent);color:#fff}
+.dualai-meta{font-size:.72rem;color:var(--muted);margin:2px 6px 0}
+.dualai-note{min-height:1.2em;font-size:.85rem;color:var(--muted)}
+.dualai-compose{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+.dualai-quick{grid-column:1/-1;display:flex;gap:6px}
+.dualai-compose textarea{width:100%;box-sizing:border-box;resize:vertical;min-height:44px;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit}
+.dualai-send{height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--accent);color:#fff;font:inherit;cursor:pointer}
+.dualai-chip{padding:4px 12px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-size:.85rem;cursor:pointer}
+.dualai-setup{font-size:.9rem;color:var(--muted)}
+.dualai-setup summary{cursor:pointer}
+.dualai-setup-body{display:flex;flex-direction:column;gap:8px;align-items:flex-start;padding-top:8px}
+.dualai-key{width:100%;box-sizing:border-box;font-family:ui-monospace,Consolas,monospace;font-size:.8rem;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.dualai-warn{color:var(--danger)}
+@media (max-width:640px){.dualai{height:calc(100dvh - 120px)}.dualai-msg{max-width:92%}}
