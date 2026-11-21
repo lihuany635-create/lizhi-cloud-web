@@ -28,7 +28,8 @@ def request(port, token, method, **params):
                 conn.sendall(json.dumps({"id": request_id, "method": name, "params": args}).encode() + b"\n")
                 reply = json.loads(stream.readline(1024 * 1024))
                 if reply.get("id") != request_id or reply.get("ok") is not True:
-                    raise RuntimeError(f"{name} refused")
+                    detail = reply.get("error", "no detail") if request_id else "authentication rejected"
+                    raise RuntimeError(f"{name} refused: {str(detail)[:200]}")
                 if request_id == 0 and reply.get("result", {}).get("authenticated") is not True:
                     raise RuntimeError("GridCraft authentication failed")
             return reply.get("result")
@@ -118,6 +119,9 @@ def run(exe, root):
             copy = saver.root / result["file_name"]
             assert copy.read_bytes() == (writer.backups / result["backup_id"]).read_bytes()
 
+            # Keep an empty window available for the native open command.
+            request(port, token, "file.new")
+            assert any(w["doc"] != window["doc"] for w in request(port, token, "window.list"))
             request(port, token, "window.close", window=window["window"])
             assert all(w["doc"] != window["doc"] for w in request(port, token, "window.list"))
             request(port, token, "app.open", path=str(copy))
