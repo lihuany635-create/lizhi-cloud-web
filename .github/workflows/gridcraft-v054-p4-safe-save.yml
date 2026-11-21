@@ -73,3 +73,30 @@ jobs:
           name: LizhiGridCraftAgent-v0.5.4-candidate
           path: dist/LizhiGridCraftAgent.exe
           if-no-files-found: error
+
+
+  windows-native-p4:
+    runs-on: windows-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify real GridCraft control socket and P4 copy save
+        shell: pwsh
+        run: |
+          $url = 'https://github.com/storytold/gridcraft/releases/download/v0.19.1/gridcraft-0.19.1-windows-x64-portable.zip'
+          $archive = Join-Path $env:RUNNER_TEMP 'gridcraft-0.19.1.zip'
+          $folder = Join-Path $env:RUNNER_TEMP 'gridcraft-p4-portable'
+          Invoke-WebRequest -Uri $url -OutFile $archive
+          $digest = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
+          if ($digest -ne '0b4bf8535f4904fac654326a360ff6d74ea6f4d184a8257c106388fafe74c9ac') {
+            throw 'GridCraft release checksum differed'
+          }
+          Expand-Archive -LiteralPath $archive -DestinationPath $folder
+          $exe = @(Get-ChildItem -LiteralPath $folder -Recurse -File -Filter 'gridcraft.exe')
+          if ($exe.Count -ne 1) { throw 'Expected one portable GridCraft executable' }
+          python integrations/gridcraft/p4_windows_native_acceptance.py $exe[0].FullName
