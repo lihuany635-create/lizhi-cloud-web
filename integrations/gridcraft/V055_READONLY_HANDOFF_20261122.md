@@ -57,6 +57,22 @@
   - ChatGPT 全鏈路。
   - 打包 v0.5.5 EXE。
 
+## 打包（上線第 1 步，2026-11-22）
+- 程式版本 `AGENT_VERSION = "0.5.5"`，Windows 版本資源檔是 `version_info_v055.txt`。
+- `--self-test` 新增 v0.5.5 檢查，下列三種情況都會在連線本機 GridCraft 之前就被拒絕：
+  - 工作簿沒有授權。
+  - 公式含 `CELL("filename")`。
+  - `engine.execute` 執行 `formulas.evaluate` 以外的命令。
+- **CI 打包**：[run 44936975071](https://github.com/lihuany635-create/lizhi-cloud-web/actions/runs/44936975071) 全部通過。
+  - 9 組代理與 worker 測試全過。
+  - EXE 版本資源是 0.5.5。
+  - 打包後的 EXE 自我檢查通過。
+- **產物**：`LizhiGridCraftAgent_v055_Windows.zip`，12,323,199 bytes，ZIP SHA256 `5b99c26f…12273a`。
+  - 內含 `LizhiGridCraftAgent_v055.exe`，EXE SHA256 `af509111cf411441a079b8fbb30e5b9c91252d9fb5f7d9ec38ec4bce9568cf93`。
+- **本機複驗**：在本人電腦對下載的 EXE 執行 `--self-test`，exit 0。已安裝的 0.5.3 檔案雜湊不變，執行中的代理也沒有被替換。
+- **Drive**：沒有上傳。連接器單檔上限 10 MB，ZIP 已在對話中直接交給本人。
+- **NOT_TESTED**：本人實際安裝、v0.5.3 自動換版、安裝後連線。
+
 ## 上線順序（每一步都需要本人批准）
 1. 打包 Windows 代理 v0.5.5，本人安裝。目前本人電腦是 0.5.3，要直接升到 0.5.5。
 2. 部署 Edge v10，維持 `readonlyV055Enabled=false`，回歸確認舊的 3 個工具正常。
