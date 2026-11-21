@@ -197,7 +197,14 @@ def run(exe,root):
                  expected_version=p["expected_version"],request_id=save_id,owner_confirmed=True)
             assert replay.get("ok") is False and replay.get("error")=="REPLAY_DENIED",replay
             assert len(list(saver.root.glob("*.xlsx")))==1
-            assert original.read_bytes()==working.read_bytes()==initial,"Original source changed"
+            assert original.read_bytes()==initial,"Original test fixture changed"
+
+            # The P4/P2 path correctly leaves the test copy dirty. GridCraft
+            # refuses to close dirty workbooks. Save ONLY the isolated working
+            # XLSX through the direct native test control channel, never by a
+            # remotely exposed MCP route, then close/reopen the exported copy.
+            request(port,token,"app.save")
+            assert original.read_bytes()==initial,"Original test fixture changed during Save"
 
             # Never close the last native GridCraft document window.
             request(port,token,"file.new")
@@ -212,7 +219,7 @@ def run(exe,root):
             assert local.read_range("Sheet1","F321",doc=str(reopened[0]["doc"]))["values"]==[["P5_PASS"]]
             cli_report=probe_native_gridcraft(saver.root,copy.name,cli)
             assert cli_report.get("status")=="NATIVE_CLI_ROUNDTRIP_PASS",cli_report
-            assert original.read_bytes()==working.read_bytes()==initial
+            assert original.read_bytes()==initial,"Original test fixture changed"
             print("PASS P5: GridCraft v0.19.1 native 320 rows, 320 formulas, merged/header/print, P4+P2 write, denied routes, backup restore, disk copy, CLI and GUI close/reopen")
         except Exception:
             print(log_path.read_text(encoding="utf-8",errors="replace")[-2500:])
