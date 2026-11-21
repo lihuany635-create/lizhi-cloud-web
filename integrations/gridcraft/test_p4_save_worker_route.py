@@ -1,5 +1,6 @@
 """P4 save-route integration tests (GitHub full repo; synthetic workbooks only)."""
 from __future__ import annotations
+from types import SimpleNamespace
 import tempfile
 import unittest
 import uuid
@@ -58,6 +59,39 @@ class SaveRoutingTests(unittest.TestCase):
             self.call('gridcraft_save_commit',{'preview_id':p['preview_id'],
                   'expected_version':p['expected_version'],'request_id':str(uuid.uuid4()),
                   'owner_confirmed':True})
+
+    def test_poll_completion_reports_local_save_refusal(self):
+        p = self.call('gridcraft_save_prepare', {'doc': '1', 'file_name': 'copy.xlsx'})
+        request_id = str(uuid.uuid4())
+        job = {
+            'id': request_id,
+            'name': 'gridcraft_save_commit',
+            'expiresAt': 2000,
+            'args': {
+                'preview_id': p['preview_id'],
+                'expected_version': p['expected_version'],
+                'request_id': request_id,
+                'owner_confirmed': True,
+            },
+        }
+        completions = []
+        def complete(job_id, result):
+            completions.append((job_id, result))
+            return {'accepted': True}
+
+        self.p4.local.status = lambda: {'status': 'READY'}
+        self.worker.clock = lambda: 1.0
+        self.worker.transport = SimpleNamespace(
+            heartbeat_merged=True, poll=lambda: {'job': job}, complete=complete,
+        )
+        self.enabled = False
+        result = self.worker.run_once()
+
+        self.assertEqual(result['resultCode'], 'OWNER_CONFIRMATION_REQUIRED')
+        self.assertEqual(completions, [
+            (request_id, {'ok': False, 'error': 'OWNER_CONFIRMATION_REQUIRED'}),
+        ])
+        self.assertEqual(list(self.saver.root.glob('*.xlsx')), [])
 
     def test_strict_args_no_path_passthrough(self):
         with self.assertRaisesRegex(UnsafeJob,'INVALID_ARGS'):

@@ -19,6 +19,7 @@ import urllib.request
 from typing import Protocol
 
 from gridcraft_desktop_local import GridCraftLocal
+from gridcraft_p4_safe_write import P4Denied
 
 DEVICE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,100}$")
 WORKBOOK_UID = re.compile(r"^[1-9][0-9]{0,19}$")
@@ -259,11 +260,15 @@ class OutboundWorker:
             raise UnsafeJob("EXPIRED_JOB")
         try:
             result = self.execute_job(job)
+        except P4Denied as exc:
+            code = str(exc)
+            safe_code = re.fullmatch(r"[A-Z][A-Z0-9_]{1,63}", code)
+            result = {"ok": False, "error": code if safe_code else "LOCAL_CONTROL_UNAVAILABLE"}
         except (UnsafeJob, ValueError, PermissionError) as exc:
             result = {"ok": False, "error": str(exc)[:80]}
         except Exception:
             result = {"ok": False, "error": "LOCAL_CONTROL_UNAVAILABLE"}
-        # Never execute a remote write, and never retry after an uncertain result.
+        # Send one completion for the claimed job; do not retry an uncertain write.
         response = self.transport.complete(req, bounded_reply(result))
         if response.get("accepted") is not True:
             raise UnsafeJob("COMPLETION_NOT_ACKNOWLEDGED")
