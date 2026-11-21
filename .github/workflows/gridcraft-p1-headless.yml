@@ -1,0 +1,60 @@
+name: GridCraft P1 official Headless smoke
+
+on:
+  push:
+    branches:
+      - feat/gridcraft-mcp-p0-20261118
+    paths:
+      - .github/workflows/gridcraft-p1-headless.yml
+      - integrations/gridcraft/*.py
+      - integrations/gridcraft/fixtures/*.b64
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-gridcraft-cli:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout candidate branch
+        uses: actions/checkout@v4
+      - name: Fetch and verify official GridCraft v0.19.1 Linux x86_64 release
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 2 --max-time 150 \
+            "https://github.com/storytold/gridcraft/releases/download/v0.19.1/gridcraft-0.19.1-linux-x86_64.tar.gz" \
+            --output "$RUNNER_TEMP/gridcraft-0.19.1-linux-x86_64.tar.gz"
+          echo "8d97bba2d5bb00fd69ed55064852c1fd914de40d5ecd55ca01c8df81b828946d  $RUNNER_TEMP/gridcraft-0.19.1-linux-x86_64.tar.gz" | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/gridcraft"
+          tar -xzf "$RUNNER_TEMP/gridcraft-0.19.1-linux-x86_64.tar.gz" -C "$RUNNER_TEMP/gridcraft"
+          CLI="$(find "$RUNNER_TEMP/gridcraft" -type f -name gridcraft-cli | head -n 1)"
+          test -n "$CLI"
+          chmod +x "$CLI"
+          "$CLI" version | tee /tmp/gridcraft-version.txt
+          grep -F "0.19.1" /tmp/gridcraft-version.txt
+          echo "GRIDCRAFT_CLI=$CLI" >> "$GITHUB_ENV"
+      - name: Python harness syntax
+        run: python3 -m py_compile integrations/gridcraft/gridcraft_mcp_probe.py integrations/gridcraft/p1_fidelity_probe.py integrations/gridcraft/p1_complex_probe.py integrations/gridcraft/p2_synthetic_store.py integrations/gridcraft/p2_synthetic_test.py integrations/gridcraft/gridcraft_desktop_local.py integrations/gridcraft/test_desktop_local.py
+      - name: Run official STDIO MCP + XLSX check on synthetic workbook
+        run: python3 integrations/gridcraft/gridcraft_mcp_probe.py --cli "$GRIDCRAFT_CLI" --timeout 35
+
+      - name: Check real GridCraft XLSX import / single-cell edit / round-trip
+        run: |
+          python3 integrations/gridcraft/p1_fidelity_probe.py \
+            --cli "$GRIDCRAFT_CLI" \
+            --fixture-b64 integrations/gridcraft/fixtures/engineering_estimate.xlsx.b64
+
+      - name: Verify GridCraft chart / formatting / validation round-trip
+        run: |
+          python3 integrations/gridcraft/p1_complex_probe.py \
+            --cli "$GRIDCRAFT_CLI" \
+            --fixture-b64 integrations/gridcraft/fixtures/engineering_complex.xlsx.b64
+
+      - name: P2 synthetic durable snapshot + real GridCraft cloud runner
+        run: python3 integrations/gridcraft/p2_synthetic_test.py
+
+      - name: Windows GridCraft loopback control security simulation
+        run: python3 integrations/gridcraft/test_desktop_local.py

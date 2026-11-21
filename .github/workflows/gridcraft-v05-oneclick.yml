@@ -1,0 +1,76 @@
+name: GridCraft v0.5 one-click agent and no-browser-confirm Site candidate
+on:
+  push:
+    branches:
+      - feat/gridcraft-p4-oneclick-v05-20261118
+    paths:
+      - .github/workflows/gridcraft-v05-oneclick.yml
+      - integrations/gridcraft/gridcraft_windows_agent.py
+      - integrations/gridcraft/test_oneclick_v05.py
+      - integrations/gridcraft/gridcraft-v05-no-click-site.test.mjs
+      - sites-migration/ai-workbench/gridcraft-v05-no-click-addon.mjs
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-oneclick:
+    runs-on: windows-2022
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile and test v0.5 auto-open/write grants
+        shell: pwsh
+        run: |
+          python -m py_compile integrations/gridcraft/gridcraft_windows_agent.py integrations/gridcraft/gridcraft_outbound_worker.py integrations/gridcraft/test_oneclick_v05.py
+          if ($LASTEXITCODE -ne 0) { throw "Compilation failed" }
+          python integrations/gridcraft/test_oneclick_v05.py
+          if ($LASTEXITCODE -ne 0) { throw "One-click tests failed" }
+      - name: P3 P4 regression
+        shell: pwsh
+        run: |
+          python integrations/gridcraft/test_windows_agent.py
+          if ($LASTEXITCODE -ne 0) { throw "Windows agent regression failed" }
+          python integrations/gridcraft/test_desktop_local.py
+          if ($LASTEXITCODE -ne 0) { throw "P3 local regression failed" }
+          python integrations/gridcraft/test_outbound_worker.py
+          if ($LASTEXITCODE -ne 0) { throw "P3 worker regression failed" }
+          python integrations/gridcraft/test_p4_safe_write.py
+          if ($LASTEXITCODE -ne 0) { throw "P4 safety regression failed" }
+          python integrations/gridcraft/test_p4_desktop.py
+          if ($LASTEXITCODE -ne 0) { throw "P4 local control regression failed" }
+      - name: Build Windows EXE and self-test
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pyinstaller==6.16.0
+          if ($LASTEXITCODE -ne 0) { throw "Install failed" }
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name LizhiGridCraftAgent_v05_OneClick --paths integrations/gridcraft integrations/gridcraft/gridcraft_windows_agent.py
+          if ($LASTEXITCODE -ne 0) { throw "EXE build failed" }
+          $exe = (Resolve-Path "dist/LizhiGridCraftAgent_v05_OneClick.exe").Path
+          $p = Start-Process -FilePath $exe -ArgumentList "--self-test" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "Packaged EXE self-test failed" }
+          (Get-FileHash $exe -Algorithm SHA256).Hash.ToLowerInvariant() | Out-File -Encoding ascii dist/SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GridCraft-Windows-v05-OneClick-candidate
+          path: |
+            dist/LizhiGridCraftAgent_v05_OneClick.exe
+            dist/SHA256.txt
+          if-no-files-found: error
+          retention-days: 14
+  site-no-click:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Test owner-authenticated no-browser-confirm P4 candidate plus original guards
+        run: |
+          node --test integrations/gridcraft/gridcraft-v05-no-click-site.test.mjs
+          node --test integrations/gridcraft/gridcraft-p4-site.test.mjs
+          node --test integrations/gridcraft/gridcraft-p4-contract.test.mjs
+          node --test integrations/gridcraft/p3-site-bridge.test.mjs

@@ -1,0 +1,33 @@
+name: GridCraft P3 production authorization smoke
+on:
+  push:
+    branches: [feat/gridcraft-mcp-p0-20261118]
+    paths: [.github/workflows/gridcraft-p3-auth-smoke.yml]
+permissions: {}
+jobs:
+  deny-unauthorized:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      GRIDCRAFT_EDGE: https://hrdzywkihfqggiwjgavi.supabase.co/functions/v1/lizhi-gridcraft-bridge
+    steps:
+      - name: Check anonymous and synthetic unauthorized requests
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$(mktemp)"
+          trap 'rm -f "$output"' EXIT
+          check() {
+            local route="$1" expected_status="$2" expected_code="$3"
+            shift 3
+            status="$(curl -sS --max-time 15 -o "$output" -w '%{http_code}' "$@" "$GRIDCRAFT_EDGE$route")"
+            echo "$route → HTTP $status"
+            test "$status" = "$expected_status"
+            jq -e --arg code "$expected_code" '.ok == false and .error == $code' "$output" >/dev/null
+          }
+          check /site/dispatch 400 METHOD_DENIED
+          check /site/dispatch 401 UNAUTHORIZED -H 'content-type: application/json' --data '{}'
+          check /site/dispatch 401 UNAUTHORIZED -H 'x-lizhi-gridcraft-actor: synthetic-wrong-owner' -H 'x-lizhi-gridcraft-bridge: synthetic-invalid' --data '{}'
+          check /site/pair/start 401 UNAUTHORIZED --data '{}'
+          check /device/poll 401 UNAUTHORIZED -H 'authorization: Bearer 1111111111111111111111111111111111111111111111111111111111111111' --data '{"deviceId":"synthetic-verification-device"}'
+          check /device/pair 400 PAIRING_GATE_OFF --data '{}'
