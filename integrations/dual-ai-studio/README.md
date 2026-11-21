@@ -45,21 +45,31 @@ Claude 代理            Codex 代理          ← 背景執行的 Claude Code /
 | `config.toml` | Claude 和 Codex 改用 `claude.exe`、`codex.exe`，工作資料夾改為 `../test-repo` | 避開 `codex.cmd` 吃掉引號，並避免使用者自訂的外掛啟動器 |
 | 新增腳本 | `start-chat`、`stop-chat`、`show-agents`、`studio`、`tools/console_window.py` | 背景執行、身分重設（名稱固定為 claude／codex）、只用傳統主控台 |
 
-## 交接紀錄（LIZHI-AI-RULES 1.0.0）
+## 目前狀態（依 AI 員工手冊 v1.5 第 15 條）
+
+| 項目 | 狀態 |
+|---|---|
+| 開發 | 開發完成 |
+| 測試 | 部分測試通過（範圍見下方 `verification.scope`） |
+| 審查 | **待獨立複核**：修補與腳本目前只有執行者自測（手冊第 16、17 條） |
+| 驗收 | **待正式驗收**：本人尚未驗收 |
+| 部署 | 已部署：程式碼已進 main（PR #115，merge `8d3e213`）；這是程式資料夾，不是網站頁面 |
+
+## 交接紀錄（LIZHI-AI-RULES 1.5）
 
 ```yaml
 policy_id: LIZHI-AI-RULES
-policy_version: 1.0.0
-project_id: unknown            # 未取得 AI 工作台存取權，未對應工作台專案
-task_id: 未建立
-working_revision: main@58624d4（本 PR 的基底）
+policy_version: 1.5            # Drive「Chatgpt 核心規則」AI 員工手冊 v1.5（2026-11-19）
+project_id: 雙AI工作室          # AI 工作台「其他 AI 紀錄」的專案名稱
+task_id: 未建立（三角色任務未建立）
+working_revision: main@8d3e213
 goal: 跨 AI 協作聊天室 P0 可行性研究與 P1 本機原型
 completed:
   - P0 研究：排除 Switch（Apache-2.0 + Commons Clause，非 OSI 開源），選定 agentchattr（MIT）
   - P1 本機實測（Windows 11，Claude Pro + ChatGPT Plus 訂閱）
   - 一鍵背景啟動、關閉、控制面板
 verification:
-  state: PASS
+  state: 部分測試通過（PASS 僅限下列範圍；整體待獨立複核、待正式驗收）
   scope: >-
     2026-11-21 單台 Windows 電腦實測：AI 互相 @ 觸發、4 跳防迴圈、Codex 開發並 commit、
     Claude 讀 diff 跑測試並以 PASS 審查、伺服器重啟後紀錄保留、背景模式下兩代理回覆
@@ -71,9 +81,11 @@ not_verified:
   - 自動模式下由新腳本啟動（只以安全模式實測）
   - 控制面板各按鈕的點擊（面板顯示已確認）
   - 手機與遠端存取、雲端部署
+  - 獨立複核（需要另一位 AI 檢查修補與腳本）
 blockers:
-  - 工作台未同步（無 aiwb 工具）
-next_action: 使用者審閱本 PR；之後評估 P2（任務狀態機、PASS/FAIL 修正上限、GitHub PR 綁定）
-user_action_required: 審閱並決定是否合併本 PR
-handoff_saved: 僅本 PR，未寫入工作台
+  - 無
+usage_logging: NOT_LOGGED      # 寫入工作台時沒有流量監控中心 MCP（手冊第 29 條）
+next_action: 【AI】安排另一位 AI 獨立複核本資料夾的修補與腳本
+user_action_required: 正式驗收（另外決定是否進入 P2：任務狀態機、PASS/FAIL 修正上限、接入工作台）
+handoff_saved: 已寫入 AI 工作台「其他 AI 紀錄」（專案「雙AI工作室」，2026-11-21），並已讀回確認
 ```
