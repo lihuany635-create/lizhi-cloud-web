@@ -97,7 +97,7 @@ function renderWorkspace() {
   }
   if(state.route === 'dualai' && !panel.dataset.dualaiMounted) {
     panel.dataset.dualaiMounted = 'loading';
-    import('./dual-ai/dual-ai.js?v=3').then(module => {
+    import('./dual-ai/dual-ai.js?v=4').then(module => {
       const host = panel.querySelector('#dualai-root');
       if(!host) throw new Error('雙AI工作室容器不存在');
       module.mount(host); panel.dataset.dualaiMounted = 'ready';

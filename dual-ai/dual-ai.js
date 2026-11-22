@@ -148,10 +148,16 @@ function addMessages(rows) {
   for (const r of rows || []) {
     if (s.ids.has(r.id)) continue;
     s.ids.add(r.id); s.messages.push(r); changed = true;
-    if (!s.lastTs || r.created_at > s.lastTs) s.lastTs = r.created_at;
   }
   if (changed) { s.messages.sort((a, b) => a.created_at < b.created_at ? -1 : a.created_at > b.created_at ? 1 : 0); if (s.messages.length > 300) s.messages.splice(0, s.messages.length - 300); }
   return changed;
+}
+
+// 查詢位置只由「查詢結果」推進：送出成功回傳的那則不能推進，否則比它早、還沒抓到的 AI 回覆會被跳過。
+// 已顯示過的列也要推進（自己送出的訊息會被查回一次），否則之後每次更新都會重抓它。
+function addFetched(rows) {
+  for (const r of rows || []) if (!s.lastTs || r.created_at > s.lastTs) s.lastTs = r.created_at;
+  return addMessages(rows);
 }
 
 async function loadInitial() {
@@ -159,7 +165,7 @@ async function loadInitial() {
     .select('id,source,sender,sender_kind,content,created_at')
     .order('created_at', { ascending: false }).order('id', { ascending: false }).limit(100);
   if (error) throw error;
-  addMessages((data || []).reverse());
+  addFetched((data || []).reverse());
 }
 
 async function loadNew() {
@@ -169,7 +175,7 @@ async function loadNew() {
   if (s.lastTs) q = q.gt('created_at', s.lastTs);
   const { data, error } = await q;
   if (error) throw error;
-  return addMessages(data);
+  return addFetched(data);
 }
 
 async function refreshStatus() {
