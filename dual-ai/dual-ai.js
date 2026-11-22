@@ -4,7 +4,7 @@
 
 const POLL_MS = 4000;
 const STATUS_MS = 10000;
-const ONLINE_WITHIN_MS = 25000;
+const ONLINE_WITHIN_MS = 45000;   // 轉接程式閒置時每 15 秒報到一次，留足緩衝
 const OUTBOX_KEY = 'lizhi-dualai-outbox';
 const AGENT_NAMES = { claude: 'Claude', codex: 'Codex' };
 
@@ -165,7 +165,8 @@ async function loadInitial() {
 async function loadNew() {
   let q = client().from('lizhi_dualai_messages').select('id,source,sender,sender_kind,content,created_at')
     .order('created_at', { ascending: true }).limit(100);
-  if (s.lastTs) q = q.gte('created_at', s.lastTs);
+  // 只取比最後一則更新的訊息；沒有新訊息時回應為空，省流量（created_at 為微秒時間戳）
+  if (s.lastTs) q = q.gt('created_at', s.lastTs);
   const { data, error } = await q;
   if (error) throw error;
   return addMessages(data);
