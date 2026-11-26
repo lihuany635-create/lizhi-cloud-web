@@ -1,0 +1,67 @@
+name: English Academy P7 isolated identity, MCP coexistence and private consent
+on:
+  pull_request:
+    paths:
+      - 'english-academy/p7/**'
+      - 'supabase/functions/lizhi-english-academy/index.ts'
+      - '.github/workflows/english-academy-p7-ci.yml'
+permissions:
+  contents: read
+
+jobs:
+  p7-identity-and-site:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Syntax check all P7 candidate modules
+        run: |
+          node --check english-academy/p7/owner-boundary.mjs
+          node --check english-academy/p7/site-mcp-compat.mjs
+          node --check english-academy/p7/safe-p1-edge.mjs
+          node --check english-academy/p7/integration-preflight.mjs
+          node --check english-academy/p7/tests/integration.test.mjs
+      - name: Verify security identity, consent, legacy tools and no-deployment gates
+        run: node --test english-academy/p7/tests/integration.test.mjs
+  p7-private-postgres:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      pg:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: temporary-ci-test-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test private account linkage and consent on synthetic data only
+        run: |
+          set -euo pipefail
+          CID=$(docker ps --filter ancestor=postgres:17 --format '{{.ID}}' | head -1)
+          test -n "$CID"
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-fixture.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/schema/20261115_p1_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-rls.test.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p5/schema/20261115_p5_aggregate_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-aggregate-fixture.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p6/schema/20261115_p6_learning_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p6/tests/postgres-p6.test.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p7/schema/20261115_p7_owner_link_and_consent_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p7/tests/postgres-p7.test.sql
+  p7-edge-compiles:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Verify P7 protected Edge draft compiles; NO deployment
+        run: deno check supabase/functions/lizhi-english-academy/index.ts

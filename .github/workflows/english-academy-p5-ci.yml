@@ -1,0 +1,131 @@
+name: English Academy P5 isolated integration and recovery
+on:
+  pull_request:
+    paths:
+      - 'english-academy/**'
+      - '.github/workflows/english-academy-p5-ci.yml'
+permissions:
+  contents: read
+
+jobs:
+  cross-stage-unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install frozen FSRS 7 runtime for isolated tests
+        working-directory: english-academy/p2
+        run: npm install --ignore-scripts --no-audit --no-fund --no-package-lock
+      - name: Check P5 syntax
+        run: |
+          node --check english-academy/p5/release-gate.mjs
+          node --check english-academy/p5/tests/learning-loop.test.mjs
+          node --check english-academy/p5/tests/release-gate.test.mjs
+      - name: Run P0-P5 pure contract, sync and closed-loop tests
+        run: |
+          node --test \
+            english-academy/poc/*.test.mjs \
+            english-academy/preview/state.test.mjs \
+            english-academy/tests/p1-api.test.mjs \
+            english-academy/tests/routing.test.mjs \
+            english-academy/tests/schema-contract.test.mjs \
+            english-academy/p2/tests/*.test.mjs \
+            english-academy/p3/tests/*.test.mjs \
+            english-academy/p4/tests/adaptive-planner.test.mjs \
+            english-academy/p4/tests/curriculum.test.mjs \
+            english-academy/p4/tests/error-drills.test.mjs \
+            english-academy/p4/tests/learning-report.test.mjs \
+            english-academy/p5/tests/*.test.mjs
+
+  browser-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install browser and dependencies (no production credentials)
+        working-directory: english-academy
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.55.1
+          npx playwright install --with-deps chromium
+      - name: P1/P4 Chromium mobile-desktop regressions
+        run: |
+          node --test \
+            english-academy/tests/browser-smoke.test.mjs \
+            english-academy/tests/live-browser.test.mjs \
+            english-academy/p4/tests/browser.test.mjs
+      - name: Keep screenshots for audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: english-p5-browser-synthetic
+          path: |
+            english-academy/test-results/
+            english-academy/p4/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  disposable-postgres-restore:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      pg:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: temporary-ci-test-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create ephemeral source schema and complete P1 RLS regression
+        run: |
+          set -euo pipefail
+          CID=$(docker ps --filter ancestor=postgres:17 --format '{{.ID}}' | head -1)
+          test -n "$CID"
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-fixture.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/schema/20261115_p1_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/tests/postgres-rls.test.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p5/schema/20261115_p5_aggregate_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-aggregate-fixture.sql
+          docker exec -i "$CID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-aggregate-assert.sql
+          echo "$CID" > /tmp/p5-postgres-cid
+      - name: Export only synthetic English tables and restore in second isolated database
+        run: |
+          set -euo pipefail
+          CID=$(cat /tmp/p5-postgres-cid)
+          docker exec "$CID" pg_dump -U postgres -d postgres -Fc --data-only \
+            --no-owner --no-acl -t 'public.english_*' -f /tmp/english-p5-synthetic.backup
+          docker exec "$CID" createdb -U postgres english_p5_restore
+          docker exec -i "$CID" psql -U postgres -d english_p5_restore -v ON_ERROR_STOP=1 < english-academy/tests/postgres-fixture.sql
+          docker exec -i "$CID" psql -U postgres -d english_p5_restore -v ON_ERROR_STOP=1 < english-academy/schema/20261115_p1_candidate.sql
+          docker exec -i "$CID" psql -U postgres -d english_p5_restore -v ON_ERROR_STOP=1 < english-academy/p5/schema/20261115_p5_aggregate_candidate.sql
+          docker exec "$CID" pg_restore -U postgres -d english_p5_restore \
+            --data-only --single-transaction --exit-on-error /tmp/english-p5-synthetic.backup
+          docker exec -i "$CID" psql -U postgres -d english_p5_restore -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-restore-assert.sql
+          docker exec -i "$CID" psql -U postgres -d english_p5_restore -v ON_ERROR_STOP=1 < english-academy/p5/tests/postgres-aggregate-assert.sql
+      - name: Remove synthetic backup (never upload database content)
+        if: always()
+        run: |
+          if test -f /tmp/p5-postgres-cid; then
+            CID=$(cat /tmp/p5-postgres-cid)
+            docker exec "$CID" rm -f /tmp/english-p5-synthetic.backup || true
+          fi
+
+  edge-syntax:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check candidate P1 Edge entrypoint without deployment
+        run: deno check supabase/functions/lizhi-english-academy/index.ts

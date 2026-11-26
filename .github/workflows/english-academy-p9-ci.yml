@@ -1,0 +1,55 @@
+name: English Academy P9 prelaunch dry-run and maintenance readiness
+on:
+  pull_request:
+    paths:
+      - 'english-academy/p9/**'
+      - '.github/workflows/english-academy-p9-ci.yml'
+permissions:
+  contents: read
+
+jobs:
+  release-safety-and-maintenance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Syntax check non-deploying P9 modules
+        run: |
+          node --check english-academy/p9/release-coordinator.mjs
+          node --check english-academy/p9/privacy-monitor.mjs
+          node --check english-academy/p9/recovery-runbook.mjs
+          node --check english-academy/p9/tests/release-maintenance.test.mjs
+          node --check english-academy/p9/scripts/create-prelaunch-report.mjs
+      - name: Validate release guard, telemetry privacy and rollback plans
+        run: node --test english-academy/p9/tests/release-maintenance.test.mjs
+      - name: Generate synthetic PRELAUNCH NO_GO evidence (not live monitoring)
+        run: node english-academy/p9/scripts/create-prelaunch-report.mjs
+      - name: Save no-go JSON for independent review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: english-p9-nongo-live-readiness
+          path: english-academy/p9/test-results/prelaunch-blocked.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  script-deploy-absence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure P9 CI has no production deployment or credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f english-academy/p9/README.md
+          test -f english-academy/p9/release-coordinator.mjs
+          test -f english-academy/p9/recovery-runbook.mjs
+          grep -q 'P8-B' english-academy/p9/README.md
+          grep -q 'DRY_RUN_ONLY' english-academy/p9/recovery-runbook.mjs
+          # Verify CI is read-only; no production/secret actions.
+          node english-academy/p9/scripts/audit-workflow.mjs .github/workflows/english-academy-p9-ci.yml
+          echo P9_DEPLOYMENT_ABSENT_IN_CI_PASS

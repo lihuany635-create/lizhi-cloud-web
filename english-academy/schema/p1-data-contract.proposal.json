@@ -1,0 +1,217 @@
+{
+  "title": "English Academy P1 persistence design contract (proposal only)",
+  "status": "draft-not-applied",
+  "productionMigrationAllowed": false,
+  "identity": {
+    "provider": "existing Supabase Google OAuth via host",
+    "ownerSource": "server verified auth.uid, never client owner_id",
+    "allowlist": "server controlled, no public write policy",
+    "mcp": "server verified client mapping to same authorized owner"
+  },
+  "tables": [
+    {
+      "name": "english_authorized_owners",
+      "ownerScoped": true,
+      "visibility": "service-only",
+      "key": "owner_id",
+      "columns": [
+        "owner_id:uuid",
+        "active:boolean",
+        "created_at:timestamptz"
+      ],
+      "operations": {
+        "web": [],
+        "mcp": [],
+        "backend": [
+          "read",
+          "write"
+        ]
+      }
+    },
+    {
+      "name": "english_card_candidates",
+      "ownerScoped": true,
+      "visibility": "owner-read",
+      "key": "id",
+      "columns": [
+        "id:uuid",
+        "owner_id:uuid",
+        "source_event_id:text",
+        "term:text",
+        "normalized_term:text",
+        "meaning_zh:text",
+        "part_of_speech:text",
+        "example_en:text",
+        "status:enum(pending,accepted,ignored,duplicate)",
+        "created_at:timestamptz",
+        "reviewed_at:timestamptz?"
+      ],
+      "operations": {
+        "web": [
+          "read"
+        ],
+        "mcp": [
+          "read"
+        ],
+        "backend": [
+          "read",
+          "write"
+        ]
+      }
+    },
+    {
+      "name": "english_cards",
+      "ownerScoped": true,
+      "visibility": "owner-read",
+      "key": "id",
+      "columns": [
+        "id:uuid",
+        "owner_id:uuid",
+        "source_candidate_id:uuid?",
+        "term:text",
+        "normalized_term:text",
+        "sense_key:text",
+        "meaning_zh:text",
+        "part_of_speech:text",
+        "example_en:text",
+        "created_at:timestamptz"
+      ],
+      "operations": {
+        "web": [
+          "read"
+        ],
+        "mcp": [
+          "read"
+        ],
+        "backend": [
+          "read",
+          "write"
+        ]
+      }
+    },
+    {
+      "name": "english_learning_sessions",
+      "ownerScoped": true,
+      "visibility": "owner-read",
+      "key": "id",
+      "columns": [
+        "id:uuid",
+        "owner_id:uuid",
+        "started_at:timestamptz",
+        "finished_at:timestamptz?",
+        "mode:text",
+        "status:enum(started,paused,completed)"
+      ],
+      "operations": {
+        "web": [
+          "read"
+        ],
+        "mcp": [
+          "read"
+        ],
+        "backend": [
+          "read",
+          "write"
+        ]
+      }
+    },
+    {
+      "name": "english_practice_events",
+      "ownerScoped": true,
+      "visibility": "owner-read",
+      "key": "id",
+      "appendOnly": true,
+      "columns": [
+        "id:uuid",
+        "owner_id:uuid",
+        "session_id:uuid",
+        "card_id:uuid",
+        "exercise_type:text",
+        "grader_type:text",
+        "result:boolean?",
+        "created_at:timestamptz",
+        "request_id:text"
+      ],
+      "operations": {
+        "web": [
+          "read"
+        ],
+        "mcp": [
+          "read"
+        ],
+        "backend": [
+          "read",
+          "append"
+        ]
+      }
+    },
+    {
+      "name": "english_sync_events",
+      "ownerScoped": true,
+      "visibility": "owner-read",
+      "key": "id",
+      "columns": [
+        "id:uuid",
+        "owner_id:uuid",
+        "source:text",
+        "request_id:text",
+        "payload_digest:text",
+        "status:enum(pending,success,failed)",
+        "result_reference:text?",
+        "created_at:timestamptz"
+      ],
+      "operations": {
+        "web": [
+          "read"
+        ],
+        "mcp": [
+          "read"
+        ],
+        "backend": [
+          "read",
+          "write"
+        ]
+      }
+    },
+    {
+      "name": "english_audit_events",
+      "ownerScoped": true,
+      "visibility": "owner-read",
+      "key": "id",
+      "appendOnly": true,
+      "columns": [
+        "id:uuid",
+        "owner_id:uuid",
+        "actor_type:text",
+        "action:text",
+        "resource_id:text",
+        "request_id:text",
+        "created_at:timestamptz"
+      ],
+      "operations": {
+        "web": [
+          "read"
+        ],
+        "mcp": [
+          "read"
+        ],
+        "backend": [
+          "read",
+          "append"
+        ]
+      }
+    }
+  ],
+  "constraints": [
+    "all ownerScoped tables require a verified owner id",
+    "all direct user reads are owner scoped; direct web and MCP writes are denied by default",
+    "backend uses per-action validated input and server-generated ownership",
+    "idempotency uses (owner_id,request_id) with a bound request payload digest",
+    "candidate to official card promotion requires server-verified explicit approval",
+    "practice and audit events are append-only; corrections are separate events",
+    "no DB service key in public files, clients or AI prompts",
+    "FSRS state and scheduling additions belong to P2",
+    "voice and objective/subjective grading records require versioned evidence in P2"
+  ],
+  "contractVersion": 1
+}
